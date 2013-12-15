@@ -1,0 +1,418 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Source Files\common">
+      <UniqueIdentifier>{4f6dda88-f3e2-48b6-8cff-43f1266fc3e2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\common\ai">
+      <UniqueIdentifier>{3ff0e305-5ad7-47f3-8d44-a1f85a71a198}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\common\gui">
+      <UniqueIdentifier>{059ff243-1ab8-4bd4-90c9-3b3afdbc3dc3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\common\math">
+      <UniqueIdentifier>{488cf6fc-eb1d-4be5-86f0-83baf2a3d4be}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\common\net">
+      <UniqueIdentifier>{4961b3db-7239-4b02-8178-0f299210e59e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\common\render">
+      <UniqueIdentifier>{a1004ff6-5c12-4759-95f9-6c9fad80ecd9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\common\save">
+      <UniqueIdentifier>{83c18d5c-631e-43c0-84f6-3871d0b10bd4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\common\script">
+      <UniqueIdentifier>{4d831461-90c7-49b5-8cdc-27535190e81f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\common\sim">
+      <UniqueIdentifier>{b4aa0e60-0799-41b9-82db-1b30e10b9d8a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\common\sound">
+      <UniqueIdentifier>{0b89ed93-3099-4d85-9e73-b28de3506c53}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="ggui.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="gmain.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="keymap.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\ai\ai.cpp">
+      <Filter>Source Files\common\ai</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\gui\bgraph.cpp">
+      <Filter>Source Files\common\gui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\gui\chat.cpp">
+      <Filter>Source Files\common\gui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\gui\font.cpp">
+      <Filter>Source Files\common\gui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\gui\gui.cpp">
+      <Filter>Source Files\common\gui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\gui\inspect.cpp">
+      <Filter>Source Files\common\gui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\gui\numpad.cpp">
+      <Filter>Source Files\common\gui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\math\3dmath.cpp">
+      <Filter>Source Files\common\math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\math\frustum.cpp">
+      <Filter>Source Files\common\math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\math\physics.cpp">
+      <Filter>Source Files\common\math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\sound\sound.cpp">
+      <Filter>Source Files\common\sound</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\sim\building.cpp">
+      <Filter>Source Files\common\sim</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\sim\buildingtype.cpp">
+      <Filter>Source Files\common\sim</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\sim\connectable.cpp">
+      <Filter>Source Files\common\sim</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\sim\construction.cpp">
+      <Filter>Source Files\common\sim</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\sim\editor.cpp">
+      <Filter>Source Files\common\sim</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\sim\job.cpp">
+      <Filter>Source Files\common\sim</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\sim\labourer.cpp">
+      <Filter>Source Files\common\sim</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\sim\military.cpp">
+      <Filter>Source Files\common\sim</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\sim\movement.cpp">
+      <Filter>Source Files\common\sim</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\sim\namegen.cpp">
+      <Filter>Source Files\common\sim</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\sim\order.cpp">
+      <Filter>Source Files\common\sim</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\sim\pathfinding.cpp">
+      <Filter>Source Files\common\sim</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\sim\player.cpp">
+      <Filter>Source Files\common\sim</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\sim\powerline.cpp">
+      <Filter>Source Files\common\sim</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\sim\research.cpp">
+      <Filter>Source Files\common\sim</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\sim\resource.cpp">
+      <Filter>Source Files\common\sim</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\sim\road.cpp">
+      <Filter>Source Files\common\sim</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\sim\selection.cpp">
+      <Filter>Source Files\common\sim</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\sim\transaction.cpp">
+      <Filter>Source Files\common\sim</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\sim\transportation.cpp">
+      <Filter>Source Files\common\sim</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\sim\truck.cpp">
+      <Filter>Source Files\common\sim</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\sim\unit.cpp">
+      <Filter>Source Files\common\sim</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\sim\unittype.cpp">
+      <Filter>Source Files\common\sim</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\sim\waves.cpp">
+      <Filter>Source Files\common\sim</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\sim\zpipeline.cpp">
+      <Filter>Source Files\common\sim</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\script\script.cpp">
+      <Filter>Source Files\common\script</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\save\save.cpp">
+      <Filter>Source Files\common\save</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\render\billboard.cpp">
+      <Filter>Source Files\common\render</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\render\foliage.cpp">
+      <Filter>Source Files\common\render</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\render\map.cpp">
+      <Filter>Source Files\common\render</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\render\minimap.cpp">
+      <Filter>Source Files\common\render</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\render\model.cpp">
+      <Filter>Source Files\common\render</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\render\ms3d.cpp">
+      <Filter>Source Files\common\render</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\render\particle.cpp">
+      <Filter>Source Files\common\render</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\render\projectile.cpp">
+      <Filter>Source Files\common\render</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\render\shader.cpp">
+      <Filter>Source Files\common\render</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\render\shadow.cpp">
+      <Filter>Source Files\common\render</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\render\skybox.cpp">
+      <Filter>Source Files\common\render</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\render\texture.cpp">
+      <Filter>Source Files\common\render</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\render\tileset.cpp">
+      <Filter>Source Files\common\render</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\render\water.cpp">
+      <Filter>Source Files\common\render</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\window.cpp">
+      <Filter>Source Files\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\debug.cpp">
+      <Filter>Source Files\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\platform.cpp">
+      <Filter>Source Files\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\util.cpp">
+      <Filter>Source Files\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\render\heightmap.cpp">
+      <Filter>Source Files\common\render</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\render\vertexarray.cpp">
+      <Filter>Source Files\common\render</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\sim\3dcursor.cpp">
+      <Filter>Source Files\common\sim</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="ggui.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="gmain.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="gres.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="keymap.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\ai\ai.h">
+      <Filter>Source Files\common\ai</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\gui\bgraph.h">
+      <Filter>Source Files\common\gui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\gui\chat.h">
+      <Filter>Source Files\common\gui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\gui\font.h">
+      <Filter>Source Files\common\gui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\gui\gui.h">
+      <Filter>Source Files\common\gui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\gui\inspect.h">
+      <Filter>Source Files\common\gui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\gui\numpad.h">
+      <Filter>Source Files\common\gui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\math\3dmath.h">
+      <Filter>Source Files\common\math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\math\frustum.h">
+      <Filter>Source Files\common\math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\math\physics.h">
+      <Filter>Source Files\common\math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\sound\sound.h">
+      <Filter>Source Files\common\sound</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\sim\building.h">
+      <Filter>Source Files\common\sim</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\sim\buildingtype.h">
+      <Filter>Source Files\common\sim</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\sim\connectable.h">
+      <Filter>Source Files\common\sim</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\sim\construction.h">
+      <Filter>Source Files\common\sim</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\sim\editor.h">
+      <Filter>Source Files\common\sim</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\sim\job.h">
+      <Filter>Source Files\common\sim</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\sim\namegen.h">
+      <Filter>Source Files\common\sim</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\sim\order.h">
+      <Filter>Source Files\common\sim</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\sim\pathfinding.h">
+      <Filter>Source Files\common\sim</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\sim\player.h">
+      <Filter>Source Files\common\sim</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\sim\powerline.h">
+      <Filter>Source Files\common\sim</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\sim\prices.h">
+      <Filter>Source Files\common\sim</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\sim\research.h">
+      <Filter>Source Files\common\sim</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\sim\resource.h">
+      <Filter>Source Files\common\sim</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\sim\road.h">
+      <Filter>Source Files\common\sim</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\sim\selection.h">
+      <Filter>Source Files\common\sim</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\sim\transaction.h">
+      <Filter>Source Files\common\sim</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\sim\transportation.h">
+      <Filter>Source Files\common\sim</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\sim\unit.h">
+      <Filter>Source Files\common\sim</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\sim\unittype.h">
+      <Filter>Source Files\common\sim</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\sim\waves.h">
+      <Filter>Source Files\common\sim</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\sim\zpipeline.h">
+      <Filter>Source Files\common\sim</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\script\script.h">
+      <Filter>Source Files\common\script</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\save\save.h">
+      <Filter>Source Files\common\save</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\render\billboard.h">
+      <Filter>Source Files\common\render</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\render\foliage.h">
+      <Filter>Source Files\common\render</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\render\map.h">
+      <Filter>Source Files\common\render</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\render\minimap.h">
+      <Filter>Source Files\common\render</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\render\model.h">
+      <Filter>Source Files\common\render</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\render\ms3d.h">
+      <Filter>Source Files\common\render</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\render\particle.h">
+      <Filter>Source Files\common\render</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\render\projectile.h">
+      <Filter>Source Files\common\render</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\render\shader.h">
+      <Filter>Source Files\common\render</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\render\shadow.h">
+      <Filter>Source Files\common\render</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\render\skybox.h">
+      <Filter>Source Files\common\render</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\render\texture.h">
+      <Filter>Source Files\common\render</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\render\tileset.h">
+      <Filter>Source Files\common\render</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\render\water.h">
+      <Filter>Source Files\common\render</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\window.h">
+      <Filter>Source Files\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\debug.h">
+      <Filter>Source Files\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\platform.h">
+      <Filter>Source Files\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\util.h">
+      <Filter>Source Files\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\render\heightmap.h">
+      <Filter>Source Files\common\render</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\render\vertexarray.h">
+      <Filter>Source Files\common\render</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\sim\3dcursor.h">
+      <Filter>Source Files\common\sim</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="res.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+</Project>
