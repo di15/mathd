@@ -2,7 +2,6 @@
 
 
 
-
 #ifndef MATH3D_H
 #define MATH3D_H
 
@@ -15,7 +14,7 @@
 #	define PI_ON_180	(M_PI/180.0)
 #endif
 
-#define CAMERA_SPEED	50.0
+#define CAMERA_SPEED	5.0f
 
 class Plane;
 class Vec3f;
@@ -41,6 +40,8 @@ double AngleBetweenVectors(Vec3f Vector1, Vec3f Vector2);
 Vec3f IntersectionPoint(Vec3f vNormal, Vec3f vLine[], double distance);
 bool Intersection(Vec3f l0, Vec3f l, Plane p, Vec3f& inter);
 Vec3f OnNear(int x, int y, int width, int height, Vec3f posvec, Vec3f sidevec, Vec3f upvec);
+Vec3f OnNearPersp(int x, int y, int width, int height, Vec3f posvec, Vec3f sidevec, Vec3f upvec, Vec3f viewdir, float fov, float mind);
+Vec3f ScreenPerspRay(int x, int y, int width, int height, Vec3f posvec, Vec3f sidevec, Vec3f upvec, Vec3f viewdir, float fov);
 Vec3f Rotate(Vec3f v, float rad, float x, float y, float z);
 Vec3f RotateAround(Vec3f v, Vec3f around, float rad, float x, float y, float z);
 float Clipf(float n, float lower, float upper);
@@ -49,16 +50,13 @@ float GetYaw(float dx, float dz);
 Matrix gluLookAt2(float eyex, float eyey, float eyez,
                float centerx, float centery, float centerz,
                float upx, float upy, float upz);
+Matrix gluLookAt3(float eyex, float eyey, float eyez,
+               float centerx, float centery, float centerz,
+               float upx, float upy, float upz);
 Matrix BuildPerspProjMat(float fov, float aspect, float znear, float zfar);
 Matrix setorthographicmat(float l, float r, float t, float b, float n, float f);
-Vec4f ScreenPos(Matrix* mvp, Vec3f vec, float width, float height);
+Vec4f ScreenPos(Matrix* mvp, Vec3f vec, float width, float height, bool persp);
 float Snap(float base, float value);
 float SnapNearest(float base, float value);
-
-Vec4f ScreenPos(Matrix* projmodlview, float x, float y, float z);
-void MakeHull(Vec3f* norms, float* ds, const Vec3f pos, const float radius, const float height);
-void MakeHull(Vec3f* norms, float* ds, const Vec3f pos, const float hwx, const float hwz, const float height);
-bool LineInterHull(const Vec3f* line, const Vec3f* norms, const float* ds, const int numplanes);
-
 
 #endif

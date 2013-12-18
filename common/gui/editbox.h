@@ -10,7 +10,7 @@ class EditBox : public Widget
 public:
 	int m_highl[2];	// highlighted (selected) text
 
-	EditBox(Widget* parent, const char* n, const RichText t, int f, Margin left, Margin top, Margin right, Margin bottom, bool pw, int maxl, void (*change2)(int p), int parm);
+	EditBox(Widget* parent, const char* n, const RichText t, int f, void (*reframef)(Widget* thisw), bool pw, int maxl, void (*change2)(int p), int parm);
 
 	void draw();
 	//void newover();

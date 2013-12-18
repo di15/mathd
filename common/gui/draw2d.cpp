@@ -1,6 +1,6 @@
 
 #include "../platform.h"
-#include "../draw/shader.h"
+#include "../render/shader.h"
 #include "draw2d.h"
 
 void DrawImage(unsigned int tex, float left, float top, float right, float bottom, float texleft, float textop, float texright, float texbottom)

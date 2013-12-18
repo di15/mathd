@@ -17,16 +17,13 @@
 #include "touchlistener.h"
 
 
-TouchListener::TouchListener(Widget* parent, Margin left, Margin top, Margin right, Margin bottom, void (*click2)(int p), void (*overf2)(int p), void (*out)(), int parm) : Widget()
+TouchListener::TouchListener(Widget* parent, void (*reframef)(Widget* thisw), void (*click2)(int p), void (*overf2)(int p), void (*out)(), int parm) : Widget()
 {
 	m_parent = parent;
 	m_type = WIDGET_TOUCHLISTENER;
 	m_over = false;
 	m_ldown = false;
-	m_pos[0] = left;
-	m_pos[1] = top;
-	m_pos[2] = right;
-	m_pos[3] = bottom;
+	reframefunc = reframef;
 	clickfunc = NULL;
 	overfunc = NULL;
 	clickfunc2 = click2;
@@ -38,7 +35,7 @@ TouchListener::TouchListener(Widget* parent, Margin left, Margin top, Margin rig
 
 bool TouchListener::mousemove()
 {
-	if(g_mouse.x >= m_pos[0].m_cached && g_mouse.x <= m_pos[2].m_cached && g_mouse.y >= m_pos[1].m_cached && g_mouse.y <= m_pos[3].m_cached)
+	if(g_mouse.x >= m_pos[0] && g_mouse.x <= m_pos[2] && g_mouse.y >= m_pos[1] && g_mouse.y <= m_pos[3])
 	{
 		if(overfunc != NULL)
 			overfunc();

@@ -53,19 +53,21 @@ void main (void)
 	float shadow = max(0.6, float(smcoord.z <= texture(shadowmap, smcoord.xy).x));
 	//float shadow = 1;
 
-	vec3 bump = normalize( texture(normalmap, texCoordOut0).xyz * 2.0 - 1.0);
+	//vec3 bump = normalize( texture(normalmap, texCoordOut0).xyz * 2.0 - 1.0);
 
 	//vec3 lvec = normalize(light_vec);
 	//float diffuse = max(dot(-lvec, normalOut), 0.0) + 0.50;
 
 	float distSqr = dot(light_vec, light_vec);
 	vec3 lvec = light_vec * inversesqrt(distSqr);
-	float diffuse = max( dot(lvec, vec3(0,0,1)), 0.0 ) * 0.9 + 0.1;
+	float diffuse = max( dot(lvec, vec3(0,0,1)), 0.0 ) * 0.75 + 0.50;
+	//float diffuse = max( dot(lvec, bump), 0.0 ) * 0.75 + 0.50;
 
-	//vec3 vvec = normalize(eyevec);
+	vec3 vvec = normalize(eyevec);
 	//float specular = pow(clamp(dot(reflect(-lvec, bump), vvec), 0.0, 1.0), 0.7 );
+	float specular = pow(clamp(dot(reflect(-lvec, vec3(0,0,1)), vvec), 0.0, 1.0), 0.7 );
 	//vec3 vspecular = vec3(0,0,0);
-	//vec3 vspecular = texture(specularmap, texCoordOut0).xyz * specular;
+	vec3 vspecular = texture(specularmap, texCoordOut0).xyz * specular;
 
 	vec4 owntexel = texture(ownermap, texCoordOut0);
 

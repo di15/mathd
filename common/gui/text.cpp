@@ -28,11 +28,11 @@ void Text::draw()
 	//g_log.flush();
 
 	if(m_shadow)
-		DrawShadowedText(m_font, m_pos[0].m_cached, m_pos[1].m_cached, &m_text, m_rgba);
+		DrawShadowedText(m_font, m_pos[0], m_pos[1], &m_text, m_rgba);
 	else
 	{
 		glUniform4f(g_shader[SHADER_ORTHO].m_slot[SSLOT_COLOR], m_rgba[0], m_rgba[1], m_rgba[2], m_rgba[3]);
-		DrawLine(m_font, m_pos[0].m_cached, m_pos[1].m_cached, &m_text);
+		DrawLine(m_font, m_pos[0], m_pos[1], &m_text);
 	}
 	//glColor4f(1, 1, 1, 1);
 	glUniform4f(g_shader[SHADER_ORTHO].m_slot[SSLOT_COLOR], 1, 1, 1, 1);

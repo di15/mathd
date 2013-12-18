@@ -48,6 +48,12 @@
 #include <iostream>
 #include <math.h>
 
+#ifdef _WIN
+#include <jpeglib.h>
+#include <png.h>
+#include <zip.h>
+#endif
+
 //#include <SDL.h>
 
 #ifdef _WIN

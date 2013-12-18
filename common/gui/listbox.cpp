@@ -19,16 +19,13 @@
 
 
 
-ListBox::ListBox(Widget* parent, const char* n, int f, Margin left, Margin top, Margin right, Margin bottom, void (*change)()) : Widget()
+ListBox::ListBox(Widget* parent, const char* n, int f, void (*reframef)(Widget* thisw), void (*change)()) : Widget()
 {
 	m_parent = parent;
 	m_type = WIDGET_LISTBOX;
 	m_name = n;
 	m_font = f;
-	m_pos[0] = left;
-	m_pos[1] = top;
-	m_pos[2] = right;
-	m_pos[3] = bottom;
+	reframefunc = reframef;
 	m_opened = false;
 	m_selected = -1;
 	m_scroll[1] = 0;
@@ -57,7 +54,7 @@ void ListBox::erase(int which)
 
 int ListBox::rowsshown()
 {
-	int rows = (m_pos[3].m_cached-m_pos[1].m_cached)/g_font[m_font].gheight;
+	int rows = (m_pos[3]-m_pos[1])/g_font[m_font].gheight;
 		
 	if(rows > m_options.size())
 		rows = m_options.size();
@@ -72,7 +69,7 @@ int ListBox::square()
 
 float ListBox::scrollspace()
 {
-	return (m_pos[3].m_cached-m_pos[1].m_cached-square()*2);
+	return (m_pos[3]-m_pos[1]-square()*2);
 }
 
 void ListBox::draw()
@@ -82,22 +79,22 @@ void ListBox::draw()
 	Font* f = &g_font[m_font];
 	int rows = rowsshown();
 
-	DrawImage(m_frametex, m_pos[0].m_cached, m_pos[1].m_cached, m_pos[2].m_cached, m_pos[3].m_cached);
+	DrawImage(m_frametex, m_pos[0], m_pos[1], m_pos[2], m_pos[3]);
 
-	DrawImage(g_texture[m_frametex].texname, m_pos[2].m_cached-square(), m_pos[1].m_cached, m_pos[2].m_cached, m_pos[3].m_cached);
-	DrawImage(g_texture[m_uptex].texname, m_pos[2].m_cached-square(), m_pos[1].m_cached, m_pos[2].m_cached, m_pos[1].m_cached+square());
-	DrawImage(g_texture[m_downtex].texname, m_pos[2].m_cached-square(), m_pos[3].m_cached-square(), m_pos[2].m_cached, m_pos[3].m_cached);
-	DrawImage(g_texture[m_filledtex].texname, m_pos[2].m_cached-square(), m_pos[1].m_cached+square()+scrollspace()*topratio(), m_pos[2].m_cached, m_pos[1].m_cached+square()+scrollspace()*bottomratio());
+	DrawImage(g_texture[m_frametex].texname, m_pos[2]-square(), m_pos[1], m_pos[2], m_pos[3]);
+	DrawImage(g_texture[m_uptex].texname, m_pos[2]-square(), m_pos[1], m_pos[2], m_pos[1]+square());
+	DrawImage(g_texture[m_downtex].texname, m_pos[2]-square(), m_pos[3]-square(), m_pos[2], m_pos[3]);
+	DrawImage(g_texture[m_filledtex].texname, m_pos[2]-square(), m_pos[1]+square()+scrollspace()*topratio(), m_pos[2], m_pos[1]+square()+scrollspace()*bottomratio());
 
 	if(m_selected >= 0 && m_selected >= (int)m_scroll && m_selected < (int)m_scroll+rowsshown())
 	{
 		glUniform4f(g_shader[SHADER_ORTHO].m_slot[SSLOT_COLOR], 1, 1, 1, 0.5f);
-		DrawImage(g_texture[m_filledtex].texname, m_pos[0].m_cached, m_pos[1].m_cached+(m_selected-(int)m_scroll)*f->gheight, m_pos[2].m_cached-square(), m_pos[1].m_cached+(m_selected-(int)m_scroll+1)*f->gheight);
+		DrawImage(g_texture[m_filledtex].texname, m_pos[0], m_pos[1]+(m_selected-(int)m_scroll)*f->gheight, m_pos[2]-square(), m_pos[1]+(m_selected-(int)m_scroll+1)*f->gheight);
 		glUniform4f(g_shader[SHADER_ORTHO].m_slot[SSLOT_COLOR], 1, 1, 1, 1);
 	}
 	
 	for(int i=(int)m_scroll; i<(int)m_scroll+rowsshown(); i++)
-		DrawShadowedText(m_font, m_pos[0].m_cached+3, m_pos[1].m_cached+g_font[m_font].gheight*(i-(int)m_scroll), &m_options[i]);
+		DrawShadowedText(m_font, m_pos[0]+3, m_pos[1]+g_font[m_font].gheight*(i-(int)m_scroll), &m_options[i]);
 }
 
 bool ListBox::mousemove()
@@ -107,7 +104,7 @@ bool ListBox::mousemove()
 
 	int dy = g_mouse.y - m_mousedown[1];
 
-	float topy = m_pos[3].m_cached+square()+scrollspace()*topratio();
+	float topy = m_pos[3]+square()+scrollspace()*topratio();
 	float newtopy = topy + dy;
 
 	//topratio = (float)scroll / (float)(options.size());
@@ -116,7 +113,7 @@ bool ListBox::mousemove()
 	//topy - pos[3] - square = scrollspace*(float)scroll / (float)(options.size())
 	//(topy - pos[3] - square)*(float)(options.size())/scrollspace = scroll
 
-	m_scroll[1] = (newtopy - m_pos[3].m_cached - square())*(float)(m_options.size())/scrollspace();
+	m_scroll[1] = (newtopy - m_pos[3] - square())*(float)(m_options.size())/scrollspace();
 
 	if(m_scroll[1] < 0)
 	{
@@ -142,8 +139,8 @@ bool ListBox::lbuttondown()
 	{
 		int row = i-(int)m_scroll;
 		// list item?
-		if(g_mouse.x >= m_pos[0].m_cached && g_mouse.x <= m_pos[2].m_cached-square() && g_mouse.y >= m_pos[1].m_cached+f->gheight*row
-			&& g_mouse.y <= m_pos[1].m_cached+f->gheight*(row+1))
+		if(g_mouse.x >= m_pos[0] && g_mouse.x <= m_pos[2]-square() && g_mouse.y >= m_pos[1]+f->gheight*row
+			&& g_mouse.y <= m_pos[1]+f->gheight*(row+1))
 		{
 			m_ldown = true;
 			return true;	// intercept mouse event
@@ -151,8 +148,8 @@ bool ListBox::lbuttondown()
 	}
 
 	// scroll bar?
-	if(g_mouse.x >= m_pos[2].m_cached-square() && g_mouse.y >= m_pos[1].m_cached+square()+scrollspace()*topratio() && g_mouse.x <= m_pos[2].m_cached && 
-			g_mouse.y <= m_pos[1].m_cached+square()+scrollspace()*bottomratio())
+	if(g_mouse.x >= m_pos[2]-square() && g_mouse.y >= m_pos[1]+square()+scrollspace()*topratio() && g_mouse.x <= m_pos[2] && 
+			g_mouse.y <= m_pos[1]+square()+scrollspace()*bottomratio())
 	{
 		m_ldown = true;
 		m_mousescroll = true;
@@ -161,14 +158,14 @@ bool ListBox::lbuttondown()
 	}
 
 	// up button?
-	if(g_mouse.x >= m_pos[2].m_cached-square() && g_mouse.y >= m_pos[1].m_cached && g_mouse.x <= m_pos[2].m_cached && g_mouse.y <= m_pos[1].m_cached+square())
+	if(g_mouse.x >= m_pos[2]-square() && g_mouse.y >= m_pos[1] && g_mouse.x <= m_pos[2] && g_mouse.y <= m_pos[1]+square())
 	{
 		m_ldown = true;
 		return true;
 	}
 
 	// down button?
-	if(g_mouse.x >= m_pos[2].m_cached-square() && g_mouse.y >= m_pos[3].m_cached-square() && g_mouse.x <= m_pos[2].m_cached && g_mouse.y <= m_pos[3].m_cached)
+	if(g_mouse.x >= m_pos[2]-square() && g_mouse.y >= m_pos[3]-square() && g_mouse.x <= m_pos[2] && g_mouse.y <= m_pos[3])
 	{
 		m_ldown = true;
 		return true;
@@ -197,8 +194,8 @@ bool ListBox::lbuttonup(bool moved)
 		int row = i-(int)m_scroll;
 
 		// list item?
-		if(g_mouse.x >= m_pos[0].m_cached && g_mouse.x <= m_pos[2].m_cached-square() && g_mouse.y >= m_pos[1].m_cached+f->gheight*row
-			&& g_mouse.y <= m_pos[1].m_cached+f->gheight*(row+1))
+		if(g_mouse.x >= m_pos[0] && g_mouse.x <= m_pos[2]-square() && g_mouse.y >= m_pos[1]+f->gheight*row
+			&& g_mouse.y <= m_pos[1]+f->gheight*(row+1))
 		{
 			m_selected = i;
 			if(changefunc != NULL)
@@ -209,9 +206,9 @@ bool ListBox::lbuttonup(bool moved)
 	}
 
 	// up button?
-	if(g_mouse.x >= m_pos[2].m_cached-square() && g_mouse.y >= m_pos[1].m_cached && g_mouse.x <= m_pos[2].m_cached && g_mouse.y <= m_pos[1].m_cached+square())
+	if(g_mouse.x >= m_pos[2]-square() && g_mouse.y >= m_pos[1] && g_mouse.x <= m_pos[2] && g_mouse.y <= m_pos[1]+square())
 	{
-		if(rowsshown() < (int)((m_pos[3].m_cached-m_pos[1].m_cached)/f->gheight))
+		if(rowsshown() < (int)((m_pos[3]-m_pos[1])/f->gheight))
 		{
 			return true;
 		}
@@ -224,7 +221,7 @@ bool ListBox::lbuttonup(bool moved)
 	}
 
 	// down button?
-	if(g_mouse.x >= m_pos[2].m_cached-square() && g_mouse.y >= m_pos[3].m_cached-square() && g_mouse.x <= m_pos[2].m_cached && g_mouse.y <= m_pos[3].m_cached)
+	if(g_mouse.x >= m_pos[2]-square() && g_mouse.y >= m_pos[3]-square() && g_mouse.x <= m_pos[2] && g_mouse.y <= m_pos[3])
 	{
 		m_scroll[1]++;
 		if(m_scroll[1]+rowsshown() > m_options.size())

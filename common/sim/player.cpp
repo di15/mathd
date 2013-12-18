@@ -439,7 +439,7 @@ void GameOver(const char* reason, int player)
 		g_gameover = true;
 		OpenAnotherView("game over");
 		CView* v = g_GUI.getview("game over");
-		CWidget* w = v->getwidget("reason", TEXT);
+		Widget* w = v->getwidget("reason", TEXT);
 		w->changetext(reason);
 	}
 }

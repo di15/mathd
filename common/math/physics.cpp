@@ -1,558 +1,309 @@
 
+
+#include "../platform.h"
 #include "physics.h"
-#include "building.h"
-#include "map.h"
-#include "road.h"
-#include "unit.h"
-#include "powerline.h"
-#include "pipeline.h"
-#include "water.h"
-#include "main.h"
-#include "chat.h"
-#include "pathfinding.h"
+#include "vec3f.h"
+#include "triangle.h"
 
-int g_lastCollider = -1;
-int g_colliderType;
-bool g_ignored;
-
-//bool g_debug1 = false;
-
-bool BuildingAdjacent(int i, int j)
+/* this version of SIGN3 shows some numerical instability, and is improved
+* by using the uncommented macro that follows, and a different test with it */
+#ifdef OLD_TEST
+#define SIGN3( A ) (((A).x<0)?4:0 | ((A).y<0)?2:0 | ((A).z<0)?1:0)
+#else
+#define EPS 10e-5
+#define SIGN3( A ) \
+   (((A).x < EPS) ? 4 : 0 | ((A).x > -EPS) ? 32 : 0 | \
+    ((A).y < EPS) ? 2 : 0 | ((A).y > -EPS) ? 16 : 0 | \
+    ((A).z < EPS) ? 1 : 0 | ((A).z > -EPS) ? 8 : 0)
+#endif
+#define CROSS( A, B, C ) { \
+  C.x =  (A).y * (B).z - (A).z * (B).y; \
+  C.y = -(A).x * (B).z + (A).z * (B).x; \
+  C.z =  (A).x * (B).y - (A).y * (B).x; \
+   }
+#define SUB( A, B, C ) { \
+  C.x =  (A).x - (B).x; \
+  C.y =  (A).y - (B).y; \
+  C.z =  (A).z - (B).z; \
+   }
+#define LERP( A, B, C) ((B)+(A)*((C)-(B)))
+#define MIN3(a,b,c) ((((a)<(b))&&((a)<(c))) ? (a) : (((b)<(c)) ? (b) : (c)))
+#define MAX3(a,b,c) ((((a)>(b))&&((a)>(c))) ? (a) : (((b)>(c)) ? (b) : (c)))
+#define INSIDE 0
+#define OUTSIDE 1
+  
+/*___________________________________________________________________________*/
+/* Which of the six face-plane(s) is point P outside of? */
+long face_plane(Vec3f p)
 {
-	CBuilding* bi = &g_building[i];
-	CBuilding* bj = &g_building[j];
-	
-	CBuildingType* ti = &g_buildingType[bi->type];
-	CBuildingType* tj = &g_buildingType[bj->type];
+long outcode;
+   outcode = 0;
+   if (p.x >  .5) outcode |= 0x01;
+   if (p.x < -.5) outcode |= 0x02;
+   if (p.y >  .5) outcode |= 0x04;
+   if (p.y < -.5) outcode |= 0x08;
+   if (p.z >  .5) outcode |= 0x10;
+   if (p.z < -.5) outcode |= 0x20;
+   return(outcode);
+}
+/*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . */
+/* Which of the twelve edge plane(s) is point P outside of? */
+long bevel_2d(Vec3f p)
+{
+long outcode;
+   outcode = 0;
+   if ( p.x + p.y > 1.0) outcode |= 0x001;
+   if ( p.x - p.y > 1.0) outcode |= 0x002;
+   if (-p.x + p.y > 1.0) outcode |= 0x004;
+   if (-p.x - p.y > 1.0) outcode |= 0x008;
+   if ( p.x + p.z > 1.0) outcode |= 0x010;
+   if ( p.x - p.z > 1.0) outcode |= 0x020;
+   if (-p.x + p.z > 1.0) outcode |= 0x040;
+   if (-p.x - p.z > 1.0) outcode |= 0x080;
+   if ( p.y + p.z > 1.0) outcode |= 0x100;
+   if ( p.y - p.z > 1.0) outcode |= 0x200;
+   if (-p.y + p.z > 1.0) outcode |= 0x400;
+   if (-p.y - p.z > 1.0) outcode |= 0x800;
+   return(outcode);
+}
+/*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . */
+/* Which of the eight corner plane(s) is point P outside of? */
+long bevel_3d(Vec3f p)
+{
+long outcode;
+   outcode = 0;
+   if (( p.x + p.y + p.z) > 1.5) outcode |= 0x01;
+   if (( p.x + p.y - p.z) > 1.5) outcode |= 0x02;
+   if (( p.x - p.y + p.z) > 1.5) outcode |= 0x04;
+   if (( p.x - p.y - p.z) > 1.5) outcode |= 0x08;
+   if ((-p.x + p.y + p.z) > 1.5) outcode |= 0x10;
+   if ((-p.x + p.y - p.z) > 1.5) outcode |= 0x20;
+   if ((-p.x - p.y + p.z) > 1.5) outcode |= 0x40;
+   if ((-p.x - p.y - p.z) > 1.5) outcode |= 0x80;
+   return(outcode);
+}
+/*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . */
+/* Test the point "alpha" of the way from P1 to P2 */
+/* See if it is on a face of the cube			  */
+/* Consider only faces in "mask"				   */
+long check_point(Vec3f p1, Vec3f p2, float alpha, long mask)
+{
+Vec3f plane_point;
+   plane_point.x = LERP(alpha, p1.x, p2.x);
+   plane_point.y = LERP(alpha, p1.y, p2.y);
+   plane_point.z = LERP(alpha, p1.z, p2.z);
+   return(face_plane(plane_point) & mask);
+}
+/*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . */
+/* Compute intersection of P1 --> P2 line segment with face planes */
+/* Then test intersection point to see if it is on cube face	   */
+/* Consider only face planes in "outcode_diff"					 */
+/* Note: Zero bits in "outcode_diff" means face line is outside of */
+long check_line(Vec3f p1, Vec3f p2, long outcode_diff)
+{
+   if ((0x01 & outcode_diff) != 0)
+	  if (check_point(p1,p2,( .5-p1.x)/(p2.x-p1.x),0x3e) == INSIDE) return(INSIDE);
+   if ((0x02 & outcode_diff) != 0)
+	  if (check_point(p1,p2,(-.5-p1.x)/(p2.x-p1.x),0x3d) == INSIDE) return(INSIDE);
+   if ((0x04 & outcode_diff) != 0)
+	  if (check_point(p1,p2,( .5-p1.y)/(p2.y-p1.y),0x3b) == INSIDE) return(INSIDE);
+   if ((0x08 & outcode_diff) != 0)
+	  if (check_point(p1,p2,(-.5-p1.y)/(p2.y-p1.y),0x37) == INSIDE) return(INSIDE);
+   if ((0x10 & outcode_diff) != 0)
+	  if (check_point(p1,p2,( .5-p1.z)/(p2.z-p1.z),0x2f) == INSIDE) return(INSIDE);
+   if ((0x20 & outcode_diff) != 0)
+	  if (check_point(p1,p2,(-.5-p1.z)/(p2.z-p1.z),0x1f) == INSIDE) return(INSIDE);
+   return(OUTSIDE);
+}
+/*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . */
+/* Test if 3D point is inside 3D triangle */
+long point_triangle_intersection(Vec3f p, Triangle t)
+{
+long sign12,sign23,sign31;
+Vec3f vect12,vect23,vect31,vect1h,vect2h,vect3h;
+Vec3f cross12_1p,cross23_2p,cross31_3p;
+/* First, a quick bounding-box test:							   */
+/* If P is outside triangle bbox, there cannot be an intersection. */
+   if (p.x > MAX3(t.m_vertex[0].x, t.m_vertex[1].x, t.m_vertex[2].x)) return(OUTSIDE); 
+   if (p.y > MAX3(t.m_vertex[0].y, t.m_vertex[1].y, t.m_vertex[2].y)) return(OUTSIDE);
+   if (p.z > MAX3(t.m_vertex[0].z, t.m_vertex[1].z, t.m_vertex[2].z)) return(OUTSIDE);
+   if (p.x < MIN3(t.m_vertex[0].x, t.m_vertex[1].x, t.m_vertex[2].x)) return(OUTSIDE);
+   if (p.y < MIN3(t.m_vertex[0].y, t.m_vertex[1].y, t.m_vertex[2].y)) return(OUTSIDE);
+   if (p.z < MIN3(t.m_vertex[0].z, t.m_vertex[1].z, t.m_vertex[2].z)) return(OUTSIDE);
+/* For each triangle side, make a vector out of it by subtracting vertexes; */
+/* make another vector from one vertex to point P.						  */
+/* The crossproduct of these two vectors is orthogonal to both and the	  */
+/* signs of its X,Y,Z components indicate whether P was to the inside or    */
+/* to the outside of this triangle side.								    */
+   SUB(t.m_vertex[0], t.m_vertex[1], vect12)
+   SUB(t.m_vertex[0],    p, vect1h);
+   CROSS(vect12, vect1h, cross12_1p)
+   sign12 = SIGN3(cross12_1p);	  /* Extract X,Y,Z signs as 0..7 or 0...63 integer */
+   SUB(t.m_vertex[1], t.m_vertex[2], vect23)
+   SUB(t.m_vertex[1],    p, vect2h);
+   CROSS(vect23, vect2h, cross23_2p)
+   sign23 = SIGN3(cross23_2p);
+   SUB(t.m_vertex[2], t.m_vertex[0], vect31)
+   SUB(t.m_vertex[2],    p, vect3h);
+   CROSS(vect31, vect3h, cross31_3p)
+   sign31 = SIGN3(cross31_3p);
+/* If all three crossproduct vectors agree in their component signs,  */
+/* then the point must be inside all three.						   */
+/* P cannot be OUTSIDE all three sides simultaneously.			    */
+   /* this is the old test; with the revised SIGN3() macro, the test
+    * needs to be revised. */
+#ifdef OLD_TEST
+   if ((sign12 == sign23) && (sign23 == sign31))
+	  return(INSIDE);
+   else
+	  return(OUTSIDE);
+#else
+   return ((sign12 & sign23 & sign31) == 0) ? OUTSIDE : INSIDE;
+#endif
+}
+/*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . */
+/**********************************************/
+/* This is the main algorithm procedure.	  */
+/* Triangle t is compared with a unit cube,   */
+/* centered on the origin.				    */
+/* It returns INSIDE (0) or OUTSIDE(1) if t   */
+/* intersects or does not intersect the cube. */
+/**********************************************/
+long t_c_intersection(Triangle t)
+{
+long v1_test,v2_test,v3_test;
+float d, denom;
+Vec3f vect12,vect13,norm;
+Vec3f hitpp,hitpn,hitnp,hitnn;
+/* First compare all three vertexes with all six face-planes */
+/* If any vertex is inside the cube, return immediately!	 */
+   if ((v1_test = face_plane(t.m_vertex[0])) == INSIDE) return(INSIDE);
+   if ((v2_test = face_plane(t.m_vertex[1])) == INSIDE) return(INSIDE);
+   if ((v3_test = face_plane(t.m_vertex[2])) == INSIDE) return(INSIDE);
+/* If all three vertexes were outside of one or more face-planes, */
+/* return immediately with a trivial rejection!				   */
+   if ((v1_test & v2_test & v3_test) != 0) return(OUTSIDE);
+/* Now do the same trivial rejection test for the 12 edge planes */
+   v1_test |= bevel_2d(t.m_vertex[0]) << 8;
+   v2_test |= bevel_2d(t.m_vertex[1]) << 8;
+   v3_test |= bevel_2d(t.m_vertex[2]) << 8;
+   if ((v1_test & v2_test & v3_test) != 0) return(OUTSIDE); 
+/* Now do the same trivial rejection test for the 8 corner planes */
+   v1_test |= bevel_3d(t.m_vertex[0]) << 24;
+   v2_test |= bevel_3d(t.m_vertex[1]) << 24;
+   v3_test |= bevel_3d(t.m_vertex[2]) << 24;
+   if ((v1_test & v2_test & v3_test) != 0) return(OUTSIDE);  
+/* If vertex 1 and 2, as a pair, cannot be trivially rejected */
+/* by the above tests, then see if the v1-->v2 triangle edge  */
+/* intersects the cube.  Do the same for v1-->v3 and v2-->v3. */
+/* Pass to the intersection algorithm the "OR" of the outcode */
+/* bits, so that only those cube faces which are spanned by   */
+/* each triangle edge need be tested.						 */
+   if ((v1_test & v2_test) == 0)
+	  if (check_line(t.m_vertex[0],t.m_vertex[1],v1_test|v2_test) == INSIDE) return(INSIDE);
+   if ((v1_test & v3_test) == 0)
+	  if (check_line(t.m_vertex[0],t.m_vertex[2],v1_test|v3_test) == INSIDE) return(INSIDE);
+   if ((v2_test & v3_test) == 0)
+	  if (check_line(t.m_vertex[1],t.m_vertex[2],v2_test|v3_test) == INSIDE) return(INSIDE);
+/* By now, we know that the triangle is not off to any side,	 */
+/* and that its sides do not penetrate the cube.  We must now    */
+/* test for the cube intersecting the interior of the triangle.  */
+/* We do this by looking for intersections between the cube	  */
+/* diagonals and the triangle...first finding the intersection   */
+/* of the four diagonals with the plane of the triangle, and	 */
+/* then if that intersection is inside the cube, pursuing	    */
+/* whether the intersection point is inside the triangle itself. */
+/* To find plane of the triangle, first perform crossproduct on  */
+/* two triangle side vectors to compute the normal vector.	   */ 
+							   
+   SUB(t.m_vertex[0],t.m_vertex[1],vect12);
+   SUB(t.m_vertex[0],t.m_vertex[2],vect13);
+   CROSS(vect12,vect13,norm)
+/* The normal vector "norm" X,Y,Z components are the coefficients */
+/* of the triangles AX + BY + CZ + D = 0 plane equation.  If we   */
+/* solve the plane equation for X=Y=Z (a diagonal), we get	    */
+/* -D/(A+B+C) as a metric of the distance from cube center to the */
+/* diagonal/plane intersection.  If this is between -0.5 and 0.5, */
+/* the intersection is inside the cube.  If so, we continue by    */
+/* doing a point/triangle intersection.						   */
+/* Do this for all four diagonals.							    */
+   d = norm.x * t.m_vertex[0].x + norm.y * t.m_vertex[0].y + norm.z * t.m_vertex[0].z;
+   /* if one of the diagonals is parallel to the plane, the other will intersect the plane */
+   if(fabs(denom=(norm.x + norm.y + norm.z))>EPS)
+   /* skip parallel diagonals to the plane; division by 0 can occur */
+   {
+	  hitpp.x = hitpp.y = hitpp.z = d / denom;
+	  if (fabs(hitpp.x) <= 0.5)
+		 if (point_triangle_intersection(hitpp,t) == INSIDE) return(INSIDE);
+   }
+   if(fabs(denom=(norm.x + norm.y - norm.z))>EPS)
+   {
+	  hitpn.z = -(hitpn.x = hitpn.y = d / denom);
+	  if (fabs(hitpn.x) <= 0.5)
+		 if (point_triangle_intersection(hitpn,t) == INSIDE) return(INSIDE);
+   }	  
+   if(fabs(denom=(norm.x - norm.y + norm.z))>EPS)
+   {	  
+	  hitnp.y = -(hitnp.x = hitnp.z = d / denom);
+	  if (fabs(hitnp.x) <= 0.5)
+		 if (point_triangle_intersection(hitnp,t) == INSIDE) return(INSIDE);
+   }
+   if(fabs(denom=(norm.x - norm.y - norm.z))>EPS)
+   {
+	  hitnn.y = hitnn.z = -(hitnn.x = d / denom);
+	  if (fabs(hitnn.x) <= 0.5)
+		 if (point_triangle_intersection(hitnn,t) == INSIDE) return(INSIDE);
+   }
+  
+/* No edge touched the cube; no cube diagonal touched the triangle. */
+/* We're done...there was no intersection.						  */
+   return(OUTSIDE);
+}
 
-	Vec3f pi = bi->pos;
-	Vec3f pj = bj->pos;
-	
-	float hwxi = ti->widthX*TILE_SIZE/2.0f;
-	float hwzi = ti->widthZ*TILE_SIZE/2.0f;
-	float hwxj = tj->widthX*TILE_SIZE/2.0f;
-	float hwzj = tj->widthZ*TILE_SIZE/2.0f;
+bool TriBoxOverlap(Vec3f vPos, Vec3f vMin, Vec3f vMax, Triangle tri)
+{//Vec3f center = c->m_pos + (vMin + t->vMax)/2.0f;
+	Vec3f center;
+	center = vPos + (vMax + vMin) / 2.0f;
+	Vec3f halfsize;
+	halfsize = (vMax - vMin) / 2.0f;
+	Vec3f scaledown;
+	scaledown.x = 1.0f / halfsize.x;
+	scaledown.y = 1.0f / halfsize.y;
+	scaledown.z = 1.0f / halfsize.z;
+	tri.m_vertex[0] = (tri.m_vertex[0] - center) * scaledown;
+	tri.m_vertex[1] = (tri.m_vertex[1] - center) * scaledown;
+	tri.m_vertex[2] = (tri.m_vertex[2] - center) * scaledown;
 
-	float eps = TILE_SIZE/16.0f;
-
-	if(fabs(pi.x-pj.x) <= hwxi+hwxj+eps && fabs(pi.z-pj.z) <= hwzi+hwzj+eps)
+	if(t_c_intersection(tri) == INSIDE)
 		return true;
 
 	return false;
 }
 
-bool PowerlineAdjacent(int i, int x, int z)
+bool TriBoxOverlap(Vec3f vCenter, Vec3f vRadius, Triangle tri)
 {
-	CBuilding* b = &g_building[i];
-	CBuildingType* t = &g_buildingType[b->type];
-	
-	Vec3f p = b->pos;
+	Vec3f scaledown;
+	scaledown.x = 1.0f / vRadius.x;
+	scaledown.y = 1.0f / vRadius.y;
+	scaledown.z = 1.0f / vRadius.z;
+	tri.m_vertex[0] = (tri.m_vertex[0] - vCenter) * scaledown;
+	tri.m_vertex[1] = (tri.m_vertex[1] - vCenter) * scaledown;
+	tri.m_vertex[2] = (tri.m_vertex[2] - vCenter) * scaledown;
 
-	float hwx = t->widthX*TILE_SIZE/2.0f;
-	float hwz = t->widthZ*TILE_SIZE/2.0f;
-
-	Vec3f p2 = PowerlinePosition(x, z);
-
-	float hwx2 = TILE_SIZE/2.0f;
-	float hwz2 = TILE_SIZE/2.0f;
-
-	if(fabs(p.x-p2.x) <= hwx+hwx2 && fabs(p.z-p2.z) <= hwz+hwz2)
+	if(t_c_intersection(tri) == INSIDE)
 		return true;
 
 	return false;
 }
 
-bool PipelineAdjacent(int i, int x, int z)
+
+bool TriBoxOverlap2(Vec3f vScaleDown, Vec3f vCenter, Triangle tri)
 {
-	CBuilding* b = &g_building[i];
-	CBuildingType* t = &g_buildingType[b->type];
-	
-	Vec3f p = b->pos;
-
-	float hwx = t->widthX*TILE_SIZE/2.0f;
-	float hwz = t->widthZ*TILE_SIZE/2.0f;
-
-	Vec3f p2 = PipelinePhysPos(x, z);
-
-	float hwx2 = TILE_SIZE/2.0f;
-	float hwz2 = TILE_SIZE/2.0f;
-
-	if(fabs(p.x-p2.x) <= hwx+hwx2 && fabs(p.z-p2.z) <= hwz+hwz2)
-		return true;
-
-	return false;
-}
-
-bool CollidesWithBuildings(float x, float z, float hwx, float hwz, int ignore, float eps)
-{
-	CBuilding* b;
-	CBuildingType* t;
-	float hwx2, hwz2;
-	Vec3f p;
-	g_ignored = false;
-
-	for(int i=0; i<BUILDINGS; i++)
-	{
-		b = &g_building[i];
-
-		if(!b->on)
-			continue;
-
-		t = &g_buildingType[b->type];
-		p = b->pos;
-		hwx2 = t->widthX*TILE_SIZE/2.0f;
-		hwz2 = t->widthZ*TILE_SIZE/2.0f;
-
-		if(fabs(p.x-x) < hwx+hwx2-eps && fabs(p.z-z) < hwz+hwz2-eps)
-		{
-			if(i == ignore)
-			{
-				g_ignored = true;
-				continue;
-			}
-			/*
-			if(g_debug1)
-			{
-				g_log<<"fabs((p.x)"<<p.x<<"-(x)"<<x<<") < (hwx)"<<hwx<<"+(hwx2)"<<hwx2<<" && fabs((p.z)"<<p.z<<"- (z)"<<z<<") < (hwz)"<<hwz<<"+(hwz2)"<<hwz2<<endl;
-				g_log<<fabs(p.x-x)<<" < "<<(hwx+hwx2)<<" && "<<fabs(p.z-z)<<" < "<<(hwz+hwz2)<<endl;
-			}*/
-
-			g_lastCollider = i;
-			g_colliderType = COLLIDER_BUILDING;
-			return true;
-		}
-	}
-
-	return false;
-}
-
-bool CollidesWithUnits(float x, float z, float hwx, float hwz, bool isUnit, CUnit* thisU, CUnit* ignore, bool checkPass, float eps)
-{
-	CUnit* u;
-	CUnitType* t;
-	float r;
-	Vec3f p;
-
-	for(int i=0; i<UNITS; i++)
-	{		
-		u = &g_unit[i];
-
-		if(!u->on)
-			continue;
-
-		if(u == ignore)
-			continue;
-
-		if(u == thisU)
-			continue;
-
-		//if(u->type == LABOURER && u->hidden())
-		if(u->hidden())
-			continue;
-
-		t = &g_unitType[u->type];
-
-		if(checkPass && isUnit && t->passable)
-			continue;
-
-		p = u->camera.Position();
-		r = t->radius;
-
-		if(fabs(p.x-x) < hwx+r-eps && fabs(p.z-z) < hwz+r-eps)
-		{
-			g_lastCollider = i;
-			g_colliderType = COLLIDER_UNIT;
-			return true;
-		}
-	}
-
-	return false;
-}
-
-bool Offmap(float x, float z, float hwx, float hwz)
-{
-	if(x - hwx < 0.0f)
-		return true;
-
-	if(x + hwx > g_hmap.m_widthX*TILE_SIZE)
-		return true;
-	
-	if(z - hwz < 0.0f)
-		return true;
-
-	if(z + hwz > g_hmap.m_widthZ*TILE_SIZE)
-		return true;
-
-	return false;
-}
-
-bool BuildingCollides(int type, Vec3f pos)
-{
-	CBuildingType* t = &g_buildingType[type];
-
-	if(Offmap(pos.x, pos.z, t->widthX*TILE_SIZE/2, t->widthZ*TILE_SIZE/2))
-		return true;
-
-	if(CollidesWithBuildings(pos.x, pos.z, t->widthX*TILE_SIZE/2, t->widthZ*TILE_SIZE/2))
-		return true;
-
-	if(CollidesWithUnits(pos.x, pos.z, t->widthX*TILE_SIZE/2, t->widthZ*TILE_SIZE/2))
-		return true;
-
-	int startx = pos.x/TILE_SIZE-t->widthX/2;
-	int endx = startx + t->widthX - 1;
-	int startz = pos.z/TILE_SIZE-t->widthZ/2;
-	int endz = startz + t->widthZ - 1;
-
-	for(int x=startx; x<=endx; x++)
-		for(int z=startz; z<=endz; z++)
-			if(RoadAt(x, z)->on)
-				return true;
-
-	return false;
-}
-
-bool BuildingLevel(int type, Vec3f pos)
-{
-	CBuildingType* t = &g_buildingType[type];
-	
-	int startx = pos.x/TILE_SIZE-t->widthX/2;
-	int endx = startx + t->widthX - 1;
-	int startz = pos.z/TILE_SIZE-t->widthZ/2;
-	int endz = startz + t->widthZ - 1;
-
-	float compare = g_hmap.getheight(startx, startz);
-
-	if(compare <= WATER_HEIGHT)
-		return false;
-
-	for(int x=startx; x<=endx+1; x++)
-		for(int z=startz; z<=endz+1; z++)
-		{
-			if(g_hmap.getheight(x, z) != compare)
-				return false;
-
-			if(g_hmap.getheight(x, z) <= WATER_HEIGHT)
-				return false;
-		}
-
-	return true;
-}
-
-bool TileUnclimablei(int tx, int tz)
-{
-	float h0 = g_hmap.getheight(tx, tz);
-	float h1 = g_hmap.getheight(tx+1, tz);
-	float h2 = g_hmap.getheight(tx, tz+1);
-	float h3 = g_hmap.getheight(tx+1, tz+1);
-
-	float minh = min(h0, min(h1, min(h2, h3)));
-	float maxh = max(h0, max(h1, max(h2, h3)));
-
-	if(fabs(maxh - minh) > MAX_CLIMB_INCLINE)
-	{
-		g_colliderType = COLLIDER_TERRAIN;
-		return true;
-	}
-
-	return false;
-}
-
-bool TileUnclimable(float px, float pz)
-{
-	int tx = px / TILE_SIZE;
-	int tz = pz / TILE_SIZE;
-	
-	return TileUnclimablei(tx, tz);
-}
-
-bool AnyWateri(int tx, int tz)
-{
-	if(g_hmap.getheight(tx, tz) <= WATER_HEIGHT)
-		return true;
-
-	if(g_hmap.getheight(tx+1, tz) <= WATER_HEIGHT)
-		return true;
-
-	if(g_hmap.getheight(tx, tz+1) <= WATER_HEIGHT)
-		return true;
-
-	if(g_hmap.getheight(tx+1, tz+1) <= WATER_HEIGHT)
-		return true;
-
-	return false;
-}
-
-bool AnyWater(float px, float pz)
-{
-	int tx = px / TILE_SIZE;
-	int tz = pz / TILE_SIZE;
-	
-	return AnyWateri(tx, tz);
-}
-
-bool AtWater(float px, float pz)
-{
-	float h = Bilerp(px, pz);
-
-	if(h <= WATER_HEIGHT)
-	{
-		g_colliderType = COLLIDER_TERRAIN;
-		return true;
-	}
-
-	return false;
-}
-
-// used to check for collisions with passable units
-// edit: used for initial spawn of unit
-bool CUnit::Collides2(bool checkroad)
-{
-	CUnitType* t = &g_unitType[type];
-	float r = t->radius;
-	Vec3f p = camera.Position();
-
-	if(checkroad)
-	{
-		bool roadVeh = t->roaded;
-
-		int tx = p.x / TILE_SIZE;
-		int tz = p.z / TILE_SIZE;
-
-		CRoad* road = RoadAt(tx, tz);
-
-		if(roadVeh && !road->on)
-			return true;
-		else if(!roadVeh && road->on)
-			return true;
-	}
-
-	if(AtWater(p.x, p.z))
-		return true;
-	
-	if(TileUnclimable(p.x, p.z))
-		return true;
-
-	if(CollidesWithBuildings(p.x, p.z, r, r))
-		return true;
-
-	if(CollidesWithUnits(p.x, p.z, r, r, true, this, NULL, false))
-		return true;
-
-	if(Offmap(p.x, p.z, r, r))
-		return true;
-
-	return false;
-}
-
-bool CUnit::confirmcollision(int ctype, int ID, float eps)
-{
-	CUnitType* ut = &g_unitType[type];
-	//Vec3f p = camera.Position();
-	float r = ut->radius;
-	const Vec3f p = camera.Position();
-
-	if(ctype == COLLIDER_BUILDING)
-	{
-		CBuilding* b = &g_building[ID];
-		CBuildingType* bt = &g_buildingType[b->type];
-		Vec3f p2 = b->pos;
-		float hwx = bt->widthX*TILE_SIZE/2.0;
-		float hwz = bt->widthZ*TILE_SIZE/2.0;
-
-		if(fabs(p2.x-p.x) < r+hwx-eps && fabs(p2.z-p.z) < r+hwz-eps)
-			return true;
-	}
-	else if(ctype == COLLIDER_UNIT)
-	{
-		CUnit* u2 = &g_unit[ID];
-		ut = &g_unitType[u2->type];
-		float r2 = ut->radius;
-		const Vec3f p2 = u2->camera.Position();
-		
-		if(fabs(p2.x-p.x) < r+r2-eps && fabs(p2.z-p.z) < r+r2-eps)
-			return true;
-	}
-	else if(ctype == COLLIDER_TERRAIN)
-	{
-		if(AtWater(p.x, p.z))
-			return true;
-
-		if(TileUnclimable(p.x, p.z))
-			return true;
-	}
-	else if(ctype == COLLIDER_NOROAD)
-	{
-		CRoad* road = RoadAt(p.x/TILE_SIZE, p.z/TILE_SIZE);
-
-		if(!road->on || !road->finished)
-			return true;
-	}
-
-	return false;
-}
-
-bool CUnit::collidesfast(CUnit* ignoreUnit, int ignoreBuilding)
-{
-	CUnitType* ut = &g_unitType[type];
-	//Vec3f p = camera.Position();
-	float r = ut->radius;
-	const Vec3f p = camera.Position();
-		
-	const bool roadVeh = ut->roaded;
-
-	float fstartx = p.x-r;
-	float fstartz = p.z-r;
-	float fendx = p.x+r;
-	float fendz = p.z+r;
-		
-	//int extentx = ceil(r/cellwx);
-	//int extentz = ceil(r/cellwz);
-	const float cellwx = MIN_RADIUS*2.0f;
-	const float cellwz = MIN_RADIUS*2.0f;
-		
-	//int startx = max(0, fstartx/cellwx);
-	//int startz = max(0, fstartz/cellwz);
-	//int endx = min(ceil(fendx/cellwx), g_hmap.m_widthX*TILE_SIZE/cellwx-1);
-	//int endz = min(ceil(fendz/cellwz), g_hmap.m_widthZ*TILE_SIZE/cellwz-1);
-	int startx = fstartx/cellwx;
-	int startz = fstartz/cellwz;
-	int endx = ceil(fendx/cellwx);
-	int endz = ceil(fendz/cellwz);
-	//int endx = startx+extentx;
-	//int endz = startz+extentz;
-
-	if(startx < 0 || startz < 0 || endx >= g_hmap.m_widthX*TILE_SIZE/cellwx || endz >= g_hmap.m_widthZ*TILE_SIZE/cellwz)
-	{
-		g_lastCollider = -1;
-		g_colliderType = COLLIDER_TERRAIN;
-		return true;
-	}
-
-	g_ignored = false;
-
-	if(roadVeh)
-	{
-		for(int x=startx; x<endx; x++)
-			for(int z=startz; z<endz; z++)
-			{
-				ColliderCell* cell = ColliderCellAt(x, z);
-				//cell->colliders.push_back(Collider(COLLIDER_UNIT, uID));
-				for(int i=0; i<cell->colliders.size(); i++)
-				{
-					Collider* c = &cell->colliders[i];
-					if(c->type == COLLIDER_UNIT && &g_unit[c->ID] == this)
-						continue;
-					if(c->type == COLLIDER_BUILDING && c->ID == ignoreBuilding)
-					{
-						if(confirmcollision(c->type, c->ID))
-							g_ignored = true;
-						continue;
-					}
-					if(c->type == COLLIDER_UNIT)
-					{
-						if(&g_unit[c->ID] == ignoreUnit)
-						{
-							if(confirmcollision(c->type, c->ID))
-								g_ignored = true;
-							continue;
-						}
-						if(g_unit[c->ID].hidden())
-							continue;
-					}
-
-					if(confirmcollision(c->type, c->ID))
-					{
-						g_colliderType = c->type;
-						g_lastCollider = c->ID;
-
-						return true;
-					}
-				}
-			}
-	}
-	else
-	{
-		for(int x=startx; x<endx; x++)
-			for(int z=startz; z<endz; z++)
-			{
-				ColliderCell* cell = ColliderCellAt(x, z);
-				//cell->colliders.push_back(Collider(COLLIDER_UNIT, uID));
-				for(int i=0; i<cell->colliders.size(); i++)
-				{
-					Collider* c = &cell->colliders[i];
-					if(c->type == COLLIDER_UNIT && &g_unit[c->ID] == this)
-						continue;
-					if(c->type == COLLIDER_NOROAD)
-						continue;
-					if(c->type == COLLIDER_BUILDING && c->ID == ignoreBuilding)
-					{
-						if(confirmcollision(c->type, c->ID))
-							g_ignored = true;
-
-						continue;
-					}
-					if(c->type == COLLIDER_UNIT)
-					{
-						if(&g_unit[c->ID] == ignoreUnit)
-						{
-							if(confirmcollision(c->type, c->ID))
-								g_ignored = true;
-							continue;
-						}
-						if(g_unit[c->ID].hidden())
-							continue;
-					}
-					
-					if(confirmcollision(c->type, c->ID))
-					{
-						g_colliderType = c->type;
-						g_lastCollider = c->ID;
-
-						return true;
-					}
-				}
-			}
-	}
-
-	return false;
-}
-
-bool CUnit::Collides(CUnit* ignoreUnit, int ignoreBuilding)
-{
-	CUnitType* t = &g_unitType[type];
-	float r = t->radius;
-	Vec3f p = camera.Position();
-	/*
-	g_debug1 = false;
-	if(UnitID(this) == 0)
-		{
-			g_debug1=  true;
-		}*/
-
-	if(AtWater(p.x, p.z))
-		return true;
-
-	if(TileUnclimable(p.x, p.z))
-		return true;
-
-	if(CollidesWithBuildings(p.x, p.z, r, r, ignoreBuilding, MIN_RADIUS/2.0f))
-	{
-		//g_debug1 = false;
-		return true;
-	}
-
-	//g_debug1 = false;
-
-	if(!t->passable && CollidesWithUnits(p.x, p.z, r, r, true, this, ignoreUnit, MIN_RADIUS/2.0f))
-	{
-			//if(type == TRUCK)
-			//	Chat("truck col");
-
-		return true;
-	}
-
-	if(Offmap(p.x, p.z, r, r))
+	tri.m_vertex[0] = (tri.m_vertex[0] - vCenter) * vScaleDown;
+	tri.m_vertex[1] = (tri.m_vertex[1] - vCenter) * vScaleDown;
+	tri.m_vertex[2] = (tri.m_vertex[2] - vCenter) * vScaleDown;
+
+	if(t_c_intersection(tri) == INSIDE)
 		return true;
 
 	return false;

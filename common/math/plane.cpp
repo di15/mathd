@@ -93,11 +93,21 @@ float PlaneDistance(Vec3f normal, Vec3f point)
 	return distance;
 }
 
-bool PointBehindPlane(Vec3f point, Plane plane)
+bool PointOnOrBehindPlane(Vec3f point, Plane plane, float epsilon)
 {
 	float result = point.x*plane.m_normal.x + point.y*plane.m_normal.y + point.z*plane.m_normal.z + plane.m_d;
 
-	if(result <= CLOSE_EPSILON)
+	if(result <= epsilon)
+		return true;
+
+	return false;
+}
+
+bool PointOnOrBehindPlane(Vec3f point, Vec3f normal, float dist, float epsilon)
+{
+	float result = point.x*normal.x + point.y*normal.y + point.z*normal.z + dist;
+
+	if(result <= epsilon)
 		return true;
 
 	return false;

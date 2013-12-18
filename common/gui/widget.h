@@ -3,9 +3,9 @@
 #define WIDGET_H
 
 #include "../utils.h"
-#include "../draw/texture.h"
+#include "../texture.h"
 #include "font.h"
-#include "../draw/shader.h"
+#include "../render/shader.h"
 #include "../window.h"
 #include "draw2d.h"
 #include "richtext.h"
@@ -26,51 +26,6 @@
 
 #define STATUS_ALPHA	(0.75f)
 
-#define MARGIN_SOURCE_WIDTH		0
-#define MARGIN_SOURCE_HEIGHT	1
-#define MARGIN_SOURCE_MIN		2
-#define MARGIN_SOURCE_MAX		3
-
-#define MARGIN_FUNC_RATIO		0
-#define MARGIN_FUNC_PIXELS		1
-#define MARGIN_FUNC_SUBTPIXELS	2
-
-class Widget;
-
-class Margin
-{
-public:
-	int m_source;
-	int m_func;
-	float m_value;
-	int m_cached;
-
-	Margin() {}
-
-	Margin(int value)
-	{
-		m_source = MARGIN_SOURCE_WIDTH;
-		m_func = MARGIN_FUNC_PIXELS;
-		m_value = value;
-	}
-
-	Margin(int source, float value)
-	{
-		m_source = source;
-		m_func = MARGIN_FUNC_RATIO;
-		m_value = value;
-	}
-
-	Margin(int source, int func, float value)
-	{
-		m_source = source;
-		m_func = func;
-		m_value = value;
-	}
-
-	void recalc(Widget* parent);
-};
-
 #define WIDGET_IMAGE				1
 #define WIDGET_BUTTON				2
 #define WIDGET_TEXT					3
@@ -88,18 +43,14 @@ public:
 #define WIDGET_VIEWPORT				15
 #define WIDGET_FRAME				16
 
-#define ALIGNMENT_LESSERSIDE		0
-#define ALIGNMENT_CENTER			1
-#define ALIGNMENT_GREATERSIDE		2
-
 class Widget
 {
 public:
 	int m_type;
 	Widget* m_parent;
-	Margin m_pos[4];
+	float m_pos[4];
 	float m_texc[4];	//texture coordinates
-    Margin m_tpos[4];	//text pos
+    float m_tpos[4];	//text pos
 	unsigned int m_tex;
 	unsigned int m_bgtex;
 	unsigned int m_bgovertex;
@@ -135,6 +86,7 @@ public:
 	void (*outfunc)();
 	void (*changefunc)();
 	void (*changefunc2)(int p);
+	void (*reframefunc)(Widget* thisw);
 
 	Widget() 
 	{
@@ -149,6 +101,7 @@ public:
 		m_parent = NULL;
 		m_opened = false;
 		m_ldown = false;
+		reframefunc = NULL;
 	}
 
 	virtual ~Widget()
@@ -182,11 +135,10 @@ public:
 	virtual void select(int which);
 	virtual void clear();
 	virtual void erase(int which)	{}
-	virtual void align();
 	virtual void reframe();	//resized or moved
 	virtual void changetext(const char* newt);
-	virtual int scrollframe(int i) const	{ return m_pos[i].m_cached;	}
-	virtual int frame(int i)	const { return m_pos[i].m_cached;	}
+	virtual int scrollframe(int i) const	{ return m_pos[i];	}
+	virtual int frame(int i)	const { return m_pos[i];	}
 	virtual Widget* getsubwidg(const char* name, int type)
 	{
 		for(auto i=m_subwidg.begin(); i!=m_subwidg.end(); i++)

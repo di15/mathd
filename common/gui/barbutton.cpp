@@ -17,7 +17,7 @@
 #include "touchlistener.h"
 #include "gui.h"
 
-BarButton::BarButton(Widget* parent, unsigned int sprite, float bar, Margin left, Margin top, Margin right, Margin bottom, void (*click)(), void (*overf)(), void (*out)()) : Widget()
+BarButton::BarButton(Widget* parent, unsigned int sprite, float bar, void (*reframef)(Widget* thisw), void (*click)(), void (*overf)(), void (*out)()) : Widget()
 {
 	m_parent = parent;
 	m_type = WIDGET_BARBUTTON;
@@ -26,10 +26,7 @@ BarButton::BarButton(Widget* parent, unsigned int sprite, float bar, Margin left
 	m_tex = sprite;
 	CreateTexture(m_bgtex, "gui\\buttonbg.png", true);
 	CreateTexture(m_bgovertex, "gui\\buttonbgover.png", true);
-	m_pos[0] = left;
-	m_pos[1] = top;
-	m_pos[2] = right;
-	m_pos[3] = bottom;
+	reframefunc = reframef;
 	m_healthbar = bar;
 	clickfunc = click;
 	overfunc = overf;
@@ -40,25 +37,25 @@ BarButton::BarButton(Widget* parent, unsigned int sprite, float bar, Margin left
 void BarButton::draw()
 {
 	if(m_over)
-		DrawImage(g_texture[m_bgovertex].texname, m_pos[0].m_cached, m_pos[1].m_cached, m_pos[2].m_cached, m_pos[3].m_cached);
+		DrawImage(g_texture[m_bgovertex].texname, m_pos[0], m_pos[1], m_pos[2], m_pos[3]);
 	else
-		DrawImage(g_texture[m_bgtex].texname, m_pos[0].m_cached, m_pos[1].m_cached, m_pos[2].m_cached, m_pos[3].m_cached);
+		DrawImage(g_texture[m_bgtex].texname, m_pos[0], m_pos[1], m_pos[2], m_pos[3]);
 
-	DrawImage(g_texture[m_tex].texname, m_pos[0].m_cached, m_pos[1].m_cached, m_pos[2].m_cached, m_pos[3].m_cached);
+	DrawImage(g_texture[m_tex].texname, m_pos[0], m_pos[1], m_pos[2], m_pos[3]);
 
 	UseS(SHADER_COLOR2D);
     glUniform1f(g_shader[SHADER_COLOR2D].m_slot[SSLOT_WIDTH], (float)g_currw);
     glUniform1f(g_shader[SHADER_COLOR2D].m_slot[SSLOT_HEIGHT], (float)g_currh);
-	DrawSquare(1, 0, 0, 1, m_pos[0].m_cached, m_pos[3].m_cached-5, m_pos[2].m_cached, m_pos[3].m_cached);
-	float bar = (m_pos[2].m_cached - m_pos[0].m_cached) * m_healthbar;
-	DrawSquare(0, 1, 0, 1, m_pos[0].m_cached, m_pos[3].m_cached-5, m_pos[0].m_cached+bar, m_pos[3].m_cached);
+	DrawSquare(1, 0, 0, 1, m_pos[0], m_pos[3]-5, m_pos[2], m_pos[3]);
+	float bar = (m_pos[2] - m_pos[0]) * m_healthbar;
+	DrawSquare(0, 1, 0, 1, m_pos[0], m_pos[3]-5, m_pos[0]+bar, m_pos[3]);
 	
 	Ortho(g_currw, g_currh, 1, 1, 1, 1);
 }
 
 bool BarButton::mousemove()
 {
-	if(g_mouse.x >= m_pos[0].m_cached && g_mouse.x <= m_pos[2].m_cached && g_mouse.y >= m_pos[1].m_cached && g_mouse.y <= m_pos[3].m_cached)
+	if(g_mouse.x >= m_pos[0] && g_mouse.x <= m_pos[2] && g_mouse.y >= m_pos[1] && g_mouse.y <= m_pos[3])
 	{
 		if(overfunc != NULL)
 			overfunc();

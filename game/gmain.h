@@ -5,9 +5,8 @@
 
 #include "../common/window.h"
 
-extern ofstream g_log;
-
 #define VERSION				1.0f
+#define CONFIGFILE			"config.ini"
 #define TITLE				"Corporation-States"
 #define SERVER_ADDR			"corpstates.com"
 #define CYCLE_FRAMES		(FRAME_RATE*60)

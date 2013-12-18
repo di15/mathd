@@ -4,22 +4,22 @@
 
 
 
-#include "main.h"
-#include "3dmath.h"
-#include "gui.h"
-#include "image.h"
-#include "menu.h"
-#include "player.h"
-#include "projectile.h"
-#include "model.h"
-#include "save.h"
-#include "editor.h"
-#include "script.h"
+#include "gmain.h"
+//#include "3dmath.h"
+//#include "gui.h"
+//#include "image.h"
+//#include "menu.h"
+//#include "player.h"
+//#include "projectile.h"
+//#include "model.h"
+//#include "save.h"
+//#include "editor.h"
+//#include "script.h"
 #include "keymap.h"
-#include "inspect.h"
-#include "selection.h"
+//#include "inspect.h"
+//#include "selection.h"
 
-bool g_canselect = true;
+//bool g_canselect = true;
 
 /*
 void Click_OpenLogin()
@@ -39,6 +39,7 @@ void Click_Login()
 	RedoGUI();
 }*/
 
+#if 0
 void Click_SaveSlot1()
 {
 	SaveSlot(1);
@@ -93,9 +94,9 @@ void Click_OpenSave()
 {
 	CView* v = g_GUI.getview("save");
 	
-	CWidget* slot1 = v->getlink(0);
-	CWidget* slot2 = v->getlink(1);
-	CWidget* slot3 = v->getlink(2);
+	Widget* slot1 = v->getlink(0);
+	Widget* slot2 = v->getlink(1);
+	Widget* slot3 = v->getlink(2);
 
 	//FILE* fp = fopen("saves\\slot1.sav", "rb");
 	//if(!fp)
@@ -156,9 +157,9 @@ void Click_OpenLoad()
 	g_gameover = false;
 	CView* v = g_GUI.getview("load");
 	
-	CWidget* slot1 = v->getlink(0);
-	CWidget* slot2 = v->getlink(1);
-	CWidget* slot3 = v->getlink(2);
+	Widget* slot1 = v->getlink(0);
+	Widget* slot2 = v->getlink(1);
+	Widget* slot3 = v->getlink(2);
 
 	//FILE* fp = fopen("saves\\slot1.sav", "rb");
 	//if(!fp)
@@ -412,10 +413,10 @@ void Click_OutBuild()
 {
 	CView* v = g_GUI.getview("build selector");
 	/*
-	CWidget* sw = &v->widget[0];
+	Widget* sw = &v->widget[0];
 	sw->ldown = false;
 
-	CWidget* w;
+	Widget* w;
 
 	for(int i=0; i<sw->subwidg.size(); i++)
 	{
@@ -432,10 +433,10 @@ void Click_OutBInspect()
 {
 	CView* v = g_GUI.getview("binspect");
 	/*
-	CWidget* sw = &v->widget[0];
+	Widget* sw = &v->widget[0];
 	sw->ldown = false;
 
-	CWidget* w;
+	Widget* w;
 
 	for(int i=0; i<sw->subwidg.size(); i++)
 	{
@@ -477,6 +478,12 @@ void Reload()
 }
 
 void OpenBSelect()
+{
+
+}
+#endif
+
+void FillGUI()
 {
 
 }

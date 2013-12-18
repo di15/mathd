@@ -17,10 +17,10 @@
 #include "viewportw.h"
 #include "../platform.h"
 #include "../window.h"
-#include "../draw/shader.h"
+#include "../render/shader.h"
 #include "gui.h"
 
-ViewportW::ViewportW(Widget* parent, const char* n, Margin left, Margin top, Margin right, Margin bottom, 
+ViewportW::ViewportW(Widget* parent, const char* n, void (*reframef)(Widget* thisw), 
 					 void (*drawf)(int p, int x, int y, int w, int h), 
 					 bool (*ldownf)(int p, int x, int y, int w, int h), 
 					 bool (*lupf)(int p, int x, int y, int w, int h), 
@@ -33,10 +33,7 @@ ViewportW::ViewportW(Widget* parent, const char* n, Margin left, Margin top, Mar
 	m_parent = parent;
 	m_type = WIDGET_VIEWPORT;
 	m_name = n;
-	m_pos[0] = left;
-	m_pos[1] = top;
-    m_pos[2] = right;
-	m_pos[3] = bottom;
+	reframefunc = reframef;
 	m_ldown = false;
 	m_param = parm;
 	drawfunc = drawf;
@@ -51,19 +48,19 @@ ViewportW::ViewportW(Widget* parent, const char* n, Margin left, Margin top, Mar
 
 void ViewportW::draw()
 {
-	//g_log<<m_pos[0].m_cached<<","<<m_pos[1].m_cached<<","<<m_pos[2].m_cached<<","<<m_pos[3].m_cached<<endl;
+	//g_log<<m_pos[0]<<","<<m_pos[1]<<","<<m_pos[2]<<","<<m_pos[3]<<endl;
 
-	int w = m_pos[2].m_cached - m_pos[0].m_cached;
-	int h = m_pos[3].m_cached - m_pos[1].m_cached;
+	int w = m_pos[2] - m_pos[0];
+	int h = m_pos[3] - m_pos[1];
 
 	int viewport[4];
 	glGetIntegerv(GL_VIEWPORT, viewport);
-	glViewport(m_pos[0].m_cached, g_height-m_pos[3].m_cached, w, h);
+	glViewport(m_pos[0], g_height-m_pos[3], w, h);
     glUniform1f(g_shader[SHADER_ORTHO].m_slot[SSLOT_WIDTH], (float)w);
     glUniform1f(g_shader[SHADER_ORTHO].m_slot[SSLOT_HEIGHT], (float)h);
 
 	if(drawfunc != NULL)
-		drawfunc(m_param,m_pos[0].m_cached, m_pos[1].m_cached, w, h);
+		drawfunc(m_param,m_pos[0], m_pos[1], w, h);
 	
 	//glViewport(0, 0, g_width, g_height);
 	glViewport(viewport[0], viewport[1], viewport[2], viewport[3]);
@@ -72,7 +69,7 @@ void ViewportW::draw()
 
 void ViewportW::premousemove()
 {
-	if(g_mouse.x >= m_pos[0].m_cached && g_mouse.x <= m_pos[2].m_cached && g_mouse.y >= m_pos[1].m_cached && g_mouse.y <= m_pos[3].m_cached)
+	if(g_mouse.x >= m_pos[0] && g_mouse.x <= m_pos[2] && g_mouse.y >= m_pos[1] && g_mouse.y <= m_pos[3])
 	{}
 	else
 		m_over = false;
@@ -80,15 +77,15 @@ void ViewportW::premousemove()
 
 bool ViewportW::mousemove()
 {
-	if(g_mouse.x >= m_pos[0].m_cached && g_mouse.x <= m_pos[2].m_cached && g_mouse.y >= m_pos[1].m_cached && g_mouse.y <= m_pos[3].m_cached)
+	if(g_mouse.x >= m_pos[0] && g_mouse.x <= m_pos[2] && g_mouse.y >= m_pos[1] && g_mouse.y <= m_pos[3])
 		m_over = true;
 
 	if(mousemovefunc != NULL)
 	{
-		int relx = g_mouse.x - m_pos[0].m_cached;
-		int rely = g_mouse.y - m_pos[1].m_cached;
-		int w = m_pos[2].m_cached - m_pos[0].m_cached;
-		int h = m_pos[3].m_cached - m_pos[1].m_cached;
+		int relx = g_mouse.x - m_pos[0];
+		int rely = g_mouse.y - m_pos[1];
+		int w = m_pos[2] - m_pos[0];
+		int h = m_pos[3] - m_pos[1];
 		return mousemovefunc(m_param, relx, rely, w, h);
 	}
 
@@ -102,10 +99,10 @@ bool ViewportW::lbuttondown()
 
 	if(ldownfunc != NULL)
 	{
-		int relx = g_mouse.x - m_pos[0].m_cached;
-		int rely = g_mouse.y - m_pos[1].m_cached;
-		int w = m_pos[2].m_cached - m_pos[0].m_cached;
-		int h = m_pos[3].m_cached - m_pos[1].m_cached;
+		int relx = g_mouse.x - m_pos[0];
+		int rely = g_mouse.y - m_pos[1];
+		int w = m_pos[2] - m_pos[0];
+		int h = m_pos[3] - m_pos[1];
 		return ldownfunc(m_param, relx, rely, w, h);
 	}
 
@@ -116,10 +113,10 @@ bool ViewportW::lbuttonup(bool moved)
 {
 	if(lupfunc != NULL)
 	{
-		int relx = g_mouse.x - m_pos[0].m_cached;
-		int rely = g_mouse.y - m_pos[1].m_cached;
-		int w = m_pos[2].m_cached - m_pos[0].m_cached;
-		int h = m_pos[3].m_cached - m_pos[1].m_cached;
+		int relx = g_mouse.x - m_pos[0];
+		int rely = g_mouse.y - m_pos[1];
+		int w = m_pos[2] - m_pos[0];
+		int h = m_pos[3] - m_pos[1];
 		return lupfunc(m_param, relx, rely, w, h);
 	}
 
@@ -136,10 +133,10 @@ bool ViewportW::rbuttondown()
 
 	if(rdownfunc != NULL)
 	{
-		int relx = g_mouse.x - m_pos[0].m_cached;
-		int rely = g_mouse.y - m_pos[1].m_cached;
-		int w = m_pos[2].m_cached - m_pos[0].m_cached;
-		int h = m_pos[3].m_cached - m_pos[1].m_cached;
+		int relx = g_mouse.x - m_pos[0];
+		int rely = g_mouse.y - m_pos[1];
+		int w = m_pos[2] - m_pos[0];
+		int h = m_pos[3] - m_pos[1];
 		return rdownfunc(m_param, relx, rely, w, h);
 	}
 
@@ -150,10 +147,10 @@ bool ViewportW::rbuttonup(bool moved)
 {
 	if(rupfunc != NULL)
 	{
-		int relx = g_mouse.x - m_pos[0].m_cached;
-		int rely = g_mouse.y - m_pos[1].m_cached;
-		int w = m_pos[2].m_cached - m_pos[0].m_cached;
-		int h = m_pos[3].m_cached - m_pos[1].m_cached;
+		int relx = g_mouse.x - m_pos[0];
+		int rely = g_mouse.y - m_pos[1];
+		int w = m_pos[2] - m_pos[0];
+		int h = m_pos[3] - m_pos[1];
 		return rupfunc(m_param, relx, rely, w, h);
 	}
 

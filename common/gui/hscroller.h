@@ -8,7 +8,7 @@
 class HScroller : public Widget
 {
 public:
-	HScroller(Widget* parent, Margin top, Margin bottom, void (*click2)(int p), void (*out)());
+	HScroller(Widget* parent, void (*reframef)(Widget* thisw), void (*click2)(int p), void (*out)());
 
 	void draw();
 	bool lbuttonup(bool moved);

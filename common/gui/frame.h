@@ -8,7 +8,7 @@
 class Frame : public Widget
 {
 public:
-	Frame(Widget* parent, const char* n, Margin left, Margin top, Margin right, Margin bottom);
+	Frame(Widget* parent, const char* n, void (*reframef)(Widget* thisw));
 
 	void draw();
 	void draw2();

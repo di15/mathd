@@ -1,27 +1,16 @@
+#include "platform.h"
+#include "texture.h"
+#include "draw/model.h"
+#include "gui/gui.h"
+#include "utils.h"
 
-
-
-
-
-
-#include "main.h"
-#include "image.h"
-#include "model.h"
-#include "map.h"
-#include "particle.h"
-#include "selection.h"
-#include "projectile.h"
-#include "unit.h"
-#include "building.h"
-#include "gui.h"
-#include "save.h"
-
-CTexture g_texture[TEXTURES];
-vector<tTextureToLoad> g_texLoad;
+Texture g_texture[TEXTURES];
+vector<TextureToLoad> g_texLoad;
 
 int g_texwidth;
 int g_texheight;
-int g_texindex;
+//int g_texindex;
+int g_lastLTex = -1;
 
 char jpegBuffer[JPEG_BUFFER_SIZE];
 JPEGSource   jpegSource;
@@ -29,36 +18,31 @@ FILE* g_src;
 //CFile g_src;
 int srcLen;
 
-tImage *LoadBMP(const char *strFileName)
+LoadedTex *LoadBMP(const char *fullpath)
 {
-	AUX_RGBImageRec *pBitmap = NULL;
+	AUX_RGBImageRec *pBitbldg = NULL;
 	FILE *pFile = NULL;
 
-	// Open a file pointer to the BMP file and check if it was found and opened 
-	if((pFile = fopen(strFileName, "rb")) == NULL) 
+	if((pFile = fopen(fullpath, "rb")) == NULL) 
 	{
-		// Display an error message saying the file was not found, then return NULL
 		MessageBox(g_hWnd, ("Unable to load BMP File!"), ("Error"), MB_OK);
 		return NULL;
 	}
 
-	// Load the bitmap using the aux function stored in glaux.lib
-	pBitmap = auxDIBImageLoad(strFileName);				
+	// Load the bitbldg using the aux function stored in glaux.lib
+	pBitbldg = auxDIBImageLoad(fullpath);				
 
-	// Allocate the tImage
-	tImage *pImage = (tImage *)malloc(sizeof(tImage));
+	LoadedTex *pImage = (LoadedTex *)malloc(sizeof(LoadedTex));
 
-	// Assign the channels, width, height and image bits to pImage
 	pImage->channels = 3;
-	pImage->sizeX = pBitmap->sizeX;
-	pImage->sizeY = pBitmap->sizeY;
-	pImage->data  = pBitmap->data;
+	pImage->sizeX = pBitbldg->sizeX;
+	pImage->sizeY = pBitbldg->sizeY;
+	pImage->data  = pBitbldg->data;
 
-	// Free the bitmap pointer (The "data" will be freed later in CreateTexture())
-	free(pBitmap);
-	
+	free(pBitbldg);
+
 	/*
-	int stride = pImage->channels * pBitmap->sizeX;
+	int stride = pImage->channels * pBitbldg->sizeX;
 	int i;
 	int y2;
 	int temp;
@@ -91,9 +75,9 @@ tImage *LoadBMP(const char *strFileName)
 	return pImage;
 }
 
-tImage *LoadTGA(const char *strFileName)
+LoadedTex *LoadTGA(const char *fullpath)
 {
-	tImage *pImageData = NULL;			// This stores our important image data
+	LoadedTex *pImageData = NULL;			// This stores our important image data
 	WORD width = 0, height = 0;			// The dimensions of the image
 	byte length = 0;					// The length in bytes to the pixels
 	byte imageType = 0;					// The image type (RLE, RGB, Alpha...)
@@ -103,26 +87,24 @@ tImage *LoadTGA(const char *strFileName)
 	int stride = 0;						// The stride (channels * width)
 	int i = 0;							// A counter
 
-	// Open a file pointer to the targa file and check if it was found and opened 
-	if((pFile = fopen(strFileName, "rb")) == NULL) 
+	if((pFile = fopen(fullpath, "rb")) == NULL) 
 	{
-		// Display an error message saying the file was not found, then return NULL
 		MessageBox(g_hWnd, ("Unable to load TGA File!"), ("Error"), MB_OK);
 		return NULL;
 	}
-		
+
 	// Allocate the structure that will hold our eventual image data (must free it!)
-	pImageData = (tImage*)malloc(sizeof(tImage));
+	pImageData = (LoadedTex*)malloc(sizeof(LoadedTex));
 
 	// Read in the length in bytes from the header to the pixel data
 	fread(&length, sizeof(byte), 1, pFile);
-	
+
 	// Jump over one byte
 	fseek(pFile,1,SEEK_CUR); 
 
 	// Read in the imageType (RLE, RGB, etc...)
 	fread(&imageType, sizeof(byte), 1, pFile);
-	
+
 	// Skip past general information we don't care about
 	fseek(pFile, 9, SEEK_CUR); 
 
@@ -130,7 +112,7 @@ tImage *LoadTGA(const char *strFileName)
 	fread(&width,  sizeof(WORD), 1, pFile);
 	fread(&height, sizeof(WORD), 1, pFile);
 	fread(&bits,   sizeof(byte), 1, pFile);
-	
+
 	// Now we move the file pointer to the pixel data
 	fseek(pFile, length + 1, SEEK_CUR); 
 
@@ -154,7 +136,7 @@ tImage *LoadTGA(const char *strFileName)
 
 				// Read in the current line of pixels
 				fread(pLine, stride, 1, pFile);
-			
+
 				// Go through all of the pixels and swap the B and R values since TGA
 				// files are stored as BGR instead of RGB (or use GL_BGR_EXT verses GL_RGB)
 				for(i = 0; i < stride; i += channels)
@@ -182,12 +164,12 @@ tImage *LoadTGA(const char *strFileName)
 			{
 				// Read in the current pixel
 				fread(&pixels, sizeof(unsigned short), 1, pFile);
-				
+
 				// Convert the 16-bit pixel into an RGB
 				b = (pixels & 0x1f) << 3;
 				g = ((pixels >> 5) & 0x1f) << 3;
 				r = ((pixels >> 10) & 0x1f) << 3;
-				
+
 				// This essentially assigns the color to our array and swaps the
 				// B and R values at the same time.
 				pImageData->data[i * 3 + 0] = r;
@@ -218,7 +200,7 @@ tImage *LoadTGA(const char *strFileName)
 		{
 			// Read in the current color count + 1
 			fread(&rleID, sizeof(byte), 1, pFile);
-			
+
 			// Check if we don't have an encoded string of colors
 			if(rleID < 128)
 			{
@@ -274,9 +256,9 @@ tImage *LoadTGA(const char *strFileName)
 					rleID--;
 					colorsRead += channels;
 				}
-				
+
 			}
-				
+
 		}
 	}
 
@@ -290,7 +272,7 @@ tImage *LoadTGA(const char *strFileName)
 	for(int y=0; y<height/2; y++)
 	{
 		y2 = height - y - 1;
-		
+
 		unsigned char *pLine = &(pImageData->data[stride * y]);
 		unsigned char *pLine2 = &(pImageData->data[stride * y2]);
 
@@ -301,13 +283,13 @@ tImage *LoadTGA(const char *strFileName)
 			temp[2] = pLine[x + 2];
 			if(bits == 32)
 				temp[3] = pLine[x + 3];
-			
+
 			pLine[x + 0] = pLine2[x + 0];
 			pLine[x + 1] = pLine2[x + 1];
 			pLine[x + 2] = pLine2[x + 2];
 			if(bits == 32)
 				pLine[x + 3] = pLine2[x + 3];
-			
+
 			pLine2[x + 0] = temp[0];
 			pLine2[x + 1] = temp[1];
 			pLine2[x + 2] = temp[2];
@@ -316,7 +298,7 @@ tImage *LoadTGA(const char *strFileName)
 		}
 	}
 
-	// Fill in our tImage structure to pass back
+	// Fill in our LoadedTex structure to pass back
 	pImageData->channels = channels;
 	pImageData->sizeX    = width;
 	pImageData->sizeY    = height;
@@ -325,11 +307,11 @@ tImage *LoadTGA(const char *strFileName)
 	return pImageData;
 }
 
-void DecodeJPG(jpeg_decompress_struct* cinfo, tImage *pImageData)
+void DecodeJPG(jpeg_decompress_struct* cinfo, LoadedTex *pImageData)
 {
 	// Read in the header of the jpeg file
 	jpeg_read_header(cinfo, TRUE);
-	
+
 	// Start to decompress the jpeg file with our compression info
 	jpeg_start_decompress(cinfo);
 
@@ -340,10 +322,10 @@ void DecodeJPG(jpeg_decompress_struct* cinfo, tImage *pImageData)
 
 	// Get the row span in bytes for each row
 	int rowSpan = cinfo->image_width * cinfo->num_components;
-	
+
 	// Allocate memory for the pixel buffer
 	pImageData->data = ((unsigned char*)malloc(sizeof(unsigned char)*rowSpan*pImageData->sizeY));
-			
+
 	// Create an array of row pointers
 	unsigned char** rowPtr = new unsigned char*[pImageData->sizeY];
 
@@ -358,7 +340,7 @@ void DecodeJPG(jpeg_decompress_struct* cinfo, tImage *pImageData)
 		rowsRead += jpeg_read_scanlines(cinfo, 
 										&rowPtr[rowsRead], cinfo->output_height - rowsRead);
 	}
-	
+
 	// Delete the temporary row pointers
 	delete [] rowPtr;
 
@@ -366,273 +348,41 @@ void DecodeJPG(jpeg_decompress_struct* cinfo, tImage *pImageData)
 	jpeg_finish_decompress(cinfo);
 }
 
-bool source_init(const char *filename) 
-{
-	g_log<<"source_init "<<filename<<endl;
-	
-    g_src = fopen(filename, "rb");
-
-    if (g_src == NULL) return 0;
-
-    fseek(g_src, 0, SEEK_END);
-
-    srcLen = ftell(g_src);
-
-    fseek(g_src, 0, SEEK_SET);
-
-	/*
-	//g_src = CFile(filename);
-
-	//if(g_src.fsize <= 0)
-	if(!g_src.mFile)
-		return false;
-
-	srcLen = g_src.remain();
-
-	LOGI("source_init size=%d", srcLen);
-	*/
-    return true;
-}
-
-void source_close() 
-{
-	g_log<<"source_close"<<endl;;
-		g_log.flush();
-    fclose(g_src);
-	//g_src.close();
-}
-
-int source_read(char* buffer) 
-{
-    //int len = min(JPEG_BUFFER_SIZE, g_src.fsize-g_src.position);
-	//int len = min(JPEG_BUFFER_SIZE, 
-
-    //fread(buffer, len, 1, g_src);
-	//g_src.read((void*)buffer, len);
-
-    //return len;
-	//LOGI("source_read");
-	
-	//return g_src.read((void*)buffer, JPEG_BUFFER_SIZE);
-
-	/*
-	LOGI("source_read...");
-	
-	int toread = JPEG_BUFFER_SIZE;
-	if(g_src.remain() < toread)
-		toread = g_src.remain();
-
-	LOGI("source_read %d", toread);
-
-	//return g_src.read((void*)buffer, toread);
-	int ret = g_src.read((void*)buffer, toread);
-
-	LOGI("read %d", ret);
-	
-	return ret;
-	*/
-
-	 int len = JPEG_BUFFER_SIZE;
-
-    if (len > srcLen) len = srcLen;
-
-    srcLen -= len;
-
-	g_log<<"source_read "<<len<<endl;
-		g_log.flush();
-
-    fread(buffer, len, 1, g_src);
-
-    return len;
-}
-
-void source_seek(int num) 
-{
-	g_log<<"source_seek "<<num<<endl;;
-		g_log.flush();
-    fseek(g_src, num, SEEK_CUR);
-	//g_src.seek(num);
-}
-
-static void init_sourceFunc(j_decompress_ptr cinfo) 
-{
-	g_log<<"init_sourceFunc"<<endl;
-		g_log.flush();
-    ((JPEGSource*)cinfo->src)->pub.bytes_in_buffer = 0;
-}
-
-static boolean fill_input_bufferFunc(j_decompress_ptr cinfo) 
-{
-	g_log<<"fill_input_bufferFunc"<<endl;
-		g_log.flush();
-    JPEGSource  *src = (JPEGSource*)cinfo->src;
-
-    src->pub.bytes_in_buffer = source_read(jpegBuffer);
-
-    src->pub.next_input_byte = (const unsigned char*)jpegBuffer;
-
-    return TRUE;
-}
-
-void skip_input_dataFunc(j_decompress_ptr cinfo, long num_bytes) 
-{
-	g_log<<"skip_input_dataFunc "<<(int)num_bytes<<endl;
-		g_log.flush();
-    JPEGSource  *src = (JPEGSource*)cinfo->src;
-
-    if (num_bytes > 0) 
-	{
-        source_seek(num_bytes);
-
-        if (num_bytes > src->pub.bytes_in_buffer) src->pub.bytes_in_buffer = 0;
-
-        else 
-		{
-            src->pub.next_input_byte += num_bytes;
-            src->pub.bytes_in_buffer -= num_bytes;
-        }
-    }
-}
-
-void term_sourceFunc(j_decompress_ptr cinfo) 
-{
-	g_log<<"term_sourceFunc"<<endl;
-		g_log.flush();
-}
-
-tImage *LoadJPG2(const char *strFileName)
-{
-		g_log<<"JPG "<< strFileName<<" 0"<<endl;
-		g_log.flush();
-
-	tImage *pImageData = NULL;
-    struct jpeg_decompress_struct cinfo;
-
-    jpeg_error_mgr jerr;
-	
-	g_log<<"JPEG_LIB_VERSION = "<<JPEG_LIB_VERSION<<endl;
-	
-		g_log<<"JPG "<< strFileName<<" 1"<<endl;
-		g_log.flush();
-
-    if (!source_init(strFileName))
-	{
-		g_log<<"Error opening jpeg "<<strFileName<<endl;
-		return NULL;
-	}
-	
-		g_log<<"JPG "<< strFileName<<" 2"<<endl;
-		g_log.flush();
-
-	pImageData = (tImage*)malloc(sizeof(tImage));
-
-    cinfo.err = jpeg_std_error(&jerr);
-    jpeg_create_decompress(&cinfo);
-    jpegSource.pub.init_source = init_sourceFunc;
-    jpegSource.pub.fill_input_buffer = fill_input_bufferFunc;
-    jpegSource.pub.skip_input_data = skip_input_dataFunc;
-    jpegSource.pub.resync_to_restart = jpeg_resync_to_restart;
-    jpegSource.pub.term_source = term_sourceFunc;
-    jpegSource.pub.next_input_byte = NULL;
-    jpegSource.pub.bytes_in_buffer = 0;
-    cinfo.src = (struct jpeg_source_mgr*)&jpegSource;
-	
-		g_log<<"JPG "<< strFileName<<" 3"<<endl;
-		g_log.flush();
-
-    jpeg_read_header(&cinfo, TRUE);
-	
-		g_log<<"JPG "<< strFileName<<" 3.1"<<endl;
-		g_log.flush();
-
-    jpeg_start_decompress(&cinfo);
-	
-		g_log<<"JPG "<< strFileName<<" 4"<<endl;
-		g_log.flush();
-
-    pImageData->channels = cinfo.num_components;
-    pImageData->sizeX    = cinfo.image_width;
-    pImageData->sizeY    = cinfo.image_height;
-
-    //printf("%d %d\n", pImageData.sizeX, pImageData.sizeY);
-
-    int rowSpan = cinfo.image_width * cinfo.num_components;
-	
-		g_log<<"JPG "<< strFileName<<" 5"<<endl;
-		g_log.flush();
-
-    pImageData->data = ((unsigned char*)malloc(sizeof(unsigned char)*rowSpan*pImageData->sizeY));
-
-    unsigned char** rowPtr = new unsigned char*[pImageData->sizeY];
-
-    for (int i = 0; i < pImageData->sizeY; i++)
-        rowPtr[i] = &(pImageData->data[i * rowSpan]);
-	
-		g_log<<"JPG "<< strFileName<<" 6"<<endl;
-		g_log.flush();
-
-    int rowsRead = 0;
-
-    while (cinfo.output_scanline < cinfo.output_height)
-        rowsRead += jpeg_read_scanlines(&cinfo, &rowPtr[rowsRead], cinfo.output_height - rowsRead);
-
-	
-		g_log<<"JPG "<< strFileName<<" 7"<<endl;
-		g_log.flush();
-
-    delete [] rowPtr;
-
-    //free(pImageData->data);
-
-    jpeg_finish_decompress(&cinfo);
-    jpeg_destroy_decompress(&cinfo);
-	
-		g_log<<"JPG "<< strFileName<<" 8"<<endl;
-		g_log.flush();
-
-    source_close();
-	
-		g_log<<"JPG "<< strFileName<<" 9"<<endl;
-		g_log.flush();
-
-    return pImageData;
-}
-
-tImage *LoadJPG(const char *strFileName)
+LoadedTex *LoadJPG(const char *fullpath)
 {
 	struct jpeg_decompress_struct cinfo;
-	tImage *pImageData = NULL;
+	LoadedTex *pImageData = NULL;
 	FILE *pFile;
-		
+
 	// Open a file pointer to the jpeg file and check if it was found and opened 
-	if((pFile = fopen(strFileName, "rb")) == NULL) 
+	if((pFile = fopen(fullpath, "rb")) == NULL) 
 	{
 		// Display an error message saying the file was not found, then return NULL
 		//MessageBox(g_hWnd, "Unable to load JPG File!", "Error", MB_OK);
 		return NULL;
 	}
-	
+
 	// Create an error handler
 	jpeg_error_mgr jerr;
 
 	// Have our compression info object point to the error handler address
 	cinfo.err = jpeg_std_error(&jerr);
-	
+
 	// Initialize the decompression object
 	jpeg_create_decompress(&cinfo);
-	
+
 	// Specify the data source (Our file pointer)	
 	jpeg_stdio_src(&cinfo, pFile);
-	
+
 	// Allocate the structure that will hold our eventual jpeg data (must free it!)
-	pImageData = (tImage*)malloc(sizeof(tImage));
+	pImageData = (LoadedTex*)malloc(sizeof(LoadedTex));
 
 	// Decode the jpeg file and fill in the image data structure to pass back
 	DecodeJPG(&cinfo, pImageData);
-	
+
 	// This releases all the stored memory for reading and decoding the jpeg
 	jpeg_destroy_decompress(&cinfo);
-	
+
 	// Close the file pointer that opened the file
 	fclose(pFile);
 
@@ -640,11 +390,10 @@ tImage *LoadJPG(const char *strFileName)
 	return pImageData;
 }
 
-
-tImage *LoadPNG(const char *strFileName)
+LoadedTex *LoadPNG(const char *fullpath)
 {
-	tImage *pImageData = NULL;
-	
+	LoadedTex *pImageData = NULL;
+
 	png_structp png_ptr;
     png_infop info_ptr;
     unsigned int sig_read = 0;
@@ -652,17 +401,17 @@ tImage *LoadPNG(const char *strFileName)
     FILE *fp;
 
 	/*
-	if ((fp = fopen(strFileName, "rb")) == NULL)
+	if ((fp = fopen(relative, "rb")) == NULL)
         return NULL;
 	png_byte header[8];
 	fread(header, sizeof(png_byte), 8, fp);
 	fclose(fp);
 	
-	g_log<<"PNG header "<<strFileName<<" "
+	g_log<<"PNG header "<<relative<<" "
 		<<(int)header[0]<<","<<(int)header[1]<<","<<(int)header[2]<<","<<(int)header[3]<<","
 		<<(int)header[4]<<","<<(int)header[5]<<","<<(int)header[6]<<","<<(int)header[7]<<endl;
 	*/
-	if ((fp = fopen(strFileName, "rb")) == NULL)
+	if ((fp = fopen(fullpath, "rb")) == NULL)
         return NULL;
 
 
@@ -744,8 +493,8 @@ tImage *LoadPNG(const char *strFileName)
      *  expand a palette into RGB
      */
 	png_read_png(png_ptr, info_ptr, PNG_TRANSFORM_STRIP_16 | PNG_TRANSFORM_PACKING | PNG_TRANSFORM_EXPAND, png_voidp_NULL);
-	
-	pImageData = (tImage*)malloc(sizeof(tImage));
+
+	pImageData = (LoadedTex*)malloc(sizeof(LoadedTex));
 
 	pImageData->sizeX = png_get_image_width(png_ptr, info_ptr); //info_ptr->width;
     pImageData->sizeY = png_get_image_height(png_ptr, info_ptr); //info_ptr->height;
@@ -759,7 +508,7 @@ tImage *LoadPNG(const char *strFileName)
             pImageData->channels = 3;
             break;
         default:
-			g_log<<strFileName<<" color type "<<png_get_color_type(png_ptr, info_ptr)<<" not supported"<<endl;
+			g_log<<fullpath<<" color type "<<png_get_color_type(png_ptr, info_ptr)<<" not supported"<<endl;
             //std::cout << "Color type " << info_ptr->color_type << " not supported" << std::endl;
             png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
             fclose(fp);
@@ -771,13 +520,13 @@ tImage *LoadPNG(const char *strFileName)
 	pImageData->data = (unsigned char*) malloc(row_bytes * pImageData->sizeY);
 
 	png_bytepp row_pointers = png_get_rows(png_ptr, info_ptr);
-	
+
 	for (int i = 0; i < pImageData->sizeY; i++) 
 	{
         // note that png is ordered top to
         // bottom, but OpenGL expect it bottom to top
         // so the order or swapped
-		
+
         memcpy((void*)(pImageData->data+(row_bytes * i)), row_pointers[i], row_bytes);
         //memcpy((void*)(pImageData->data+(row_bytes * (pImageData->sizeY-1-i))), row_pointers[i], row_bytes);
     }
@@ -790,26 +539,59 @@ tImage *LoadPNG(const char *strFileName)
 	return pImageData;
 }
 
-bool FindTexture(unsigned int &texture, const char* filepath)
+bool FindTexture(unsigned int &textureidx, const char* relative)
 {
 	char corrected[1024];
-	strcpy(corrected, filepath);
-
-	for(int i=0; i<strlen(corrected); i++)
-		if(corrected[i] == '/')
-			corrected[i] = '\\';
+	strcpy(corrected, relative);
+	CorrectSlashes(corrected);
 
 	for(int i=0; i<TEXTURES; i++)
-		if(g_texture[i].loaded && stricmp(g_texture[i].filepath, corrected) == 0)
+	{
+		Texture* t = &g_texture[i];
+
+		if(t->loaded && _stricmp(t->filepath, corrected) == 0)
 		{
-			g_texindex = i;
-			texture = g_texture[i].tex;
-			g_texwidth = g_texture[i].width;
-			g_texheight = g_texture[i].height;
+			//g_texindex = i;
+			//texture = t->texname;
+			textureidx = i;
+			g_texwidth = t->width;
+			g_texheight = t->height;
 			return true;
 		}
+	}
 
 	return false;
+}
+
+void FreeTexture(const char* relative)
+{
+	char corrected[MAX_PATH+1];
+	strcpy(corrected, relative);
+	CorrectSlashes(corrected);
+
+	for(int i=0; i<TEXTURES; i++)
+	{
+		Texture* t = &g_texture[i];
+
+		if(t->loaded && _stricmp(t->filepath, corrected) == 0)
+		{
+			t->loaded = false;
+			glDeleteTextures(1, &t->texname);
+			//g_log<<"Found texture "<<filepath<<" ("<<texture<<")"<<endl;
+			return;
+		}
+	}
+}
+
+void FreeTexture(int i)
+{
+	Texture* t = &g_texture[i];
+
+	if(t->loaded)
+	{
+		t->loaded = false;
+		glDeleteTextures(1, &t->texname);
+	}
 }
 
 int NewTexture()
@@ -821,30 +603,56 @@ int NewTexture()
 	return -1;
 }
 
-void TextureLoaded(unsigned int texture, const char* filepath, int id)
+bool TextureLoaded(unsigned int texture, const char* relative, bool transp, unsigned int& texindex, bool reload)
 {
 	char corrected[1024];
-	strcpy(corrected, filepath);
+	strcpy(corrected, relative);
+	CorrectSlashes(corrected);
 
-	for(int i=0; i<strlen(corrected); i++)
-		if(corrected[i] == '/')
-			corrected[i] = '\\';
+	if(!reload)
+	{
+		texindex = NewTexture();
 
-	int i = id;
+		if((int)texindex < 0)
+		{
+			texindex = 0;	// Give a harmless texture index
+			return false;
+		}
+	}
 
-	if(id < 0)
-		i = NewTexture();
+	//g_texindex = texindex;
+	Texture* t = &g_texture[texindex];
+	t->loaded = true;
+	strcpy(t->filepath, corrected);
+	t->texname = texture;
+	t->width = g_texwidth;
+	t->height = g_texheight;
+	t->transp = transp;
 
-	if(i < 0)
-		return;
+	t->sky = false;
+	t->breakable = false;
+	t->passthru = false;
+	t->grate = false;
+	t->ladder = false;
+	t->water = false;
+	t->fabric = false;
 
-	g_texindex = i;
+	if(strstr(corrected, "^"))
+		t->sky = true;
+	if(strstr(corrected, "!"))
+		t->breakable = true;
+	if(strstr(corrected, "~"))
+		t->passthru = true;
+	if(strstr(corrected, "`"))
+		t->grate = true;
+	if(strstr(corrected, "#"))
+		t->ladder = true;
+	if(strstr(corrected, "$"))
+		t->water = true;
+	if(strstr(corrected, "@"))
+		t->fabric = true;
 
-	g_texture[i].loaded = true;
-	strcpy(g_texture[i].filepath, corrected);
-	g_texture[i].tex = texture;
-	g_texture[i].width = g_texwidth;
-	g_texture[i].height = g_texheight;
+	return true;
 }
 
 void FreeTextures()
@@ -854,12 +662,12 @@ void FreeTextures()
 		if(!g_texture[i].loaded)
 			continue;
 
-		glDeleteTextures(1, &g_texture[i].tex);
-		g_texture[i].loaded = false;
+		glDeleteTextures(1, &g_texture[i].texname);
+		//g_texture[i].loaded = false;	// Needed to reload textures
 	}
 }
 
-void FindTextureExtension(char *strFileName)
+void FindTextureExtension(char *relative)
 {
 	char strJPGPath[MAX_PATH] = {0};
 	char strPNGPath[MAX_PATH] = {0};
@@ -872,7 +680,7 @@ void FindTextureExtension(char *strFileName)
 	//strcat(strJPGPath, "\\");
 	FullPath("", strJPGPath);
 
-	strcat(strJPGPath, strFileName);
+	strcat(strJPGPath, relative);
 	strcpy(strTGAPath, strJPGPath);
 	strcpy(strBMPPath, strTGAPath);
 	strcpy(strPNGPath, strBMPPath);
@@ -885,42 +693,44 @@ void FindTextureExtension(char *strFileName)
 	if((fp = fopen(strJPGPath, "rb")) != NULL)
 	{
 		fclose(fp);
-		strcat(strFileName, ".jpg");
+		strcat(relative, ".jpg");
 		return;
 	}
 	
 	if((fp = fopen(strPNGPath, "rb")) != NULL)
 	{
 		fclose(fp);
-		strcat(strFileName, ".png");
+		strcat(relative, ".png");
 		return;
 	}
 
 	if((fp = fopen(strTGAPath, "rb")) != NULL)
 	{
 		fclose(fp);
-		strcat(strFileName, ".tga");
+		strcat(relative, ".tga");
 		return;
 	}
 
 	if((fp = fopen(strBMPPath, "rb")) != NULL)
 	{
 		fclose(fp);
-		strcat(strFileName, ".bmp");
+		strcat(relative, ".bmp");
 		return;
 	}
 }
 
-int g_lastLTex = -1;
 bool Load1Texture()
 {
 	if(g_lastLTex+1 < g_texLoad.size())
-		Status(g_texLoad[g_lastLTex+1].filepath);
+		Status(g_texLoad[g_lastLTex+1].relative);
 
 	if(g_lastLTex >= 0)
 	{
-		tTextureToLoad* t = &g_texLoad[g_lastLTex];
-		CreateTexture(*t->tex, t->filepath, t->clamp);
+		TextureToLoad* t = &g_texLoad[g_lastLTex];
+		if(t->reload)
+			CreateTexture(t->texindex, t->relative, t->clamp, t->reload);
+		else
+			CreateTexture(*t->ptexindex, t->relative, t->clamp, t->reload);
 	}
 
 	g_lastLTex ++;
@@ -928,83 +738,108 @@ bool Load1Texture()
 	if(g_lastLTex >= g_texLoad.size())
 	{
 		g_texLoad.clear();
-		return true;	// Done loading all textures
+		return false;	// Done loading all textures
 	}
 
-	return false;	// Not finished loading textures
+	return true;	// Not finished loading textures
 }
 
-void QueueTexture(unsigned int* tex, const char* strFileName, bool clamp)
+void QueueTexture(unsigned int* texindex, const char* relative, bool clamp)
 {
-	tTextureToLoad toLoad;
-	toLoad.tex = tex;
-	strcpy(toLoad.filepath, strFileName);
+	TextureToLoad toLoad;
+	toLoad.ptexindex = texindex;
+	strcpy(toLoad.relative, relative);
 	toLoad.clamp = clamp;
+	toLoad.reload = false;
 
 	g_texLoad.push_back(toLoad);
 }
 
-bool CreateTexture(unsigned int &texture, const char* strFileName, bool clamp, int id)
+void RequeueTexture(unsigned int texindex, const char* relative, bool clamp)
 {
-	if(!strFileName) 
+	TextureToLoad toLoad;
+	toLoad.texindex = texindex;
+	strcpy(toLoad.relative, relative);
+	toLoad.clamp = clamp;
+	toLoad.reload = true;
+
+	g_texLoad.push_back(toLoad);
+}
+
+LoadedTex* LoadTexture(const char* full)
+{
+	if(strstr(full, ".jpg"))
+	{
+		return LoadJPG(full);
+		//return LoadJPG2(relative);
+	}
+	else if(strstr(full, ".png"))
+	{
+		return LoadPNG(full);
+	}
+	else if(strstr(full, ".tga"))
+	{
+		return LoadTGA(full);
+	}
+	else if(strstr(full, ".bmp"))
+	{
+		return LoadBMP(full);
+	}
+
+	return NULL;
+}
+
+bool CreateTexture(unsigned int &texindex, const char* relative, bool clamp, bool reload)
+{
+	if(!relative) 
 		return false;
 
-	if(id < 0)
-		if(FindTexture(texture, strFileName))
+	if(!reload)
+		if(FindTexture(texindex, relative))
 			return true;
 
-	// Define a pointer to a tImage
-	tImage *pImage = NULL;
+	// Define a pointer to a LoadedTex
+	LoadedTex *pImage = NULL;
 
 	char full[1024];
-	FullPath(strFileName, full);
+	FullPath(relative, full);
 
-	// If the file is a jpeg, load the jpeg and store the data in pImage
-	if(strstr(strFileName, ".jpg"))
-	{
-		pImage = LoadJPG(full);
-		//pImage = LoadJPG2(strFileName);
-	}
-	else if(strstr(strFileName, ".png"))
-	{
-		pImage = LoadPNG(full);
-	}
-	// If the file is a tga, load the tga and store the data in pImage
-	else if(strstr(strFileName, ".tga"))
-	{
-		pImage = LoadTGA(full);
-	}
-	// If the file is a bitmap, load the bitmap and store the data in pImage
-	else if(strstr(strFileName, ".bmp"))
-	{
-		pImage = LoadBMP(full);
-	}
+	pImage = LoadTexture(full);
 
 	// Make sure valid image data was given to pImage, otherwise return false
 	if(pImage == NULL)		
 	{
-		g_log<<"Failed to load "<<strFileName<<"\n\r";
+		g_log<<"Failed to load "<<relative<<endl;
 		g_log.flush();
+		
+		if(!reload)
+			texindex = 0;	// Give a harmless texture index
+
 		return false;
 	}
 
+	unsigned int texname;
 	// Generate a texture with the associative texture ID stored in the array
-	glGenTextures(1, &texture);
+	glGenTextures(1, &texname);
 
 	// This sets the alignment requirements for the start of each pixel row in memory.
 	glPixelStorei (GL_UNPACK_ALIGNMENT, 1);
 
 	// Bind the texture to the texture arrays index and init the texture
-	glBindTexture(GL_TEXTURE_2D, texture);
+	glBindTexture(GL_TEXTURE_2D, texname);
 
 	// Assume that the texture is a 24 bit RGB texture (We convert 16-bit ones to 24-bit)
 	int textureType = GL_RGB;
+	bool transp = false;
 
 	// If the image is 32-bit (4 channels), then we need to specify GL_RGBA for an alpha
 	if(pImage->channels == 4)
+	{
 		textureType = GL_RGBA;
+		transp = true;
+	}
 		
-	// Option 1: with mipmaps
+	// Option 1: with mipbldgs
 	gluBuild2DMipmaps(GL_TEXTURE_2D, pImage->channels, pImage->sizeX, pImage->sizeY, textureType, GL_UNSIGNED_BYTE, pImage->data);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_NEAREST);
 	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
@@ -1020,13 +855,12 @@ bool CreateTexture(unsigned int &texture, const char* strFileName, bool clamp, i
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 	}
 	
-	// Option 2: without mipmaps
-	//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);c
+	// Option 2: without mipbldgs
+	//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	//glTexImage2D(GL_TEXTURE_2D, 0, textureType, pImage->sizeX, pImage->sizeY, 0, textureType, GL_UNSIGNED_BYTE, pImage->data);
 
-	// Now we need to free the image data that we loaded since openGL stored it as a texture
-	if (pImage)										// If we loaded the image
+	if(pImage)
 	{
 		g_texwidth = pImage->sizeX;
 		g_texheight = pImage->sizeY;
@@ -1038,36 +872,57 @@ bool CreateTexture(unsigned int &texture, const char* strFileName, bool clamp, i
 
 		free(pImage);								// Free the image structure
 
-		g_log<<strFileName<<"\n\r";
+		g_log<<relative<<"\n\r";
 		g_log.flush();
 	}
 
-	TextureLoaded(texture, strFileName, id);
+	TextureLoaded(texname, relative, transp, texindex, reload);
 
 	// Return a success
 	return true;
 }
 
-void ReloadTextures()
+void RequeueTextures()
 {
 	FreeTextures();
 
 	for(int i=0; i<TEXTURES; i++)
 	{
 		if(g_texture[i].loaded)
-			CreateTexture(g_texture[i].tex, g_texture[i].filepath, i);
+			RequeueTexture(i, g_texture[i].filepath, i);
 	}
 	
-	LoadParticles();
-	LoadProjectiles();
-	LoadTerrainTextures();
-	LoadUnitSprites();
-	BSprites();
-
-	for(int i=0; i<MODELS; i++)
-	{
-		if(g_model[i].on)
-			g_model[i].ReloadTexture();
-	}
+	//LoadParticles();
+	//LoadProjectiles();
+	//LoadTerrainTextures();
+	//LoadUnitSprites();
+	//BSprites();
 }
 
+void DiffPath(const char* basepath, char* diffpath)
+{
+	strcpy(diffpath, basepath);
+	//StripExtension(diffpath);
+	strcat(diffpath, ".jpg");
+}
+
+void SpecPath(const char* basepath, char* specpath)
+{
+	strcpy(specpath, basepath);
+	//StripExtension(specpath);
+	strcat(specpath, ".spec.jpg");
+}
+
+void NormPath(const char* basepath, char* normpath)
+{
+	strcpy(normpath, basepath);
+	//StripExtension(normpath);
+	strcat(normpath, ".norm.jpg");
+}
+
+void OwnPath(const char* basepath, char* ownpath)
+{
+	strcpy(ownpath, basepath);
+	//StripExtension(ownpath);
+	strcat(ownpath, ".team.png");
+}

@@ -25,22 +25,6 @@
 #include "frame.h"
 #include "viewportw.h"
 
-#define MAX_OPTIONS_SHOWN	5
-#define LBAR_WIDTH		100
-#define MMBAR_WIDTH		(LBAR_WIDTH*128.0f/110.0f)
-#define MMBAR_HEIGHT	(MMBAR_WIDTH*1.0f/1.0f)
-#define MINIMAP_X1		(MMBAR_WIDTH*6.0f/128.0f)
-#define MINIMAP_X2		(MMBAR_WIDTH*121.0f/128.0f)
-#define MINIMAP_Y1		(MMBAR_HEIGHT*6.0f/128.0f)
-#define MINIMAP_Y2		(MMBAR_HEIGHT*114.0f/128.0f)
-#define TBAR_HEIGHT		15
-
-#define HSCROLLER_SPACING	16
-#define HSCROLLER_OPTIONW	173
-#define HSCROLLER_SIDESP	(((14+17-7)+(20+18-11))/2)
-
-#define STATUS_ALPHA	(0.75f)
-
 class GUI
 {
 public:
@@ -291,14 +275,8 @@ void OpenSoleView(const char* name, int page=0);
 bool OpenAnotherView(const char* name, int page=0);
 void NextPage(const char* name);
 bool MousePosition();
-void CenterMoUseS();
+void CenterMouse();
 void Status(const char* status, bool logthis=false);
 void Ortho(int width, int height, float r, float g, float b, float a);
-
-
-void RedoGUI();
-void OpenPlay();
-void OpenEditor();
-void OpenMenu();
 
 #endif

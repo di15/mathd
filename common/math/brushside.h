@@ -8,8 +8,18 @@
 #include "plane.h"
 #include "polygon.h"
 #include "triangle.h"
-#include "../draw/model.h"
-#include "../draw/vertexarray.h"
+#include "../render/model.h"
+#include "../render/vertexarray.h"
+
+//tex coord equation - not used
+class TexCEq
+{
+	float m_rot;	//degrees
+	float m_scale[2];	//default 0.1, world to tex coordinates
+	float m_offset[2];	//in world distances
+};
+
+class CutBrushSide;
 
 class BrushSide
 {
@@ -19,24 +29,7 @@ public:
 	unsigned int m_diffusem;
 	unsigned int m_specularm;
 	unsigned int m_normalm;
-	
-	BrushSide(const BrushSide& original);
-	BrushSide(){}
-	virtual ~BrushSide(){}
-	virtual void usetex();
-};
-
-//tex coord equation
-class TexCEq
-{
-	float m_rot;	//degrees
-	float m_scale[2];	//default 0.1, world to tex coordinates
-	float m_offset[2];	//in world distances
-};
-
-class EdBrushSide : public BrushSide
-{
-public:
+	unsigned int m_ownerm;	//team colour map
 	int m_ntris;
 	Triangle2* m_tris;
 	Plane m_tceq[2];	//tex coord uv equations
@@ -44,13 +37,14 @@ public:
 	int* m_vindices;	//indices into parent brush's shared vertex array; only stores unique vertices as defined by polygon outline
 	Vec3f m_centroid;
 	
-	EdBrushSide(const EdBrushSide& original);
-	EdBrushSide& operator=(const EdBrushSide &original);
-	EdBrushSide();
-	EdBrushSide(Vec3f normal, Vec3f point);
-	~EdBrushSide();
+	BrushSide(const BrushSide& original);
+	BrushSide& operator=(const BrushSide &original);
+	BrushSide();
+	BrushSide(Vec3f normal, Vec3f point);
+	~BrushSide();
 	void makeva();
-	//void usetex();
+	void vafromcut(CutBrushSide* cutside);
+	void usetex();
 	void gentexeq();	//fit texture to face
 	void fittex();
 	void remaptex();

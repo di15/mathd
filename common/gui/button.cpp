@@ -17,7 +17,7 @@
 #include "icon.h"
 #include "../ustring.h"
 
-Button::Button(Widget* parent, const char* n, const char* filepath, const RichText label, const RichText t, int f, Margin left, Margin top, Margin right, Margin bottom, void (*click)(), void (*overf)(), void (*out)()) : Widget()
+Button::Button(Widget* parent, const char* n, const char* filepath, const RichText label, const RichText t, int f, void (*reframef)(Widget* thisw), void (*click)(), void (*overf)(), void (*out)()) : Widget()
 {
 	m_parent = parent;
 	m_type = WIDGET_BUTTON;
@@ -35,10 +35,7 @@ Button::Button(Widget* parent, const char* n, const char* filepath, const RichTe
 	CreateTexture(m_tex, filepath, true);
 	CreateTexture(m_bgtex, "gui\\buttonbg.png", true);
 	CreateTexture(m_bgovertex, "gui\\buttonbgover.png", true);
-	m_pos[0] = left;
-	m_pos[1] = top;
-	m_pos[2] = right;
-	m_pos[3] = bottom;
+	reframefunc = reframef;
 	clickfunc = click;
 	overfunc = overf;
 	clickfunc2 = NULL;
@@ -47,7 +44,7 @@ Button::Button(Widget* parent, const char* n, const char* filepath, const RichTe
 	reframe();
 }
 
-Button::Button(Widget* parent, const char* filepath, const RichText t, int f, Margin left, Margin top, Margin right, Margin bottom, void (*click)(), void (*overf)(), void (*out)()) : Widget()
+Button::Button(Widget* parent, const char* filepath, const RichText t, int f, void (*reframef)(Widget* thisw), void (*click)(), void (*overf)(), void (*out)()) : Widget()
 {
 	m_parent = parent;
 	m_type = WIDGET_BUTTON;
@@ -63,10 +60,7 @@ Button::Button(Widget* parent, const char* filepath, const RichText t, int f, Ma
 	CreateTexture(m_tex, filepath, true);
 	CreateTexture(m_bgtex, "gui\\buttonbg.png", true);
 	CreateTexture(m_bgovertex, "gui\\buttonbgover.png", true);
-	m_pos[0] = left;
-	m_pos[1] = top;
-	m_pos[2] = right;
-	m_pos[3] = bottom;
+	reframefunc = reframef;
 	clickfunc = click;
 	overfunc = overf;
 	clickfunc2 = NULL;
@@ -75,7 +69,7 @@ Button::Button(Widget* parent, const char* filepath, const RichText t, int f, Ma
 	reframe();
 }
 
-Button::Button(Widget* parent, const char* filepath, const RichText t, int f, Margin left, Margin top, Margin right, Margin bottom, void (*click2)(int p), int parm) : Widget()
+Button::Button(Widget* parent, const char* filepath, const RichText t, int f, void (*reframef)(Widget* thisw), void (*click2)(int p), int parm) : Widget()
 {
 	m_parent = parent;
 	m_type = WIDGET_BUTTON;
@@ -91,10 +85,7 @@ Button::Button(Widget* parent, const char* filepath, const RichText t, int f, Ma
 	CreateTexture(m_tex, filepath, true);
 	CreateTexture(m_bgtex, "gui\\buttonbg.png", true);
 	CreateTexture(m_bgovertex, "gui\\buttonbgover.png", true);
-	m_pos[0] = left;
-	m_pos[1] = top;
-	m_pos[2] = right;
-	m_pos[3] = bottom;
+	reframefunc = reframef;
 	clickfunc = NULL;
 	overfunc = NULL;
 	clickfunc2 = click2;
@@ -104,7 +95,7 @@ Button::Button(Widget* parent, const char* filepath, const RichText t, int f, Ma
 	reframe();
 }
 
-Button::Button(Widget* parent, const char* filepath, const RichText t, int f, Margin left, Margin top, Margin right, Margin bottom, void (*click2)(int p), void (*overf2)(int p), void (*out)(), int parm) : Widget()
+Button::Button(Widget* parent, const char* filepath, const RichText t, int f, void (*reframef)(Widget* thisw), void (*click2)(int p), void (*overf2)(int p), void (*out)(), int parm) : Widget()
 {
 	m_parent = parent;
 	m_type = WIDGET_BUTTON;
@@ -121,10 +112,7 @@ Button::Button(Widget* parent, const char* filepath, const RichText t, int f, Ma
 	CreateTexture(m_tex, filepath, true);
 	CreateTexture(m_bgtex, "gui\\buttonbg.png", true);
 	CreateTexture(m_bgovertex, "gui\\buttonbgover.png", true);
-	m_pos[0] = left;
-	m_pos[1] = top;
-	m_pos[2] = right;
-	m_pos[3] = bottom;
+	reframefunc = reframef;
 	clickfunc = NULL;
 	overfunc = NULL;
 	clickfunc2 = click2;
@@ -165,8 +153,8 @@ void Button::reframe()
 		}
 	}
 
-	m_tpos[0] = Margin(MARGIN_SOURCE_WIDTH, MARGIN_FUNC_PIXELS, (m_pos[2].m_cached-m_pos[0].m_cached)/2.0f-length/2.0f);
-	m_tpos[1] = Margin(MARGIN_SOURCE_HEIGHT, MARGIN_FUNC_PIXELS, (m_pos[3].m_cached-m_pos[1].m_cached)/2.0f-g_font[m_font].gheight/2.0f);
+	m_tpos[0] = Margin(MARGIN_SOURCE_WIDTH, MARGIN_FUNC_PIXELS, (m_pos[2]-m_pos[0])/2.0f-length/2.0f);
+	m_tpos[1] = Margin(MARGIN_SOURCE_HEIGHT, MARGIN_FUNC_PIXELS, (m_pos[3]-m_pos[1])/2.0f-g_font[m_font].gheight/2.0f);
 	m_tpos[0].recalc(this);
 	m_tpos[1].recalc(this);
 	//m_tpos[2].recalc(this);
@@ -175,7 +163,7 @@ void Button::reframe()
 
 void Button::premousemove()
 {
-	if(g_mouse.x >= m_pos[0].m_cached && g_mouse.x <= m_pos[2].m_cached && g_mouse.y >= m_pos[1].m_cached && g_mouse.y <= m_pos[3].m_cached)
+	if(g_mouse.x >= m_pos[0] && g_mouse.x <= m_pos[2] && g_mouse.y >= m_pos[1] && g_mouse.y <= m_pos[3])
 	{
 	}
 	else
@@ -189,7 +177,7 @@ void Button::premousemove()
 
 bool Button::mousemove()
 {
-	if(g_mouse.x >= m_pos[0].m_cached && g_mouse.x <= m_pos[2].m_cached && g_mouse.y >= m_pos[1].m_cached && g_mouse.y <= m_pos[3].m_cached)
+	if(g_mouse.x >= m_pos[0] && g_mouse.x <= m_pos[2] && g_mouse.y >= m_pos[1] && g_mouse.y <= m_pos[3])
 	{
 		if(overfunc != NULL)
 			overfunc();
@@ -207,13 +195,13 @@ bool Button::mousemove()
 void Button::draw()
 {
 	if(m_over)
-		DrawImage(g_texture[m_bgovertex].texname, m_pos[0].m_cached, m_pos[1].m_cached, m_pos[2].m_cached, m_pos[3].m_cached);
+		DrawImage(g_texture[m_bgovertex].texname, m_pos[0], m_pos[1], m_pos[2], m_pos[3]);
 	else
-		DrawImage(g_texture[m_bgtex].texname, m_pos[0].m_cached, m_pos[1].m_cached, m_pos[2].m_cached, m_pos[3].m_cached);
+		DrawImage(g_texture[m_bgtex].texname, m_pos[0], m_pos[1], m_pos[2], m_pos[3]);
 
-	DrawImage(g_texture[m_tex].texname, m_pos[0].m_cached, m_pos[1].m_cached, m_pos[2].m_cached, m_pos[3].m_cached);  
+	DrawImage(g_texture[m_tex].texname, m_pos[0], m_pos[1], m_pos[2], m_pos[3]);  
 
-	DrawShadowedText(m_font, m_tpos[0].m_cached, m_tpos[1].m_cached, &m_label);
+	DrawShadowedText(m_font, m_tpos[0], m_tpos[1], &m_label);
 
 	//if(_stricmp(m_name.c_str(), "choose texture") == 0)
 	//	g_log<<"draw choose texture"<<endl;
@@ -222,7 +210,7 @@ void Button::draw()
 void Button::draw2()
 {
 	if(m_over)
-		//DrawShadowedText(m_font, m_tpos[0].m_cached, m_tpos[1].m_cached, m_text.c_str());
+		//DrawShadowedText(m_font, m_tpos[0], m_tpos[1], m_text.c_str());
 		DrawShadowedText(m_font, g_mouse.x, g_mouse.y-g_font[m_font].gheight, &m_text);
 }
 

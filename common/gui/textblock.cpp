@@ -21,10 +21,10 @@
 
 void TextBlock::draw()
 {
-    float width = m_pos[2].m_cached - m_pos[0].m_cached;
-    float height = m_pos[3].m_cached - m_pos[1].m_cached;
+    float width = m_pos[2] - m_pos[0];
+    float height = m_pos[3] - m_pos[1];
     
-    DrawBoxShadText(m_font, m_pos[0].m_cached, m_pos[1].m_cached, width, height, &m_text, m_rgba, 0, -1);
+    DrawBoxShadText(m_font, m_pos[0], m_pos[1], width, height, &m_text, m_rgba, 0, -1);
 	
 	glUniform4f(g_shader[SHADER_ORTHO].m_slot[SSLOT_COLOR], 1, 1, 1, 1);
 }
@@ -34,7 +34,7 @@ void TextBlock::changevalue(const char* newv)
 	m_value = newv;
 	if(m_caret > strlen(newv))
 		m_caret = strlen(newv);
-	m_lines = CountLines(&m_value, MAINFONT8, m_pos[0].m_cached, m_pos[1].m_cached, m_pos[2].m_cached-m_pos[0].m_cached-square(), m_pos[3].m_cached-m_pos[1].m_cached);
+	m_lines = CountLines(&m_value, MAINFONT8, m_pos[0], m_pos[1], m_pos[2]-m_pos[0]-square(), m_pos[3]-m_pos[1]);
 }
 
 int TextBlock::square()

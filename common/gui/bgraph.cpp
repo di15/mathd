@@ -41,7 +41,7 @@ void BGraph::draw()
 
 	Chat("call");*/
 
-	Use(COLOR2D);
+	UseS(COLOR2D);
     glUniform1f(g_shader[SHADER::COLOR2D].m_slot[SLOT::WIDTH], (float)g_width);
     glUniform1f(g_shader[SHADER::COLOR2D].m_slot[SLOT::HEIGHT], (float)g_height);
     //glUniform4f(g_shader[SHADER::COLOR2D].m_slot[SLOT::COLOR], 1, 1, 1, 1);
@@ -76,7 +76,7 @@ void BGraph::draw()
 		}
 	}
 
-	Use(ORTHO);
+	UseS(ORTHO);
     glUniform1f(g_shader[SHADER::ORTHO].m_slot[SLOT::WIDTH], (float)g_width);
     glUniform1f(g_shader[SHADER::ORTHO].m_slot[SLOT::HEIGHT], (float)g_height);
     glEnableVertexAttribArray(g_shader[SHADER::ORTHO].m_slot[SLOT::POSITION]);
@@ -141,7 +141,7 @@ void FillBGraph()
 
 		char periodstr[16];
 		sprintf(periodstr, "-%d:%02d", mins, secs);
-		CWidget periodw;
+		Widget periodw;
 		periodw.Text("name", periodstr, MAINFONT8, frameleft + horizratio * (float)framew - 15, framebottom, true, gray[0], gray[1], gray[2], gray[3]);
 		graph->periodicmarks.push_back(periodw);
 
@@ -198,7 +198,7 @@ void FillBGraph()
 		char resstr[64];
 		sprintf(resstr, "%c %s", r->icon, r->name);
 		const float* rgba = r->rgba;
-		CWidget* restext = &graph->resnamecolor[i];
+		Widget* restext = &graph->resnamecolor[i];
 		restext->Text(g_resource[i].name, resstr, MAINFONT8, x, y, true, rgba[0], rgba[1], rgba[2], rgba[3]);
 
 		x += colw;
@@ -210,11 +210,11 @@ void FillBGraph()
 		}
 	}
 	
-	CWidget prodtext;
+	Widget prodtext;
 	float vratio = (maxstock / (maxstock+maxcons));
 	prodtext.Text("name", "Production and Earnings", MAINFONT8, frameleft + framew/2 - 75, frametop + (float)frameh * vratio - rowh, true, gray[0], gray[1], gray[2], gray[3]);
 	graph->periodicmarks.push_back(prodtext);
-	CWidget constext;
+	Widget constext;
 	constext.Text("name", "Consumption and Expenses", MAINFONT8, frameleft + framew/2 - 75, frametop + (float)frameh * vratio, true, gray[0], gray[1], gray[2], gray[3]);
 	graph->periodicmarks.push_back(constext);
 	
@@ -230,7 +230,7 @@ void FillBGraph()
 
 		char periodstr[16];
 		sprintf(periodstr, "%d", i);
-		CWidget periodw;
+		Widget periodw;
 		periodw.Text("name", periodstr, MAINFONT8, frameleft, frametop + (float)frameh * vertratio, true, gray[0], gray[1], gray[2], gray[3]);
 		graph->periodicmarks.push_back(periodw);
 	}
@@ -248,7 +248,7 @@ void FillBGraph()
 
 		char periodstr[16];
 		sprintf(periodstr, "-%d", i);
-		CWidget periodw;
+		Widget periodw;
 		periodw.Text("name", periodstr, MAINFONT8, frameleft, frametop + (float)frameh * vertratio, true, gray[0], gray[1], gray[2], gray[3]);
 		graph->periodicmarks.push_back(periodw);
 	}

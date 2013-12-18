@@ -15,8 +15,10 @@ public:
 	bool (*rdownfunc)(int p, int relx, int rely, int w, int h);
 	bool (*rupfunc)(int p, int relx, int rely, int w, int h);
 	bool (*mousewfunc)(int p, int d);
+	bool (*mdownfunc)(int p, int relx, int rely, int w, int h);
+	bool (*mupfunc)(int p, int relx, int rely, int w, int h);
 
-	ViewportW(Widget* parent, const char* n, Margin left, Margin top, Margin right, Margin bottom, 
+	ViewportW(Widget* parent, const char* n, void (*reframef)(Widget* thisw), 
 		void (*drawf)(int p, int x, int y, int w, int h), 
 		bool (*ldownf)(int p, int relx, int rely, int w, int h), 
 		bool (*lupf)(int p, int relx, int rely, int w, int h), 

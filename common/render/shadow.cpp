@@ -459,8 +459,8 @@ void RenderToShadowMap(Matrix projection, Matrix viewmat, Matrix modelmat)
 		g_lightEye.x, g_lightEye.y, g_lightEye.z, 
 		g_lightUp.x, g_lightUp.y, g_lightUp.z);
 	
-	Use(DEPTH);
-	//Use(ORTHO);
+	UseS(DEPTH);
+	//UseS(ORTHO);
 	glUniformMatrix4fv(g_shader[SHADER::DEPTH].m_slot[SLOT::PROJECTION], 1, 0, g_lightProjectionMatrix.getMatrix());
 	glUniformMatrix4fv(g_shader[SHADER::DEPTH].m_slot[SLOT::MODELMAT], 1, 0, modelmat.getMatrix());
 	glUniformMatrix4fv(g_shader[SHADER::DEPTH].m_slot[SLOT::VIEWMAT], 1, 0, g_lightModelViewMatrix.getMatrix());
@@ -481,14 +481,14 @@ void RenderToShadowMap(Matrix projection, Matrix viewmat, Matrix modelmat)
 
 	glDisable(GL_POLYGON_OFFSET_FILL);
 	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
-	Use(ORTHO);
+	UseS(ORTHO);
 	
 	glViewport(0, 0, g_width, g_height);
 }
 
 void ShadowShader(int shader, Matrix projection, Matrix viewmat, Matrix modelmat, Matrix modelviewinv, float mvLightPos[3], float lightDir[3])
 {
-	Use(shader);
+	UseS(shader);
 	Shader* s = &g_shader[g_curS];
 	glUniformMatrix4fv(s->m_slot[SLOT::PROJECTION], 1, 0, projection.getMatrix());
 	glUniformMatrix4fv(s->m_slot[SLOT::MODELMAT], 1, 0, modelmat.getMatrix());
@@ -666,7 +666,7 @@ void RenderShadowedScene(Matrix projection, Matrix viewmat, Matrix modelmat, Mat
 
 	if(g_mode == EDITOR)
 	{
-		Use(COLOR3D);
+		UseS(COLOR3D);
 		glUniformMatrix4fv(g_shader[SHADER::COLOR3D].m_slot[SLOT::PROJECTION], 1, 0, projection.getMatrix());
 		glUniformMatrix4fv(g_shader[SHADER::COLOR3D].m_slot[SLOT::MODELMAT], 1, 0, modelmat.getMatrix());
 		glUniformMatrix4fv(g_shader[SHADER::COLOR3D].m_slot[SLOT::VIEWMAT], 1, 0, viewmat.getMatrix());

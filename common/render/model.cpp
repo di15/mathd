@@ -2,9 +2,8 @@
 #include "../platform.h"
 #include "../math/3dmath.h"
 #include "model.h"
-#include "texture.h"
+#include "../texture.h"
 #include "../utils.h"
-#include "../platform.h"
 #include "../gui/gui.h"
 #include "shader.h"
 #include "../debug.h"
@@ -15,11 +14,20 @@ vector<ModelToLoad> g_modelsToLoad;
 
 Model::~Model()
 {
+	destroy();
+}
+
+void Model::destroy()
+{
 	if(m_va == NULL)
 		return;
 
 	delete [] m_va;
 	m_va = NULL;
+
+	m_ms3d.destroy();
+
+	m_on = false;
 }
 
 int NewModel()
@@ -31,11 +39,11 @@ int NewModel()
 	return -1;
 }
 
-void QueueModel(int* id, const char* filepath, Vec3f scale, Vec3f translate)
+void QueueModel(int* id, const char* relative, Vec3f scale, Vec3f translate)
 {
 	ModelToLoad toLoad;
 	toLoad.id = id;
-	strcpy(toLoad.filepath, filepath);
+	strcpy(toLoad.filepath, relative);
 	toLoad.scale = scale;
 	toLoad.translate = translate;
 
@@ -52,8 +60,7 @@ bool Load1Model()
 	if(last >= 0)
 	{
 		int id = NewModel();
-		g_model[id].m_on = true;
-		g_model[id].load(g_modelsToLoad[last].filepath, g_modelsToLoad[last].scale, g_modelsToLoad[last].translate);
+		g_model[id].load(g_modelsToLoad[last].filepath, g_modelsToLoad[last].scale, g_modelsToLoad[last].translate, false);
 		(*g_modelsToLoad[last].id) = id;
 	}
 
@@ -87,15 +94,15 @@ void Model::usetex()
 	glActiveTextureARB(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, g_texture[ m_diffusem ].texname);
 	glUniform1iARB(g_shader[g_curS].m_slot[SSLOT_TEXTURE0], 0);
-	/*
+
 	glActiveTextureARB(GL_TEXTURE1);
 	glBindTexture(GL_TEXTURE_2D, g_texture[ m_specularm ].texname);
 	glUniform1iARB(g_shader[g_curS].m_slot[SSLOT_SPECULARMAP], 1);
-	
+
 	glActiveTextureARB(GL_TEXTURE2);
 	glBindTexture(GL_TEXTURE_2D, g_texture[ m_normalm ].texname);
 	glUniform1iARB(g_shader[g_curS].m_slot[SSLOT_NORMALMAP], 2);
-	*/
+
 	glActiveTextureARB(GL_TEXTURE3);
 	glBindTexture(GL_TEXTURE_2D, g_texture[ m_ownerm ].texname);
 	glUniform1iARB(g_shader[g_curS].m_slot[SSLOT_OWNERMAP], 3);
@@ -104,8 +111,6 @@ void Model::usetex()
 void Model::draw(int frame, Vec3f pos, float yaw)
 {
 	Shader* s = &g_shader[g_curS];
-
-	//yaw = 110;	// (int)(rand()%360);
 
 	float pitch = 0;
 	Matrix modelmat;
@@ -127,21 +132,68 @@ void Model::draw(int frame, Vec3f pos, float yaw)
 	glDrawArrays(GL_TRIANGLES, 0, va->numverts);
 }
 
-void Model::load(const char* filepath, Vec3f scale, Vec3f translate)
+int FindModel(const char* relative)
+{
+	char full[MAX_PATH+1];
+	FullPath(relative, full);
+	char corrected[MAX_PATH+1];
+	strcpy(corrected, full);
+	CorrectSlashes(corrected);
+
+	for(int i=0; i<MODELS; i++)
+	{
+		Model* m = &g_model[i];
+
+		if(!m->m_on)
+			continue;
+
+		if(stricmp(m->m_fullpath.c_str(), corrected) == 0)
+			return i;
+	}
+
+	return -1;
+}
+
+
+int LoadModel(const char* relative, Vec3f scale, Vec3f translate, bool dontqueue)
+{
+	int i = FindModel(relative);
+
+	if(i >= 0)
+		return i;
+
+	i = NewModel();
+
+	if(i < 0)
+		return i;
+
+	if(g_model[i].load(relative, scale, translate, dontqueue))
+		return i;
+
+	return -1;
+}
+
+bool Model::load(const char* relative, Vec3f scale, Vec3f translate, bool dontqueue)
 {
 	m_diffusem = 0;
 	m_specularm = 0;
 	m_normalm = 0;
 	m_ownerm = 0;
 
-	bool result = m_ms3d.load(filepath);
+	bool result = m_ms3d.load(relative, m_diffusem, m_specularm, m_normalm, m_ownerm, dontqueue);
 
 	if(result)
 	{
-		m_ms3d.queuetex(m_diffusem, m_specularm, m_normalm, m_ownerm);
-		m_ms3d.genva(&m_va, scale, translate, filepath);
+		m_on = true;
+		m_ms3d.genva(&m_va, scale, translate, relative);
+		char full[MAX_PATH+1];
+		FullPath(relative, full);
+		char corrected[MAX_PATH+1];
+		strcpy(corrected, full);
+		CorrectSlashes(corrected);
+		m_fullpath = corrected;
 	}
-	
+
 	/*
 	if(result)
 	{
@@ -149,29 +201,8 @@ void Model::load(const char* filepath, Vec3f scale, Vec3f translate)
 		//QueueTexture(&spectex, specfile, true);
 		CorrectNormals();
 	}*/
-}
 
-void BeginVertexArrays()
-{
-	glEnableClientState(GL_VERTEX_ARRAY);
-	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-	glEnableClientState(GL_NORMAL_ARRAY);
-
-	glActiveTextureARB(GL_TEXTURE3_ARB);
-	glEnable(GL_TEXTURE_2D);
-	glActiveTextureARB(GL_TEXTURE0_ARB);
-}
-
-void EndVertexArrays()
-{
-	glActiveTextureARB(GL_TEXTURE3_ARB);
-	glDisable(GL_TEXTURE_2D);
-	glBindTexture(GL_TEXTURE_2D, NULL);
-	glActiveTextureARB(GL_TEXTURE0_ARB);
-
-	glDisableClientState(GL_VERTEX_ARRAY);
-	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-	glDisableClientState(GL_NORMAL_ARRAY);
+	return result;
 }
 
 bool PlayAnimation(float& frame, int first, int last, bool loop, float rate)
@@ -219,4 +250,17 @@ bool PlayAnimationB(float& frame, int first, int last, bool loop, float rate)
     }
     
     return false;
+}
+
+void FreeModels()
+{
+	for(int i=0; i<MODELS; i++)
+	{
+		Model* m = &g_model[i];
+
+		if(!m->m_on)
+			continue;
+
+		m->destroy();
+	}
 }

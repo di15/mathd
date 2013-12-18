@@ -1,5 +1,8 @@
 
+#ifndef GGUI_H
+#define GGUI_H
 
+#if 0
 
 void Reload();
 void Click_SaveSlot1();
@@ -39,3 +42,9 @@ void Click_OutManufUnits();
 void OpenBSelect();
 
 extern bool g_canselect;
+
+#endif
+
+#endif	//GGUI_H
+
+void FillGUI();

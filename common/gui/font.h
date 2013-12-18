@@ -54,24 +54,15 @@ public:
 	}
 };
 
-#define FONT_CORBEL28		0
-#define FONT_EUROSTILE16	1
-#define FONT_EUROSTILE32	2
-#define FONT_GULIM10		3
-#define FONT_GULIM16		4
-#define FONT_GULIM32		5
-#define FONT_MSUIGOTHIC10	6
-#define FONT_MSUIGOTHIC16	7
-#define FONT_SMALLFONTS10	8
-#define FONTS				9
+#define FONT_EUROSTILE32	0
+#define FONT_MSUIGOTHIC16	1
+#define FONT_SMALLFONTS10	2
+#define FONTS				3
 extern Font g_font[FONTS];
 
 #define MAINFONT8 (FONT_SMALLFONTS10)
 #define MAINFONT16 (FONT_MSUIGOTHIC16)
-//#define MAINFONT32 (FONT::GULIM32)
-//#define MAINFONT32 (FONT::CORBEL28)
-//#define MAINFONT32 (UNSTEADYOVERSTEER20)
-#define MAINFONT32 (FONT_CORBEL28)
+#define MAINFONT32 (FONT_EUROSTILE32)
 
 class RichText;
 
@@ -89,7 +80,7 @@ void DrawBoxShadText(int fnt, float startx, float starty, float width, float hei
 int CountLines(const RichText* text, int fnt, float startx, float starty, float width, float height);
 int EndX(const RichText* text, int lastc, int fnt, float startx, float starty);
 int MatchGlyphF(const RichText* text, int fnt, int matchx, float startx, float starty, float framex1, float framey1, float framex2, float framey2);
-void HighlightF(int fnt, float startx, float starty, float framex1, float framey1, float framex2, float framey2, const RichText* text, int starti, int endi);
+void HighlightF(int fnt, float startx, float starty, float framex1, float framey1, float framex2, float framey2, const RichText* text, int highlstarti, int highlendi);
 void NextLineBreak();
 void AdvanceGlyph();
 

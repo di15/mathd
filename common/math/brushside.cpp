@@ -3,26 +3,13 @@
 #include "../platform.h"
 #include "brushside.h"
 #include "plane.h"
-#include "../draw/shader.h"
-#include "../draw/texture.h"
+#include "../render/shader.h"
+#include "../texture.h"
 #include "../utils.h"
 #include "brush.h"
+#include "../save/compilemap.h"
 
-BrushSide::BrushSide(const BrushSide& original) : m_drawva(original.m_drawva)
-{
-	/*
-	Plane m_plane;
-	VertexArray m_drawva;
-	unsigned int m_diffusem;*/
-
-	m_plane = original.m_plane;
-	m_diffusem = original.m_diffusem;
-	m_specularm = original.m_specularm;
-	m_normalm = original.m_normalm;
-	//m_drawva = original.m_drawva;
-}
-
-EdBrushSide& EdBrushSide::operator=(const EdBrushSide &original)
+BrushSide& BrushSide::operator=(const BrushSide &original)
 {
 	//g_log<<"edbrushside assignment operator "<<endl;
 	//g_log.flush();
@@ -31,6 +18,7 @@ EdBrushSide& EdBrushSide::operator=(const EdBrushSide &original)
 	m_diffusem = original.m_diffusem;
 	m_specularm = original.m_specularm;
 	m_normalm = original.m_normalm;
+	m_ownerm = original.m_ownerm;
 	m_drawva = original.m_drawva;
 
 	m_ntris = original.m_ntris;
@@ -62,10 +50,17 @@ EdBrushSide& EdBrushSide::operator=(const EdBrushSide &original)
 	return *this;
 }
 
-EdBrushSide::EdBrushSide(const EdBrushSide& original)
+BrushSide::BrushSide(const BrushSide& original)
 {
 	//g_log<<"edbrushside copy constructor"<<endl;
-
+	
+	m_ntris = 0;
+	m_tris = NULL;
+	m_tceq[0] = Plane(0.1f,0.1f,0.1f,0);
+	m_tceq[1] = Plane(0.1f,0.1f,0.1f,0);
+	m_diffusem = 0;
+	m_vindices = NULL;
+	m_centroid = Vec3f(0,0,0);
 	*this = original;
 
 	/*
@@ -95,7 +90,7 @@ EdBrushSide::EdBrushSide(const EdBrushSide& original)
 	*/
 }
 
-EdBrushSide::EdBrushSide()
+BrushSide::BrushSide()
 {
 	//g_log<<"edbrushside constructor default "<<endl;
 	//g_log.flush();
@@ -109,7 +104,7 @@ EdBrushSide::EdBrushSide()
 	m_centroid = Vec3f(0,0,0);
 }
 
-EdBrushSide::~EdBrushSide()
+BrushSide::~BrushSide()
 {
 	//g_log<<"edbrushsid destructor "<<endl;
 
@@ -159,7 +154,7 @@ Vec3f PlaneCrossAxis(Vec3f normal)
 	return crossaxis[match];
 }
 
-void EdBrushSide::gentexeq()
+void BrushSide::gentexeq()
 {	
 	Vec3f uaxis = Normalize(Cross(PlaneCrossAxis(m_plane.m_normal), m_plane.m_normal)) / STOREY_HEIGHT;
 	Vec3f vaxis = Normalize(Cross(uaxis, m_plane.m_normal)) / STOREY_HEIGHT;
@@ -170,7 +165,7 @@ void EdBrushSide::gentexeq()
 
 #define FITTEX_DEBUG
 
-void EdBrushSide::fittex()
+void BrushSide::fittex()
 {
 	//Vec3f uaxis = Normalize(Cross(PlaneCrossAxis(m_plane.m_normal), m_plane.m_normal)) / STOREY_HEIGHT;
 	//Vec3f vaxis = Normalize(Cross(uaxis, m_plane.m_normal)) / STOREY_HEIGHT;
@@ -283,7 +278,7 @@ void EdBrushSide::fittex()
 #endif
 }
 
-void EdBrushSide::remaptex()
+void BrushSide::remaptex()
 {
 	Vec3f* un = &m_tceq[0].m_normal;
 	Vec3f* vn = &m_tceq[1].m_normal;
@@ -320,7 +315,7 @@ void EdBrushSide::remaptex()
 	makeva();
 }
 
-EdBrushSide::EdBrushSide(Vec3f normal, Vec3f point)
+BrushSide::BrushSide(Vec3f normal, Vec3f point)
 {
 	m_ntris = 0;
 	m_tris = NULL;
@@ -335,9 +330,9 @@ EdBrushSide::EdBrushSide(Vec3f normal, Vec3f point)
 	//g_log.flush();
 	
 	CreateTexture(m_diffusem, "textures/notex.jpg", false);
-	//m_diffusem = g_texindex;
 	m_specularm = m_diffusem;
 	m_normalm = m_diffusem;
+	m_ownerm = m_diffusem;
 	m_vindices = NULL;
 	//m_centroid = Vec3f(0,0,0);
 }
@@ -358,16 +353,21 @@ void BrushSide::usetex()
 	//glBindTexture(GL_TEXTURE_2D, m_diffusem);
 	glBindTexture(GL_TEXTURE_2D, g_texture[m_normalm].texname);
 	glUniform1iARB(g_shader[g_curS].m_slot[SSLOT_NORMALMAP], 2);
+	
+	glActiveTextureARB(GL_TEXTURE3);
+	//glBindTexture(GL_TEXTURE_2D, m_diffusem);
+	glBindTexture(GL_TEXTURE_2D, g_texture[m_ownerm].texname);
+	glUniform1iARB(g_shader[g_curS].m_slot[SSLOT_OWNERMAP], 3);
 }
 /*
-void EdBrushSide::usetex()
+void BrushSide::usetex()
 {
 	glActiveTextureARB(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, g_texture[m_diffusem].tex);
 	glUniform1iARB(g_shader[g_curS].m_slot[SSLOT_TEXTURE0], 0);
 }*/
 
-void EdBrushSide::makeva()
+void BrushSide::makeva()
 {
 	m_drawva.alloc(m_ntris * 3);
 
@@ -388,4 +388,41 @@ void EdBrushSide::makeva()
 	}
 
 	m_outline.makeva();
+}
+
+//Remake the drawable vertex array from a list of
+//triangles in the CutBrushSide class
+void BrushSide::vafromcut(CutBrushSide* cutside)
+{
+	m_drawva.free();
+
+	int ntris = cutside->m_frag.size();
+	m_drawva.alloc(ntris*3);
+
+	int triidx = 0;
+	for(auto triitr=cutside->m_frag.begin(); triitr!=cutside->m_frag.end(); triitr++, triidx++)
+	{
+		for(int vertidx=0; vertidx<3; vertidx++)
+		{
+			m_drawva.vertices[triidx*3+vertidx] = triitr->m_vertex[vertidx];
+			m_drawva.normals[triidx*3+vertidx] = m_plane.m_normal;
+
+			//Reconstruct the texture coordinate according 
+			//to the plane equation of the brush side
+
+			Vec3f vert = m_drawva.vertices[triidx*3+vertidx];
+
+			m_drawva.texcoords[triidx*3+vertidx].x 
+				= m_tceq[0].m_normal.x * vert.x
+				+ m_tceq[0].m_normal.y * vert.y
+				+ m_tceq[0].m_normal.z * vert.z
+				+ m_tceq[0].m_d;
+			
+			m_drawva.texcoords[triidx*3+vertidx].y
+				= m_tceq[1].m_normal.x * vert.x
+				+ m_tceq[1].m_normal.y * vert.y
+				+ m_tceq[1].m_normal.z * vert.z
+				+ m_tceq[1].m_d;
+		}
+	}
 }

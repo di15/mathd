@@ -37,7 +37,7 @@ void Change_EdPRes(int param)
 {
 	CPlayer* p = &g_player[g_selP];
 	CView* v = g_GUI.getview("ed pmore");
-	CWidget* eb = v->getwidget(g_resource[param].name, EDITBOX);
+	Widget* eb = v->getwidget(g_resource[param].name, EDITBOX);
 	p->global[param] = strToFloat(eb->value.c_str());
 }
 
@@ -47,17 +47,17 @@ void Change_EdPWage(int param)
 	CView* v = g_GUI.getview("ed pmore2");
 	if(param >= 0)
 	{
-		CWidget* eb = v->getwidget(g_buildingType[param].name, EDITBOX);
+		Widget* eb = v->getwidget(g_buildingType[param].name, EDITBOX);
 		p->wage[param] = strToFloat(eb->value.c_str());
 	}
 	else if(param == -1)
 	{
-		CWidget* eb = v->getwidget("truck wage", EDITBOX);
+		Widget* eb = v->getwidget("truck wage", EDITBOX);
 		p->truckwage = strToFloat(eb->value.c_str());
 	}
 	else if(param == -3)
 	{
-		CWidget* eb = v->getwidget("construction wage", EDITBOX);
+		Widget* eb = v->getwidget("construction wage", EDITBOX);
 		p->conwage = strToFloat(eb->value.c_str());
 
 		//char msg[128];
@@ -73,12 +73,12 @@ void Change_EdPPrice(int param)
 
 	if(param >= 0)
 	{
-		CWidget* eb = v->getwidget(g_resource[param].name, EDITBOX);
+		Widget* eb = v->getwidget(g_resource[param].name, EDITBOX);
 		p->price[param] = strToFloat(eb->value.c_str());
 	}
 	else if(param == -2)
 	{
-		CWidget* eb = v->getwidget("transport price", EDITBOX);
+		Widget* eb = v->getwidget("transport price", EDITBOX);
 		p->transportprice = strToFloat(eb->value.c_str());
 	}
 }
@@ -106,7 +106,7 @@ void Click_EdPMore()
 		if(r->capacity)
 			continue;
 
-		CWidget* eb = v->getwidget(r->name, EDITBOX);
+		Widget* eb = v->getwidget(r->name, EDITBOX);
 
 		char value[32];
 		if(i == CURRENC)
@@ -130,7 +130,7 @@ void Click_EdPMore2()
 		if(g_buildingType[i].input[LABOUR] <= 0.0f)
 			continue;
 
-		CWidget* eb = v->getwidget(g_buildingType[i].name, EDITBOX);
+		Widget* eb = v->getwidget(g_buildingType[i].name, EDITBOX);
 
 		char value[32];
 		sprintf(value, "%.2f", (float)g_player[g_selP].wage[i]);
@@ -138,7 +138,7 @@ void Click_EdPMore2()
 		eb->changevalue(value);
 	}
 
-	CWidget* eb = v->getwidget("truck wage", EDITBOX);
+	Widget* eb = v->getwidget("truck wage", EDITBOX);
 	char value[32];
 	sprintf(value, "%.2f", (float)g_player[g_selP].truckwage);
 	eb->changevalue(value);
@@ -170,7 +170,7 @@ void Click_EdPMore3()
 
 		r = &g_resource[i];
 
-		CWidget* eb = v->getwidget(r->name, EDITBOX);
+		Widget* eb = v->getwidget(r->name, EDITBOX);
 
 		char value[32];
 		sprintf(value, "%.2f", (float)g_player[g_selP].price[i]);
@@ -178,7 +178,7 @@ void Click_EdPMore3()
 		eb->changevalue(value);
 	}
 
-	CWidget* eb = v->getwidget("transport price", EDITBOX);
+	Widget* eb = v->getwidget("transport price", EDITBOX);
 	char value[32];
 	sprintf(value, "%.2f", (float)g_player[g_selP].transportprice);
 	eb->changevalue(value);
@@ -700,7 +700,7 @@ void Change_SelP()
 
 	CView* edplayers = g_GUI.getview("ed players");
 	edplayers->getwidget("activity", DROPDOWN)->selected = g_player[g_selP].activity;
-	CWidget* logo = edplayers->getwidget("logo", IMAGE);
+	Widget* logo = edplayers->getwidget("logo", IMAGE);
 	CreateTexture(logo->tex, faclogofile[g_selP], true);
 }
 

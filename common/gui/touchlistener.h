@@ -8,7 +8,7 @@
 class TouchListener : public Widget
 {
 public:
-	TouchListener(Widget* parent, Margin left, Margin top, Margin right, Margin bottom, void (*click2)(int p), void (*overf)(int p), void (*out)(), int parm);
+	TouchListener(Widget* parent, void (*reframef)(Widget* thisw), void (*click2)(int p), void (*overf)(int p), void (*out)(), int parm);
 
 	bool lbuttonup(bool moved)
 	{

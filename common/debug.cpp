@@ -1,16 +1,16 @@
 
 
 
-
+#include "platform.h"
 #include "debug.h"
-#include "main.h"
-#include "gui.h"
-#include "unit.h"
-#include "pathfinding.h"
-#include "physics.h"
-#include "building.h"
+//#include "main.h"
+//#include "gui.h"
+//#include "unit.h"
+//#include "pathfinding.h"
+//#include "physics.h"
+//#include "building.h"
 
-CProfile g_profile[PROFILES];
+Profile g_profile[PROFILES];
 ofstream g_profF;
 
 void LastNum(const char* l)
@@ -23,6 +23,7 @@ void LastNum(const char* l)
 	last.flush();
 }
 
+#if 0
 void UDebug(int i)
 {
 	return;
@@ -167,3 +168,4 @@ void UpdateFPS()
 	//g_GUI.getview("chat")->gettext("fps")->text = msg;
 }
 
+#endif

@@ -33,7 +33,9 @@ public:
 	void rotateabout(Vec3f center, float rad, float x, float y, float z);
 	void strafe(float speed);
 	void move(float speed);
-	//void accelerate(float speed);
+	void accelerate(float speed);
+	void accelstrafe(float speed);
+	void accelrise(float speed);
 	void rise(float speed);
 	void move(Vec3f delta);
 	void moveto(Vec3f newpos);
@@ -44,6 +46,7 @@ public:
 	void calcpitch();
 	void frameupd();
 	void friction();
+	void friction2();
 	float yaw();
 	float pitch();
 };									

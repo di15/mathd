@@ -17,17 +17,14 @@
 #include "touchlistener.h"
 #include "icon.h"
 
-TextArea::TextArea(Widget* parent, const char* n, const RichText t, int f, Margin left, Margin top, Margin right, Margin bottom, float r, float g, float b, float a, void (*change)()) : Widget()
+TextArea::TextArea(Widget* parent, const char* n, const RichText t, int f, void (*reframef)(Widget* thisw), float r, float g, float b, float a, void (*change)()) : Widget()
 {
 	m_parent = parent;
 	m_type = WIDGET_TEXTAREA;
 	m_name = n;
 	m_value = t;
 	m_font = f;
-	m_pos[0] = left;
-	m_pos[1] = top;
-    m_pos[2] = right;
-    m_pos[3] = bottom;
+	reframefunc = reframef;
 	m_ldown = false;
 	m_rgba[0] = r;
 	m_rgba[1] = g;
@@ -45,33 +42,33 @@ TextArea::TextArea(Widget* parent, const char* n, const RichText t, int f, Margi
 	CreateTexture(m_uptex, "gui\\up.jpg", true);
 	CreateTexture(m_downtex, "gui\\down.jpg", true);
 	reframe();
-	m_lines = CountLines(&m_value, f, m_pos[0].m_cached, m_pos[1].m_cached, m_pos[2].m_cached-m_pos[0].m_cached-square(), m_pos[3].m_cached-m_pos[1].m_cached);
+	m_lines = CountLines(&m_value, f, m_pos[0], m_pos[1], m_pos[2]-m_pos[0]-square(), m_pos[3]-m_pos[1]);
 }
 
 void TextArea::draw()
 {
 	glUniform4f(g_shader[SHADER_ORTHO].m_slot[SSLOT_COLOR], 1, 1, 1, 1);
 
-	DrawImage(m_frametex, m_pos[0].m_cached, m_pos[1].m_cached, m_pos[2].m_cached, m_pos[3].m_cached);
+	DrawImage(m_frametex, m_pos[0], m_pos[1], m_pos[2], m_pos[3]);
 	
-	DrawImage(g_texture[m_frametex].texname, m_pos[2].m_cached-square(), m_pos[1].m_cached, m_pos[2].m_cached, m_pos[3].m_cached);
-	DrawImage(g_texture[m_uptex].texname, m_pos[2].m_cached-square(), m_pos[1].m_cached, m_pos[2].m_cached, m_pos[1].m_cached+square());
-	DrawImage(g_texture[m_downtex].texname, m_pos[2].m_cached-square(), m_pos[3].m_cached-square(), m_pos[2].m_cached, m_pos[3].m_cached);
-	DrawImage(g_texture[m_filledtex].texname, m_pos[2].m_cached-square(), m_pos[1].m_cached+square()+scrollspace()*topratio(), m_pos[2].m_cached, m_pos[1].m_cached+square()+scrollspace()*bottomratio());
+	DrawImage(g_texture[m_frametex].texname, m_pos[2]-square(), m_pos[1], m_pos[2], m_pos[3]);
+	DrawImage(g_texture[m_uptex].texname, m_pos[2]-square(), m_pos[1], m_pos[2], m_pos[1]+square());
+	DrawImage(g_texture[m_downtex].texname, m_pos[2]-square(), m_pos[3]-square(), m_pos[2], m_pos[3]);
+	DrawImage(g_texture[m_filledtex].texname, m_pos[2]-square(), m_pos[1]+square()+scrollspace()*topratio(), m_pos[2], m_pos[1]+square()+scrollspace()*bottomratio());
 
-    float width = m_pos[2].m_cached - m_pos[0].m_cached - square();
-    float height = m_pos[3].m_cached - m_pos[1].m_cached;
+    float width = m_pos[2] - m_pos[0] - square();
+    float height = m_pos[3] - m_pos[1];
     
-    //DrawBoxShadText(m_font, m_pos[0].m_cached, m_pos[1].m_cached, width, height, m_value.c_str(), m_rgba, m_scroll[1], m_opened ? m_caret : -1);
+    //DrawBoxShadText(m_font, m_pos[0], m_pos[1], width, height, m_value.c_str(), m_rgba, m_scroll[1], m_opened ? m_caret : -1);
 
-	DrawShadowedTextF(m_font, m_pos[0].m_cached+m_scroll[0], m_pos[1].m_cached, m_pos[0].m_cached, m_pos[1].m_cached, m_pos[2].m_cached, m_pos[3].m_cached, &m_value, NULL, m_opened ? m_caret : -1);
+	DrawShadowedTextF(m_font, m_pos[0]+m_scroll[0], m_pos[1], m_pos[0], m_pos[1], m_pos[2], m_pos[3], &m_value, NULL, m_opened ? m_caret : -1);
 
-	HighlightF(m_font, m_pos[0].m_cached+m_scroll[0], m_pos[1].m_cached, m_pos[0].m_cached, m_pos[1].m_cached, m_pos[2].m_cached, m_pos[3].m_cached, &m_value, m_highl[0], m_highl[1]);
+	HighlightF(m_font, m_pos[0]+m_scroll[0], m_pos[1], m_pos[0], m_pos[1], m_pos[2], m_pos[3], &m_value, m_highl[0], m_highl[1]);
 }
 
 int TextArea::rowsshown()
 {
-	int rows = (m_pos[3].m_cached-m_pos[1].m_cached)/g_font[m_font].gheight;
+	int rows = (m_pos[3]-m_pos[1])/g_font[m_font].gheight;
 
 	return rows;
 }
@@ -83,14 +80,14 @@ int TextArea::square()
 
 float TextArea::scrollspace()
 {
-	return (m_pos[3].m_cached-m_pos[1].m_cached-square()*2);
+	return (m_pos[3]-m_pos[1]-square()*2);
 }
 
 bool TextArea::mousemove()
 {
 	if(m_ldown)
 	{
-		int newcaret = MatchGlyphF(&m_value, m_font, g_mouse.x, m_pos[0].m_cached+m_scroll[0], m_pos[1].m_cached, m_pos[0].m_cached, m_pos[1].m_cached, m_pos[2].m_cached, m_pos[3].m_cached);
+		int newcaret = MatchGlyphF(&m_value, m_font, g_mouse.x, m_pos[0]+m_scroll[0], m_pos[1], m_pos[0], m_pos[1], m_pos[2], m_pos[3]);
 		
 		if(newcaret > m_caret)
 		{
@@ -110,7 +107,7 @@ bool TextArea::mousemove()
 		return true;
 	}
 
-	if(g_mouse.x >= m_pos[0].m_cached && g_mouse.x <= m_pos[2].m_cached && g_mouse.y >= m_pos[1].m_cached && g_mouse.y <= m_pos[3].m_cached)
+	if(g_mouse.x >= m_pos[0] && g_mouse.x <= m_pos[2] && g_mouse.y >= m_pos[1] && g_mouse.y <= m_pos[3])
 	{
 		m_over = true;
 
@@ -182,8 +179,22 @@ bool TextArea::keydown(int k)
 
 		m_caret ++;
 	}
+	else if(k == VK_DELETE)
+	{
+		len = m_value.texlen();
+		
+		if((m_highl[1] <= 0 || m_highl[0] == m_highl[1]) && m_caret >= len || len <= 0)
+			return true;
+
+		delnext();
+
+		if(!m_passw)
+			m_value = ParseTags(m_value, &m_caret);
+	}
 	else if(k == 190 && !g_keys[VK_SHIFT])
-		placechar('.');
+	{
+		//placechar('.');
+	}
 	
 	if(changefunc != NULL)
 		changefunc();
@@ -199,7 +210,7 @@ void TextArea::changevalue(const char* newv)
 	m_value = newv;
 	if(m_caret > strlen(newv))
 		m_caret = strlen(newv);
-	m_lines = CountLines(&m_value, MAINFONT8, m_pos[0].m_cached, m_pos[1].m_cached, m_pos[2].m_cached-m_pos[0].m_cached-square(), m_pos[3].m_cached-m_pos[1].m_cached);
+	m_lines = CountLines(&m_value, MAINFONT8, m_pos[0], m_pos[1], m_pos[2]-m_pos[0]-square(), m_pos[3]-m_pos[1]);
 }
 
 bool TextArea::keyup(int k)
@@ -261,10 +272,10 @@ void TextArea::placestr(const char* str)
 	}
 	
 	//RichText val = drawvalue();
-	int endx = EndX(&m_value, m_caret, m_font, m_pos[0].m_cached+m_scroll[0], m_pos[1].m_cached);
+	int endx = EndX(&m_value, m_caret, m_font, m_pos[0]+m_scroll[0], m_pos[1]);
 
-	if(endx >= m_pos[2].m_cached)
-		m_scroll[0] -= endx - m_pos[2].m_cached + 1;
+	if(endx >= m_pos[2])
+		m_scroll[0] -= endx - m_pos[2] + 1;
 
 	delete [] addstr;
 }
@@ -292,12 +303,12 @@ bool TextArea::delnext()
 	}
 		
 	//RichText val = drawvalue();
-	int endx = EndX(&m_value, m_caret, m_font, m_pos[0].m_cached+m_scroll[0], m_pos[1].m_cached);
+	int endx = EndX(&m_value, m_caret, m_font, m_pos[0]+m_scroll[0], m_pos[1]);
 
-	if(endx <= m_pos[0].m_cached)
-		m_scroll[0] += m_pos[0].m_cached - endx + 1;
-	else if(endx >= m_pos[2].m_cached)
-		m_scroll[0] -= endx - m_pos[2].m_cached + 1;
+	if(endx <= m_pos[0])
+		m_scroll[0] += m_pos[0] - endx + 1;
+	else if(endx >= m_pos[2])
+		m_scroll[0] -= endx - m_pos[2] + 1;
 
 	return true;
 }
@@ -327,12 +338,12 @@ bool TextArea::delprev()
 	}
 		
 	//RichText val = drawvalue();
-	int endx = EndX(&m_value, m_caret, m_font, m_pos[0].m_cached+m_scroll[0], m_pos[1].m_cached);
+	int endx = EndX(&m_value, m_caret, m_font, m_pos[0]+m_scroll[0], m_pos[1]);
 
-	if(endx <= m_pos[0].m_cached)
-		m_scroll[0] += m_pos[0].m_cached - endx + 1;
-	else if(endx >= m_pos[2].m_cached)
-		m_scroll[0] -= endx - m_pos[2].m_cached + 1;
+	if(endx <= m_pos[0])
+		m_scroll[0] += m_pos[0] - endx + 1;
+	else if(endx >= m_pos[2])
+		m_scroll[0] -= endx - m_pos[2] + 1;
 
 	return true;
 }
@@ -423,10 +434,10 @@ void TextArea::selectall()
 	m_caret = -1;
 			
 	//RichText val = drawvalue();
-	int endx = EndX(&m_value, m_value.texlen(), m_font, m_pos[0].m_cached+m_scroll[0], m_pos[1].m_cached);
+	int endx = EndX(&m_value, m_value.texlen(), m_font, m_pos[0]+m_scroll[0], m_pos[1]);
 
-	if(endx <= m_pos[2].m_cached)
-		m_scroll[0] += m_pos[2].m_cached - endx - 1;
+	if(endx <= m_pos[2])
+		m_scroll[0] += m_pos[2] - endx - 1;
 
 	if(m_scroll[0] >= 0)
 		m_scroll[0] = 0;
@@ -455,7 +466,7 @@ bool TextArea::charin(int k)
 
 		if(!m_passw)
 			m_value = ParseTags(m_value, &m_caret);
-	}
+	}/*
 	else if(k == VK_DELETE)
 	{
 		len = m_value.texlen();
@@ -467,7 +478,7 @@ bool TextArea::charin(int k)
 
 		if(!m_passw)
 			m_value = ParseTags(m_value, &m_caret);
-	}
+	}*/
 	else if(k == VK_SHIFT)
 		return true;
 	else if(k == VK_CAPITAL)

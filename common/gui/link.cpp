@@ -39,7 +39,7 @@ void Link::draw()
 		color[2] = 0.8f;
 	}
 
-	DrawShadowedText(m_font, m_pos[0].m_cached, m_pos[1].m_cached, &m_text, color);
+	DrawShadowedText(m_font, m_pos[0], m_pos[1], &m_text, color);
 
 	//glColor4f(1, 1, 1, 1);
 	glUniform4f(g_shader[SHADER_ORTHO].m_slot[SSLOT_COLOR], 1, 1, 1, 1);
@@ -50,9 +50,9 @@ void Link::draw()
 void Link::premousemove()
 {
 	int texlen = m_text.texlen();
-	if(g_mouse.x >= m_pos[0].m_cached && g_mouse.y >= m_pos[1].m_cached && 
-		g_mouse.x <= m_pos[0].m_cached+texlen*g_font[m_font].gheight/2 && 
-		g_mouse.y <= m_pos[1].m_cached+g_font[m_font].gheight)
+	if(g_mouse.x >= m_pos[0] && g_mouse.y >= m_pos[1] && 
+		g_mouse.x <= m_pos[0]+texlen*g_font[m_font].gheight/2 && 
+		g_mouse.y <= m_pos[1]+g_font[m_font].gheight)
 	{
 	}
 	else
@@ -64,9 +64,9 @@ void Link::premousemove()
 bool Link::mousemove()
 {
 	int texlen = m_text.texlen();
-	if(g_mouse.x >= m_pos[0].m_cached && g_mouse.y >= m_pos[1].m_cached && 
-		g_mouse.x <= m_pos[0].m_cached+texlen*g_font[m_font].gheight/2 && 
-		g_mouse.y <= m_pos[1].m_cached+g_font[m_font].gheight)
+	if(g_mouse.x >= m_pos[0] && g_mouse.y >= m_pos[1] && 
+		g_mouse.x <= m_pos[0]+texlen*g_font[m_font].gheight/2 && 
+		g_mouse.y <= m_pos[1]+g_font[m_font].gheight)
 	{
 		m_over = true;
 

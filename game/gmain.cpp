@@ -6,12 +6,13 @@
 #include "../common/render/shader.h"
 #include "gres.h"
 #include "../common/gui/font.h"
-#include "../common/render/texture.h"
+#include "../common/texture.h"
 #include "../common/render/model.h"
 #include "../common/math/frustum.h"
 #include "../common/render/billboard.h"
 #include "../common/render/skybox.h"
 #include "ggui.h"
+#include "../common/gui/gui.h"
 #include "../common/render/particle.h"
 #include "../common/sim/building.h"
 #include "../common/render/map.h"
@@ -38,10 +39,10 @@
 #include "../common/ai/ai.h"
 #include "../common/render/foliage.h"
 #include "../common/window.h"
+#include "../common/utils.h"
 
-ofstream g_log;
 bool g_quit = false;
-APPMODE g_mode = LOGO;
+APPMODE g_mode = LOADING;
 
 //static long long g_lasttime = GetTickCount();
 
@@ -180,67 +181,18 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	return DefWindowProc(hWnd, uMsg, wParam, lParam);
 }
 
-void CalculateFrameRate()
-{
-	static double framesPerSecond   = 0.0f;		// This will store our fps
-    static double lastTime			= 0.0f;		// This will hold the time from the last frame
-
-	static double frameTime = 0.0f;				// This stores the last frame's time
-
-	// Get the current time in seconds
-    double currentTime = timeGetTime() * 0.001f;				
-
-
-/////// * /////////// * /////////// * NEW * /////// * /////////// * /////////// *
-
-	// We added a small value to the frame interval to account for some video
-	// cards (Radeon's) with fast computers falling through the floor without it.
-
-	// Here we store the elapsed time between the current and last frame,
-	// then keep the current frame in our static variable for the next frame.
- 	g_FrameInterval = currentTime - frameTime + 0.005f;
-
-/////// * /////////// * /////////// * NEW * /////// * /////////// * /////////// *
-
-
-	frameTime = currentTime;
-
-	// Increase the frame counter
-    ++framesPerSecond;
-
-	// Now we want to subtract the current time by the last time that was stored
-	// to see if the time elapsed has been over a second, which means we found our FPS.
-    if( currentTime - lastTime > 1.0f )
-	{
-		char msg[128];
-		sprintf(msg, "FPS: %f, %fs", (float)framesPerSecond, (float)(currentTime - lastTime)/(float)framesPerSecond);
-		g_GUI.getview("chat")->getwidget("fps", TEXT)->text = msg;
-
-		// Here we set the lastTime to the currentTime
-	    lastTime = currentTime;
-		
-		// Copy the frames per second into a string to display in the window title bar
-		//sprintf(strFrameRate, "Current Frames Per Second: %d", int(framesPerSecond));
-
-		// Set the window title bar to our string
-		//SetWindowText(g_hWnd, strFrameRate);
-
-		// Reset the frames per second
-        framesPerSecond = 0;
-    }
-}
-
 void AfterDraw(Matrix projection, Matrix viewmat, Matrix modelmat)
 {
 	//g_log<<"sizeof(g_scenery) = "<<sizeof(g_scenery)<<endl;
 
+#if 0
 	Matrix projmodlview = projection;
 	projmodlview.postMultiply(viewmat);
 	projmodlview.postMultiply(modelmat);
 	
 	DrawSelection(projection, viewmat, modelmat);
 	
-	Use(COLOR3D);
+	UseS(COLOR3D);
     glUniformMatrix4fv(g_shader[SHADER::COLOR3D].m_slot[SLOT::PROJECTION], 1, 0, projection.getMatrix());
 	glUniformMatrix4fv(g_shader[SHADER::COLOR3D].m_slot[SLOT::MODELMAT], 1, 0, modelmat.getMatrix());
 	glUniformMatrix4fv(g_shader[SHADER::COLOR3D].m_slot[SLOT::VIEWMAT], 1, 0, viewmat.getMatrix());
@@ -251,7 +203,7 @@ void AfterDraw(Matrix projection, Matrix viewmat, Matrix modelmat)
 	//DrawPaths();
 	//DrawVelocities();
 
-	Use(BILLBOARD);
+	UseS(BILLBOARD);
     glUniformMatrix4fv(g_shader[SHADER::BILLBOARD].m_slot[SLOT::PROJECTION], 1, 0, projection.getMatrix());
 	glUniformMatrix4fv(g_shader[SHADER::BILLBOARD].m_slot[SLOT::MODELMAT], 1, 0, modelmat.getMatrix());
 	glUniformMatrix4fv(g_shader[SHADER::BILLBOARD].m_slot[SLOT::VIEWMAT], 1, 0, viewmat.getMatrix());
@@ -272,7 +224,7 @@ void AfterDraw(Matrix projection, Matrix viewmat, Matrix modelmat)
 	DrawBillboards();
 	//EndVertexArrays();
 	
-	Use(ORTHO);
+	UseS(ORTHO);
     glUniform1f(g_shader[SHADER::ORTHO].m_slot[SLOT::WIDTH], (float)g_width);
     glUniform1f(g_shader[SHADER::ORTHO].m_slot[SLOT::HEIGHT], (float)g_height);
     glUniform4f(g_shader[SHADER::ORTHO].m_slot[SLOT::COLOR], 1, 1, 1, 1);
@@ -283,7 +235,7 @@ void AfterDraw(Matrix projection, Matrix viewmat, Matrix modelmat)
 	DrawBStatus(projmodlview);
 	DrawTransactions(projmodlview);
 	
-	Use(COLOR2D);
+	UseS(COLOR2D);
     glUniform1f(g_shader[SHADER::COLOR2D].m_slot[SLOT::WIDTH], (float)g_width);
     glUniform1f(g_shader[SHADER::COLOR2D].m_slot[SLOT::HEIGHT], (float)g_height);
     glUniform4f(g_shader[SHADER::COLOR2D].m_slot[SLOT::COLOR], 1, 1, 1, STATUS_ALPHA);
@@ -291,6 +243,7 @@ void AfterDraw(Matrix projection, Matrix viewmat, Matrix modelmat)
 
 	DrawUnitStats(projmodlview);
 	DrawBStats(projmodlview);
+#endif
 }
 
 void Draw()
@@ -303,7 +256,7 @@ void Draw()
 		
 		//TurnOffShader();
 		//g_camera.Look();
-		
+#if 0
 		float aspect = fabsf((float)g_width / (float)g_height);
 		//Matrix projection = BuildPerspProjMat(FIELD_OF_VIEW, aspect, MIN_DISTANCE, MAX_DISTANCE);
 		Matrix projection = setorthographicmat(-PROJ_RIGHT, PROJ_RIGHT, PROJ_RIGHT/aspect, -PROJ_RIGHT/aspect, MIN_DISTANCE, MAX_DISTANCE);
@@ -331,7 +284,7 @@ void Draw()
 		g_frustum.CalculateFrustum(projection.getMatrix(), modelview.getMatrix());
 
 		/*
-		g_shader[SHADER::MAP].Use();
+		g_shader[SHADER::MAP].UseS();
         glUniformMatrix4fv(g_shader[SHADER::MAP].m_slot[SLOT::PROJECTION], 1, 0, projection.getMatrix());
         glUniformMatrix4fv(g_shader[SHADER::MAP].m_slot[SLOT::MODELMAT], 1, 0, modelmat.getMatrix());
         glUniformMatrix4fv(g_shader[SHADER::MAP].m_slot[SLOT::VIEWMAT], 1, 0, viewmat.getMatrix());
@@ -348,7 +301,7 @@ void Draw()
 		
 		if(g_mode == EDITOR)
 		{
-			g_shader[SHADER::COLOR3D].Use();
+			g_shader[SHADER::COLOR3D].UseS();
 			glUniformMatrix4fv(g_shader[SHADER::COLOR3D].m_slot[SLOT::PROJECTION], 1, 0, projection.getMatrix());
 			glUniformMatrix4fv(g_shader[SHADER::COLOR3D].m_slot[SLOT::MODELMAT], 1, 0, modelmat.getMatrix());
 			glUniformMatrix4fv(g_shader[SHADER::COLOR3D].m_slot[SLOT::VIEWMAT], 1, 0, viewmat.getMatrix());
@@ -358,7 +311,7 @@ void Draw()
 			DrawTileSq();
 		}
 
-		g_shader[SHADER::MODEL].Use();
+		g_shader[SHADER::MODEL].UseS();
         glUniformMatrix4fv(g_shader[SHADER::MODEL].m_slot[SLOT::PROJECTION], 1, 0, projection.getMatrix());
         glUniformMatrix4fv(g_shader[SHADER::MODEL].m_slot[SLOT::MODELMAT], 1, 0, modelmat.getMatrix());
         glUniformMatrix4fv(g_shader[SHADER::MODEL].m_slot[SLOT::VIEWMAT], 1, 0, viewmat.getMatrix());
@@ -400,9 +353,11 @@ void Draw()
 				LastNum("pre ad");
 		AfterDraw(projection, viewmat, modelmat);
 				LastNum("post ad");
+
+#endif
 	}
 
-	g_GUI.frame();
+	g_GUI.frameupd();
 	g_GUI.draw();
 
 	SwapBuffers(g_hDC);
@@ -414,6 +369,7 @@ void UpdateLoading()
 
 	switch(stage)
 	{
+#if 0
 	case 0: Status("Loading textures...", true); stage++; break;
 	case 1: LoadTiles(); LoadMap(); LoadTerrainTextures(); LoadHoverTex(); LoadSkyBox("defsky"); Status("Loading particles...", true); stage++; break;
 	case 2: LoadParticles(); Status("Loading projectiles...", true); stage++; break;
@@ -421,13 +377,12 @@ void UpdateLoading()
 	case 4: LoadUnitSprites(); Status("Loading sounds...", true); stage++; break;
 	case 5: LoadSounds(); Status("Loading building sprites...", true); stage++; break;
 	case 6: BSprites(); Status("Loading models...", true); stage++; break;
-	case 7: if(Load1Model()) stage++; break;
-	case 8:
-		if(Load1Texture())
+#endif
+	case 0: if(!Load1Model()) stage++; break;
+	case 1:
+		if(!Load1Texture())
 		{
 			g_mode = MENU;
-			RedoGUI();
-			g_hmap.retexture();
 		}
 		break;
 	}
@@ -439,11 +394,9 @@ void UpdateReloading()
 	switch(g_reStage)
 	{
 	case 0:
-		if(Load1Texture())
+		if(!Load1Texture())
 		{
 			g_mode = MENU;
-			RedoGUI();
-			g_hmap.retexture();
 		}
 		break;
 	}
@@ -462,12 +415,12 @@ void UpdateLogo()
 	if(stage < 60)
 	{
 		float a = (float)stage / 60.0f;
-		g_GUI.getview("logo")->widget[0].rgba[3] = a;
+		g_GUI.getview("logo")->getwidget("logo", WIDGET_IMAGE)->m_rgba[3] = a;
 	}
 	else if(stage < 120)
 	{
 		float a = 1.0f - (float)(stage-60) / 60.0f;
-		g_GUI.getview("logo")->widget[0].rgba[3] = a;
+		g_GUI.getview("logo")->getwidget("logo", WIDGET_IMAGE)->m_rgba[3] = a;
 	}
 	else
 		SkipLogo();
@@ -475,31 +428,9 @@ void UpdateLogo()
 	stage++;
 }
 
-void UpdateIntro()
-{
-	static int stage = 0;
-
-	if(stage < 60)
-	{
-		float a = (float)stage / 60.0f;
-		g_GUI.getview("intro")->widget[0].rgba[3] = a;
-	}
-	else if(stage < 120)
-	{
-		float a = 1.0f - (float)(stage-60) / 60.0f;
-		g_GUI.getview("intro")->widget[0].rgba[3] = a;
-	}
-	else
-	{
-		g_mode = MENU;
-		RedoGUI();
-	}
-
-	stage++;
-}
-
 void UpdateGameState()
 {
+#if 0
 	CalculateFrameRate();
 	Scroll();
 	LastNum("pre upd u");
@@ -515,13 +446,16 @@ void UpdateGameState()
 	ResourceTicker();
 	//UpdateTimes();
 	UpdateFPS();
+#endif
 }
 
 void UpdateEditor()
 {
+#if 0
 	CalculateFrameRate();
 	Scroll();
 	UpdateFPS();
+#endif
 }
 
 void Update()
@@ -542,11 +476,12 @@ void Update()
 
 void LoadConfig()
 {
-	ifstream config("config.ini");
-	
-	//getline(config, g_username);
-	//getline(config, g_servername);
+	char cfgfull[MAX_PATH+1];
+	FullPath(CONFIGFILE, cfgfull);
 
+#if 0
+	ifstream config(cfgfull);
+	
 	int fulls;
 	config>>fulls;
 	
@@ -560,15 +495,49 @@ void LoadConfig()
 
 	g_width = g_selectedRes.width;
 	g_height = g_selectedRes.height;
+#endif
+	
+	ifstream f(cfgfull);
+	string line;
+	char keystr[32];
+	char actstr[32];
+
+	while(!f.eof())
+	{
+
+#if 0
+		key = -1;
+		down = NULL;
+		up = NULL;
+#endif 
+		strcpy(keystr, "");
+		strcpy(actstr, "");
+
+		getline(f, line);
+		sscanf(line.c_str(), "%s %s", keystr, actstr);
+		
+		float valuef = StrToFloat(actstr);
+		int valuei = StrToInt(actstr);
+		bool valueb = (bool)valuei;
+		
+		if(stricmp(keystr, "fullscreen") == 0)					g_fullscreen = valueb;
+		else if(stricmp(keystr, "client_width") == 0)			g_width = g_selectedRes.width = valuei;
+		else if(stricmp(keystr, "client_height") == 0)			g_height = g_selectedRes.height = valuei;
+		else if(stricmp(keystr, "screen_bpp") == 0)				g_bpp = valuei;
+		//else if(stricmp(keystr, "render_pitch") == 0)			g_renderpitch = valuef;
+		//else if(stricmp(keystr, "render_yaw") == 0)				g_renderyaw = valuef;
+		//else if(stricmp(keystr, "1_tile_pixel_width") == 0)		g_1tilewidth = valuei;
+		//else if(stricmp(keystr, "sun_x") == 0)					g_lightOff.x = valuef;
+		//else if(stricmp(keystr, "sun_y") == 0)					g_lightOff.y = valuef;
+		//else if(stricmp(keystr, "sun_z") == 0)					g_lightOff.z = valuef;
+	}
 }
 
+#if 0
 void WriteConfig()
 {
 	ofstream config;
-	config.open("config.ini", ios_base::out);
-	
-	//config<<g_username<<endl;
-	//config<<g_servername<<endl;
+	config.open(CONFIGFILE, ios_base::out);
 	
 	int fulls;
 	if(g_fullscreen)
@@ -580,6 +549,7 @@ void WriteConfig()
 	config<<g_selectedRes.width<<" "<<g_selectedRes.height<<endl;
 	config<<g_bpp;
 }
+#endif
 
 /*
 void EnumerateMaps()
@@ -610,15 +580,20 @@ void EnumerateMaps()
 
 void Init()
 {
-	g_log.open("log.txt", ios_base::out);
-	g_log<<"Version "<<VERSION<<endl<<endl;
-	g_log.flush();
+	// Might be launched from command prompt, need
+	// to set working directory to exe's folder.
+	char exepath[MAX_PATH+1];
+	ExePath(exepath);
+	SetCurrentDirectory(exepath);
+
+	OpenLog("log.txt", VERSION);
 
 	srand(GetTickCount());
 	
 	LoadConfig();
 	//EnumerateMaps();
 	EnumerateDisplay();
+#if 0
 	MapKeys();
 	InitPlayers();
 	InitResources();
@@ -629,16 +604,19 @@ void Init()
 	InitPowerlines();
 	InitPipelines();
 	InitProfiles();
+#endif
 }
 
 void Deinit()
 {
+#if 0
 	g_log<<"Freeing map...";
 	g_log.flush();
 	g_hmap.free();
 	g_log<<"Map freed."<<endl;
 	g_log.flush();
 	FreeScript();
+#endif
 }
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
@@ -648,8 +626,11 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 	Init();
 	
-	if(!MakeWindow())
+	if(!MakeWindow(TEXT(TITLE), LoadIcon(g_hInstance, MAKEINTRESOURCE(IDI_TRIGEAR)), &WndProc))
 		return 0;
+	
+	//Queue();
+	//FillGUI();
 
 	while(!g_quit)
 	{
@@ -677,8 +658,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 				Sleep(1);
 		}
 	}
-
-	DestroyWindow();
+	
+	DestroyWindow(TEXT(TITLE));
 	Deinit();
 
 	return msg.wParam;

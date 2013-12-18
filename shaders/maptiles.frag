@@ -26,17 +26,13 @@ varying vec3 eyevec;
 
 varying float sandalpha;
 varying float grassalpha;
-varying float dirtalpha;
+varying float snowalpha;
 varying float rockalpha;
 
-uniform sampler2D sandgrad;
-uniform sampler2D sanddet;
-uniform sampler2D grassgrad;
-uniform sampler2D grassdet;
-uniform sampler2D dirtgrad;
-uniform sampler2D dirtdet;
-uniform sampler2D rockgrad;
-uniform sampler2D rockdet;
+uniform sampler2D sandtex;
+uniform sampler2D grasstex;
+uniform sampler2D rocktex;
+uniform sampler2D snowtex;
 
 void main (void)
 {
@@ -62,24 +58,20 @@ void main (void)
 	//vec3 vspecular = vec3(0,0,0);
 	//vec3 vspecular = texture(specularmap, texCoordOut0).xyz * specular;
 
-	vec4 sandgradtxl = texture(sandgrad, texCoordOut0 / 100);
-	vec4 sanddettxl = texture(sanddet, texCoordOut0 / 1);
-	vec4 grassgradtxl = texture(grassgrad, texCoordOut0 / 100);
-	vec4 grassdettxl = texture(grassdet, texCoordOut0 / 1);
-	vec4 dirtgradtxl = texture(dirtgrad, texCoordOut0 / 100);
-	vec4 dirtdettxl = texture(dirtdet, texCoordOut0 / 1);
-	vec4 rockgradtxl = texture(rockgrad, texCoordOut0 / 100);
-	vec4 rockdettxl = texture(rockdet, texCoordOut0 / 1);
+	vec4 sandtxl = texture(sandtex, texCoordOut0 / 1.3);
+	vec4 grasstxl = texture(grasstex, texCoordOut0 / 1.3);
+	vec4 rocktxl = texture(rocktex, texCoordOut0 / 1.3);
+	vec4 snowtxl = texture(snowtex, texCoordOut0 / 1.3);
 
 	//float sandalpha2 = sandalpha + (sanddettxl.w * sandbumpscale);	
 	//float grassalpha2 = grassalpha + (grassdettxl.w * grassbumpscale);
 	//float dirtalpha2 = dirtalpha + (dirtdettxl.w * dirtbumpscale);
 	//float rockalpha2 = rockalpha + (rockdettxl.w * rockbumpscale);
 
-	float sandalpha2 = sandalpha + (sanddettxl.w * 0.2);	
-	float grassalpha2 = grassalpha + (grassdettxl.w * 0.2);
-	float dirtalpha2 = dirtalpha + (dirtdettxl.w * 0.2);
-	float rockalpha2 = rockalpha + (rockdettxl.w * 0.2);
+	float sandalpha2 = sandalpha + (sandtxl.w * 0.2);	
+	float grassalpha2 = grassalpha + (grasstxl.w * 0.2);
+	float rockalpha2 = rockalpha + (rocktxl.w * 0.2);
+	float snowalpha2 = snowalpha + (snowtxl.w * 0.2);
 
 	float minalph = 0.25;
 	float maxalph = 0.75;
@@ -87,28 +79,25 @@ void main (void)
 
 	sandalpha2 = (max(minalph, min(maxalph, sandalpha2)) - minalph) / arange;
 	grassalpha2 = (max(minalph, min(maxalph, grassalpha2)) - minalph) / arange;
-	dirtalpha2 = (max(minalph, min(maxalph, dirtalpha2)) - minalph) / arange;
 	rockalpha2 = (max(minalph, min(maxalph, rockalpha2)) - minalph) / arange;
+	snowalpha2 = (max(minalph, min(maxalph, snowalpha2)) - minalph) / arange;
 
-	float totalalpha = sandalpha2 + grassalpha2 + dirtalpha2 + rockalpha2;
+	float totalalpha = sandalpha2 + grassalpha2 + rockalpha2 + snowalpha2;
 	sandalpha2 = sandalpha2 / totalalpha;
 	grassalpha2 = grassalpha2 / totalalpha;
-	dirtalpha2 = dirtalpha2 / totalalpha;
 	rockalpha2 = rockalpha2 / totalalpha;
+	snowalpha2 = snowalpha2 / totalalpha;
 
 	//sandalpha2 = 1;
 
-
 	//sandalpha2 = 0;
 	//grassalpha2 = 0;
-	//dirtalpha2 = 0;
 	//rockalpha2 = 1;
 
-
-	vec4 stexel = vec4( vec3(sandgradtxl.xyz * sanddettxl.xyz * sandalpha2) +
-				vec3(grassgradtxl.xyz * grassdettxl.xyz * grassalpha2) +
-				vec3(dirtgradtxl.xyz * dirtdettxl.xyz * dirtalpha2) +
-				vec3(rockgradtxl.xyz * rockdettxl.xyz * rockalpha2),
+	vec4 stexel = vec4( vec3(sandtxl.xyz * sandalpha2) +
+				vec3(grasstxl.xyz * grassalpha2) +
+				vec3(rocktxl.xyz * rockalpha2) +
+				vec3(snowtxl.xyz * snowalpha2),
 				1.0);
 
 	//float alph = color.w * texel0.w * elevtransp;

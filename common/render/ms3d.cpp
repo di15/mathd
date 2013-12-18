@@ -1,7 +1,7 @@
 
 #include "ms3d.h"
-#include "texture.h"
-#include "../util.h"
+#include "../texture.h"
+#include "../utils.h"
 #include "model.h"
 #include "../platform.h"
 #include "../math/vec3f.h"
@@ -10,6 +10,7 @@
 #include "../math/3dmath.h"
 #include "../math/matrix.h"
 #include "vertexarray.h"
+#include "../save/saveedm.h"
 
 //int m_frame = 0;
 
@@ -28,6 +29,11 @@ MS3DModel::MS3DModel()
 }
 
 MS3DModel::~MS3DModel()
+{
+	destroy();
+}
+
+void MS3DModel::destroy()
 {
 	int i;
 	for ( i = 0; i < m_numMeshes; i++ )
@@ -71,13 +77,13 @@ MS3DModel::~MS3DModel()
 	}
 }
 
-void MS3DModel::queuetex(unsigned int& diffm, unsigned int& specm, unsigned int& normm, unsigned int& ownm)
+void MS3DModel::loadtex(unsigned int& diffm, unsigned int& specm, unsigned int& normm, unsigned int& ownm, bool dontqueue)
 {
 	for ( int i = 0; i < m_numMaterials; i++ )
 		if ( strlen( m_pMaterials[i].m_pTextureFilename ) > 0 )
 		{
 			//QueueTexture(&m_pMaterials[i].m_diffusem, m_pMaterials[i].m_pTextureFilename, true);
-			
+
 			char basefile[MAX_PATH+1];
 			strcpy(basefile, m_pMaterials[i].m_pTextureFilename);
 			StripPath(basefile);
@@ -93,16 +99,26 @@ void MS3DModel::queuetex(unsigned int& diffm, unsigned int& specm, unsigned int&
 			NormPath(basename, normfile);
 			OwnPath(basename, ownfile);
 
-			QueueTexture(&diffm, difffile, false);
-			//QueueTexture(&specm, specfile, false);
-			//QueueTexture(&normm, normfile, false);
-			QueueTexture(&ownm, ownfile, false);
+			if(dontqueue)
+			{
+				CreateTexture(diffm, difffile, false);
+				CreateTexture(specm, specfile, false);
+				CreateTexture(normm, normfile, false);
+				CreateTexture(ownm, ownfile, false);
+			}
+			else
+			{
+				QueueTexture(&diffm, difffile, false);
+				QueueTexture(&specm, specfile, false);
+				QueueTexture(&normm, normfile, false);
+				QueueTexture(&ownm, ownfile, false);
+			}
 		}
 		//else
 		//	m_pMaterials[i].m_diffusem = 0;
 }
 
-bool MS3DModel::load(const char *relative)
+bool MS3DModel::load(const char *relative, unsigned int& diffm, unsigned int& specm, unsigned int& normm, unsigned int& ownm, bool dontqueue)
 {
 	char full[MAX_PATH+1];
 	FullPath(relative, full);
@@ -115,6 +131,10 @@ bool MS3DModel::load(const char *relative)
 	}
 
 	string reltemp = StripFile(relative);
+
+	//if(strlen(reltemp.c_str()) == 0)
+	//	reltemp += CORRECT_SLASH;
+
 	strcpy(m_relative, reltemp.c_str());
 
 	/*
@@ -211,7 +231,7 @@ bool MS3DModel::load(const char *relative)
 
 		char materialIndex = *( char* )pPtr;
 		pPtr += sizeof( char );
-	
+
 		m_pMeshes[i].m_materialIndex = materialIndex;
 		m_pMeshes[i].m_numTriangles = nTriangles;
 		m_pMeshes[i].m_pTriangleIndices = pTriangleIndices;
@@ -247,7 +267,7 @@ bool MS3DModel::load(const char *relative)
 		pPtr += sizeof( MS3DMaterial );
 	}
 
-	//loadtex(diffm, specm, normm);
+	loadtex(diffm, specm, normm, ownm, dontqueue);
 
 	float animFPS = *( float* )pPtr;
 	pPtr += sizeof( float );
@@ -337,7 +357,7 @@ bool MS3DModel::load(const char *relative)
 	delete[] pBuffer;
 
 	restart();
-	
+
 	g_log<<relative<<"\n\r";
 
 	return true;
@@ -374,8 +394,13 @@ void MS3DModel::genva(VertexArray** vertexArrays, Vec3f scale, Vec3f translate, 
 	{
 		advanceanim();
 
+		for(int index = 0; index < m_numVertices; index++)
+		{
+			normalweights[index].clear();
+		}
+
 		int vert = 0;
-		
+
 		vertices = (*vertexArrays)[f].vertices;
 		texcoords = (*vertexArrays)[f].texcoords;
 		normals = (*vertexArrays)[f].normals;
@@ -390,16 +415,16 @@ void MS3DModel::genva(VertexArray** vertexArrays, Vec3f scale, Vec3f translate, 
 				for(int k = 0; k < 3; k++)
 				{
 					int index = pTri->m_vertexIndices[k];
-				
+
 					if(m_pVertices[index].m_boneID == -1)
 					{
 						texcoords[vert].x = pTri->m_s[k];
 						texcoords[vert].y = 1.0f - pTri->m_t[k];
-				
+
 						normals[vert].x = pTri->m_vertexNormals[k][0];
 						normals[vert].y = pTri->m_vertexNormals[k][1];
 						normals[vert].z = pTri->m_vertexNormals[k][2];
-				
+
 						vertices[vert].x = m_pVertices[index].m_location[0] * scale.x + translate.x;
 						vertices[vert].y = m_pVertices[index].m_location[1] * scale.y + translate.y;
 						vertices[vert].z = m_pVertices[index].m_location[2] * scale.z + translate.z;
@@ -408,19 +433,19 @@ void MS3DModel::genva(VertexArray** vertexArrays, Vec3f scale, Vec3f translate, 
 					{
 						// rotate according to transformation matrix
 						const Matrix& final = m_pJoints[m_pVertices[index].m_boneID].m_final;
-					
+
 						texcoords[vert].x = pTri->m_s[k];
 						texcoords[vert].y = 1.0f - pTri->m_t[k];
 
 						Vec3f newNormal(pTri->m_vertexNormals[k]);
 						newNormal.transform3(final);
 						newNormal = Normalize(newNormal);
-					
+
 						normals[vert] = newNormal;
 
 						Vec3f newVertex(m_pVertices[index].m_location);
 						newVertex.transform(final);
-					
+
 						vertices[vert].x = newVertex.x * scale.x + translate.x;
 						vertices[vert].y = newVertex.y * scale.y + translate.y;
 						vertices[vert].z = newVertex.z * scale.z + translate.z;
@@ -437,7 +462,7 @@ void MS3DModel::genva(VertexArray** vertexArrays, Vec3f scale, Vec3f translate, 
 						vert --;
 					else if(vert % 3 == 1)
 						vert += 2;
-					
+
 				}
 
 				Vec3f normal;
@@ -450,7 +475,7 @@ void MS3DModel::genva(VertexArray** vertexArrays, Vec3f scale, Vec3f translate, 
 				//normals[i] = normal;
 				//normals[i+1] = normal;
 				//normals[i+2] = normal;
-				
+
 				for(int k = 0; k < 3; k++)
 				{
 					int index = pTri->m_vertexIndices[k];
@@ -460,7 +485,7 @@ void MS3DModel::genva(VertexArray** vertexArrays, Vec3f scale, Vec3f translate, 
 		}
 
 		vert = 0;
-		
+
 		for(int i = 0; i < m_numMeshes; i++)
 		{
 			for(int j = 0; j < m_pMeshes[i].m_numTriangles; j++)
@@ -491,8 +516,10 @@ void MS3DModel::genva(VertexArray** vertexArrays, Vec3f scale, Vec3f translate, 
 						g_log.flush();
 					}*/
 
-					normals[vert] = Normalize(weighsum);
-					
+					normals[vert] = weighsum;
+					//normals[vert+1] = weighsum;
+					//normals[vert+2] = weighsum;
+
 					//vert ++;
 
 					// Reverse vertex order
@@ -643,7 +670,7 @@ void MS3DModel::advanceanim()
 		{
 			const MS3DModel::Keyframe& curFrame = pJoint->m_pRotationKeyframes[frame];
 			const MS3DModel::Keyframe& prevFrame = pJoint->m_pRotationKeyframes[frame-1];
-			
+
 			float timeDelta = curFrame.m_time-prevFrame.m_time;
 			float interpValue = (float)(( time-prevFrame.m_time )/timeDelta );
 

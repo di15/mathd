@@ -5,8 +5,8 @@
 
 #include "../platform.h"
 #include "font.h"
-#include "../draw/texture.h"
-#include "../draw/shader.h"
+#include "../render/texture.h"
+#include "../render/shader.h"
 #include "../window.h"
 #include "../utils.h"
 #include "gui.h"
@@ -180,6 +180,7 @@ void DrawGlyphF()
 
 void HighlGlyphF()
 {
+	/*
     Font* f = &g_font[g_currfont];
     Glyph* g = &f->glyph[g_str[i]];
 
@@ -187,7 +188,36 @@ void HighlGlyphF()
 	int right = x + g->offset[0] + g->texsize[0];
     int top = y;
 	int bottom = y + g->offset[1] + g->texsize[1];
-	HighlGlyphF(left, top, right, bottom);
+	HighlGlyphF(left, top, right, bottom);*/
+
+	Font* f = &g_font[g_currfont];
+
+	if(g_rtextp->m_type == RICHTEXT_ICON)
+	{
+		Icon* icon = &g_icon[g_rtextp->m_icon];
+		float hscale = f->gheight / (float)icon->m_height;
+		
+		UseIconTex(g_rtextp->m_icon);
+
+		int left = x;
+		int right = left + (float)icon->m_width * hscale;
+		int top = y;
+		int bottom = top + f->gheight;
+		HighlGlyphF(left, top, right, bottom);
+
+		UseFontTex();
+	}
+	else if(g_rtextp->m_type == RICHTEXT_TEXT)
+	{
+		unsigned int k = g_rtextp->m_text.m_data[pi];
+		Glyph* g = &f->glyph[k];
+
+		int left = x + g->offset[0];
+		int right = left + g->texsize[0];
+		int top = y + g->offset[1];
+		int bottom = top + g->texsize[1];
+		HighlGlyphF(left, top, right, bottom);
+	}
 }
 
 void DrawCaret()
@@ -349,12 +379,15 @@ void LoadFont(int id, const char* fontfile)
     f->width = g_texwidth;
     f->height = g_texheight;
 
-    char fullfontpath[128];
+    char fullfontpath[MAX_PATH+1];
+	string fontfileext = string(fontfile) + ".fnt";
 	sprintf(fullfontpath, "%s.fnt", fontfile);
+	FullPath(fontfileext.c_str(), fullfontpath);
     FILE* fp = fopen(fullfontpath, "rb");
     if(!fp)
     {
         g_log<<"Error loading font "<<fontfile<<endl;
+		g_log<<"Full path: "<<fullfontpath<<endl;
         return;
     }
     
@@ -452,45 +485,49 @@ void DrawGlyphF(float left, float top, float right, float bottom, float texleft,
 
 	if(newleft < frame[0])
 	{
-		newtexleft = (frame[0]-newleft)*(texright-texleft)/(right-left);
+		newtexleft = texleft+(frame[0]-newleft)*(texright-texleft)/(right-left);
 		newleft = frame[0];
 	}
 	else if(newleft > frame[2])
 	{
-		newtexleft = (frame[2]-newleft)*(texright-texleft)/(right-left);
+		return;
+		//newtexleft = texleft+(newleft-frame[2])*(texright-texleft)/(right-left);
 		newleft = frame[2];
 	}
 
 	if(newright < frame[0])
 	{
-		newtexleft = (frame[0]-newright)*(texright-texleft)/(right-left);
+		return;
+		//newtexleft = texleft+(frame[0]-newright)*(texright-texleft)/(right-left);
 		newright = frame[0];
 	}
 	else if(newright > frame[2])
 	{
-		newtexright = (frame[2]-newright)*(texright-texleft)/(right-left);
+		newtexright = texleft+(frame[2]-newleft)*(texright-texleft)/(right-left);
 		newright = frame[2];
 	}
 
 	if(newtop < frame[1])
 	{
-		newtextop = (frame[1]-newtop)*(texbottom-textop)/(bottom-top);
+		newtextop = textop+(frame[1]-newtop)*(texbottom-textop)/(bottom-top);
 		newtop = frame[1];
 	}
 	else if(newtop > frame[3])
 	{
-		newtextop = (frame[3]-newtop)*(texbottom-textop)/(bottom-top);
+		return;
+		//newtextop = textop+(newtop-frame[3])*(texbottom-textop)/(bottom-top);
 		newtop = frame[3];
 	}
 
 	if(newbottom < frame[1])
 	{
-		newtexbottom = (frame[1]-newbottom)*(texbottom-textop)/(bottom-top);
+		return;
+		//newtexbottom = textop+(frame[1]-newbottom)*(texbottom-textop)/(bottom-top);
 		newbottom = frame[1];
 	}
 	else if(newbottom > frame[3])
 	{
-		newtexbottom = (frame[3]-newbottom)*(texbottom-textop)/(bottom-top);
+		newtexbottom = textop+(frame[3]-newtop)*(texbottom-textop)/(bottom-top);
 		newbottom = frame[3];
 	}
 
@@ -652,7 +689,7 @@ void DrawShadowedTextF(int fnt, float startx, float starty, float framex1, float
     glUniform4f(g_shader[SHADER_ORTHO].m_slot[SSLOT_COLOR], 1, 1, 1, 1);
 }
 
-void HighlightF(int fnt, float startx, float starty, float framex1, float framey1, float framex2, float framey2, const RichText* text, int starti, int endi)
+void HighlightF(int fnt, float startx, float starty, float framex1, float framey1, float framex2, float framey2, const RichText* text, int highlstarti, int highlendi)
 {
 	UseS(SHADER_COLOR2D);
     glUniform1f(g_shader[SHADER_COLOR2D].m_slot[SSLOT_WIDTH], (float)g_currw);
@@ -663,15 +700,15 @@ void HighlightF(int fnt, float startx, float starty, float framex1, float framey
 	
 	TextLayer(startx, starty);
 
-	for(i=0; i<starti; i++)
+	for(i=0; i<highlstarti; i++)
         AdvanceGlyph();
-
-	for(; i<endi; i++)
+	
+	for(; i<highlendi; i++)
     {
 		HighlGlyphF();
         AdvanceGlyph();
     }
-
+	
 	Ortho(g_currw, g_currh, 1, 1, 1, 1);
 }
 
@@ -876,20 +913,25 @@ int MatchGlyphF(const RichText* text, int fnt, int matchx, float startx, float s
 {
 	int lastclose = 0;
 	
-	StartTextF(text, fnt, g_currw*2, g_currh*2, 0, startx, framex1, framey1, framex2, framey2);
+	//StartTextF(text, fnt, g_currw*2, g_currh*2, 0, startx, framex1, framey1, framex2, framey2);
+	StartTextF(text, fnt, g_width*2, g_height*2, 0, startx, framex1, framey1, framex2, framey2);
 	TextLayer(startx, starty);
 
-	if(x >= matchx)
+	if(x >= matchx || size <= 0)
 		return lastclose;
+	
+	int lastx = x;
 
 	for(i=0; i<size && x <= framex2; i++)
     {
 		AdvanceGlyph();
-
+		
 		lastclose = i;
 		
-		if(x >= matchx)
+		if((float)(x+lastx)/2.0f >= matchx)
 			return lastclose;
+
+		lastx = x;
     }
 
 	return lastclose+1;
@@ -897,13 +939,7 @@ int MatchGlyphF(const RichText* text, int fnt, int matchx, float startx, float s
 
 void LoadFonts()
 {
-    LoadFont(FONT_CORBEL28, "fonts/corbel28");
-    LoadFont(FONT_EUROSTILE16, "fonts/eurostile16");
     LoadFont(FONT_EUROSTILE32, "fonts/eurostile32");
-    LoadFont(FONT_GULIM10, "fonts/gulim10");
-    LoadFont(FONT_GULIM16, "fonts/gulim16");
-    LoadFont(FONT_GULIM32, "fonts/gulim32");
-    LoadFont(FONT_MSUIGOTHIC10, "fonts/msuigothic10");
     LoadFont(FONT_MSUIGOTHIC16, "fonts/msuigothic16");
     LoadFont(FONT_SMALLFONTS10, "fonts/smallfonts10");
 }

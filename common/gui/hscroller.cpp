@@ -18,7 +18,7 @@
 
 
 
-HScroller::HScroller(Widget* parent, Margin top, Margin bottom, void (*click2)(int p), void (*out)()) : Widget()
+HScroller::HScroller(Widget* parent, void (*reframef)(Widget* thisw), void (*click2)(int p), void (*out)()) : Widget()
 {
 	m_parent = parent;
 	m_type = WIDGET_HSCROLLER;
@@ -26,10 +26,7 @@ HScroller::HScroller(Widget* parent, Margin top, Margin bottom, void (*click2)(i
 	m_ldown = false;
 	m_vel[0] = 0;
 	m_vel[1] = 0;
-	m_pos[0] = Margin(MARGIN_SOURCE_WIDTH, MARGIN_FUNC_PIXELS, HSCROLLER_SIDESP);
-	m_pos[1] = top;
-	m_pos[2] = Margin(MARGIN_SOURCE_WIDTH, MARGIN_FUNC_SUBTPIXELS, HSCROLLER_SIDESP);
-	m_pos[3] = bottom;
+	reframefunc = reframef;
 	clickfunc = NULL;
 	overfunc = NULL;
 	clickfunc2 = click2;
@@ -49,7 +46,7 @@ bool HScroller::checkover()
 {
 	m_over = false;
 
-	if(g_mouse.x >= m_pos[0].m_cached && g_mouse.x <= m_pos[2].m_cached && g_mouse.y >= m_pos[1].m_cached && g_mouse.y <= m_pos[3].m_cached)
+	if(g_mouse.x >= m_pos[0] && g_mouse.x <= m_pos[2] && g_mouse.y >= m_pos[1] && g_mouse.y <= m_pos[3])
 	{
 		m_over = true;
 		return true;
@@ -87,13 +84,13 @@ void HScroller::movesub()
 	float changex = 0;
 	if(m_vel[0] < 0.0f)
 	{
-		changex = max(m_vel[0], g_width-HSCROLLER_SIDESP-m_pos[2].m_cached);
+		changex = max(m_vel[0], g_width-HSCROLLER_SIDESP-m_pos[2]);
 		if(changex > m_vel[0])
 			m_vel[0] = 0;
 	}
 	else if(m_vel[0] > 0.0f)
 	{
-		changex = min(m_vel[0], HSCROLLER_SIDESP-m_pos[0].m_cached);
+		changex = min(m_vel[0], HSCROLLER_SIDESP-m_pos[0]);
 		if(changex < m_vel[0])
 			m_vel[0] = 0;
 	}
@@ -102,16 +99,16 @@ void HScroller::movesub()
 
 	m_vel[0] *= 0.9f;
 
-	m_pos[0].m_cached += changex;
-	m_pos[2].m_cached += changex;
+	m_pos[0] += changex;
+	m_pos[2] += changex;
 
 	Widget* sw;
 	for(auto i=m_subwidg.begin(); i!=m_subwidg.end(); i++)
 	{
 		sw = *i;
-		sw->m_pos[0].m_cached += changex;
-		sw->m_pos[2].m_cached += changex;
-		sw->m_tpos[0].m_cached += changex;
+		sw->m_pos[0] += changex;
+		sw->m_pos[2] += changex;
+		sw->m_tpos[0] += changex;
 	}
 }
 

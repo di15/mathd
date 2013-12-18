@@ -10,7 +10,7 @@ class BarButton : public Widget
 public:
 	float m_healthbar;
 
-	BarButton(Widget* parent, unsigned int sprite, float bar, Margin left, Margin top, Margin right, Margin bottom, void (*click)(), void (*overf)(), void (*out)());
+	BarButton(Widget* parent, unsigned int sprite, float bar, void (*reframef)(Widget* thisw), void (*click)(), void (*overf)(), void (*out)());
 
 	void draw();
 	bool lbuttonup(bool moved)

@@ -4,16 +4,13 @@
 #ifndef DEBUG_H
 #define DEBUG_H
 
-#include <winsock2.h>	// winsock2 needs to be included before windows.h
-#include <Windows.h>
-#include <fstream>
+#include "platform.h"
 
-using namespace std;
-
+#if 0
 
 enum PROFILE{FRAME, UPDATE, DRAW, UPDATEUNITS, UPDATEBUILDINGS, DRAWBUILDINGS, DRAWUNITS, SORTPARTICLES, DRAWPARTICLES, DRAWMAP, SHADOWS, DRAWSKY, DRAWPOWERLINES, DRAWROADS, DRAWMODEL1, DRAWMODEL2, DRAWMODEL3, PROFILES};
 
-class CProfile
+class Profile
 {
 public:
 	char name[64];
@@ -27,7 +24,7 @@ public:
 	double lastframetotal;
 	int inside;
 
-	CProfile()
+	Profile()
 	{
 		lastframe = 0;
 		frames = 0;
@@ -35,7 +32,7 @@ public:
 	}
 };
 
-extern CProfile g_profile[PROFILES];
+extern Profile g_profile[PROFILES];
 
 void StartProfile(int id);
 void EndProfile(int id);
@@ -44,6 +41,8 @@ void InitProfiles();
 void UpdateFPS();
 void UDebug(int i);
 
+#endif
+
 void LastNum(const char* l);
 
-#endif
+#endif	//DEBUG_H

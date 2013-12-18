@@ -21,6 +21,6 @@ public:
 };
 
 bool InsidePolygon(Vec3f vIntersection, Vec3f Poly[], long verticeCount);
-bool IntersectedPolygon(Vec3f vPoly[], Vec3f* vLine, int verticeCount, Vec3f* vIntersection=NULL);
+bool IntersectedPolygon(Vec3f vPoly[], Vec3f vLine[], int verticeCount, Vec3f* vIntersection=NULL);
 
 #endif

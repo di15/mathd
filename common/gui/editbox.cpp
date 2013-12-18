@@ -17,7 +17,7 @@
 #include "touchlistener.h"
 #include "gui.h"
 
-EditBox::EditBox(Widget* parent, const char* n, const RichText t, int f, Margin left, Margin top, Margin right, Margin bottom, bool pw, int maxl, void (*change2)(int p), int parm) : Widget()
+EditBox::EditBox(Widget* parent, const char* n, const RichText t, int f, void (*reframef)(Widget* thisw), bool pw, int maxl, void (*change2)(int p), int parm) : Widget()
 {
 	m_parent = parent;
 	m_type = WIDGET_EDITBOX;
@@ -28,10 +28,7 @@ EditBox::EditBox(Widget* parent, const char* n, const RichText t, int f, Margin 
 	m_opened = false;
 	m_passw = pw;
 	m_maxlen = maxl;
-	m_pos[0] = left;
-	m_pos[1] = top;
-	m_pos[2] = right;
-	m_pos[3] = bottom;
+	reframefunc = reframef;
 	m_scroll[0] = 0;
 	m_highl[0] = 0;
 	m_highl[1] = 0;
@@ -66,7 +63,7 @@ void EditBox::draw()
 	//glColor4f(1, 1, 1, 1);
 	glUniform4f(g_shader[SHADER_ORTHO].m_slot[SSLOT_COLOR], 1, 1, 1, 1);
 
-	DrawImage(g_texture[m_frametex].texname, m_pos[0].m_cached, m_pos[1].m_cached, m_pos[2].m_cached, m_pos[3].m_cached);
+	DrawImage(g_texture[m_frametex].texname, m_pos[0], m_pos[1], m_pos[2], m_pos[3]);
 
 	if(m_over)
 		//glColor4f(1, 1, 1, 1);
@@ -77,12 +74,15 @@ void EditBox::draw()
 
 	RichText val = drawvalue();
 
-	DrawShadowedTextF(m_font, m_pos[0].m_cached+m_scroll[0], m_pos[1].m_cached, m_pos[0].m_cached, m_pos[1].m_cached, m_pos[2].m_cached, m_pos[3].m_cached, &val, NULL, m_opened ? m_caret : -1);
+	//if(m_opened)
+	//	g_log<<"op m_caret="<<m_caret<<endl;
+
+	DrawShadowedTextF(m_font, m_pos[0]+m_scroll[0], m_pos[1], m_pos[0], m_pos[1], m_pos[2], m_pos[3], &val, NULL, m_opened ? m_caret : -1);
 
 	//glColor4f(1, 1, 1, 1);
 	//glUniform4f(g_shader[SHADER_ORTHO].m_slot[SSLOT_COLOR], 1, 1, 1, 1);
 
-	HighlightF(m_font, m_pos[0].m_cached+m_scroll[0], m_pos[1].m_cached, m_pos[0].m_cached, m_pos[1].m_cached, m_pos[2].m_cached, m_pos[3].m_cached, &val, m_highl[0], m_highl[1]);
+	HighlightF(m_font, m_pos[0]+m_scroll[0], m_pos[1], m_pos[0], m_pos[1], m_pos[2], m_pos[3], &val, m_highl[0], m_highl[1]);
 }
 
 bool EditBox::mousemove()
@@ -95,7 +95,7 @@ bool EditBox::mousemove()
 	if(m_ldown)
 	{
 		RichText val = drawvalue();
-		int newcaret = MatchGlyphF(&val, m_font, g_mouse.x, m_pos[0].m_cached+m_scroll[0], m_pos[1].m_cached, m_pos[0].m_cached, m_pos[1].m_cached, m_pos[2].m_cached, m_pos[3].m_cached);
+		int newcaret = MatchGlyphF(&val, m_font, g_mouse.x, m_pos[0]+m_scroll[0], m_pos[1], m_pos[0], m_pos[1], m_pos[2], m_pos[3]);
 		
 		if(newcaret > m_caret)
 		{
@@ -115,7 +115,7 @@ bool EditBox::mousemove()
 		return true;
 	}
 
-	if(g_mouse.x >= m_pos[0].m_cached && g_mouse.x <= m_pos[2].m_cached && g_mouse.y >= m_pos[1].m_cached && g_mouse.y <= m_pos[3].m_cached)
+	if(g_mouse.x >= m_pos[0] && g_mouse.x <= m_pos[2] && g_mouse.y >= m_pos[1] && g_mouse.y <= m_pos[3])
 	{
 		m_over = true;
 
@@ -147,24 +147,24 @@ void EditBox::frameupd()
 		g_log.flush();
 #endif
 
-		if(g_mouse.x >= m_pos[2].m_cached-5)
+		if(g_mouse.x >= m_pos[2]-5)
 		{
 			m_scroll[0] -= max(1, g_font[m_font].gheight/4.0f);
 
 			RichText val = drawvalue();
 			int vallen = val.texlen();
 			
-			int endx = EndX(&val, vallen, m_font, m_pos[0].m_cached+m_scroll[0], m_pos[1].m_cached);
+			int endx = EndX(&val, vallen, m_font, m_pos[0]+m_scroll[0], m_pos[1]);
 
-			if(endx < m_pos[2].m_cached)
-				m_scroll[0] += m_pos[2].m_cached - endx;
+			if(endx < m_pos[2])
+				m_scroll[0] += m_pos[2] - endx;
 
 			if(m_scroll[0] > 0.0f)
 				m_scroll[0] = 0.0f;
 
 			movedcar = true;
 		}
-		else if(g_mouse.x <= m_pos[0].m_cached+5)
+		else if(g_mouse.x <= m_pos[0]+5)
 		{
 			m_scroll[0] += max(1, g_font[m_font].gheight/4.0f);
 
@@ -177,14 +177,14 @@ void EditBox::frameupd()
 		if(movedcar)
 		{
 			RichText val = drawvalue();
-			int newcaret = MatchGlyphF(&val, m_font, g_mouse.x, m_pos[0].m_cached+m_scroll[0], m_pos[1].m_cached, m_pos[0].m_cached, m_pos[1].m_cached, m_pos[2].m_cached, m_pos[3].m_cached);
-		
+			int newcaret = MatchGlyphF(&val, m_font, g_mouse.x, m_pos[0]+m_scroll[0], m_pos[1], m_pos[0], m_pos[1], m_pos[2], m_pos[3]);
+
 			if(newcaret > m_caret)
 			{
 				m_highl[0] = m_caret;
 				m_highl[1] = newcaret;
 			}
-			else
+			else if(newcaret < m_caret)
 			{
 				m_highl[0] = newcaret;
 				m_highl[1] = m_caret;
@@ -212,10 +212,11 @@ bool EditBox::lbuttondown()
 
 		RichText val = drawvalue();
 
-		//m_highl[1] = MatchGlyphF(m_value.c_str(), m_font, m_pos[0].m_cached+m_scroll[0], m_pos[1].m_cached, m_pos[0].m_cached, m_pos[1].m_cached, m_pos[2].m_cached, m_pos[3].m_cached);
+		//m_highl[1] = MatchGlyphF(m_value.c_str(), m_font, m_pos[0]+m_scroll[0], m_pos[1], m_pos[0], m_pos[1], m_pos[2], m_pos[3]);
 		//m_highl[0] = m_highl[1];
 		//m_caret = m_highl[1];
-		m_caret = MatchGlyphF(&val, m_font, g_mouse.x, m_pos[0].m_cached+m_scroll[0], m_pos[1].m_cached, m_pos[0].m_cached, m_pos[1].m_cached, m_pos[2].m_cached, m_pos[3].m_cached);
+		m_caret = MatchGlyphF(&val, m_font, g_mouse.x, m_pos[0]+m_scroll[0], m_pos[1], m_pos[0], m_pos[1], m_pos[2], m_pos[3]);
+
 		m_highl[0] = 0;
 		m_highl[1] = 0;
 
@@ -261,34 +262,8 @@ bool EditBox::keydown(int k)
 
 	if(m_caret > len)
 		m_caret = len;
-/*
-	if(k == VK_BACK)
-	{
-		int len = value.length();
-		
-		if(caret <= 0 || len <= 0)
-			return true;
 
-		string before = value.substr(0, caret-1);
-		string after = value.substr(caret, len-caret);
-		value = before;
-		value.append(after);
-
-		caret--;
-	}
-	else if(k == VK_DELETE)
-	{
-		int len = value.length();
-		
-		if(caret >= len || len <= 0)
-			return true;
-
-		string before = value.substr(0, caret);
-		string after = value.substr(caret+1, len-caret);
-		value = before;
-		value.append(after);
-	}
-	else*/ if(k == VK_LEFT)
+	if(k == VK_LEFT)
 	{	
 		if(m_highl[0] > 0 && m_highl[0] != m_highl[1])
 		{
@@ -301,13 +276,13 @@ bool EditBox::keydown(int k)
 			m_caret --;
 		
 		RichText val = drawvalue();
-		int endx = EndX(&val, m_caret, m_font, m_pos[0].m_cached+m_scroll[0], m_pos[1].m_cached);
+		int endx = EndX(&val, m_caret, m_font, m_pos[0]+m_scroll[0], m_pos[1]);
 
-		//g_log<<"left endx = "<<endx<<"/"<<m_pos[0].m_cached<<endl;
+		//g_log<<"left endx = "<<endx<<"/"<<m_pos[0]<<endl;
 		//g_log.flush();
 
-		if(endx <= m_pos[0].m_cached)
-			m_scroll[0] += m_pos[0].m_cached - endx + 1;
+		if(endx <= m_pos[0])
+			m_scroll[0] += m_pos[0] - endx + 1;
 	}
 	else if(k == VK_RIGHT)
 	{
@@ -324,155 +299,30 @@ bool EditBox::keydown(int k)
 			m_caret ++;
 		
 		RichText val = drawvalue();
-		int endx = EndX(&val, m_caret, m_font, m_pos[0].m_cached+m_scroll[0], m_pos[1].m_cached);
+		int endx = EndX(&val, m_caret, m_font, m_pos[0]+m_scroll[0], m_pos[1]);
 
-		if(endx >= m_pos[2].m_cached)
-			m_scroll[0] -= endx - m_pos[2].m_cached + 1;
+		if(endx >= m_pos[2])
+			m_scroll[0] -= endx - m_pos[2] + 1;
+	}
+	else if(k == VK_DELETE)
+	{
+		len = m_value.texlen();
+
+		//g_log<<"vk del"<<endl;
+		//g_log.flush();
+		
+		if((m_highl[1] <= 0 || m_highl[0] == m_highl[1]) && m_caret >= len || len <= 0)
+			return true;
+
+		delnext();
+
+		if(!m_passw)
+			m_value = ParseTags(m_value, &m_caret);
 	}
 	else if(k == 190 && !g_keys[VK_SHIFT])
-		placechar('.');
-	/*
-	else if(k == VK_SHIFT)
-		return true;
-	else if(k == VK_CAPITAL)
-		return true;
-	else if(k == VK_SPACE)
 	{
-		int len = value.length();
-
-		if(len >= maxlen)
-			return true;
-
-		char addchar = ' ';
-		string before = value.substr(0, caret);
-		string after = value.substr(caret, len-caret);
-		value = before + addchar + after;
-		caret ++;
-	}/*
-	else if(k >= 'A' && k <= 'Z')
-	{
-		int len = value.length();
-
-		if(len >= maxlen)
-			return true;
-
-		char addchar = k;
-
-		if(!g_keys[VK_SHIFT] && !g_keys[VK_CAPITAL])
-			addchar += 32;
-
-		string before = value.substr(0, caret);
-		string after = value.substr(caret, len-caret);
-		value = before + addchar + after;
-		caret ++;
-	}*//*
-	else if(k == 190 || k == 188)
-	{
-		int len = value.length();
-
-		if(len >= maxlen)
-			return true;
-
-		char addchar = k;
-
-		if(g_keys[VK_SHIFT])
-		{
-			if(k == 190)
-				addchar = '>';
-			else if(k == 188)
-				addchar = '<';
-		}
-		else
-		{
-			if(k == 190)
-				addchar = '.';
-			else if(k == 188)
-				addchar = ',';
-		}
-		
-		string before = value.substr(0, caret);
-		string after = value.substr(caret, len-caret);
-		value = before + addchar + after;
-		caret ++;
+		//placechar('.');
 	}
-	else if((k >= '!' && k <= '@') || (k >= '[' && k <= '`') || (k >= '{' && k <= '~'))
-	{
-		int len = value.length();
-
-		if(len >= maxlen)
-			return true;
-
-		char addchar = k;
-
-		if(g_keys[VK_SHIFT])
-		{
-			if(k == '0')
-				addchar = ')';
-			else if(k == '1')
-				addchar = '!';
-			else if(k == '2')
-				addchar = '@';
-			else if(k == '3')
-				addchar = '#';
-			else if(k == '4')
-				addchar = '$';
-			else if(k == '5')
-				addchar = '%';
-			else if(k == '6')
-				addchar = '^';
-			else if(k == '7')
-				addchar = '&';
-			else if(k == '8')
-				addchar = '*';
-			else if(k == '9')
-				addchar = '(';
-			else if(k == '`')
-				addchar = '~';
-		}
-
-		string before = value.substr(0, caret);
-		string after = value.substr(caret, len-caret);
-		value = before + addchar + after;
-		caret ++;
-	}*/
-	/*
-	else if(k == VK_TAB)
-	{
-		for(int i=0; i<g_GUI.view.size(); i++)
-		{
-			View* v = &g_GUI.view[i];
-			for(int j=0; j<v->widget.size(); j++)
-			{
-				Widget* w = &v->widget[j];
-				if(w == this)
-				{
-					opened = false;
-
-					for(int l=j+1; l<v->widget.size();l++)
-					{
-						w = &v->widget[l];
-						if(w->type == WIDGET_EDITBOX)
-						{
-							w->opened = true;
-							return true;
-						}
-					}
-					for(int l=0; l<j; l++)
-					{
-						w = &v->widget[l];
-						if(w->type == WIDGET_EDITBOX)
-						{
-							w->opened = true;
-							return true;
-						}
-					}
-
-					m_opened = true;
-					return true;
-				}
-			}
-		}
-	}*/
 	
 	if(changefunc2 != NULL)
 		changefunc2(m_param);
@@ -495,7 +345,7 @@ void EditBox::placechar(int k)
 	if(len >= m_maxlen)
 		return;
 
-	char addchar = k;
+	//char addchar = k;
 
 	if(m_highl[1] > 0 && m_highl[0] != m_highl[1])
 	{
@@ -508,22 +358,29 @@ void EditBox::placechar(int k)
 
 		before = m_value.substr(0, m_caret);
 		after = m_value.substr(m_caret, len-m_caret);
-		m_value = before + RichTextP(UString(addchar)) + after;
+		m_value = before + RichTextP(UString(k)) + after;
 		m_caret ++;
 	}
 	else
 	{
 		RichText before = m_value.substr(0, m_caret);
 		RichText after = m_value.substr(m_caret, len-m_caret);
-		m_value = before + RichTextP(UString(addchar)) + after;
+		
+		//g_log<<"m_value str: "<<m_value.rawstr()<<endl;
+		//g_log<<"before str: "<<before.rawstr()<<endl;
+		//g_log<<"after str: "<<after.rawstr()<<endl;
+		//g_log<<"addstr: "<<RichText(RichTextP(UString(k))).rawstr()<<endl;
+		//g_log.flush();
+
+		m_value = before + RichText(RichTextP(UString(k))) + after;
 		m_caret ++;
 	}
 	
 	RichText val = drawvalue();
-	int endx = EndX(&val, m_caret, m_font, m_pos[0].m_cached+m_scroll[0], m_pos[1].m_cached);
+	int endx = EndX(&val, m_caret, m_font, m_pos[0]+m_scroll[0], m_pos[1]);
 
-	if(endx >= m_pos[2].m_cached)
-		m_scroll[0] -= endx - m_pos[2].m_cached + 1;
+	if(endx >= m_pos[2])
+		m_scroll[0] -= endx - m_pos[2] + 1;
 }
 
 void EditBox::placestr(const char* str)
@@ -577,10 +434,10 @@ void EditBox::placestr(const char* str)
 	}
 	
 	RichText val = drawvalue();
-	int endx = EndX(&val, m_caret, m_font, m_pos[0].m_cached+m_scroll[0], m_pos[1].m_cached);
+	int endx = EndX(&val, m_caret, m_font, m_pos[0]+m_scroll[0], m_pos[1]);
 
-	if(endx >= m_pos[2].m_cached)
-		m_scroll[0] -= endx - m_pos[2].m_cached + 1;
+	if(endx >= m_pos[2])
+		m_scroll[0] -= endx - m_pos[2] + 1;
 
 	delete [] addstr;
 }
@@ -632,12 +489,12 @@ bool EditBox::delnext()
 	}
 		
 	RichText val = drawvalue();
-	int endx = EndX(&val, m_caret, m_font, m_pos[0].m_cached+m_scroll[0], m_pos[1].m_cached);
+	int endx = EndX(&val, m_caret, m_font, m_pos[0]+m_scroll[0], m_pos[1]);
 
-	if(endx <= m_pos[0].m_cached)
-		m_scroll[0] += m_pos[0].m_cached - endx + 1;
-	else if(endx >= m_pos[2].m_cached)
-		m_scroll[0] -= endx - m_pos[2].m_cached + 1;
+	if(endx <= m_pos[0])
+		m_scroll[0] += m_pos[0] - endx + 1;
+	else if(endx >= m_pos[2])
+		m_scroll[0] -= endx - m_pos[2] + 1;
 
 	return true;
 }
@@ -662,17 +519,22 @@ bool EditBox::delprev()
 		RichText before = m_value.substr(0, m_caret-1);
 		RichText after = m_value.substr(m_caret, len-m_caret);
 		m_value = before + after;
+		
+		//g_log<<"before newval="<<before.rawstr()<<" texlen="<<before.texlen()<<endl;
+		//g_log<<"after="<<after.rawstr()<<" texlen="<<after.texlen()<<endl;
+		//g_log<<"ba newval="<<m_value.rawstr()<<" texlen="<<(before + after).texlen()<<endl;
+		//g_log<<"newval="<<m_value.rawstr()<<" texlen="<<m_value.texlen()<<endl;
 
 		m_caret--;
 	}
 		
 	RichText val = drawvalue();
-	int endx = EndX(&val, m_caret, m_font, m_pos[0].m_cached+m_scroll[0], m_pos[1].m_cached);
+	int endx = EndX(&val, m_caret, m_font, m_pos[0]+m_scroll[0], m_pos[1]);
 
-	if(endx <= m_pos[0].m_cached)
-		m_scroll[0] += m_pos[0].m_cached - endx + 1;
-	else if(endx >= m_pos[2].m_cached)
-		m_scroll[0] -= endx - m_pos[2].m_cached + 1;
+	if(endx <= m_pos[0])
+		m_scroll[0] += m_pos[0] - endx + 1;
+	else if(endx >= m_pos[2])
+		m_scroll[0] -= endx - m_pos[2] + 1;
 
 	return true;
 }
@@ -763,10 +625,10 @@ void EditBox::selectall()
 	m_caret = -1;
 			
 	RichText val = drawvalue();
-	int endx = EndX(&val, m_value.texlen(), m_font, m_pos[0].m_cached+m_scroll[0], m_pos[1].m_cached);
+	int endx = EndX(&val, m_value.texlen(), m_font, m_pos[0]+m_scroll[0], m_pos[1]);
 
-	if(endx <= m_pos[2].m_cached)
-		m_scroll[0] += m_pos[2].m_cached - endx - 1;
+	if(endx <= m_pos[2])
+		m_scroll[0] += m_pos[2] - endx - 1;
 
 	if(m_scroll[0] >= 0)
 		m_scroll[0] = 0;
@@ -784,21 +646,27 @@ bool EditBox::charin(int k)
 	if(m_caret > len)
 		m_caret = len;
 
+	//g_log<<"vk "<<k<<endl;
+	//g_log.flush();
+
 	if(k == VK_BACK)
 	{
 		len = m_value.texlen();
 
-		if((m_highl[1] <= 0 || m_highl[0] == m_highl[1]) && m_caret >= len || len <= 0)
+		if((m_highl[1] <= 0 || m_highl[0] == m_highl[1]) && len <= 0)
 			return true;
 
 		delprev();
 
 		if(!m_passw)
 			m_value = ParseTags(m_value, &m_caret);
-	}
+	}/*
 	else if(k == VK_DELETE)
 	{
 		len = m_value.texlen();
+
+		g_log<<"vk del"<<endl;
+		g_log.flush();
 		
 		if((m_highl[1] <= 0 || m_highl[0] == m_highl[1]) && m_caret >= len || len <= 0)
 			return true;
@@ -807,7 +675,7 @@ bool EditBox::charin(int k)
 
 		if(!m_passw)
 			m_value = ParseTags(m_value, &m_caret);
-	}
+	}*/
 	else if(k == VK_SHIFT)
 		return true;
 	else if(k == VK_CAPITAL)

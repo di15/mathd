@@ -17,7 +17,7 @@
 #include "touchlistener.h"
 
 
-DropDownS::DropDownS(Widget* parent, const char* n, int f, Margin left, Margin top, Margin right, Margin bottom, void (*change)()) : Widget()
+DropDownS::DropDownS(Widget* parent, const char* n, int f, void (*reframef)(Widget* thisw), void (*change)()) : Widget()
 {
 	m_parent = parent;
 	m_type = WIDGET_DROPDOWNSELECTOR;
@@ -29,10 +29,7 @@ DropDownS::DropDownS(Widget* parent, const char* n, int f, Margin left, Margin t
 	m_mousescroll = false;
 	m_ldown = false;
 	changefunc = change;
-	m_pos[0] = left;
-	m_pos[1] = top;
-	m_pos[2] = right;
-	m_pos[3] = bottom;
+	reframefunc = reframef;
 	CreateTexture(m_frametex, "gui\\frame.jpg", true);
 	CreateTexture(m_filledtex, "gui\\filled.jpg", true);
 	CreateTexture(m_uptex, "gui\\up.jpg", true);
@@ -78,10 +75,10 @@ void DropDownS::draw()
 	//glColor4f(1, 1, 1, 1);
 	glUniform4f(g_shader[SHADER_ORTHO].m_slot[SSLOT_COLOR], 1, 1, 1, 1);
 
-	DrawImage(g_texture[m_frametex].texname, m_pos[0].m_cached, m_pos[1].m_cached, m_pos[2].m_cached, m_pos[3].m_cached);
+	DrawImage(g_texture[m_frametex].texname, m_pos[0], m_pos[1], m_pos[2], m_pos[3]);
 
 	if(!m_opened)
-		DrawImage(g_texture[m_downtex].texname, m_pos[2].m_cached-square(), m_pos[1].m_cached, m_pos[2].m_cached, m_pos[1].m_cached+square());
+		DrawImage(g_texture[m_downtex].texname, m_pos[2]-square(), m_pos[1], m_pos[2], m_pos[1]+square());
 
 	if(m_options.size() <= 0)
 		return;
@@ -91,7 +88,7 @@ void DropDownS::draw()
 		//if(m_options.size() <= 0)
 		//	return;
 
-		//DrawShadowedText(m_font, m_pos[0].m_cached+3, m_pos[1].m_cached, m_options[0].c_str());
+		//DrawShadowedText(m_font, m_pos[0]+3, m_pos[1], m_options[0].c_str());
 
 		return;
 	}
@@ -99,7 +96,7 @@ void DropDownS::draw()
 	if(m_selected >= m_options.size())
 		return;
 
-	DrawShadowedText(m_font, m_pos[0].m_cached+3, m_pos[1].m_cached, &m_options[m_selected]);
+	DrawShadowedText(m_font, m_pos[0]+3, m_pos[1], &m_options[m_selected]);
 }
 
 void DropDownS::draw2()
@@ -110,14 +107,14 @@ void DropDownS::draw2()
 	//glColor4f(1, 1, 1, 1);
 	glUniform4f(g_shader[SHADER_ORTHO].m_slot[SSLOT_COLOR], 1, 1, 1, 1);
 
-	DrawImage(g_texture[m_frametex].texname, m_pos[0].m_cached, m_pos[1].m_cached+g_font[m_font].gheight, m_pos[2].m_cached, m_pos[3].m_cached+g_font[m_font].gheight*rowsshown());
-	DrawImage(g_texture[m_frametex].texname, m_pos[2].m_cached-square(), m_pos[1].m_cached, m_pos[2].m_cached, m_pos[3].m_cached+g_font[m_font].gheight*rowsshown());
-	DrawImage(g_texture[m_uptex].texname, m_pos[2].m_cached-square(), m_pos[1].m_cached, m_pos[2].m_cached, m_pos[1].m_cached+square());
-	DrawImage(g_texture[m_downtex].texname, m_pos[2].m_cached-square(), m_pos[3].m_cached+g_font[m_font].gheight*rowsshown()-square(), m_pos[2].m_cached, m_pos[3].m_cached+g_font[m_font].gheight*rowsshown());
-	DrawImage(g_texture[m_filledtex].texname, m_pos[2].m_cached-square(), m_pos[3].m_cached+scrollspace()*topratio(), m_pos[2].m_cached, m_pos[3].m_cached+scrollspace()*bottomratio());
+	DrawImage(g_texture[m_frametex].texname, m_pos[0], m_pos[1]+g_font[m_font].gheight, m_pos[2], m_pos[3]+g_font[m_font].gheight*rowsshown());
+	DrawImage(g_texture[m_frametex].texname, m_pos[2]-square(), m_pos[1], m_pos[2], m_pos[3]+g_font[m_font].gheight*rowsshown());
+	DrawImage(g_texture[m_uptex].texname, m_pos[2]-square(), m_pos[1], m_pos[2], m_pos[1]+square());
+	DrawImage(g_texture[m_downtex].texname, m_pos[2]-square(), m_pos[3]+g_font[m_font].gheight*rowsshown()-square(), m_pos[2], m_pos[3]+g_font[m_font].gheight*rowsshown());
+	DrawImage(g_texture[m_filledtex].texname, m_pos[2]-square(), m_pos[3]+scrollspace()*topratio(), m_pos[2], m_pos[3]+scrollspace()*bottomratio());
 
 	for(int i=(int)m_scroll[1]; i<(int)m_scroll[1]+rowsshown(); i++)
-		DrawShadowedText(m_font, m_pos[0].m_cached+3, m_pos[3].m_cached+g_font[m_font].gheight*(i-(int)m_scroll[1]), &m_options[i]);
+		DrawShadowedText(m_font, m_pos[0]+3, m_pos[3]+g_font[m_font].gheight*(i-(int)m_scroll[1]), &m_options[i]);
 }
 
 bool DropDownS::mousemove()
@@ -147,7 +144,7 @@ bool DropDownS::mousemove()
 		return;
 	}
 	*/
-	float topy = m_pos[3].m_cached+square()+scrollspace()*topratio();
+	float topy = m_pos[3]+square()+scrollspace()*topratio();
 	float newtopy = topy + dy;
 
 	//topratio = (float)scroll / (float)(options.size());
@@ -156,7 +153,7 @@ bool DropDownS::mousemove()
 	//topy - pos[3] - square = scrollspace*(float)scroll / (float)(options.size())
 	//(topy - pos[3] - square)*(float)(options.size())/scrollspace = scroll
 
-	m_scroll[1] = (newtopy - m_pos[3].m_cached - square())*(float)(m_options.size())/scrollspace();
+	m_scroll[1] = (newtopy - m_pos[3] - square())*(float)(m_options.size())/scrollspace();
 
 	if(m_scroll[1] < 0)
 	{
@@ -181,8 +178,8 @@ bool DropDownS::prelbuttondown()
 	for(int i=(int)m_scroll[1]; i<(int)m_scroll[1]+rowsshown(); i++)
 	{
 		// list item?
-		if(g_mouse.x >= m_pos[0].m_cached && g_mouse.x <= m_pos[2].m_cached-square() && g_mouse.y >= m_pos[3].m_cached+g_font[m_font].gheight*(i-(int)m_scroll[1])
-			&& g_mouse.y <= m_pos[3].m_cached+g_font[m_font].gheight*(i-(int)m_scroll[1]+1))
+		if(g_mouse.x >= m_pos[0] && g_mouse.x <= m_pos[2]-square() && g_mouse.y >= m_pos[3]+g_font[m_font].gheight*(i-(int)m_scroll[1])
+			&& g_mouse.y <= m_pos[3]+g_font[m_font].gheight*(i-(int)m_scroll[1]+1))
 		{
 			m_ldown = true;
 			return true;	// intercept mouse event
@@ -190,8 +187,8 @@ bool DropDownS::prelbuttondown()
 	}
 
 	// scroll bar?
-	if(g_mouse.x >= m_pos[2].m_cached-square() && g_mouse.y >= m_pos[3].m_cached+scrollspace()*topratio() && g_mouse.x <= m_pos[2].m_cached && 
-			g_mouse.y <= m_pos[3].m_cached+scrollspace()*bottomratio())
+	if(g_mouse.x >= m_pos[2]-square() && g_mouse.y >= m_pos[3]+scrollspace()*topratio() && g_mouse.x <= m_pos[2] && 
+			g_mouse.y <= m_pos[3]+scrollspace()*bottomratio())
 	{
 		m_ldown = true;
 		m_mousescroll = true;
@@ -200,14 +197,14 @@ bool DropDownS::prelbuttondown()
 	}
 
 	// up button?
-	if(g_mouse.x >= m_pos[2].m_cached-square() && g_mouse.y >= m_pos[1].m_cached && g_mouse.x <= m_pos[2].m_cached && g_mouse.y <= m_pos[3].m_cached)
+	if(g_mouse.x >= m_pos[2]-square() && g_mouse.y >= m_pos[1] && g_mouse.x <= m_pos[2] && g_mouse.y <= m_pos[3])
 	{
 		m_ldown = true;
 		return true;
 	}
 
 	// down button?
-	if(g_mouse.x >= m_pos[2].m_cached-square() && g_mouse.y >= m_pos[3].m_cached+scrollspace() && g_mouse.x <= m_pos[2].m_cached && g_mouse.y <= m_pos[3].m_cached+scrollspace()+g_font[m_font].gheight)
+	if(g_mouse.x >= m_pos[2]-square() && g_mouse.y >= m_pos[3]+scrollspace() && g_mouse.x <= m_pos[2] && g_mouse.y <= m_pos[3]+scrollspace()+g_font[m_font].gheight)
 	{
 		m_ldown = true;
 		return true;
@@ -218,7 +215,7 @@ bool DropDownS::prelbuttondown()
 
 bool DropDownS::lbuttondown()
 {
-	if(g_mouse.x >= m_pos[0].m_cached && g_mouse.y >= m_pos[1].m_cached && g_mouse.x <= m_pos[2].m_cached && g_mouse.y <= m_pos[3].m_cached)
+	if(g_mouse.x >= m_pos[0] && g_mouse.y >= m_pos[1] && g_mouse.x <= m_pos[2] && g_mouse.y <= m_pos[3])
 	{
 		m_ldown = true;
 		return true;
@@ -249,8 +246,8 @@ bool DropDownS::prelbuttonup(bool moved)
 	for(int i=(int)m_scroll[1]; i<(int)m_scroll[1]+rowsshown(); i++)
 	{
 		// list item?
-		if(g_mouse.x >= m_pos[0].m_cached && g_mouse.x <= m_pos[2].m_cached-square() && g_mouse.y >= m_pos[3].m_cached+g_font[m_font].gheight*(i-(int)m_scroll[1])
-			&& g_mouse.y <= m_pos[3].m_cached+g_font[m_font].gheight*(i-(int)m_scroll[1]+1))
+		if(g_mouse.x >= m_pos[0] && g_mouse.x <= m_pos[2]-square() && g_mouse.y >= m_pos[3]+g_font[m_font].gheight*(i-(int)m_scroll[1])
+			&& g_mouse.y <= m_pos[3]+g_font[m_font].gheight*(i-(int)m_scroll[1]+1))
 		{
 			m_selected = i;
 			m_opened = false;
@@ -261,7 +258,7 @@ bool DropDownS::prelbuttonup(bool moved)
 	}
 
 	// up button?
-	if(g_mouse.x >= m_pos[2].m_cached-square() && g_mouse.y >= m_pos[1].m_cached && g_mouse.x <= m_pos[2].m_cached && g_mouse.y <= m_pos[3].m_cached)
+	if(g_mouse.x >= m_pos[2]-square() && g_mouse.y >= m_pos[1] && g_mouse.x <= m_pos[2] && g_mouse.y <= m_pos[3])
 	{
 		m_scroll[1]--;
 		if(m_scroll[1] < 0)
@@ -271,7 +268,7 @@ bool DropDownS::prelbuttonup(bool moved)
 	}
 
 	// down button?
-	if(g_mouse.x >= m_pos[2].m_cached-square() && g_mouse.y >= m_pos[3].m_cached+scrollspace() && g_mouse.x <= m_pos[2].m_cached && g_mouse.y <= m_pos[3].m_cached+scrollspace()+g_font[m_font].gheight)
+	if(g_mouse.x >= m_pos[2]-square() && g_mouse.y >= m_pos[3]+scrollspace() && g_mouse.x <= m_pos[2] && g_mouse.y <= m_pos[3]+scrollspace()+g_font[m_font].gheight)
 	{
 		m_scroll[1]++;
 		if(m_scroll[1]+rowsshown() > m_options.size())
@@ -292,7 +289,7 @@ bool DropDownS::lbuttonup(bool moved)
 
 	m_ldown = false;
 
-	if(g_mouse.x >= m_pos[2].m_cached-square() && g_mouse.y >= m_pos[1].m_cached && g_mouse.x <= m_pos[2].m_cached && g_mouse.y <= m_pos[1].m_cached+square())
+	if(g_mouse.x >= m_pos[2]-square() && g_mouse.y >= m_pos[1] && g_mouse.x <= m_pos[2] && g_mouse.y <= m_pos[1]+square())
 	{
 		m_opened = true;
 		return true;

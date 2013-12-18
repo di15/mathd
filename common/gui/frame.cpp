@@ -18,15 +18,12 @@
 #include "frame.h"
 #include "../platform.h"
 
-Frame::Frame(Widget* parent, const char* n, Margin left, Margin top, Margin right, Margin bottom)
+Frame::Frame(Widget* parent, const char* n, void (*reframef)(Widget* thisw))
 {
 	m_parent = parent;
 	m_type = WIDGET_FRAME;
 	m_name = n;
-	m_pos[0] = left;
-	m_pos[1] = top;
-    m_pos[2] = right;
-	m_pos[3] = bottom;
+	reframefunc = reframef;
 	m_ldown = false;
 	reframe();
 }

@@ -78,8 +78,8 @@ void CloseNumPad()
 void NumPadUnderscore()
 {
 	CView* v = g_GUI.getview("numpad");
-	CWidget* number = v->getwidget("number", TEXT);
-	CWidget* underscore = v->getwidget("underscore", TEXT);
+	Widget* number = v->getwidget("number", TEXT);
+	Widget* underscore = v->getwidget("underscore", TEXT);
 
 	float x = number->pos[0];
 	CFont* f = &g_font[number->font];
@@ -126,7 +126,7 @@ void NumPadChange(float change)
 	g_numPadVal += change;
 
 	CView* v = g_GUI.getview("numpad");
-	CWidget* number = v->getwidget("number", TEXT);
+	Widget* number = v->getwidget("number", TEXT);
 
 	char numberstr[32];
 	if(g_numPadDecimal)

@@ -149,6 +149,7 @@ RichText& RichText::operator=(const RichText &original)
 RichText RichText::operator+(const RichText &other)
 {
 	RichTextP twopart;
+	bool havecombomid = false;
 	
 	RichTextP* last1 = NULL;
 	RichTextP* first2 = NULL;
@@ -177,6 +178,7 @@ RichText RichText::operator+(const RichText &other)
 		{
 			twopart.m_type = RICHTEXT_TEXT;
 			twopart.m_text = last1->m_text + first2->m_text;
+			havecombomid = true;
 		}
 		else
 		{
@@ -196,10 +198,14 @@ RichText RichText::operator+(const RichText &other)
 			continue;
 
 		combined.m_part.push_back(*i);
+
+		//g_log<<"combined1 rawstr = "<<combined.rawstr()<<endl;
 	}
 
-	if(twopart.texlen() > 0)
+	if(twopart.texlen() > 0 && havecombomid)
 		combined.m_part.push_back(twopart);
+	
+		//g_log<<"combined2 rawstr = "<<combined.rawstr()<<endl;
 
 	for(auto i=other.m_part.begin(); i!=other.m_part.end(); i++)
 	{
@@ -210,6 +216,8 @@ RichText RichText::operator+(const RichText &other)
 			continue;
 
 		combined.m_part.push_back(*i);
+		
+		//g_log<<"combined3 rawstr = "<<combined.rawstr()<<endl;
 	}
 
 	return combined;
@@ -227,21 +235,22 @@ RichText RichText::substr(int start, int length) const
 	{
 		int currlen = currp->texlen();
 
-		if(currplace < start+length && currplace+currlen >= start)
-		{
-			if(currp->texlen() <= 0)
-				continue;
+		if(currlen <= 0)
+			continue;
 
+		int startplace = start - currplace;
+		int endplace = (start+length) - currplace;
+
+		//if(currplace < start+length && currplace+currlen >= start)
+		if(startplace < currlen && endplace >= 0)
+		{
 			RichTextP addp;
-		
-			int startplace = currplace - start;
-			int endplace = currplace - (start+length);
 
 			if(startplace < 0)
 				startplace = 0;
 
-			if(endplace > currp->texlen())
-				endplace = currp->texlen();
+			if(endplace > currlen)
+				endplace = currlen;
 
 			int addlen = endplace - startplace;
 

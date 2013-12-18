@@ -48,7 +48,6 @@ void Polyg::freeva()
 bool InsidePolygon(Vec3f vIntersection, Vec3f Poly[], long verticeCount)
 {
 	const double MATCH_FACTOR = 0.9999;		// Used to cover up the error in floating point
-	//const double MATCH_FACTOR = 0.95;
 	double Angle = 0.0;						// Initialize the angle
 	Vec3f vA, vB;						// Create temp vectors
 	
@@ -88,7 +87,7 @@ bool InsidePolygon(Vec3f vIntersection, Vec3f Poly[], long verticeCount)
 	return false;								// If you get here, it obviously wasn't inside the polygon, so Return FALSE
 }
 
-bool IntersectedPolygon(Vec3f vPoly[], Vec3f* vLine, int verticeCount, Vec3f* vIntersection)
+bool IntersectedPolygon(Vec3f vPoly[], Vec3f vLine[], int verticeCount, Vec3f* vIntersection)
 {
 	Vec3f vNormal;// = {0};
 	float originDistance = 0;

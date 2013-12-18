@@ -3,6 +3,7 @@
 #ifndef ICON_H
 #define ICON_H
 
+#include "../platform.h"
 #include "../ustring.h"
 
 class Icon
@@ -14,7 +15,7 @@ public:
 	UString m_tag;
 };
 
-#define ICON_DOLLARS		0
+#define ICON_CENTS			0
 #define ICON_LABOUR			1
 #define ICON_HOUSING		2
 #define ICON_FOODWS			3
@@ -34,10 +35,13 @@ public:
 #define ICON_URONIUM		17
 #define ICON_COHL			18
 #define ICON_TIME			19
-#define ICONS				20
+#define ICON_ZETROLRET		20
+#define ICONS				21
 
 extern Icon g_icon[ICONS];
 
+#ifndef _SERVER
 void DefineIcon(int type, const char* relative, const UString tag);
+#endif
 
 #endif

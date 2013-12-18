@@ -18,11 +18,11 @@ class BGraph
 public:
 	bool resrelevant[RESOURCES];
 	bool resrelevant2[RESOURCES];
-	CWidget resnamecolor[RESOURCES];
+	Widget resnamecolor[RESOURCES];
 	vector<Vec3f> rescurve[RESOURCES];
 	vector<Vec3f> rescurve2[RESOURCES];
 	vector<Line> bglines;
-	vector<CWidget> periodicmarks;
+	vector<Widget> periodicmarks;
 
 	void reset();
 	BGraph();

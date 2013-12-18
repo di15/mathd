@@ -84,7 +84,7 @@ void Click_DelTrigger()
 		return;
 
 	CView* v = g_GUI.getview("ed script");
-	CWidget* lb = v->getwidget("triggers", LISTBOX);
+	Widget* lb = v->getwidget("triggers", LISTBOX);
 	lb->erase(lb->selected);
 
 	if(t->prev == NULL)
@@ -158,8 +158,8 @@ void Click_AddTrigger()
 {
 	Change_Triggers();
 	CView* v = g_GUI.getview("ed script");
-	CWidget* lb = v->getwidget("triggers", LISTBOX);
-	CWidget* eb = v->getwidget("newtrigger", EDITBOX);
+	Widget* lb = v->getwidget("triggers", LISTBOX);
+	Widget* eb = v->getwidget("newtrigger", EDITBOX);
 
 	if(!UniqueTrigger(eb->value.c_str()))
 	{
@@ -175,8 +175,8 @@ void Click_AddTrigger()
 void Click_AddCondition()
 {
 	CView* v = g_GUI.getview("ed trigger");
-	CWidget* lb = v->getwidget("conditions", LISTBOX);
-	CWidget* eb = v->getwidget("newcondition", EDITBOX);
+	Widget* lb = v->getwidget("conditions", LISTBOX);
+	Widget* eb = v->getwidget("newcondition", EDITBOX);
 
 	if(!UniqueCondition(eb->value.c_str()))
 	{
@@ -194,8 +194,8 @@ void Click_AddCondition()
 void Click_AddAction()
 {	
 	CView* v = g_GUI.getview("ed trigger");
-	CWidget* lb = v->getwidget("effects", LISTBOX);
-	CWidget* eb = v->getwidget("neweffect", EDITBOX);
+	Widget* lb = v->getwidget("effects", LISTBOX);
+	Widget* eb = v->getwidget("neweffect", EDITBOX);
 
 	if(!UniqueEffect(eb->value.c_str()))
 	{
@@ -218,8 +218,8 @@ void Click_RenCondition()
 		return;
 	
 	CView* v = g_GUI.getview("ed trigger");
-	CWidget* lb = v->getwidget("conditions", LISTBOX);
-	CWidget* eb = v->getwidget("newcondition", EDITBOX);
+	Widget* lb = v->getwidget("conditions", LISTBOX);
+	Widget* eb = v->getwidget("newcondition", EDITBOX);
 	int sel = lb->selected;
 
 	if(sel < 0)
@@ -243,14 +243,14 @@ void Click_RenEffect()
 		return;
 	
 	CView* v = g_GUI.getview("ed trigger");
-	CWidget* lb = v->getwidget("effects", LISTBOX);
+	Widget* lb = v->getwidget("effects", LISTBOX);
 
 	if(lb == NULL)
 	{
 		MessageBox(g_hWnd, "lb null", "", NULL);
 	}
 
-	CWidget* eb = v->getwidget("neweffect", EDITBOX);
+	Widget* eb = v->getwidget("neweffect", EDITBOX);
 	
 	if(eb == NULL)
 	{
@@ -299,18 +299,18 @@ void Select_ConCaptB()
 
 void GMessage(const char* text)
 {
-	CWidget* gmessage = g_GUI.getview("game message")->getwidget("message", TEXTBOX);
+	Widget* gmessage = g_GUI.getview("game message")->getwidget("message", TEXTBOX);
 	gmessage->text = text;
 	g_lasthint.message = text;
 	g_lasthint.graphic = "gui\\transp.png";
-	CWidget* graphic = g_GUI.getview("game message")->getwidget("graphic", IMAGE);
+	Widget* graphic = g_GUI.getview("game message")->getwidget("graphic", IMAGE);
 	graphic->tex = g_transparency;
 	Click_LastHint();
 }
 
 void GMessageG(const char* tex, int w, int h)
 {
-	CWidget* graphic = g_GUI.getview("game message")->getwidget("graphic", IMAGE);
+	Widget* graphic = g_GUI.getview("game message")->getwidget("graphic", IMAGE);
 	CreateTexture(graphic->tex, tex, true);
 	graphic->pos[0] = g_width/2 - w/2;
 	graphic->pos[2] = g_width/2 + w/2;
@@ -569,12 +569,12 @@ void ReGUICondition()
 		return;
 
 	CView* v = g_GUI.getview("ed condition");
-	CWidget* dd = v->getwidget("type", DROPDOWN);
+	Widget* dd = v->getwidget("type", DROPDOWN);
 	dd->select(chosen->type);
 
 	CView* v2;
-	CWidget* dd2;
-	CWidget* w;
+	Widget* dd2;
+	Widget* w;
 	char buffer[128];
 	CBuilding* bldg;
 
@@ -660,7 +660,7 @@ void Change_ConUCntType()
 		return;
 
 	CView* v = g_GUI.getview("ed con ucount");
-	CWidget* owner = v->getwidget("unitt", DROPDOWN);
+	Widget* owner = v->getwidget("unitt", DROPDOWN);
 	chosen->target = owner->selected;
 }
 
@@ -672,7 +672,7 @@ void Change_ConUCntOwner()
 		return;
 
 	CView* v = g_GUI.getview("ed con ucount");
-	CWidget* owner = v->getwidget("owner", DROPDOWN);
+	Widget* owner = v->getwidget("owner", DROPDOWN);
 	chosen->owner = owner->selected;
 }
 
@@ -684,7 +684,7 @@ void Change_ConUCntCount(int dummy)
 		return;
 
 	CView* v = g_GUI.getview("ed con ucount");
-	CWidget* count = v->getwidget("count", EDITBOX);
+	Widget* count = v->getwidget("count", EDITBOX);
 	chosen->count = strToInt(count->value.c_str());
 }
 
@@ -699,15 +699,15 @@ void ReGUIEffect()
 	OpenAnotherView("ed effect");
 
 	CView* v = g_GUI.getview("ed effect");
-	CWidget* dd = v->getwidget("type", DROPDOWN);
+	Widget* dd = v->getwidget("type", DROPDOWN);
 	dd->select(chosen->type);
 	
 	CView* v2;
-	CWidget* dd2;
+	Widget* dd2;
 	CTrigger* trigger = g_scripthead;
-	CWidget* textarea;
-	CWidget* editbox;
-	CWidget* graphic;
+	Widget* textarea;
+	Widget* editbox;
+	Widget* graphic;
 	int centerx = g_width/2;
 	int centery = g_height/2+50;
 	char wstr[16];
@@ -781,7 +781,7 @@ void Click_DelCondition()
 		return;
 	
 	CView* v = g_GUI.getview("ed trigger");
-	CWidget* lb = v->getwidget("conditions", LISTBOX);
+	Widget* lb = v->getwidget("conditions", LISTBOX);
 	int sel = lb->selected;
 
 	if(sel < 0)
@@ -799,7 +799,7 @@ void Click_DelEffect()
 		return;
 	
 	CView* v = g_GUI.getview("ed trigger");
-	CWidget* lb = v->getwidget("effects", LISTBOX);
+	Widget* lb = v->getwidget("effects", LISTBOX);
 	int sel = lb->selected;
 	
 	if(sel < 0)
@@ -816,8 +816,8 @@ void Click_RenameTrigger()
 		return;
 	
 	CView* v = g_GUI.getview("ed script");
-	CWidget* lb = v->getwidget("triggers", LISTBOX);
-	CWidget* eb = v->getwidget("newtrigger", EDITBOX);
+	Widget* lb = v->getwidget("triggers", LISTBOX);
+	Widget* eb = v->getwidget("newtrigger", EDITBOX);
 	if(!UniqueTrigger(eb->value.c_str()))
 	{
 		OpenAnotherView("name unique");
@@ -872,7 +872,7 @@ int TriggerID(CTrigger* trigger)
 CTrigger* GetChosenTrigger()
 {
 	CView* edscript = g_GUI.getview("ed script");
-	CWidget* triggers = edscript->getwidget("triggers", LISTBOX);
+	Widget* triggers = edscript->getwidget("triggers", LISTBOX);
 	int selected = triggers->selected;
 	return GetTrigger(selected);
 }
@@ -880,7 +880,7 @@ CTrigger* GetChosenTrigger()
 CCondition* GetChosenCondition()
 {
 	CView* edscript = g_GUI.getview("ed script");
-	CWidget* triggers = edscript->getwidget("triggers", LISTBOX);
+	Widget* triggers = edscript->getwidget("triggers", LISTBOX);
 	int selected = triggers->selected;
 	CTrigger* t = GetTrigger(selected);
 
@@ -888,7 +888,7 @@ CCondition* GetChosenCondition()
 		return NULL;
 
 	CView* edtrigger = g_GUI.getview("ed trigger");
-	CWidget* conditions = edtrigger->getwidget("conditions", LISTBOX);
+	Widget* conditions = edtrigger->getwidget("conditions", LISTBOX);
 	selected = conditions->selected;
 
 	if(selected < 0)
@@ -903,7 +903,7 @@ CCondition* GetChosenCondition()
 CEffect* GetChosenEffect()
 {
 	CView* edscript = g_GUI.getview("ed script");
-	CWidget* triggers = edscript->getwidget("triggers", LISTBOX);
+	Widget* triggers = edscript->getwidget("triggers", LISTBOX);
 	int selected = triggers->selected;
 	CTrigger* t = GetTrigger(selected);
 
@@ -911,7 +911,7 @@ CEffect* GetChosenEffect()
 		return NULL;
 
 	CView* edtrigger = g_GUI.getview("ed trigger");
-	CWidget* effects = edtrigger->getwidget("effects", LISTBOX);
+	Widget* effects = edtrigger->getwidget("effects", LISTBOX);
 	selected = effects->selected;
 
 	if(selected < 0)
@@ -944,7 +944,7 @@ CTrigger* GetScriptTail()
 void ReGUIScript()
 {
 	CView* edscript = g_GUI.getview("ed script");
-	CWidget* events = edscript->getwidget("triggers", LISTBOX);
+	Widget* events = edscript->getwidget("triggers", LISTBOX);
 	events->clear();
 
 	CTrigger* cure = g_scripthead;
@@ -963,8 +963,8 @@ void ReGUITrigger()
 		return;
 
 	CView* edtrigger = g_GUI.getview("ed trigger");
-	CWidget* conditions = edtrigger->getwidget("conditions", LISTBOX);
-	CWidget* effects = edtrigger->getwidget("effects", LISTBOX);
+	Widget* conditions = edtrigger->getwidget("conditions", LISTBOX);
+	Widget* effects = edtrigger->getwidget("effects", LISTBOX);
 	conditions->clear();
 	effects->clear();
 
@@ -978,7 +978,7 @@ void ReGUITrigger()
 		effects->options.push_back(t->effects[i].name);
 	}
 
-	CWidget* enabled = edtrigger->getwidget("enabled", CHECKBOX);
+	Widget* enabled = edtrigger->getwidget("enabled", CHECKBOX);
 	enabled->selected = t->enabled ? 1 : 0;
 }
 
@@ -1062,7 +1062,7 @@ void Change_ConRes()
 		return;
 
 	CView* v = g_GUI.getview("ed con selr");
-	CWidget* resdropdown = v->getwidget("res", DROPDOWN);
+	Widget* resdropdown = v->getwidget("res", DROPDOWN);
 	chosen->target = resdropdown->selected;
 }
 
@@ -1081,7 +1081,7 @@ void Change_ConPrice(int dummy)
 		return;
 
 	CView* v = g_GUI.getview("ed con price");
-	CWidget* pricebox = v->getwidget("price", EDITBOX);
+	Widget* pricebox = v->getwidget("price", EDITBOX);
 	chosen->fval = strToFloat(pricebox->value.c_str());
 }
 
@@ -1093,14 +1093,14 @@ void Change_ConUnit()
 		return;
 
 	CView* v = g_GUI.getview("ed con selu");
-	CWidget* dd = v->getwidget("unitt", DROPDOWN);
+	Widget* dd = v->getwidget("unitt", DROPDOWN);
 	chosen->target = dd->selected;
 }
 
 void Change_EffTrigger()
 {
 	CView* v = g_GUI.getview("ed eff selt");
-	CWidget* dd = v->getwidget("trigger", DROPDOWN);
+	Widget* dd = v->getwidget("trigger", DROPDOWN);
 
 	CEffect* eff = GetChosenEffect();
 
@@ -1123,7 +1123,7 @@ void Change_ConBuild()
 		return;
 
 	CView* v = g_GUI.getview("ed con selb");
-	CWidget* dd = v->getwidget("build", DROPDOWN);
+	Widget* dd = v->getwidget("build", DROPDOWN);
 	chosen->target = dd->selected;
 }
 
@@ -1138,7 +1138,7 @@ void Change_CondType()
 	OpenAnotherView("ed condition");
 
 	CView* v = g_GUI.getview("ed condition");
-	CWidget* dd = v->getwidget("type", DROPDOWN);
+	Widget* dd = v->getwidget("type", DROPDOWN);
 	chosen->type = dd->selected;
 	
 	if(chosen->type == CONDITION_CAPTUREB)
@@ -1155,7 +1155,7 @@ void Change_EffType()
 		return;
 
 	CView* v = g_GUI.getview("ed effect");
-	CWidget* dd = v->getwidget("type", DROPDOWN);
+	Widget* dd = v->getwidget("type", DROPDOWN);
 	chosen->type = dd->selected;
 
 	ReGUIEffect();
@@ -1209,7 +1209,7 @@ void Click_CloseTrigger()
 
 void Click_MessageR(int res)
 {
-	CWidget* textarea = g_GUI.getview("ed eff message")->getwidget("message", TEXTAREA);
+	Widget* textarea = g_GUI.getview("ed eff message")->getwidget("message", TEXTAREA);
 	textarea->opened = true;
 	if(res < RESOURCES)
 	{
@@ -1224,7 +1224,7 @@ void Click_MessageR(int res)
 
 void Change_EffGPath(int dummy)
 {
-	CWidget* editbox = g_GUI.getview("ed eff selg")->getwidget("path", EDITBOX);
+	Widget* editbox = g_GUI.getview("ed eff selg")->getwidget("path", EDITBOX);
 	CEffect* chosen = GetChosenEffect();
 
 	if(chosen == NULL)
@@ -1232,13 +1232,13 @@ void Change_EffGPath(int dummy)
 
 	chosen->textval = editbox->value;
 
-	CWidget* graphic = g_GUI.getview("ed eff selg")->getwidget("graphic", IMAGE);
+	Widget* graphic = g_GUI.getview("ed eff selg")->getwidget("graphic", IMAGE);
 	CreateTexture(graphic->tex, chosen->textval.c_str(), true);
 }
 
 void Change_EffMPath(int dummy)
 {
-	CWidget* editbox = g_GUI.getview("ed eff selm")->getwidget("path", EDITBOX);
+	Widget* editbox = g_GUI.getview("ed eff selm")->getwidget("path", EDITBOX);
 	CEffect* chosen = GetChosenEffect();
 
 	if(chosen == NULL)
@@ -1255,11 +1255,11 @@ void Change_EffGSize(int dummy)
 		return;
 
 	CView* v = g_GUI.getview("ed eff selg");
-	CWidget* ww = v->getwidget("width", EDITBOX);
-	CWidget* wh = v->getwidget("height", EDITBOX);
+	Widget* ww = v->getwidget("width", EDITBOX);
+	Widget* wh = v->getwidget("height", EDITBOX);
 	int width = strToInt(ww->value.c_str());
 	int height = strToInt(wh->value.c_str());
-	CWidget* graphic = v->getwidget("graphic", IMAGE);
+	Widget* graphic = v->getwidget("graphic", IMAGE);
 	int centerx = g_width/2;
 	int centery = g_height/2+50;
 	graphic->pos[0] = centerx - width/2;
@@ -1299,7 +1299,7 @@ void Click_EffPickMPath()
 	if(chosen == NULL)
 		return;
 	
-	CWidget* editbox = g_GUI.getview("ed eff selm")->getwidget("path", EDITBOX);
+	Widget* editbox = g_GUI.getview("ed eff selm")->getwidget("path", EDITBOX);
 	editbox->value = MakePathRelative(filepath);
 	Change_EffMPath(0);
 }
@@ -1333,14 +1333,14 @@ void Click_EffPickGPath()
 	if(chosen == NULL)
 		return;
 	
-	CWidget* editbox = g_GUI.getview("ed eff selg")->getwidget("path", EDITBOX);
+	Widget* editbox = g_GUI.getview("ed eff selg")->getwidget("path", EDITBOX);
 	editbox->value = MakePathRelative(filepath);
 	Change_EffGPath(0);
 }
 
 void Change_Message()
 {
-	CWidget* textarea = g_GUI.getview("ed eff message")->getwidget("message", TEXTAREA);
+	Widget* textarea = g_GUI.getview("ed eff message")->getwidget("message", TEXTAREA);
 	CEffect* chosen = GetChosenEffect();
 
 	if(chosen == NULL)
@@ -1362,6 +1362,6 @@ void Change_TrigEnabled()
 		return;
 
 	CView* edtrigger = g_GUI.getview("ed trigger");
-	CWidget* enabled = edtrigger->getwidget("enabled", CHECKBOX);
+	Widget* enabled = edtrigger->getwidget("enabled", CHECKBOX);
 	t->enabled = enabled->selected <= 0 ? false : true;
 }

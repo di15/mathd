@@ -10,7 +10,6 @@
 #include "../math/vec2f.h"
 #include "../math/matrix.h"
 
-
 // byte-align structures
 #pragma pack(push, 1)
 
@@ -88,7 +87,7 @@ class MS3DModel
 	public:
 		char m_relative[MAX_PATH+1];
 		int m_frame;
-		
+
 		//	Mesh
 		struct Mesh
 		{
@@ -150,9 +149,10 @@ class MS3DModel
 		MS3DModel();
 		~MS3DModel();
 
-		bool load(const char *relative);
+		bool load(const char *relative, unsigned int& diffm, unsigned int& specm, unsigned int& normm, unsigned int& ownm, bool dontqueue);
+		void destroy();
 
-		void queuetex(unsigned int& diffm, unsigned int& specm, unsigned int& normm, unsigned int& ownm);
+		void loadtex(unsigned int& diffm, unsigned int& specm, unsigned int& normm, unsigned int& ownm, bool dontqueue);
 		void genva(VertexArray** vertexArrays, Vec3f scale, Vec3f translate, const char* filepath);
 
 	//protected:
@@ -190,7 +190,7 @@ class MS3DModel
 		//	Vertices Used
 		int m_numVertices;
 		Vertex *m_pVertices;
-	
+
 		int m_numJoints;
 		Joint *m_pJoints;
 

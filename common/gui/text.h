@@ -8,15 +8,14 @@
 class Text : public Widget
 {
 public:
-	Text(Widget* parent, const char* n, const RichText t, int f, Margin left, Margin top, bool shdw=true, float r=0.8f, float g=0.8f, float b=0.8f, float a=1) : Widget()
+	Text(Widget* parent, const char* n, const RichText t, int f, void (*reframef)(Widget* thisw), bool shdw=true, float r=0.8f, float g=0.8f, float b=0.8f, float a=1) : Widget()
 	{
 		m_parent = parent;
 		m_type = WIDGET_TEXT;
 		m_name = n;
 		m_text = t;
 		m_font = f;
-		m_pos[0] = left;
-		m_pos[1] = top;
+		reframefunc = reframef;
 		m_ldown = false;
 		//rgba[0] = rgba[1] = rgba[2] = 0.8f;
 		//rgba[3] = 1.0f;

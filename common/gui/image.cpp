@@ -18,7 +18,7 @@
 
 
 
-Image::Image(Widget* parent, const char* nm, const char* filepath, Margin left, Margin top, Margin right, Margin bottom, int align, float r, float g, float b, float a, float texleft, float textop, float texright, float texbottom) : Widget()
+Image::Image(Widget* parent, const char* nm, const char* filepath, void (*reframef)(Widget* thisw), float r, float g, float b, float a, float texleft, float textop, float texright, float texbottom) : Widget()
 {
 	m_parent = parent;
 	m_type = WIDGET_IMAGE;
@@ -26,10 +26,7 @@ Image::Image(Widget* parent, const char* nm, const char* filepath, Margin left, 
 	//CreateTexture(tex, filepath, true);
 	CreateTexture(m_tex, filepath, false);
 	//CreateTexture(tex, filepath, clamp);
-	m_pos[0] = left;
-	m_pos[1] = top;
-	m_pos[2] = right;
-	m_pos[3] = bottom;
+	reframefunc = reframef;
 	m_texc[0] = texleft;
 	m_texc[1] = textop;
 	m_texc[2] = texright;
@@ -39,21 +36,17 @@ Image::Image(Widget* parent, const char* nm, const char* filepath, Margin left, 
 	m_rgba[1] = g;
 	m_rgba[2] = b;
 	m_rgba[3] = a;
-	m_alignment = align;
 	reframe();
 }
 
-Image::Image(Widget* parent, const char* filepath, Margin left, Margin top, Margin right, Margin bottom, int align, float r, float g, float b, float a, float texleft, float textop, float texright, float texbottom) : Widget()
+Image::Image(Widget* parent, const char* filepath, void (*reframef)(Widget* thisw), float r, float g, float b, float a, float texleft, float textop, float texright, float texbottom) : Widget()
 {
 	m_parent = parent;
 	m_type = WIDGET_IMAGE;
 	//CreateTexture(tex, filepath, true);
 	CreateTexture(m_tex, filepath, false);
 	//CreateTexture(tex, filepath, clamp);
-	m_pos[0] = left;
-	m_pos[1] = top;
-	m_pos[2] = right;
-	m_pos[3] = bottom;
+	reframefunc = reframef;
 	m_texc[0] = texleft;
 	m_texc[1] = textop;
 	m_texc[2] = texright;
@@ -63,19 +56,15 @@ Image::Image(Widget* parent, const char* filepath, Margin left, Margin top, Marg
 	m_rgba[1] = g;
 	m_rgba[2] = b;
 	m_rgba[3] = a;
-	m_alignment = align;
 	reframe();
 }
 
-Image::Image(Widget* parent, unsigned int t, Margin left, Margin top, Margin right, Margin bottom, int align, float r, float g, float b, float a, float texleft, float textop, float texright, float texbottom) : Widget()
+Image::Image(Widget* parent, unsigned int t, void (*reframef)(Widget* thisw), float r, float g, float b, float a, float texleft, float textop, float texright, float texbottom) : Widget()
 {
 	m_parent = parent;
 	m_type = WIDGET_IMAGE;
 	m_tex = t;
-	m_pos[0] = left;
-	m_pos[1] = top;
-	m_pos[2] = right;
-	m_pos[3] = bottom;
+	reframefunc = reframef;
 	m_texc[0] = texleft;
 	m_texc[1] = textop;
 	m_texc[2] = texright;
@@ -85,7 +74,6 @@ Image::Image(Widget* parent, unsigned int t, Margin left, Margin top, Margin rig
 	m_rgba[1] = g;
 	m_rgba[2] = b;
 	m_rgba[3] = a;
-	m_alignment = align;
 	reframe();
 }
 
@@ -110,7 +98,7 @@ void Image::draw()
 {
 	//glColor4fv(rgba);
 	glUniform4fv(g_shader[SHADER_ORTHO].m_slot[SSLOT_COLOR], 1, m_rgba);
-	DrawImage(g_texture[m_tex].texname, m_pos[0].m_cached, m_pos[1].m_cached, m_pos[2].m_cached, m_pos[3].m_cached, m_texc[0], m_texc[1], m_texc[2], m_texc[3]);
+	DrawImage(g_texture[m_tex].texname, m_pos[0], m_pos[1], m_pos[2], m_pos[3], m_texc[0], m_texc[1], m_texc[2], m_texc[3]);
 	//glColor4f(1,1,1,1);
 	glUniform4f(g_shader[SHADER_ORTHO].m_slot[SSLOT_COLOR], 1, 1, 1, 1);
 }

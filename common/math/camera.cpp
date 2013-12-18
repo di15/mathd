@@ -56,7 +56,7 @@ Vec3f Camera::lookpos()
 		vLine[0] = m_pos;
 		vLine[1] = m_pos - d * 64.0f;
 
-		vLine[1] = g_edbldg.TraceRay(m_pos, vLine[1]);
+		vLine[1] = g_edmap.TraceRay(m_pos, vLine[1]);
 
 		CEntity* e;
 		int localE = g_player[g_localP].entity;
@@ -245,13 +245,14 @@ void Camera::lookat(Vec3f at)
 	calcstrafe();
 }
 
-void Camera::strafe(float speed)
+/*
+void Camera::Strafe(float speed)
 {
 	m_vel.x += m_strafe.x * speed;
 	m_vel.z += m_strafe.z * speed;
 }
 
-void Camera::move(float speed)
+void Camera::Move(float speed)
 {
 	Vec3f vVector = m_view - m_pos;
 
@@ -260,7 +261,8 @@ void Camera::move(float speed)
 	m_vel.x += vVector.x * speed;
 	m_vel.z += vVector.z * speed;
 }
-/*
+*/
+
 void Camera::strafe(float speed)
 {
 	m_pos.x += m_strafe.x * speed;
@@ -280,10 +282,10 @@ void Camera::move(float speed)
 	m_pos.z += vVector.z * speed;
 	m_view.x += vVector.x * speed;
 	m_view.z += vVector.z * speed;
-}*/
+}
 
 //bool g_debug2 = false;
-/*
+
 void Camera::accelerate(float speed)
 {
 	Vec3f vVector = m_view - m_pos;
@@ -292,11 +294,33 @@ void Camera::accelerate(float speed)
 	
 	m_vel.x += vVector.x * speed;
 	m_vel.z += vVector.z * speed;
-}*/
+}
+
+void Camera::accelstrafe(float speed)
+{
+	Vec3f vVector = Normalize(m_strafe);
+	
+	m_vel.x += vVector.x * speed;
+	m_vel.z += vVector.z * speed;
+}
+
+void Camera::accelrise(float speed)
+{
+	Vec3f vVector = Normalize(m_up);
+	
+	m_vel.y += vVector.y * speed;
+}
 
 void Camera::friction()
 {
 	m_vel.x *= INVFRICTION;
+	m_vel.z *= INVFRICTION;
+}
+
+void Camera::friction2()
+{
+	m_vel.x *= INVFRICTION;
+	m_vel.y *= INVFRICTION;
 	m_vel.z *= INVFRICTION;
 }
 

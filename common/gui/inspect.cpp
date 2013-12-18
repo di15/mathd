@@ -18,11 +18,11 @@
 #include "transaction.h"
 #include "bgraph.h"
 
-void AddGrayBGFr(vector<CWidget> *wv, int left, int top, int right, int bottom)
+void AddGrayBGFr(vector<Widget> *wv, int left, int top, int right, int bottom)
 {
 	int midheight = bottom - top - 32 - 23;
 
-	CWidget image;
+	Widget image;
 
 	image.Image("gui\\grayframes\\grayfbg.png",				left + 23,						top + 17,					right - 21,					bottom - 18,					1,1,1,1,		0, 0, ((right-21)-(left+23))/46.0f, ((bottom-18)-(top+17))/46.0f);
 	wv->push_back(image);
@@ -48,11 +48,11 @@ void AddGrayBGFr(vector<CWidget> *wv, int left, int top, int right, int bottom)
 	wv->push_back(image);
 }
 
-void AddFrame(vector<CWidget> *wv, int left, int top, int right, int bottom, int leftoff, int rightoff, int titlewidth, int undertextw)
+void AddFrame(vector<Widget> *wv, int left, int top, int right, int bottom, int leftoff, int rightoff, int titlewidth, int undertextw)
 {
 	int midheight = bottom - top - 60 - 52;
 	
-	CWidget image;
+	Widget image;
 
 	image.Image("gui\\frames\\topleft.png",			left - leftoff,						top,						left + 29 - leftoff + 1-1,			top + 52 + 1-1,					1,1,1,1);
 	wv->push_back(image);
@@ -100,11 +100,11 @@ void RePrice(int res)
 	float pricef = p->price[res];
 	
 	CView* v = g_GUI.getview("binspect");
-	CWidget* mw = &v->widget[1];
+	Widget* mw = &v->widget[1];
 
 	char textname[32];
 	sprintf(textname, "%s price", r->name);
-	CWidget* w = mw->getsubwidg(textname, TEXTBOX);
+	Widget* w = mw->getsubwidg(textname, TEXTBOX);
 
 	char pricestr[32];
 	sprintf(pricestr, "%c%0.2f / %c", g_resource[CURRENC].icon, p->price[res], g_resource[res].icon);
@@ -120,11 +120,11 @@ void ReUPrice(int unit)
 	float pricef = p->uprice[unit];
 	
 	CView* v = g_GUI.getview("binspect");
-	CWidget* mw = &v->widget[1];
+	Widget* mw = &v->widget[1];
 
 	char textname[32];
 	sprintf(textname, "%s price", t->name);
-	CWidget* w = mw->getsubwidg(textname, TEXTBOX);
+	Widget* w = mw->getsubwidg(textname, TEXTBOX);
 
 	char pricestr[32];
 	sprintf(pricestr, "%c%0.2f", g_resource[CURRENC].icon, p->uprice[unit]);
@@ -204,11 +204,11 @@ void UpdateQueueCount(int utindex)
 
 	if(v->widget.size() >= 2)
 	{
-		CWidget* mw = &v->widget[1];
+		Widget* mw = &v->widget[1];
 		char numboxname[64];
 		sprintf(numboxname, "num %s", ut->name);
 
-		CWidget* numbox = mw->getsubwidg(numboxname, TEXTBOX);
+		Widget* numbox = mw->getsubwidg(numboxname, TEXTBOX);
 
 		if(numbox != NULL)
 		{
@@ -223,13 +223,13 @@ void UpdateQueueCount(int utindex)
 	
 	if(v->widget.size() >= 2)
 	{
-		CWidget* mw = &v->widget[1];
+		Widget* mw = &v->widget[1];
 
 		char numboxname[64];
 		sprintf(numboxname, "num %s", ut->name);
 		char numboxvalue[32];
 		sprintf(numboxvalue, "%d (%d)", numinprod, allpinprod);
-		CWidget* numbox = mw->getsubwidg(numboxname, TEXTBOX);
+		Widget* numbox = mw->getsubwidg(numboxname, TEXTBOX);
 		numbox->changetext(numboxvalue);
 	}
 }
@@ -247,7 +247,7 @@ void UpdatePQuota()
 
 	if(v->widget.size() >= 2)
 	{
-		CWidget* mw = &v->widget[1];
+		Widget* mw = &v->widget[1];
 
 		CBuildingType* t = &g_buildingType[b->type];
 		
@@ -263,7 +263,7 @@ void UpdatePQuota()
 			sprintf(add, "%c%d ", g_resource[i].icon, (int)rquota);
 			strcat(pquotastr, add);
 		}
-		CWidget* numbox = mw->getsubwidg("quota str", TEXTBOX);
+		Widget* numbox = mw->getsubwidg("quota str", TEXTBOX);
 		numbox->changetext(pquotastr);
 	}
 }
@@ -281,14 +281,14 @@ void UpdateBWage()
 
 	if(v->widget.size() >= 2)
 	{
-		CWidget* mw = &v->widget[1];
+		Widget* mw = &v->widget[1];
 
 		CBuildingType* t = &g_buildingType[b->type];
 		
 		char wagestr[64];
 		CPlayer* p = &g_player[b->owner];
 		sprintf(wagestr, "%c%0.2f/%c", g_resource[CURRENC].icon, p->wage[b->type], g_resource[LABOUR].icon);
-		CWidget* numbox = mw->getsubwidg("wage str", TEXTBOX);
+		Widget* numbox = mw->getsubwidg("wage str", TEXTBOX);
 		numbox->changetext(wagestr);
 	}
 }
@@ -306,7 +306,7 @@ void UpdateStockStr()
 
 	if(v->widget.size() >= 2)
 	{
-		CWidget* mw = &v->widget[1];
+		Widget* mw = &v->widget[1];
 
 		CBuildingType* bt = &g_buildingType[b->type];
 		CPlayer* p = &g_player[b->owner];
@@ -384,7 +384,7 @@ void UpdateStockStr()
 			strcat(stockstr, add);
 		}
 
-		CWidget* w = mw->getsubwidg("stock", TEXTBOX);
+		Widget* w = mw->getsubwidg("stock", TEXTBOX);
 		w->changetext(stockstr);
 	}
 }
@@ -402,17 +402,17 @@ void UpdateBForSale()
 
 	if(v->widget.size() >= 2)
 	{
-		CWidget* mw = &v->widget[1];
+		Widget* mw = &v->widget[1];
 
 		CBuildingType* bt = &g_buildingType[b->type];
 
 		/*
-		CWidget* w = mw->getsubwidg("stock", TEXTBOX);
+		Widget* w = mw->getsubwidg("stock", TEXTBOX);
 		w->changetext(stockstr);
 		*/
 		
-		CWidget* salebutton = mw->getsubwidg("sale button", BUTTON);
-		CWidget* saleprice = mw->getsubwidg("sale price", TEXTBOX);
+		Widget* salebutton = mw->getsubwidg("sale button", BUTTON);
+		Widget* saleprice = mw->getsubwidg("sale price", TEXTBOX);
 
 		if(b->forsale)
 		{
@@ -451,7 +451,7 @@ void BForSalePrice()
 	CBuilding* b = &g_building[g_selection[0]];
 
 	CView* v = g_GUI.getview("put for sale");
-	CWidget* pricebox = v->getwidget("price", TEXT);
+	Widget* pricebox = v->getwidget("price", TEXT);
 
 	char pricestr[32];
 	sprintf(pricestr, "%c%0.2f", g_resource[CURRENC].icon, b->saleprice);
@@ -558,7 +558,7 @@ void Click_CancelManuf(int utindex)
 void FillBManuf(int building)
 {
 	CView* v = g_GUI.getview("manufunits");
-	CWidget* mw = &v->widget[1];
+	Widget* mw = &v->widget[1];
 	
 	mw->pos[0] = 0;
 	mw->pos[2] = HSCROLLER_SPACING;
@@ -574,22 +574,22 @@ void FillBManuf(int building)
 		CUnitType* ut = &g_unitType[utindex];
 		
 		AddGrayBGFr(&mw->subwidg, mw->pos[2], mw->pos[1], mw->pos[2]+HSCROLLER_OPTIONW, mw->pos[3]);
-		CWidget usprite;
+		Widget usprite;
 		usprite.Image(ut->sprite, mw->pos[2]+20, mw->pos[1]+20, mw->pos[2]+20+HSCROLLER_OPTIONW-20-20, mw->pos[1]+20+HSCROLLER_OPTIONW-20-20, 1, 1, 1, 1.0f);
 		mw->subwidg.push_back(usprite);
 		
-		CWidget namebox;
+		Widget namebox;
 		namebox.TextBox("uname", ut->name, MAINFONT8, mw->pos[2]+10, mw->pos[1]+10, mw->pos[2]+HSCROLLER_OPTIONW-10, mw->pos[1]+50, 1, 1, 1, 1.0f);
 		mw->subwidg.push_back(namebox);
 
-		CWidget numbox;
+		Widget numbox;
 		char numboxname[64];
 		sprintf(numboxname, "num %s", ut->name);
 		numbox.TextBox(numboxname, "0 queued", MAINFONT8, mw->pos[2]+10, mw->pos[1]+10+15, mw->pos[2]+HSCROLLER_OPTIONW-10, mw->pos[1]+50, 1, 1, 1, 1.0f);
 		mw->subwidg.push_back(numbox);
 		UpdateQueueCount(utindex);
 
-		CWidget costbox;
+		Widget costbox;
 		char costboxname[64];
 		sprintf(costboxname, "cost %s", ut->name);
 		char coststr[128];
@@ -616,7 +616,7 @@ void FillBManuf(int building)
 		costbox.TextBox(costboxname, coststr, MAINFONT8, mw->pos[2]+10, mw->pos[1]+10+15*2, mw->pos[2]+HSCROLLER_OPTIONW-10, mw->pos[3], 1, 1, 1, 1.0f);
 		mw->subwidg.push_back(costbox);
 
-		CWidget button;
+		Widget button;
 		if(b->owner == g_localP)
 			button.Button("gui\\transp.png", "Manufacture", MAINFONT8, mw->pos[2]+HSCROLLER_OPTIONW-10-140, mw->pos[3]-10*2-44*2, mw->pos[2]+HSCROLLER_OPTIONW-10, mw->pos[3]-10*2-44*1, &Click_ManufUnit, NULL, NULL, utindex);
 		else
@@ -649,7 +649,7 @@ void Click_BGraph()
 void FillBInspect(int building)
 {
 	CView* v = g_GUI.getview("binspect");
-	CWidget* mw = &v->widget[1];
+	Widget* mw = &v->widget[1];
 
 	mw->pos[0] = 0;
 	mw->pos[2] = HSCROLLER_SPACING;
@@ -660,10 +660,10 @@ void FillBInspect(int building)
 	CBuilding* b = &g_building[building];
 	CBuildingType* bt = &g_buildingType[b->type];
 	CPlayer* p = &g_player[b->owner];
-	CWidget bsprite;
+	Widget bsprite;
 	bsprite.Image(bt->sprite, mw->pos[2]+20, mw->pos[1]+20, mw->pos[2]+20+HSCROLLER_OPTIONW-20-20, mw->pos[1]+20+HSCROLLER_OPTIONW-20-20, 1, 1, 1, 1.0f);
 	mw->subwidg.push_back(bsprite);
-	CWidget namebox;
+	Widget namebox;
 	//title.Text(name, name, MAINFONT8, mw->pos[0]+5, mw->pos[1], true);
 	namebox.TextBox("bname", bt->name, MAINFONT8, mw->pos[2]+10, mw->pos[1]+10, mw->pos[2]+HSCROLLER_OPTIONW-10, mw->pos[1]+50, 1, 1, 1, 1.0f);
 	mw->subwidg.push_back(namebox);
@@ -671,7 +671,7 @@ void FillBInspect(int building)
 	mw->pos[2] += HSCROLLER_SPACING;
 
 	AddGrayBGFr(&mw->subwidg, mw->pos[2], mw->pos[1], mw->pos[2]+HSCROLLER_OPTIONW, mw->pos[3]);
-	CWidget faclogo;
+	Widget faclogo;
 	faclogo.Image(faclogofile[b->owner], mw->pos[2]+20, mw->pos[1]+20, mw->pos[2]+20+HSCROLLER_OPTIONW-20-20, mw->pos[1]+20+HSCROLLER_OPTIONW-20-20, 1, 1, 1, 1.0f);
 	mw->subwidg.push_back(faclogo);
 	namebox.TextBox("facname", facfullname[b->owner], MAINFONT8, mw->pos[2]+10, mw->pos[1]+10, mw->pos[2]+HSCROLLER_OPTIONW-10, mw->pos[1]+50, 1, 1, 1, 1.0f);
@@ -682,11 +682,11 @@ void FillBInspect(int building)
 	AddGrayBGFr(&mw->subwidg, mw->pos[2], mw->pos[1], mw->pos[2]+HSCROLLER_OPTIONW, mw->pos[3]);
 	namebox.TextBox("stockt", "Stock", MAINFONT8, mw->pos[2]+10, mw->pos[1]+10, mw->pos[2]+HSCROLLER_OPTIONW-10, mw->pos[1]+50, 1, 1, 1, 1.0f);
 	mw->subwidg.push_back(namebox);
-	CWidget textbox;
+	Widget textbox;
 	textbox.TextBox("stock", " ", MAINFONT8, mw->pos[2]+10, mw->pos[1]+30, mw->pos[2]+HSCROLLER_OPTIONW-10, mw->pos[3], 1, 1, 1, 1.0f);
 	mw->subwidg.push_back(textbox);
 	UpdateStockStr();
-	CWidget graphbutt;
+	Widget graphbutt;
 	graphbutt.Button("gui\\transp.png", "Stock Graph", MAINFONT8, mw->pos[2]+10, mw->pos[3]-20-44, mw->pos[2]+HSCROLLER_OPTIONW-10, mw->pos[3]-20, &Click_BGraph, NULL, NULL);
 	mw->subwidg.push_back(graphbutt);
 	mw->pos[2] += HSCROLLER_OPTIONW;
@@ -723,7 +723,7 @@ void FillBInspect(int building)
 			mw->subwidg.push_back(textbox);
 			if(b->owner == g_localP)
 			{
-				CWidget butt;
+				Widget butt;
 				butt.Button("gui\\plus.png", "", MAINFONT8, mw->pos[2]+hspace-20-44*2, mw->pos[1]+30+row*vsppp, mw->pos[2]+hspace-20-44*1, mw->pos[1]+30+row*vsppp+44, &Click_PlusPrice, NULL, NULL, i);
 				mw->subwidg.push_back(butt);
 				butt.Button("gui\\minus.png", "", MAINFONT8, mw->pos[2]+hspace-20-44*1, mw->pos[1]+30+row*vsppp, mw->pos[2]+hspace-20-44*0, mw->pos[1]+30+row*vsppp+44, &Click_MinusPrice, NULL, NULL, i);
@@ -748,7 +748,7 @@ void FillBInspect(int building)
 				int utindex = bt->buildable[i];
 				CUnitType* ut = &g_unitType[utindex];
 
-				CWidget usprite;
+				Widget usprite;
 				usprite.Image(ut->sprite, mw->pos[2]+10, mw->pos[1]+10, mw->pos[2]+HSCROLLER_OPTIONW-10, mw->pos[1]+HSCROLLER_OPTIONW-10, 1, 1, 1, 1.0f);
 				mw->subwidg.push_back(usprite);
 
@@ -780,7 +780,7 @@ void FillBInspect(int building)
 				textbox.TextBox(textname, pricestr, MAINFONT8, mw->pos[2]+20, mw->pos[1]+30+1*vsppp, mw->pos[2]+hspace-20-44*2, mw->pos[1]+30+2*vsppp, 1, 1, 1, 1.0f);
 				mw->subwidg.push_back(textbox);
 
-				CWidget butt;
+				Widget butt;
 				butt.Button("gui\\plus.png", "", MAINFONT8, mw->pos[2]+hspace-20-44*2, mw->pos[1]+30+1*vsppp, mw->pos[2]+hspace-20-44*1, mw->pos[1]+30+1*vsppp+44, &Click_PlusUPrice, NULL, NULL, utindex);
 				mw->subwidg.push_back(butt);
 				butt.Button("gui\\minus.png", "", MAINFONT8, mw->pos[2]+hspace-20-44*1, mw->pos[1]+30+1*vsppp, mw->pos[2]+hspace-20-44*0, mw->pos[1]+30+1*vsppp+44, &Click_MinusUPrice, NULL, NULL, utindex);
@@ -802,7 +802,7 @@ void FillBInspect(int building)
 				mw->subwidg.push_back(textbox);
 				UpdatePQuota();
 
-				CWidget butt;
+				Widget butt;
 				butt.Button("gui\\plus.png", "", MAINFONT8, mw->pos[2]+hspace-20-44*2, mw->pos[1]+30+1*vsppp, mw->pos[2]+hspace-20-44*1, mw->pos[1]+30+1*vsppp+44, &Click_PlusPQuota, NULL, NULL);
 				mw->subwidg.push_back(butt);
 				butt.Button("gui\\minus.png", "", MAINFONT8, mw->pos[2]+hspace-20-44*1, mw->pos[1]+30+1*vsppp, mw->pos[2]+hspace-20-44*0, mw->pos[1]+30+1*vsppp+44, &Click_MinusPQuota, NULL, NULL);
@@ -824,7 +824,7 @@ void FillBInspect(int building)
 				mw->subwidg.push_back(textbox);
 				UpdateBWage();
 				
-				CWidget butt;
+				Widget butt;
 				butt.Button("gui\\plus.png", "", MAINFONT8, mw->pos[2]+hspace-20-44*2, mw->pos[1]+30+1*vsppp, mw->pos[2]+hspace-20-44*1, mw->pos[1]+30+1*vsppp+44, &Click_PlusBWage, NULL, NULL);
 				mw->subwidg.push_back(butt);
 				butt.Button("gui\\minus.png", "", MAINFONT8, mw->pos[2]+hspace-20-44*1, mw->pos[1]+30+1*vsppp, mw->pos[2]+hspace-20-44*0, mw->pos[1]+30+1*vsppp+44, &Click_MinusBWage, NULL, NULL);
@@ -845,7 +845,7 @@ void FillBInspect(int building)
 		int numrows = vspace/(vsppu+10);
 		int numcols = ceil((float)numbs/(float)numrows);
 		int totalw = max(120, (hspace+10)*numcols+10);
-		CWidget touchlistener;
+		Widget touchlistener;
 		touchlistener.TouchListener(mw->pos[2], mw->pos[1], mw->pos[2]+totalw, mw->pos[3], &Click_ManufUnits, NULL, NULL, 0);
 		mw->subwidg.push_back(touchlistener);
 		AddGrayBGFr(&mw->subwidg, mw->pos[2], mw->pos[1], mw->pos[2]+totalw, mw->pos[3]);
@@ -862,7 +862,7 @@ void FillBInspect(int building)
 		{
 			int utindex = bt->buildable[i];
 			CUnitType* ut = &g_unitType[utindex];
-			CWidget usprite;
+			Widget usprite;
 			usprite.Image(ut->sprite, mw->pos[2]+10, mw->pos[1]+(vsppu+10)*row+30, mw->pos[2]+hspace+10, mw->pos[1]+(vsppu)*(row+1)+10*row+30, 1, 1, 1, 1.0f);
 			mw->subwidg.push_back(usprite);
 
@@ -875,7 +875,7 @@ void FillBInspect(int building)
 					numinprod ++;
 			}
 
-			CWidget numbox;
+			Widget numbox;
 			char numboxname[64];
 			sprintf(numboxname, "num %s", ut->name);
 			numbox.TextBox(numboxname, "0", MAINFONT8, mw->pos[2]+10, mw->pos[1]+vsppu*row+30+10, mw->pos[2]+hspace-10, mw->pos[1]+vsppu*(row+1)+30+10, 1, 1, 1, 1.0f);
@@ -902,11 +902,11 @@ void FillBInspect(int building)
 		
 		AddGrayBGFr(&mw->subwidg, mw->pos[2], mw->pos[1], mw->pos[2]+hspace, mw->pos[3]);
 
-		CWidget numbox;
+		Widget numbox;
 		numbox.TextBox("sale price", " ", MAINFONT8, mw->pos[2]+10, mw->pos[1]+30, mw->pos[2]+hspace-10, mw->pos[1]+30+40, 1, 1, 1, 1.0f);
 		mw->subwidg.push_back(numbox);
 
-		CWidget butt;
+		Widget butt;
 		butt.Button("sale button", "gui\\transp.png", "Put for sale", MAINFONT8, mw->pos[2]+10, mw->pos[1]+30+40, mw->pos[2]+hspace-10, mw->pos[1]+30+40+44, &Click_BForSale, NULL, NULL);
 		mw->subwidg.push_back(butt);
 		UpdateBForSale();
@@ -916,24 +916,24 @@ void FillBInspect(int building)
 	}
 
 	/*
-	CWidget optbg;
+	Widget optbg;
 	optbg.Image("gui\\buildbg.png", mw->pos[2], mw->pos[1], mw->pos[2]+HSCROLLER_OPTIONW, mw->pos[3], 1, 1, 1, 1.0f);
 	mw->subwidg.push_back(optbg);
 
-	CWidget touchl;
+	Widget touchl;
 	touchl.TouchListener(mw->pos[2], mw->pos[1], mw->pos[2]+HSCROLLER_OPTIONW, mw->pos[3], &Click_BInspect, NULL, NULL, BINSPECT_);
 	mw->subwidg.push_back(touchl);
 
-	CWidget bsprite;
+	Widget bsprite;
 	bsprite.Image(graphic, mw->pos[2]+20, mw->pos[1]+20, mw->pos[2]+20+75, mw->pos[1]+20+75, 1, 1, 1, 1.0f);
 	mw->subwidg.push_back(bsprite);
 
-	CWidget namebox;
+	Widget namebox;
 	//title.Text(name, name, MAINFONT8, mw->pos[0]+5, mw->pos[1], true);
 	namebox.TextBox(name, name, MAINFONT8, mw->pos[2]+10, mw->pos[1]+10, mw->pos[2]+HSCROLLER_OPTIONW-10, mw->pos[1]+50, 1, 1, 1, 1.0f);
 	mw->subwidg.push_back(namebox);
 
-	CWidget descbox;
+	Widget descbox;
 	char descall[1024];
 	sprintf(descall, "%s", desc);
 

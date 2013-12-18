@@ -8,7 +8,7 @@
 class DropDownS : public Widget
 {
 public:
-	DropDownS(Widget* parent, const char* n, int f, Margin left, Margin top, Margin right, Margin bottom, void (*change)());
+	DropDownS(Widget* parent, const char* n, int f, void (*reframef)(Widget* thisw), void (*change)());
 
 	void draw();
 	void draw2();

@@ -8,10 +8,10 @@
 class Button : public Widget
 {
 public:
-	Button(Widget* parent, const char* n, const char* filepath, const RichText label, const RichText t, int f, Margin left, Margin top, Margin right, Margin bottom, void (*click)(), void (*overf)(), void (*out)());
-	Button(Widget* parent, const char* filepath, const RichText t, int f, Margin left, Margin top, Margin right, Margin bottom, void (*click)(), void (*overf)(), void (*out)());
-	Button(Widget* parent, const char* filepath, const RichText t, int f, Margin left, Margin top, Margin right, Margin bottom, void (*click2)(int p), int parm);
-	Button(Widget* parent, const char* filepath, const RichText t, int f, Margin left, Margin top, Margin right, Margin bottom, void (*click2)(int p), void (*overf)(int p), void (*out)(), int parm);
+	Button(Widget* parent, const char* n, const char* filepath, const RichText label, const RichText t, int f, void (*reframef)(Widget* thisw), void (*click)(), void (*overf)(), void (*out)());
+	Button(Widget* parent, const char* filepath, const RichText t, int f, void (*reframef)(Widget* thisw), void (*click)(), void (*overf)(), void (*out)());
+	Button(Widget* parent, const char* filepath, const RichText t, int f, void (*reframef)(Widget* thisw), void (*click2)(int p), int parm);
+	Button(Widget* parent, const char* filepath, const RichText t, int f, void (*reframef)(Widget* thisw), void (*click2)(int p), void (*overf)(int p), void (*out)(), int parm);
 
 	void draw();
 	void draw2();

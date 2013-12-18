@@ -57,6 +57,7 @@ void main(void)
 	//vec3 normalEyeSpace = vec3( normalMatrix * vec4(normalIn, 0.0) );
 	//vec3 normalEyeSpace = mat3(normalMatrix) * normalIn;
 	mat4 normalMat = transpose( inverse( model * view ) );
+	//mat4 normalMat = transpose( inverse( model ) );
 	//mat4 normalMat = invModelView;
 	vec3 normalEyeSpace = vec3( normalMat * vec4(normalIn, 0.0) );
 	normalOut = normalize(normalEyeSpace);

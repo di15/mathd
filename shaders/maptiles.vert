@@ -34,15 +34,15 @@ varying vec3 eyevec;
 uniform float sandonlymaxy;	// 100
 uniform float sandgrassmaxy;	// 1,000
 uniform float grassonlymaxy;	// 75,000
-uniform float grassdirtmaxy;	// 90,000
-uniform float dirtonlymaxy;	// 95,000
-uniform float dirtrockmaxy;	// 99,000
+uniform float grassrockmaxy;	// 90,000
 //uniform float rockonlymaxy = 100,000;
+uniform float mapminz;
+uniform float mapmaxz;
 
 varying float sandalpha;
 varying float grassalpha;
-varying float dirtalpha;
 varying float rockalpha;
+varying float snowalpha;
 
 uniform vec3 sundirection;
 
@@ -63,66 +63,111 @@ void main(void)
 	{
 		sandalpha = 1;
 		grassalpha = 0;
-		dirtalpha = 0;
 		rockalpha = 0;
+		snowalpha = 0;
 	}
 	else if(position.y < sandgrassmaxy)
 	{
 		float transition = (position.y - sandonlymaxy) / (sandgrassmaxy - sandonlymaxy);
 		sandalpha = 1.0 - transition;
 		grassalpha = transition;
-		dirtalpha = 0;
 		rockalpha = 0;
+		snowalpha = 0;
 	}
 	else if(position.y < grassonlymaxy)
 	{
 		sandalpha = 0;
 		grassalpha = 1;
-		dirtalpha = 0;
 		rockalpha = 0;
+		snowalpha = 0;
 	}
-	else if(position.y < grassdirtmaxy)
+	else if(position.y < grassrockmaxy)
 	{
-		float transition = (position.y - grassonlymaxy) / (grassdirtmaxy - grassonlymaxy);
+		float transition = (position.y - grassonlymaxy) / (grassrockmaxy - grassonlymaxy);
 		sandalpha = 0;
 		grassalpha = 1.0 - transition;
-		dirtalpha = transition;
-		rockalpha = 0;
-	}
-	else if(position.y < dirtonlymaxy)
-	{
-		sandalpha = 0;
-		grassalpha = 0;
-		dirtalpha = 1;
-		rockalpha = 0;
-	}
-	else if(position.y < dirtrockmaxy)
-	{
-		
-		float transition = (position.y - dirtonlymaxy) / (dirtrockmaxy - dirtonlymaxy);
-		sandalpha = 0;
-		grassalpha = 0;
-		dirtalpha = 1.0 - transition;
+		snowalpha = 0;
 		rockalpha = transition;
 	}
 	else
 	{
 		sandalpha = 0;
 		grassalpha = 0;
-		dirtalpha = 0;
+		snowalpha = 0;
 		rockalpha = 1;
 	}
+
+	float mapzspan = mapmaxz - mapminz;
+	float mapz10percent = mapzspan * 0.1;
+
+	float snowupperz = mapmaxz - mapz10percent*2.0;
+	float snowlowerz = mapminz + mapz10percent*2.0;
+
+	float snowtransition = 0;
+
+	if(position.z > snowupperz)
+	{
+		snowtransition = (position.z - snowupperz) / (mapz10percent*2.0);
+	}
+	else if(position.z < snowlowerz)
+	{
+		snowtransition = 1.0 - (position.z - mapminz) / (mapz10percent*2.0);
+	}
+
+	if(snowtransition > 0.0)
+	{
+		float otheralpha = sandalpha + grassalpha + rockalpha;
+		float alphascale = (1.0 - snowtransition) / otheralpha;
+
+		sandalpha *= alphascale;
+		grassalpha *= alphascale;
+		rockalpha *= alphascale;
+		snowalpha = snowtransition;
+	}
+	else
+	{
+		float mapcenterz = mapminz + mapzspan/2.0;
+		float equatorlower = mapcenterz - mapz10percent*2.0;
+		float equatorupper = mapcenterz + mapz10percent*2.0;
+
+		float sandtransition = 0;
+
+		if(position.z > equatorlower && position.z <= mapcenterz)
+		{
+			sandtransition = (position.z - equatorlower) / (mapz10percent*2.0);
+		}
+		else if(position.z >= mapcenterz && position.z < equatorupper)
+		{
+			sandtransition = (equatorupper - position.z) / (mapz10percent*2.0);
+		}
+
+		if(sandtransition > 0.0)
+		{
+			float otheralpha = snowalpha + grassalpha + rockalpha;
+
+			if(otheralpha > 0.0)
+			{
+				float alphascale = (1.0 - sandtransition) / otheralpha;
+				
+				snowalpha *= alphascale;
+				grassalpha *= alphascale;
+				rockalpha *= alphascale;
+				sandalpha = sandtransition;
+			}
+		}
+	}
+	
 
 /*
 	sandalpha = 1;
 	grassalpha = 1;
-	dirtalpha = 1;
+	snowalpha = 1;
 	rockalpha = 1;
 */
 /*
 	sandalpha = 0;
 	grassalpha = 0;
-	dirtalpha = 1;
+	snowalpha = 1;
 	rockalpha = 0;
 */
 

@@ -5,10 +5,10 @@
 #ifndef _FRUSTUM_H
 #define _FRUSTUM_H
 
-#include "main.h"
+#include "../platform.h"
 #include "3dmath.h"
 
-class CFrustum 
+class Frustum 
 {
 public:
 	void CalculateFrustum(const float* proj, const float* modl);
@@ -21,18 +21,6 @@ private:
 	float m_Frustum[6][4];	// This holds the A B C and D values for each side of our frustum.
 };
 
-class CDebug 
-{
-public:
-	void AddDebugLine(Vec3f vPoint1, Vec3f vPoint2);
-	void AddDebugBox(Vec3f vCenter, float width, float height, float depth);
-	void RenderDebugLines();		
-	void Clear();					
-
-private:
-	vector<Vec3f> m_vLines;		
-};
-
-extern CFrustum g_frustum;
+extern Frustum g_frustum;
 
 #endif

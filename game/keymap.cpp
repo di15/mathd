@@ -2,8 +2,11 @@
 
 
 
-#include "main.h"
+#include "gmain.h"
 #include "keymap.h"
+#include "../common/platform.h"
+
+#if 0
 #include "3dmath.h"
 #include "gui.h"
 #include "menu.h"
@@ -313,13 +316,17 @@ void MouseMove()
 	}
 }
 
+#endif
+
 void MapKeys()
 {	
+#if 0
 	AssignKey(VK_ESCAPE, &Escape, NULL);
 	AssignMouseWheel(&MouseWheel);
 	AssignMouseMove(&MouseMove);
 	AssignLButton(&MouseLeftButtonDown, &MouseLeftButtonUp);
 	AssignRButton(NULL, &MouseRightButtonUp);
+#endif
 
 	/*
 	int key;
