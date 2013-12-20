@@ -1,6 +1,6 @@
 #include "platform.h"
 #include "texture.h"
-#include "draw/model.h"
+#include "render/model.h"
 #include "gui/gui.h"
 #include "utils.h"
 

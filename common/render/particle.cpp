@@ -1,12 +1,13 @@
 
 
 #include "particle.h"
-#include "image.h"
-#include "main.h"
+#include "../texture.h"
+#include "../platform.h"
 #include "billboard.h"
+#include "../math/vec3f.h"
 
-CParticleType g_particleType[PARTICLE_TYPES];
-CParticle g_particle[PARTICLES];
+ParticleT g_particleT[PARTICLE_TYPES];
+Particle g_particle[PARTICLES];
 
 int NewParticle()
 {
@@ -17,11 +18,11 @@ int NewParticle()
 	return -1;
 }
 
-void Particle(int i, char* texpath, int del, float dec, Vec3f minV, Vec3f maxV, Vec3f minA, Vec3f maxA, float minS, float maxS, void (*collision)(CParticle* part, CBillboard* billb, Vec3f trace, Vec3f normal))
+void DefineParticle(int i, char* texpath, int del, float dec, Vec3f minV, Vec3f maxV, Vec3f minA, Vec3f maxA, float minS, float maxS, void (*collision)(Particle* part, Billboard* billb, Vec3f trace, Vec3f normal))
 {
-	CParticleType* t = &g_particleType[i];
+	ParticleT* t = &g_particleT[i];
 
-	t->billbT = Billboard(texpath);
+	t->billbT = IdentifyBillboard(texpath);
 	t->delay = del;
 	t->decay = dec;
 	t->minvelocity = minV;
@@ -35,21 +36,21 @@ void Particle(int i, char* texpath, int del, float dec, Vec3f minV, Vec3f maxV, 
 
 void LoadParticles()
 {
-	//void Particle(int i, char* texpath, int del, float dec, Vec3f minV, Vec3f maxV, Vec3f minA, Vec3f maxA, float minS, float maxS, void (*collision)(CParticle* part, CBillboard* billb, Vec3f trace, Vec3f normal))
-	Particle(EXHAUST, "billboards\\exhaust.png", 500, 0.003f, Vec3f(0, 0.05f, 0), Vec3f(0.01f, 0.08f, -0.01f), Vec3f(-0.0001f, 0.0f, -0.0001f), Vec3f(-0.0001f, 0.0f, -0.0001f), 2.0f, 10.0f, NULL);
-	Particle(EXHAUSTBIG, "billboards\\exhaust.png", 500, 0.003f, Vec3f(0, 0.05f, 0), Vec3f(0.01f, 0.08f, -0.01f), Vec3f(-0.0001f, 0.0f, -0.0001f), Vec3f(-0.0001f, 0.0f, -0.0001f), 5.0f, 17.0f, NULL);
-	Particle(FIREBALL, "billboards\\fireball.png", 500, 0.02f, Vec3f(0, 0.08f, 0), Vec3f(0.0f, 0.08f, 0.0f), Vec3f(0, 0.0f, 0), Vec3f(0.0f, 0.0f, 0.0f), 16.0f, 16.0f, NULL);
-	Particle(FIREBALL2, "billboards\\fireball2.png", 500, 0.02f, Vec3f(0, 0.08f, 0), Vec3f(0.0f, 0.08f, 0.0f), Vec3f(0, 0.0f, 0), Vec3f(0.0f, 0.0f, 0.0f), 16.0f, 16.0f, NULL);
-	Particle(SMOKE, "billboards\\smoke.png", 500, 0.01f, Vec3f(0, 0.4f, 0), Vec3f(0.0f, 0.4f, 0.0f), Vec3f(0, 0.0f, 0), Vec3f(0.0f, 0.0f, 0.0f), 10.0f, 10.0f, NULL);
-	Particle(SMOKE2, "billboards\\smoke2.png", 500, 0.01f, Vec3f(0, 0.4f, 0), Vec3f(0.0f, 0.4f, 0.0f), Vec3f(0, 0.0f, 0), Vec3f(0.0f, 0.0f, 0.0f), 10.0f, 10.0f, NULL);
-	Particle(DEBRIS, "billboards\\debris.png", 500, 0.01f, Vec3f(-0.8f, 0.8f, -0.8f), Vec3f(0.8f, 0.8f, 0.8f), Vec3f(0, -0.05f, 0), Vec3f(0.0f, -0.09f, 0.0f), 0.5f, 1.0f, NULL);
-	Particle(FLAME, "billboards\\flame.png", 50, 0.01f, Vec3f(-0.05f, 0.1f, -0.05f), Vec3f(0.06f, 0.3f, 0.06f), Vec3f(0, 0.0f, 0), Vec3f(0, 0.0f, 0), 5.5f, 6.0f, NULL);
-	Particle(PLUME, "billboards\\plume.png", 25, 0.01f, Vec3f(-0.05f, 0.2f, -0.05f), Vec3f(0.06f, 0.5f, 0.06f), Vec3f(0, 0.0f, 0), Vec3f(0, 0.0f, 0), 5.5f, 12.0f, NULL);
+	//void Particle(int i, char* texpath, int del, float dec, Vec3f minV, Vec3f maxV, Vec3f minA, Vec3f maxA, float minS, float maxS, void (*collision)(Particle* part, Billboard* billb, Vec3f trace, Vec3f normal))
+	DefineParticle(EXHAUST, "billboards\\exhaust.png", 500, 0.003f, Vec3f(0, 0.05f, 0), Vec3f(0.01f, 0.08f, -0.01f), Vec3f(-0.0001f, 0.0f, -0.0001f), Vec3f(-0.0001f, 0.0f, -0.0001f), 2.0f, 10.0f, NULL);
+	DefineParticle(EXHAUSTBIG, "billboards\\exhaust.png", 500, 0.003f, Vec3f(0, 0.05f, 0), Vec3f(0.01f, 0.08f, -0.01f), Vec3f(-0.0001f, 0.0f, -0.0001f), Vec3f(-0.0001f, 0.0f, -0.0001f), 5.0f, 17.0f, NULL);
+	DefineParticle(FIREBALL, "billboards\\fireball.png", 500, 0.02f, Vec3f(0, 0.08f, 0), Vec3f(0.0f, 0.08f, 0.0f), Vec3f(0, 0.0f, 0), Vec3f(0.0f, 0.0f, 0.0f), 16.0f, 16.0f, NULL);
+	DefineParticle(FIREBALL2, "billboards\\fireball2.png", 500, 0.02f, Vec3f(0, 0.08f, 0), Vec3f(0.0f, 0.08f, 0.0f), Vec3f(0, 0.0f, 0), Vec3f(0.0f, 0.0f, 0.0f), 16.0f, 16.0f, NULL);
+	DefineParticle(SMOKE, "billboards\\smoke.png", 500, 0.01f, Vec3f(0, 0.4f, 0), Vec3f(0.0f, 0.4f, 0.0f), Vec3f(0, 0.0f, 0), Vec3f(0.0f, 0.0f, 0.0f), 10.0f, 10.0f, NULL);
+	DefineParticle(SMOKE2, "billboards\\smoke2.png", 500, 0.01f, Vec3f(0, 0.4f, 0), Vec3f(0.0f, 0.4f, 0.0f), Vec3f(0, 0.0f, 0), Vec3f(0.0f, 0.0f, 0.0f), 10.0f, 10.0f, NULL);
+	DefineParticle(DEBRIS, "billboards\\debris.png", 500, 0.01f, Vec3f(-0.8f, 0.8f, -0.8f), Vec3f(0.8f, 0.8f, 0.8f), Vec3f(0, -0.05f, 0), Vec3f(0.0f, -0.09f, 0.0f), 0.5f, 1.0f, NULL);
+	DefineParticle(FLAME, "billboards\\flame.png", 50, 0.01f, Vec3f(-0.05f, 0.1f, -0.05f), Vec3f(0.06f, 0.3f, 0.06f), Vec3f(0, 0.0f, 0), Vec3f(0, 0.0f, 0), 5.5f, 6.0f, NULL);
+	DefineParticle(PLUME, "billboards\\plume.png", 25, 0.01f, Vec3f(-0.05f, 0.2f, -0.05f), Vec3f(0.06f, 0.5f, 0.06f), Vec3f(0, 0.0f, 0), Vec3f(0, 0.0f, 0), 5.5f, 12.0f, NULL);
 }
 
-void CParticle::Update(CBillboard* billb)
+void Particle::Update(Billboard* billb)
 {
-	CParticleType* t = &g_particleType[type];
+	ParticleT* t = &g_particleT[type];
 	life -= t->decay;
 
 	if(life <= 0.0f)
@@ -62,10 +63,10 @@ void CParticle::Update(CBillboard* billb)
 	/*
 	Vec3f to = billb->pos + vel;
 
-	Vec3f trace = g_hmap.TraceRay(billb->pos, to);
+	Vec3f trace = g_edmap.TraceRay(billb->pos, to);
 
 	if(trace != to && t->collision != NULL)
-		t->collision(this, billb, trace, g_hmap.CollisionNormal());
+		t->collision(this, billb, trace, g_edmap.CollisionNormal());
 	*/
 
 	billb->pos = billb->pos + vel;
@@ -83,10 +84,10 @@ void EmitParticle(int type, Vec3f pos)
 	if(i < 0)
 		return;
 
-	CParticleType* t = &g_particleType[type];
+	ParticleT* t = &g_particleT[type];
 	PlaceBillboard(t->billbT, pos, t->minsize, i);
 
-	CParticle* p = &g_particle[i];
+	Particle* p = &g_particle[i];
 
 	p->on = true;
 	p->life = 1;
@@ -98,8 +99,8 @@ void EmitParticle(int type, Vec3f pos)
 
 void UpdateParticles()
 {
-	CBillboard* b;
-	CParticle* p;
+	Billboard* b;
+	Particle* p;
 
 	for(int i=0; i<BILLBOARDS; i++)
 	{

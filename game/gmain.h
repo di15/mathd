@@ -20,6 +20,7 @@
 enum APPMODE{LOGO, INTRO, LOADING, RELOADING, MENU, PLAY, PAUSE, EDITOR};
 extern APPMODE g_mode;
 extern int g_reStage;
+extern bool g_mouseout;
 
 void WriteConfig();
 

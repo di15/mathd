@@ -2,16 +2,17 @@
 
 
 #include "billboard.h"
-#include "main.h"
-#include "3dmath.h"
-#include "image.h"
+#include "../platform.h"
+#include "../math/3dmath.h"
+#include "../texture.h"
 #include "particle.h"
-#include "map.h"
-#include "chat.h"
 #include "shader.h"
+#include "../utils.h"
+#include "../math/vec3f.h"
+#include "../math/camera.h"
 
-CBillboardType g_billbT[BILLBOARD_TYPES];
-CBillboard g_billb[BILLBOARDS];
+BillboardT g_billbT[BILLBOARD_TYPES];
+Billboard g_billb[BILLBOARDS];
 unsigned int g_muzzle[4];
 
 void Effects()
@@ -33,12 +34,12 @@ int NewBillbT()
 
 int NewBillboard(const char* tex)
 {
-    //CBillboardType t;
+    //BillboardT t;
 	int i = NewBillbT();
 	if(i < 0)
 		return -1;
 
-	CBillboardType* t = &g_billbT[i];
+	BillboardT* t = &g_billbT[i];
 	t->on = true;
 
 	char rawtex[64];
@@ -54,7 +55,7 @@ int NewBillboard(const char* tex)
 	return i;
 }
 
-int Billboard(const char* name)
+int IdentifyBillboard(const char* name)
 {
 	//char rawname[64];
 	//StripPathExtension(name, rawname);
@@ -62,8 +63,8 @@ int Billboard(const char* name)
     //for(int i=0; i<g_billbT.size(); i++)
     for(int i=0; i<BILLBOARD_TYPES; i++)
     {
-        //if(!stricmp(g_billbT[i].name, rawname))
-        if(g_billbT[i].on && !stricmp(g_billbT[i].name, name))
+        //if(!_stricmp(g_billbT[i].name, rawname))
+        if(g_billbT[i].on && !_stricmp(g_billbT[i].name, name))
             return i;
     }
 	
@@ -82,7 +83,7 @@ int NewBillboard()
 
 void PlaceBillboard(const char* n, Vec3f pos, float size, int particle)
 {
-    int type = Billboard(n);
+    int type = IdentifyBillboard(n);
     if(type < 0)
         return;
     
@@ -95,7 +96,7 @@ void PlaceBillboard(int type, Vec3f pos, float size, int particle)
     if(i < 0)
         return;
 
-    CBillboard* b = &g_billb[i];
+    Billboard* b = &g_billb[i];
     b->on = true;
     b->type = type;
     b->pos = pos;
@@ -105,7 +106,7 @@ void PlaceBillboard(int type, Vec3f pos, float size, int particle)
 
 void SortBillboards()
 {
-    Vec3f pos = g_camera.Position();
+    Vec3f pos = g_camera.m_pos;
     
 	for(int i=0; i<BILLBOARDS; i++)
 	{
@@ -115,7 +116,7 @@ void SortBillboards()
 		g_billb[i].dist = Magnitude2(pos - g_billb[i].pos);
 	}
     
-	CBillboard temp;
+	Billboard temp;
 	int leftoff = 0;
 	bool backtracking = false;
     
@@ -154,19 +155,19 @@ void SortBillboards()
 
 void DrawBillboards()
 {
-    CBillboard* billb;
-    CBillboardType* t;
+    Billboard* billb;
+    BillboardT* t;
     float size;
     
-	Vec3f vertical = g_camera.Up2();
-	Vec3f horizontal = g_camera.Strafe();
+	Vec3f vertical = g_camera.up2();
+	Vec3f horizontal = g_camera.m_strafe;
 	Vec3f a, b, c, d;
 	Vec3f vert, horiz;
 
-	CParticle* part;
-	CParticleType* pT;
+	Particle* part;
+	ParticleT* pT;
 
-	Shader* s = &g_shader[SHADER::BILLBOARD];
+	Shader* s = &g_shader[SHADER_BILLBOARD];
     
     for(int i=0; i<BILLBOARDS; i++)
     {
@@ -180,14 +181,14 @@ void DrawBillboards()
 		if(billb->particle >= 0)
 		{
 			part = &g_particle[billb->particle];
-			pT = &g_particleType[part->type];
+			pT = &g_particleT[part->type];
 			size = pT->minsize + pT->sizevariation*(1.0f - part->life);
-			glUniform4f(s->m_slot[SLOT::COLOR], 1, 1, 1, part->life);
+			glUniform4f(s->m_slot[SSLOT_COLOR], 1, 1, 1, part->life);
 		}
 		else
 		{
 			size = billb->size;
-			glUniform4f(s->m_slot[SLOT::COLOR], 1, 1, 1, 1);
+			glUniform4f(s->m_slot[SSLOT_COLOR], 1, 1, 1, 1);
 		}
 
 		vert = vertical*size;
@@ -213,9 +214,9 @@ void DrawBillboards()
 		//glVertexPointer(3, GL_FLOAT, sizeof(float)*5, &vertices[0]);
 		//glTexCoordPointer(2, GL_FLOAT, sizeof(float)*5, &vertices[3]);
 		
-		glVertexAttribPointer(s->m_slot[SLOT::POSITION], 3, GL_FLOAT, GL_FALSE, sizeof(float) * 5, &vertices[0]);
-		glVertexAttribPointer(s->m_slot[SLOT::TEXCOORD0], 2, GL_FLOAT, GL_FALSE, sizeof(float) * 5, &vertices[3]);
-		//glVertexAttribPointer(s->m_slot[SLOT::NORMAL], 3, GL_FLOAT, GL_FALSE, sizeof(float) * 5, va->normals);
+		glVertexAttribPointer(s->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, sizeof(float) * 5, &vertices[0]);
+		glVertexAttribPointer(s->m_slot[SSLOT_TEXCOORD0], 2, GL_FLOAT, GL_FALSE, sizeof(float) * 5, &vertices[3]);
+		//glVertexAttribPointer(s->m_slot[SSLOT_NORMAL], 3, GL_FLOAT, GL_FALSE, sizeof(float) * 5, va->normals);
 
         glDrawArrays(GL_TRIANGLES, 0, 6);
     }
@@ -262,7 +263,7 @@ void DrawBillboards()
 		else
 			muzz = RotateAround(iT->front, Vec3f(0, MID_HEIGHT_OFFSET, 0), -cam->Pitch(), 1, 0, 0);
 		
-		muzz = cam->Position() + Rotate(muzz, cam->Yaw(), 0, 1, 0);
+		muzz = cam->m_pos + Rotate(muzz, cam->Yaw(), 0, 1, 0);
         
 		a = muzz - horiz + vert;
 		b = muzz - horiz - vert;

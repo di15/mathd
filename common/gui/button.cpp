@@ -124,33 +124,15 @@ Button::Button(Widget* parent, const char* filepath, const RichText t, int f, vo
 
 void Button::reframe()
 {
+#if 0
 	m_pos[0].recalc(m_parent);
 	m_pos[1].recalc(m_parent);
 	m_pos[2].recalc(m_parent);
 	m_pos[3].recalc(m_parent);
     float length = 0;
-	/*
     for(int i=0; i<strlen(m_label.c_str()); i++)
 	{
         length += g_font[m_font].glyph[m_label[i]].origsize[0];
-	}*/
-
-	Font* f = &g_font[m_font];
-	for(auto i=m_label.m_part.begin(); i!=m_label.m_part.end(); i++)
-	{
-		if(i->m_type == RICHTEXT_TEXT)
-		{
-			for(int j=0; j<i->m_text.m_length; j++)
-			{
-				length += f->glyph[ i->m_text.m_data[j] ].origsize[0];
-			}
-		}
-		else
-		{
-			Icon* icon = &g_icon[i->m_icon];
-			float hscale = f->gheight / (float)icon->m_height;
-			length += (float)icon->m_width * hscale;
-		}
 	}
 
 	m_tpos[0] = Margin(MARGIN_SOURCE_WIDTH, MARGIN_FUNC_PIXELS, (m_pos[2]-m_pos[0])/2.0f-length/2.0f);
@@ -159,6 +141,10 @@ void Button::reframe()
 	m_tpos[1].recalc(this);
 	//m_tpos[2].recalc(this);
 	//m_tpos[3].recalc(this);
+#endif
+
+	if(reframefunc)
+		reframefunc(this);
 }
 
 void Button::premousemove()

@@ -8,7 +8,7 @@
 #include "polygon.h"
 #include "triangle.h"
 #include "brushside.h"
-#include "../sim/door.h"
+//#include "../sim/door.h"
 
 #define STOREY_HEIGHT	250.0f //20.0f
 
@@ -20,7 +20,7 @@ public:
 	int m_nsharedv;
 	Vec3f* m_sharedv;	//shared vertices array
 	int m_texture;	//used to determine brush attributes
-	EdDoor* m_door;
+	//EdDoor* m_door;
 	bool m_broken;
 	
 	Brush& operator=(const Brush& original);

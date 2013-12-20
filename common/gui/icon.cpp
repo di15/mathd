@@ -1,7 +1,7 @@
 
 
 #include "icon.h"
-#include "../render/texture.h"
+#include "../texture.h"
 
 Icon g_icon[ICONS];
 

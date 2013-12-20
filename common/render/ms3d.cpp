@@ -10,7 +10,7 @@
 #include "../math/3dmath.h"
 #include "../math/matrix.h"
 #include "vertexarray.h"
-#include "../save/saveedm.h"
+//#include "../save/saveedm.h"
 
 //int m_frame = 0;
 

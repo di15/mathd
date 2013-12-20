@@ -1,3 +1,3 @@
-#include "res.h"
+#include "gres.h"
 
 IDI_TRIGEAR ICON "trigear.ico"

@@ -50,9 +50,6 @@
     <ClCompile Include="keymap.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\common\gui\bgraph.cpp">
-      <Filter>Source Files\common\gui</Filter>
-    </ClCompile>
     <ClCompile Include="..\common\gui\chat.cpp">
       <Filter>Source Files\common\gui</Filter>
     </ClCompile>
@@ -60,12 +57,6 @@
       <Filter>Source Files\common\gui</Filter>
     </ClCompile>
     <ClCompile Include="..\common\gui\gui.cpp">
-      <Filter>Source Files\common\gui</Filter>
-    </ClCompile>
-    <ClCompile Include="..\common\gui\inspect.cpp">
-      <Filter>Source Files\common\gui</Filter>
-    </ClCompile>
-    <ClCompile Include="..\common\gui\numpad.cpp">
       <Filter>Source Files\common\gui</Filter>
     </ClCompile>
     <ClCompile Include="..\common\math\3dmath.cpp">
@@ -77,34 +68,16 @@
     <ClCompile Include="..\common\math\physics.cpp">
       <Filter>Source Files\common\math</Filter>
     </ClCompile>
-    <ClCompile Include="..\common\sound\sound.cpp">
-      <Filter>Source Files\common\sound</Filter>
-    </ClCompile>
-    <ClCompile Include="..\common\render\billboard.cpp">
-      <Filter>Source Files\common\render</Filter>
-    </ClCompile>
     <ClCompile Include="..\common\render\model.cpp">
       <Filter>Source Files\common\render</Filter>
     </ClCompile>
     <ClCompile Include="..\common\render\ms3d.cpp">
       <Filter>Source Files\common\render</Filter>
     </ClCompile>
-    <ClCompile Include="..\common\render\particle.cpp">
-      <Filter>Source Files\common\render</Filter>
-    </ClCompile>
-    <ClCompile Include="..\common\render\projectile.cpp">
-      <Filter>Source Files\common\render</Filter>
-    </ClCompile>
     <ClCompile Include="..\common\render\shader.cpp">
       <Filter>Source Files\common\render</Filter>
     </ClCompile>
     <ClCompile Include="..\common\render\shadow.cpp">
-      <Filter>Source Files\common\render</Filter>
-    </ClCompile>
-    <ClCompile Include="..\common\render\skybox.cpp">
-      <Filter>Source Files\common\render</Filter>
-    </ClCompile>
-    <ClCompile Include="..\common\render\texture.cpp">
       <Filter>Source Files\common\render</Filter>
     </ClCompile>
     <ClCompile Include="..\common\window.cpp">
@@ -182,12 +155,6 @@
     <ClCompile Include="..\common\gui\widget.cpp">
       <Filter>Source Files\common\gui</Filter>
     </ClCompile>
-    <ClCompile Include="..\common\math\brush.cpp">
-      <Filter>Source Files\common\math</Filter>
-    </ClCompile>
-    <ClCompile Include="..\common\math\brushside.cpp">
-      <Filter>Source Files\common\math</Filter>
-    </ClCompile>
     <ClCompile Include="..\common\math\camera.cpp">
       <Filter>Source Files\common\math</Filter>
     </ClCompile>
@@ -241,9 +208,6 @@
     <ClInclude Include="keymap.h">
       <Filter>Source Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\common\gui\bgraph.h">
-      <Filter>Source Files\common\gui</Filter>
-    </ClInclude>
     <ClInclude Include="..\common\gui\chat.h">
       <Filter>Source Files\common\gui</Filter>
     </ClInclude>
@@ -251,12 +215,6 @@
       <Filter>Source Files\common\gui</Filter>
     </ClInclude>
     <ClInclude Include="..\common\gui\gui.h">
-      <Filter>Source Files\common\gui</Filter>
-    </ClInclude>
-    <ClInclude Include="..\common\gui\inspect.h">
-      <Filter>Source Files\common\gui</Filter>
-    </ClInclude>
-    <ClInclude Include="..\common\gui\numpad.h">
       <Filter>Source Files\common\gui</Filter>
     </ClInclude>
     <ClInclude Include="..\common\math\3dmath.h">
@@ -268,34 +226,16 @@
     <ClInclude Include="..\common\math\physics.h">
       <Filter>Source Files\common\math</Filter>
     </ClInclude>
-    <ClInclude Include="..\common\sound\sound.h">
-      <Filter>Source Files\common\sound</Filter>
-    </ClInclude>
-    <ClInclude Include="..\common\render\billboard.h">
-      <Filter>Source Files\common\render</Filter>
-    </ClInclude>
     <ClInclude Include="..\common\render\model.h">
       <Filter>Source Files\common\render</Filter>
     </ClInclude>
     <ClInclude Include="..\common\render\ms3d.h">
       <Filter>Source Files\common\render</Filter>
     </ClInclude>
-    <ClInclude Include="..\common\render\particle.h">
-      <Filter>Source Files\common\render</Filter>
-    </ClInclude>
-    <ClInclude Include="..\common\render\projectile.h">
-      <Filter>Source Files\common\render</Filter>
-    </ClInclude>
     <ClInclude Include="..\common\render\shader.h">
       <Filter>Source Files\common\render</Filter>
     </ClInclude>
     <ClInclude Include="..\common\render\shadow.h">
-      <Filter>Source Files\common\render</Filter>
-    </ClInclude>
-    <ClInclude Include="..\common\render\skybox.h">
-      <Filter>Source Files\common\render</Filter>
-    </ClInclude>
-    <ClInclude Include="..\common\render\texture.h">
       <Filter>Source Files\common\render</Filter>
     </ClInclude>
     <ClInclude Include="..\common\window.h">
@@ -372,12 +312,6 @@
     </ClInclude>
     <ClInclude Include="..\common\gui\widget.h">
       <Filter>Source Files\common\gui</Filter>
-    </ClInclude>
-    <ClInclude Include="..\common\math\brush.h">
-      <Filter>Source Files\common\math</Filter>
-    </ClInclude>
-    <ClInclude Include="..\common\math\brushside.h">
-      <Filter>Source Files\common\math</Filter>
     </ClInclude>
     <ClInclude Include="..\common\math\camera.h">
       <Filter>Source Files\common\math</Filter>

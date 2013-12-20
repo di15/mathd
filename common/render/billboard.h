@@ -3,32 +3,29 @@
 #ifndef BILLBOARD_H
 #define BILLBOARD_H
 
-#include <WinSock2.h>	//winsock2.h must be included before windows.h
-#include <Shlwapi.h>
-#include <vector>
-#include "3dmath.h"
-
-#pragma comment(lib, "shlwapi.lib")
+#include "../platform.h"
+#include "../math/3dmath.h"
+#include "../math/vec3f.h"
 
 using namespace std;
 
-class CBillboardType
+class BillboardT
 {
 public:
 	bool on;
     char name[32];
     unsigned int tex;
 
-	CBillboardType()
+	BillboardT()
 	{
 		on = false;
 	}
 };
 
 #define BILLBOARD_TYPES			64
-extern CBillboardType g_billbT[BILLBOARD_TYPES];
+extern BillboardT g_billbT[BILLBOARD_TYPES];
 
-class CBillboard
+class Billboard
 {
 public:
     bool on;
@@ -38,7 +35,7 @@ public:
     float dist;
 	int particle;
     
-    CBillboard()
+    Billboard()
     {
         on = false;
 		particle = -1;
@@ -46,14 +43,14 @@ public:
 };
 
 #define BILLBOARDS  512
-extern CBillboard g_billb[BILLBOARDS];
+extern Billboard g_billb[BILLBOARDS];
 
 extern unsigned int g_muzzle[4];
 
 void Effects();
 int NewBillboard();
 int NewBillboard(char* tex);
-int Billboard(const char* name);
+int IdentifyBillboard(const char* name);
 void SortBillboards();
 void DrawBillboards();
 void PlaceBillboard(const char* n, Vec3f pos, float size, int particle=-1);

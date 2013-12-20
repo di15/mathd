@@ -5,12 +5,13 @@
 
 #pragma warning(disable: 4018)
 
-#include "3dmath.h"
+#include "../math/3dmath.h"
+#include "../math/vec3f.h"
 
-class CParticle;
-class CBillboard;
+class Particle;
+class Billboard;
 
-class CParticleType
+class ParticleT
 {
 public:
 	int billbT;
@@ -22,11 +23,11 @@ public:
 	Vec3f accelvariation;
 	float minsize;
 	float sizevariation;
-	void (*collision)(CParticle* part, CBillboard* billb, Vec3f trace, Vec3f normal);
+	void (*collision)(Particle* part, Billboard* billb, Vec3f trace, Vec3f normal);
 };
 
 enum PARTICLETYPE{EXHAUST, EXHAUSTBIG, FIREBALL, FIREBALL2, SMOKE, SMOKE2, DEBRIS, FLAME, PLUME, PARTICLE_TYPES};
-extern CParticleType g_particleType[PARTICLE_TYPES];
+extern ParticleT g_particleT[PARTICLE_TYPES];
 
 class EmitterCounter
 {
@@ -46,9 +47,9 @@ public:
 	}
 };
 
-class CBillboard;
+class Billboard;
 
-class CParticle
+class Particle
 {
 public:
 	bool on;
@@ -57,14 +58,14 @@ public:
 	Vec3f vel;
 	float dist;
 
-	CParticle() { on = false; }
-	CParticle(Vec3f p, Vec3f v) { on = true; vel = v; }
+	Particle() { on = false; }
+	Particle(Vec3f p, Vec3f v) { on = true; vel = v; }
 
-	void Update(CBillboard* billb);
+	void Update(Billboard* billb);
 };
 
 #define PARTICLES 256
-extern CParticle g_particle[PARTICLES];
+extern Particle g_particle[PARTICLES];
 
 class EmitterPlace
 {

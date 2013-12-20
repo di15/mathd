@@ -1,7 +1,7 @@
 
 
 #include "gui.h"
-#include "../render/texture.h"
+#include "../texture.h"
 
 void View::draw()
 {

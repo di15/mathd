@@ -79,16 +79,8 @@ Image::Image(Widget* parent, unsigned int t, void (*reframef)(Widget* thisw), fl
 
 void Image::reframe()	//resized or moved
 {
-	m_pos[0].recalc(m_parent);
-	m_pos[1].recalc(m_parent);
-	m_pos[2].recalc(m_parent);
-	m_pos[3].recalc(m_parent);
-	//m_tpos[0].recalc(this);
-	//m_tpos[1].recalc(this);
-	//m_tpos[2].recalc(this);
-	//m_tpos[3].recalc(this);
-
-	align();
+	if(reframefunc)
+		reframefunc(this);
 
 	for(auto i=m_subwidg.begin(); i!=m_subwidg.end(); i++)
 		(*i)->reframe();

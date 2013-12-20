@@ -9,21 +9,24 @@
 #include "../common/texture.h"
 #include "../common/render/model.h"
 #include "../common/math/frustum.h"
+#if 0
 #include "../common/render/billboard.h"
 #include "../common/render/skybox.h"
+#endif
 #include "ggui.h"
 #include "../common/gui/gui.h"
-#include "../common/render/particle.h"
-#include "../common/sim/building.h"
-#include "../common/render/map.h"
+#include "../common/debug.h"
+#if 0
+//#include "../common/render/particle.h"
+//#include "../common/sim/building.h"
+//#include "../common/sim/map.h"
 #include "../common/render/shadow.h"
 #include "../common/sim/road.h"
 #include "../common/sim/powerline.h"
 #include "../common/sim/zpipeline.h"
 #include "../common/render/particle.h"
 #include "../common/sim/unit.h"
-#include "../common/sim/resource.h"
-#include "../common/debug.h"
+#include "../common/sim/resource.h"\
 #include "../common/sim/selection.h"
 #include "../common/sim/waves.h"
 #include "../common/render/projectile.h"
@@ -38,11 +41,13 @@
 #include "../common/script/script.h"
 #include "../common/ai/ai.h"
 #include "../common/render/foliage.h"
+#endif
 #include "../common/window.h"
 #include "../common/utils.h"
 
-bool g_quit = false;
 APPMODE g_mode = LOADING;
+bool g_mouseout = false;
+bool g_moved = false;
 
 //static long long g_lasttime = GetTickCount();
 
@@ -117,7 +122,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		case WM_RBUTTONUP:
 		{
 			g_mousekeys[2] = false;
-			g_GUI.rbuttonup();
+			g_GUI.rbuttonup(g_moved);
 		}break;
 		
 		case WM_MBUTTONDOWN:

@@ -3,7 +3,7 @@
 
 #include "../render/shader.h"
 #include "gui.h"
-#include "../render/texture.h"
+#include "../texture.h"
 #include "font.h"
 #include "../math/3dmath.h"
 #include "../platform.h"

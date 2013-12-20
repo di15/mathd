@@ -83,5 +83,6 @@ int MatchGlyphF(const RichText* text, int fnt, int matchx, float startx, float s
 void HighlightF(int fnt, float startx, float starty, float framex1, float framey1, float framex2, float framey2, const RichText* text, int highlstarti, int highlendi);
 void NextLineBreak();
 void AdvanceGlyph();
+int TextWidth(int fnt, const RichText* text);
 
 #endif

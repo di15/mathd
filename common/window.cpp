@@ -1,6 +1,6 @@
 
 #include "window.h"
-#include "render/texture.h"
+#include "texture.h"
 #include "render/shader.h"
 #include "gui/gui.h"
 #include "gui/font.h"

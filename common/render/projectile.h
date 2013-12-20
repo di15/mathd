@@ -1,10 +1,11 @@
 
-#include <vector>
-#include "3dmath.h"
+#include "../platform.h"
+#include "../math/3dmath.h"
+#include "../math/vec3f.h"
 
 using namespace std;
 
-class CProjectileType
+class ProjectileType
 {
 public:
 	unsigned int tex;
@@ -13,9 +14,9 @@ public:
 };
 
 enum PROJECTILE{GUNPROJ, PROJECTILE_TYPES};
-extern CProjectileType g_projectileType[PROJECTILE_TYPES];
+extern ProjectileType g_projectileType[PROJECTILE_TYPES];
 
-class CProjectile
+class Projectile
 {
 public:
 	bool on;
@@ -23,12 +24,12 @@ public:
 	Vec3f end;
 	int type;
 
-	CProjectile()
+	Projectile()
 	{
 		on = false;
 	}
 
-	CProjectile(Vec3f s, Vec3f e, int t)
+	Projectile(Vec3f s, Vec3f e, int t)
 	{
 		on = true;
 		start = s;
@@ -38,7 +39,7 @@ public:
 };
 
 #define PROJECTILES	128
-extern CProjectile g_projectile[PROJECTILES];
+extern Projectile g_projectile[PROJECTILES];
 
 void LoadProjectiles();
 void DrawProjectiles();

@@ -1,66 +1,48 @@
 ﻿
 
-#include "main.h"
+#include "../utils.h"
 #include "shadow.h"
-#include "map.h"
 #include "shader.h"
-#include "3dmath.h"
+#include "../math/3dmath.h"
 #include "model.h"
-#include "building.h"
-#include "road.h"
-#include "powerline.h"
-#include "pipeline.h"
 #include "particle.h"
-#include "unit.h"
-#include "selection.h"
-#include "order.h"
-#include "pathfinding.h"
 #include "projectile.h"
-#include "debug.h"
+#include "../debug.h"
 #include "billboard.h"
-#include "skybox.h"
-#include "chat.h"
-#include "water.h"
-#include "scenery.h"
+#include "../platform.h"
+#include "../window.h"
+#include "../math/vec3f.h"
+#include "../math/matrix.h"
+#include "model.h"
+#include "../sim/sim.h"
+#include "model.h"
+#include "../sim/map.h"
+#include "../math/camera.h"
 
 unsigned int g_depth;
-int g_depthSizeX = 512;	//4096;
-int g_depthSizeY = 512;	//4096;
+const int g_depthSizeX = 2048;	//512;	//4096;
+const int g_depthSizeY = 2048;	//512;	//4096;
 unsigned int g_rbDepth;
 unsigned int g_fbDepth;
 
-Vec3f g_lightPos;	//(0, 160, MAP_SIZE*TILE_SIZE);
-Vec3f g_lightEye;	//(MAP_SIZE*TILE_SIZE/2, 0, MAP_SIZE*TILE_SIZE/2);
-//float g_lightPos[] = {0, 16, 4*TILE_SIZE};
-//float g_lightEye[] = {0, 0, 0};
-//Vec3f g_lightPos;
-//Vec3f g_lightEye;
+//1000000.0f/300 = 3333.3333333333333333333333333333 cm = 
+
+Vec3f g_lightOff(-MAX_DISTANCE/500, MAX_DISTANCE/300, MAX_DISTANCE/400);
+Vec3f g_lightPos;	//(-MAX_DISTANCE/2, MAX_DISTANCE/5, MAX_DISTANCE/3);
+Vec3f g_lightEye;	//(-MAX_DISTANCE/2+1.0f/2.0f, MAX_DISTANCE/3-1.0f/3.0f, MAX_DISTANCE/3-1.0f/3.0f);
 Vec3f g_lightUp(0,1,0);
-/*
+
 Matrix g_lightProjectionMatrix;
 Matrix g_lightModelViewMatrix;
-
 Matrix g_cameraInverseModelViewMatrix;
 Matrix g_lightMatrix;
-
-Matrix g_cameraModelViewMatrix;*/
-
-//float g_lightProjectionMatrix[16];
-Matrix g_lightProjectionMatrix;
-//float g_lightModelViewMatrix[16];
-Matrix g_lightModelViewMatrix;
-
-//float g_cameraInverseModelViewMatrix[16];
-Matrix g_cameraInverseModelViewMatrix;
-//float g_lightMatrix[16];
-Matrix g_lightMatrix;
-
-//float g_cameraModelViewMatrix[16];
 Matrix g_cameraModelViewMatrix;
-//float g_cameraProjectionMatrix[16];
 Matrix g_cameraProjectionMatrix;
 
-//unsigned int g_uniform[UNIFORMS];
+void (*DrawSceneDepthFunc)() = NULL;
+void (*DrawSceneFunc)(Matrix projection, Matrix viewmat, Matrix modelmat, Matrix modelviewinv, float mvLightPos[3], float lightDir[3]) = NULL;
+
+Vec3f g_viewInter;
 
 void InitShadows()
 {
@@ -84,24 +66,12 @@ void InitShadows()
 	glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_2D, g_depth, 0);
 	glFramebufferRenderbufferEXT(GL_FRAMEBUFFER_EXT, GL_DEPTH_ATTACHMENT_EXT, GL_RENDERBUFFER_EXT, g_rbDepth);
 	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
-
-	g_shader[DEPTH].InitShaders("shaders\\depth.vert", "shaders\\depth.frag");
-	g_shader[SHADOW].InitShaders("shaders\\shadow.vert", "shaders\\shadow.frag");
-	g_shader[SHADOWOWN].InitShaders("shaders\\shadowown.vert", "shaders\\shadowown.frag");
-	
-	//g_uniform[SHADOWMAP] = g_shader[SHADOW].GetVariable("shadowMap");
-	//g_uniform[LIGHTMATRIX] = g_shader[SHADOW].GetVariable("lightMatrix");
-	//g_uniform[LIGHTPOS] = g_shader[SHADOW].GetVariable("lightPos");
-	//g_uniform[LIGHTDIR] = g_shader[SHADOW].GetVariable("lightDir");
-	//g_uniform[TEXTURE1] = g_shader[SHADOW].GetVariable("texture1");
-	//g_uniform[TEXTURE2] = g_shader[SHADOW].GetVariable("texture2");
-	//g_uniform[TEXTURE4] = g_shader[SHADOW].GetVariable("texture4");
 }
 
 void InverseMatrix(Matrix* dstm, Matrix srcm)
 {
 	float dst[16];
-	const float* src = srcm.getMatrix();
+	const float* src = srcm.m_matrix;
 
 	dst[0] = src[0];
 	dst[1] = src[4];
@@ -278,7 +248,7 @@ bool InverseMatrix2(Matrix mat, Matrix invMat)
     double inv[16], det;
     int i;
 
-	const float* m = mat.getMatrix();
+	const float* m = mat.m_matrix;
 
     inv[0] = m[5]  * m[10] * m[15] - 
              m[5]  * m[11] * m[14] - 
@@ -410,7 +380,7 @@ bool InverseMatrix2(Matrix mat, Matrix invMat)
 
 void Transpose(Matrix mat, Matrix transpMat)
 {
-	const float* m = mat.getMatrix();
+	const float* m = mat.m_matrix;
 	float transp[16];
 
 	int j;
@@ -430,92 +400,83 @@ void Transpose(Matrix mat, Matrix transpMat)
 	transpMat.set(transp);
 }
 
-Vec3f g_viewInter;
-
-void RenderToShadowMap(Matrix projection, Matrix viewmat, Matrix modelmat)
+void RenderToShadowMap(Matrix projection, Matrix viewmat, Matrix modelmat, Vec3f focus)
 {
-	Vec3f vLine[2];
-	Vec3f ray = g_camera.View() - g_camera.Position();
-	Vec3f onnear = g_camera.Position();	//OnNear(g_width/2, g_height/2);
-	vLine[0] = onnear;
-	vLine[1] = onnear + (ray * 100000.0f);
-	GetMapIntersection(vLine, &g_lightEye);
-	float viewD = Magnitude(onnear - g_lightEye) * 1.0f;
-	g_lightPos = g_lightEye + Vec3f(-viewD, viewD, viewD);
+	glDisable(GL_CULL_FACE);
 
-	glViewport(0, 0, g_depthSizeX, g_depthSizeY);
+	int viewport[4];
+	glGetIntegerv(GL_VIEWPORT, viewport);
 
 	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, g_fbDepth);
+	glViewport(0, 0, g_depthSizeX, g_depthSizeY);
 
 	glClearColor(1.0, 1.0, 1.0, 1.0);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	glEnable(GL_POLYGON_OFFSET_FILL);
 	glPolygonOffset(2.0, 500.0);
+
+	g_lightPos = focus + g_lightOff;
+	g_lightEye = focus;
+
+	//g_lightEye = Vec3f(0,0,0);
+	//g_lightPos = g_lightEye + g_lightOff;
 	
 	//g_lightProjectionMatrix = BuildPerspProjMat(90.0, 1.0, 30.0, 10000.0);
-	g_lightProjectionMatrix = setorthographicmat(-PROJ_RIGHT, PROJ_RIGHT, PROJ_RIGHT, -PROJ_RIGHT, 30.0, 10000.0);
+	g_lightProjectionMatrix = setorthographicmat(-PROJ_RIGHT*2/g_zoom, PROJ_RIGHT*2/g_zoom, PROJ_RIGHT*2/g_zoom, -PROJ_RIGHT*2/g_zoom, MIN_DISTANCE, MAX_DISTANCE/300);
 	g_lightModelViewMatrix = gluLookAt2(g_lightPos.x, g_lightPos.y, g_lightPos.z,
 		g_lightEye.x, g_lightEye.y, g_lightEye.z, 
 		g_lightUp.x, g_lightUp.y, g_lightUp.z);
 	
-	UseS(DEPTH);
-	//UseS(ORTHO);
-	glUniformMatrix4fv(g_shader[SHADER::DEPTH].m_slot[SLOT::PROJECTION], 1, 0, g_lightProjectionMatrix.getMatrix());
-	glUniformMatrix4fv(g_shader[SHADER::DEPTH].m_slot[SLOT::MODELMAT], 1, 0, modelmat.getMatrix());
-	glUniformMatrix4fv(g_shader[SHADER::DEPTH].m_slot[SLOT::VIEWMAT], 1, 0, g_lightModelViewMatrix.getMatrix());
-	glUniform4f(g_shader[SHADER::MODEL].m_slot[SLOT::COLOR], 1, 1, 1, 1);
-	glEnableVertexAttribArray(g_shader[SHADER::DEPTH].m_slot[SLOT::POSITION]);
-	glEnableVertexAttribArray(g_shader[SHADER::DEPTH].m_slot[SLOT::TEXCOORD0]);
-	
-	g_hmap.draw();
-	DrawBuildings();
-	DrawPowerlines();
-	DrawRoads();
-	DrawPipelines();
-	DrawSelB();
-	DrawUnits();
-	DrawScenery();
-	
+	UseS(SHADER_DEPTH);
+	glUniformMatrix4fv(g_shader[SHADER_DEPTH].m_slot[SSLOT_PROJECTION], 1, 0, g_lightProjectionMatrix.m_matrix);
+	glUniformMatrix4fv(g_shader[SHADER_DEPTH].m_slot[SSLOT_MODELMAT], 1, 0, modelmat.m_matrix);
+	glUniformMatrix4fv(g_shader[SHADER_DEPTH].m_slot[SSLOT_VIEWMAT], 1, 0, g_lightModelViewMatrix.m_matrix);
+	glUniform4f(g_shader[SHADER_MODEL].m_slot[SSLOT_COLOR], 1, 1, 1, 1);
+	glEnableVertexAttribArray(g_shader[SHADER_DEPTH].m_slot[SSLOT_POSITION]);
+	glEnableVertexAttribArray(g_shader[SHADER_DEPTH].m_slot[SSLOT_TEXCOORD0]);
+
+	if(DrawSceneDepthFunc != NULL)
+		DrawSceneDepthFunc();
+
 	TurnOffShader();
 
 	glDisable(GL_POLYGON_OFFSET_FILL);
 	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
-	UseS(ORTHO);
-	
-	glViewport(0, 0, g_width, g_height);
+
+	//glViewport(0, 0, g_width, g_height);
+	glViewport(viewport[0], viewport[1], viewport[2], viewport[3]);
+	glEnable(GL_CULL_FACE);
 }
 
-void ShadowShader(int shader, Matrix projection, Matrix viewmat, Matrix modelmat, Matrix modelviewinv, float mvLightPos[3], float lightDir[3])
+void UseShadow(int shader, Matrix projection, Matrix viewmat, Matrix modelmat, Matrix modelviewinv, float mvLightPos[3], float lightDir[3])
 {
 	UseS(shader);
 	Shader* s = &g_shader[g_curS];
-	glUniformMatrix4fv(s->m_slot[SLOT::PROJECTION], 1, 0, projection.getMatrix());
-	glUniformMatrix4fv(s->m_slot[SLOT::MODELMAT], 1, 0, modelmat.getMatrix());
-	glUniformMatrix4fv(s->m_slot[SLOT::VIEWMAT], 1, 0, viewmat.getMatrix());
-	//glUniformMatrix4fv(s->m_slot[SLOT::NORMALMAT], 1, 0, modelviewinv.getMatrix());
-	//glUniformMatrix4fv(s->m_slot[SLOT::INVMODLVIEWMAT], 1, 0, modelviewinv.getMatrix());
-	glUniform4f(s->m_slot[SLOT::COLOR], 1, 1, 1, 1);
-	glEnableVertexAttribArray(s->m_slot[SLOT::POSITION]);
-	glEnableVertexAttribArray(s->m_slot[SLOT::TEXCOORD0]);
-	//glEnableVertexAttribArray(s->m_slot[SLOT::TEXCOORD1]);
-	//glEnableVertexAttribArray(s->m_slot[SLOT::NORMAL]);
+	glUniformMatrix4fv(s->m_slot[SSLOT_PROJECTION], 1, 0, projection.m_matrix);
+	glUniformMatrix4fv(s->m_slot[SSLOT_MODELMAT], 1, 0, modelmat.m_matrix);
+	glUniformMatrix4fv(s->m_slot[SSLOT_VIEWMAT], 1, 0, viewmat.m_matrix);
+	//glUniformMatrix4fv(s->m_slot[SSLOT_NORMALMAT], 1, 0, modelviewinv.m_matrix);
+	//glUniformMatrix4fv(s->m_slot[SSLOT_INVMODLVIEWMAT], 1, 0, modelviewinv.m_matrix);
+	glUniform4f(s->m_slot[SSLOT_COLOR], 1, 1, 1, 1);
+	glEnableVertexAttribArray(s->m_slot[SSLOT_POSITION]);
+	glEnableVertexAttribArray(s->m_slot[SSLOT_TEXCOORD0]);
+	//glEnableVertexAttribArray(s->m_slot[SSLOT_TEXCOORD1]);
+	//glEnableVertexAttribArray(s->m_slot[SSLOT_NORMAL]);
 	
-	//glUniformMatrix4fvARB(s->m_slot[SLOT::LIGHTMATRIX], 1, false, g_lightMatrix);
-	glUniformMatrix4fvARB(s->m_slot[SLOT::LIGHTMATRIX], 1, false, g_lightMatrix.getMatrix());
+	//glUniformMatrix4fvARB(s->m_slot[SSLOT_LIGHTMATRIX], 1, false, g_lightMatrix);
+	glUniformMatrix4fvARB(s->m_slot[SSLOT_LIGHTMATRIX], 1, false, g_lightMatrix.m_matrix);
 	
-	glUniform3fARB(s->m_slot[SLOT::LIGHTPOS], mvLightPos[0], mvLightPos[1], mvLightPos[2]);
-	glUniform3fARB(s->m_slot[SLOT::LIGHTDIR], lightDir[0], lightDir[1], lightDir[2]);
+	glUniform3fARB(s->m_slot[SSLOT_LIGHTPOS], mvLightPos[0], mvLightPos[1], mvLightPos[2]);
+	glUniform3fARB(s->m_slot[SSLOT_SUNDIRECTION], lightDir[0], lightDir[1], lightDir[2]);
+//	glUniform1fARB(s->m_slot[SSLOT_MAXELEV], g_maxelev);
 }
 
 void RenderShadowedScene(Matrix projection, Matrix viewmat, Matrix modelmat, Matrix modelview)
 {
-	StartProfile(SHADOWS);
-
-	glViewport(0, 0, g_width, g_height);
+	//glViewport(0, 0, g_width, g_height);
 	//glClearColor(0.0, 0.0, 0.0, 1.0);
 	glClearColor(1.0, 1.0, 1.0, 1.0);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	//glMatrixMode(GL_PROJECTION);
 	//glLoadIdentity();
@@ -530,151 +491,59 @@ void RenderShadowedScene(Matrix projection, Matrix viewmat, Matrix modelmat, Mat
 	//glGetFloatv(GL_MODELVIEW_MATRIX, g_cameraModelViewMatrix);
 	g_cameraModelViewMatrix = modelview;
 
-	EndProfile(SHADOWS);
-
 	// Do non-shadowed drawing here
 	//DrawSkyBox(g_camera.LookPos());
-
-	StartProfile(SHADOWS);
 	
 	InverseMatrix(&g_cameraInverseModelViewMatrix, modelview);
-	//InverseMatrix(&g_cameraInverseModelViewMatrix, g_cameraModelViewMatrix);
-	//InverseMatrix(g_cameraInverseModelViewMatrix, g_cameraModelViewMatrix);
 
-	/*
-	glPushMatrix();
-	glLoadIdentity();
-	glTranslatef(0.5, 0.5, 0.5); // + 0.5
-	glScalef(0.5, 0.5, 0.5); // * 0.5
-	//glMultMatrixf(g_lightProjectionMatrix);
-	glMultMatrixf(g_lightProjectionMatrix.getMatrix());
-	//glMultMatrixf(g_lightModelViewMatrix);
-	glMultMatrixf(g_lightModelViewMatrix.getMatrix());
-	//glMultMatrixf(g_cameraInverseModelViewMatrix);
-	glMultMatrixf(g_cameraInverseModelViewMatrix.getMatrix());
-	float lm[16];
-	//glGetFloatv(GL_MODELVIEW_MATRIX, g_lightMatrix);
-	glGetFloatv(GL_MODELVIEW_MATRIX, lm);
-	g_lightMatrix.set(lm);
-	glPopMatrix();
-	*/
-	
-	//glPushMatrix();
-	//glLoadIdentity();
 	float trans[] = { 0.5f, 0.5f, 0.5f };
-	//float trans[] = { 0, 0, 0 };
-	//Matrix transm;
-	//transm.setTranslation(trans);
-	//g_lightMatrix.postMultiply(transm);
 	g_lightMatrix.loadIdentity();
 	g_lightMatrix.setTranslation(trans);
-	//glTranslatef(0.5, 0.5, 0.5); // + 0.5
-	//glScalef(0.5, 0.5, 0.5); // * 0.5
 	float scalef[] = { 0.5f, 0.5f, 0.5f };
 	Matrix scalem;
 	scalem.setScale(scalef);
 	g_lightMatrix.postMultiply(scalem);
 	g_lightMatrix.postMultiply(g_lightProjectionMatrix);
 	g_lightMatrix.postMultiply(g_lightModelViewMatrix);
-	g_lightMatrix.postMultiply(g_cameraInverseModelViewMatrix);
+	//g_lightMatrix.postMultiply(g_cameraInverseModelViewMatrix);
 
 	Matrix modelviewinv;
 	InverseMatrix2(modelview, modelviewinv);
 	Transpose(modelviewinv, modelviewinv);
 	
-	//const float* mv = g_cameraModelViewMatrix;
-	const float* mv = g_cameraModelViewMatrix.getMatrix();
-	//const float* mv = modelview.getMatrix();
+	const float* mv = g_cameraModelViewMatrix.m_matrix;
 	float mvLightPos[3];
 	mvLightPos[0] = mv[0] * g_lightPos.x + mv[4] * g_lightPos.y + mv[8] * g_lightPos.z + mv[12];
 	mvLightPos[1] = mv[1] * g_lightPos.x + mv[5] * g_lightPos.y + mv[9] * g_lightPos.z + mv[13];
 	mvLightPos[2] = mv[2] * g_lightPos.x + mv[6] * g_lightPos.y + mv[10] * g_lightPos.z + mv[14];
-	
+
 	float lightDir[3];
-	lightDir[0] = g_lightEye.x - g_lightPos.x;
-	lightDir[1] = g_lightEye.y - g_lightPos.y;
-	lightDir[2] = g_lightEye.z - g_lightPos.z;
-	
-	EndProfile(SHADOWS);
-	
-	ShadowShader(SHADOW, projection, viewmat, modelmat, modelviewinv, mvLightPos, lightDir);
+	//lightDir[0] = g_lightEye.x - g_lightPos.x;
+	//lightDir[1] = g_lightEye.y - g_lightPos.y;
+	//lightDir[2] = g_lightEye.z - g_lightPos.z;
+	lightDir[0] = g_lightPos.x - g_lightEye.x;
+	lightDir[1] = g_lightPos.y - g_lightEye.y;
+	lightDir[2] = g_lightPos.z - g_lightEye.z;
 
-	//glActiveTextureARB(GL_TEXTURE0);
-	//glBindTexture(GL_TEXTURE_2D, g_transparency);
-	//glUniform1iARB(g_shader[SHADER::SHADOW].m_slot[SLOT::TEXTURE0], 0);
+	if(DrawSceneFunc != NULL)
+		DrawSceneFunc(projection, viewmat, modelmat, modelviewinv, mvLightPos, lightDir);
+		//DrawSceneFunc(projection, viewmat, modelmat, modelviewinv, (float*)&g_lightPos, lightDir);
 
-	glActiveTextureARB(GL_TEXTURE1);
-	glBindTexture(GL_TEXTURE_2D, g_transparency);
-	glUniform1iARB(g_shader[SHADER::SHADOW].m_slot[SLOT::TEXTURE1], 1);
-	
-	glActiveTextureARB(GL_TEXTURE2);
-	glBindTexture(GL_TEXTURE_2D, g_transparency);
-	glUniform1iARB(g_shader[SHADER::SHADOW].m_slot[SLOT::TEXTURE2], 2);
-	
-	glActiveTextureARB(GL_TEXTURE3);
-	glBindTexture(GL_TEXTURE_2D, g_transparency);
-	glUniform1iARB(g_shader[SHADER::SHADOW].m_slot[SLOT::TEXTURE3], 3);
-	
-	glActiveTextureARB(GL_TEXTURE4);
-	glBindTexture(GL_TEXTURE_2D, g_depth);
-	glUniform1iARB(g_shader[SHADER::SHADOW].m_slot[SLOT::SHADOWMAP], 4);
-	
-	g_hmap.draw();
-	
-	//glActiveTextureARB(GL_TEXTURE0);
-	//glBindTexture(GL_TEXTURE_2D, g_transparency);
-	//glUniform1iARB(g_shader[SHADER::SHADOW].m_slot[SLOT::TEXTURE0], 0);
-
-	glActiveTextureARB(GL_TEXTURE1);
-	glBindTexture(GL_TEXTURE_2D, g_transparency);
-	glUniform1iARB(g_shader[SHADER::SHADOW].m_slot[SLOT::TEXTURE1], 1);
-	
-	glActiveTextureARB(GL_TEXTURE2);
-	glBindTexture(GL_TEXTURE_2D, g_transparency);
-	glUniform1iARB(g_shader[SHADER::SHADOW].m_slot[SLOT::TEXTURE2], 2);
-	
-	glActiveTextureARB(GL_TEXTURE3);
-	glBindTexture(GL_TEXTURE_2D, g_transparency);
-	glUniform1iARB(g_shader[SHADER::SHADOW].m_slot[SLOT::TEXTURE3], 3);
-
-	DrawWater();
-	
-	ShadowShader(SHADOWOWN, projection, viewmat, modelmat, modelviewinv, mvLightPos, lightDir);
-	
-	glActiveTextureARB(GL_TEXTURE4);
-	glBindTexture(GL_TEXTURE_2D, g_depth);
-	glUniform1iARB(g_shader[SHADER::SHADOW].m_slot[SLOT::SHADOWMAP], 4);
-
-	glActiveTextureARB(GL_TEXTURE1);
-	glBindTexture(GL_TEXTURE_2D, g_transparency);
-	glUniform1iARB(g_shader[SHADER::SHADOWOWN].m_slot[SLOT::TEXTURE1], 1);
-	glActiveTextureARB(GL_TEXTURE0);
-
-	DrawBuildings();
-	DrawPowerlines();
-	DrawRoads();
-	DrawPipelines();
-	DrawSelB();
-	DrawUnits();
-	DrawScenery();
-
-	StartProfile(SHADOWS);
 	TurnOffShader();
 	glBindTexture(GL_TEXTURE_2D, 0);
 	glActiveTextureARB(GL_TEXTURE0_ARB);
-	EndProfile(SHADOWS);
-
+	/*
 	if(g_mode == EDITOR)
 	{
 		UseS(COLOR3D);
-		glUniformMatrix4fv(g_shader[SHADER::COLOR3D].m_slot[SLOT::PROJECTION], 1, 0, projection.getMatrix());
-		glUniformMatrix4fv(g_shader[SHADER::COLOR3D].m_slot[SLOT::MODELMAT], 1, 0, modelmat.getMatrix());
-		glUniformMatrix4fv(g_shader[SHADER::COLOR3D].m_slot[SLOT::VIEWMAT], 1, 0, viewmat.getMatrix());
-		glUniform4f(g_shader[SHADER::COLOR3D].m_slot[SLOT::COLOR], 0, 1, 0, 1);
-		glEnableVertexAttribArray(g_shader[SHADER::COLOR3D].m_slot[SLOT::POSITION]);
-		glEnableVertexAttribArray(g_shader[SHADER::COLOR3D].m_slot[SLOT::NORMAL]);
+		glUniformMatrix4fv(g_shader[SHADER_COLOR3D].m_slot[SSLOT_PROJECTION], 1, 0, projection.m_matrix);
+		glUniformMatrix4fv(g_shader[SHADER_COLOR3D].m_slot[SSLOT_MODELMAT], 1, 0, modelmat.m_matrix);
+		glUniformMatrix4fv(g_shader[SHADER_COLOR3D].m_slot[SSLOT_VIEWMAT], 1, 0, viewmat.m_matrix);
+		glUniform4f(g_shader[SHADER_COLOR3D].m_slot[SSLOT_COLOR], 0, 1, 0, 1);
+		glEnableVertexAttribArray(g_shader[SHADER_COLOR3D].m_slot[SSLOT_POSITION]);
+		glEnableVertexAttribArray(g_shader[SHADER_COLOR3D].m_slot[SSLOT_NORMAL]);
 		DrawTileSq();
-	}
+	}*/
 	
 	TurnOffShader();
 	//g_camera.Look();

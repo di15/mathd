@@ -1,27 +1,55 @@
 
-#include "main.h"
-#include "shader.h"
-#include "map.h"
-#include "image.h"
+/*
 #include "water.h"
+#include "heightmap.h"
+#include "../shader.h"
+#include "../math/3dmath.h"
+#include "../math/vec3f.h"
+#include "../math/vec2f.h"
+#include "../platform.h"
+#include "../shadow.h"
+#include "../texture.h"
+#include "../utils.h"
+
+unsigned int g_watertex[WATER_TEXS];
+
+void LoadWater()
+{
+	CreateTextureI(g_watertex[WATER_TEX_GRADIENT], "terrain/default/water.gradient.png", false);
+	CreateTextureI(g_watertex[WATER_TEX_DETAIL], "terrain/default/water.detail.jpg", false);
+	CreateTextureI(g_watertex[WATER_TEX_SPECULAR], "terrain/default/water.spec.jpg", false);
+	CreateTextureI(g_watertex[WATER_TEX_NORMAL], "terrain/default/water.norm.jpg", false);
+}
 
 void DrawWater()
 {			
 	Shader* s = &g_shader[g_curS];
-
+	
 	glActiveTextureARB(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, g_water);
-	glUniform1iARB(s->m_slot[SLOT::TEXTURE0], 0);
+	glBindTexture(GL_TEXTURE_2D, g_texture[ g_watertex[WATER_TEX_GRADIENT] ].tex);
+	glUniform1iARB(s->m_slot[SSLOT_GRADIENTTEX], 0);
 
+	glActiveTextureARB(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_2D, g_texture[ g_watertex[WATER_TEX_DETAIL] ].tex);
+	glUniform1iARB(s->m_slot[SSLOT_DETAILTEX], 1);
+
+	glActiveTextureARB(GL_TEXTURE2);
+	glBindTexture(GL_TEXTURE_2D, g_texture[ g_watertex[WATER_TEX_SPECULAR] ].tex);
+	glUniform1iARB(s->m_slot[SSLOT_SPECULARMAP], 2);
+
+	glActiveTextureARB(GL_TEXTURE3);
+	glBindTexture(GL_TEXTURE_2D, g_texture[ g_watertex[WATER_TEX_NORMAL] ].tex);
+	glUniform1iARB(s->m_slot[SSLOT_NORMALMAP], 3);
+	
 	Vec3f a, b, c, d;
 
 	int wx = g_hmap.m_widthX;
 	int wz = g_hmap.m_widthZ;
-	
-	a = Vec3f(wx * TILE_SIZE, WATER_HEIGHT, wz * TILE_SIZE);
-	b = Vec3f(0, WATER_HEIGHT, wz * TILE_SIZE);
-	c = Vec3f(0, WATER_HEIGHT, 0);
-	d = Vec3f(wx * TILE_SIZE, WATER_HEIGHT, 0);
+
+	a = Vec3f(wx * TILE_SIZE, WATER_LEVEL, wz * TILE_SIZE);
+	b = Vec3f(0, WATER_LEVEL, wz * TILE_SIZE);
+	c = Vec3f(0, WATER_LEVEL, 0);
+	d = Vec3f(wx * TILE_SIZE, WATER_LEVEL, 0);
 
 	float vertices[] =
 	{
@@ -43,7 +71,7 @@ void DrawWater()
 		0, 0
 	};
 
-	static const float normals[] =
+	const float normals[] =
 	{
 		0, 1, 0,
 		0, 1, 0,
@@ -52,10 +80,10 @@ void DrawWater()
 		0, 1, 0,
 		0, 1, 0
 	};
-    
-	glVertexAttribPointer(s->m_slot[SLOT::POSITION], 3, GL_FLOAT, GL_FALSE, 0, vertices);
-	glVertexAttribPointer(s->m_slot[SLOT::TEXCOORD0], 2, GL_FLOAT, GL_FALSE, 0, texcoords0);
-	glVertexAttribPointer(s->m_slot[SLOT::NORMAL], 3, GL_FLOAT, GL_FALSE, 0, normals);
+
+	glVertexAttribPointer(s->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, vertices);
+	glVertexAttribPointer(s->m_slot[SSLOT_TEXCOORD0], 2, GL_FLOAT, GL_FALSE, 0, texcoords0);
+	glVertexAttribPointer(s->m_slot[SSLOT_NORMAL], 3, GL_FLOAT, GL_FALSE, 0, normals);
 
 	glDrawArrays(GL_TRIANGLES, 0, 6);
-}
+}*/

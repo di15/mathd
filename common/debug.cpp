@@ -10,8 +10,10 @@
 //#include "physics.h"
 //#include "building.h"
 
+#if 0
 Profile g_profile[PROFILES];
 ofstream g_profF;
+#endif
 
 void LastNum(const char* l)
 {

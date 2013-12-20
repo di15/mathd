@@ -1,13 +1,15 @@
 
 #include "projectile.h"
-#include "image.h"
-#include "main.h"
-#include "shader.h"
+#include "../texture.h"
+#include "../utils.h"
+#include "../render/shader.h"
+#include "../platform.h"
+#include "../math/camera.h"
 
-CProjectileType g_projectileType[PROJECTILE_TYPES];
-CProjectile g_projectile[PROJECTILES];
+ProjectileType g_projectileType[PROJECTILE_TYPES];
+Projectile g_projectile[PROJECTILES];
 
-void CProjectileType::Define(char* texpath)
+void ProjectileType::Define(char* texpath)
 {
 	//CreateTexture(tex, texpath);
 	QueueTexture(&tex, texpath, true);
@@ -29,18 +31,18 @@ int NewProjectile()
 
 void NewProjectile(Vec3f start, Vec3f end, int type)
 {
-	//g_projectile.push_back(CProjectile(start, end, type));
+	//g_projectile.push_back(Projectile(start, end, type));
 	int i = NewProjectile();
 	if(i < 0)
 		return;
 
-	g_projectile[i] = CProjectile(start, end, type);
+	g_projectile[i] = Projectile(start, end, type);
 }
 
 void DrawProjectiles()
 {
-	CProjectile* proj;
-	CProjectileType* t;
+	Projectile* proj;
+	ProjectileType* t;
 	Vec3f start;
 	Vec3f end;
 	
@@ -51,11 +53,11 @@ void DrawProjectiles()
 	Vec3f center;
 	Vec3f parallel;
 	Vec3f perpindicular;
-	Vec3f view = Normalize(g_camera.View() - g_camera.Position());
+	Vec3f view = Normalize(g_camera.m_view - g_camera.m_pos);
 	Vec3f a, b, c, d;
 
-	Shader* s = &g_shader[SHADER::BILLBOARD];
-	glUniform4f(s->m_slot[SLOT::COLOR], 1, 1, 1, 1);
+	Shader* s = &g_shader[SHADER_BILLBOARD];
+	glUniform4f(s->m_slot[SSLOT_COLOR], 1, 1, 1, 1);
 
 	for(int i=0; i<PROJECTILES; i++)
 	{
@@ -101,9 +103,9 @@ void DrawProjectiles()
             a.x, a.y, a.z,          0, 0
         };
 
-		glVertexAttribPointer(s->m_slot[SLOT::POSITION], 3, GL_FLOAT, GL_FALSE, sizeof(float) * 5, &vertices[0]);
-		glVertexAttribPointer(s->m_slot[SLOT::TEXCOORD0], 2, GL_FLOAT, GL_FALSE, sizeof(float) * 5, &vertices[3]);
-		//glVertexAttribPointer(s->m_slot[SLOT::NORMAL], 3, GL_FLOAT, GL_FALSE, sizeof(float) * 5, va->normals);
+		glVertexAttribPointer(s->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, sizeof(float) * 5, &vertices[0]);
+		glVertexAttribPointer(s->m_slot[SSLOT_TEXCOORD0], 2, GL_FLOAT, GL_FALSE, sizeof(float) * 5, &vertices[3]);
+		//glVertexAttribPointer(s->m_slot[SSLOT_NORMAL], 3, GL_FLOAT, GL_FALSE, sizeof(float) * 5, va->normals);
 		
         glDrawArrays(GL_TRIANGLES, 0, 6);
 

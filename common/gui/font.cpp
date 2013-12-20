@@ -5,7 +5,7 @@
 
 #include "../platform.h"
 #include "font.h"
-#include "../render/texture.h"
+#include "../texture.h"
 #include "../render/shader.h"
 #include "../window.h"
 #include "../utils.h"
@@ -935,6 +935,11 @@ int MatchGlyphF(const RichText* text, int fnt, int matchx, float startx, float s
     }
 
 	return lastclose+1;
+}
+
+int TextWidth(int fnt, const RichText* text)
+{
+	return EndX(text, text->texlen(), fnt, 0, 0);
 }
 
 void LoadFonts()
