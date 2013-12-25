@@ -113,8 +113,8 @@ void DropDownS::draw2()
 	DrawImage(g_texture[m_downtex].texname, m_pos[2]-square(), m_pos[3]+g_font[m_font].gheight*rowsshown()-square(), m_pos[2], m_pos[3]+g_font[m_font].gheight*rowsshown());
 	DrawImage(g_texture[m_filledtex].texname, m_pos[2]-square(), m_pos[3]+scrollspace()*topratio(), m_pos[2], m_pos[3]+scrollspace()*bottomratio());
 
-	for(int i=(int)m_scroll[1]; i<(int)m_scroll[1]+rowsshown(); i++)
-		DrawShadowedText(m_font, m_pos[0]+3, m_pos[3]+g_font[m_font].gheight*(i-(int)m_scroll[1]), &m_options[i]);
+	for(int i=(int)m_scroll[1][1]; i<(int)m_scroll[1][1]+rowsshown(); i++)
+		DrawShadowedText(m_font, m_pos[0]+3, m_pos[3]+g_font[m_font].gheight*(i-(int)m_scroll[1][1]), &m_options[i]);
 }
 
 bool DropDownS::mousemove()
@@ -175,11 +175,11 @@ bool DropDownS::prelbuttondown()
 	if(!m_opened)
 		return false;
 
-	for(int i=(int)m_scroll[1]; i<(int)m_scroll[1]+rowsshown(); i++)
+	for(int i=(int)m_scroll[1][1]; i<(int)m_scroll[1][1]+rowsshown(); i++)
 	{
 		// list item?
-		if(g_mouse.x >= m_pos[0] && g_mouse.x <= m_pos[2]-square() && g_mouse.y >= m_pos[3]+g_font[m_font].gheight*(i-(int)m_scroll[1])
-			&& g_mouse.y <= m_pos[3]+g_font[m_font].gheight*(i-(int)m_scroll[1]+1))
+		if(g_mouse.x >= m_pos[0] && g_mouse.x <= m_pos[2]-square() && g_mouse.y >= m_pos[3]+g_font[m_font].gheight*(i-(int)m_scroll[1][1])
+			&& g_mouse.y <= m_pos[3]+g_font[m_font].gheight*(i-(int)m_scroll[1][1]+1))
 		{
 			m_ldown = true;
 			return true;	// intercept mouse event
@@ -243,11 +243,11 @@ bool DropDownS::prelbuttonup(bool moved)
 		return true;	// intercept mouse event
 	}
 
-	for(int i=(int)m_scroll[1]; i<(int)m_scroll[1]+rowsshown(); i++)
+	for(int i=(int)m_scroll[1][1]; i<(int)m_scroll[1][1]+rowsshown(); i++)
 	{
 		// list item?
-		if(g_mouse.x >= m_pos[0] && g_mouse.x <= m_pos[2]-square() && g_mouse.y >= m_pos[3]+g_font[m_font].gheight*(i-(int)m_scroll[1])
-			&& g_mouse.y <= m_pos[3]+g_font[m_font].gheight*(i-(int)m_scroll[1]+1))
+		if(g_mouse.x >= m_pos[0] && g_mouse.x <= m_pos[2]-square() && g_mouse.y >= m_pos[3]+g_font[m_font].gheight*(i-(int)m_scroll[1][1])
+			&& g_mouse.y <= m_pos[3]+g_font[m_font].gheight*(i-(int)m_scroll[1][1]+1))
 		{
 			m_selected = i;
 			m_opened = false;

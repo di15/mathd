@@ -130,8 +130,8 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>$(SolutionDir)\libs\lpng;$(SolutionDir)\libs\jpeglib;$(SolutionDir)\libs\libzip-0.11.1\lib;$(SolutionDir)\libs\opengl;$(SolutionDir)\libs\win\SDL-1.2.15\include;$(IncludePath)</IncludePath>
-    <LibraryPath>$(SolutionDir)\libs\lpng\lib;$(SolutionDir)\libs\jpeglib;$(SolutionDir)\libs\win\SDL-1.2.15\lib\x86;$(SolutionDir)\libs\zlib-1.2.5\build\Release;$(SolutionDir)\libs\libzip-0.11.1\build\lib\Release;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(SolutionDir)\libs\lpng;$(SolutionDir)\libs\jpeglib;$(SolutionDir)\libs\libzip-0.11.1\lib;$(SolutionDir)\libs\;$(SolutionDir)\libs\win\SDL-1.2.15\include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)\libs\lpng\lib;$(SolutionDir)\libs\jpeglib;$(SolutionDir)\libs\win\SDL-1.2.15\lib\x86;$(SolutionDir)\libs\zlib-1.2.5\build\Release;$(SolutionDir)\libs\GL;$(SolutionDir)\libs\libzip-0.11.1\build\lib\Release;$(LibraryPath)</LibraryPath>
     <TargetName>CorpStates</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='32 bit release|Win32'">

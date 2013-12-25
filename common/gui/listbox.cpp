@@ -86,15 +86,15 @@ void ListBox::draw()
 	DrawImage(g_texture[m_downtex].texname, m_pos[2]-square(), m_pos[3]-square(), m_pos[2], m_pos[3]);
 	DrawImage(g_texture[m_filledtex].texname, m_pos[2]-square(), m_pos[1]+square()+scrollspace()*topratio(), m_pos[2], m_pos[1]+square()+scrollspace()*bottomratio());
 
-	if(m_selected >= 0 && m_selected >= (int)m_scroll && m_selected < (int)m_scroll+rowsshown())
+	if(m_selected >= 0 && m_selected >= (int)m_scroll[1] && m_selected < (int)m_scroll[1]+rowsshown())
 	{
 		glUniform4f(g_shader[SHADER_ORTHO].m_slot[SSLOT_COLOR], 1, 1, 1, 0.5f);
-		DrawImage(g_texture[m_filledtex].texname, m_pos[0], m_pos[1]+(m_selected-(int)m_scroll)*f->gheight, m_pos[2]-square(), m_pos[1]+(m_selected-(int)m_scroll+1)*f->gheight);
+		DrawImage(g_texture[m_filledtex].texname, m_pos[0], m_pos[1]+(m_selected-(int)m_scroll[1])*f->gheight, m_pos[2]-square(), m_pos[1]+(m_selected-(int)m_scroll[1]+1)*f->gheight);
 		glUniform4f(g_shader[SHADER_ORTHO].m_slot[SSLOT_COLOR], 1, 1, 1, 1);
 	}
 	
-	for(int i=(int)m_scroll; i<(int)m_scroll+rowsshown(); i++)
-		DrawShadowedText(m_font, m_pos[0]+3, m_pos[1]+g_font[m_font].gheight*(i-(int)m_scroll), &m_options[i]);
+	for(int i=(int)m_scroll[1]; i<(int)m_scroll[1]+rowsshown(); i++)
+		DrawShadowedText(m_font, m_pos[0]+3, m_pos[1]+g_font[m_font].gheight*(i-(int)m_scroll[1]), &m_options[i]);
 }
 
 bool ListBox::mousemove()
@@ -135,9 +135,9 @@ bool ListBox::lbuttondown()
 {
 	Font* f = &g_font[m_font];
 
-	for(int i=(int)m_scroll; i<(int)m_scroll+rowsshown(); i++)
+	for(int i=(int)m_scroll[1]; i<(int)m_scroll[1]+rowsshown(); i++)
 	{
-		int row = i-(int)m_scroll;
+		int row = i-(int)m_scroll[1];
 		// list item?
 		if(g_mouse.x >= m_pos[0] && g_mouse.x <= m_pos[2]-square() && g_mouse.y >= m_pos[1]+f->gheight*row
 			&& g_mouse.y <= m_pos[1]+f->gheight*(row+1))
@@ -189,9 +189,9 @@ bool ListBox::lbuttonup(bool moved)
 	
 	Font* f = &g_font[m_font];
 
-	for(int i=(int)m_scroll; i<(int)m_scroll+rowsshown(); i++)
+	for(int i=(int)m_scroll[1]; i<(int)m_scroll[1]+rowsshown(); i++)
 	{
-		int row = i-(int)m_scroll;
+		int row = i-(int)m_scroll[1];
 
 		// list item?
 		if(g_mouse.x >= m_pos[0] && g_mouse.x <= m_pos[2]-square() && g_mouse.y >= m_pos[1]+f->gheight*row
