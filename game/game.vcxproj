@@ -1,0 +1,415 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="32 bit 2|Win32">
+      <Configuration>32 bit 2</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="32 bit 2|x64">
+      <Configuration>32 bit 2</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="32 bit release|Win32">
+      <Configuration>32 bit release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="32 bit release|x64">
+      <Configuration>32 bit release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{AD1BD195-6D12-4F4F-9C01-197ADD2C5A88}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>Pathogen</RootNamespace>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v110</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v110</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v110_xp</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>NotSet</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='32 bit release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v110</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>NotSet</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v110</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>NotSet</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='32 bit release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v110</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>NotSet</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='32 bit 2|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v110</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>NotSet</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='32 bit 2|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v110</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>NotSet</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='32 bit release|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='32 bit release|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='32 bit 2|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='32 bit 2|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LinkIncremental>false</LinkIncremental>
+    <IncludePath>$(SolutionDir)\libs\lpng;$(SolutionDir)\libs\jpeglib;$(SolutionDir)\libs\libzip-0.11.1\lib;$(SolutionDir)\libs\opengl;$(SolutionDir)\libs\win\SDL-1.2.15\include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)\libs\lpng\lib;$(SolutionDir)\libs\jpeglib;$(SolutionDir)\libs\win\SDL-1.2.15\lib\x86;$(SolutionDir)\libs\zlib-1.2.5\build\Release;$(SolutionDir)\libs\libzip-0.11.1\build\lib\Release;$(LibraryPath)</LibraryPath>
+    <TargetName>CorpStates</TargetName>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='32 bit release|Win32'">
+    <LinkIncremental>false</LinkIncremental>
+    <IncludePath>C:\Libs\jpeglib;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Libs\jpeglib;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <LinkIncremental>false</LinkIncremental>
+    <IncludePath>C:\Libs\jpeglib;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Libs\jpeglib;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='32 bit release|x64'">
+    <LinkIncremental>false</LinkIncremental>
+    <IncludePath>C:\Libs\jpeglib;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Libs\jpeglib;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='32 bit 2|Win32'">
+    <LinkIncremental>false</LinkIncremental>
+    <IncludePath>C:\Libs\jpeglib;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Libs\jpeglib;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='32 bit 2|x64'">
+    <LinkIncremental>false</LinkIncremental>
+    <IncludePath>C:\Libs\jpeglib;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Libs\jpeglib;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+    <PostBuildEvent>
+      <Command>copy /Y "$(SolutionDir)Release\$(TargetFileName)" "$(SolutionDir)..\testfolder\$(TargetFileName)"</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='32 bit release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='32 bit release|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='32 bit 2|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='32 bit 2|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="..\common\debug.cpp" />
+    <ClCompile Include="..\common\gui\barbutton.cpp" />
+    <ClCompile Include="..\common\gui\button.cpp" />
+    <ClCompile Include="..\common\gui\chat.cpp" />
+    <ClCompile Include="..\common\gui\checkbox.cpp" />
+    <ClCompile Include="..\common\gui\draw2d.cpp" />
+    <ClCompile Include="..\common\gui\dropdowns.cpp" />
+    <ClCompile Include="..\common\gui\editbox.cpp" />
+    <ClCompile Include="..\common\gui\font.cpp" />
+    <ClCompile Include="..\common\gui\frame.cpp" />
+    <ClCompile Include="..\common\gui\gui.cpp" />
+    <ClCompile Include="..\common\gui\hscroller.cpp" />
+    <ClCompile Include="..\common\gui\icon.cpp" />
+    <ClCompile Include="..\common\gui\image.cpp" />
+    <ClCompile Include="..\common\gui\insdraw.cpp" />
+    <ClCompile Include="..\common\gui\link.cpp" />
+    <ClCompile Include="..\common\gui\listbox.cpp" />
+    <ClCompile Include="..\common\gui\richtext.cpp" />
+    <ClCompile Include="..\common\gui\text.cpp" />
+    <ClCompile Include="..\common\gui\textarea.cpp" />
+    <ClCompile Include="..\common\gui\textblock.cpp" />
+    <ClCompile Include="..\common\gui\touchlistener.cpp" />
+    <ClCompile Include="..\common\gui\view.cpp" />
+    <ClCompile Include="..\common\gui\viewportw.cpp" />
+    <ClCompile Include="..\common\gui\widget.cpp" />
+    <ClCompile Include="..\common\math\3dmath.cpp" />
+    <ClCompile Include="..\common\math\camera.cpp" />
+    <ClCompile Include="..\common\math\edge.cpp" />
+    <ClCompile Include="..\common\math\frustum.cpp" />
+    <ClCompile Include="..\common\math\line.cpp" />
+    <ClCompile Include="..\common\math\matrix.cpp" />
+    <ClCompile Include="..\common\math\physics.cpp" />
+    <ClCompile Include="..\common\math\plane.cpp" />
+    <ClCompile Include="..\common\math\polygon.cpp" />
+    <ClCompile Include="..\common\math\quaternion.cpp" />
+    <ClCompile Include="..\common\math\vec3f.cpp" />
+    <ClCompile Include="..\common\math\vec3i.cpp" />
+    <ClCompile Include="..\common\math\vec4f.cpp" />
+    <ClCompile Include="..\common\platform.cpp" />
+    <ClCompile Include="..\common\render\model.cpp" />
+    <ClCompile Include="..\common\render\ms3d.cpp" />
+    <ClCompile Include="..\common\render\shader.cpp" />
+    <ClCompile Include="..\common\render\shadow.cpp" />
+    <ClCompile Include="..\common\render\vertexarray.cpp" />
+    <ClCompile Include="..\common\texture.cpp" />
+    <ClCompile Include="..\common\ustring.cpp" />
+    <ClCompile Include="..\common\utils.cpp" />
+    <ClCompile Include="..\common\window.cpp" />
+    <ClCompile Include="ggui.cpp" />
+    <ClCompile Include="gmain.cpp" />
+    <ClCompile Include="keymap.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\common\debug.h" />
+    <ClInclude Include="..\common\gui\barbutton.h" />
+    <ClInclude Include="..\common\gui\button.h" />
+    <ClInclude Include="..\common\gui\chat.h" />
+    <ClInclude Include="..\common\gui\checkbox.h" />
+    <ClInclude Include="..\common\gui\draw2d.h" />
+    <ClInclude Include="..\common\gui\dropdowns.h" />
+    <ClInclude Include="..\common\gui\editbox.h" />
+    <ClInclude Include="..\common\gui\font.h" />
+    <ClInclude Include="..\common\gui\frame.h" />
+    <ClInclude Include="..\common\gui\gui.h" />
+    <ClInclude Include="..\common\gui\hscroller.h" />
+    <ClInclude Include="..\common\gui\icon.h" />
+    <ClInclude Include="..\common\gui\image.h" />
+    <ClInclude Include="..\common\gui\insdraw.h" />
+    <ClInclude Include="..\common\gui\link.h" />
+    <ClInclude Include="..\common\gui\listbox.h" />
+    <ClInclude Include="..\common\gui\richtext.h" />
+    <ClInclude Include="..\common\gui\text.h" />
+    <ClInclude Include="..\common\gui\textarea.h" />
+    <ClInclude Include="..\common\gui\textblock.h" />
+    <ClInclude Include="..\common\gui\touchlistener.h" />
+    <ClInclude Include="..\common\gui\view.h" />
+    <ClInclude Include="..\common\gui\viewportw.h" />
+    <ClInclude Include="..\common\gui\widget.h" />
+    <ClInclude Include="..\common\math\3dmath.h" />
+    <ClInclude Include="..\common\math\camera.h" />
+    <ClInclude Include="..\common\math\edge.h" />
+    <ClInclude Include="..\common\math\frustum.h" />
+    <ClInclude Include="..\common\math\line.h" />
+    <ClInclude Include="..\common\math\matrix.h" />
+    <ClInclude Include="..\common\math\physics.h" />
+    <ClInclude Include="..\common\math\plane.h" />
+    <ClInclude Include="..\common\math\polygon.h" />
+    <ClInclude Include="..\common\math\quaternion.h" />
+    <ClInclude Include="..\common\math\triangle.h" />
+    <ClInclude Include="..\common\math\vec2f.h" />
+    <ClInclude Include="..\common\math\vec2i.h" />
+    <ClInclude Include="..\common\math\vec3f.h" />
+    <ClInclude Include="..\common\math\vec3i.h" />
+    <ClInclude Include="..\common\math\vec4f.h" />
+    <ClInclude Include="..\common\platform.h" />
+    <ClInclude Include="..\common\render\model.h" />
+    <ClInclude Include="..\common\render\ms3d.h" />
+    <ClInclude Include="..\common\render\shader.h" />
+    <ClInclude Include="..\common\render\shadow.h" />
+    <ClInclude Include="..\common\render\vertexarray.h" />
+    <ClInclude Include="..\common\texture.h" />
+    <ClInclude Include="..\common\ustring.h" />
+    <ClInclude Include="..\common\utils.h" />
+    <ClInclude Include="..\common\window.h" />
+    <ClInclude Include="ggui.h" />
+    <ClInclude Include="gmain.h" />
+    <ClInclude Include="gres.h" />
+    <ClInclude Include="keymap.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="res.rc" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>
