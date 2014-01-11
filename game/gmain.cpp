@@ -16,17 +16,19 @@
 #include "ggui.h"
 #include "../common/gui/gui.h"
 #include "../common/debug.h"
+#include "../common/render/heightmap.h"
+#include "../common/math/camera.h"
+#include "../common/render/shadow.h"
 #if 0
 //#include "../common/render/particle.h"
 //#include "../common/sim/building.h"
 //#include "../common/sim/map.h"
-#include "../common/render/shadow.h"
 #include "../common/sim/road.h"
 #include "../common/sim/powerline.h"
 #include "../common/sim/zpipeline.h"
 #include "../common/render/particle.h"
 #include "../common/sim/unit.h"
-#include "../common/sim/resource.h"\
+#include "../common/sim/resource.h"
 #include "../common/sim/selection.h"
 #include "../common/sim/waves.h"
 #include "../common/render/projectile.h"
@@ -251,6 +253,24 @@ void AfterDraw(Matrix projection, Matrix viewmat, Matrix modelmat)
 #endif
 }
 
+void DrawScene(Matrix projection, Matrix viewmat, Matrix modelmat, Matrix modelviewinv, float mvLightPos[3], float lightDir[3])
+{
+#if 0
+	UseShadow(SHADER_MAP, projection, viewmat, modelmat, modelviewinv, mvLightPos, lightDir);
+	glActiveTextureARB(GL_TEXTURE4);
+	glBindTexture(GL_TEXTURE_2D, g_depth);
+	glUniform1iARB(g_shader[g_curS].m_slot[SSLOT_SHADOWMAP], 4);
+	
+	DrawMap(&g_map);
+	DrawEntities();
+#endif
+}
+
+void DrawSceneDepth()
+{
+	//g_model[themodel].draw(0, Vec3f(0,0,0), 0);
+}
+
 void Draw()
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -258,27 +278,15 @@ void Draw()
 
 	if(g_mode == PLAY || g_mode == EDITOR)
 	{
-		
-		//TurnOffShader();
-		//g_camera.Look();
-#if 0
 		float aspect = fabsf((float)g_width / (float)g_height);
-		//Matrix projection = BuildPerspProjMat(FIELD_OF_VIEW, aspect, MIN_DISTANCE, MAX_DISTANCE);
-		Matrix projection = setorthographicmat(-PROJ_RIGHT, PROJ_RIGHT, PROJ_RIGHT/aspect, -PROJ_RIGHT/aspect, MIN_DISTANCE, MAX_DISTANCE);
-		
-		Vec3f viewvec = g_camera.View();
-        Vec3f posvec = g_camera.Position();
-        Vec3f posvec2 = g_camera.LookPos();
-        Vec3f upvec = g_camera.UpVector();
+		Matrix projection = BuildPerspProjMat(FIELD_OF_VIEW, aspect, MIN_DISTANCE, MAX_DISTANCE);
 
-		//char msg[128];
-		//sprintf(msg, "y = %f", posvec.y);
-		//Chat(msg);
-        
-        Matrix viewmat = gluLookAt2(posvec2.x, posvec2.y, posvec2.z,
-                                    viewvec.x, viewvec.y, viewvec.z,
-                                    upvec.x, upvec.y, upvec.z);
-		
+		Vec3f focusvec = g_camera.m_view;
+		Vec3f posvec = g_camera.m_pos;
+		Vec3f upvec = g_camera.m_up;
+
+		Matrix viewmat = gluLookAt3(posvec.x, posvec.y, posvec.z, focusvec.x, focusvec.y, focusvec.z, upvec.x, upvec.y, upvec.z);
+
 		Matrix modelview;
 		Matrix modelmat;
 		float translation[] = {0, 0, 0};
@@ -286,80 +294,16 @@ void Draw()
 		modelmat.setTranslation(translation);
 		modelview.postMultiply(viewmat);
 
-		g_frustum.CalculateFrustum(projection.getMatrix(), modelview.getMatrix());
+		Matrix mvpmat;
+		mvpmat.set(projection.m_matrix);
+		mvpmat.postMultiply(viewmat);
 
-		/*
-		g_shader[SHADER::MAP].UseS();
-        glUniformMatrix4fv(g_shader[SHADER::MAP].m_slot[SLOT::PROJECTION], 1, 0, projection.getMatrix());
-        glUniformMatrix4fv(g_shader[SHADER::MAP].m_slot[SLOT::MODELMAT], 1, 0, modelmat.getMatrix());
-        glUniformMatrix4fv(g_shader[SHADER::MAP].m_slot[SLOT::VIEWMAT], 1, 0, viewmat.getMatrix());
-        glUniform4f(g_shader[SHADER::MAP].m_slot[SLOT::COLOR], 1, 1, 1, 1);
-		glEnableVertexAttribArray(g_shader[SHADER::MAP].m_slot[SLOT::POSITION]);
-		glEnableVertexAttribArray(g_shader[SHADER::MAP].m_slot[SLOT::TEXCOORD0]);
-		//glEnableVertexAttribArray(g_shader[SHADER::MAP].m_slot[SLOT::TEXCOORD1]);
-		glEnableVertexAttribArray(g_shader[SHADER::MAP].m_slot[SLOT::NORMAL]);
-        //glBindBuffer(GL_ARRAY_BUFFER, 0);
-        //glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-		//DrawSkyBox(g_camera.LookPos());
-		//DrawMap();
-		g_hmap.draw(&g_shader[SHADER::MAP]);
-		
-		if(g_mode == EDITOR)
+		//if(v->m_type == VIEWPORT_MAIN3D)
 		{
-			g_shader[SHADER::COLOR3D].UseS();
-			glUniformMatrix4fv(g_shader[SHADER::COLOR3D].m_slot[SLOT::PROJECTION], 1, 0, projection.getMatrix());
-			glUniformMatrix4fv(g_shader[SHADER::COLOR3D].m_slot[SLOT::MODELMAT], 1, 0, modelmat.getMatrix());
-			glUniformMatrix4fv(g_shader[SHADER::COLOR3D].m_slot[SLOT::VIEWMAT], 1, 0, viewmat.getMatrix());
-			glUniform4f(g_shader[SHADER::COLOR3D].m_slot[SLOT::COLOR], 0, 1, 0, 1);
-			glEnableVertexAttribArray(g_shader[SHADER::COLOR3D].m_slot[SLOT::POSITION]);
-			glEnableVertexAttribArray(g_shader[SHADER::COLOR3D].m_slot[SLOT::NORMAL]);
-			DrawTileSq();
+			//RenderToShadowMap(projection, viewmat, modelmat, g_camera.m_view);
+			RenderToShadowMap(projection, viewmat, modelmat, Vec3f(0,0,0));
+			RenderShadowedScene(projection, viewmat, modelmat, modelview);
 		}
-
-		g_shader[SHADER::MODEL].UseS();
-        glUniformMatrix4fv(g_shader[SHADER::MODEL].m_slot[SLOT::PROJECTION], 1, 0, projection.getMatrix());
-        glUniformMatrix4fv(g_shader[SHADER::MODEL].m_slot[SLOT::MODELMAT], 1, 0, modelmat.getMatrix());
-        glUniformMatrix4fv(g_shader[SHADER::MODEL].m_slot[SLOT::VIEWMAT], 1, 0, viewmat.getMatrix());
-        glUniform4f(g_shader[SHADER::MODEL].m_slot[SLOT::COLOR], 1, 1, 1, 1);
-		glEnableVertexAttribArray(g_shader[SHADER::MODEL].m_slot[SLOT::POSITION]);
-		glEnableVertexAttribArray(g_shader[SHADER::MODEL].m_slot[SLOT::TEXCOORD0]);
-		glEnableVertexAttribArray(g_shader[SHADER::MODEL].m_slot[SLOT::NORMAL]);
-        //glBindBuffer(GL_ARRAY_BUFFER, 0);
-        //glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-		
-		//BeginVertexArrays();
-		//DrawSurroundings();
-		DrawWater(&g_shader[SHADER::MODEL]);
-		DrawBuildings(&g_shader[SHADER::MODEL]);
-		DrawPowerlines(&g_shader[SHADER::MODEL]);
-		DrawRoads(&g_shader[SHADER::MODEL]);
-		DrawSelB(&g_shader[SHADER::MODEL]);
-		DrawUnits(&g_shader[SHADER::MODEL]);
-		//EndVertexArrays();
-		TurnOffShader();
-
-		DrawUnitStatus();
-		//DrawGrid();
-		//DrawUnitSquares();
-		//DrawPaths();
-		DrawSelection();
-		DrawOrders();
-		DrawProjectiles();
-		BeginVertexArrays();
-		SortBillboards();
-		DrawBillboards();
-		EndVertexArrays();
-		*/
-		
-				LastNum("pre rtsm");
-		RenderToShadowMap(projection, viewmat, modelmat);
-				LastNum("pre rss");
-		RenderShadowedScene(projection, viewmat, modelmat, modelview);
-				LastNum("pre ad");
-		AfterDraw(projection, viewmat, modelmat);
-				LastNum("post ad");
-
-#endif
 	}
 
 	g_GUI.frameupd();
@@ -635,7 +579,12 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		return 0;
 	
 	//Queue();
-	//FillGUI();
+	FillGUI();
+
+	QueueTexture(&g_tiletexs[TILE_SAND], "textures/terrain/default/sand.png", false);
+	QueueTexture(&g_tiletexs[TILE_GRASS], "textures/terrain/default/grass.png", false);
+	QueueTexture(&g_tiletexs[TILE_SNOW], "textures/terrain/default/snow.png", false);
+	QueueTexture(&g_tiletexs[TILE_ROCK], "textures/terrain/default/rock.png", false);
 
 	while(!g_quit)
 	{
@@ -653,11 +602,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		{
 			if ((g_mode == LOADING || g_mode == RELOADING) || AnimateNextFrame(FRAME_RATE))
 			{
-				LastNum("pre upd");
 				Update();
-				LastNum("pre draw");
 				Draw();
-				LastNum("post draw");
 			}
 			else
 				Sleep(1);

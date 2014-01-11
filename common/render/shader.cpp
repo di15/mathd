@@ -259,6 +259,7 @@ void LoadShader(int shader, char* strVertex, char* strFragment)
 
 	//g_log<<"shader "<<strVertex<<","<<strFragment<<endl;
 	
+	
     s->MapAttrib(SSLOT_POSITION, "position");
     s->MapAttrib(SSLOT_NORMAL, "normalIn");
     s->MapAttrib(SSLOT_TEXCOORD0, "texCoordIn0");
@@ -292,21 +293,17 @@ void LoadShader(int shader, char* strVertex, char* strFragment)
 	s->MapUniform(SSLOT_SANDONLYMAXY, "sandonlymaxy");
 	s->MapUniform(SSLOT_SANDGRASSMAXY, "sandgrassmaxy");
 	s->MapUniform(SSLOT_GRASSONLYMAXY, "grassonlymaxy");
-	s->MapUniform(SSLOT_GRASSDIRTMAXY, "grassdirtmaxy");
-	s->MapUniform(SSLOT_DIRTONLYMAXY, "dirtonlymaxy");
-	s->MapUniform(SSLOT_DIRTROCKMAXY, "dirtrockmaxy");
-	s->MapUniform(SSLOT_SANDGRAD, "sandgrad");
-	s->MapUniform(SSLOT_SANDDET, "sanddet");
-	s->MapUniform(SSLOT_GRASSGRAD, "grassgrad");
-	s->MapUniform(SSLOT_GRASSDET, "grassdet");
-	s->MapUniform(SSLOT_DIRTGRAD, "dirtgrad");
-	s->MapUniform(SSLOT_DIRTDET, "dirtdet");
-	s->MapUniform(SSLOT_ROCKGRAD, "rockgrad");
-	s->MapUniform(SSLOT_ROCKGRAD, "rockdet");
+	s->MapUniform(SSLOT_GRASSROCKMAXY, "dirtrockmaxy");
+	s->MapUniform(SSLOT_SANDTEX, "sandtex");
+	s->MapUniform(SSLOT_GRASSTEX, "grasstex");
+	s->MapUniform(SSLOT_SNOWTEX, "snowtex");
+	s->MapUniform(SSLOT_ROCKTEX, "rocktex");
 	s->MapUniform(SSLOT_SUNDIRECTION, "sundirection");
 	s->MapUniform(SSLOT_GRADIENTTEX, "gradienttex");
 	s->MapUniform(SSLOT_DETAILTEX, "detailtex");
 	s->MapUniform(SSLOT_OWNERMAP, "ownermap");
+	s->MapUniform(SSLOT_MAPMINZ, "mapminz");
+	s->MapUniform(SSLOT_MAPMAXZ, "mapmaxz");
 }
 
 void UseS(int shader)		

@@ -194,6 +194,9 @@
     <ClCompile Include="..\common\utils.cpp">
       <Filter>Source Files\common</Filter>
     </ClCompile>
+    <ClCompile Include="..\common\render\heightmap.cpp">
+      <Filter>Source Files\common\render</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ggui.h">
@@ -360,6 +363,9 @@
     </ClInclude>
     <ClInclude Include="..\common\utils.h">
       <Filter>Source Files\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\render\heightmap.h">
+      <Filter>Source Files\common\render</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

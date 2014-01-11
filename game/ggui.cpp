@@ -6,7 +6,7 @@
 
 #include "gmain.h"
 //#include "3dmath.h"
-//#include "gui.h"
+#include "../common/gui/gui.h"
 //#include "image.h"
 //#include "menu.h"
 //#include "player.h"
@@ -483,7 +483,22 @@ void OpenBSelect()
 }
 #endif
 
+void Resize_NewGameLink(Widget* thisw)
+{
+}
+
+void Click_NewGame()
+{
+
+}
+
 void FillGUI()
 {
+	View* mainmenuview = AddView("mainmenu");
+
+	mainmenuview->widget.push_back(new Link(NULL, "new game link", RichText("New Game"), MAINFONT8, Resize_NewGameLink, Click_NewGame));
+
+	Click_NewGame();
+
 
 }

@@ -336,6 +336,7 @@
     <ClCompile Include="..\common\math\vec3i.cpp" />
     <ClCompile Include="..\common\math\vec4f.cpp" />
     <ClCompile Include="..\common\platform.cpp" />
+    <ClCompile Include="..\common\render\heightmap.cpp" />
     <ClCompile Include="..\common\render\model.cpp" />
     <ClCompile Include="..\common\render\ms3d.cpp" />
     <ClCompile Include="..\common\render\shader.cpp" />
@@ -392,6 +393,7 @@
     <ClInclude Include="..\common\math\vec3i.h" />
     <ClInclude Include="..\common\math\vec4f.h" />
     <ClInclude Include="..\common\platform.h" />
+    <ClInclude Include="..\common\render\heightmap.h" />
     <ClInclude Include="..\common\render\model.h" />
     <ClInclude Include="..\common\render\ms3d.h" />
     <ClInclude Include="..\common\render\shader.h" />
