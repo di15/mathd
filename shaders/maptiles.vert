@@ -55,7 +55,7 @@ void main(void)
 	lpos = lightMatrix * vpos;
 	//lpos.w = 1;
 	gl_Position = projection * (view * (model * position));
-	gl_Position.w = 1;
+	//gl_Position.w = 1;
 
 	//elevy = position.y;
 
@@ -141,7 +141,7 @@ void main(void)
 			sandtransition = (equatorupper - position.z) / (mapz10percent*2.0);
 		}
 
-		if(sandtransition > 0.0)
+		if(sandtransition > 0.0 && sandtransition > sandalpha)
 		{
 			float otheralpha = snowalpha + grassalpha + rockalpha;
 
@@ -180,7 +180,7 @@ void main(void)
 	vec3 normalEyeSpace = vec3( normalMat * vec4(normalIn, 0.0) );
 	normalOut = normalize(normalEyeSpace);
 
-	vec3 n = normalOut;
+	vec3 n = normalIn;
 	//vec3 tangentEyeSpace = vec3( normalMat * vec4(tangent, 0.0) );
 	//vec3 t = normalize(tangentEyeSpace);
 	//vec3 t = normalOut;

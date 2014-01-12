@@ -49,6 +49,7 @@ public:
 	void friction2();
 	float yaw();
 	float pitch();
+	Vec3f zoompos();
 };									
 
 extern Camera g_camera;

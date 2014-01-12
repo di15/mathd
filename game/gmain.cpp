@@ -244,7 +244,7 @@ void Draw()
 		//Matrix projection = setorthographicmat(-PROJ_RIGHT*aspect/g_zoom, PROJ_RIGHT*aspect/g_zoom, PROJ_RIGHT/g_zoom, -PROJ_RIGHT/g_zoom, MIN_DISTANCE, MAX_DISTANCE);
 
 		Vec3f focusvec = g_camera.m_view;
-		Vec3f posvec = g_camera.m_pos;
+		Vec3f posvec = g_camera.zoompos();
 		Vec3f upvec = g_camera.m_up;
 
 		Matrix viewmat = gluLookAt3(posvec.x, posvec.y, posvec.z, focusvec.x, focusvec.y, focusvec.z, upvec.x, upvec.y, upvec.z);
@@ -271,6 +271,7 @@ void Draw()
 			vLine[0] = onnear;
 			vLine[1] = onnear + (ray * 100000.0f);
 			if(!GetMapIntersection(&g_hmap, vLine, &focus))
+			//if(!FastMapIntersect(&g_hmap, vLine, &focus))
 				GetMapIntersection2(&g_hmap, vLine, &focus);
 			RenderToShadowMap(projection, viewmat, modelmat, focus);
 			RenderShadowedScene(projection, viewmat, modelmat, modelview);

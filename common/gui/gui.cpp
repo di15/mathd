@@ -34,7 +34,7 @@ void GUI::draw()
 
 	//DrawImage(g_depth, g_width - 300, 0, g_width, 300, 0, 1, 1, 0);
 	
-	DrawImage(g_depth, 0, 0, 150, 150, 0, 1, 1, 0);
+	//DrawImage(g_depth, 0, 0, 150, 150, 0, 1, 1, 0);
 
 	UseS(SHADER_COLOR2D);
     glUniform1f(g_shader[SHADER_COLOR2D].m_slot[SSLOT_WIDTH], (float)g_width);

@@ -15,9 +15,10 @@
 #define MAX_DISTANCE		(100 * 1000 * 10.0f) //10km
 #define FIELD_OF_VIEW		45.0f
 //#define PROJ_LEFT			(-16*4)
-#define PROJ_RIGHT			1500	//(16*4)
+#define PROJ_RIGHT			600 //(500)	//(30*12.5f)
 //#define PROJ_TOP			(16*4)
 //#define PROJ_BOTTOM			(-16*4)
+#define INI_ZOOM			0.1f
 
 extern double g_frameinterval;
 extern int g_width;

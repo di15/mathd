@@ -26,7 +26,7 @@ double g_lastTime = 0.0f;		// This will hold the time from the last frame
 double g_framesPerSecond = 0.0f;		// This will store our fps
 double g_instantFPS = 0.0f;
 long long g_lasttime = GetTickCount();
-float g_zoom = 1;
+float g_zoom = INI_ZOOM;
 
 void AddRes(int w, int h)
 {

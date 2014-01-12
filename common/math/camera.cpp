@@ -2,6 +2,7 @@
 #include "camera.h"
 #include "3dmath.h"
 #include "physics.h"
+#include "../window.h"
 
 Camera g_camera;
 
@@ -366,4 +367,11 @@ void Camera::calcstrafe()
 {
 	Vec3f vCross = Cross(m_view - m_pos, m_up);
 	m_strafe = Normalize(vCross);
+}
+
+Vec3f Camera::zoompos()
+{
+	Vec3f dir = Normalize( m_view - m_pos );
+	Vec3f posvec = m_view - dir * 1000.0f / g_zoom;
+	return posvec;
 }

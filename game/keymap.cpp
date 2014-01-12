@@ -288,9 +288,6 @@ void MouseWheel(int delta)
 	if(g_mode == PLAY || g_mode == EDITOR)
 	{
 		g_zoom *= 1.0f + (float)delta / 10.0f;
-		Vec3f ray = g_camera.m_view - g_camera.m_pos;
-		ray = ray * 1.0f/(1.0f + (float)delta / 10.0f);
-		g_camera.m_pos = g_camera.m_view - ray;
 	}
 }
 
