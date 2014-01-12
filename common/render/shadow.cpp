@@ -16,7 +16,7 @@
 #include "model.h"
 #include "../sim/sim.h"
 #include "model.h"
-#include "../sim/map.h"
+#include "../sim/building.h"
 #include "../math/camera.h"
 
 unsigned int g_depth;
@@ -25,9 +25,7 @@ const int g_depthSizeY = 2048;	//512;	//4096;
 unsigned int g_rbDepth;
 unsigned int g_fbDepth;
 
-//1000000.0f/300 = 3333.3333333333333333333333333333 cm = 
-
-Vec3f g_lightOff(-MAX_DISTANCE/500, MAX_DISTANCE/300, MAX_DISTANCE/400);
+Vec3f g_lightOff(-MAX_DISTANCE/5, MAX_DISTANCE/3, MAX_DISTANCE/4);
 Vec3f g_lightPos;	//(-MAX_DISTANCE/2, MAX_DISTANCE/5, MAX_DISTANCE/3);
 Vec3f g_lightEye;	//(-MAX_DISTANCE/2+1.0f/2.0f, MAX_DISTANCE/3-1.0f/3.0f, MAX_DISTANCE/3-1.0f/3.0f);
 Vec3f g_lightUp(0,1,0);
@@ -423,7 +421,7 @@ void RenderToShadowMap(Matrix projection, Matrix viewmat, Matrix modelmat, Vec3f
 	//g_lightPos = g_lightEye + g_lightOff;
 	
 	//g_lightProjectionMatrix = BuildPerspProjMat(90.0, 1.0, 30.0, 10000.0);
-	g_lightProjectionMatrix = setorthographicmat(-PROJ_RIGHT*2/g_zoom, PROJ_RIGHT*2/g_zoom, PROJ_RIGHT*2/g_zoom, -PROJ_RIGHT*2/g_zoom, MIN_DISTANCE, MAX_DISTANCE/300);
+	g_lightProjectionMatrix = setorthographicmat(-PROJ_RIGHT*4/g_zoom, PROJ_RIGHT*4/g_zoom, PROJ_RIGHT*4/g_zoom, -PROJ_RIGHT*4/g_zoom, MIN_DISTANCE, MAX_DISTANCE);
 	g_lightModelViewMatrix = gluLookAt2(g_lightPos.x, g_lightPos.y, g_lightPos.z,
 		g_lightEye.x, g_lightEye.y, g_lightEye.z, 
 		g_lightUp.x, g_lightUp.y, g_lightUp.z);
@@ -469,7 +467,7 @@ void UseShadow(int shader, Matrix projection, Matrix viewmat, Matrix modelmat, M
 	
 	glUniform3fARB(s->m_slot[SSLOT_LIGHTPOS], mvLightPos[0], mvLightPos[1], mvLightPos[2]);
 	glUniform3fARB(s->m_slot[SSLOT_SUNDIRECTION], lightDir[0], lightDir[1], lightDir[2]);
-//	glUniform1fARB(s->m_slot[SSLOT_MAXELEV], g_maxelev);
+	//glUniform1fARB(s->m_slot[SSLOT_MAXELEV], g_maxelev);
 }
 
 void RenderShadowedScene(Matrix projection, Matrix viewmat, Matrix modelmat, Matrix modelview)

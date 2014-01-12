@@ -12,10 +12,10 @@
 #define INI_BPP				32
 #define FRAME_RATE			30
 #define MIN_DISTANCE		1.0f
-#define MAX_DISTANCE		9000.0f
+#define MAX_DISTANCE		(100 * 1000 * 10.0f) //10km
 #define FIELD_OF_VIEW		45.0f
 //#define PROJ_LEFT			(-16*4)
-#define PROJ_RIGHT			(16*4)
+#define PROJ_RIGHT			1500	//(16*4)
 //#define PROJ_TOP			(16*4)
 //#define PROJ_BOTTOM			(-16*4)
 

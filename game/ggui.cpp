@@ -18,26 +18,11 @@
 #include "keymap.h"
 //#include "inspect.h"
 //#include "selection.h"
+#include "../common/render/heightmap.h"
+#include "../common/math/camera.h"
+#include "../common/render/shadow.h"
 
 //bool g_canselect = true;
-
-/*
-void Click_OpenLogin()
-{
-	OpenSoleView("login");
-}
-
-void Click_Login()
-{
-	CSpawn spawn = g_spawn[0];
-	int e;
-	bool place = PlaceEntity(HUMAN1, g_localP, spawn.pos, spawn.angle, &e);
-	g_camera = &g_entity[e].camera;
-	if(!place)
-		g_player[g_localP].crouched = true;
-	g_mode = PLAY;
-	RedoGUI();
-}*/
 
 #if 0
 void Click_SaveSlot1()
@@ -487,18 +472,42 @@ void Resize_NewGameLink(Widget* thisw)
 {
 }
 
+void Resize_LoadingStatus(Widget* thisw)
+{
+	thisw->m_pos[0] = g_width/2;
+	thisw->m_pos[1] = g_height/2;
+	thisw->m_tpos[0] = g_width/2;
+	thisw->m_tpos[1] = g_height/2;
+}
+
 void Click_NewGame()
 {
+	g_hmap.allocate(128, 128);
 
+	g_camera.position(
+		-1000.0f/3, 1000.0f/3 + 5000, -1000.0f/3, 
+		0, 5000, 0, 
+		0, 1, 0);
+
+	//g_camera.move( Vec3f(g_hmap.m_widthx*TILE_SIZE/2, 0, g_hmap.m_widthz*TILE_SIZE/2) );
+
+	g_mode = PLAY;
+
+	OpenSoleView("play menu");
 }
 
 void FillGUI()
 {
+	DrawSceneFunc = DrawScene;
+	DrawSceneDepthFunc = DrawSceneDepth;
+
+	View* loadingview = AddView("loading");
+
+	loadingview->widget.push_back(new Text(NULL, "status", RichText("Loading..."), MAINFONT8, Resize_LoadingStatus));
+
 	View* mainmenuview = AddView("mainmenu");
 
 	mainmenuview->widget.push_back(new Link(NULL, "new game link", RichText("New Game"), MAINFONT8, Resize_NewGameLink, Click_NewGame));
 
-	Click_NewGame();
-
-
+	OpenSoleView("loading");
 }

@@ -14,7 +14,7 @@
 #	define PI_ON_180	(M_PI/180.0)
 #endif
 
-#define CAMERA_SPEED	5.0f
+#define CAMERA_SPEED	50.0f
 
 class Plane;
 class Vec3f;

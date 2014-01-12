@@ -88,7 +88,7 @@ void Heightmap::allocate(int wx, int wz)
 
 	for(int x=0; x<=wx; x++)
 		for(int z=0; z<=wz; z++)
-			m_heightpoints[ z*(wx+1) + x ] = 0;
+			m_heightpoints[ z*(wx+1) + x ] = 0 + rand()%1000;
 
 	//g_log<<"setting tile types to grass"<<endl;
 	//g_log.flush();
@@ -165,11 +165,9 @@ void Heightmap::destroy()
 	//g_log.flush();
 
 	delete [] m_heightpoints;
-#ifndef _SERVER
 	delete [] m_vertices;
 	delete [] m_normals;
 	delete [] m_texcoords0;
-#endif
 
 	//g_log<<"setting wx,z to 0"<<endl;
 	//g_log.flush();
@@ -330,12 +328,15 @@ void Heightmap::draw()
 			glDrawArrays(GL_TRIANGLES, 0, 6);
 		}
 		*/
-	/*	
+
+	// Draw all tiles
 	glVertexAttribPointer(s->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, m_vertices);
 	glVertexAttribPointer(s->m_slot[SSLOT_TEXCOORD0], 2, GL_FLOAT, GL_FALSE, 0, m_texcoords0);
 	glVertexAttribPointer(s->m_slot[SSLOT_NORMAL], 3, GL_FLOAT, GL_FALSE, 0, m_normals);
-	glDrawArrays(GL_TRIANGLES, 0, (m_widthx) * (m_widthz) * 3 * 2);*/
+	glDrawArrays(GL_TRIANGLES, 0, (m_widthx) * (m_widthz) * 3 * 2);
 
+#if 0
+	// Draw only visible tiles in strips
 	for(int z=g_mapview[0].y; z<=g_mapview[1].y; z++)
 	{
 		int starti = m_widthx*z + g_mapview[0].x;
@@ -349,7 +350,7 @@ void Heightmap::draw()
 		glVertexAttribPointer(s->m_slot[SSLOT_NORMAL], 3, GL_FLOAT, GL_FALSE, 0, m_normals);
 		glDrawArrays(GL_TRIANGLES, starti * 2 * 3, spanx * 3 * 2);
 	}
-
+#endif
 }
 
 #endif	//#ifndef _SERVER

@@ -50,6 +50,8 @@
 APPMODE g_mode = LOADING;
 bool g_mouseout = false;
 bool g_moved = false;
+Heightmap g_hmap;
+int themodel = 0;
 
 //static long long g_lasttime = GetTickCount();
 
@@ -188,98 +190,58 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	return DefWindowProc(hWnd, uMsg, wParam, lParam);
 }
 
-void AfterDraw(Matrix projection, Matrix viewmat, Matrix modelmat)
-{
-	//g_log<<"sizeof(g_scenery) = "<<sizeof(g_scenery)<<endl;
-
-#if 0
-	Matrix projmodlview = projection;
-	projmodlview.postMultiply(viewmat);
-	projmodlview.postMultiply(modelmat);
-	
-	DrawSelection(projection, viewmat, modelmat);
-	
-	UseS(COLOR3D);
-    glUniformMatrix4fv(g_shader[SHADER::COLOR3D].m_slot[SLOT::PROJECTION], 1, 0, projection.getMatrix());
-	glUniformMatrix4fv(g_shader[SHADER::COLOR3D].m_slot[SLOT::MODELMAT], 1, 0, modelmat.getMatrix());
-	glUniformMatrix4fv(g_shader[SHADER::COLOR3D].m_slot[SLOT::VIEWMAT], 1, 0, viewmat.getMatrix());
-	glEnableVertexAttribArray(g_shader[SHADER::COLOR3D].m_slot[SLOT::POSITION]);
-	glUniform4f(g_shader[SHADER::COLOR3D].m_slot[SLOT::COLOR], 1, 1, 1, 1);
-	//DrawGrid();
-	//DrawUnitSquares();
-	//DrawPaths();
-	//DrawVelocities();
-
-	UseS(BILLBOARD);
-    glUniformMatrix4fv(g_shader[SHADER::BILLBOARD].m_slot[SLOT::PROJECTION], 1, 0, projection.getMatrix());
-	glUniformMatrix4fv(g_shader[SHADER::BILLBOARD].m_slot[SLOT::MODELMAT], 1, 0, modelmat.getMatrix());
-	glUniformMatrix4fv(g_shader[SHADER::BILLBOARD].m_slot[SLOT::VIEWMAT], 1, 0, viewmat.getMatrix());
-	glUniform4f(g_shader[SHADER::BILLBOARD].m_slot[SLOT::COLOR], 1, 1, 1, 1);
-	glEnableVertexAttribArray(g_shader[SHADER::BILLBOARD].m_slot[SLOT::POSITION]);
-	glEnableVertexAttribArray(g_shader[SHADER::BILLBOARD].m_slot[SLOT::TEXCOORD0]);
-	//glEnableVertexAttribArray(g_shader[SHADER::BILLBOARD].m_slot[SLOT::NORMAL]);
-    glActiveTextureARB(GL_TEXTURE0);
-	//glBindBuffer(GL_ARRAY_BUFFER, 0);
-	//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-
-	DrawOrders();
-	DrawProjectiles();
-	//SortParticles();
-	//DrawParticles();
-	//BeginVertexArrays();
-	SortBillboards();
-	DrawBillboards();
-	//EndVertexArrays();
-	
-	UseS(ORTHO);
-    glUniform1f(g_shader[SHADER::ORTHO].m_slot[SLOT::WIDTH], (float)g_width);
-    glUniform1f(g_shader[SHADER::ORTHO].m_slot[SLOT::HEIGHT], (float)g_height);
-    glUniform4f(g_shader[SHADER::ORTHO].m_slot[SLOT::COLOR], 1, 1, 1, 1);
-    glEnableVertexAttribArray(g_shader[SHADER::ORTHO].m_slot[SLOT::POSITION]);
-    glEnableVertexAttribArray(g_shader[SHADER::ORTHO].m_slot[SLOT::TEXCOORD0]);
-	
-	DrawUnitStatus(projmodlview);
-	DrawBStatus(projmodlview);
-	DrawTransactions(projmodlview);
-	
-	UseS(COLOR2D);
-    glUniform1f(g_shader[SHADER::COLOR2D].m_slot[SLOT::WIDTH], (float)g_width);
-    glUniform1f(g_shader[SHADER::COLOR2D].m_slot[SLOT::HEIGHT], (float)g_height);
-    glUniform4f(g_shader[SHADER::COLOR2D].m_slot[SLOT::COLOR], 1, 1, 1, STATUS_ALPHA);
-    glEnableVertexAttribArray(g_shader[SHADER::COLOR2D].m_slot[SLOT::POSITION]);
-
-	DrawUnitStats(projmodlview);
-	DrawBStats(projmodlview);
-#endif
-}
-
 void DrawScene(Matrix projection, Matrix viewmat, Matrix modelmat, Matrix modelviewinv, float mvLightPos[3], float lightDir[3])
 {
+	UseShadow(SHADER_MAPTILES, projection, viewmat, modelmat, modelviewinv, mvLightPos, lightDir);
+	glActiveTextureARB(GL_TEXTURE8);
+	glBindTexture(GL_TEXTURE_2D, g_depth);
+	glUniform1iARB(g_shader[g_curS].m_slot[SSLOT_SHADOWMAP], 8);
+	g_hmap.draw();
+
 #if 0
-	UseShadow(SHADER_MAP, projection, viewmat, modelmat, modelviewinv, mvLightPos, lightDir);
+	UseShadow(SHADER_WATER, projection, viewmat, modelmat, modelviewinv, mvLightPos, lightDir);
 	glActiveTextureARB(GL_TEXTURE4);
 	glBindTexture(GL_TEXTURE_2D, g_depth);
 	glUniform1iARB(g_shader[g_curS].m_slot[SSLOT_SHADOWMAP], 4);
-	
-	DrawMap(&g_map);
-	DrawEntities();
+	DrawWater();
+#endif
+
+#if 0
+	UseShadow(SHADER_MODEL, projection, viewmat, modelmat, modelviewinv, mvLightPos, lightDir);
+	glActiveTextureARB(GL_TEXTURE4);
+	glBindTexture(GL_TEXTURE_2D, g_depth);
+	glUniform1iARB(g_shader[g_curS].m_slot[SSLOT_SHADOWMAP], 4);
+	//DrawEdBuilding(&g_edbldg, g_showsky);
+#if 0
+	DrawBuildings();
+	DrawFoliage();
+#endif
+	g_model[themodel].draw(0, Vec3f(0,0,0), 0);
 #endif
 }
 
 void DrawSceneDepth()
 {
 	//g_model[themodel].draw(0, Vec3f(0,0,0), 0);
+	
+	g_hmap.draw();
+#if 0
+	DrawBuildings();
+	DrawFoliage();
+	//DrawEdBuilding(&g_edbldg, false);
+#endif
 }
 
 void Draw()
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	glLoadIdentity();	
+	glLoadIdentity();
 
 	if(g_mode == PLAY || g_mode == EDITOR)
 	{
 		float aspect = fabsf((float)g_width / (float)g_height);
 		Matrix projection = BuildPerspProjMat(FIELD_OF_VIEW, aspect, MIN_DISTANCE, MAX_DISTANCE);
+		//Matrix projection = setorthographicmat(-PROJ_RIGHT*aspect/g_zoom, PROJ_RIGHT*aspect/g_zoom, PROJ_RIGHT/g_zoom, -PROJ_RIGHT/g_zoom, MIN_DISTANCE, MAX_DISTANCE);
 
 		Vec3f focusvec = g_camera.m_view;
 		Vec3f posvec = g_camera.m_pos;
@@ -301,7 +263,16 @@ void Draw()
 		//if(v->m_type == VIEWPORT_MAIN3D)
 		{
 			//RenderToShadowMap(projection, viewmat, modelmat, g_camera.m_view);
-			RenderToShadowMap(projection, viewmat, modelmat, Vec3f(0,0,0));
+			//RenderToShadowMap(projection, viewmat, modelmat, Vec3f(0,0,0));
+			Vec3f focus;
+			Vec3f vLine[2];
+			Vec3f ray = g_camera.m_view - posvec;
+			Vec3f onnear = posvec;	//OnNear(g_width/2, g_height/2);
+			vLine[0] = onnear;
+			vLine[1] = onnear + (ray * 100000.0f);
+			if(!GetMapIntersection(&g_hmap, vLine, &focus))
+				GetMapIntersection2(&g_hmap, vLine, &focus);
+			RenderToShadowMap(projection, viewmat, modelmat, focus);
 			RenderShadowedScene(projection, viewmat, modelmat, modelview);
 		}
 	}
@@ -332,6 +303,8 @@ void UpdateLoading()
 		if(!Load1Texture())
 		{
 			g_mode = MENU;
+			g_mode = PLAY;
+			Click_NewGame();
 		}
 		break;
 	}
@@ -377,11 +350,97 @@ void UpdateLogo()
 	stage++;
 }
 
+bool OverMinimap()
+{
+	return false;
+}
+
+void Scroll()
+{
+	if(g_mouseout)
+		return;
+
+	bool moved = false;
+
+	//if(GetKeyState(VK_UP) & 0x80 || GetKeyState('W') & 0x80 || g_mouse.y <= SCROLL_BORDER) 
+	if((!g_keyintercepted && (g_keys[VK_UP] || g_keys['W'])) || (g_mouse.y <= SCROLL_BORDER && !OverMinimap())) 
+	{				
+		g_camera.accelerate(CAMERA_SPEED / g_zoom);			
+		moved = true;	
+	}
+
+	//if(GetKeyState(VK_DOWN) & 0x80 || GetKeyState('S') & 0x80 || g_mouse.y >= g_height-SCROLL_BORDER)
+	if((!g_keyintercepted && (g_keys[VK_DOWN] || g_keys['S'])) || (g_mouse.y >= g_height-SCROLL_BORDER && !OverMinimap())) 
+	{			
+		g_camera.accelerate(-CAMERA_SPEED / g_zoom);	
+		moved = true;			
+	}
+
+	//if(GetKeyState(VK_LEFT) & 0x80 || GetKeyState('A') & 0x80 || g_mouse.x <= SCROLL_BORDER) 
+	if((!g_keyintercepted && (g_keys[VK_LEFT] || g_keys['A'])) || (g_mouse.x <= SCROLL_BORDER && !OverMinimap())) 
+	{			
+		g_camera.accelstrafe(-CAMERA_SPEED / g_zoom);
+		moved = true;
+	}
+
+	//if(GetKeyState(VK_RIGHT) & 0x80 || GetKeyState('D') & 0x80 || g_mouse.x >= g_width-SCROLL_BORDER) 
+	if((!g_keyintercepted && (g_keys[VK_RIGHT] || g_keys['D'])) || (g_mouse.x >= g_width-SCROLL_BORDER && !OverMinimap())) 
+	{			
+		g_camera.accelstrafe(CAMERA_SPEED / g_zoom);
+		moved = true;
+	}
+
+	if(moved)
+	{
+		if(g_camera.m_pos.x < -g_hmap.m_widthx*TILE_SIZE/4)
+		{
+			float d = -g_hmap.m_widthx*TILE_SIZE/4 - g_camera.m_pos.x;
+			g_camera.move(Vec3f(d, 0, 0));
+		}
+		else if(g_camera.m_pos.x > g_hmap.m_widthx*TILE_SIZE*5/4)
+		{
+			float d = g_camera.m_pos.x - g_hmap.m_widthx*TILE_SIZE*5/4;
+			g_camera.move(Vec3f(-d, 0, 0));
+		}
+
+		if(g_camera.m_pos.z < -g_hmap.m_widthz*TILE_SIZE/4)
+		{
+			float d = -g_hmap.m_widthz*TILE_SIZE/4 - g_camera.m_pos.z;
+			g_camera.move(Vec3f(0, 0, d));
+		}
+		else if(g_camera.m_pos.z > g_hmap.m_widthz*TILE_SIZE*5/4)
+		{
+			float d = g_camera.m_pos.z - g_hmap.m_widthz*TILE_SIZE*5/4;
+			g_camera.move(Vec3f(0, 0, -d));
+		}
+
+#if 0
+		UpdateMouse3D();
+
+		if(g_mode == EDITOR && g_mousekeys[0])
+		{
+			EdApply();
+		}
+
+		if(!g_mousekeys[0])
+		{
+			g_vStart = g_vTile;
+			g_vMouseStart = g_vMouse;
+		}
+#endif
+
+		g_camera.frameupd();
+		g_camera.friction2();
+	}
+}
+
 void UpdateGameState()
 {
 #if 0
 	CalculateFrameRate();
+#endif
 	Scroll();
+#if 0
 	LastNum("pre upd u");
 	UpdateUnits();
 	LastNum("pre upd b");
@@ -427,24 +486,6 @@ void LoadConfig()
 {
 	char cfgfull[MAX_PATH+1];
 	FullPath(CONFIGFILE, cfgfull);
-
-#if 0
-	ifstream config(cfgfull);
-	
-	int fulls;
-	config>>fulls;
-	
-	if(fulls)
-		g_fullscreen = true;
-	else
-		g_fullscreen = false;
-
-	config>>g_selectedRes.width>>g_selectedRes.height;
-	config>>g_bpp;
-
-	g_width = g_selectedRes.width;
-	g_height = g_selectedRes.height;
-#endif
 	
 	ifstream f(cfgfull);
 	string line;
@@ -542,8 +583,8 @@ void Init()
 	LoadConfig();
 	//EnumerateMaps();
 	EnumerateDisplay();
-#if 0
 	MapKeys();
+#if 0
 	InitPlayers();
 	InitResources();
 	InitScenery();
@@ -581,10 +622,12 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	//Queue();
 	FillGUI();
 
-	QueueTexture(&g_tiletexs[TILE_SAND], "textures/terrain/default/sand.png", false);
-	QueueTexture(&g_tiletexs[TILE_GRASS], "textures/terrain/default/grass.png", false);
-	QueueTexture(&g_tiletexs[TILE_SNOW], "textures/terrain/default/snow.png", false);
-	QueueTexture(&g_tiletexs[TILE_ROCK], "textures/terrain/default/rock.png", false);
+	QueueTexture(&g_tiletexs[TILE_SAND], "textures/terrain/default/sand.jpg", false);
+	QueueTexture(&g_tiletexs[TILE_GRASS], "textures/terrain/default/grass.jpg", false);
+	QueueTexture(&g_tiletexs[TILE_SNOW], "textures/terrain/default/snow.jpg", false);
+	QueueTexture(&g_tiletexs[TILE_ROCK], "textures/terrain/default/rock.jpg", false);
+
+	QueueModel(&themodel, "models/battlecomp/battlecomp.ms3d", Vec3f(0.1f,0.1f,0.1f) * 100 / 64, Vec3f(0,100,0));
 
 	while(!g_quit)
 	{

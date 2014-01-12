@@ -17,11 +17,16 @@
 
 //#define LOCAL_TRANSX	//define this if you want only player-specific transaction hovering notifications to appear
 
+class Heightmap;
+
 enum APPMODE{LOGO, INTRO, LOADING, RELOADING, MENU, PLAY, PAUSE, EDITOR};
 extern APPMODE g_mode;
 extern int g_reStage;
 extern bool g_mouseout;
+extern Heightmap g_hmap;
 
 void WriteConfig();
+void DrawScene(Matrix projection, Matrix viewmat, Matrix modelmat, Matrix modelviewinv, float mvLightPos[3], float lightDir[3]);
+void DrawSceneDepth();
 
 #endif

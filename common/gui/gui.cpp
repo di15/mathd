@@ -34,6 +34,8 @@ void GUI::draw()
 
 	//DrawImage(g_depth, g_width - 300, 0, g_width, 300, 0, 1, 1, 0);
 	
+	DrawImage(g_depth, 0, 0, 150, 150, 0, 1, 1, 0);
+
 	UseS(SHADER_COLOR2D);
     glUniform1f(g_shader[SHADER_COLOR2D].m_slot[SSLOT_WIDTH], (float)g_width);
     glUniform1f(g_shader[SHADER_COLOR2D].m_slot[SSLOT_HEIGHT], (float)g_height);
@@ -150,7 +152,17 @@ void Status(const char* status, bool logthis)
 	upper[i] = '\0';*/
 	
 	//g_GUI.getview("loading")->getwidget("status", WIDGET_TEXT)->m_text = upper;
-	g_GUI.getview("loading")->getwidget("status", WIDGET_TEXT)->m_text = RichText(UString(status));
+	View* loadingview = g_GUI.getview("loading");
+	
+	if(!loadingview)
+		return;
+	
+	Widget* statustext = loadingview->getwidget("status", WIDGET_TEXT);
+	
+	if(!statustext)
+		return;
+	
+	statustext->m_text = RichText(UString(status));
 }
 
 bool MousePosition()

@@ -5,6 +5,9 @@
 #include "gmain.h"
 #include "keymap.h"
 #include "../common/platform.h"
+#include "../common/gui/gui.h"
+#include "../common/math/camera.h"
+#include "../common/math/vec3f.h"
 
 #if 0
 #include "3dmath.h"
@@ -56,80 +59,6 @@ void Escape()
 	//OpenAnotherView("quit");
 	//g_mode = PAUSE;
 	//OpenSoleView("pause");
-}
-
-void Scroll()
-{
-	if(g_mouseout)
-		return;
-
-	bool moved = false;
-
-	//if(GetKeyState(VK_UP) & 0x80 || GetKeyState('W') & 0x80 || g_mouse.y <= SCROLL_BORDER) 
-	if((!g_keyintercepted && (g_keys[VK_UP] || g_keys['W'])) || (g_mouse.y <= SCROLL_BORDER && !OverMinimap())) 
-	{				
-		g_camera.Move(CAMERA_SPEED);			
-		moved = true;	
-	}
-
-	//if(GetKeyState(VK_DOWN) & 0x80 || GetKeyState('S') & 0x80 || g_mouse.y >= g_height-SCROLL_BORDER)
-	if((!g_keyintercepted && (g_keys[VK_DOWN] || g_keys['S'])) || (g_mouse.y >= g_height-SCROLL_BORDER && !OverMinimap())) 
-	{			
-		g_camera.Move(-CAMERA_SPEED);	
-		moved = true;			
-	}
-
-	//if(GetKeyState(VK_LEFT) & 0x80 || GetKeyState('A') & 0x80 || g_mouse.x <= SCROLL_BORDER) 
-	if((!g_keyintercepted && (g_keys[VK_LEFT] || g_keys['A'])) || (g_mouse.x <= SCROLL_BORDER && !OverMinimap())) 
-	{			
-		g_camera.Strafe(-CAMERA_SPEED);
-		moved = true;
-	}
-
-	//if(GetKeyState(VK_RIGHT) & 0x80 || GetKeyState('D') & 0x80 || g_mouse.x >= g_width-SCROLL_BORDER) 
-	if((!g_keyintercepted && (g_keys[VK_RIGHT] || g_keys['D'])) || (g_mouse.x >= g_width-SCROLL_BORDER && !OverMinimap())) 
-	{			
-		g_camera.Strafe(CAMERA_SPEED);
-		moved = true;
-	}
-
-	if(moved)
-	{
-		if(g_camera.Position().x < -g_hmap.m_widthX*TILE_SIZE/4)
-		{
-			float d = -g_hmap.m_widthX*TILE_SIZE/4 - g_camera.Position().x;
-			g_camera.Move(Vec3f(d, 0, 0));
-		}
-		else if(g_camera.Position().x > g_hmap.m_widthX*TILE_SIZE*5/4)
-		{
-			float d = g_camera.Position().x - g_hmap.m_widthX*TILE_SIZE*5/4;
-			g_camera.Move(Vec3f(-d, 0, 0));
-		}
-
-		if(g_camera.Position().z < -g_hmap.m_widthZ*TILE_SIZE/4)
-		{
-			float d = -g_hmap.m_widthZ*TILE_SIZE/4 - g_camera.Position().z;
-			g_camera.Move(Vec3f(0, 0, d));
-		}
-		else if(g_camera.Position().z > g_hmap.m_widthZ*TILE_SIZE*5/4)
-		{
-			float d = g_camera.Position().z - g_hmap.m_widthZ*TILE_SIZE*5/4;
-			g_camera.Move(Vec3f(0, 0, -d));
-		}
-
-		UpdateMouse3D();
-
-		if(g_mode == EDITOR && g_mousekeys[0])
-		{
-			EdApply();
-		}
-
-		if(!g_mousekeys[0])
-		{
-			g_vStart = g_vTile;
-			g_vMouseStart = g_vMouse;
-		}
-	}
 }
 
 void MouseLeftButtonDown()
@@ -318,15 +247,64 @@ void MouseMove()
 
 #endif
 
+void MouseMidButtonDown()
+{
+	if(g_mode == PLAY || g_mode == EDITOR)
+	{
+		if(g_mousekeys[1])
+		{
+			CenterMouse();
+		}
+	}
+}
+
+void MouseMidButtonUp()
+{
+}
+
+void RotateAbout()
+{
+	float dx = g_mouse.x - g_width/2;
+	float dy = g_mouse.y - g_height/2;
+
+	g_camera.rotateabout(g_camera.m_view, dy / 100.0f, g_camera.m_strafe.x, g_camera.m_strafe.y, g_camera.m_strafe.z);
+	g_camera.rotateabout(g_camera.m_view, dx / 100.0f, g_camera.m_up.x, g_camera.m_up.y, g_camera.m_up.z);
+}
+
+void MouseMove()
+{
+	if(g_mode == PLAY || g_mode == EDITOR)
+	{
+		if(g_mousekeys[1])
+		{
+			RotateAbout();
+			CenterMouse();
+		}
+	}
+}
+
+void MouseWheel(int delta)
+{        
+	if(g_mode == PLAY || g_mode == EDITOR)
+	{
+		g_zoom *= 1.0f + (float)delta / 10.0f;
+		Vec3f ray = g_camera.m_view - g_camera.m_pos;
+		ray = ray * 1.0f/(1.0f + (float)delta / 10.0f);
+		g_camera.m_pos = g_camera.m_view - ray;
+	}
+}
+
 void MapKeys()
 {	
 #if 0
 	AssignKey(VK_ESCAPE, &Escape, NULL);
-	AssignMouseWheel(&MouseWheel);
-	AssignMouseMove(&MouseMove);
 	AssignLButton(&MouseLeftButtonDown, &MouseLeftButtonUp);
 	AssignRButton(NULL, &MouseRightButtonUp);
 #endif
+	
+	AssignMouseMove(&MouseMove);
+	AssignMouseWheel(&MouseWheel);
+	AssignMButton(MouseMidButtonDown, MouseMidButtonUp);
 
 	/*
 	int key;
