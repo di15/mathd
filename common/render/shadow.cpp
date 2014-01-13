@@ -16,7 +16,6 @@
 #include "model.h"
 #include "../sim/sim.h"
 #include "model.h"
-#include "../sim/building.h"
 #include "../math/camera.h"
 
 unsigned int g_depth;

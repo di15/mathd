@@ -43,8 +43,8 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v110</PlatformToolset>
-    <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v110_xp</PlatformToolset>
+    <CharacterSet>NotSet</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
@@ -124,6 +124,8 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
+    <IncludePath>$(SolutionDir)\libs\lpng;$(SolutionDir)\libs\;$(SolutionDir)\libs\libzip-0.11.1\lib;$(SolutionDir)\libs\jpeglib;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)\libs\GL;$(SolutionDir)\libs\zlib-1.2.5\build\Release;$(SolutionDir)\libs\libzip-0.11.1\build\lib\Release;$(SolutionDir)\libs\lpng\lib;$(SolutionDir)\libs\jpeglib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
@@ -166,11 +168,15 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
+    <PostBuildEvent>
+      <Command>copy /Y "$(SolutionDir)Debug\$(TargetFileName)" "$(SolutionDir)..\testfolder\$(TargetFileName)"</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -300,7 +306,6 @@
     <ClCompile Include="..\common\debug.cpp" />
     <ClCompile Include="..\common\gui\barbutton.cpp" />
     <ClCompile Include="..\common\gui\button.cpp" />
-    <ClCompile Include="..\common\gui\chat.cpp" />
     <ClCompile Include="..\common\gui\checkbox.cpp" />
     <ClCompile Include="..\common\gui\draw2d.cpp" />
     <ClCompile Include="..\common\gui\dropdowns.cpp" />
@@ -308,7 +313,6 @@
     <ClCompile Include="..\common\gui\font.cpp" />
     <ClCompile Include="..\common\gui\frame.cpp" />
     <ClCompile Include="..\common\gui\gui.cpp" />
-    <ClCompile Include="..\common\gui\hscroller.cpp" />
     <ClCompile Include="..\common\gui\icon.cpp" />
     <ClCompile Include="..\common\gui\image.cpp" />
     <ClCompile Include="..\common\gui\insdraw.cpp" />
@@ -342,6 +346,7 @@
     <ClCompile Include="..\common\render\shader.cpp" />
     <ClCompile Include="..\common\render\shadow.cpp" />
     <ClCompile Include="..\common\render\vertexarray.cpp" />
+    <ClCompile Include="..\common\sim\sim.cpp" />
     <ClCompile Include="..\common\texture.cpp" />
     <ClCompile Include="..\common\ustring.cpp" />
     <ClCompile Include="..\common\utils.cpp" />
@@ -354,7 +359,6 @@
     <ClInclude Include="..\common\debug.h" />
     <ClInclude Include="..\common\gui\barbutton.h" />
     <ClInclude Include="..\common\gui\button.h" />
-    <ClInclude Include="..\common\gui\chat.h" />
     <ClInclude Include="..\common\gui\checkbox.h" />
     <ClInclude Include="..\common\gui\draw2d.h" />
     <ClInclude Include="..\common\gui\dropdowns.h" />
@@ -362,7 +366,6 @@
     <ClInclude Include="..\common\gui\font.h" />
     <ClInclude Include="..\common\gui\frame.h" />
     <ClInclude Include="..\common\gui\gui.h" />
-    <ClInclude Include="..\common\gui\hscroller.h" />
     <ClInclude Include="..\common\gui\icon.h" />
     <ClInclude Include="..\common\gui\image.h" />
     <ClInclude Include="..\common\gui\insdraw.h" />
@@ -399,6 +402,7 @@
     <ClInclude Include="..\common\render\shader.h" />
     <ClInclude Include="..\common\render\shadow.h" />
     <ClInclude Include="..\common\render\vertexarray.h" />
+    <ClInclude Include="..\common\sim\sim.h" />
     <ClInclude Include="..\common\texture.h" />
     <ClInclude Include="..\common\ustring.h" />
     <ClInclude Include="..\common\utils.h" />

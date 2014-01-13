@@ -14,7 +14,6 @@
 #include "checkbox.h"
 #include "dropdowns.h"
 #include "editbox.h"
-#include "hscroller.h"
 #include "insdraw.h"
 #include "link.h"
 #include "listbox.h"

@@ -6,7 +6,6 @@ $(SolutionDir)\libs\jpeglib
 $(SolutionDir)\libs\lpng
 $(SolutionDir)\libs\libzip-0.11.1\lib
 $(SolutionDir)\libs\
-$(SolutionDir)\libs\win\SDL-1.2.15\include
 
 libs:
 
@@ -14,7 +13,6 @@ $(SolutionDir)\libs\jpeglib
 $(SolutionDir)\libs\lpng\lib
 $(SolutionDir)\libs\libzip-0.11.1\build\lib\Release
 $(SolutionDir)\libs\zlib-1.2.5\build\Release
-$(SolutionDir)\libs\win\SDL-1.2.15\lib\x86
 $(SolutionDir)\libs\GL
 
 

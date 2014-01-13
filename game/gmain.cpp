@@ -9,49 +9,20 @@
 #include "../common/texture.h"
 #include "../common/render/model.h"
 #include "../common/math/frustum.h"
-#if 0
-#include "../common/render/billboard.h"
-#include "../common/render/skybox.h"
-#endif
 #include "ggui.h"
 #include "../common/gui/gui.h"
 #include "../common/debug.h"
 #include "../common/render/heightmap.h"
 #include "../common/math/camera.h"
 #include "../common/render/shadow.h"
-#if 0
-//#include "../common/render/particle.h"
-//#include "../common/sim/building.h"
-//#include "../common/sim/map.h"
-#include "../common/sim/road.h"
-#include "../common/sim/powerline.h"
-#include "../common/sim/zpipeline.h"
-#include "../common/render/particle.h"
-#include "../common/sim/unit.h"
-#include "../common/sim/resource.h"
-#include "../common/sim/selection.h"
-#include "../common/sim/waves.h"
-#include "../common/render/projectile.h"
-#include "../common/sim/order.h"
-#include "../common/gui/chat.h"
-#include "../common/sim/editor.h"
-#include "../common/render/water.h"
-#include "../common/sim/transaction.h"
-#include "../common/sim/player.h"
-#include "../common/sound/sound.h"
-#include "../common/render/minimap.h"
-#include "../common/script/script.h"
-#include "../common/ai/ai.h"
-#include "../common/render/foliage.h"
-#endif
 #include "../common/window.h"
 #include "../common/utils.h"
+#include "../common/sim/sim.h"
 
 APPMODE g_mode = LOADING;
 bool g_mouseout = false;
 bool g_moved = false;
 Heightmap g_hmap;
-int themodel = 0;
 
 //static long long g_lasttime = GetTickCount();
 
@@ -270,8 +241,8 @@ void Draw()
 			Vec3f onnear = posvec;	//OnNear(g_width/2, g_height/2);
 			vLine[0] = onnear;
 			vLine[1] = onnear + (ray * 100000.0f);
-			if(!GetMapIntersection(&g_hmap, vLine, &focus))
-			//if(!FastMapIntersect(&g_hmap, vLine, &focus))
+			//if(!GetMapIntersection(&g_hmap, vLine, &focus))
+			if(!FastMapIntersect(&g_hmap, vLine, &focus))
 				GetMapIntersection2(&g_hmap, vLine, &focus);
 			RenderToShadowMap(projection, viewmat, modelmat, focus);
 			RenderShadowedScene(projection, viewmat, modelmat, modelview);
@@ -290,15 +261,6 @@ void UpdateLoading()
 
 	switch(stage)
 	{
-#if 0
-	case 0: Status("Loading textures...", true); stage++; break;
-	case 1: LoadTiles(); LoadMap(); LoadTerrainTextures(); LoadHoverTex(); LoadSkyBox("defsky"); Status("Loading particles...", true); stage++; break;
-	case 2: LoadParticles(); Status("Loading projectiles...", true); stage++; break;
-	case 3: LoadProjectiles(); Status("Loading unit sprites...", true); stage++; break;
-	case 4: LoadUnitSprites(); Status("Loading sounds...", true); stage++; break;
-	case 5: LoadSounds(); Status("Loading building sprites...", true); stage++; break;
-	case 6: BSprites(); Status("Loading models...", true); stage++; break;
-#endif
 	case 0: if(!Load1Model()) stage++; break;
 	case 1:
 		if(!Load1Texture())
@@ -363,28 +325,24 @@ void Scroll()
 
 	bool moved = false;
 
-	//if(GetKeyState(VK_UP) & 0x80 || GetKeyState('W') & 0x80 || g_mouse.y <= SCROLL_BORDER) 
 	if((!g_keyintercepted && (g_keys[VK_UP] || g_keys['W'])) || (g_mouse.y <= SCROLL_BORDER && !OverMinimap())) 
 	{				
 		g_camera.accelerate(CAMERA_SPEED / g_zoom);			
 		moved = true;	
 	}
 
-	//if(GetKeyState(VK_DOWN) & 0x80 || GetKeyState('S') & 0x80 || g_mouse.y >= g_height-SCROLL_BORDER)
 	if((!g_keyintercepted && (g_keys[VK_DOWN] || g_keys['S'])) || (g_mouse.y >= g_height-SCROLL_BORDER && !OverMinimap())) 
 	{			
 		g_camera.accelerate(-CAMERA_SPEED / g_zoom);	
 		moved = true;			
 	}
 
-	//if(GetKeyState(VK_LEFT) & 0x80 || GetKeyState('A') & 0x80 || g_mouse.x <= SCROLL_BORDER) 
 	if((!g_keyintercepted && (g_keys[VK_LEFT] || g_keys['A'])) || (g_mouse.x <= SCROLL_BORDER && !OverMinimap())) 
 	{			
 		g_camera.accelstrafe(-CAMERA_SPEED / g_zoom);
 		moved = true;
 	}
 
-	//if(GetKeyState(VK_RIGHT) & 0x80 || GetKeyState('D') & 0x80 || g_mouse.x >= g_width-SCROLL_BORDER) 
 	if((!g_keyintercepted && (g_keys[VK_RIGHT] || g_keys['D'])) || (g_mouse.x >= g_width-SCROLL_BORDER && !OverMinimap())) 
 	{			
 		g_camera.accelstrafe(CAMERA_SPEED / g_zoom);
@@ -585,29 +543,10 @@ void Init()
 	//EnumerateMaps();
 	EnumerateDisplay();
 	MapKeys();
-#if 0
-	InitPlayers();
-	InitResources();
-	InitScenery();
-	InitBuildings();
-	InitUnits();
-	InitRoads();
-	InitPowerlines();
-	InitPipelines();
-	InitProfiles();
-#endif
 }
 
 void Deinit()
 {
-#if 0
-	g_log<<"Freeing map...";
-	g_log.flush();
-	g_hmap.free();
-	g_log<<"Map freed."<<endl;
-	g_log.flush();
-	FreeScript();
-#endif
 }
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
@@ -620,15 +559,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	if(!MakeWindow(TEXT(TITLE), LoadIcon(g_hInstance, MAKEINTRESOURCE(IDI_TRIGEAR)), &WndProc))
 		return 0;
 	
-	//Queue();
+	Queue();
 	FillGUI();
-
-	QueueTexture(&g_tiletexs[TILE_SAND], "textures/terrain/default/sand.jpg", false);
-	QueueTexture(&g_tiletexs[TILE_GRASS], "textures/terrain/default/grass.jpg", false);
-	QueueTexture(&g_tiletexs[TILE_SNOW], "textures/terrain/default/snow.jpg", false);
-	QueueTexture(&g_tiletexs[TILE_ROCK], "textures/terrain/default/rock.jpg", false);
-
-	QueueModel(&themodel, "models/battlecomp/battlecomp.ms3d", Vec3f(0.1f,0.1f,0.1f) * 100 / 64, Vec3f(0,100,0));
 
 	while(!g_quit)
 	{

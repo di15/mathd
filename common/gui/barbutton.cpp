@@ -6,7 +6,6 @@
 #include "checkbox.h"
 #include "editbox.h"
 #include "dropdowns.h"
-#include "hscroller.h"
 #include "image.h"
 #include "insdraw.h"
 #include "link.h"
