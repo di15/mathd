@@ -615,11 +615,29 @@ bool FastMapIntersect(Heightmap* hmap, Vec3f line[2], Vec3f* intersection)
 	// testing each tile's triangles for intersection.
 	while(lengthdone*lengthdone < lengthsqrd)
 	{
-		float xdif = fabs( currtilex * TILE_SIZE - currpoint.x );
-		float zdif = fabs( currtilez * TILE_SIZE - currpoint.z );
+		float xdif = currtilex * TILE_SIZE - currpoint.x;
+		float zdif = currtilez * TILE_SIZE - currpoint.z;
 		
-		float xmoveratio = fabs( xdif / ray.x );
-		float zmoveratio = fabs( zdif / ray.z );
+		float xmoveratio = xdif / ray.x;
+		float zmoveratio = zdif / ray.z;
+
+		// Advance to the next tile margin on the x axis
+		while(xmoveratio < 0)
+		{
+			currtilex = nexttilex;
+			nexttilex += tiledx;
+			xdif = currtilex * TILE_SIZE - currpoint.x;
+			xmoveratio = xdif / ray.x;
+		}
+		
+		// Advance to the next tile margin on the zaxis
+		while(zmoveratio < 0)
+		{
+			currtilez = nexttilez;
+			nexttilez += tiledz;
+			zdif = currtilez * TILE_SIZE - currpoint.z;
+			zmoveratio = zdif / ray.z;
+		}
 
 		float moveratio = 0;
 
@@ -632,25 +650,63 @@ bool FastMapIntersect(Heightmap* hmap, Vec3f line[2], Vec3f* intersection)
 		{
 			moveratio = zmoveratio;
 		}
+		else if(xmoveratio == zmoveratio && xmoveratio > 0)
+		{
+			moveratio = xmoveratio;
+		}
 		else
+		{
 			return false;
+		}
+
+		//The currpoint's don't exactly follow the original ray/line,
+		//so we have to check nearby tiles for intersections.
+		int mintilex = currtilex;
+		int mintilez = currtilez;
+		int maxtilex = currtilex;
+		int maxtilez = currtilez;
+
+		//Are we close to the previous tile on the x axis?
+		if( max(0, currpoint.x/TILE_SIZE-0.1f) < mintilex)
+			mintilex--;
+
+		//Are we close to the previous tile on the z axis?
+		if( max(0, currpoint.z/TILE_SIZE-0.1f) < mintilez)
+			mintilez--;
+
+		//Are we close to the next tile on the x axis?
+		if( min(hmap->m_widthx-1, currpoint.x/TILE_SIZE+0.1f) > maxtilex)
+			maxtilex++;
+
+		//Are we close to the next tile on the z axis?
+		if( min(hmap->m_widthz-1, currpoint.z/TILE_SIZE+0.1f) > maxtilez)
+			maxtilez++;
+
+		for(int itertilex = mintilex; itertilex <= maxtilex; itertilex ++)
+			for(int itertilez = mintilez; itertilez <= maxtilez; itertilez ++)
+				if(TileIntersect(hmap, line, itertilex, itertilez, intersection))
+					return true;
 
 		currpoint = currpoint + ray * moveratio; 
-
-		if(TileIntersect(hmap, line, currtilex, currtilez, intersection))
-			return true;
 
 		lengthdone += moveratio;
 
 		// Move the smallest distance to the next tile
-		if(xmoveratio < zmoveratio)
+		if(xmoveratio < zmoveratio && xmoveratio > 0)
 		{
 			currtilex = nexttilex;
 			nexttilex += tiledx;
 		}
-		else
+		else if(zmoveratio < xmoveratio && zmoveratio > 0)
 		{
 			currtilez = nexttilez;
+			nexttilez += tiledz;
+		}
+		else if(xmoveratio == zmoveratio)
+		{
+			currtilex = nexttilex;
+			currtilez = nexttilez;
+			nexttilex += tiledx;
 			nexttilez += tiledz;
 		}
 	}
