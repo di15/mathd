@@ -237,7 +237,7 @@ void Draw()
 			//RenderToShadowMap(projection, viewmat, modelmat, Vec3f(0,0,0));
 			Vec3f focus;
 			Vec3f vLine[2];
-			Vec3f ray = g_camera.m_view - posvec;
+			Vec3f ray = Normalize(g_camera.m_view - posvec);
 			Vec3f onnear = posvec;	//OnNear(g_width/2, g_height/2);
 			vLine[0] = onnear;
 			vLine[1] = onnear + (ray * 100000.0f);

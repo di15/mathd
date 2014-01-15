@@ -15,6 +15,7 @@
 #include "../math/camera.h"
 #include "../window.h"
 #include "../math/polygon.h"
+#include "../math/physics.h"
 
 #ifndef _SERVER
 unsigned int g_tiletexs[TILE_TYPES];
@@ -486,15 +487,16 @@ bool GetMapIntersection(Heightmap* hmap, Vec3f* vLine, Vec3f* vIntersection)
 
 /*
 Given a point that is on a ray, move it until it is within a given heightmap's borders.
+Returns success (true) or failure (false).
 */
-void MoveIntoMap(Vec3f& point, Vec3f ray, Heightmap* hmap)
+bool MoveIntoMap(Vec3f& point, Vec3f ray, Heightmap* hmap)
 {
 	// Already within map?
 	if(point.x >= 1 
-		&& point.x < hmap->m_widthx * TILE_SIZE - 1
+		&& point.x < (hmap->m_widthx-1) * TILE_SIZE - 1
 		&& point.z >= 1
-		&& point.z < hmap->m_widthz * TILE_SIZE - 1)
-		return;
+		&& point.z < (hmap->m_widthz-1) * TILE_SIZE - 1)
+		return true;
 
 	// Get x distance off the map.
 
@@ -502,8 +504,8 @@ void MoveIntoMap(Vec3f& point, Vec3f ray, Heightmap* hmap)
 
 	if(point.x < 0)	// If start x is behind the map
 		xdif = point.x - 5;	// Add padding to make sure we're within the map
-	else if(point.x > hmap->m_widthx * TILE_SIZE)	// If start x is in front of the map
-		xdif = hmap->m_widthx * TILE_SIZE - point.x + 5;	// Add padding to make sure we're within the map
+	else if(point.x >= (hmap->m_widthx-1) * TILE_SIZE)	// If start x is in front of the map
+		xdif = (hmap->m_widthx-1) * TILE_SIZE - point.x + 5;	// Add padding to make sure we're within the map
 
 	// Ray is of unit length, so this gives us how much we travel along the ray to get  x to within the map border.
 	float x0moveratio = -xdif / ray.x;
@@ -515,12 +517,23 @@ void MoveIntoMap(Vec3f& point, Vec3f ray, Heightmap* hmap)
 
 	if(point.z < 0)	// If start z is behind the map
 		zdif = point.z - 5;	// Add padding to make sure we're within the map
-	else if(point.z > hmap->m_widthz * TILE_SIZE)	// If start z is in front of the map
-		zdif = hmap->m_widthz * TILE_SIZE - point.z + 5;	// Add padding to make sure we're within the map
+	else if(point.z >= (hmap->m_widthz-1) * TILE_SIZE)	// If start z is in front of the map
+		zdif = (hmap->m_widthz-1) * TILE_SIZE - point.z + 5;	// Add padding to make sure we're within the map
 	
 	// Ray is of unit length, so this gives us how much we travel along the ray to get z to within the map border.
 	float z0moveratio = -zdif / ray.z;
 	point = point + ray * z0moveratio;
+	
+	// If we still couldn't get the point within the map 
+	// (maybe the ray is outside the map, beside a corner)
+	// then return false.
+	if(point.x < 1 
+		|| point.x >= (hmap->m_widthx-1) * TILE_SIZE - 1
+		|| point.z < 1
+		|| point.z >= (hmap->m_widthz-1) * TILE_SIZE - 1)
+		return false;
+
+	return true;
 }
 
 bool TileIntersect(Heightmap* hmap, Vec3f* line, int x, int z, Vec3f* intersection)
@@ -564,10 +577,15 @@ bool FastMapIntersect(Heightmap* hmap, Vec3f line[2], Vec3f* intersection)
 		return false;
 	
 	Vec3f ray = Normalize( line[1] - line[0] );
-	float lengthsqrd = Magnitude2( line[1] - line[0] );
+	float lengthsqrd = Magnitude2( line[1] - line[0] );	//length squared
 
-	MoveIntoMap(line[0], ray, hmap);	// Move the start to within the map if it isn't already.
-	MoveIntoMap(line[1], ray, hmap);	// Move the end to within the map if it isn't already.
+	// Move the start to within the map if it isn't already.
+	if(!MoveIntoMap(line[0], ray, hmap))
+		return false;
+
+	// Move the end to within the map if it isn't already.
+	if(!MoveIntoMap(line[1], ray, hmap))
+		return false;
 
 	float lengthdone = 0;
 
@@ -575,9 +593,6 @@ bool FastMapIntersect(Heightmap* hmap, Vec3f line[2], Vec3f* intersection)
 
 	int currtilex = currpoint.x / TILE_SIZE;
 	int currtilez = currpoint.z / TILE_SIZE;
-
-	int nexttilex = currtilex;
-	int nexttilez = currtilez;
 	
 	// The directions in which we will move to the next tile on the x and z axis
 	int tiledx = 0;
@@ -592,6 +607,9 @@ bool FastMapIntersect(Heightmap* hmap, Vec3f line[2], Vec3f* intersection)
 		tiledz = 1;
 	else if(ray.z < 0)
 		tiledz = -1;
+	
+	int nexttilex = currtilex + tiledx;
+	int nexttilez = currtilez + tiledz;
 
 	// Move from tile to tile along the line until,
 	// testing each tile's triangles for intersection.
@@ -599,21 +617,23 @@ bool FastMapIntersect(Heightmap* hmap, Vec3f line[2], Vec3f* intersection)
 	{
 		float xdif = fabs( currtilex * TILE_SIZE - currpoint.x );
 		float zdif = fabs( currtilez * TILE_SIZE - currpoint.z );
-
-		float xmoveratio = xdif / ray.x + 1;	// Add padding to make sure we get into the next tile
-		float zmoveratio = zdif / ray.z + 1;	// Add padding to make sure we get into the next tile
+		
+		float xmoveratio = fabs( xdif / ray.x );
+		float zmoveratio = fabs( zdif / ray.z );
 
 		float moveratio = 0;
 
 		// Move the smallest distance to the next tile
-		if(xmoveratio < zmoveratio)
+		if(xmoveratio < zmoveratio && xmoveratio > 0)
 		{
 			moveratio = xmoveratio;
 		}
-		else
+		else if(zmoveratio < xmoveratio && zmoveratio > 0)
 		{
 			moveratio = zmoveratio;
 		}
+		else
+			return false;
 
 		currpoint = currpoint + ray * moveratio; 
 
