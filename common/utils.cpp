@@ -18,6 +18,24 @@ const string DateTime()
     return buf;
 }
 
+const string FileDateTime() 
+{
+    time_t     now = time(0);
+    struct tm  tstruct;
+    char       buf[80];
+    tstruct = *localtime(&now);
+    // Visit http://www.cplusplus.com/reference/clibrary/ctime/strftime/
+    // for more information about date/time format
+    strftime(buf, sizeof(buf), "%Y-%m-%d %X", &tstruct);
+
+	for(int i=0; i<strlen(buf); i++)
+		if(buf[i] == ':')
+			buf[i] = '-';
+
+    return buf;
+}
+
+
 void OpenLog(const char* filename, float version)
 {
 	char fullpath[MAX_PATH+1];

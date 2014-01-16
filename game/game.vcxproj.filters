@@ -194,6 +194,12 @@
     <ClCompile Include="..\common\sim\sim.cpp">
       <Filter>Source Files\common\sim</Filter>
     </ClCompile>
+    <ClCompile Include="..\common\sim\resources.cpp">
+      <Filter>Source Files\common\sim</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\render\screenshot.cpp">
+      <Filter>Source Files\common\render</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ggui.h">
@@ -360,6 +366,12 @@
     </ClInclude>
     <ClInclude Include="..\common\sim\sim.h">
       <Filter>Source Files\common\sim</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\sim\resources.h">
+      <Filter>Source Files\common\sim</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\render\screenshot.h">
+      <Filter>Source Files\common\render</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

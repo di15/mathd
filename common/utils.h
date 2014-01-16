@@ -13,6 +13,8 @@ using namespace std;
 
 extern ofstream g_log;
 
+const string DateTime();
+const string FileDateTime();
 void FullPath(const char* filename, char* full);
 string MakePathRelative(const char* full);
 void ExePath(char* exepath);

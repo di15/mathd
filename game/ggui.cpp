@@ -5,289 +5,16 @@
 
 
 #include "gmain.h"
-//#include "3dmath.h"
 #include "../common/gui/gui.h"
-//#include "image.h"
-//#include "menu.h"
-//#include "player.h"
-//#include "projectile.h"
-//#include "model.h"
-//#include "save.h"
-//#include "editor.h"
-//#include "script.h"
 #include "keymap.h"
-//#include "inspect.h"
-//#include "selection.h"
 #include "../common/render/heightmap.h"
 #include "../common/math/camera.h"
 #include "../common/render/shadow.h"
+#include "../common/render/screenshot.h"
 
 //bool g_canselect = true;
 
 #if 0
-void Click_SaveSlot1()
-{
-	SaveSlot(1);
-	Click_OpenSave();
-}
-
-void Click_SaveSlot2()
-{
-	SaveSlot(2);
-	Click_OpenSave();
-}
-
-void Click_SaveSlot3()
-{
-	SaveSlot(3);
-	Click_OpenSave();
-}
-
-void Click_LoadSlot1()
-{
-	if(!LoadSlot(1))
-		return;
-
-	g_mode = PLAY;
-	OpenPlay();
-}
-
-void Click_LoadSlot2()
-{
-	if(!LoadSlot(2))
-		return;
-
-	g_mode = PLAY;
-	OpenPlay();
-}
-
-void Click_LoadSlot3()
-{
-	if(!LoadSlot(3))
-		return;
-
-	g_mode = PLAY;
-	OpenPlay();
-}
-
-void Click_BackToInGame()
-{
-	OpenSoleView("ingame");
-}
-
-void Click_OpenSave()
-{
-	CView* v = g_GUI.getview("save");
-	
-	Widget* slot1 = v->getlink(0);
-	Widget* slot2 = v->getlink(1);
-	Widget* slot3 = v->getlink(2);
-
-	//FILE* fp = fopen("saves\\slot1.sav", "rb");
-	//if(!fp)
-	if(!LoadMap("saves\\slot1.sav", true))
-		slot1->text = "   Slot 1";
-	else
-	{
-		char name[32];
-		//FILE* fp = fopen("saves\\slot1.sav", "rb");
-		//fread(name, sizeof(char), 32, fp);
-		char full[MAX_PATH+1];
-		FullPath("saves\\slot1.sav", full);
-		MapName(full, name);
-		slot1->text = name;
-		//fclose(fp);
-		//fp = NULL;
-	}
-
-	//fp = fopen("saves\\slot2.sav", "rb");
-	//if(!fp)
-	if(!LoadMap("saves\\slot2.sav", true))
-		slot2->text = "   Slot 2";
-	else
-	{
-		char name[32];
-		//FILE* fp = fopen("saves\\slot2.sav", "rb");
-		//fread(name, sizeof(char), 32, fp);
-		char full[MAX_PATH+1];
-		FullPath("saves\\slot2.sav", full);
-		MapName(full, name);
-		slot2->text = name;
-		//fclose(fp);
-		//fp = NULL;
-	}
-
-	//fp = fopen("saves\\slot3.sav", "rb");
-	//if(!fp)
-	if(!LoadMap("saves\\slot3.sav", true))
-		slot3->text = "   Slot 3";
-	else
-	{
-		char name[32];
-		//FILE* fp = fopen("saves\\slot3.sav", "rb");
-		//fread(name, sizeof(char), 32, fp);
-		char full[MAX_PATH+1];
-		FullPath("saves\\slot3.sav", full);
-		MapName(full, name);
-		slot3->text = name;
-		//fclose(fp);
-		//fp = NULL;
-	}
-
-	OpenSoleView("save");
-}
-
-void Click_OpenLoad()
-{
-	g_gameover = false;
-	CView* v = g_GUI.getview("load");
-	
-	Widget* slot1 = v->getlink(0);
-	Widget* slot2 = v->getlink(1);
-	Widget* slot3 = v->getlink(2);
-
-	//FILE* fp = fopen("saves\\slot1.sav", "rb");
-	//if(!fp)
-	if(!LoadMap("saves\\slot1.sav", true))
-		slot1->text = "   Slot 1";
-	else
-	{
-		char name[32];
-		//FILE* fp = fopen("saves\\slot1.sav", "rb");
-		//fread(name, sizeof(char), 32, fp);
-		char full[MAX_PATH+1];
-		FullPath("saves\\slot1.sav", full);
-		MapName(full, name);
-		slot1->text = name;
-		//fclose(fp);
-		//fp = NULL;
-	}
-
-	//fp = fopen("saves\\slot2.sav", "rb");
-	//if(!fp)
-	if(!LoadMap("saves\\slot2.sav", true))
-		slot2->text = "   Slot 2";
-	else
-	{
-		char name[32];
-		//FILE* fp = fopen("saves\\slot2.sav", "rb");
-		//fread(name, sizeof(char), 32, fp);
-		char full[MAX_PATH+1];
-		FullPath("saves\\slot2.sav", full);
-		MapName(full, name);
-		slot2->text = name;
-		//fclose(fp);
-		//fp = NULL;
-	}
-
-	//fp = fopen("saves\\slot3.sav", "rb");
-	//if(!fp)
-	if(!LoadMap("saves\\slot3.sav", true))
-		slot3->text = "   Slot 3";
-	else
-	{
-		char name[32];
-		//FILE* fp = fopen("saves\\slot3.sav", "rb");
-		//fread(name, sizeof(char), 32, fp);
-		char full[MAX_PATH+1];
-		FullPath("saves\\slot3.sav", full);
-		MapName(full, name);
-		slot3->text = name;
-		//fclose(fp);
-		//fp = NULL;
-	}
-
-	OpenSoleView("load");
-}
-
-void Click_Play()
-{
-	g_build = NOTHING;
-	g_canselect = true;
-	OpenSoleView("play");
-}
-
-void Click_NewGame()
-{
-	/*
-	g_camera.PositionCamera(MAP_SIZE*TILE_SIZE/2, 86, 0, 
-							MAP_SIZE*TILE_SIZE/2, 85, 1, 
-							0, 1, 0);
-							*/
-	
-	g_camera.PositionCamera(g_hmap.m_widthX*TILE_SIZE/2, 86, g_hmap.m_widthZ*TILE_SIZE, 
-							g_hmap.m_widthX*TILE_SIZE/2, 85, g_hmap.m_widthZ*TILE_SIZE-1, 
-							0, 1, 0);
-
-	/*
-	g_camera.PositionCamera(MAP_SIZE*TILE_SIZE/2, TILE_SIZE*3.0f, MAP_SIZE*TILE_SIZE/2, 
-							MAP_SIZE*TILE_SIZE/2, TILE_SIZE*3.0f-3*TILE_SIZE, MAP_SIZE*TILE_SIZE/2-2*TILE_SIZE, 
-							0, 1, 0);
-							*/
-
-	g_selP = g_localP;
-	g_canselect = true;
-	g_mode = PLAY;
-	g_gameover = false;
-	RedoGUI();
-	//RandomMap();
-	FreeMap();
-
-	char full[MAX_PATH+1];
-	FullPath("levels\\level0", full);
-	LoadMap(full);
-
-	UpdateMouse3D();
-}
-
-void Click_LoadGame()
-{
-}
-
-void Click_Editor()
-{
-	g_camera.PositionCamera(g_hmap.m_widthX*TILE_SIZE/2, 86, g_hmap.m_widthZ*TILE_SIZE, 
-							g_hmap.m_widthX*TILE_SIZE/2, 85, g_hmap.m_widthZ*TILE_SIZE-1, 
-							0, 1, 0);
-	
-	g_mode = EDITOR;
-	g_build = NOTHING;
-	OpenEditor();
-	//RandomMap();
-	FreeMap();
-	UpdateMouse3D();
-	Change_EdCat();
-	ReGUIScript();
-	FillColliderCells();
-}
-
-void Click_BackToGame()
-{
-	//CloseView("quit");
-	g_mode = PLAY;
-	OpenPlay();
-}
-
-void Click_Settings()
-{
-	OpenSoleView("settings");
-}
-
-void Click_Credits()
-{
-	OpenSoleView("credits");
-}
-
-void Click_Quit()
-{
-	PostQuitMessage(0);
-}
-
-void Click_BackToMain()
-{
-	OpenSoleView("main");
-}
-
 void Change_Fullscreen()
 {
 	int selected = g_GUI.getview("settings")->getwidget("fullscreen", DROPDOWN)->selected;
@@ -552,7 +279,31 @@ void Click_NewGame()
 
 	g_mode = PLAY;
 
-	OpenSoleView("play menu");
+	OpenSoleView("play gui");
+}
+
+void Resize_ResNamesTextBlock(Widget* thisw)
+{
+	thisw->m_pos[0] = 0;
+	thisw->m_pos[1] = 10;
+	thisw->m_pos[2] = g_width;
+	thisw->m_pos[3] = g_height;
+}
+
+void Resize_ResAmtsTextBlock(Widget* thisw)
+{
+	thisw->m_pos[0] = 300;
+	thisw->m_pos[1] = 10;
+	thisw->m_pos[2] = g_width;
+	thisw->m_pos[3] = g_height;
+}
+
+void Resize_ResDeltasTextBlock(Widget* thisw)
+{
+	thisw->m_pos[0] = 500;
+	thisw->m_pos[1] = 10;
+	thisw->m_pos[2] = g_width;
+	thisw->m_pos[3] = g_height;
 }
 
 void FillGUI()
@@ -560,13 +311,121 @@ void FillGUI()
 	DrawSceneFunc = DrawScene;
 	DrawSceneDepthFunc = DrawSceneDepth;
 
+	AssignKey(VK_F1, SaveScreenshot, NULL);
+
+	// Loading View
+
 	View* loadingview = AddView("loading");
 
 	loadingview->widget.push_back(new Text(NULL, "status", RichText("Loading..."), MAINFONT8, Resize_LoadingStatus));
+
+	// Main View
 
 	View* mainmenuview = AddView("mainmenu");
 
 	mainmenuview->widget.push_back(new Link(NULL, "new game link", RichText("New Game"), MAINFONT8, Resize_NewGameLink, Click_NewGame));
 
 	OpenSoleView("loading");
+
+	// Play GUI
+
+	View* playguiview = AddView("play gui");
+
+	/*
+	DefineIcon(ICON_DOLLAR, "gui/icons/dollars.png", ":funds:");
+	DefineIcon(ICON_LABOUR, "gui/icons/labour.png", ":labour:");
+	DefineIcon(ICON_HOUSING, "gui/icons/housing.png", ":housing:");
+	DefineIcon(ICON_FARMPRODUCT, "gui/icons/farmproducts.png", ":farmprod:");
+	DefineIcon(ICON_FOOD, "gui/icons/food.png", ":food:");
+	DefineIcon(ICON_CHEMICALS, "gui/icons/chemicals.png", ":chemicals:");
+	DefineIcon(ICON_ELECTRONICS, "gui/icons/electronics.png", ":electronics:");
+	DefineIcon(ICON_RESEARCH, "gui/icons/research.png", ":research:");
+	DefineIcon(ICON_PRODUCTION, "gui/icons/production.png", ":production:");
+	DefineIcon(ICON_IRONORE, "gui/icons/ironore.png", ":ironore:");
+	DefineIcon(ICON_URANIUMORE, "gui/icons/uraniumore.png", ":uraniumore:");
+	DefineIcon(ICON_STEEL, "gui/icons/steel.png", ":steel:");
+	DefineIcon(ICON_CRUDEOIL, "gui/icons/crudeoil.png", ":crudeoil:");
+	DefineIcon(ICON_WSFUEL, "gui/icons/fuelwholesale.png", ":wsfuel:");
+	DefineIcon(ICON_STONE, "gui/icons/stone.png", ":stone:");
+	DefineIcon(ICON_CEMENT, "gui/icons/cement.png", ":cement:");
+	DefineIcon(ICON_ENERGY, "gui/icons/energy.png", ":energy:");
+	DefineIcon(ICON_ENRICHEDURAN, "gui/icons/uranium.png", ":enricheduran:");
+	DefineIcon(ICON_COAL, "gui/icons/coal.png", ":coal:");
+	DefineIcon(ICON_TIME, "gui/icons/time.png", ":time:");
+	DefineIcon(ICON_RETFUEL, "gui/icons/fuelretail.png", ":retfuel:");
+	*/
+
+	RichText resnamestext = ParseTags(RichText(
+		"RESOURCE \n"\
+		":funds:Funds: \n"\
+		":housing:Occupancy: \n"\
+		":farmprod:Farm Products: \n"\
+		":food:Food: \n"
+		":chemicals:Chemicals: \n"\
+		":electronics:Electronics: \n"
+		":research:Research: \n"\
+		":production:Production: \n"\
+		":ironore:Iron Ore: \n"\
+		":uraniumore:Uranium Ore: \n"\
+		":steel:Steel: \n"\
+		":crudeoil:Crude Oil: \n"\
+		":wsfuel:Wholesale Fuel: \n"\
+		":retfuel:Retail Fuel: \n"\
+		":stone:Stone: \n"\
+		":cement:Cement: \n"\
+		":energy:Energy: \n"\
+		":enricheduran:Enriched Uranium: \n"\
+		":coal:Coal: \n"), 
+		NULL);
+
+	
+	RichText resamtstext = ParseTags(RichText(
+		"AMOUNT \n"\
+		"100 \n"\
+		"100/231 \n"\
+		"100 \n"\
+		"100 \n"
+		"100 \n"\
+		"100 \n"
+		"100 \n"\
+		"100 \n"\
+		"100 \n"\
+		"100 \n"\
+		"100 \n"\
+		"100 \n"\
+		"100 \n"\
+		"100 \n"\
+		"100 \n"\
+		"100 \n"\
+		"100/146 \n"\
+		"100 \n"\
+		"100 \n"), 
+		NULL);
+	
+	RichText resdeltastext = ParseTags(RichText(
+		"DELTA \n"\
+		"+11/:time: \n"\
+		" \n"\
+		"+8/:time:  \n"\
+		"+8/:time: \n"
+		"+8/:time: \n"\
+		"+8/:time: \n"
+		"+8/:time: \n"\
+		"+8/:time: \n"\
+		"+8/:time: \n"\
+		"+8/:time: \n"\
+		"+8/:time: \n"\
+		"+8/:time: \n"\
+		"+8/:time: \n"\
+		"+8/:time: \n"\
+		"+8/:time: \n"\
+		"+8/:time: \n"\
+		" \n"\
+		"-8/:time: \n"\
+		"+12/:time: \n"), 
+		NULL);
+	
+	playguiview->widget.push_back(new TextBlock(NULL, "resnames", resnamestext, MAINFONT32, Resize_ResNamesTextBlock));
+	playguiview->widget.push_back(new TextBlock(NULL, "resamts", resamtstext, MAINFONT32, Resize_ResAmtsTextBlock));
+	playguiview->widget.push_back(new TextBlock(NULL, "resdeltas", resdeltastext, MAINFONT32, Resize_ResDeltasTextBlock));
 }

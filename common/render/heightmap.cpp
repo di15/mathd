@@ -607,6 +607,9 @@ bool FastMapIntersect(Heightmap* hmap, Vec3f line[2], Vec3f* intersection)
 		tiledz = 1;
 	else if(ray.z < 0)
 		tiledz = -1;
+
+	if(tiledx == 0 && tiledz == 0)
+		return false;
 	
 	int nexttilex = currtilex + tiledx;
 	int nexttilez = currtilez + tiledz;

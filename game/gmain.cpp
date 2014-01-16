@@ -578,8 +578,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		{
 			if ((g_mode == LOADING || g_mode == RELOADING) || AnimateNextFrame(FRAME_RATE))
 			{
-				Update();
 				Draw();
+				Update();
 			}
 			else
 				Sleep(1);

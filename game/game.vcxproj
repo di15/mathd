@@ -343,9 +343,11 @@
     <ClCompile Include="..\common\render\heightmap.cpp" />
     <ClCompile Include="..\common\render\model.cpp" />
     <ClCompile Include="..\common\render\ms3d.cpp" />
+    <ClCompile Include="..\common\render\screenshot.cpp" />
     <ClCompile Include="..\common\render\shader.cpp" />
     <ClCompile Include="..\common\render\shadow.cpp" />
     <ClCompile Include="..\common\render\vertexarray.cpp" />
+    <ClCompile Include="..\common\sim\resources.cpp" />
     <ClCompile Include="..\common\sim\sim.cpp" />
     <ClCompile Include="..\common\texture.cpp" />
     <ClCompile Include="..\common\ustring.cpp" />
@@ -399,9 +401,11 @@
     <ClInclude Include="..\common\render\heightmap.h" />
     <ClInclude Include="..\common\render\model.h" />
     <ClInclude Include="..\common\render\ms3d.h" />
+    <ClInclude Include="..\common\render\screenshot.h" />
     <ClInclude Include="..\common\render\shader.h" />
     <ClInclude Include="..\common\render\shadow.h" />
     <ClInclude Include="..\common\render\vertexarray.h" />
+    <ClInclude Include="..\common\sim\resources.h" />
     <ClInclude Include="..\common\sim\sim.h" />
     <ClInclude Include="..\common\texture.h" />
     <ClInclude Include="..\common\ustring.h" />
