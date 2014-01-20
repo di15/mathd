@@ -500,7 +500,7 @@ void WriteConfig()
 }
 #endif
 
-/*
+#if 0
 void EnumerateMaps()
 {
 	WIN32_FIND_DATA ffd;
@@ -525,7 +525,8 @@ void EnumerateMaps()
 	{
 		// Failure
 	}
-}*/
+}
+#endif
 
 void Init()
 {

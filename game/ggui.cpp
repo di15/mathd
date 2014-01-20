@@ -306,6 +306,16 @@ void Resize_ResDeltasTextBlock(Widget* thisw)
 	thisw->m_pos[3] = g_height;
 }
 
+#define CORNER_PANEL_SIZE	200
+
+void Resize_BottRightPanel(Widget* thisw)
+{
+	thisw->m_pos[0] = g_width - CORNER_PANEL_SIZE;
+	thisw->m_pos[1] = g_height - CORNER_PANEL_SIZE;
+	thisw->m_pos[2] = g_width;
+	thisw->m_pos[3] = g_height;
+}
+
 void FillGUI()
 {
 	DrawSceneFunc = DrawScene;
@@ -428,4 +438,6 @@ void FillGUI()
 	playguiview->widget.push_back(new TextBlock(NULL, "resnames", resnamestext, MAINFONT32, Resize_ResNamesTextBlock));
 	playguiview->widget.push_back(new TextBlock(NULL, "resamts", resamtstext, MAINFONT32, Resize_ResAmtsTextBlock));
 	playguiview->widget.push_back(new TextBlock(NULL, "resdeltas", resdeltastext, MAINFONT32, Resize_ResDeltasTextBlock));
+
+	playguiview->widget.push_back(new Image(NULL, "gui/filled.jpg", Resize_BottRightPanel)); 
 }

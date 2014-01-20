@@ -277,7 +277,7 @@ void SaveScreenshot()
 	g_log<<"Writing screenshot "<<fullpath<<endl;
 	g_log.flush();
 
-	SaveJPEG(fullpath, &screenshot, 90);
+	SaveJPEG(fullpath, &screenshot, 50);
 
 	free(screenshot.data);
 }

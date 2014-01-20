@@ -49,8 +49,12 @@ void InitShadows()
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
-
+	
+#if 1
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16, g_depthSizeX, g_depthSizeY, 0, GL_RGBA, GL_UNSIGNED_SHORT, 0);
+#else
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT32F, g_depthSizeX, g_depthSizeY, 0, GL_RGBA, GL_UNSIGNED_SHORT, 0);
+#endif
 	glBindTexture(GL_TEXTURE_2D, 0);
 
 	glGenRenderbuffersEXT(1, &g_rbDepth);
@@ -411,7 +415,8 @@ void RenderToShadowMap(Matrix projection, Matrix viewmat, Matrix modelmat, Vec3f
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	glEnable(GL_POLYGON_OFFSET_FILL);
-	glPolygonOffset(2.0, 500.0);
+	//glPolygonOffset(2.0, 500.0);
+	glPolygonOffset(1.0, 250.0);
 
 	g_lightPos = focus + g_lightOff;
 	g_lightEye = focus;

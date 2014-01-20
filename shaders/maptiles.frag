@@ -28,11 +28,15 @@ varying float sandalpha;
 varying float grassalpha;
 varying float snowalpha;
 varying float rockalpha;
+varying float crackedrockalpha;
 
 uniform sampler2D sandtex;
 uniform sampler2D grasstex;
 uniform sampler2D rocktex;
 uniform sampler2D snowtex;
+uniform sampler2D crackedrocktex;
+
+uniform vec3 sundirection;
 
 void main (void)
 {
@@ -46,8 +50,8 @@ void main (void)
 	//vec3 bump = normalize( texture(normalmap, texCoordOut0).xyz * 2.0 - 1.0);
 	vec3 bump = vec3(0,0,1);
 
-	//vec3 lvec = normalize(light_vec);
-	//float diffuse = max(dot(-lvec, normalOut), 0.0) + 0.50;
+	//vec3 lvec = normalize(sundirection);
+	//float diffuse = max(dot(lvec, normalOut), 0.0) + 0.50;
 
 	float distSqr = dot(light_vec, light_vec);
 	vec3 lvec = light_vec * inversesqrt(distSqr);
@@ -58,10 +62,11 @@ void main (void)
 	//vec3 vspecular = vec3(0,0,0);
 	//vec3 vspecular = texture(specularmap, texCoordOut0).xyz * specular;
 
-	vec4 sandtxl = texture(sandtex, texCoordOut0 / 1.3);
-	vec4 grasstxl = texture(grasstex, texCoordOut0 / 1.3);
-	vec4 rocktxl = texture(rocktex, texCoordOut0 / 1.3);
-	vec4 snowtxl = texture(snowtex, texCoordOut0 / 1.3);
+	vec4 sandtxl = texture(sandtex, texCoordOut0 / 5.3);
+	vec4 grasstxl = texture(grasstex, texCoordOut0 / 5.3);
+	vec4 rocktxl = texture(rocktex, texCoordOut0 / 5.3);
+	vec4 snowtxl = texture(snowtex, texCoordOut0 / 5.3);
+	vec4 crackedrocktxl = texture(crackedrocktex, texCoordOut0 / 5.3);
 
 	//float sandalpha2 = sandalpha + (sanddettxl.w * sandbumpscale);	
 	//float grassalpha2 = grassalpha + (grassdettxl.w * grassbumpscale);
@@ -72,6 +77,7 @@ void main (void)
 	float grassalpha2 = grassalpha + (grasstxl.w * 0.2);
 	float rockalpha2 = rockalpha + (rocktxl.w * 0.2);
 	float snowalpha2 = snowalpha + (snowtxl.w * 0.2);
+	float crackedrockalpha2 = crackedrockalpha + (crackedrocktxl.w * 0.2);
 
 	float minalph = 0.25;
 	float maxalph = 0.75;
@@ -81,12 +87,14 @@ void main (void)
 	grassalpha2 = (max(minalph, min(maxalph, grassalpha2)) - minalph) / arange;
 	rockalpha2 = (max(minalph, min(maxalph, rockalpha2)) - minalph) / arange;
 	snowalpha2 = (max(minalph, min(maxalph, snowalpha2)) - minalph) / arange;
+	crackedrockalpha2 = (max(minalph, min(maxalph, crackedrockalpha2)) - minalph) / arange;
 
-	float totalalpha = sandalpha2 + grassalpha2 + rockalpha2 + snowalpha2;
-	sandalpha2 = sandalpha2 / totalalpha;
-	grassalpha2 = grassalpha2 / totalalpha;
-	rockalpha2 = rockalpha2 / totalalpha;
-	snowalpha2 = snowalpha2 / totalalpha;
+	float totalalpha = sandalpha2 + grassalpha2 + rockalpha2 + snowalpha2 + crackedrockalpha2;
+	sandalpha2 /= totalalpha;
+	grassalpha2 /= totalalpha;
+	rockalpha2 /= totalalpha;
+	snowalpha2 /= totalalpha;
+	crackedrockalpha2 /= totalalpha;
 
 	//sandalpha2 = 1;
 
@@ -97,7 +105,8 @@ void main (void)
 	vec4 stexel = vec4( vec3(sandtxl.xyz * sandalpha2) +
 				vec3(grasstxl.xyz * grassalpha2) +
 				vec3(rocktxl.xyz * rockalpha2) +
-				vec3(snowtxl.xyz * snowalpha2),
+				vec3(snowtxl.xyz * snowalpha2) +
+				vec3(crackedrocktxl.xyz * crackedrockalpha2),
 				1.0);
 
 	//float alph = color.w * texel0.w * elevtransp;
@@ -105,7 +114,9 @@ void main (void)
 
 	//shadow = 1;
 
-	//gl_FragColor = vec4(color.xyz * stexel.xyz * shadow * diffuse + vspecular, alph);
+	float minlight = min(shadow, diffuse);
+
+	//gl_FragColor = vec4(color.xyz * stexel.xyz * minlight, alph);
 	//gl_FragColor = vec4(color.xyz * stexel.xyz * shadow, alph);
 	gl_FragColor = vec4(color.xyz * stexel.xyz * shadow * diffuse, alph);
 	//gl_FragColor = vec4(color.xyz * sanddettxl.xyz * shadow * diffuse, alph);

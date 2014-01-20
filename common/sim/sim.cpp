@@ -106,6 +106,7 @@ void Queue()
 	QueueTexture(&g_tiletexs[TILE_GRASS], "textures/terrain/default/grass.jpg", false);
 	QueueTexture(&g_tiletexs[TILE_SNOW], "textures/terrain/default/snow.jpg", false);
 	QueueTexture(&g_tiletexs[TILE_ROCK], "textures/terrain/default/rock.jpg", false);
+	QueueTexture(&g_tiletexs[TILE_CRACKEDROCK], "textures/terrain/default/crackedrock.jpg", false);
 
 	//QueueModel(&themodel, "models/battlecomp/battlecomp.ms3d", Vec3f(0.1f,0.1f,0.1f) * 100 / 64, Vec3f(0,100,0));
 }

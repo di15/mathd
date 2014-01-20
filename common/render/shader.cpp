@@ -298,6 +298,7 @@ void LoadShader(int shader, char* strVertex, char* strFragment)
 	s->MapUniform(SSLOT_GRASSTEX, "grasstex");
 	s->MapUniform(SSLOT_SNOWTEX, "snowtex");
 	s->MapUniform(SSLOT_ROCKTEX, "rocktex");
+	s->MapUniform(SSLOT_CRACKEDROCKTEX, "crackedrocktex");
 	s->MapUniform(SSLOT_SUNDIRECTION, "sundirection");
 	s->MapUniform(SSLOT_GRADIENTTEX, "gradienttex");
 	s->MapUniform(SSLOT_DETAILTEX, "detailtex");

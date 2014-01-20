@@ -16,11 +16,12 @@ class Vec3f;
 class Shader;
 class Matrix;
 
-#define TILE_SAND		0
-#define TILE_GRASS		1
-#define TILE_SNOW		2
-#define TILE_ROCK		3
-#define TILE_TYPES		4
+#define TILE_SAND			0
+#define TILE_GRASS			1
+#define TILE_SNOW			2
+#define TILE_ROCK			3
+#define TILE_CRACKEDROCK	4
+#define TILE_TYPES			5
 
 
 #ifndef _SERVER

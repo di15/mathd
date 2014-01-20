@@ -196,59 +196,374 @@ inline float Heightmap::getheight(int x, int z)
 
 void Heightmap::remesh()
 {
-	Vec3f a, b, c, d;
-	Vec3f norm0, norm1;
-	Vec3f tri0[3];
-	Vec3f tri1[3];
-	int z;
+	/*
+	These are the vertices of the tile.
+
+	(0,0)      (1,0)
+	c or 2     d or 3
+	------------
+	|          |
+	|          |
+	|          |
+	|__________|
+	b or 1     a or 0
+	(0,1)      (1,1)
+	*/
+
+	Vec3f a, b, c, d;	// tile corner vertices
+	Vec3f norm0, norm1;	// the two tile triangle normals
+	Vec3f tri0[3];	//  first tile triangle
+	Vec3f tri1[3];	// second tile triangle
 	float heights[4];
 	float aD, bD, cD, dD;
-	float diag1010;
-	float diag0101;
+
+	// The numbers here indicate whether the vertex in
+	// question is involved, counting from the top,left (0,0)
+	// corner going clockwise.
+	float diag1010;	// height difference along diagonal a-to-c
+	float diag0101;	// height difference along diagonal b-to-d
+
+	/*
+	We will blend the normals of all the vertices with 4 neighbouring
+	tiles, so that the terrain doesn't look blocky.
+
+	Each tile has 6 vertices for two triangles.
+	
+	We need pointers for this because we construct the normals as we go along, 
+	and only blend them in the end.
+	*/
+	vector<Vec3f**> *addedvertnormals = new vector<Vec3f**>[ m_widthx * m_widthz * 6 ];
+
+	/*
+	Because triangles will alternate, we need to keep an ordered list
+	for the tile corner vertex normals for each tile, for 
+	figuring out the corner vertex normals of neighbouring tiles.
+	*/
+	struct TileNormals
+	{
+		Vec3f *normala;
+		Vec3f *normalb;
+		Vec3f *normalc;
+		Vec3f *normald;
+	};
+
+	TileNormals *tilenormals = new TileNormals[ m_widthx * m_widthz ];
 
 	for(int x=0; x<m_widthx; x++)
-		for(z=0; z<m_widthz; z++)
+		for(int z=0; z<m_widthz; z++)
 		{
 			heights[0] = getheight(x+1, z+1);
 			heights[1] = getheight(x, z+1);
 			heights[2] = getheight(x, z);
 			heights[3] = getheight(x+1, z);
 
+			/*
+			These are the vertices of the tile.
+
+			(0,0)      (1,0)
+			c or 2     d or 3
+			------------
+			|          |
+			|          |
+			|          |
+			|__________|
+			b or 1     a or 0
+			(0,1)      (1,1)
+
+			We need to decide which way the diagonal (shared edge of the
+			triangles) will be, because it doesn't look nice where the 
+			land meets the water if we don't alternate them according
+			to which diagonal has the greater height difference. And also,
+			it doesn't look good in general anywhere where there's
+			mountains or ridges.
+
+			What we're going to do here is give smoothness to changing
+			slopes, instead of hard corners. 
+
+			Imagine if there's a really strong difference in height 
+			along the diagonal c-to-a. 
+
+			If we break the tile into triangles like this, 
+
+			(0,0)      (1,0)
+			c or 2     d or 3
+			------------
+			| \        |
+			|    \     |
+			|      \   |
+			|________\_|
+			b or 1     a or 0
+			(0,1)      (1,1)
+
+			Then there will be a sharp corner at vertex a.
+
+			However, if we cut the tile into triangles like this,
+
+			
+			(0,0)      (1,0)
+			c or 2     d or 3
+			------------
+			|        / |
+			|      /   |
+			|    /     |
+			|_/________|
+			b or 1     a or 0
+			(0,1)      (1,1)
+
+			then this will be a bevelled corner. 
+
+			Combined with other tiles this will look like:
+
+			          |
+			          |
+			          |
+			         /
+			       /
+			_____/
+
+			Otherwise, if we didn't check which way
+			to cut the tile into triangles, it would look
+			like a sharp corner:
+
+			          |
+			          |
+			          |
+			__________|
+
+			*/
+
 			a = Vec3f( (x+1)*TILE_SIZE, heights[0], (z+1)*TILE_SIZE );
 			b = Vec3f( (x)*TILE_SIZE, heights[1], (z+1)*TILE_SIZE );
 			c = Vec3f( (x)*TILE_SIZE, heights[2], (z)*TILE_SIZE );
 			d = Vec3f( (x+1)*TILE_SIZE, heights[3], (z)*TILE_SIZE );
 
+			/*
+			Get the difference between each tile vertex
+			and the average of the two neighbouring 
+			(diagonal) vertices.
+			*/
+
 			aD = fabsf( heights[0] - (heights[1]+heights[3])/2.0f );
 			bD = fabsf( heights[1] - (heights[2]+heights[0])/2.0f );
 			cD = fabsf( heights[2] - (heights[3]+heights[1])/2.0f );
 			dD = fabsf( heights[3] - (heights[0]+heights[2])/2.0f );
+
+			/*
+			For either of the two possible diagonals,
+			get the maximum difference, to see
+			which diagonal is steeper.
+			*/
+
 			diag1010 = max( aD, cD );
 			diag0101 = max( bD, dD );
 
+			/*
+			If diagonal a-to-c has a greater
+			height difference, 
+
+			(0,0)      (1,0)
+			c or 2     d or 3
+			------------
+			|          |
+			|          |
+			|          |
+			|__________|
+			b or 1     a or 0
+			(0,1)      (1,1)
+
+			triangle 1 will be made of vertices
+			a, b, and d, and triangle 2 will be
+			made of vertices b, c, d.
+			*/
+
+			int tileindex6v = (z * m_widthx + x) * 3 * 2;
+			int tileindex = (z * m_widthx + x);
+
 			if(diag1010 > diag0101)
 			{
-				m_vertices[ (z * m_widthx + x) * 3 * 2 + 0 ] = a;
-				m_vertices[ (z * m_widthx + x) * 3 * 2 + 1 ] = b;
-				m_vertices[ (z * m_widthx + x) * 3 * 2 + 2 ] = d;
-				m_vertices[ (z * m_widthx + x) * 3 * 2 + 3 ] = b;
-				m_vertices[ (z * m_widthx + x) * 3 * 2 + 4 ] = c;
-				m_vertices[ (z * m_widthx + x) * 3 * 2 + 5 ] = d;
 				/*
-				m_texcoords0[ (z * m_widthx + x) * 3 * 2 + 0 ] = Vec2f(0, 0);
-				m_texcoords0[ (z * m_widthx + x) * 3 * 2 + 1 ] = Vec2f(1, 0);
-				m_texcoords0[ (z * m_widthx + x) * 3 * 2 + 2 ] = Vec2f(0, 1);
-				m_texcoords0[ (z * m_widthx + x) * 3 * 2 + 3 ] = Vec2f(1, 0);
-				m_texcoords0[ (z * m_widthx + x) * 3 * 2 + 4 ] = Vec2f(1, 1);
-				m_texcoords0[ (z * m_widthx + x) * 3 * 2 + 5 ] = Vec2f(0, 1);
+				(0,0)      (1,0)
+				c or 2     d or 3
+				------------
+				|        / |
+				|      /   |
+				|    /     |
+				|_/________|
+				b or 1     a or 0
+				(0,1)      (1,1)
 				*/
+
+				m_vertices[ tileindex6v + 0 ] = a;
+				m_vertices[ tileindex6v + 1 ] = b;
+				m_vertices[ tileindex6v + 2 ] = d;
+				m_vertices[ tileindex6v + 3 ] = b;
+				m_vertices[ tileindex6v + 4 ] = c;
+				m_vertices[ tileindex6v + 5 ] = d;
+
+
+				// Need triangles to figure out 
+				// the tile normals.
 				tri0[0] = a;
 				tri0[1] = b;
 				tri0[2] = d;
 				tri1[0] = b;
 				tri1[1] = c;
 				tri1[2] = d;
+
+				/*
+				(0,0)      (1,0)
+				c or 2     d or 3
+				------------
+				| tri1   / |
+				|      /   |
+				|    / tri0|
+				|_/________|
+				b or 1     a or 0
+				(0,1)      (1,1)
+
+				tri 0 = a,b,d
+				tri 1 = b,c,d
+
+				Now we have to remember that the triangle indices don't correspond to the vertex numbers;
+				there's 6 triangle vertices (2 repeated) and only 4 unique tile corner vertices.
+				*/
+				
+				tilenormals[ tileindex ].normala = &m_normals[ tileindex6v + 0 ];
+				tilenormals[ tileindex ].normalb = &m_normals[ tileindex6v + 1 ];
+				tilenormals[ tileindex ].normalc = &m_normals[ tileindex6v + 4 ];
+				tilenormals[ tileindex ].normald = &m_normals[ tileindex6v + 2 ];
+
+				// Add the normals for this tile itself
+				addedvertnormals[ tileindex6v + 0 ].push_back( &tilenormals[ tileindex ].normala );
+				addedvertnormals[ tileindex6v + 1 ].push_back( &tilenormals[ tileindex ].normalb );
+				addedvertnormals[ tileindex6v + 2 ].push_back( &tilenormals[ tileindex ].normald );
+				addedvertnormals[ tileindex6v + 3 ].push_back( &tilenormals[ tileindex ].normalb );
+				addedvertnormals[ tileindex6v + 4 ].push_back( &tilenormals[ tileindex ].normalc );
+				addedvertnormals[ tileindex6v + 5 ].push_back( &tilenormals[ tileindex ].normald );
+
+				//If there's a tile in the x-1 direction, add its normal to corners c(2) and b(1).
+				// c(2) is the vertex index 4 of the two triangle vertices.
+				// b(1) is the vertex index 1 and 3 of the two triangle vertices.
+				if(x > 0)
+				{
+					int nearbytileindex = (z * m_widthx + (x-1));
+					TileNormals* nearbytilenormals = &tilenormals[ nearbytileindex ];
+					
+					// vertex 4 of the triangles (corner c(2)) is corner d(3) of the neighbouring tile
+					addedvertnormals[ tileindex6v + 4 ].push_back( &nearbytilenormals->normald );
+
+					// vertex 1 of the triangles (corner b(1)) is corner a(0) of the neighbouring tile
+					addedvertnormals[ tileindex6v + 1 ].push_back( &nearbytilenormals->normala );
+					
+					// vertex 3 of the triangles (corner b(1)) is corner a(0) of the neighbouring tile
+					addedvertnormals[ tileindex6v + 3 ].push_back( &nearbytilenormals->normala );
+				}
+
+				
+				/*
+				(0,0)      (1,0)
+				c or 2     d or 3
+				------------
+				| tri1   / |
+				|      /   |
+				|    / tri0|
+				|_/________|
+				b or 1     a or 0
+				(0,1)      (1,1)
+
+				tri 0 = a,b,d
+				tri 1 = b,c,d
+				*/
+
+				//If there's a tile in the x+1 direction, add its normal to corners d(3) and a(0).
+				// d(3) is the vertex index 2 and 5 of the two triangles vertices.
+				// a(0) is the vertex index 0 of the two triangles.
+				if(x < m_widthx-1)
+				{
+					int nearbytileindex = (z * m_widthx + (x+1));
+					TileNormals* nearbytilenormals = &tilenormals[ nearbytileindex ];
+
+					// vertex 2 of the triangles (corner d(3)) is corner c(2) of the neighbouring tile
+					addedvertnormals[ tileindex6v + 2 ].push_back( &nearbytilenormals->normalc );
+
+					// vertex 5 of the triangles (corner d(3)) is corner c(2) of the neighbouring tile
+					addedvertnormals[ tileindex6v + 5 ].push_back( &nearbytilenormals->normalc );
+					
+					// vertex 0 of the triangles (corner a(0)) is corner b(1) of the neighbouring tile
+					addedvertnormals[ tileindex6v + 0 ].push_back( &nearbytilenormals->normalb );
+				}
+
+				//If there's a tile in the z-1 direction, add its normal to corners c(2) and d(3). 
+				// c(2) is the vertex index 4 of the two triangle vertices.
+				// d(3) is the vertex index 2 and 5 of the two triangle vertices.
+				if(z > 0)
+				{
+					int nearbytileindex = ((z-1) * m_widthx + x);
+					TileNormals* nearbytilenormals = &tilenormals[ nearbytileindex ];
+					
+					// vertex 4 of the triangles (corner c(2)) is corner b(1) of the neighbouring tile
+					addedvertnormals[ tileindex6v + 4 ].push_back( &nearbytilenormals->normalb );
+
+					// vertex 2 of the triangles (corner d(3)) is corner a(0) of the neighbouring tile
+					addedvertnormals[ tileindex6v + 2 ].push_back( &nearbytilenormals->normala );
+					
+					// vertex 5 of the triangles (corner d(3)) is corner a(0) of the neighbouring tile
+					addedvertnormals[ tileindex6v + 5 ].push_back( &nearbytilenormals->normala );
+				}
+				
+				/*
+				(0,0)      (1,0)
+				c or 2     d or 3
+				------------
+				| tri1   / |
+				|      /   |
+				|    / tri0|
+				|_/________|
+				b or 1     a or 0
+				(0,1)      (1,1)
+
+				tri 0 = a,b,d
+				tri 1 = b,c,d
+				*/
+
+				//If there's a tile in the z+1 direction, add its normal to corners b(1) and a(0).
+				// b(1) is the vertex index 1 and 3 of the two triangles vertices.
+				// a(0) is the vertex index 0 of the two triangles.
+				if(z < m_widthz-1)
+				{
+					int nearbytileindex = ((z+1) * m_widthx + x);
+					TileNormals* nearbytilenormals = &tilenormals[ nearbytileindex ];
+
+					// vertex 1 of the triangles (corner b(1)) is corner c(2) of the neighbouring tile
+					addedvertnormals[ tileindex6v + 2 ].push_back( &nearbytilenormals->normalc );
+
+					// vertex 3 of the triangles (corner b(1)) is corner c(2) of the neighbouring tile
+					addedvertnormals[ tileindex6v + 5 ].push_back( &nearbytilenormals->normalc );
+					
+					// vertex 0 of the triangles (corner a(0)) is corner d(3) of the neighbouring tile
+					addedvertnormals[ tileindex6v + 0 ].push_back( &nearbytilenormals->normald );
+				}
 			}
+			
+			/*
+			Otherwise, if diagonal d-to-b has a 
+			greater height difference, 
+
+			(0,0)      (1,0)
+			c or 2     d or 3
+			------------
+			|  \       |
+			|    \     |
+			|      \   |
+			|________\_|
+			b or 1     a or 0
+			(0,1)      (1,1)
+
+			triangle 1 will be made of vertices
+			a, b, and c, and triangle 2 will be
+			made of vertices d, a, c.
+			*/
+
 			else
 			{
 				m_vertices[ (z * m_widthx + x) * 3 * 2 + 0 ] = a;
@@ -257,20 +572,143 @@ void Heightmap::remesh()
 				m_vertices[ (z * m_widthx + x) * 3 * 2 + 3 ] = d;
 				m_vertices[ (z * m_widthx + x) * 3 * 2 + 4 ] = a;
 				m_vertices[ (z * m_widthx + x) * 3 * 2 + 5 ] = c;
-				/*
-				m_texcoords0[ (z * m_widthx + x) * 3 * 2 + 0 ] = Vec2f(0, 0);
-				m_texcoords0[ (z * m_widthx + x) * 3 * 2 + 1 ] = Vec2f(1, 0);
-				m_texcoords0[ (z * m_widthx + x) * 3 * 2 + 2 ] = Vec2f(1, 1);
-				m_texcoords0[ (z * m_widthx + x) * 3 * 2 + 3 ] = Vec2f(0, 1);
-				m_texcoords0[ (z * m_widthx + x) * 3 * 2 + 4 ] = Vec2f(0, 0);
-				m_texcoords0[ (z * m_widthx + x) * 3 * 2 + 5 ] = Vec2f(1, 1);
-				*/
+
 				tri0[0] = a;
 				tri0[1] = b;
 				tri0[2] = c;
 				tri1[0] = d;
 				tri1[1] = a;
 				tri1[2] = c;
+
+				/*
+				(0,0)      (1,0)
+				c or 2     d or 3
+				------------
+				|  \ tri 1 |
+				|    \     |
+				|tri 0 \   |
+				|________\_|
+				b or 1     a or 0
+				(0,1)      (1,1)
+
+				tri 0 = a,b,c
+				tri 1 = d,a,c
+				*/
+
+				tilenormals[ tileindex ].normala = &m_normals[ tileindex6v + 0 ];
+				tilenormals[ tileindex ].normalb = &m_normals[ tileindex6v + 1 ];
+				tilenormals[ tileindex ].normalc = &m_normals[ tileindex6v + 2 ];
+				tilenormals[ tileindex ].normald = &m_normals[ tileindex6v + 3 ];
+
+				// Add the normals for this tile itself
+				addedvertnormals[ tileindex6v + 0 ].push_back( &tilenormals[ tileindex ].normala );
+				addedvertnormals[ tileindex6v + 1 ].push_back( &tilenormals[ tileindex ].normalb );
+				addedvertnormals[ tileindex6v + 2 ].push_back( &tilenormals[ tileindex ].normalc );
+				addedvertnormals[ tileindex6v + 3 ].push_back( &tilenormals[ tileindex ].normald );
+				addedvertnormals[ tileindex6v + 4 ].push_back( &tilenormals[ tileindex ].normala );
+				addedvertnormals[ tileindex6v + 5 ].push_back( &tilenormals[ tileindex ].normalc );
+
+				//If there's a tile in the x-1 direction, add its normal to corners c(2) and b(1).
+				// c(2) is the vertex index 2 and 5 of the two triangle vertices.
+				// b(1) is the vertex index 1 of the two triangle vertices.
+				if(x > 0)
+				{
+					int nearbytileindex = (z * m_widthx + (x-1));
+					TileNormals* nearbytilenormals = &tilenormals[ nearbytileindex ];
+					
+					// vertex 2 of the triangles (corner c(2)) is corner d(3) of the neighbouring tile
+					addedvertnormals[ tileindex6v + 2 ].push_back( &nearbytilenormals->normald );
+
+					// vertex 5 of the triangles (corner c(2)) is corner d(3) of the neighbouring tile
+					addedvertnormals[ tileindex6v + 5 ].push_back( &nearbytilenormals->normald );
+					
+					// vertex 1 of the triangles (corner b(1)) is corner a(0) of the neighbouring tile
+					addedvertnormals[ tileindex6v + 1 ].push_back( &nearbytilenormals->normala );
+				}
+				
+				/*
+				(0,0)      (1,0)
+				c or 2     d or 3
+				------------
+				|  \ tri 1 |
+				|    \     |
+				|tri 0 \   |
+				|________\_|
+				b or 1     a or 0
+				(0,1)      (1,1)
+
+				tri 0 = a,b,c
+				tri 1 = d,a,c
+				*/
+
+				//If there's a tile in the x+1 direction, add its normal to corners d(3) and a(0).
+				// d(3) is the vertex index 3 of the two triangles vertices.
+				// a(0) is the vertex index 0 and 4 of the two triangles.
+				if(x < m_widthx-1)
+				{
+					int nearbytileindex = (z * m_widthx + (x+1));
+					TileNormals* nearbytilenormals = &tilenormals[ nearbytileindex ];
+
+					// vertex 3 of the triangles (corner d(3)) is corner c(2) of the neighbouring tile
+					addedvertnormals[ tileindex6v + 3 ].push_back( &nearbytilenormals->normalc );
+
+					// vertex 0 of the triangles (corner a(0)) is corner c(2) of the neighbouring tile
+					addedvertnormals[ tileindex6v + 0 ].push_back( &nearbytilenormals->normala );
+					
+					// vertex 4 of the triangles (corner a(0)) is corner b(1) of the neighbouring tile
+					addedvertnormals[ tileindex6v + 4 ].push_back( &nearbytilenormals->normalb );
+				}
+
+				//If there's a tile in the z-1 direction, add its normal to corners c(2) and d(3). 
+				// c(2) is the vertex index 2 and 5 of the two triangle vertices.
+				// d(3) is the vertex index 3 of the two triangle vertices.
+				if(z > 0)
+				{
+					int nearbytileindex = ((z-1) * m_widthx + x);
+					TileNormals* nearbytilenormals = &tilenormals[ nearbytileindex ];
+					
+					// vertex 2 of the triangles (corner c(2)) is corner b(1) of the neighbouring tile
+					addedvertnormals[ tileindex6v + 4 ].push_back( &nearbytilenormals->normalb );
+
+					// vertex 5 of the triangles (corner c(2)) is corner a(0) of the neighbouring tile
+					addedvertnormals[ tileindex6v + 2 ].push_back( &nearbytilenormals->normalb );
+					
+					// vertex 3 of the triangles (corner d(3)) is corner a(0) of the neighbouring tile
+					addedvertnormals[ tileindex6v + 5 ].push_back( &nearbytilenormals->normala );
+				}
+				
+				/*
+				(0,0)      (1,0)
+				c or 2     d or 3
+				------------
+				|  \ tri 1 |
+				|    \     |
+				|tri 0 \   |
+				|________\_|
+				b or 1     a or 0
+				(0,1)      (1,1)
+
+				tri 0 = a,b,c
+				tri 1 = d,a,c
+				*/
+				
+				//If there's a tile in the z+1 direction, add its normal to corners b(1) and a(0).
+				// b(1) is the vertex index 1 of the two triangles vertices.
+				// a(0) is the vertex index 0 and 4 of the two triangles.
+				if(z < m_widthz-1)
+				{
+					int nearbytileindex = ((z+1) * m_widthx + x);
+					TileNormals* nearbytilenormals = &tilenormals[ nearbytileindex ];
+
+					// vertex 1 of the triangles (corner b(1)) is corner c(2) of the neighbouring tile
+					addedvertnormals[ tileindex6v + 1 ].push_back( &nearbytilenormals->normalc );
+
+					// vertex 0 of the triangles (corner b(1)) is corner c(2) of the neighbouring tile
+					addedvertnormals[ tileindex6v + 1 ].push_back( &nearbytilenormals->normald );
+					
+					// vertex 4 of the triangles (corner a(0)) is corner d(3) of the neighbouring tile
+					addedvertnormals[ tileindex6v + 4 ].push_back( &nearbytilenormals->normald );
+				}
 			}
 
 			for(int i=0; i<6; i++)
@@ -289,6 +727,41 @@ void Heightmap::remesh()
 			m_normals[ (z * m_widthx + x) * 3 * 2 + 4 ] = norm1;
 			m_normals[ (z * m_widthx + x) * 3 * 2 + 5 ] = norm1;
 		}
+
+	Vec3f* tempnormals = new Vec3f[ m_widthx * m_widthz * 3 * 2 ];
+
+	for(int x=0; x<m_widthx; x++)
+		for(int z=0; z<m_widthz; z++)
+			for(int trivert = 0; trivert < 6; trivert++)
+			{
+				int tileindex6v = (z * m_widthx + x) * 3 * 2 + trivert;
+				int tileindex = (z * m_widthx + x);
+				vector<Vec3f**> vertexnormals = addedvertnormals[ tileindex6v ];
+
+				Vec3f finalnormal(0,0,0);
+
+				// Average all the added normals for each tile vertex
+
+				for(int i=0; i<vertexnormals.size(); i++)
+					finalnormal = finalnormal + **(vertexnormals[i]);
+
+				if(vertexnormals.size() <= 0)
+					continue;
+
+				tempnormals[ tileindex6v ] = finalnormal / (float)vertexnormals.size();
+			}
+		
+	for(int x=0; x<m_widthx; x++)
+		for(int z=0; z<m_widthz; z++)
+			for(int trivert = 0; trivert < 6; trivert ++)
+			{
+				int tileindex6v = (z * m_widthx + x) * 3 * 2 + trivert;
+				m_normals[ tileindex6v ] = tempnormals[ tileindex6v ];
+			}
+
+	delete [] tempnormals;
+	delete [] addedvertnormals;
+	delete [] tilenormals;
 }
 
 void Heightmap::draw()
@@ -310,6 +783,9 @@ void Heightmap::draw()
 	glActiveTextureARB(GL_TEXTURE3);
 	glBindTexture(GL_TEXTURE_2D, g_texture[ g_tiletexs[TILE_ROCK] ].texname);
 	glUniform1iARB(s->m_slot[SSLOT_ROCKTEX], 3);
+	glActiveTextureARB(GL_TEXTURE4);
+	glBindTexture(GL_TEXTURE_2D, g_texture[ g_tiletexs[TILE_CRACKEDROCK] ].texname);
+	glUniform1iARB(s->m_slot[SSLOT_CRACKEDROCKTEX], 4);
 	
 	float yscale = TILE_Y_SCALE / 2000.0f;
 	glUniform1f(s->m_slot[SSLOT_SANDONLYMAXY], 10 * yscale);
@@ -382,7 +858,9 @@ float Bilerp(Heightmap* hmap, float x, float z)
 bool GetMapIntersection2(Heightmap* hmap, Vec3f* vLine, Vec3f* vIntersection)
 {
 	Vec3f vQuad[4];
-	/*
+	
+#define WATER_LEVEL	1000
+
 	vQuad[0] = Vec3f(-10*hmap->m_widthx*TILE_SIZE, WATER_LEVEL*2.0f, -10*hmap->m_widthz*TILE_SIZE);
 	vQuad[1] = Vec3f(10*hmap->m_widthx*TILE_SIZE, WATER_LEVEL*2.0f, -10*hmap->m_widthz*TILE_SIZE);
 	vQuad[2] = Vec3f(10*hmap->m_widthx*TILE_SIZE, WATER_LEVEL*2.0f, 10*hmap->m_widthz*TILE_SIZE);
@@ -390,7 +868,7 @@ bool GetMapIntersection2(Heightmap* hmap, Vec3f* vLine, Vec3f* vIntersection)
 
 	if(IntersectedPolygon(vQuad, vLine, 4, vIntersection))
 		return true;
-		*/
+		
 
 	return false;
 }
@@ -687,8 +1165,13 @@ bool FastMapIntersect(Heightmap* hmap, Vec3f line[2], Vec3f* intersection)
 
 		for(int itertilex = mintilex; itertilex <= maxtilex; itertilex ++)
 			for(int itertilez = mintilez; itertilez <= maxtilez; itertilez ++)
+			{
+				if(itertilex < 0 || itertilex >= hmap->m_widthx || itertilez < 0 || itertilez >= hmap->m_widthz)
+					return false;
+
 				if(TileIntersect(hmap, line, itertilex, itertilez, intersection))
 					return true;
+			}
 
 		currpoint = currpoint + ray * moveratio; 
 

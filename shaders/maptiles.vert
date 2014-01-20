@@ -43,6 +43,7 @@ varying float sandalpha;
 varying float grassalpha;
 varying float rockalpha;
 varying float snowalpha;
+varying float crackedrockalpha;
 
 uniform vec3 sundirection;
 
@@ -156,6 +157,26 @@ void main(void)
 			}
 		}
 	}
+
+	// Make cracked rock ridges appear at more horizontal-facing polygons.
+	// Higher normal.y means the polygon is more upward-facing.
+	crackedrockalpha = min(1, 
+				max(0, 
+					1.0 - (normalIn.y - 0.2)/0.6
+				)
+				);
+
+	// We don't want sandy beaches with steep inclines to look like rock.
+	if(position.y < sandonlymaxy)
+		crackedrockalpha = 0;
+
+	float otheralpha = snowalpha + grassalpha + rockalpha + sandalpha;
+	float alphascale = (1.0 - crackedrockalpha) / otheralpha;
+	
+	snowalpha *= alphascale;
+	grassalpha *= alphascale;
+	rockalpha *= alphascale;
+	sandalpha *= alphascale;
 	
 
 /*
