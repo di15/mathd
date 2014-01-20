@@ -291,6 +291,17 @@ void MouseWheel(int delta)
 	}
 }
 
+
+void ZoomIn()
+{
+	MouseWheel(-1);
+}
+
+void ZoomOut()
+{
+	MouseWheel(1);
+}
+
 void MapKeys()
 {	
 #if 0
@@ -302,6 +313,8 @@ void MapKeys()
 	AssignMouseMove(&MouseMove);
 	AssignMouseWheel(&MouseWheel);
 	AssignMButton(MouseMidButtonDown, MouseMidButtonUp);
+	AssignKey('R', ZoomOut, NULL);
+	AssignKey('F', ZoomIn, NULL);
 
 	/*
 	int key;

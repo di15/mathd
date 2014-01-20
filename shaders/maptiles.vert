@@ -200,6 +200,7 @@ void main(void)
 	//mat4 normalMat = invModelView;
 	vec3 normalEyeSpace = vec3( normalMat * vec4(normalIn, 0.0) );
 	normalOut = normalize(normalEyeSpace);
+	//normalOut = normalIn;
 
 	vec3 n = normalIn;
 	//vec3 tangentEyeSpace = vec3( normalMat * vec4(tangent, 0.0) );
@@ -207,8 +208,10 @@ void main(void)
 	//vec3 t = normalOut;
 
 	vec3 t;
-	vec3 c1 = cross( normalOut, vec3(0.0, 0.0, 1.0) ); 
-	vec3 c2 = cross( normalOut, vec3(0.0, 1.0, 0.0) ); 
+	//vec3 c1 = cross( normalOut, vec3(0.0, 0.0, 1.0) ); 
+	//vec3 c2 = cross( normalOut, vec3(0.0, 1.0, 0.0) );
+	vec3 c1 = cross( normalIn, vec3(0.0, 0.0, 1.0) ); 
+	vec3 c2 = cross( normalIn, vec3(0.0, 1.0, 0.0) ); 
 
 	if( length(c1)>length(c2) )
 	{
@@ -224,12 +227,15 @@ void main(void)
 
 	vec3 vVertex = vec3(view * (model * position));
 
+
 	//light_vec = vpos.xyz - lightPos;
 	//vec3 tmpVec = lightPos - vVertex;
 	vec3 tmpVec = sundirection;
 	light_vec.x = dot(tmpVec, t);
 	light_vec.y = dot(tmpVec, b);
 	light_vec.z = dot(tmpVec, n);
+
+	//light_vec = sundirection;
 
 	//light_vec = n;
 	//light_vec = normalIn * 0.5 + 0.5;
