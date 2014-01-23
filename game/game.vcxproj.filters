@@ -200,6 +200,21 @@
     <ClCompile Include="..\common\render\screenshot.cpp">
       <Filter>Source Files\common\render</Filter>
     </ClCompile>
+    <ClCompile Include="..\common\sim\buildingtype.cpp">
+      <Filter>Source Files\common\sim</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\save\savemap.cpp">
+      <Filter>Source Files\common\save</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\math\hmapmath.cpp">
+      <Filter>Source Files\common\math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\render\territory.cpp">
+      <Filter>Source Files\common\render</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\sim\country.cpp">
+      <Filter>Source Files\common\sim</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ggui.h">
@@ -372,6 +387,21 @@
     </ClInclude>
     <ClInclude Include="..\common\render\screenshot.h">
       <Filter>Source Files\common\render</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\sim\buildingtype.h">
+      <Filter>Source Files\common\sim</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\save\savemap.h">
+      <Filter>Source Files\common\save</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\math\hmapmath.h">
+      <Filter>Source Files\common\math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\render\territory.h">
+      <Filter>Source Files\common\render</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\sim\country.h">
+      <Filter>Source Files\common\sim</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -7,6 +7,7 @@
 #include "../render/model.h"
 #include "resources.h"
 #include "../gui/icon.h"
+#include "buildingtype.h"
 
 void Queue()
 {
@@ -111,4 +112,6 @@ void Queue()
 	QueueTexture(&g_tiletexs[TILE_CRACKEDROCK_NORM], "textures/terrain/default/crackedrock.norm.jpg", false);
 
 	//QueueModel(&themodel, "models/battlecomp/battlecomp.ms3d", Vec3f(0.1f,0.1f,0.1f) * 100 / 64, Vec3f(0,100,0));
+
+	DefineBuildingType(BUILDING_APARTMENT, "models/apartment/basebuilding.ms3d", Vec3f(2, 1, 2) * 1000, Vec3f(0,0,0));
 }

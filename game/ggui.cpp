@@ -11,8 +11,10 @@
 #include "../common/math/camera.h"
 #include "../common/render/shadow.h"
 #include "../common/render/screenshot.h"
+#include "../common/save/savemap.h"
 
 //bool g_canselect = true;
+
 
 #if 0
 void Change_Fullscreen()
@@ -89,22 +91,6 @@ void Change_BPP()
 	RedoGUI();
 }
 
-void Click_LastHint()
-{
-	OpenAnotherView("game message");
-}
-
-void Click_Exit()
-{
-	Escape();
-}
-
-void Click_OpenBuild()
-{
-	g_canselect = false;
-	OpenAnotherView("build selector");
-}
-
 void Click_BuildNum(int param)
 {
 	if(param == NOTHING && g_mode != EDITOR)
@@ -141,33 +127,6 @@ void Click_OutBuild()
 	CloseView("build selector");
 }
 
-void Click_OutBInspect()
-{
-	CView* v = g_GUI.getview("binspect");
-	/*
-	Widget* sw = &v->widget[0];
-	sw->ldown = false;
-
-	Widget* w;
-
-	for(int i=0; i<sw->subwidg.size(); i++)
-	{
-		w = &sw->subwidg[i];
-		w->ldown = false;
-	}
-	*/
-	g_canselect = true;
-
-	CloseView("binspect");
-}
-
-void Click_OutManufUnits()
-{
-	CloseView("manufunits");
-	FillBInspect(g_selection[0]);
-	OpenAnotherView("binspect");
-}
-
 void Reload()
 {
 	g_mode = RELOADING;
@@ -188,11 +147,6 @@ void Reload()
 			g_model[i].ReloadTexture();
 	}
 }
-
-void OpenBSelect()
-{
-
-}
 #endif
 
 void Resize_NewGameLink(Widget* thisw)
@@ -207,75 +161,10 @@ void Resize_LoadingStatus(Widget* thisw)
 	thisw->m_tpos[1] = g_height/2;
 }
 
-void LoadJPGMap(const char* relative)
-{
-	g_hmap.destroy();
-
-	LoadedTex *pImage = NULL;
-
-	char full[1024];
-	FullPath(relative, full);
-
-	pImage = LoadJPG(full);
-
-	if(!pImage)
-		return;
-
-	g_hmap.allocate(pImage->sizeX-1, pImage->sizeY-1);
-
-	for(int x=0; x<pImage->sizeX; x++)
-	{
-		for(int z=0; z<pImage->sizeY; z++)
-		{
-			float r = (unsigned int)pImage->data[ z*pImage->sizeX*3 + x*3 + 0 ];
-			float g = (unsigned int)pImage->data[ z*pImage->sizeX*3 + x*3 + 1 ];
-			float b = (unsigned int)pImage->data[ z*pImage->sizeX*3 + x*3 + 2 ];
-
-			float y = (r+g+b)/3.0f*TILE_Y_SCALE/255.0f - TILE_Y_SCALE/2.0f;
-			y = y / fabs(y) * pow(fabs(y), TILE_Y_POWER) * TILE_Y_AFTERPOW;
-
-			g_hmap.setheight(x, z, y);
-		}
-	}
-
-	g_hmap.remesh();
-
-	Vec3f center = Vec3f( g_hmap.m_widthx * TILE_SIZE/2.0f, g_hmap.getheight(g_hmap.m_widthx/2, g_hmap.m_widthz/2), g_hmap.m_widthz * TILE_SIZE/2.0f );
-	Vec3f delta = center - g_camera.m_view;
-	g_camera.move(delta);
-	Vec3f viewvec = g_camera.m_view - g_camera.m_pos;
-	viewvec = Normalize(viewvec) * max(g_hmap.m_widthx, g_hmap.m_widthz) * TILE_SIZE;
-	g_camera.m_pos = g_camera.m_view - viewvec;
-	g_zoom = INI_ZOOM;
-
-	if(pImage)
-	{
-		if (pImage->data)							// If there is texture data
-		{
-			free(pImage->data);						// Free the texture data, we don't need it anymore
-		}
-
-		free(pImage);								// Free the image structure
-
-		g_log<<relative<<"\n\r";
-		g_log.flush();
-	}
-}
 
 void Click_NewGame()
 {
-	g_hmap.allocate(128, 128);
-
 	LoadJPGMap("heightmaps/heightmap0c.jpg");
-
-	g_camera.position(
-		-1000.0f/3, 1000.0f/3 + 5000, -1000.0f/3, 
-		0, 5000, 0, 
-		0, 1, 0);
-	
-	g_camera.position(1000.0f/3, 1000.0f/3, 1000.0f/3, 0, 0, 0, 0, 1, 0);
-
-	g_camera.move( Vec3f(g_hmap.m_widthx*TILE_SIZE/2, 1000, g_hmap.m_widthz*TILE_SIZE/2) );
 
 	g_mode = PLAY;
 
@@ -314,6 +203,42 @@ void Resize_BottRightPanel(Widget* thisw)
 	thisw->m_pos[1] = g_height - CORNER_PANEL_SIZE;
 	thisw->m_pos[2] = g_width;
 	thisw->m_pos[3] = g_height;
+}
+
+void Resize_BuildButton_TopLeft(Widget* thisw)
+{
+	thisw->m_pos[0] = g_width - CORNER_PANEL_SIZE + CORNER_PANEL_SIZE/3 * 0;
+	thisw->m_pos[1] = g_height - CORNER_PANEL_SIZE + CORNER_PANEL_SIZE/3 * 0;
+	thisw->m_pos[2] = thisw->m_pos[0] + CORNER_PANEL_SIZE/3 * 1;
+	thisw->m_pos[3] = thisw->m_pos[1] + CORNER_PANEL_SIZE/3 * 1;
+}
+
+void Resize_BuildButton_TopMid(Widget* thisw)
+{
+	thisw->m_pos[0] = g_width - CORNER_PANEL_SIZE + CORNER_PANEL_SIZE/3 * 1;
+	thisw->m_pos[1] = g_height - CORNER_PANEL_SIZE + CORNER_PANEL_SIZE/3 * 0;
+	thisw->m_pos[2] = thisw->m_pos[0] + CORNER_PANEL_SIZE/3 * 1;
+	thisw->m_pos[3] = thisw->m_pos[1] + CORNER_PANEL_SIZE/3 * 1;
+}
+
+void Resize_BuildButton_TopRight(Widget* thisw)
+{
+	thisw->m_pos[0] = g_width - CORNER_PANEL_SIZE + CORNER_PANEL_SIZE/3 * 2;
+	thisw->m_pos[1] = g_height - CORNER_PANEL_SIZE + CORNER_PANEL_SIZE/3 * 0;
+	thisw->m_pos[2] = thisw->m_pos[0] + CORNER_PANEL_SIZE/3 * 1;
+	thisw->m_pos[3] = thisw->m_pos[1] + CORNER_PANEL_SIZE/3 * 1;
+}
+
+void Click_BuildApartment()
+{
+}
+
+void Over_BuildApartment()
+{
+}
+
+void Out_Build()
+{
 }
 
 void FillGUI()
@@ -383,7 +308,7 @@ void FillGUI()
 		":retfuel:Retail Fuel: \n"\
 		":stone:Stone: \n"\
 		":cement:Cement: \n"\
-		":energy:Energy: \n"\
+		":energy:Energy Usage: \n"\
 		":enricheduran:Enriched Uranium: \n"\
 		":coal:Coal: \n"), 
 		NULL);
@@ -398,7 +323,7 @@ void FillGUI()
 		"100 \n"\
 		"100 \n"
 		"100 \n"\
-		"100 \n"\
+		"12/134 \n"\
 		"100 \n"\
 		"100 \n"\
 		"100 \n"\
@@ -440,4 +365,8 @@ void FillGUI()
 	playguiview->widget.push_back(new TextBlock(NULL, "resdeltas", resdeltastext, MAINFONT32, Resize_ResDeltasTextBlock));
 
 	playguiview->widget.push_back(new Image(NULL, "gui/filled.jpg", Resize_BottRightPanel)); 
+	
+	playguiview->widget.push_back(new Button(NULL, "models/apartment/texture.jpg", RichText("Apartment Building"), MAINFONT8, Resize_BuildButton_TopLeft, Click_BuildApartment, Over_BuildApartment, Out_Build));
+	playguiview->widget.push_back(new Button(NULL, "models/cemplant/texture.jpg", RichText("Cement Plant"), MAINFONT8, Resize_BuildButton_TopMid, Click_BuildApartment, Over_BuildApartment, Out_Build));
+	playguiview->widget.push_back(new Button(NULL, "models/chemplant/texture.jpg", RichText("Chemical Plant"), MAINFONT8, Resize_BuildButton_TopRight, Click_BuildApartment, Over_BuildApartment, Out_Build));
 }

@@ -23,7 +23,6 @@ enum APPMODE{LOGO, INTRO, LOADING, RELOADING, MENU, PLAY, PAUSE, EDITOR};
 extern APPMODE g_mode;
 extern int g_reStage;
 extern bool g_mouseout;
-extern Heightmap g_hmap;
 
 void WriteConfig();
 void DrawScene(Matrix projection, Matrix viewmat, Matrix modelmat, Matrix modelviewinv, float mvLightPos[3], float lightDir[3]);

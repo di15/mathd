@@ -18,11 +18,11 @@
 #include "../common/window.h"
 #include "../common/utils.h"
 #include "../common/sim/sim.h"
+#include "../common/math/hmapmath.h"
 
 APPMODE g_mode = LOADING;
 bool g_mouseout = false;
 bool g_moved = false;
-Heightmap g_hmap;
 
 //static long long g_lasttime = GetTickCount();
 

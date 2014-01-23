@@ -330,6 +330,7 @@
     <ClCompile Include="..\common\math\camera.cpp" />
     <ClCompile Include="..\common\math\edge.cpp" />
     <ClCompile Include="..\common\math\frustum.cpp" />
+    <ClCompile Include="..\common\math\hmapmath.cpp" />
     <ClCompile Include="..\common\math\line.cpp" />
     <ClCompile Include="..\common\math\matrix.cpp" />
     <ClCompile Include="..\common\math\physics.cpp" />
@@ -346,7 +347,11 @@
     <ClCompile Include="..\common\render\screenshot.cpp" />
     <ClCompile Include="..\common\render\shader.cpp" />
     <ClCompile Include="..\common\render\shadow.cpp" />
+    <ClCompile Include="..\common\render\territory.cpp" />
     <ClCompile Include="..\common\render\vertexarray.cpp" />
+    <ClCompile Include="..\common\save\savemap.cpp" />
+    <ClCompile Include="..\common\sim\buildingtype.cpp" />
+    <ClCompile Include="..\common\sim\country.cpp" />
     <ClCompile Include="..\common\sim\resources.cpp" />
     <ClCompile Include="..\common\sim\sim.cpp" />
     <ClCompile Include="..\common\texture.cpp" />
@@ -385,6 +390,7 @@
     <ClInclude Include="..\common\math\camera.h" />
     <ClInclude Include="..\common\math\edge.h" />
     <ClInclude Include="..\common\math\frustum.h" />
+    <ClInclude Include="..\common\math\hmapmath.h" />
     <ClInclude Include="..\common\math\line.h" />
     <ClInclude Include="..\common\math\matrix.h" />
     <ClInclude Include="..\common\math\physics.h" />
@@ -404,7 +410,11 @@
     <ClInclude Include="..\common\render\screenshot.h" />
     <ClInclude Include="..\common\render\shader.h" />
     <ClInclude Include="..\common\render\shadow.h" />
+    <ClInclude Include="..\common\render\territory.h" />
     <ClInclude Include="..\common\render\vertexarray.h" />
+    <ClInclude Include="..\common\save\savemap.h" />
+    <ClInclude Include="..\common\sim\buildingtype.h" />
+    <ClInclude Include="..\common\sim\country.h" />
     <ClInclude Include="..\common\sim\resources.h" />
     <ClInclude Include="..\common\sim\sim.h" />
     <ClInclude Include="..\common\texture.h" />

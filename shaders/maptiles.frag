@@ -65,7 +65,7 @@ void main (void)
 	vec3 lvec = light_vec * inversesqrt(distSqr);
 	float diffuse = min(1, max( dot(lvec, bump), 0.0 ) * 0.75 + 0.50);
 	float rockdiffuse = min(1, max( dot(lvec, rockbump), 0.0 ));
-	float crackedrockdiffuse = min(1, max( dot(lvec, crackedrockbump), 0.0 ));
+	float crackedrockdiffuse = min(1, max( dot(lvec, crackedrockbump), 0.0 ) * 0.75 + 0.50);
 
 	//vec3 vvec = normalize(eyevec);
 	//float specular = pow(clamp(dot(reflect(-lvec, bump), vvec), 0.0, 1.0), 0.7 );
@@ -123,6 +123,8 @@ void main (void)
 	float alph = color.w * stexel.w;
 
 	//shadow = 1;
+
+	//diffuse = diffuse * (1.0 - crackedrockalpha2) + crackedrockdiffuse * crackedrockalpha2;
 
 	float minlight = min(shadow, diffuse);
 

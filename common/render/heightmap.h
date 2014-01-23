@@ -25,22 +25,24 @@ class Matrix;
 #define TILE_CRACKEDROCK_NORM	6
 #define TILE_TYPES				7
 
-
-#ifndef _SERVER
 extern unsigned int g_tiletexs[TILE_TYPES];
 extern Vec2i g_mapview[2];
-#endif
 
 class Heightmap
 {
 public:
-	int m_widthx;	//number of tiles, not heightpoints/corners
-	int m_widthz;	//number of height points/corners is +1
+	/*
+	Number of tiles, not heightpoints/corners.
+	Number of height points/corners is +1.
+	*/
+	int m_widthx;
+	int m_widthz;
 
-	float* m_heightpoints;
-	Vec3f* m_vertices;
-	Vec2f* m_texcoords0;
-	Vec3f* m_normals;
+	float *m_heightpoints;
+	Vec3f *m_vertices;
+	Vec2f *m_texcoords0;
+	Vec3f *m_normals;
+	int *m_countryowner;
 
 	Heightmap()
 	{
@@ -49,15 +51,13 @@ public:
 	}
 
 	void allocate(int wx, int wz);
-#ifndef _SERVER
 	void remesh();
 	void draw();
-#endif
 	float getheight(int x, int z);
 	void changeheight(int x, int z, float change);
 	void setheight(int x, int z, float height);
-
 	void destroy();
+	int &getcountry(int x, int z);
 
 	~Heightmap()
 	{
@@ -65,9 +65,6 @@ public:
 	}
 };
 
-float Bilerp(Heightmap* hmap, float x, float z);
-bool GetMapIntersection2(Heightmap* hmap, Vec3f* vLine, Vec3f* vIntersection);
-bool GetMapIntersection(Heightmap* hmap, Vec3f* vLine, Vec3f* vIntersection);
-bool FastMapIntersect(Heightmap* hmap, Vec3f line[2], Vec3f* intersection);
+extern Heightmap g_hmap;
 
 #endif

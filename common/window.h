@@ -18,7 +18,7 @@
 #define PROJ_RIGHT			600 //(500)	//(30*12.5f)
 //#define PROJ_TOP			(16*4)
 //#define PROJ_BOTTOM			(-16*4)
-#define INI_ZOOM			0.1f
+#define INI_ZOOM			0.025f
 
 extern double g_frameinterval;
 extern int g_width;
