@@ -474,6 +474,9 @@ void DrawGlyph(float left, float top, float right, float bottom, float texleft, 
 
 void DrawGlyphF(float left, float top, float right, float bottom, float texleft, float textop, float texright, float texbottom)
 {   
+	//DrawGlyph(left, top, right, bottom, texleft, textop, texright, texbottom);
+
+	//return;
 	float newleft = left;
 	float newtop = top;
 	float newright = right;
@@ -483,6 +486,7 @@ void DrawGlyphF(float left, float top, float right, float bottom, float texleft,
 	float newtexright = texright;
 	float newtexbottom = texbottom;
 
+#if 1
 	if(newleft < frame[0])
 	{
 		newtexleft = texleft+(frame[0]-newleft)*(texright-texleft)/(right-left);
@@ -530,6 +534,53 @@ void DrawGlyphF(float left, float top, float right, float bottom, float texleft,
 		newtexbottom = textop+(frame[3]-newtop)*(texbottom-textop)/(bottom-top);
 		newbottom = frame[3];
 	}
+#elif 0
+	if(newleft < frame[0])
+	{
+		newtexleft = (frame[0]-newleft)*(texright-texleft)/(right-left);
+		newleft = frame[0];
+	}
+	else if(newleft > frame[2])
+	{
+		newtexleft = (frame[2]-newleft)*(texright-texleft)/(right-left);
+		newleft = frame[2];
+	}
+
+	if(newright < frame[0])
+	{
+		newtexleft = (frame[0]-newright)*(texright-texleft)/(right-left);
+		newright = frame[0];
+	}
+	else if(newright > frame[2])
+	{
+		newtexright = (frame[2]-newright)*(texright-texleft)/(right-left);
+		newright = frame[2];
+	}
+
+	if(newtop < frame[1])
+	{
+		newtextop = (frame[1]-newtop)*(texbottom-textop)/(bottom-top);
+		newtop = frame[1];
+	}
+	else if(newtop > frame[3])
+	{
+		newtextop = (frame[3]-newtop)*(texbottom-textop)/(bottom-top);
+		newtop = frame[3];
+	}
+
+	if(newbottom < frame[1])
+	{
+		newtexbottom = (frame[1]-newbottom)*(texbottom-textop)/(bottom-top);
+		newbottom = frame[1];
+	}
+	else if(newbottom > frame[3])
+	{
+		newtexbottom = (frame[3]-newbottom)*(texbottom-textop)/(bottom-top);
+		newbottom = frame[3];
+	}
+#endif
+
+
 
     float vertices[] =
     {
@@ -585,7 +636,7 @@ void HighlGlyphF(float left, float top, float right, float bottom)
         
         newright, newbottom,0,
         newleft, newbottom,0,
-        newleft, newtop,0,
+        newleft, newtop,0
     };
 	
     glVertexAttribPointer(g_shader[SHADER_ORTHO].m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, &vertices[0]);

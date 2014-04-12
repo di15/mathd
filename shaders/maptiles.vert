@@ -54,7 +54,11 @@ void main(void)
 	//vec4 vpos = position;
 	vpos.w = 1;
 	lpos = lightMatrix * vpos;
-	//lpos.w = 1;
+/*
+	lpos.xy /= 2.0;
+	lpos.xy += vec2(0.5, 0.5);
+*/
+	lpos.w = 1;
 	gl_Position = projection * (view * (model * position));
 	//gl_Position.w = 1;
 

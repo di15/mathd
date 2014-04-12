@@ -254,3 +254,13 @@ bool Widget::delnext()
 
 	return true;
 }
+
+void CenterLabel(Widget* w)
+{
+	Font* f = &g_font[w->m_font];
+
+	int texwidth = TextWidth(w->m_font, &w->m_label);
+
+	w->m_tpos[0] = (w->m_pos[2]+w->m_pos[0])/2 - texwidth/2;
+	w->m_tpos[1] = (w->m_pos[3]+w->m_pos[1])/2 - f->gheight/2;
+}

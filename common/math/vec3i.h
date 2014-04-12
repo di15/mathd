@@ -15,14 +15,14 @@ public:
 		x = y = z = 0;
 	}
 
-	Vec3i(float X, float Y, float Z) 
+	Vec3i(int X, int Y, int Z) 
 	{ 
 		x = X; 
 		y = Y; 
 		z = Z;
 	}
 
-	Vec3i(const float* values)
+	Vec3i(const int* values)
 	{
 		set(values);
 	}
@@ -53,7 +53,7 @@ public:
 		return Vec3i(x - vVector.x, y - vVector.y, z - vVector.z);
 	}
 	
-	Vec3i operator*(const float num) const
+	Vec3i operator*(const int num) const
 	{
 		return Vec3i(x * num, y * num, z * num);
 	}
@@ -63,12 +63,12 @@ public:
 		return Vec3i(x * v.x, y * v.y, z * v.z);
 	}
 
-	Vec3i operator/(const float num) const
+	Vec3i operator/(const int num) const
 	{
 		return Vec3i(x / num, y / num, z / num);
 	}
 
-	inline void set(const float* values)
+	inline void set(const int* values)
 	{
 		x = values[0];
 		y = values[1];

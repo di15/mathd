@@ -8,21 +8,21 @@
 #include "../platform.h"
 #include "../math/3dmath.h"
 #include "view.h"
-#include "image.h"
-#include "barbutton.h"
-#include "button.h"
-#include "checkbox.h"
-#include "dropdowns.h"
-#include "editbox.h"
-#include "insdraw.h"
-#include "link.h"
-#include "listbox.h"
-#include "text.h"
-#include "textarea.h"
-#include "textblock.h"
-#include "touchlistener.h"
-#include "frame.h"
-#include "viewportw.h"
+#include "widgets/image.h"
+#include "widgets/barbutton.h"
+#include "widgets/button.h"
+#include "widgets/checkbox.h"
+#include "widgets/dropdowns.h"
+#include "widgets/editbox.h"
+#include "widgets/insdraw.h"
+#include "widgets/link.h"
+#include "widgets/listbox.h"
+#include "widgets/text.h"
+#include "widgets/textarea.h"
+#include "widgets/textblock.h"
+#include "widgets/touchlistener.h"
+#include "widgets/frame.h"
+#include "widgets/viewportw.h"
 
 class GUI
 {
@@ -120,13 +120,21 @@ public:
 
 	void lbuttondown()
 	{
+		g_keyintercepted = false;
+
 		for(auto i=view.rbegin(); i!=view.rend(); i++)
 			if(i->opened && i->prelbuttondown())
+			{
+				g_keyintercepted = true;
 				return;	// intercept mouse event
+			}
 		
 		for(auto i=view.rbegin(); i!=view.rend(); i++)
 			if(i->opened && i->lbuttondown())
+			{
+				g_keyintercepted = true;
 				return;	// intercept mouse event
+			}
 
 		if(lbuttondownfunc != NULL)
 			lbuttondownfunc();
@@ -188,6 +196,8 @@ public:
 
 	void mousemove()
 	{
+		g_mouseoveraction = false;
+
 		for(auto i=view.begin(); i!=view.end(); i++)
 			if(i->opened)
 				i->premousemove();
@@ -260,6 +270,7 @@ public:
 extern GUI g_GUI;
 extern int g_currw;
 extern int g_currh;
+extern bool g_mouseoveraction;
 
 void AssignKey(int i, void (*down)(), void (*up)());
 void AssignAnyKey(void (*down)(int k), void (*up)(int k));
@@ -272,6 +283,7 @@ View* AddView(const char* name, int page=0);
 void CloseView(const char* name);
 void OpenSoleView(const char* name, int page=0);
 bool OpenAnotherView(const char* name, int page=0);
+bool ViewOpen(const char* name, int page=0);
 void NextPage(const char* name);
 bool MousePosition();
 void CenterMouse();

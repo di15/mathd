@@ -61,6 +61,7 @@
 #include <stdlib.h>
 #include <vector>
 #include <list>
+#include <deque>
 #include <set>
 #include <fstream>
 #include <iostream>

@@ -13,8 +13,8 @@ class BillboardT
 {
 public:
 	bool on;
-    char name[32];
-    unsigned int tex;
+	char name[32];
+	unsigned int tex;
 
 	BillboardT()
 	{
@@ -28,18 +28,18 @@ extern BillboardT g_billbT[BILLBOARD_TYPES];
 class Billboard
 {
 public:
-    bool on;
-    int type;
-    float size;
-    Vec3f pos;
-    float dist;
+	bool on;
+	int type;
+	float size;
+	Vec3f pos;
+	float dist;
 	int particle;
-    
-    Billboard()
-    {
-        on = false;
+
+	Billboard()
+	{
+		on = false;
 		particle = -1;
-    }
+	}
 };
 
 #define BILLBOARDS  512

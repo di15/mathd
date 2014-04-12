@@ -13,7 +13,8 @@
 #include "quaternion.h"
 #include "vec4f.h"
 #include "matrix.h"
-#include "plane.h"
+#include "vec3i.h"
+#include "plane3f.h"
 #include "../window.h"
 
 float Clipf(float n, float lower, float upper)
@@ -34,19 +35,41 @@ Vec3f VMin(float minf, Vec3f v)
 	return v;
 }
 
-float Magnitude(Vec3f vNormal)
+float Magnitude(Vec3f vec)
 {
-	return (float)sqrt( (vNormal.x * vNormal.x) + (vNormal.y * vNormal.y) + (vNormal.z * vNormal.z) );
+	return (float)sqrtf( (vec.x * vec.x) + (vec.y * vec.y) + (vec.z * vec.z) );
 }
 
-float Magnitude2(Vec3f vNormal)
+float Magnitude(Vec2f vec)
 {
-	return (vNormal.x * vNormal.x) + (vNormal.y * vNormal.y) + (vNormal.z * vNormal.z);
+	return (float)sqrtf( (vec.x * vec.x) + (vec.y * vec.y) );
 }
 
-float Magnitude3(Vec3f vNormal)
+float Magnitude2(Vec3f vec)
 {
-	return (vNormal.x * vNormal.x) + (vNormal.z * vNormal.z);
+	return (vec.x * vec.x) + (vec.y * vec.y) + (vec.z * vec.z);
+}
+
+float Magnitude3(Vec3f vec)
+{
+	return (vec.x * vec.x) + (vec.z * vec.z);
+}
+
+int Magnitude(Vec2i vec)
+{
+	return sqrt( vec.x*vec.x + vec.y*vec.y );
+}
+
+int Magnitude2(Vec2i vec)
+{
+	return vec.x*vec.x + vec.y*vec.y;
+}
+
+// Manhattan distance
+int Manhattan(Vec2i vec)
+{
+	//return max(abs(vec.x), abs(vec.y));
+	return abs(vec.x) + abs(vec.y);
 }
 
 Vec3f Normalize(Vec3f vNormal)
@@ -56,6 +79,16 @@ Vec3f Normalize(Vec3f vNormal)
 	vNormal.x /= magnitude;
 	vNormal.y /= magnitude;
 	vNormal.z /= magnitude;
+
+	return vNormal;
+}
+
+Vec2f Normalize(Vec2f vNormal)
+{
+	float magnitude = Magnitude(vNormal);
+
+	vNormal.x /= magnitude;
+	vNormal.y /= magnitude;
 
 	return vNormal;
 }
@@ -144,7 +177,7 @@ bool IntersectedPlane(Vec3f vPoly[], Vec3f vLine[], Vec3f &vNormal, float &origi
 //#define MATH_DEBUG
 
 // http://en.wikipedia.org/wiki/Line-plane_intersection
-bool Intersection(Vec3f l0, Vec3f l, Plane p, Vec3f& inter)
+bool Intersection(Vec3f l0, Vec3f l, Plane3f p, Vec3f& inter)
 {
 	float denom = Dot(l, p.m_normal);
 
@@ -173,6 +206,16 @@ bool Intersection(Vec3f l0, Vec3f l, Plane p, Vec3f& inter)
 float Dot(Vec3f vVector1, Vec3f vVector2) 
 {
 	return ( (vVector1.x * vVector2.x) + (vVector1.y * vVector2.y) + (vVector1.z * vVector2.z) );
+}
+
+int Dot(Vec3i vVector1, Vec3i vVector2) 
+{
+	return ( (vVector1.x * vVector2.x) + (vVector1.y * vVector2.y) + (vVector1.z * vVector2.z) );
+}
+
+int Dot(Vec2i vVector1, Vec2i vVector2) 
+{
+	return ( (vVector1.x * vVector2.x) + (vVector1.y * vVector2.y) );
 }
 
 double AngleBetweenVectors(Vec3f Vector1, Vec3f Vector2)

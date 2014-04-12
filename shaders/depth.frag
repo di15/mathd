@@ -19,4 +19,10 @@ void main(void)
 
 	//gl_FragColor = vec4(gl_FragCoord.z, gl_FragCoord.z, gl_FragCoord.z, texel0.w);
 	gl_FragColor = vec4(gl_FragCoord.z, gl_FragCoord.z, gl_FragCoord.z, 1.0);
+/*
+	gl_FragColor.x = gl_FragCoord.z * 1.05;
+	gl_FragColor.y = gl_FragCoord.z * 1.05;
+	gl_FragColor.z = gl_FragCoord.z * 1.05;
+	gl_FragColor.w = 1;
+*/
 }

@@ -10,16 +10,29 @@
 #include "../window.h"
 #include "draw2d.h"
 #include "../render/shadow.h"
+#include "../render/heightmap.h"
+#include "../../game/gmain.h"
 
 GUI g_GUI;
 int g_currw;
 int g_currh;
+
+/*
+Determines if the cursor is over an actionable widget, like a drop-down selector.
+If it is, we don't want to scroll if the mouse is at the edge of the screen because
+the user is trying to do something.
+*/
+bool g_mouseoveraction = false;
 
 void GUI::draw()
 {
 	glClear(GL_DEPTH_BUFFER_BIT);
 	glDisable(GL_DEPTH_TEST);
 	Ortho(g_width, g_height, 1, 1, 1, 1);
+	
+#if 0
+	DrawImage(g_texture[0].texname, g_width - 300, 0, g_width, 300, 0, 1, 1, 0);
+#endif
 
 	for(auto i=view.begin(); i!=view.end(); i++)
 		if(i->opened)
@@ -34,7 +47,13 @@ void GUI::draw()
 #endif
 
 #if 0
+	//if(g_depth != -1)
 	DrawImage(g_depth, 0, 0, 150, 150, 0, 1, 1, 0);
+#endif
+
+#if 0
+	if(g_mode == PLAY)
+		DrawImage(g_tiletexs[TILE_PRERENDER], 0, 0, 150, 150, 0, 1, 1, 0);
 #endif
 
 	UseS(SHADER_COLOR2D);
@@ -110,10 +129,23 @@ bool OpenAnotherView(const char* name, int page)
 	{
 		if(_stricmp(i->name.c_str(), name) == 0 && i->page == page)
 		{
+#if 0
+			g_log<<"open an "<<name<<endl;
+			g_log.flush();
+#endif
 			i->opened = true;
 			return true;
 		}
 	}
+
+	return false;
+}
+
+bool ViewOpen(const char* name, int page)
+{
+	for(auto i=g_GUI.view.begin(); i!=g_GUI.view.end(); i++)
+		if(_stricmp(i->name.c_str(), name) == 0 && i->page == page)
+			return i->opened;
 
 	return false;
 }
@@ -143,6 +175,11 @@ void Status(const char* status, bool logthis)
 		g_log<<status<<endl;
 		g_log.flush();
 	}
+
+#if 1
+	g_log<<status<<endl;
+	g_log.flush();
+#endif
 	/*
 	char upper[1024];
 	int i;

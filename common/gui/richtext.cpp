@@ -10,8 +10,8 @@
 RichTextP::RichTextP()
 {
 #ifdef USTR_DEBUG
-	//g_log<<"RichTextP::RichTextP()"<<endl;
-	//g_log.flush();
+	g_log<<"RichTextP::RichTextP()"<<endl;
+	g_log.flush();
 #endif
 }
 
@@ -19,8 +19,8 @@ RichTextP::RichTextP(const RichTextP& original)
 {
 	
 #ifdef USTR_DEBUG
-	//g_log<<"RichTextP::RichTextP(const RichTextP& original)"<<endl;
-	//g_log.flush();
+	g_log<<"RichTextP::RichTextP(const RichTextP& original)"<<endl;
+	g_log.flush();
 #endif
 
 	*this = original;
@@ -54,8 +54,8 @@ RichTextP::RichTextP(int type, int subtype)
 RichTextP& RichTextP::operator=(const RichTextP &original)
 {
 #ifdef USTR_DEBUG
-	//g_log<<"RichTextP& RichTextP::operator=(const RichTextP &original)"<<endl;
-	//g_log.flush();
+	g_log<<"RichTextP& RichTextP::operator=(const RichTextP &original)"<<endl;
+	g_log.flush();
 #endif
 
 	m_type = original.m_type;
@@ -132,10 +132,10 @@ RichText::RichText(const char* cstr)
 RichText& RichText::operator=(const RichText &original)
 {
 #ifdef USTR_DEBUG
-	//g_log<<"richtext::= ";
-	//g_log.flush();
-	//g_log<<original.rawstr()<<endl;
-	//g_log.flush();
+	g_log<<"richtext::= ";
+	g_log.flush();
+	g_log<<original.rawstr()<<endl;
+	g_log.flush();
 #endif
 
 	m_part.clear();

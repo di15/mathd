@@ -44,6 +44,7 @@ typedef void (APIENTRYP PFNGLDETACHOBJECTARBPROC) (GLhandleARB containerObj, GLh
 typedef void (APIENTRYP PFNGLDELETEOBJECTARBPROC) (GLhandleARB obj);
 typedef void (APIENTRYP PFNGLPROGRAMLOCALPARAMETER4FARBPROC) (GLenum target, GLuint index, GLfloat x, GLfloat y, GLfloat z, GLfloat w);
 typedef void (APIENTRYP PFNGLBINDPROGRAMARBPROC) (GLenum target, GLuint program);
+//typedef void (GLAPIENTRYP PFNGLDRAWARRAYSINSTANCEDPROC) (GLenum, GLint, GLsizei, GLsizei);
 
 extern PFNGLCREATESHADEROBJECTARBPROC glCreateShaderObjectARB;
 extern PFNGLSHADERSOURCEARBPROC glShaderSourceARB;
@@ -92,6 +93,11 @@ extern PFNGLUNIFORM4FPROC glUniform4f;
 extern PFNGLENABLEVERTEXATTRIBARRAYPROC glEnableVertexAttribArray;
 extern PFNGLBINDBUFFERPROC glBindBuffer;
 extern PFNGLBUFFERDATAPROC glBufferData;
+extern PFNGLDRAWARRAYSINSTANCEDPROC glDrawArraysInstanced;
+extern PFNGLGENBUFFERSPROC glGenBuffers;
+extern PFNGLDELETEBUFFERSPROC glDeleteBuffers;
+extern PFNGLMAPBUFFERPROC glMapBuffer;
+extern PFNGLUNMAPBUFFERPROC glUnmapBuffer;
 
 #define SSLOT_SHADOWMAP			0
 #define SSLOT_LIGHTMATRIX		1
@@ -140,7 +146,14 @@ extern PFNGLBUFFERDATAPROC glBufferData;
 #define SSLOT_OWNERMAP			43
 #define SSLOT_MAPMINZ			44
 #define SSLOT_MAPMAXZ			45
-#define SSLOTS					46
+#define SSLOT_VERTCOLORS		46
+#define SSLOT_MODELMATS			47
+#define SSLOT_ONSWITCHES		48
+#define SSLOT_MAPMINX			49
+#define SSLOT_MAPMAXX			50
+#define SSLOT_MAPMINY			51
+#define SSLOT_MAPMAXY			52
+#define SSLOTS					53
 
 class Shader
 {
@@ -166,18 +179,25 @@ public:
 	GLhandleARB m_hProgramObject;
 };
 
-#define SHADER_DEPTH		0
-#define SHADER_SHADOW		1
-#define SHADER_OWNED		2
-#define SHADER_ORTHO		3
-#define SHADER_COLOR2D		4
-#define SHADER_MODEL		5
-//#define SHADER_MODEL		6
-#define SHADER_COLOR3D		7
-#define SHADER_BILLBOARD	8
-#define SHADER_MAPTILES		9
-#define SHADER_WATER		10
-#define SHADERS				11
+#define SHADER_DEPTH			0
+#define SHADER_SHADOW			1
+#define SHADER_OWNED			2
+#define SHADER_ORTHO			3
+#define SHADER_COLOR2D			4
+#define SHADER_MODEL			5
+//#define SHADER_MODEL			6
+#define SHADER_COLOR3D			7
+#define SHADER_BILLBOARD		8
+#define SHADER_MAPTILES			9
+#define SHADER_WATER			10
+#define SHADER_BORDERS			11
+#define SHADER_DEPTHTRANSP		12
+#define SHADER_FOLIAGE			13
+#define SHADER_MAPTILESMM		14
+#define SHADER_WATERMM			15
+#define SHADER_BORDERSMM		16
+#define SHADER_MAPTILESPREREND	17
+#define SHADERS					18
 
 extern Shader g_shader[SHADERS];
 extern int g_curS;

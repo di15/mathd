@@ -3,11 +3,12 @@
 
 #include "platform.h"
 #include "debug.h"
+#include "utils.h"
 //#include "main.h"
 //#include "gui.h"
 //#include "unit.h"
 //#include "pathfinding.h"
-//#include "physics.h"
+//#include "collision.h"
 //#include "building.h"
 
 #if 0
@@ -19,10 +20,17 @@ void LastNum(const char* l)
 {
 	return;
 
+#if 1
+	char fullpath[MAX_PATH+1];
+	FullPath("last.txt", fullpath);
 	ofstream last;
-	last.open("last.txt", ios_base::out);
+	last.open(fullpath, ios_base::out);
 	last<<l;
 	last.flush();
+#else
+	g_log<<l<<endl;
+	g_log.flush();
+#endif
 }
 
 #if 0
@@ -30,24 +38,24 @@ void UDebug(int i)
 {
 	return;
 
-	CUnit* u = &g_unit[i];
-	CUnitType* t = &g_unitType[u->type];
+	Unit* u = &g_unit[i];
+	UnitT* t = &g_unitType[u->type];
 
 	g_log<<"UNIT DEBUG: "<<t->name<<" ("<<i<<")"<<endl;
 	g_log<<"path size: "<<u->path.size()<<endl;
 	
 	if(u->collidesfast())
 	{
-		g_log<<"COLLIDES: type:"<<g_colliderType<<" ID:"<<g_lastCollider<<endl;
+		g_log<<"COLLIDES: type:"<<g_collidertype<<" ID:"<<g_lastcollider<<endl;
 
-		if(g_colliderType == COLLIDER_BUILDING)
+		if(g_collidertype == COLLIDER_BUILDING)
 		{
-			CBuilding* b = &g_building[g_lastCollider];
-			CBuildingType* bt = &g_buildingType[b->type];
+			Building* b = &g_building[g_lastcollider];
+			BuildingT* bt = &g_buildingT[b->type];
 
 			g_log<<"COLLIDER B: "<<bt->name<<endl;
 
-			if(u->confirmcollision(g_colliderType, g_lastCollider))
+			if(u->confirmcollision(g_collidertype, g_lastcollider))
 			{
 				g_log<<"CONFIRMED COLLISION"<<endl;
 
@@ -156,7 +164,7 @@ void InitProfiles()
 	Profile(DRAWMAP, DRAW, "DrawMap();");
 	Profile(SHADOWS, DRAW, "Shadows");
 	Profile(DRAWSKY, DRAW, "DrawSky();");
-	Profile(DRAWPOWERLINES, DRAW, "DrawPowerlines();");
+	Profile(DRAWPOWERLINES, DRAW, "DrawPowls();");
 	Profile(DRAWROADS, DRAW, "DrawRoads();");
 	Profile(DRAWMODEL1, DRAWBUILDINGS, "Draw model 1");
 	Profile(DRAWMODEL2, DRAWBUILDINGS, "Draw model 2");

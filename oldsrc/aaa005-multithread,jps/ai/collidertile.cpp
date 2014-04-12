@@ -1,0 +1,490 @@
+
+
+#include "collidertile.h"
+#include "../math/vec2i.h"
+#include "../math/3dmath.h"
+#include "../sys/workthread.h"
+#include "../sim/unit.h"
+#include "../sim/unittype.h"
+#include "../sim/building.h"
+#include "../sim/buildingtype.h"
+#include "../render/heightmap.h"
+#include "../math/hmapmath.h"
+#include "../phys/collision.h"
+#include "../sim/road.h"
+#include "../render/water.h"
+#include "../utils.h"
+#include "../render/shader.h"
+#include "../sim/selection.h"
+#include "../sim/sim.h"
+#include "../phys/trace.h"
+#include "binheap.h"
+#include "pathnode.h"
+#include "../math/vec2i.h"
+#include "pathdebug.h"
+#include "pathjob.h"
+#include "../debug.h"
+
+ColliderTile *g_collidertile = NULL;
+
+ColliderTile::ColliderTile()
+{
+#if 0
+	bool hasroad;
+	bool hasland;
+	bool haswater;
+	bool abrupt;	//abrupt incline?
+	list<int> units;
+	list<int> foliage;
+	int building;
+#endif
+
+	hasroad = false;
+	hasland = false;
+	haswater = false;
+	abrupt = false;
+	building = -1;
+	units[0] = -1;
+	units[1] = -1;
+	units[2] = -1;
+	units[3] = -1;
+}
+
+inline Vec2i PathNodePos(int cmposx, int cmposz)
+{
+	return Vec2i(cmposx/PATHNODE_SIZE, cmposz/PATHNODE_SIZE);
+}
+
+void FreePathGrid()
+{
+	if(g_collidertile)
+	{
+		delete [] g_collidertile;
+		g_collidertile = NULL;
+	}
+
+	g_pathdim = Vec2i(0,0);
+
+	for(int i=0; i<WORKTHREADS; i++)
+		g_workthread[i].destroy();
+}
+
+void AllocPathGrid(int cmwx, int cmwz)
+{
+	FreePathGrid();
+	g_pathdim.x = cmwx / PATHNODE_SIZE;
+	g_pathdim.y = cmwz / PATHNODE_SIZE;
+	g_collidertile = new ColliderTile [ g_pathdim.x * g_pathdim.y ];
+
+	for(int i=0; i<WORKTHREADS; i++)
+	{
+		g_workthread[i].alloc(g_pathdim.x, g_pathdim.y);
+	}
+}
+
+ColliderTile* ColliderTileAt(int nx, int nz)
+{
+	return &g_collidertile[ PathNodeIndex(nx, nz) ];
+}
+
+void FillColliderGrid()
+{
+	const int cwx = g_pathdim.x;
+	const int cwz = g_pathdim.y;
+
+	for(int x=0; x<cwx; x++)
+		for(int z=0; z<cwz; z++)
+		{
+			int cmx = x*PATHNODE_SIZE + PATHNODE_SIZE/2;
+			int cmz = z*PATHNODE_SIZE + PATHNODE_SIZE/2;
+			ColliderTile* cell = ColliderTileAt(x, z);
+            
+			//g_log<<"cell "<<x<<","<<z<<" cmpos="<<cmx<<","<<cmz<<" y="<<g_hmap.accheight(cmx, cmz)<<endl;
+
+			if(AtLand(cmx, cmz))
+			{
+				cell->hasland = true;
+				//g_log<<"land"<<endl;
+			}
+			else
+				cell->hasland = false;
+
+			if(AtWater(cmx, cmz))
+				cell->haswater = true;
+			else
+				cell->haswater = false;
+            
+			if(TileUnclimable(cmx, cmz))
+				cell->abrupt = true;
+			else
+				cell->abrupt = false;
+            
+			int tx = cmx/TILE_SIZE;
+			int tz = cmz/TILE_SIZE;
+
+			RoadTile* r = RoadAt(tx, tz);
+
+			if(r->on && r->finished)
+				cell->hasroad = true;
+			else
+				cell->hasroad = false;
+		}
+
+	for(int i=0; i<UNITS; i++)
+	{
+		Unit* u = &g_unit[i];
+	
+		if(!u->on)
+			continue;
+
+		u->fillcollider();
+	}
+
+	for(int i=0; i<BUILDINGS; i++)
+	{
+		Building* b = &g_building[i];
+
+		if(!b->on)
+			continue;
+
+		b->fillcollider();
+	}
+
+	for(int i=0; i<WORKTHREADS; i++)
+		g_workthread[i].resetcells();
+}
+
+void Unit::fillcollider()
+{
+	UnitT* t = &g_unitT[type];
+	int ui = this - g_unit;
+
+	//cm = centimeter position
+	int cmminx = cmpos.x - t->size.x/2;
+	int cmminz = cmpos.y - t->size.z/2;
+	int cmmaxx = cmminx + t->size.x - 1;
+	int cmmaxz = cmminz + t->size.z - 1;
+
+	//c = cell position
+	int cminx = cmminx / PATHNODE_SIZE;
+	int cminz = cmminz / PATHNODE_SIZE;
+	int cmaxx = cmmaxx / PATHNODE_SIZE;
+	int cmaxz = cmmaxz / PATHNODE_SIZE;
+	
+	for(int nz = cminz; nz <= cmaxz; nz++)
+		for(int nx = cminx; nx <= cmaxx; nx++)
+		{
+			ColliderTile* c = ColliderTileAt(nx, nz);
+
+			for(short uiter = 0; uiter < 4; uiter++)
+			{
+				if(c->units[uiter] < 0)
+				{
+					c->units[uiter] = ui;
+					break;
+				}
+			}
+		}
+}
+
+void Building::fillcollider()
+{
+	BuildingT* t = &g_buildingT[type];
+	int bi = this - g_building;
+
+	//t = tile position
+	int tminx = tilepos.x - t->widthx/2;
+	int tminz = tilepos.y - t->widthz/2;
+	int tmaxx = tminx + t->widthx;
+	int tmaxz = tminz + t->widthz;
+
+	//cm = centimeter position
+	int cmminx = tminx*TILE_SIZE;
+	int cmminz = tminz*TILE_SIZE;
+	int cmmaxx = tmaxx*TILE_SIZE - 1;
+	int cmmaxz = tmaxz*TILE_SIZE - 1;
+
+	//c = cell position
+	int cminx = cmminx / PATHNODE_SIZE;
+	int cminz = cmminz / PATHNODE_SIZE;
+	int cmaxx = cmmaxx / PATHNODE_SIZE;
+	int cmaxz = cmmaxz / PATHNODE_SIZE;
+	
+	for(int nz = cminz; nz <= cmaxz; nz++)
+		for(int nx = cminx; nx <= cmaxx; nx++)
+		{
+			ColliderTile* c = ColliderTileAt(nx, nz);
+			c->building = bi;
+		}
+}
+
+void Unit::freecollider()
+{
+	UnitT* t = &g_unitT[type];
+	int ui = this - g_unit;
+
+	//cm = centimeter position
+	int cmminx = cmpos.x - t->size.x/2;
+	int cmminz = cmpos.y - t->size.z/2;
+	int cmmaxx = cmminx + t->size.x - 1;
+	int cmmaxz = cmminz + t->size.z - 1;
+
+	//c = cell position
+	int cminx = cmminx / PATHNODE_SIZE;
+	int cminz = cmminz / PATHNODE_SIZE;
+	int cmaxx = cmmaxx / PATHNODE_SIZE;
+	int cmaxz = cmmaxz / PATHNODE_SIZE;
+	
+	for(int nz = cminz; nz <= cmaxz; nz++)
+		for(int nx = cminx; nx <= cmaxx; nx++)
+		{
+			ColliderTile* c = ColliderTileAt(nx, nz);
+
+			for(short uiter = 0; uiter < 4; uiter++)
+			{
+				if(c->units[uiter] == ui)
+					c->units[uiter] = -1;
+			}
+		}
+}
+
+void Building::freecollider()
+{
+	BuildingT* t = &g_buildingT[type];
+	int bi = this - g_building;
+
+	//t = tile position
+	int tminx = tilepos.x - t->widthx/2;
+	int tminz = tilepos.y - t->widthz/2;
+	int tmaxx = tminx + t->widthx;
+	int tmaxz = tminz + t->widthz;
+
+	//cm = centimeter position
+	int cmminx = tminx*TILE_SIZE;
+	int cmminz = tminz*TILE_SIZE;
+	int cmmaxx = tmaxx*TILE_SIZE - 1;
+	int cmmaxz = tmaxz*TILE_SIZE - 1;
+
+	//c = cell position
+	int cminx = cmminx / PATHNODE_SIZE;
+	int cminz = cmminz / PATHNODE_SIZE;
+	int cmaxx = cmmaxx / PATHNODE_SIZE;
+	int cmaxz = cmmaxz / PATHNODE_SIZE;
+	
+	for(int nz = cminz; nz <= cmaxz; nz++)
+		for(int nx = cminx; nx <= cmaxx; nx++)
+		{
+			ColliderTile* c = ColliderTileAt(nx, nz);
+
+			if(c->building == bi)
+				c->building = -1;
+		}
+}
+
+bool Walkable2(PathJob* pj, int cmposx, int cmposz)
+{
+	const int nx = cmposx / PATHNODE_SIZE;
+	const int nz = cmposz / PATHNODE_SIZE;
+
+	if(nx < 0 || nz < 0 || nx >= g_pathdim.x || nz >= g_pathdim.y)
+		return false;
+	
+	ColliderTile* cell = ColliderTileAt( nx, nz );
+
+#if 1
+	if(pj->roaded && !cell->hasroad)
+	{
+		return false;
+	}
+
+	if(pj->landborne && !cell->hasland)
+	{
+		return false;
+	}
+
+	if(pj->seaborne && !cell->haswater)
+	{
+		return false;
+	}
+#endif
+
+	UnitT* ut = &g_unitT[pj->utype];
+
+	int cmminx = cmposx - ut->size.x/2;
+	int cmminz = cmposz - ut->size.z/2;
+	int cmmaxx = cmminx + ut->size.x - 1;
+	int cmmaxz = cmminz + ut->size.z - 1;
+
+	int cminx = cmminx/PATHNODE_SIZE;
+	int cminz = cmminz/PATHNODE_SIZE;
+	int cmaxx = cmmaxx/PATHNODE_SIZE;
+	int cmaxz = cmmaxz/PATHNODE_SIZE;
+
+	if(cminx < 0 || cminz < 0 || cmaxx >= g_pathdim.x || cmaxz >= g_pathdim.y)
+	{
+		return false;
+	}
+	
+	for(int z=cminz; z<=cmaxz; z++)
+		for(int x=cminx; x<=cmaxx; x++)
+		{
+			cell = ColliderTileAt(x, z);
+
+			if(cell->building >= 0 && cell->building != pj->ignoreb)
+			{
+				Building* b = &g_building[cell->building];
+				BuildingT* t2 = &g_buildingT[b->type];
+
+				int tminx = b->tilepos.x - t2->widthx/2;
+				int tminz = b->tilepos.y - t2->widthz/2;
+				int tmaxx = tminx + t2->widthx;
+				int tmaxz = tminz + t2->widthz;
+				
+				int minx2 = tminx*TILE_SIZE;
+				int minz2 = tminz*TILE_SIZE;
+				int maxx2 = tmaxx*TILE_SIZE - 1;
+				int maxz2 = tmaxz*TILE_SIZE - 1;
+				
+				if(cmminx <= maxx2 && cmminz <= maxz2 && cmmaxx >= minx2 && cmmaxz >= minz2)
+					return false;
+			}
+
+			for(short uiter = 0; uiter < 4; uiter++)
+			{
+				short uindex = cell->units[uiter];
+
+				if( uindex < 0 )
+					continue;
+
+				Unit* u = &g_unit[uindex];
+
+				if(uindex != pj->thisu && uindex != pj->ignoreu && !u->hidden())
+				{
+#if 1
+					UnitT* t = &g_unitT[u->type];
+					
+					int cmminx2 = u->cmpos.x - t->size.x/2;
+					int cmminz2 = u->cmpos.y - t->size.z/2;
+					int cmmaxx2 = cmminx2 + t->size.x - 1;
+					int cmmaxz2 = cmminz2 + t->size.z - 1;
+
+					if(cmmaxx >= cmminx2 && cmmaxz >= cmminz2 && cmminx <= cmmaxx2 && cmminz <= cmmaxz2)
+					{
+
+						return false;
+					}
+#else
+					return false;
+#endif
+				}
+			}
+		}
+
+	return true;
+}
+
+bool Walkable(const PathJob* pj, const int nx, const int nz)
+{
+	if(nx < 0 || nz < 0 || nx >= g_pathdim.x || nz >= g_pathdim.y)
+		return false;
+	
+	ColliderTile* cell = ColliderTileAt( nx, nz );
+
+#if 1
+	if(pj->roaded && !cell->hasroad)
+	{
+		return false;
+	}
+
+	if(pj->landborne && !cell->hasland)
+	{
+		return false;
+	}
+
+	if(pj->seaborne && !cell->haswater)
+	{
+		return false;
+	}
+#endif
+
+	const UnitT* ut = &g_unitT[pj->utype];
+
+	const int cmposx = nx * PATHNODE_SIZE + PATHNODE_SIZE/2;
+	const int cmposz = nz * PATHNODE_SIZE + PATHNODE_SIZE/2;
+
+	const int cmminx = cmposx - ut->size.x/2;
+	const int cmminz = cmposz - ut->size.z/2;
+	const int cmmaxx = cmminx + ut->size.x - 1;
+	const int cmmaxz = cmminz + ut->size.z - 1;
+
+	const int cminx = cmminx/PATHNODE_SIZE;
+	const int cminz = cmminz/PATHNODE_SIZE;
+	const int cmaxx = cmmaxx/PATHNODE_SIZE;
+	const int cmaxz = cmmaxz/PATHNODE_SIZE;
+
+	if(cminx < 0 || cminz < 0 || cmaxx >= g_pathdim.x || cmaxz >= g_pathdim.y)
+	{
+		return false;
+	}
+	
+	for(int z=cminz; z<=cmaxz; z++)
+		for(int x=cminx; x<=cmaxx; x++)
+		{
+			cell = ColliderTileAt(x, z);
+
+			if(cell->building >= 0 && cell->building != pj->ignoreb)
+			{
+#if 0
+				Building* b = &g_building[cell->building];
+				BuildingT* t2 = &g_buildingT[b->type];
+
+				int tminx = b->tilepos.x - t2->widthx/2;
+				int tminz = b->tilepos.y - t2->widthz/2;
+				int tmaxx = tminx + t2->widthx;
+				int tmaxz = tminz + t2->widthz;
+				
+				int minx2 = tminx*TILE_SIZE;
+				int minz2 = tminz*TILE_SIZE;
+				int maxx2 = tmaxx*TILE_SIZE - 1;
+				int maxz2 = tmaxz*TILE_SIZE - 1;
+				
+				if(cmminx <= maxx2 && cmminz <= maxz2 && cmmaxx >= minx2 && cmmaxz >= minz2)
+					return false;
+#else
+				return false;
+#endif
+			}
+			
+			for(short uiter = 0; uiter < 4; uiter++)
+			{
+				short uindex = cell->units[uiter];
+
+				if( uindex < 0 )
+					continue;
+
+				Unit* u = &g_unit[uindex];
+
+				if(uindex != pj->thisu && uindex != pj->ignoreu && !u->hidden())
+				{
+#if 0
+					UnitT* t = &g_unitT[u->type];
+					
+					int cmminx2 = u->cmpos.x - t->size.x/2;
+					int cmminz2 = u->cmpos.y - t->size.z/2;
+					int cmmaxx2 = cmminx2 + t->size.x - 1;
+					int cmmaxz2 = cmminz2 + t->size.z - 1;
+
+					if(cmmaxx >= cmminx2 && cmmaxz >= cmminz2 && cmminx <= cmmaxx2 && cmminz <= cmmaxz2)
+					{
+
+						return false;
+					}
+#else
+					return false;
+#endif
+				}
+			}
+		}
+
+	return true;
+}

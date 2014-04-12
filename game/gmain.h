@@ -5,11 +5,11 @@
 
 #include "../common/window.h"
 
-#define VERSION				1.0f
+#define VERSION				3
 #define CONFIGFILE			"config.ini"
-#define TITLE				"Corporation-States"
+#define TITLE				"Corporations and States"
 #define SERVER_ADDR			"corpstates.com"
-#define CYCLE_FRAMES		(FRAME_RATE*60)
+#define CYCLE_FRAMES		(DRAW_FRAME_RATE*60)
 
 //#define TRUCK_DEBUG
 //#define TRUCK_DEBUG2

@@ -8,6 +8,7 @@
 #include "shader.h"
 #include "../debug.h"
 #include "vertexarray.h"
+#include "../sys/workthread.h"
 
 Model g_model[MODELS];
 vector<ModelToLoad> g_modelsToLoad;
@@ -53,9 +54,11 @@ void QueueModel(int* id, const char* relative, Vec3f scale, Vec3f translate)
 bool Load1Model()
 {
 	static int last = -1;
-
+	
+	MutexWait(g_drawmutex);
 	if(last+1 < g_modelsToLoad.size())
 		Status(g_modelsToLoad[last+1].filepath);
+	MutexRelease(g_drawmutex);
 
 	if(last >= 0)
 	{

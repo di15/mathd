@@ -8,7 +8,7 @@
 #include "math/3dmath.h"
 
 bool g_quit = false;
-double g_frameinterval = 0.0f;
+double g_drawfrinterval = 0.0f;
 int g_width = INI_WIDTH;
 int g_height = INI_HEIGHT;
 int g_bpp = INI_BPP;
@@ -21,12 +21,24 @@ Vec2i g_mousestart;
 bool g_keyintercepted = false;
 bool g_keys[256];
 bool g_mousekeys[3];
+#if 0
 double g_currentTime;
 double g_lastTime = 0.0f;		// This will hold the time from the last frame
 double g_framesPerSecond = 0.0f;		// This will store our fps
-double g_instantFPS = 0.0f;
+#endif
+double g_instantdrawfps = 0.0f;
 long long g_lasttime = GetTickCount();
 float g_zoom = INI_ZOOM;
+
+void TrackMouse()
+{
+	TRACKMOUSEEVENT tme;
+	tme.cbSize = sizeof(tme);
+	tme.dwFlags = TME_LEAVE | TME_HOVER;
+	tme.dwHoverTime = HOVER_DEFAULT;	//100;
+	tme.hwndTrack = g_hWnd;
+	TrackMouseEvent(&tme);
+}
 
 void AddRes(int w, int h)
 {
@@ -97,49 +109,50 @@ void Resize(int width, int height)
 	}
 }
 
-void CalculateFrameRate()
+void CalcDrawFrameRate()
 {
-	static double frameTime = 0.0f;				// This stores the last frame's time
+	static double frametime = 0.0f;				// This stores the last frame's time
+	static int framecounter = 0;
+	static double lasttime;
 
 	// Get the current time in seconds
-    g_currentTime = timeGetTime() * 0.001f;				
+    double currtime = timeGetTime() * 0.001f;				
 
 	// We added a small value to the frame interval to account for some video
 	// cards (Radeon's) with fast computers falling through the floor without it.
 
 	// Here we store the elapsed time between the current and last frame,
 	// then keep the current frame in our static variable for the next frame.
- 	g_frameinterval = g_currentTime - frameTime + 0.005f;
+ 	g_drawfrinterval = currtime - frametime;	// + 0.005f;
 	
-	//g_instantFPS = 1.0f / (g_currentTime - frameTime);
-	//g_instantFPS = 1.0f / g_frameinterval;
+	//g_instantdrawfps = 1.0f / (g_currentTime - frameTime);
+	//g_instantdrawfps = 1.0f / g_drawfrinterval;
 
-	frameTime = g_currentTime;
+	frametime = currtime;
 
 	// Increase the frame counter
-    ++g_framesPerSecond;
+    ++framecounter;
 
 	// Now we want to subtract the current time by the last time that was stored
 	// to see if the time elapsed has been over a second, which means we found our FPS.
-    if( g_currentTime - g_lastTime > 1.0f )
+    if( currtime - lasttime > 1.0f )
 	{
-		g_instantFPS = g_framesPerSecond;
+		g_instantdrawfps = framecounter;
 
 		// Here we set the lastTime to the currentTime
-	    g_lastTime = g_currentTime;
+	    lasttime = currtime;
 
 		// Reset the frames per second
-        g_framesPerSecond = 0;
+        framecounter = 0;
     }
 }
 
-
-bool AnimateNextFrame(int desiredFrameRate)
+bool DrawNextFrame(int desiredFrameRate)
 {
 	static double lastTime = GetTickCount() * 0.001;
 	static double elapsedTime = 0.0f;
 
-	double currentTime = GetTickCount() * 0.001; // Get the time (milliseconds = seconds * .001)
+	double currentTime = GetTickCount64() * 0.001; // Get the time (milliseconds = seconds * .001)
 	double deltaTime = currentTime - lastTime; // Get the slice of time
 	double desiredFPS = 1.0 / (double)desiredFrameRate; // Store 1 / desiredFrameRate
 

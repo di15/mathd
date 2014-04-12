@@ -22,6 +22,13 @@ varying vec2 texCoordOut0;
 varying vec3 normalOut;
 varying vec3 eyevec;
 
+const vec2 poissonDisk[4] = vec2[](
+  vec2( -0.94201624, -0.39906216 ),
+  vec2( 0.94558609, -0.76890725 ),
+  vec2( -0.094184101, -0.92938870 ),
+  vec2( 0.34495938, 0.29387760 )
+);
+
 void main (void)
 {
 	//if(elevy > maxelev)
@@ -49,9 +56,25 @@ void main (void)
 
 	alph = 1.0;
 
+	float cosTheta = dot( normalOut, light_vec );
+	float shadow_bias = 0.005 * tan(acos(cosTheta)); 
+	// cosTheta is dot( n,l ), clamped between 0 and 1
+	shadow_bias = clamp(shadow_bias, 0,0.01);
+
 	vec3 smcoord = lpos.xyz / lpos.w;
-	float shadow = max(0.6, float(smcoord.z <= texture(shadowmap, smcoord.xy).x));
-	//float shadow = 1;
+	//float shadow = max(0.6, 
+	//	float(smcoord.z - shadow_bias <= texture(shadowmap, smcoord.xy).x));
+		//float(smcoord.z <= texture(shadowmap, smcoord.xy).x));
+	float shadow = 1;
+
+	for (int i=0;i<4;i++)
+	{
+  		if ( texture2D( shadowmap, smcoord.xy + poissonDisk[i]/700.0 ).z 
+			<  smcoord.z - shadow_bias )
+		{
+    			shadow-=0.1;
+  		}
+	}
 
 	//vec3 bump = normalize( texture(normalmap, texCoordOut0).xyz * 2.0 - 1.0);
 

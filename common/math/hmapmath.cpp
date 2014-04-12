@@ -5,6 +5,12 @@
 #include "../math/polygon.h"
 #include "../math/3dmath.h"
 #include "hmapmath.h"
+#include "../render/water.h"
+#include "../utils.h"
+#include "../phys/collision.h"
+#include "../window.h"
+#include "../math/camera.h"
+
 
 float Bilerp(Heightmap* hmap, float x, float z)
 {
@@ -32,13 +38,18 @@ float Bilerp(Heightmap* hmap, float x, float z)
 bool GetMapIntersection2(Heightmap* hmap, Vec3f* vLine, Vec3f* vIntersection)
 {
 	Vec3f vQuad[4];
-	
-#define WATER_LEVEL	1000
 
+#if 1
 	vQuad[0] = Vec3f(-10*hmap->m_widthx*TILE_SIZE, WATER_LEVEL*2.0f, -10*hmap->m_widthz*TILE_SIZE);
 	vQuad[1] = Vec3f(10*hmap->m_widthx*TILE_SIZE, WATER_LEVEL*2.0f, -10*hmap->m_widthz*TILE_SIZE);
 	vQuad[2] = Vec3f(10*hmap->m_widthx*TILE_SIZE, WATER_LEVEL*2.0f, 10*hmap->m_widthz*TILE_SIZE);
 	vQuad[3] = Vec3f(-10*hmap->m_widthx*TILE_SIZE, WATER_LEVEL*2.0f, 10*hmap->m_widthz*TILE_SIZE);
+#else
+	vQuad[3] = Vec3f(-10*hmap->m_widthx*TILE_SIZE, WATER_LEVEL*2.0f, -10*hmap->m_widthz*TILE_SIZE);
+	vQuad[2] = Vec3f(10*hmap->m_widthx*TILE_SIZE, WATER_LEVEL*2.0f, -10*hmap->m_widthz*TILE_SIZE);
+	vQuad[1] = Vec3f(10*hmap->m_widthx*TILE_SIZE, WATER_LEVEL*2.0f, 10*hmap->m_widthz*TILE_SIZE);
+	vQuad[0] = Vec3f(-10*hmap->m_widthx*TILE_SIZE, WATER_LEVEL*2.0f, 10*hmap->m_widthz*TILE_SIZE);
+#endif
 
 	if(IntersectedPolygon(vQuad, vLine, 4, vIntersection))
 		return true;
@@ -51,7 +62,7 @@ bool GetMapIntersection(Heightmap* hmap, Vec3f* vLine, Vec3f* vIntersection)
 {
 	Vec3f vTri[3];
 
-	Vec3f* v = hmap->m_vertices;
+	Vec3f* v = hmap->m_collverts;
 	int wx = hmap->m_widthx;
 	int wz = hmap->m_widthz;
 
@@ -193,7 +204,7 @@ bool TileIntersect(Heightmap* hmap, Vec3f* line, int x, int z, Vec3f* intersecti
 	Vec3f tri[3];
 	const int wx = hmap->m_widthx;
 	const int wz = hmap->m_widthz;
-	Vec3f* v = hmap->m_vertices;
+	Vec3f* v = hmap->m_collverts;
 
 	tri[0] = v[ (z * wx + x) * 3 * 2 + 0 ];
 	tri[1] = v[ (z * wx + x) * 3 * 2 + 1 ];
@@ -212,8 +223,10 @@ bool TileIntersect(Heightmap* hmap, Vec3f* line, int x, int z, Vec3f* intersecti
 	return false;
 }
 
-bool FastMapIntersect(Heightmap* hmap, Vec3f line[2], Vec3f* intersection)
+bool FastMapIntersectOld(Heightmap* hmap, Vec3f line[2], Vec3f* intersection)
 {
+	//return GetMapIntersection(hmap, line, intersection);
+
 	// If both start and end are on one side of the map, we can't get an intersection, so return false.
 
 	if(line[0].x < 0 && line[1].x < 0)
@@ -372,4 +385,267 @@ bool FastMapIntersect(Heightmap* hmap, Vec3f line[2], Vec3f* intersection)
 	}
 
 	return false;
+}
+
+
+bool FastMapIntersect(Heightmap* hmap, Vec3f* line, Vec3f* intersection)
+{
+	Vec3f ray = line[1] - line[0];
+	Vec3f tilestart = line[0] / TILE_SIZE;
+	Vec3f tileray = ray / TILE_SIZE;
+
+	int len = Magnitude(tileray);
+
+	for(int i=0; i<len; i++)
+	{
+		Vec3f pos = tilestart + tileray * (float)i / (float)len;
+		int tx = pos.x;
+		int tz = pos.z;
+
+		if(tx < 0)
+			continue;
+
+		if(tz < 0)
+			continue;
+
+		if(tx >= hmap->m_widthx)
+			continue;
+
+		if(tz >= hmap->m_widthz)
+			continue;
+		
+		if(TileIntersect(hmap, line, tx, tz, intersection))
+			return true;
+	}
+
+	return false;
+}
+
+float Highest(int minx, int minz, int maxx, int maxz)
+{
+	float highest = 0;
+
+	for(int x=minx; x<=maxx; x++)
+		for(int z=minz; z<=maxz; z++)
+		{
+#if 0
+			g_log<<"x,z"<<x<<","<<z<<endl;
+			g_log.flush();
+#endif
+
+			if( g_hmap.getheight(x, z) > highest || (x==minx && z==minz) )
+				highest = g_hmap.getheight(x, z);
+		}
+
+	return highest;
+}
+
+bool TileUnclimablei(int tx, int tz)
+{
+	float h0 = g_hmap.getheight(tx, tz);
+	float h1 = g_hmap.getheight(tx+1, tz);
+	float h2 = g_hmap.getheight(tx, tz+1);
+	float h3 = g_hmap.getheight(tx+1, tz+1);
+    
+	float minh = min(h0, min(h1, min(h2, h3)));
+	float maxh = max(h0, max(h1, max(h2, h3)));
+    
+	if(fabs(maxh - minh) > MAX_CLIMB_INCLINE)
+	{
+#if 0
+		g_log<<tx<<","<<tz<<" ("<<g_hmap.m_widthx<<","<<g_hmap.m_widthz<<" incline "<<fabs(maxh - minh)<<endl;
+		g_log.flush();
+#endif
+#if 0
+		g_collidertype = COLLIDER_TERRAIN;
+#endif
+		return true;
+	}
+    
+	return false;
+}
+
+bool TileUnclimable(float px, float pz)
+{
+	int tx = px / TILE_SIZE;
+	int tz = pz / TILE_SIZE;
+    
+	return TileUnclimablei(tx, tz);
+}
+
+bool AnyWateri(int tx, int tz)
+{
+	if(g_hmap.getheight(tx, tz) <= WATER_LEVEL)
+		return true;
+    
+	if(g_hmap.getheight(tx+1, tz) <= WATER_LEVEL)
+		return true;
+    
+	if(g_hmap.getheight(tx, tz+1) <= WATER_LEVEL)
+		return true;
+    
+	if(g_hmap.getheight(tx+1, tz+1) <= WATER_LEVEL)
+		return true;
+    
+	return false;
+}
+
+bool AnyLandi(int tx, int tz)
+{
+	if(g_hmap.getheight(tx, tz) > WATER_LEVEL)
+		return true;
+    
+	if(g_hmap.getheight(tx+1, tz) > WATER_LEVEL)
+		return true;
+    
+	if(g_hmap.getheight(tx, tz+1) > WATER_LEVEL)
+		return true;
+    
+	if(g_hmap.getheight(tx+1, tz+1) > WATER_LEVEL)
+		return true;
+    
+	return false;
+}
+
+bool AnyWater(int cmx, int cmz)
+{
+	int tx = cmx / TILE_SIZE;
+	int tz = cmz / TILE_SIZE;
+    
+	return AnyWateri(tx, tz);
+}
+
+bool AtWater(int cmx, int cmz)
+{
+#if 0
+	const float h = Bilerp(&g_hmap, cmx, cmz);
+#else
+	const float h = g_hmap.accheight(cmx, cmz);
+#endif
+    
+	if(h <= WATER_LEVEL)
+	{
+#if 0
+		g_collidertype = COLLIDER_TERRAIN;
+#endif
+		return true;
+	}
+    
+	return false;
+}
+
+bool AtLand(int cmx, int cmz)
+{
+#if 0
+	const float h = Bilerp(&g_hmap, cmx, cmz);
+#else
+	const float h = g_hmap.accheight(cmx, cmz);
+#endif
+    
+	if(h > WATER_LEVEL)
+	{
+#if 0
+		g_collidertype = COLLIDER_TERRAIN;
+#endif
+		return true;
+	}
+    
+	return false;
+}
+
+Heightmap* SelectHMZoom(float zoom)
+{
+#if 0
+	float zoomrange = MAX_ZOOM - MIN_ZOOM;
+	
+	float zoom2 = MIN_ZOOM + zoomrange * 0.08f;
+	float zoom4 = MIN_ZOOM + zoomrange * 0.05f;
+	float zoom8 = MIN_ZOOM + zoomrange * 0.01f;
+
+	if(zoom <= zoom8)
+		return &g_hmap8;
+	else if(zoom <= zoom4)
+		return &g_hmap4;
+	else if(zoom <= zoom2)
+		return &g_hmap2;
+	else
+		return &g_hmap;
+#else
+	return &g_hmap;
+#endif
+}
+
+void CalcMapView()
+{
+	return;
+
+	Vec3f campos = g_camera.zoompos();
+	Vec3f camup2 = g_camera.up2();
+	Vec3f viewdir = Normalize(g_camera.m_view - campos);
+
+	Vec3f topleftend = OnNearPersp(0, 0, g_width, g_height, campos, g_camera.m_strafe, camup2, viewdir, FIELD_OF_VIEW, MAX_DISTANCE/g_zoom);
+	Vec3f toprightend = OnNearPersp(g_width, 0, g_width, g_height, campos, g_camera.m_strafe, camup2, viewdir, FIELD_OF_VIEW, MAX_DISTANCE/g_zoom);
+	Vec3f bottomleftend = OnNearPersp(0, g_height, g_width, g_height, campos, g_camera.m_strafe, camup2, viewdir, FIELD_OF_VIEW, MAX_DISTANCE/g_zoom);
+	Vec3f bottomrightend = OnNearPersp(g_width, g_height, g_width, g_height, campos, g_camera.m_strafe, camup2, viewdir, FIELD_OF_VIEW, MAX_DISTANCE/g_zoom);
+
+	Vec3f topleftline[2];
+	Vec3f toprightline[2];
+	Vec3f bottomleftline[2];
+	Vec3f bottomrightline[2];
+
+	Vec3f ray = Normalize(g_camera.m_view - g_camera.m_pos) * 1000000.0f;
+	
+	topleftline[0] = campos;
+	toprightline[0] = campos;
+	bottomleftline[0] = campos;
+	bottomrightline[0] = campos;
+	
+	topleftline[1] = topleftend;
+	toprightline[1] = toprightend;
+	bottomleftline[1] = bottomleftend;
+	bottomrightline[1] = bottomrightend;
+
+	Vec3f topleftinter;
+	Vec3f toprightinter;
+	Vec3f bottomleftinter;
+	Vec3f bottomrightinter;
+
+	if(!FastMapIntersect(&g_hmap, topleftline, &topleftinter))
+	{
+		//g_log<<"noint1";
+		GetMapIntersection2(&g_hmap, topleftline, &topleftinter);
+	}
+
+	if(!FastMapIntersect(&g_hmap, toprightline, &toprightinter))
+	{
+		//g_log<<"noint2";
+		GetMapIntersection2(&g_hmap, toprightline, &toprightinter);
+	}
+
+	if(!FastMapIntersect(&g_hmap, bottomleftline, &bottomleftinter))
+	{
+		//g_log<<"noint3";
+		GetMapIntersection2(&g_hmap, bottomleftline, &bottomleftinter);
+	}
+
+	if(!FastMapIntersect(&g_hmap, bottomrightline, &bottomrightinter))
+	{
+		//g_log<<"noint4";
+		GetMapIntersection2(&g_hmap, bottomrightline, &bottomrightinter);
+	}
+	
+	float minx = min(topleftinter.x, min(toprightinter.x, min(bottomleftinter.x, bottomrightinter.x)));
+	float minz = min(topleftinter.z, min(toprightinter.z, min(bottomleftinter.z, bottomrightinter.z)));
+	float maxx = max(topleftinter.x, max(toprightinter.x, max(bottomleftinter.x, bottomrightinter.x)));
+	float maxz = max(topleftinter.z, max(toprightinter.z, max(bottomleftinter.z, bottomrightinter.z)));
+	/*
+	minx = 127/2 - 10;
+	minz = 127/2 - 10;
+	maxx = 127/2 + 10;
+	maxz = 127/2 + 10;
+	*/
+	g_mapview[0].x = Clipi(minx / TILE_SIZE, 0, g_hmap.m_widthx-1);
+	g_mapview[0].y = Clipi(minz / TILE_SIZE, 0, g_hmap.m_widthz-1);
+	g_mapview[1].x = Clipi(ceil(maxx / TILE_SIZE), 0, g_hmap.m_widthx-1);
+	g_mapview[1].y = Clipi(ceil(maxz / TILE_SIZE), 0, g_hmap.m_widthz-1);
 }

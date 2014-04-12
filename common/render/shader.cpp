@@ -56,6 +56,11 @@ PFNGLUNIFORM4FPROC glUniform4f;
 PFNGLENABLEVERTEXATTRIBARRAYPROC glEnableVertexAttribArray;
 PFNGLBINDBUFFERPROC glBindBuffer;
 PFNGLBUFFERDATAPROC glBufferData;
+PFNGLDRAWARRAYSINSTANCEDPROC glDrawArraysInstanced;
+PFNGLGENBUFFERSPROC glGenBuffers;
+PFNGLDELETEBUFFERSPROC glDeleteBuffers;
+PFNGLMAPBUFFERPROC glMapBuffer;
+PFNGLUNMAPBUFFERPROC glUnmapBuffer;
 
 Shader g_shader[SHADERS];
 int g_curS = 0;
@@ -177,6 +182,11 @@ void InitGLSL()
 	glEnableVertexAttribArray = (PFNGLENABLEVERTEXATTRIBARRAYPROC)wglGetProcAddress("glEnableVertexAttribArray");
 	glBindBuffer = (PFNGLBINDBUFFERPROC)wglGetProcAddress("glBindBuffer");
 	glBufferData = (PFNGLBUFFERDATAPROC)wglGetProcAddress("glBufferData");
+	glDrawArraysInstanced = (const PFNGLDRAWARRAYSINSTANCEDPROC)wglGetProcAddress("glDrawArraysInstanced");
+	glGenBuffers = (PFNGLGENBUFFERSPROC) wglGetProcAddress("glGenBuffers");
+	glDeleteBuffers = (PFNGLDELETEBUFFERSPROC)wglGetProcAddress("glDeleteBuffers");
+	glMapBuffer = (PFNGLMAPBUFFERPROC)wglGetProcAddress("glMapBuffer");
+	glUnmapBuffer = (PFNGLUNMAPBUFFERPROC)wglGetProcAddress("glUnmapBuffer");
 	
 	LoadShader(SHADER_ORTHO, "shaders/ortho.vert", "shaders/ortho.frag");
 	LoadShader(SHADER_COLOR2D, "shaders/color2d.vert", "shaders/color2d.frag");
@@ -184,11 +194,18 @@ void InitGLSL()
 	LoadShader(SHADER_COLOR3D, "shaders/color3d.vert", "shaders/color3d.frag");
 	LoadShader(SHADER_BILLBOARD, "shaders/billboard.vert", "shaders/billboard.frag");
 	LoadShader(SHADER_DEPTH, "shaders/depth.vert", "shaders/depth.frag");
+	LoadShader(SHADER_DEPTHTRANSP, "shaders/depth.vert", "shaders/depthtransp.frag");
 	LoadShader(SHADER_SHADOW, "shaders/shadow.vert", "shaders/shadow.frag");
 	LoadShader(SHADER_OWNED, "shaders/owned.vert", "shaders/owned.frag");
 	//LoadShader(SHADER_MODEL, "shaders/building.vert", "shaders/building.frag");
 	LoadShader(SHADER_MAPTILES, "shaders/maptiles.vert", "shaders/maptiles.frag");
 	LoadShader(SHADER_WATER, "shaders/water.vert", "shaders/water.frag");
+	LoadShader(SHADER_BORDERS, "shaders/borders.vert", "shaders/borders.frag");
+	LoadShader(SHADER_FOLIAGE, "shaders/foliage.vert", "shaders/foliage.frag");
+	LoadShader(SHADER_MAPTILESMM, "shaders/maptilesmm.vert", "shaders/maptilesmm.frag");
+	LoadShader(SHADER_WATERMM, "shaders/watermm.vert", "shaders/watermm.frag");
+	LoadShader(SHADER_BORDERSMM, "shaders/bordersmm.vert", "shaders/bordersmm.frag");
+	LoadShader(SHADER_MAPTILESPREREND, "shaders/maptilesprerend.vert", "shaders/maptilesprerend.frag");
 }
 
 string LoadTextFile(char* strFile)
@@ -196,7 +213,10 @@ string LoadTextFile(char* strFile)
 	ifstream fin(strFile);
 
 	if(!fin)
+	{
+		g_log<<"Failed to load file "<<strFile<<endl;
 		return "";
+	}
 
 	string strLine = "";
 	string strText = "";
@@ -264,6 +284,7 @@ void LoadShader(int shader, char* strVertex, char* strFragment)
     s->MapAttrib(SSLOT_NORMAL, "normalIn");
     s->MapAttrib(SSLOT_TEXCOORD0, "texCoordIn0");
     s->MapAttrib(SSLOT_TEXCOORD1, "texCoordIn1");
+	s->MapAttrib(SSLOT_VERTCOLORS, "vertcolors");
     //s->MapAttrib(SSLOT_TANGENT, "tangent");
 	s->MapUniform(SSLOT_SHADOWMAP, "shadowmap");
 	s->MapUniform(SSLOT_LIGHTMATRIX, "lightMatrix");
@@ -307,6 +328,12 @@ void LoadShader(int shader, char* strVertex, char* strFragment)
 	s->MapUniform(SSLOT_OWNERMAP, "ownermap");
 	s->MapUniform(SSLOT_MAPMINZ, "mapminz");
 	s->MapUniform(SSLOT_MAPMAXZ, "mapmaxz");
+	s->MapUniform(SSLOT_MODELMATS, "modelmats");
+	s->MapUniform(SSLOT_ONSWITCHES, "onswitches");
+	s->MapUniform(SSLOT_MAPMINX, "mapminx");
+	s->MapUniform(SSLOT_MAPMAXX, "mapmaxx");
+	s->MapUniform(SSLOT_MAPMINY, "mapminy");
+	s->MapUniform(SSLOT_MAPMAXY, "mapmaxy");
 }
 
 void UseS(int shader)		

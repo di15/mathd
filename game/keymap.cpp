@@ -8,6 +8,9 @@
 #include "../common/gui/gui.h"
 #include "../common/math/camera.h"
 #include "../common/math/vec3f.h"
+#include "../common/math/hmapmath.h"
+#include "../common/render/heightmap.h"
+#include "../common/window.h"
 
 #if 0
 #include "3dmath.h"
@@ -90,9 +93,9 @@ void MouseLeftButtonDown()
 			if(g_build == ROAD)
 				UpdateRoadPlans();
 			else if(g_build == POWERLINE)
-				UpdatePowerlinePlans();
+				UpdatePowlPlans();
 			else if(g_build == PIPELINE)
-				UpdatePipelinePlans();
+				UpdateCrPipePlans();
 		}
 		else
 		{
@@ -156,7 +159,7 @@ void MouseLeftButtonUp()
 		}
 		else if(g_build == POWERLINE)
 		{
-			PlacePowerline();
+			PlacePowl();
 			g_build = NOTHING;
 			if(g_mode != EDITOR)
 				g_canselect = true;
@@ -165,7 +168,7 @@ void MouseLeftButtonUp()
 		}
 		else if(g_build == PIPELINE)
 		{
-			PlacePipeline();
+			PlaceCrPipe();
 			g_build = NOTHING;
 			if(g_mode != EDITOR)
 				g_canselect = true;
@@ -189,7 +192,7 @@ void MouseRightButtonUp()
 			return;
 
 		int i = g_selection[0];
-		CUnit* u = &g_unit[i];
+		Unit* u = &g_unit[i];
 
 		if(u->type == LABOURER || u->type == TRUCK)
 			return;
@@ -219,10 +222,10 @@ void MouseMove()
 {
 	if(g_mode == PLAY || g_mode == EDITOR)
 	{
-		if(g_mousekeys[1])
+		if(g_mousekeys[MOUSEKEY_MIDDLE])
 			g_camera.SetViewByMouse();
 
-		if(g_mousekeys[0] && g_minimapdrag)
+		if(g_mousekeys[MOUSEKEY_LEFT] && g_minimapdrag)
 		{
 			if(OverMinimap())
 			{
@@ -234,7 +237,7 @@ void MouseMove()
 
 		if(g_mode == EDITOR)
 		{
-			if(!g_mousekeys[0])
+			if(!g_mousekeys[MOUSEKEY_LEFT])
 			{
 				g_vStart = g_vTile;
 				g_vMouseStart = g_vMouse;
@@ -251,7 +254,7 @@ void MouseMidButtonDown()
 {
 	if(g_mode == PLAY || g_mode == EDITOR)
 	{
-		if(g_mousekeys[1])
+		if(g_mousekeys[MOUSEKEY_MIDDLE])
 		{
 			CenterMouse();
 		}
@@ -262,32 +265,37 @@ void MouseMidButtonUp()
 {
 }
 
-void RotateAbout()
-{
-	float dx = g_mouse.x - g_width/2;
-	float dy = g_mouse.y - g_height/2;
-
-	g_camera.rotateabout(g_camera.m_view, dy / 100.0f, g_camera.m_strafe.x, g_camera.m_strafe.y, g_camera.m_strafe.z);
-	g_camera.rotateabout(g_camera.m_view, dx / 100.0f, g_camera.m_up.x, g_camera.m_up.y, g_camera.m_up.z);
-}
-
-void MouseMove()
-{
-	if(g_mode == PLAY || g_mode == EDITOR)
-	{
-		if(g_mousekeys[1])
-		{
-			RotateAbout();
-			CenterMouse();
-		}
-	}
-}
-
 void MouseWheel(int delta)
 {        
 	if(g_mode == PLAY || g_mode == EDITOR)
 	{
+		if(g_zoom <= MIN_ZOOM && delta < 0)
+			return;
+
+		if(g_zoom >= MAX_ZOOM && delta > 0)
+			return;
+
+		float oldzoom = g_zoom;
+		Vec3f line[2];
+		line[0] = g_camera.zoompos();
+
 		g_zoom *= 1.0f + (float)delta / 10.0f;
+		line[1] = g_camera.zoompos();
+
+		Vec3f ray = Normalize( line[1] - line[0] );
+
+		line[0] = line[0] - ray;
+		line[1] = line[1] + ray;
+
+		Vec3f clip;
+#if 0
+		if(GetMapIntersection(&g_hmap, line, &clip))
+#else
+		if(FastMapIntersect(&g_hmap, line, &clip))
+#endif
+			g_zoom = oldzoom;
+		else
+			CalcMapView();
 	}
 }
 
@@ -310,7 +318,6 @@ void MapKeys()
 	AssignRButton(NULL, &MouseRightButtonUp);
 #endif
 	
-	AssignMouseMove(&MouseMove);
 	AssignMouseWheel(&MouseWheel);
 	AssignMButton(MouseMidButtonDown, MouseMidButtonUp);
 	AssignKey('R', ZoomOut, NULL);

@@ -46,8 +46,8 @@ UString::UString(unsigned int k)
 UString& UString::operator=(const UString& original)
 {
 #ifdef USTR_DEBUG
-	//g_log<<"UString= ["<<rawstr()<<"] => ["<<original.rawstr()<<"]"<<endl;
-	//g_log.flush();
+	g_log<<"UString= ["<<rawstr()<<"] => ["<<original.rawstr()<<"]"<<endl;
+	g_log.flush();
 #endif
 
 	delete [] m_data;
@@ -96,8 +96,8 @@ UString UString::substr(int start, int len) const
 	newstr.m_data[len] = 0;
 
 #ifdef USTR_DEBUG
-	//g_log<<"USt substr :: "<<newstr.rawstr()<<endl;
-	//g_log.flush();
+	g_log<<"USt substr :: "<<newstr.rawstr()<<endl;
+	g_log.flush();
 #endif
 
 	return newstr;

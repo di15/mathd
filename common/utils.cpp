@@ -36,7 +36,7 @@ const string FileDateTime()
 }
 
 
-void OpenLog(const char* filename, float version)
+void OpenLog(const char* filename, int version)
 {
 	char fullpath[MAX_PATH+1];
 	FullPath(filename, fullpath);
@@ -213,3 +213,29 @@ void BackSlashes(char* corrected)
 			corrected[i] = '\\';
 }
 
+void ErrorMessage(const char* title, const char* message)
+{
+#ifdef PLATFORM_WIN32
+    MessageBox(g_hWnd, message, title, MB_OK);
+#else
+    SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, title, message, NULL);
+#endif
+}
+
+void InfoMessage(const char* title, const char* message)
+{
+#ifdef PLATFORM_WIN32
+		MessageBox(g_hWnd, message, title, MB_OK);
+#else
+    SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_INFORMATION, title, message, NULL);
+#endif
+}
+
+void WarningMessage(const char* title, const char* message)
+{
+#ifdef PLATFORM_WIN32
+		MessageBox(g_hWnd, message, title, MB_OK);
+#else
+    SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_WARNING, title, message, NULL);
+#endif
+}

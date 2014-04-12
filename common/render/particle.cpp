@@ -66,7 +66,7 @@ void Particle::Update(Billboard* billb)
 	Vec3f trace = g_edmap.TraceRay(billb->pos, to);
 
 	if(trace != to && t->collision != NULL)
-		t->collision(this, billb, trace, g_edmap.CollisionNormal());
+	t->collision(this, billb, trace, g_edmap.CollisionNormal());
 	*/
 
 	billb->pos = billb->pos + vel;
@@ -113,7 +113,7 @@ void UpdateParticles()
 			continue;
 
 		p = &g_particle[b->particle];
-		
+
 		p->Update(b);
 	}
 }

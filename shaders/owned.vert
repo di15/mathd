@@ -40,9 +40,9 @@ void main(void)
 	vec4 vpos = model * position;
 	vpos.w = 1;
 	lpos = lightMatrix * vpos;
-	//lpos.w = 1;
+	lpos.w = 1;
 	gl_Position = projection * (view * (model * position));
-	gl_Position.w = 1;
+	//gl_Position.w = 1;
 
 	elevy = position.y;
 	//elevtransp = 1;

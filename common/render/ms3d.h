@@ -2,8 +2,6 @@
 #ifndef MS3D_H
 #define MS3D_H
 
-#pragma warning( disable : 4160 )
-
 #include "../platform.h"
 #include "../math/3dmath.h"
 #include "../math/vec3f.h"

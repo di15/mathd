@@ -451,6 +451,8 @@ void MS3DModel::genva(VertexArray** vertexArrays, Vec3f scale, Vec3f translate, 
 						vertices[vert].z = newVertex.z * scale.z + translate.z;
 					}
 
+
+
 					//vert ++;
 
 					// Reverse vertex order
@@ -467,14 +469,17 @@ void MS3DModel::genva(VertexArray** vertexArrays, Vec3f scale, Vec3f translate, 
 
 				Vec3f normal;
 				Vec3f tri[3];
-				tri[0] = vertices[vert-3];
+				tri[0] = vertices[vert-3+0];
 				tri[1] = vertices[vert-3+1];
 				tri[2] = vertices[vert-3+2];
 				//normal = Normal2(tri);
 				normal = Normal(tri);	//Reverse order
-				//normals[i] = normal;
-				//normals[i+1] = normal;
-				//normals[i+2] = normal;
+
+#if 1	// No normal smoothing?
+				normals[vert-3+0] = normal;
+				normals[vert-3+1] = normal;
+				normals[vert-3+2] = normal;
+#endif
 
 				for(int k = 0; k < 3; k++)
 				{
@@ -516,9 +521,9 @@ void MS3DModel::genva(VertexArray** vertexArrays, Vec3f scale, Vec3f translate, 
 						g_log.flush();
 					}*/
 
+#if 0	// Smooth normals?
 					normals[vert] = weighsum;
-					//normals[vert+1] = weighsum;
-					//normals[vert+2] = weighsum;
+#endif
 
 					//vert ++;
 
@@ -625,7 +630,20 @@ void MS3DModel::advanceanim()
 
 		if(pJoint->m_numRotationKeyframes == 0 && pJoint->m_numTranslationKeyframes == 0)
 		{
+#if 0
 			pJoint->m_final.set( pJoint->m_absolute.m_matrix);
+#else
+			Matrix relativeFinal( pJoint->m_relative );
+
+			if ( pJoint->m_parent == -1 )
+				pJoint->m_final.set( relativeFinal.m_matrix );
+			else
+			{
+				pJoint->m_final.set( m_pJoints[pJoint->m_parent].m_final.m_matrix );
+				pJoint->m_final.postMultiply( relativeFinal );
+			}
+#endif
+
 			continue;
 		}
 

@@ -1,0 +1,525 @@
+//
+// gviewport.cpp
+//
+//
+
+#include "../../common/render/shader.h"
+#include "../../common/gui/gui.h"
+#include "../../common/math/3dmath.h"
+#include "../../common/window.h"
+#include "../../common/platform.h"
+#include "../../common/gui/font.h"
+#include "../../common/math/camera.h"
+#include "../../common/math/matrix.h"
+#include "../../common/render/shadow.h"
+#include "../../common/render/heightmap.h"
+#include "../../common/math/vec4f.h"
+#include "../../common/math/brush.h"
+#include "../../common/math/frustum.h"
+#include "../../common/keycodes.h"
+#include "../../common/sim/sim.h"
+#include "gviewport.h"
+#include "../../common/math/hmapmath.h"
+#include "../../common/render/border.h"
+#include "../../common/render/water.h"
+#include "../../common/save/savemap.h"
+#include "../../common/gui/widgets/spez/bottompanel.h"
+
+ViewportT g_viewportT[VIEWPORT_TYPES];
+Viewport g_viewport[4];
+//Vec3f g_focus;
+static Vec3f accum(0,0,0);
+bool g_changed = false;
+
+ViewportT::ViewportT(Vec3f offset, Vec3f up, const char* label, bool axial)
+{
+	m_offset = offset;
+	m_up = up;
+	strcpy(m_label, label);
+	m_axial = axial;
+}
+
+Viewport::Viewport()
+{
+	m_drag = false;
+	m_ldown = false;
+	m_rdown = false;
+}
+
+Viewport::Viewport(int type)
+{
+	m_drag = false;
+	m_ldown = false;
+	m_rdown = false;
+	m_mdown = false;
+	m_type = type;
+}
+
+Vec3f Viewport::up()
+{
+    Vec3f upvec = g_camera.m_up;
+	ViewportT* t = &g_viewportT[m_type];
+
+	if(t->m_axial)
+		upvec = t->m_up;
+
+	return upvec;
+}
+
+Vec3f Viewport::up2()
+{
+    Vec3f upvec = g_camera.up2();
+	ViewportT* t = &g_viewportT[m_type];
+
+	if(t->m_axial)
+		upvec = t->m_up;
+
+	return upvec;
+}
+
+Vec3f Viewport::strafe()
+{
+	Vec3f upvec = up();
+	ViewportT* t = &g_viewportT[m_type];
+	Vec3f sidevec = Normalize(Cross(Vec3f(0,0,0)-t->m_offset, upvec));
+
+	//if(!t->m_axial)
+	//	sidevec = g_camera.m_strafe;
+
+	return sidevec;
+}
+
+Vec3f Viewport::focus()
+{
+	Vec3f viewvec = g_camera.m_view;
+	return viewvec;
+}
+
+Vec3f Viewport::viewdir()
+{
+	Vec3f focusvec = focus();
+	Vec3f posvec = pos();
+	//Vec3f viewvec = posvec + Normalize(focusvec-posvec);
+	//return viewvec;
+	return focusvec-posvec;
+}
+
+Vec3f Viewport::pos()
+{
+    Vec3f posvec = g_camera.m_pos;
+
+#if 0
+	if(g_projtype == PROJ_PERSP && !t->m_axial)
+	{
+		Vec3f dir = Normalize( g_camera.m_view - g_camera.m_pos );
+		posvec = g_camera.m_view - dir * 1000.0f / g_zoom;
+	}
+#endif
+
+	ViewportT* t = &g_viewportT[m_type];
+
+	if(t->m_axial)
+		posvec = g_camera.m_view + t->m_offset;
+
+	return posvec;
+}
+
+void DrawMMFrust()
+{
+	Vec3f campos = g_camera.zoompos();
+	Vec3f camside = g_camera.m_strafe;
+	Vec3f camup2 = g_camera.up2();
+	Vec3f viewdir = Normalize(g_camera.m_view - g_camera.m_pos);
+
+	int minx = 0;
+	int maxx = g_width;
+	int miny = 0;
+	int maxy = g_height;
+
+	//Vec3f campos = g_camera.m_pos;
+	//Vec3f camside = g_camera.m_strafe;
+	//Vec3f camup2 = g_camera.up2();
+	//Vec3f viewdir = Normalize( g_camera.m_view - g_camera.m_pos );
+
+	Vec3f topLeftRay = ScreenPerspRay(minx, miny, g_width, g_height, campos, camside, camup2, viewdir, FIELD_OF_VIEW);
+	Vec3f lineTopLeft[2];
+	lineTopLeft[0] = campos;
+	lineTopLeft[1] = campos + (topLeftRay * 1000000.0f);
+
+	Vec3f topRightRay = ScreenPerspRay(maxx, miny, g_width, g_height, campos, camside, camup2, viewdir, FIELD_OF_VIEW);
+	Vec3f lineTopRight[2];
+	lineTopRight[0] = campos;
+	lineTopRight[1] = campos + (topRightRay * 1000000.0f);
+
+	Vec3f bottomLeftRay = ScreenPerspRay(minx, maxy, g_width, g_height, campos, camside, camup2, viewdir, FIELD_OF_VIEW);
+	Vec3f lineBottomLeft[2];
+	lineBottomLeft[0] = campos;
+	lineBottomLeft[1] = campos + (bottomLeftRay * 1000000.0f);
+
+	Vec3f bottomRightRay = ScreenPerspRay(maxx, maxy, g_width, g_height, campos, camside, camup2, viewdir, FIELD_OF_VIEW);
+	Vec3f lineBottomRight[2];
+	lineBottomRight[0] = campos;
+	lineBottomRight[1] = campos + (bottomRightRay * 1000000.0f);
+
+	Vec3f interTopLeft;
+	Vec3f interTopRight;
+	Vec3f interBottomLeft;
+	Vec3f interBottomRight;
+
+	if(!FastMapIntersect(&g_hmap, lineTopLeft, &interTopLeft))
+		GetMapIntersection2(&g_hmap, lineTopLeft, &interTopLeft);
+	if(!FastMapIntersect(&g_hmap, lineTopRight, &interTopRight))
+		GetMapIntersection2(&g_hmap, lineTopRight, &interTopRight);
+	if(!FastMapIntersect(&g_hmap, lineBottomLeft, &interBottomLeft))
+		GetMapIntersection2(&g_hmap, lineBottomLeft, &interBottomLeft);
+	if(!FastMapIntersect(&g_hmap, lineBottomRight, &interBottomRight))
+		GetMapIntersection2(&g_hmap, lineBottomRight, &interBottomRight);
+
+	float mmxscale = (float)MINIMAP_SIZE / (g_hmap.m_widthx*TILE_SIZE);
+	float mmzscale = (float)MINIMAP_SIZE / (g_hmap.m_widthz*TILE_SIZE);
+	
+	interTopLeft.x = interTopLeft.x * mmxscale;
+	interTopRight.x = interTopRight.x * mmxscale;
+	interBottomLeft.x = interBottomLeft.x * mmxscale;
+	interBottomRight.x = interBottomRight.x * mmxscale;
+	
+	interTopLeft.z = interTopLeft.z * mmzscale;
+	interTopRight.z = interTopRight.z * mmzscale;
+	interBottomLeft.z = interBottomLeft.z * mmzscale;
+	interBottomRight.z = interBottomRight.z * mmzscale;
+
+    float vertices[] =
+    {
+        //posx, posy
+        interTopLeft.x, interTopLeft.z,0,
+        interTopRight.x, interTopRight.z,0,
+        interBottomRight.x, interBottomRight.z,0,
+        interBottomLeft.x, interBottomLeft.z,0,
+        interTopLeft.x, interTopLeft.z,0
+    };
+	
+    glVertexAttribPointer(g_shader[SHADER_COLOR2D].m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, &vertices[0]);
+    
+    glDrawArrays(GL_LINE_STRIP, 0, 5);
+}
+
+void DrawMinimap(Matrix projection, Matrix viewmat, Matrix modelmat, Matrix modelviewinv, float mvLightPos[3], float lightDir[3])
+{
+	Matrix mvpmat;
+	mvpmat.set(projection.m_matrix);
+	mvpmat.postMultiply(viewmat);
+
+	//g_frustum.construct(projection.m_matrix, viewmat.m_matrix);
+
+#if 1
+	UseShadow(SHADER_MAPTILESMM, projection, viewmat, modelmat, modelviewinv, mvLightPos, lightDir);
+	glActiveTextureARB(GL_TEXTURE8);
+	glBindTexture(GL_TEXTURE_2D, g_depth);
+	glUniform1iARB(g_shader[g_curS].m_slot[SSLOT_SHADOWMAP], 8);
+	g_hmap.draw4();
+#endif
+	
+	UseShadow(SHADER_WATERMM, projection, viewmat, modelmat, modelviewinv, mvLightPos, lightDir);
+	glActiveTextureARB(GL_TEXTURE8);
+	glBindTexture(GL_TEXTURE_2D, g_depth);
+	glUniform1iARB(g_shader[g_curS].m_slot[SSLOT_SHADOWMAP], 8);
+	DrawWater2();
+
+#if 1
+	UseShadow(SHADER_BORDERSMM, projection, viewmat, modelmat, modelviewinv, mvLightPos, lightDir);
+	//glActiveTextureARB(GL_TEXTURE8);
+	//glBindTexture(GL_TEXTURE_2D, g_depth);
+	//glUniform1iARB(g_shader[g_curS].m_slot[SSLOT_SHADOWMAP], 8);
+	Shader* s = &g_shader[g_curS];
+	glUniform1f(s->m_slot[SSLOT_MAPMINZ], 0);
+	glUniform1f(s->m_slot[SSLOT_MAPMAXZ], g_hmap.m_widthz*TILE_SIZE);
+	glUniform1f(s->m_slot[SSLOT_MAPMINX], 0);
+	glUniform1f(s->m_slot[SSLOT_MAPMAXX], g_hmap.m_widthx*TILE_SIZE);
+	glUniform1f(s->m_slot[SSLOT_MAPMINY], ConvertHeight(0));
+	glUniform1f(s->m_slot[SSLOT_MAPMAXY], ConvertHeight(255));
+	glUniform4f(g_shader[g_curS].m_slot[SSLOT_COLOR], 1, 1, 1, 0.5f);
+	DrawBorders();
+#endif
+	
+	glDisable(GL_DEPTH_TEST);
+
+	UseS(SHADER_COLOR2D);
+    glUniform1f(g_shader[SHADER_COLOR2D].m_slot[SSLOT_WIDTH], (float)MINIMAP_SIZE);
+    glUniform1f(g_shader[SHADER_COLOR2D].m_slot[SSLOT_HEIGHT], (float)MINIMAP_SIZE);
+	glUniform4f(g_shader[SHADER_COLOR2D].m_slot[SSLOT_COLOR], 1, 1, 1, 0.5f);
+	DrawMMFrust();
+}
+
+void DrawMinimapDepth()
+{
+	//if(rand()%2 == 1)
+	g_hmap.draw4();
+}
+
+void DrawViewport(int which, int x, int y, int width, int height)
+{
+	//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glEnable(GL_DEPTH_TEST);
+	glClear(GL_DEPTH_BUFFER_BIT);
+	Viewport* v = &g_viewport[which];
+	ViewportT* t = &g_viewportT[v->m_type];
+
+#if 0
+	float aspect = fabsf((float)width / (float)height);
+	Matrix projection;
+
+	bool persp = false;
+
+#if 0
+	if(g_projtype == PROJ_PERSP && v->!t->m_axial)
+	{
+		projection = BuildPerspProjMat(FIELD_OF_VIEW, aspect, MIN_DISTANCE, MAX_DISTANCE);
+		persp = true;
+	}
+	else if(g_projtype == PROJ_ORTHO || v->t->m_axial)
+	{
+		projection = setorthographicmat(-PROJ_RIGHT*aspect/g_zoom, PROJ_RIGHT*aspect/g_zoom, PROJ_RIGHT/g_zoom, -PROJ_RIGHT/g_zoom, MIN_DISTANCE, MAX_DISTANCE);
+	}
+#endif
+
+	//Vec3f viewvec = g_focus;	//g_camera.m_view;
+	//Vec3f viewvec = g_camera.m_view;
+	Vec3f focusvec = v->focus();
+    //Vec3f posvec = g_focus + t->m_offset;
+    //Vec3f posvec = g_camera.m_pos;
+	Vec3f posvec = v->pos();
+
+	//if(v->t->m_axial)
+	//	posvec = g_camera.m_view + t->m_offset;
+
+	//viewvec = posvec + Normalize(viewvec-posvec);
+    //Vec3f posvec2 = g_camera.lookpos() + t->m_offset;
+    //Vec3f upvec = t->m_up;
+    //Vec3f upvec = g_camera.m_up;
+	Vec3f upvec = v->up();
+
+	//if(v->t->m_axial)
+	//	upvec = t->m_up;
+
+    Matrix viewmat = gluLookAt3(posvec.x, posvec.y, posvec.z, focusvec.x, focusvec.y, focusvec.z, upvec.x, upvec.y, upvec.z);
+
+	Matrix modelview;
+	Matrix modelmat;
+	float translation[] = {0, 0, 0};
+	modelview.setTranslation(translation);
+	modelmat.setTranslation(translation);
+	modelview.postMultiply(viewmat);
+
+	Matrix mvpmat;
+	mvpmat.set(projection.m_matrix);
+	mvpmat.postMultiply(viewmat);
+#endif
+
+#if 0
+	//if(v->!t->m_axial)
+	{
+		//RenderToShadowMap(projection, viewmat, modelmat, g_focus);
+		//RenderToShadowMap(projection, viewmat, modelmat, g_camera.m_view);
+		RenderToShadowMap(projection, viewmat, modelmat, Vec3f(0,0,0));
+		RenderShadowedScene(projection, viewmat, modelmat, modelview);
+	}
+#endif
+
+#if 0
+	if(v->m_type == VIEWPORT_FRONT || v->m_type == VIEWPORT_LEFT || v->m_type == VIEWPORT_TOP)
+	{
+		UseS(SHADER_COLOR3D);
+		Shader* s = &g_shader[g_curS];
+		glUniformMatrix4fv(s->m_slot[SSLOT_PROJECTION], 1, GL_FALSE, projection.m_matrix);
+		glUniformMatrix4fv(s->m_slot[SSLOT_VIEWMAT], 1, GL_FALSE, viewmat.m_matrix);
+		glUniformMatrix4fv(s->m_slot[SSLOT_MODELMAT], 1, GL_FALSE, modelmat.m_matrix);
+		glEnableVertexAttribArray(s->m_slot[SSLOT_POSITION]);
+		DrawGrid(vmin, vmax);
+	}
+#endif
+	
+	if(v->m_type == VIEWPORT_MINIMAP)
+	{
+		float aspect = fabsf((float)width / (float)height);
+		Matrix projection = BuildPerspProjMat(FIELD_OF_VIEW, aspect, MIN_DISTANCE, MAX_DISTANCE/g_zoom);
+		//Matrix projection = setorthographicmat(-PROJ_RIGHT*aspect/g_zoom, PROJ_RIGHT*aspect/g_zoom, PROJ_RIGHT/g_zoom, -PROJ_RIGHT/g_zoom, MIN_DISTANCE, MAX_DISTANCE);
+
+		Vec3f focusvec = g_camera.m_view;
+		Vec3f posvec = g_camera.zoompos();
+		Vec3f upvec = g_camera.m_up;
+
+		Matrix viewmat = gluLookAt3(posvec.x, posvec.y, posvec.z, focusvec.x, focusvec.y, focusvec.z, upvec.x, upvec.y, upvec.z);
+
+		Matrix modelview;
+		Matrix modelmat;
+		float translation[] = {0, 0, 0};
+		modelview.setTranslation(translation);
+		modelmat.setTranslation(translation);
+		modelview.postMultiply(viewmat);
+
+		Matrix mvpmat;
+		mvpmat.set(projection.m_matrix);
+		mvpmat.postMultiply(viewmat);
+
+		//if(v->m_type == VIEWPORT_MAIN3D)
+		{
+			//RenderToShadowMap(projection, viewmat, modelmat, g_camera.m_view);
+			//RenderToShadowMap(projection, viewmat, modelmat, Vec3f(0,0,0));
+			Vec3f focus(g_hmap.m_widthx*TILE_SIZE, 0, g_hmap.m_widthz*TILE_SIZE);
+			Vec3f vLine[2];
+			Vec3f ray = Normalize(g_camera.m_view - posvec);
+			Vec3f onnear = posvec;	//OnNear(g_width/2, g_height/2);
+#if 0
+			vLine[0] = onnear;
+			vLine[1] = onnear + (ray * 100000.0f);
+			//if(!GetMapIntersection(&g_hmap, vLine, &focus))
+			if(!FastMapIntersect(&g_hmap, vLine, &focus))
+				//if(!GetMapIntersection(&g_hmap, vLine, &focus))
+					GetMapIntersection2(&g_hmap, vLine, &focus);
+#endif
+			RenderToShadowMap(projection, viewmat, modelmat, focus, focus + g_lightOff / MIN_ZOOM, DrawMinimapDepth);
+			RenderShadowedScene(projection, viewmat, modelmat, modelview, DrawMinimap);
+		}
+	}
+
+
+#if 0
+	Ortho(width, height, 1, 0, 0, 1);
+	glDisable(GL_DEPTH_TEST);
+	RichText rt = RichText(t->m_label);
+	DrawShadowedText(MAINFONT8, 0, 0, &rt, NULL, -1);
+#endif
+
+	//if(persp)
+	//	DrawVertexDebug(&projection, &modelmat, &viewmat, width, height);
+
+	glFlush();
+}
+
+bool ViewportLDown(int which, int relx, int rely, int width, int height)
+{
+	//return false;
+
+	Viewport* v = &g_viewport[which];
+	v->m_ldown = true;
+	v->m_lastmouse = Vec2i(relx, rely);
+	v->m_curmouse = Vec2i(relx, rely);
+
+
+	ViewportT* t = &g_viewportT[v->m_type];
+
+	//g_log<<"vp["<<which<<"] l down"<<endl;
+	//g_log.flush();
+
+	float aspect = fabsf((float)width / (float)height);
+	Matrix projection;
+
+	bool persp = false;
+
+#if 0
+	if(v->!t->m_axial && g_projtype == PROJ_PERSP)
+	{
+		projection = BuildPerspProjMat(FIELD_OF_VIEW, aspect, MIN_DISTANCE, MAX_DISTANCE);
+		persp = true;
+	}
+	else
+	{
+		projection = setorthographicmat(-PROJ_RIGHT*aspect/g_zoom, PROJ_RIGHT*aspect/g_zoom, PROJ_RIGHT/g_zoom, -PROJ_RIGHT/g_zoom, MIN_DISTANCE, MAX_DISTANCE);
+	}
+#endif
+
+	//Vec3f viewvec = g_focus; //g_camera.m_view;
+	//Vec3f viewvec = g_camera.m_view;
+	Vec3f focusvec = v->focus();
+    //Vec3f posvec = g_focus + t->m_offset;
+	//Vec3f posvec = g_camera.m_pos;
+	Vec3f posvec = v->pos();
+
+	//if(v->t->m_axial)
+	{
+	//	posvec = g_camera.m_view + t->m_offset;
+		//viewvec = posvec + Normalize(g_camera.m_view-posvec);
+	}
+
+	//viewvec = posvec + Normalize(viewvec-posvec);
+    //Vec3f posvec2 = g_camera.lookpos() + t->m_offset;
+    //Vec3f upvec = t->m_up;
+    //Vec3f upvec = g_camera.m_up;
+	Vec3f upvec = v->up();
+
+	//if(v->t->m_axial)
+	//	upvec = t->m_up;
+
+    Matrix viewmat = gluLookAt3(posvec.x, posvec.y, posvec.z, focusvec.x, focusvec.y, focusvec.z, upvec.x, upvec.y, upvec.z);
+	Matrix mvpmat;
+	mvpmat.set(projection.m_matrix);
+	mvpmat.postMultiply(viewmat);
+
+	return true;
+}
+
+
+bool ViewportRDown(int which, int relx, int rely, int width, int height)
+{
+	Viewport* v = &g_viewport[which];
+	v->m_rdown = true;
+	v->m_lastmouse = Vec2i(relx, rely);
+	v->m_curmouse = Vec2i(relx, rely);
+
+	return true;
+}
+
+bool ViewportLUp(int which, int relx, int rely, int width, int height)
+{
+	Viewport* v = &g_viewport[which];
+	ViewportT* t = &g_viewportT[v->m_type];
+
+	if(v->m_ldown)
+	{
+		//return true;
+		v->m_ldown = false;
+
+	}
+
+	//g_sel1b = NULL;
+	//g_dragV = -1;
+	//g_dragS = -1;
+
+	return false;
+}
+
+bool ViewportRUp(int which, int relx, int rely, int width, int height)
+{
+	Viewport* v = &g_viewport[which];
+	ViewportT* t = &g_viewportT[v->m_type];
+
+	v->m_rdown = false;
+
+	return false;
+}
+
+bool ViewportMousewheel(int which, int delta)
+{
+	Viewport* v = &g_viewport[which];
+	ViewportT* t = &g_viewportT[v->m_type];
+
+#if 0
+	//if(v->!t->m_axial)
+	{
+		g_zoom *= 1.0f + (float)delta / 10.0f;
+		return true;
+	}
+#endif
+
+	return false;
+}
+
+bool ViewportMousemove(int which, int relx, int rely, int width, int height)
+{
+	Viewport* v = &g_viewport[which];
+
+	v->m_lastmouse = Vec2i(relx, rely);
+	v->m_curmouse = Vec2i(relx, rely);
+
+	return false;
+}

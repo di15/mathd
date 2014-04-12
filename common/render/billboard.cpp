@@ -34,7 +34,7 @@ int NewBillbT()
 
 int NewBillboard(const char* tex)
 {
-    //BillboardT t;
+	//BillboardT t;
 	int i = NewBillbT();
 	if(i < 0)
 		return -1;
@@ -48,7 +48,7 @@ int NewBillboard(const char* tex)
 	char texpath[128];
 	sprintf(texpath, "billboards\\%s", rawtex);
 	FindTextureExtension(texpath);
-    //CreateTexture(t.tex, texpath);
+	//CreateTexture(t.tex, texpath);
 	QueueTexture(&t->tex, texpath, true);
 	//g_billbT.push_back(t);
 	//return g_billbT.size() - 1;
@@ -59,72 +59,72 @@ int IdentifyBillboard(const char* name)
 {
 	//char rawname[64];
 	//StripPathExtension(name, rawname);
-	
-    //for(int i=0; i<g_billbT.size(); i++)
-    for(int i=0; i<BILLBOARD_TYPES; i++)
-    {
-        //if(!_stricmp(g_billbT[i].name, rawname))
-        if(g_billbT[i].on && !_stricmp(g_billbT[i].name, name))
-            return i;
-    }
-	
-    //return NewBillboard(rawname);
-    return NewBillboard(name);
+
+	//for(int i=0; i<g_billbT.size(); i++)
+	for(int i=0; i<BILLBOARD_TYPES; i++)
+	{
+		//if(!_stricmp(g_billbT[i].name, rawname))
+		if(g_billbT[i].on && !_stricmp(g_billbT[i].name, name))
+			return i;
+	}
+
+	//return NewBillboard(rawname);
+	return NewBillboard(name);
 }
 
 int NewBillboard()
 {
-    for(int i=0; i<BILLBOARDS; i++)
-        if(!g_billb[i].on)
-            return i;
-    
-    return -1;
+	for(int i=0; i<BILLBOARDS; i++)
+		if(!g_billb[i].on)
+			return i;
+
+	return -1;
 }
 
 void PlaceBillboard(const char* n, Vec3f pos, float size, int particle)
 {
-    int type = IdentifyBillboard(n);
-    if(type < 0)
-        return;
-    
-    PlaceBillboard(type, pos, size, particle);
+	int type = IdentifyBillboard(n);
+	if(type < 0)
+		return;
+
+	PlaceBillboard(type, pos, size, particle);
 }
 
 void PlaceBillboard(int type, Vec3f pos, float size, int particle)
 {
-    int i = NewBillboard();
-    if(i < 0)
-        return;
+	int i = NewBillboard();
+	if(i < 0)
+		return;
 
-    Billboard* b = &g_billb[i];
-    b->on = true;
-    b->type = type;
-    b->pos = pos;
-    b->size = size;
+	Billboard* b = &g_billb[i];
+	b->on = true;
+	b->type = type;
+	b->pos = pos;
+	b->size = size;
 	b->particle = particle;
 }
 
 void SortBillboards()
 {
-    Vec3f pos = g_camera.m_pos;
-    
+	Vec3f pos = g_camera.m_pos;
+
 	for(int i=0; i<BILLBOARDS; i++)
 	{
 		if(!g_billb[i].on)
 			continue;
-        
+
 		g_billb[i].dist = Magnitude2(pos - g_billb[i].pos);
 	}
-    
+
 	Billboard temp;
 	int leftoff = 0;
 	bool backtracking = false;
-    
+
 	for(int i=1; i<BILLBOARDS; i++)
 	{
 		//if(!g_billb[i].on)
 		//	continue;
-        
+
 		if(i > 0)
 		{
 			if(g_billb[i].dist > g_billb[i-1].dist)
@@ -155,10 +155,10 @@ void SortBillboards()
 
 void DrawBillboards()
 {
-    Billboard* billb;
-    BillboardT* t;
-    float size;
-    
+	Billboard* billb;
+	BillboardT* t;
+	float size;
+
 	Vec3f vertical = g_camera.up2();
 	Vec3f horizontal = g_camera.m_strafe;
 	Vec3f a, b, c, d;
@@ -168,16 +168,16 @@ void DrawBillboards()
 	ParticleT* pT;
 
 	Shader* s = &g_shader[SHADER_BILLBOARD];
-    
-    for(int i=0; i<BILLBOARDS; i++)
-    {
-        billb = &g_billb[i];
-        if(!billb->on)
-            continue;
-        
-        t = &g_billbT[billb->type];
-        glBindTexture(GL_TEXTURE_2D, t->tex);
-        
+
+	for(int i=0; i<BILLBOARDS; i++)
+	{
+		billb = &g_billb[i];
+		if(!billb->on)
+			continue;
+
+		t = &g_billbT[billb->type];
+		glBindTexture(GL_TEXTURE_2D, t->tex);
+
 		if(billb->particle >= 0)
 		{
 			part = &g_particle[billb->particle];
@@ -193,33 +193,33 @@ void DrawBillboards()
 
 		vert = vertical*size;
 		horiz = horizontal*size;
-		
+
 		a = billb->pos - horiz + vert;
 		b = billb->pos - horiz - vert;
 		c = billb->pos + horiz - vert;
 		d = billb->pos + horiz + vert;
 
-        float vertices[] =
-        {
-            //posx, posy posz   texx, texy
-            a.x, a.y, a.z,          1, 0,
-            b.x, b.y, b.z,          1, 1,
-            c.x, c.y, c.z,          0, 1,
-            
-            c.x, c.y, c.z,          0, 1,
-            d.x, d.y, d.z,          0, 0,
-            a.x, a.y, a.z,          1, 0
-        };
-		
+		float vertices[] =
+		{
+			//posx, posy posz   texx, texy
+			a.x, a.y, a.z,          1, 0,
+			b.x, b.y, b.z,          1, 1,
+			c.x, c.y, c.z,          0, 1,
+
+			c.x, c.y, c.z,          0, 1,
+			d.x, d.y, d.z,          0, 0,
+			a.x, a.y, a.z,          1, 0
+		};
+
 		//glVertexPointer(3, GL_FLOAT, sizeof(float)*5, &vertices[0]);
 		//glTexCoordPointer(2, GL_FLOAT, sizeof(float)*5, &vertices[3]);
-		
+
 		glVertexAttribPointer(s->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, sizeof(float) * 5, &vertices[0]);
 		glVertexAttribPointer(s->m_slot[SSLOT_TEXCOORD0], 2, GL_FLOAT, GL_FALSE, sizeof(float) * 5, &vertices[3]);
 		//glVertexAttribPointer(s->m_slot[SSLOT_NORMAL], 3, GL_FLOAT, GL_FALSE, sizeof(float) * 5, va->normals);
 
-        glDrawArrays(GL_TRIANGLES, 0, 6);
-    }
+		glDrawArrays(GL_TRIANGLES, 0, 6);
+	}
 
 	/*
 	CEntity* e;
@@ -235,56 +235,56 @@ void DrawBillboards()
 
 	for(int i=0; i<ENTITIES; i++)
 	{
-		e = &g_entity[i];
+	e = &g_entity[i];
 
-		if(!e->on)
-			continue;
+	if(!e->on)
+	continue;
 
-		if(e->controller < 0)
-			continue;
+	if(e->controller < 0)
+	continue;
 
-		p = &g_player[e->controller];
+	p = &g_player[e->controller];
 
-		if(p->equipped < 0)
-			continue;
+	if(p->equipped < 0)
+	continue;
 
-		h = &p->items[p->equipped];
-		iT = &g_itemType[h->type];
+	h = &p->items[p->equipped];
+	iT = &g_itemType[h->type];
 
-		if((e->frame[BODY_UPPER] < ANIM_SHOTSHOULDER_S || e->frame[BODY_UPPER] > ANIM_SHOTSHOULDER_S+4))
-			continue;
+	if((e->frame[BODY_UPPER] < ANIM_SHOTSHOULDER_S || e->frame[BODY_UPPER] > ANIM_SHOTSHOULDER_S+4))
+	continue;
 
-		glBindTexture(GL_TEXTURE_2D, g_muzzle[rand()%4]);
+	glBindTexture(GL_TEXTURE_2D, g_muzzle[rand()%4]);
 
-		cam = &e->camera;
+	cam = &e->camera;
 
-		if(p == &g_player[g_localP] && g_viewmode == FIRSTPERSON)
-			muzz = Rotate(iT->front, -cam->Pitch(), 1, 0, 0);
-		else
-			muzz = RotateAround(iT->front, Vec3f(0, MID_HEIGHT_OFFSET, 0), -cam->Pitch(), 1, 0, 0);
-		
-		muzz = cam->m_pos + Rotate(muzz, cam->Yaw(), 0, 1, 0);
-        
-		a = muzz - horiz + vert;
-		b = muzz - horiz - vert;
-		c = muzz + horiz - vert;
-		d = muzz + horiz + vert;
+	if(p == &g_player[g_localP] && g_viewmode == FIRSTPERSON)
+	muzz = Rotate(iT->front, -cam->Pitch(), 1, 0, 0);
+	else
+	muzz = RotateAround(iT->front, Vec3f(0, MID_HEIGHT_OFFSET, 0), -cam->Pitch(), 1, 0, 0);
 
-        float vertices[] =
-        {
-            //posx, posy posz   texx, texy
-            a.x, a.y, a.z,          1, 0,
-            b.x, b.y, b.z,          1, 1,
-            c.x, c.y, c.z,          0, 1,
-            
-            c.x, c.y, c.z,          0, 1,
-            d.x, d.y, d.z,          0, 0,
-            a.x, a.y, a.z,          1, 0
-        };
-		
-		glVertexPointer(3, GL_FLOAT, sizeof(float)*5, &vertices[0]);
-		glTexCoordPointer(2, GL_FLOAT, sizeof(float)*5, &vertices[3]);
+	muzz = cam->m_pos + Rotate(muzz, cam->Yaw(), 0, 1, 0);
 
-        glDrawArrays(GL_TRIANGLES, 0, 6);
+	a = muzz - horiz + vert;
+	b = muzz - horiz - vert;
+	c = muzz + horiz - vert;
+	d = muzz + horiz + vert;
+
+	float vertices[] =
+	{
+	//posx, posy posz   texx, texy
+	a.x, a.y, a.z,          1, 0,
+	b.x, b.y, b.z,          1, 1,
+	c.x, c.y, c.z,          0, 1,
+
+	c.x, c.y, c.z,          0, 1,
+	d.x, d.y, d.z,          0, 0,
+	a.x, a.y, a.z,          1, 0
+	};
+
+	glVertexPointer(3, GL_FLOAT, sizeof(float)*5, &vertices[0]);
+	glTexCoordPointer(2, GL_FLOAT, sizeof(float)*5, &vertices[3]);
+
+	glDrawArrays(GL_TRIANGLES, 0, 6);
 	}*/
 }

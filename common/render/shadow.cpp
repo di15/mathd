@@ -18,13 +18,17 @@
 #include "model.h"
 #include "../math/camera.h"
 
-unsigned int g_depth;
+unsigned int g_depth = -1;
 const int g_depthSizeX = 2048;	//512;	//4096;
 const int g_depthSizeY = 2048;	//512;	//4096;
 unsigned int g_rbDepth;
 unsigned int g_fbDepth;
 
+//#define LIGHT_MAX_D		(1000.0f * 100.0f)
+//#define LIGHT_MIN_D		1.0f
+
 Vec3f g_lightOff(-MAX_DISTANCE/5, MAX_DISTANCE/3, MAX_DISTANCE/4);
+//Vec3f g_lightOff(-LIGHT_MAX_D/5, LIGHT_MAX_D/3, LIGHT_MAX_D/4);
 Vec3f g_lightPos;	//(-MAX_DISTANCE/2, MAX_DISTANCE/5, MAX_DISTANCE/3);
 Vec3f g_lightEye;	//(-MAX_DISTANCE/2+1.0f/2.0f, MAX_DISTANCE/3-1.0f/3.0f, MAX_DISTANCE/3-1.0f/3.0f);
 Vec3f g_lightUp(0,1,0);
@@ -36,8 +40,10 @@ Matrix g_lightMatrix;
 Matrix g_cameraModelViewMatrix;
 Matrix g_cameraProjectionMatrix;
 
+#if 0
 void (*DrawSceneDepthFunc)() = NULL;
 void (*DrawSceneFunc)(Matrix projection, Matrix viewmat, Matrix modelmat, Matrix modelviewinv, float mvLightPos[3], float lightDir[3]) = NULL;
+#endif
 
 Vec3f g_viewInter;
 
@@ -53,7 +59,8 @@ void InitShadows()
 #if 1
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16, g_depthSizeX, g_depthSizeY, 0, GL_RGBA, GL_UNSIGNED_SHORT, 0);
 #else
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT32F, g_depthSizeX, g_depthSizeY, 0, GL_RGBA, GL_UNSIGNED_SHORT, 0);
+	//glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT32F, g_depthSizeX, g_depthSizeY, 0, GL_RGBA, GL_UNSIGNED_SHORT, 0);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT32F, g_depthSizeX, g_depthSizeY, 0, GL_RED, GL_UNSIGNED_SHORT, 0);
 #endif
 	glBindTexture(GL_TEXTURE_2D, 0);
 
@@ -69,6 +76,9 @@ void InitShadows()
 	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
 }
 
+/*
+Doesn't work in all cases but good enough for its purpose in shadow mapping.
+*/
 void InverseMatrix(Matrix* dstm, Matrix srcm)
 {
 	float dst[16];
@@ -94,157 +104,10 @@ void InverseMatrix(Matrix* dstm, Matrix srcm)
 	dstm->set(dst);
 }
 
-void InverseMatrix(float dst[16], float src[16])
-{
-	dst[0] = src[0];
-	dst[1] = src[4];
-	dst[2] = src[8];
-	dst[3] = 0.0;
-	dst[4] = src[1];
-	dst[5] = src[5];
-	dst[6]  = src[9];
-	dst[7] = 0.0;
-	dst[8] = src[2];
-	dst[9] = src[6];
-	dst[10] = src[10];
-	dst[11] = 0.0;
-	dst[12] = -(src[12] * src[0]) - (src[13] * src[1]) - (src[14] * src[2]);
-	dst[13] = -(src[12] * src[4]) - (src[13] * src[5]) - (src[14] * src[6]);
-	dst[14] = -(src[12] * src[8]) - (src[13] * src[9]) - (src[14] * src[10]);
-	dst[15] = 1.0;
-}
-
-bool gluInvertMatrix(const float m[16], float invOut[16])
-{
-    float inv[16], det;
-    int i;
-
-    inv[0] = m[5]  * m[10] * m[15] - 
-             m[5]  * m[11] * m[14] - 
-             m[9]  * m[6]  * m[15] + 
-             m[9]  * m[7]  * m[14] +
-             m[13] * m[6]  * m[11] - 
-             m[13] * m[7]  * m[10];
-
-    inv[4] = -m[4]  * m[10] * m[15] + 
-              m[4]  * m[11] * m[14] + 
-              m[8]  * m[6]  * m[15] - 
-              m[8]  * m[7]  * m[14] - 
-              m[12] * m[6]  * m[11] + 
-              m[12] * m[7]  * m[10];
-
-    inv[8] = m[4]  * m[9] * m[15] - 
-             m[4]  * m[11] * m[13] - 
-             m[8]  * m[5] * m[15] + 
-             m[8]  * m[7] * m[13] + 
-             m[12] * m[5] * m[11] - 
-             m[12] * m[7] * m[9];
-
-    inv[12] = -m[4]  * m[9] * m[14] + 
-               m[4]  * m[10] * m[13] +
-               m[8]  * m[5] * m[14] - 
-               m[8]  * m[6] * m[13] - 
-               m[12] * m[5] * m[10] + 
-               m[12] * m[6] * m[9];
-
-    inv[1] = -m[1]  * m[10] * m[15] + 
-              m[1]  * m[11] * m[14] + 
-              m[9]  * m[2] * m[15] - 
-              m[9]  * m[3] * m[14] - 
-              m[13] * m[2] * m[11] + 
-              m[13] * m[3] * m[10];
-
-    inv[5] = m[0]  * m[10] * m[15] - 
-             m[0]  * m[11] * m[14] - 
-             m[8]  * m[2] * m[15] + 
-             m[8]  * m[3] * m[14] + 
-             m[12] * m[2] * m[11] - 
-             m[12] * m[3] * m[10];
-
-    inv[9] = -m[0]  * m[9] * m[15] + 
-              m[0]  * m[11] * m[13] + 
-              m[8]  * m[1] * m[15] - 
-              m[8]  * m[3] * m[13] - 
-              m[12] * m[1] * m[11] + 
-              m[12] * m[3] * m[9];
-
-    inv[13] = m[0]  * m[9] * m[14] - 
-              m[0]  * m[10] * m[13] - 
-              m[8]  * m[1] * m[14] + 
-              m[8]  * m[2] * m[13] + 
-              m[12] * m[1] * m[10] - 
-              m[12] * m[2] * m[9];
-
-    inv[2] = m[1]  * m[6] * m[15] - 
-             m[1]  * m[7] * m[14] - 
-             m[5]  * m[2] * m[15] + 
-             m[5]  * m[3] * m[14] + 
-             m[13] * m[2] * m[7] - 
-             m[13] * m[3] * m[6];
-
-    inv[6] = -m[0]  * m[6] * m[15] + 
-              m[0]  * m[7] * m[14] + 
-              m[4]  * m[2] * m[15] - 
-              m[4]  * m[3] * m[14] - 
-              m[12] * m[2] * m[7] + 
-              m[12] * m[3] * m[6];
-
-    inv[10] = m[0]  * m[5] * m[15] - 
-              m[0]  * m[7] * m[13] - 
-              m[4]  * m[1] * m[15] + 
-              m[4]  * m[3] * m[13] + 
-              m[12] * m[1] * m[7] - 
-              m[12] * m[3] * m[5];
-
-    inv[14] = -m[0]  * m[5] * m[14] + 
-               m[0]  * m[6] * m[13] + 
-               m[4]  * m[1] * m[14] - 
-               m[4]  * m[2] * m[13] - 
-               m[12] * m[1] * m[6] + 
-               m[12] * m[2] * m[5];
-
-    inv[3] = -m[1] * m[6] * m[11] + 
-              m[1] * m[7] * m[10] + 
-              m[5] * m[2] * m[11] - 
-              m[5] * m[3] * m[10] - 
-              m[9] * m[2] * m[7] + 
-              m[9] * m[3] * m[6];
-
-    inv[7] = m[0] * m[6] * m[11] - 
-             m[0] * m[7] * m[10] - 
-             m[4] * m[2] * m[11] + 
-             m[4] * m[3] * m[10] + 
-             m[8] * m[2] * m[7] - 
-             m[8] * m[3] * m[6];
-
-    inv[11] = -m[0] * m[5] * m[11] + 
-               m[0] * m[7] * m[9] + 
-               m[4] * m[1] * m[11] - 
-               m[4] * m[3] * m[9] - 
-               m[8] * m[1] * m[7] + 
-               m[8] * m[3] * m[5];
-
-    inv[15] = m[0] * m[5] * m[10] - 
-              m[0] * m[6] * m[9] - 
-              m[4] * m[1] * m[10] + 
-              m[4] * m[2] * m[9] + 
-              m[8] * m[1] * m[6] - 
-              m[8] * m[2] * m[5];
-
-    det = m[0] * inv[0] + m[1] * inv[4] + m[2] * inv[8] + m[3] * inv[12];
-
-    if (det == 0)
-        return false;
-
-    det = 1.0 / det;
-
-    for (i = 0; i < 16; i++)
-        invOut[i] = inv[i] * det;
-
-    return true;
-}
-
-bool InverseMatrix2(Matrix mat, Matrix invMat)
+/*
+More robust inverse matrix function.
+*/
+bool InverseMatrix2(Matrix mat, Matrix &invMat)
 {
     double inv[16], det;
     int i;
@@ -401,7 +264,7 @@ void Transpose(Matrix mat, Matrix transpMat)
 	transpMat.set(transp);
 }
 
-void RenderToShadowMap(Matrix projection, Matrix viewmat, Matrix modelmat, Vec3f focus)
+void RenderToShadowMap(Matrix projection, Matrix viewmat, Matrix modelmat, Vec3f focus, Vec3f lightpos, void (*drawscenedepthfunc)())
 {
 	glDisable(GL_CULL_FACE);
 
@@ -416,17 +279,34 @@ void RenderToShadowMap(Matrix projection, Matrix viewmat, Matrix modelmat, Vec3f
 
 	glEnable(GL_POLYGON_OFFSET_FILL);
 	//glPolygonOffset(2.0, 500.0);
-	glPolygonOffset(1.0, 250.0);
+	glPolygonOffset(10.0, 2500.0);
+	//glPolygonOffset(1.0, 250.0);
 
-	g_lightPos = focus + g_lightOff;
+	g_lightPos = lightpos;
 	g_lightEye = focus;
 
 	//g_lightEye = Vec3f(0,0,0);
 	//g_lightPos = g_lightEye + g_lightOff;
+
+	float zoom = Magnitude(g_lightOff) / Magnitude(g_lightEye - g_lightPos);
 	
+#define LIGHT_SCALE		3
+//#define LIGHT_SCALE		1
+
 	//g_lightProjectionMatrix = BuildPerspProjMat(90.0, 1.0, 30.0, 10000.0);
-	g_lightProjectionMatrix = setorthographicmat(-PROJ_RIGHT*4/g_zoom, PROJ_RIGHT*4/g_zoom, PROJ_RIGHT*4/g_zoom, -PROJ_RIGHT*4/g_zoom, MIN_DISTANCE, MAX_DISTANCE);
-	g_lightModelViewMatrix = gluLookAt2(g_lightPos.x, g_lightPos.y, g_lightPos.z,
+	g_lightProjectionMatrix = setorthographicmat(
+		-PROJ_RIGHT*LIGHT_SCALE/zoom, 
+		PROJ_RIGHT*LIGHT_SCALE/zoom, 
+		PROJ_RIGHT*LIGHT_SCALE/zoom, 
+		-PROJ_RIGHT*LIGHT_SCALE/zoom, 
+		MIN_DISTANCE, 
+		MAX_DISTANCE/zoom);
+
+	//g_lightPos = RotateAround(g_lightPos, g_lightEye, DEGTORAD((g_simframe%360)), 0, 0, 1);
+
+	g_lightModelViewMatrix = gluLookAt2(
+		g_lightPos.x, g_lightPos.y, g_lightPos.z,
+		//timelightpos.x, timelightpos.y, timelightpos.z,
 		g_lightEye.x, g_lightEye.y, g_lightEye.z, 
 		g_lightUp.x, g_lightUp.y, g_lightUp.z);
 	
@@ -438,8 +318,8 @@ void RenderToShadowMap(Matrix projection, Matrix viewmat, Matrix modelmat, Vec3f
 	glEnableVertexAttribArray(g_shader[SHADER_DEPTH].m_slot[SSLOT_POSITION]);
 	glEnableVertexAttribArray(g_shader[SHADER_DEPTH].m_slot[SSLOT_TEXCOORD0]);
 
-	if(DrawSceneDepthFunc != NULL)
-		DrawSceneDepthFunc();
+	if(drawscenedepthfunc != NULL)
+		drawscenedepthfunc();
 
 	TurnOffShader();
 
@@ -474,7 +354,7 @@ void UseShadow(int shader, Matrix projection, Matrix viewmat, Matrix modelmat, M
 	//glUniform1fARB(s->m_slot[SSLOT_MAXELEV], g_maxelev);
 }
 
-void RenderShadowedScene(Matrix projection, Matrix viewmat, Matrix modelmat, Matrix modelview)
+void RenderShadowedScene(Matrix projection, Matrix viewmat, Matrix modelmat, Matrix modelview, void (*drawscenefunc)(Matrix projection, Matrix viewmat, Matrix modelmat, Matrix modelviewinv, float mvLightPos[3], float lightDir[3]))
 {
 	//glViewport(0, 0, g_width, g_height);
 	//glClearColor(0.0, 0.0, 0.0, 1.0);
@@ -498,15 +378,18 @@ void RenderShadowedScene(Matrix projection, Matrix viewmat, Matrix modelmat, Mat
 	
 	InverseMatrix(&g_cameraInverseModelViewMatrix, modelview);
 
-	float trans[] = { 0.5f, 0.5f, 0.5f };
+	// We need to change the clip-space coordinates from range [-1,1] to [0,1] for texture mapping
 	g_lightMatrix.loadIdentity();
+#if 1
+	float trans[] = { 0.5f, 0.5f, 0.5f };
 	g_lightMatrix.setTranslation(trans);
 	float scalef[] = { 0.5f, 0.5f, 0.5f };
 	Matrix scalem;
 	scalem.setScale(scalef);
-	g_lightMatrix.postMultiply(scalem);
-	g_lightMatrix.postMultiply(g_lightProjectionMatrix);
-	g_lightMatrix.postMultiply(g_lightModelViewMatrix);
+	g_lightMatrix.postMultiply2(scalem);
+#endif
+	g_lightMatrix.postMultiply2(g_lightProjectionMatrix);
+	g_lightMatrix.postMultiply2(g_lightModelViewMatrix);
 	//g_lightMatrix.postMultiply(g_cameraInverseModelViewMatrix);
 
 	Matrix modelviewinv;
@@ -527,8 +410,8 @@ void RenderShadowedScene(Matrix projection, Matrix viewmat, Matrix modelmat, Mat
 	lightDir[1] = g_lightPos.y - g_lightEye.y;
 	lightDir[2] = g_lightPos.z - g_lightEye.z;
 
-	if(DrawSceneFunc != NULL)
-		DrawSceneFunc(projection, viewmat, modelmat, modelviewinv, mvLightPos, lightDir);
+	if(drawscenefunc != NULL)
+		drawscenefunc(projection, viewmat, modelmat, modelviewinv, mvLightPos, lightDir);
 		//DrawSceneFunc(projection, viewmat, modelmat, modelviewinv, (float*)&g_lightPos, lightDir);
 
 	TurnOffShader();

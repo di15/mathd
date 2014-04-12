@@ -10,7 +10,11 @@
 #include "draw2d.h"
 #include "richtext.h"
 
-#define MAX_OPTIONS_SHOWN	5
+
+#define MAX_OPTIONS_SHOWN	7
+
+#if 0
+//left overs
 #define LBAR_WIDTH		100
 #define MMBAR_WIDTH		(LBAR_WIDTH*128.0f/110.0f)
 #define MMBAR_HEIGHT	(MMBAR_WIDTH*1.0f/1.0f)
@@ -19,6 +23,7 @@
 #define MINIMAP_Y1		(MMBAR_HEIGHT*6.0f/128.0f)
 #define MINIMAP_Y2		(MMBAR_HEIGHT*114.0f/128.0f)
 #define TBAR_HEIGHT		15
+#endif
 
 #define HSCROLLER_SPACING	16
 #define HSCROLLER_OPTIONW	173
@@ -42,6 +47,8 @@
 #define WIDGET_TEXTAREA				14
 #define WIDGET_VIEWPORT				15
 #define WIDGET_FRAME				16
+#define WIDGET_RESTICKER			17
+#define WIDGET_BOTTOMPANEL			18
 
 class Widget
 {
@@ -153,5 +160,9 @@ public:
 	virtual void pasteval() {}
 	virtual void selectall() {}
 };
+
+extern bool g_mouseoveraction;
+
+void CenterLabel(Widget* w);
 
 #endif

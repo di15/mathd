@@ -15,5 +15,5 @@ void main(void)
 	gl_Position = projection * (view * (model * position));
 	//normalOut = normalIn;
 	texCoordOut0 = texCoordIn0;
-	gl_Position.w = 1;
+	//gl_Position.w = 1;
 }
