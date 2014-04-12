@@ -4,7 +4,6 @@
 #include "collidertile.h"
 #include "../math/vec2i.h"
 #include "../math/3dmath.h"
-#include "../sys/workthread.h"
 #include "../sim/unit.h"
 #include "../sim/unittype.h"
 #include "../sim/building.h"
@@ -29,7 +28,7 @@ void ReconstructPath(PathJob* pj, PathNode* endnode)
 	// Reconstruct the path, following the path steps
 	for(PathNode* n = endnode; n; n = n->previous)
 	{
-		Vec2i npos = PathNodePos(pj->wt, n);
+		Vec2i npos = PathNodePos(n);
 		Vec2i cmpos( npos.x * PATHNODE_SIZE + PATHNODE_SIZE/2, npos.y * PATHNODE_SIZE + PATHNODE_SIZE/2 );
 		pj->path->push_front(cmpos);
 	}

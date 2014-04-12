@@ -5,7 +5,6 @@
 #include "collidertile.h"
 #include "../math/vec2i.h"
 #include "../math/3dmath.h"
-#include "../sys/workthread.h"
 #include "../sim/unit.h"
 #include "../sim/unittype.h"
 #include "../sim/building.h"
@@ -28,6 +27,9 @@
 #include "../window.h"
 #include "partialpath.h"
 
+long long g_lastpath = 0;
+list<PathNode*> g_toclear;
+
 void ClearNodes(list<PathNode*> &toclear)
 {
 	for(auto niter = toclear.begin(); niter != toclear.end(); niter++)
@@ -42,16 +44,18 @@ void ClearNodes(list<PathNode*> &toclear)
 
 bool PathJob::process()
 {
-	long long frames = g_simframe - wt->lastpath;
+#if 0
+	long long frames = g_simframe - g_lastpath;
 
 	int delay = frames * 1000 / DRAW_FRAME_RATE;
 
 	if(delay < PATH_DELAY)
 		return false;
 
-	wt->lastpath = g_simframe;
+	g_lastpath = g_simframe;
+#endif
 
-	wt->openlist.resetelems();
+	ResetPathNodes();
 
 	SnapToNode(this);
 
@@ -60,7 +64,7 @@ bool PathJob::process()
 	closest = 0;
 	closestnode = NULL;
 
-	while( wt->openlist.hasmore() ) 
+	while( g_openlist.hasmore() ) 
 	{
 		searchdepth ++;
 
@@ -68,10 +72,10 @@ bool PathJob::process()
 			break;
 
 		// Pops the lowest F-cost node, moves it in the closed list
-		node = wt->openlist.deletemin();
-		int i = node - wt->pathnode;
+		node = g_openlist.deletemin();
+		int i = node - g_pathnode;
 
-		Vec2i npos = PathNodePos(wt, node);
+		Vec2i npos = PathNodePos(node);
 
 		node->closed = true;
 
@@ -79,7 +83,7 @@ bool PathJob::process()
 		if( AtGoal(this, node) ) 
 		{
 			ReconstructPath(this, node);
-			ClearNodes(wt->toclear);
+			ClearNodes(g_toclear);
 
 			if(callback)
 				callback(true, this);
@@ -97,7 +101,7 @@ bool PathJob::process()
 	if(pjtype == PATHJOB_QUICKPARTIAL && closestnode)
 		ReconstructPath(this, closestnode);
 
-	ClearNodes(wt->toclear);
+	ClearNodes(g_toclear);
 
 	// No path found
 	if(callback)

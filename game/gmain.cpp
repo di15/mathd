@@ -34,15 +34,16 @@
 #include "../common/render/transaction.h"
 #include "../common/ai/collidertile.h"
 #include "../common/ai/pathdebug.h"
-#include "../common/sys/workthread.h"
 #include "gui/playgui.h"
 #include "../common/gui/widgets/spez/bottompanel.h"
 #include "../common/texture.h"
-#include "../common/sys/updthread.h"
 
 APPMODE g_mode = LOADING;
 bool g_mouseout = false;
 bool g_moved = false;
+
+double g_instantupdfps = 0;
+double g_updfrinterval = 0;
 
 //static long long g_lasttime = GetTickCount();
 
@@ -177,9 +178,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 void SkipLogo()
 {
-	MutexWait(g_glovarmutex);
 	g_mode = LOADING;
-	MutexRelease(g_glovarmutex);
 	OpenSoleView("loading");
 }
 
@@ -207,57 +206,138 @@ void UpdateLoading()
 {
 	static int stage = 0;
 
-	//MutexWait(g_glovarmutex);
 	switch(stage)
 	{
 	case 0: if(!Load1Model()) stage++; break;
 	case 1:
 		if(!Load1Texture())
 		{
-			MutexWait(g_glovarmutex);
 			g_mode = MENU;
-			MutexRelease(g_glovarmutex);
 			//g_mode = PLAY;
 			Click_NewGame();
 			//Click_OpenEditor();
 		}
 		break;
 	}
-	//MutexRelease(g_glovarmutex);
 }
 
 int g_reStage = 0;
 void UpdateReloading()
 {
-	//MutexWait(g_glovarmutex);
 	switch(g_reStage)
 	{
 	case 0:
 		if(!Load1Texture())
 		{
-			MutexWait(g_glovarmutex);
 			g_mode = MENU;
-			MutexRelease(g_glovarmutex);
 		}
 		break;
 	}
-	//MutexRelease(g_glovarmutex);
 }
 
-void UpdateDraw()
+void CalcUpdFrameRate()
 {
-	MutexWait(g_glovarmutex);
-	APPMODE mode = g_mode;
-	MutexRelease(g_glovarmutex);
+	static unsigned int frametime = 0;				// This stores the last frame's time
+	static int framecounter = 0;
+	static unsigned int lasttime;
 
-	if(mode == LOGO)
+	// Get the current time in seconds
+    unsigned int currtime = timeGetTime();				
+
+	// We added a small value to the frame interval to account for some video
+	// cards (Radeon's) with fast computers falling through the floor without it.
+
+	// Here we store the elapsed time between the current and last frame,
+	// then keep the current frame in our static variable for the next frame.
+ 	g_updfrinterval = (currtime - frametime) / 1000.0f;	// + 0.005f;
+	
+	//g_instantdrawfps = 1.0f / (g_currentTime - frameTime);
+	//g_instantdrawfps = 1.0f / g_drawfrinterval;
+
+	frametime = currtime;
+
+	// Increase the frame counter
+    ++framecounter;
+
+	// Now we want to subtract the current time by the last time that was stored
+	// to see if the time elapsed has been over a second, which means we found our FPS.
+    if( currtime - lasttime > 1000 )
+	{
+		g_instantupdfps = framecounter;
+
+		// Here we set the lastTime to the currentTime
+	    lasttime = currtime;
+
+		// Reset the frames per second
+        framecounter = 0;
+    }
+}
+
+bool UpdNextFrame(int desiredFrameRate)
+{
+	static long long lastTime = GetTickCount64();
+	static long long elapsedTime = 0;
+
+	long long currentTime = GetTickCount64(); // Get the time (milliseconds = seconds * .001)
+	long long deltaTime = currentTime - lastTime; // Get the slice of time
+	int desiredFPS = 1000 / (float)desiredFrameRate; // Store 1 / desiredFrameRate
+
+	elapsedTime += deltaTime; // Add to the elapsed time
+	lastTime = currentTime; // Update lastTime
+
+	// Check if the time since we last checked is greater than our desiredFPS
+	if( elapsedTime > desiredFPS )
+	{
+		elapsedTime -= desiredFPS; // Adjust the elapsed time
+
+		// Return true, to animate the next frame of animation
+		return true;
+	}
+
+	// We don't animate right now.
+	return false;
+	/*
+	long long currentTime = GetTickCount();
+	float desiredFPMS = 1000.0f/(float)desiredFrameRate;
+	int deltaTime = currentTime - g_lasttime;
+
+	if(deltaTime >= desiredFPMS)
+	{
+		g_lasttime = currentTime;
+		return true;
+	}
+
+	return false;*/
+}
+
+void UpdateGameState()
+{
+	g_simframe ++;
+
+	UpdateUnits();
+}
+
+void UpdateEditor()
+{
+#if 0
+	UpdateFPS();
+#endif
+}
+
+void Update()
+{	
+	if(g_mode == LOGO)
 		UpdateLogo();
 	//else if(g_mode == INTRO)
 	//	UpdateIntro();
-	else if(mode == LOADING)
+	else if(g_mode == LOADING)
 		UpdateLoading();
-	else if(mode == RELOADING)
+	else if(g_mode == RELOADING)
 		UpdateReloading();
+	else if(g_mode == PLAY)
+		UpdateGameState();
+	else if(g_mode == EDITOR)
+		UpdateEditor();
 }
 
 void DrawScene(Matrix projection, Matrix viewmat, Matrix modelmat, Matrix modelviewinv, float mvLightPos[3], float lightDir[3])
@@ -274,7 +354,7 @@ void DrawScene(Matrix projection, Matrix viewmat, Matrix modelmat, Matrix modelv
 	glActiveTextureARB(GL_TEXTURE8);
 	glBindTexture(GL_TEXTURE_2D, g_depth);
 	glUniform1iARB(g_shader[g_curS].m_slot[SSLOT_SHADOWMAP], 8);
-	SelectHMZoom(g_zoom)->draw3();
+	SelectHMZoom(g_zoom)->draw();
 	//g_hmap.draw();
 #endif
 
@@ -299,7 +379,7 @@ void DrawScene(Matrix projection, Matrix viewmat, Matrix modelmat, Matrix modelv
 	glActiveTextureARB(GL_TEXTURE4);
 	glBindTexture(GL_TEXTURE_2D, g_depth);
 	glUniform1iARB(g_shader[g_curS].m_slot[SSLOT_SHADOWMAP], 4);
-	DrawWater();
+	DrawWater3();
 
 	UseShadow(SHADER_OWNED, projection, viewmat, modelmat, modelviewinv, mvLightPos, lightDir);
 	glActiveTextureARB(GL_TEXTURE5);
@@ -400,10 +480,8 @@ void Draw()
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 #if 2
-	MutexWait(g_glovarmutex);
 	if(g_mode == PLAY || g_mode == EDITOR)
 	{
-		MutexRelease(g_glovarmutex);
 
 		float aspect = fabsf((float)g_width / (float)g_height);
 		Matrix projection = BuildPerspProjMat(FIELD_OF_VIEW, aspect, MIN_DISTANCE, MAX_DISTANCE/g_zoom);
@@ -444,7 +522,6 @@ void Draw()
 			RenderShadowedScene(projection, viewmat, modelmat, modelview, DrawScene);
 		}
 	}
-	else MutexRelease(g_glovarmutex);
 #endif
 
 #if 0
@@ -479,9 +556,7 @@ void Draw()
 	glDisable(GL_DEPTH_TEST);
 
 	char fpsstr[256];
-	MutexWait(g_glovarmutex);
 	sprintf(fpsstr, "draw fps: %lf (%lf s/frame), upd fps: %lf (%lf s/frame), zoom: %f, simframe: %lld", g_instantdrawfps, 1.0/g_instantdrawfps, g_instantupdfps, 1.0/g_instantupdfps, g_zoom, g_simframe);
-	MutexRelease(g_glovarmutex);
 	RichText fpsrstr(fpsstr);
 	DrawShadowedText(MAINFONT8, 0, g_height-MINIMAP_SIZE-32-10, &fpsrstr);
 	glEnable(GL_DEPTH_TEST);
@@ -737,7 +812,6 @@ void Init()
 
 void Deinit()
 {
-	StopThreads();
 }
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
@@ -752,9 +826,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	
 	Queue();
 	FillGUI();
-	StartThreads();
 	
-#if 1
+#if 0
 	char blitfull[MAX_PATH+1];
 	FullPath("models/spruce1/spruce1.png", blitfull);
 	blittex = LoadPNG(blitfull);
@@ -767,9 +840,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		{
 			if(msg.message == WM_QUIT)
 			{
-				MutexWait(g_glovarmutex);
 				g_quit = true;
-				MutexRelease(g_glovarmutex);
 			}
 			else
 			{
@@ -779,34 +850,29 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		}
 		else
 		{
-#if 0
+#if 1
 			if ((g_mode == LOADING || g_mode == RELOADING) || DrawNextFrame(DRAW_FRAME_RATE))
 #endif
 			{
 				CalcDrawFrameRate();
-				UpdateDraw();
 				Draw();
 
-				MutexWait(g_glovarmutex);
 				if(g_mode == PLAY || g_mode == EDITOR)
 				{
-					MutexRelease(g_glovarmutex);
 					Scroll();
 					UpdateResTicker();
-					//ThreadPhase();
-					//Update();
 				}
-				else
-					MutexRelease(g_glovarmutex);
 			}
-#if 0
-			else
-				Sleep(1);
-#endif
+			
+			if((g_mode == LOADING || g_mode == RELOADING) || UpdNextFrame(SIM_FRAME_RATE))
+			{
+				CalcUpdFrameRate();
+				Update();
+			}
 		}
 	}
 	
-#if 1
+#if 0
 	delete blittex;
 #endif
 

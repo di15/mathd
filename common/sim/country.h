@@ -7,6 +7,7 @@
 class Country
 {
 public:
+	unsigned char player;
 	float colorcode[4];
 	RichText name;
 

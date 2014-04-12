@@ -11,6 +11,7 @@
 #include "vertexarray.h"
 #include "heightmap.h"
 #include "../utils.h"
+#include "../window.h"
 
 FoliageT g_foliageT[FOLIAGE_TYPES];
 Foliage g_foliage[FOLIAGES];
@@ -283,6 +284,9 @@ void DrawFoliage(Vec3f zoompos, Vec3f vertical, Vec3f horizontal)
 	
 	glActiveTextureARB(GL_TEXTURE0);
 	glUniform1iARB(s->m_slot[SSLOT_TEXTURE0], 0);
+	
+	glUniform1f(s->m_slot[SSLOT_MIND], MIN_DISTANCE);
+	glUniform1f(s->m_slot[SSLOT_MAXD], MAX_DISTANCE / g_zoom);
 
 	FoliageT* t = &g_foliageT[FOLIAGE_TREE1];
 	Vec3i* size = &t->size;

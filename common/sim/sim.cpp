@@ -69,7 +69,8 @@ void Queue()
 	DefineIcon(ICON_LABOUR, "gui/icons/labour.png", ":labour:");
 	DefineIcon(ICON_HOUSING, "gui/icons/housing.png", ":housing:");
 	DefineIcon(ICON_FARMPRODUCT, "gui/icons/farmproducts.png", ":farmprod:");
-	DefineIcon(ICON_FOOD, "gui/icons/food.png", ":food:");
+	DefineIcon(ICON_WSFOOD, "gui/icons/wsfood.png", ":wsfood:");
+	DefineIcon(ICON_RETFOOD, "gui/icons/retfood.png", ":retfood:");
 	DefineIcon(ICON_CHEMICALS, "gui/icons/chemicals.png", ":chemicals:");
 	DefineIcon(ICON_ELECTRONICS, "gui/icons/electronics.png", ":electronics:");
 	DefineIcon(ICON_RESEARCH, "gui/icons/research.png", ":research:");
@@ -143,7 +144,8 @@ void Queue()
 	DefineRes(RES_ELECTRONICS,	"Electronics",			"",							ICON_ELECTRONICS,	true,	false,	false,	1.0f,1.0f,1.0f,1.0f);
 	DefineRes(RES_RESEARCH,		"Research",				"",							ICON_RESEARCH,		false,	false,	true,	1.0f,1.0f,1.0f,1.0f);
 	DefineRes(RES_PRODUCTION,	"Production",			"",							ICON_PRODUCTION,	true,	false,	false,	1.0f,1.0f,1.0f,1.0f);
-	DefineRes(RES_FOOD,			"Food",					"",							ICON_FOOD,			true,	false,	false,	1.0f,1.0f,1.0f,1.0f);
+	DefineRes(RES_WSFOOD,		"Wholesale Food",		"",							ICON_WSFOOD,		true,	false,	false,	1.0f,1.0f,1.0f,1.0f);
+	DefineRes(RES_RETFOOD,		"Retail Food",			"",							ICON_RETFOOD,		true,	false,	false,	1.0f,1.0f,1.0f,1.0f);
 	DefineRes(RES_IRONORE,		"Iron Ore",				"Iron Ore Deposit",			ICON_IRONORE,		true,	false,	false,	1.0f,1.0f,1.0f,1.0f);
 	DefineRes(RES_URANIUMORE,	"Uranium Ore",			"Uranium Ore Deposit",		ICON_URANIUMORE,	true,	false,	false,	1.0f,1.0f,1.0f,1.0f);
 	DefineRes(RES_STEEL,		"Steel",				"",							ICON_STEEL,			true,	false,	false,	1.0f,1.0f,1.0f,1.0f);
@@ -516,14 +518,23 @@ void Queue()
 	BuildingInput(BUILDING_RESEARCHFAC, RES_WATER, 5);
 	BuildingOutput(BUILDING_RESEARCHFAC, RES_RESEARCH, 5);
 	
-	DefineBuildingType(BUILDING_STORE, "Store", Vec2i(2,1), "models/store1/basebuilding.ms3d", Vec3f(100,100,100), Vec3f(0,0,0), "models/store1/basebuilding.ms3d", Vec3f(100,100,100), Vec3f(0,0,0), FOUNDATION_LAND, RES_NONE);
+	DefineBuildingType(BUILDING_FOODPROCPL, "Food Processing Plant", Vec2i(2,1), "models/foodprocpl/basebuilding.ms3d", Vec3f(100,100,100), Vec3f(0,0,0), "models/foodprocpl_c/basebuilding.ms3d", Vec3f(100,100,100), Vec3f(0,0,0), FOUNDATION_LAND, RES_NONE);
 	BuildingConMat(BUILDING_STORE, RES_CEMENT, 5);
 	BuildingConMat(BUILDING_STORE, RES_LABOUR, 10);
 	BuildingConMat(BUILDING_STORE, RES_STEEL, 10);
 	BuildingInput(BUILDING_STORE, RES_ENERGY, 5);
 	BuildingInput(BUILDING_STORE, RES_FARMPRODUCTS, 5);
 	BuildingInput(BUILDING_STORE, RES_WATER, 5);
-	BuildingOutput(BUILDING_STORE, RES_FOOD, 5);
+	BuildingOutput(BUILDING_STORE, RES_WSFOOD, 5);
+	
+	DefineBuildingType(BUILDING_STORE, "Store", Vec2i(2,1), "models/store1/basebuilding.ms3d", Vec3f(100,100,100), Vec3f(0,0,0), "models/store1/basebuilding.ms3d", Vec3f(100,100,100), Vec3f(0,0,0), FOUNDATION_LAND, RES_NONE);
+	BuildingConMat(BUILDING_STORE, RES_CEMENT, 5);
+	BuildingConMat(BUILDING_STORE, RES_LABOUR, 10);
+	BuildingConMat(BUILDING_STORE, RES_STEEL, 10);
+	BuildingInput(BUILDING_STORE, RES_ENERGY, 5);
+	BuildingInput(BUILDING_STORE, RES_WSFOOD, 5);
+	BuildingInput(BUILDING_STORE, RES_WATER, 5);
+	BuildingOutput(BUILDING_STORE, RES_RETFOOD, 5);
 	
 	DefineBuildingType(BUILDING_STEELMILL, "Steel Mill", Vec2i(1,1), "models/steelmill/basebuilding.ms3d", Vec3f(100,100,100), Vec3f(0,0,0), "models/steelmill_c/basebuilding.ms3d", Vec3f(100,100,100), Vec3f(0,0,0), FOUNDATION_LAND, RES_NONE);
 	BuildingConMat(BUILDING_STEELMILL, RES_CEMENT, 5);

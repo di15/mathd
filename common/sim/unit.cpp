@@ -10,14 +10,13 @@
 #include "../math/hmapmath.h"
 #include "unitmove.h"
 #include "sim.h"
-#include "../sys/workthread.h"
+#include "labourer.h"
 
 Unit g_unit[UNITS];
 
 Unit::Unit()
 {
 	on = false;
-	oldon = on;
 	threadwait = false;
 }
 
@@ -28,9 +27,7 @@ Unit::~Unit()
 
 void Unit::destroy()
 {
-	MutexWaitInf(g_drawmutex);
 	on = false;
-	MutexRelease(g_drawmutex);
 	threadwait = false;
 }
 
@@ -40,23 +37,6 @@ void Unit::resetpath()
 	subgoal = cmpos;
 	goal = cmpos;
 	pathblocked = false;
-}
-
-Unit::RenderState::RenderState()
-{
-	on = false;
-}
-
-void Unit::updrendst()
-{
-	rendst.on = on;
-	rendst.frame[0] = frame[0];
-	rendst.frame[1] = frame[1];
-	rendst.hp = hp;
-	rendst.mode = mode;
-	rendst.type = type;
-	rendst.drawpos = drawpos;
-	rendst.rotation = rotation;
 }
 
 #if 0
@@ -129,10 +109,8 @@ void DrawUnits()
 	{
 		Unit* u = &g_unit[i];
 		
-		MutexWait(g_drawmutex);
 		if(!u->on)
 		{
-			MutexRelease(g_drawmutex);
 			continue;
 		}
 
@@ -141,7 +119,6 @@ void DrawUnits()
 		Model* m = &g_model[t->model];
 		
 		m->draw(u->frame[BODY_LOWER], u->drawpos, u->rotation.y);
-		MutexRelease(g_drawmutex);
 	}
 }
 
@@ -168,8 +145,8 @@ void StartingBelongings(Unit* u)
 			u->belongings[ c->currencyres ] = 100;
 		}
 
-		u->belongings[ RES_FOOD ] = 9000;	//lasts for 5 minutes
-		u->belongings[ RES_LABOUR ] = 1000;	//lasts for 33.333 seconds
+		u->belongings[ RES_RETFOOD ] = STARTING_RETFOOD;
+		u->belongings[ RES_LABOUR ] = STARTING_LABOUR;
 	}
 }
 
@@ -301,6 +278,12 @@ void AnimateUnit(Unit* u)
 	}
 }
 
+void UpdateAI(Unit* u)
+{
+	if(u->type == UNIT_LABOURER)
+		UpdateLabourer(u);
+}
+
 void UpdateUnits()
 {
 	for(int i = 0; i < UNITS; i++)
@@ -310,17 +293,8 @@ void UpdateUnits()
 		if(!u->on)
 			continue;
 
-		//UpdateAI(u);
+		UpdateAI(u);
 		MoveUnit(u);
 		AnimateUnit(u);
-	}
-	
-	for(int i = 0; i < UNITS; i++)
-	{
-		Unit* u = &g_unit[i];
-		
-		MutexWait(g_drawmutex, 0);
-		u->updrendst();
-		MutexRelease(g_drawmutex);
 	}
 }

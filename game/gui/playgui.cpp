@@ -360,7 +360,8 @@ void UpdateResTicker()
 	restext.m_part.push_back(RichTextP(RICHTEXT_ICON, ICON_ROUBLES)); restext.m_part.push_back(RichTextP(" Roubles: 100 +1/")); restext.m_part.push_back(RichTextP(RICHTEXT_ICON, ICON_TIME)); restext.m_part.push_back(RichTextP("    "));
 	restext.m_part.push_back(RichTextP(RICHTEXT_ICON, ICON_HOUSING)); restext.m_part.push_back(RichTextP(" Housing: 100/120")); restext.m_part.push_back(RichTextP("    "));
 	restext.m_part.push_back(RichTextP(RICHTEXT_ICON, ICON_FARMPRODUCT)); restext.m_part.push_back(RichTextP(" Farm Products: 100 +1/")); restext.m_part.push_back(RichTextP(RICHTEXT_ICON, ICON_TIME)); restext.m_part.push_back(RichTextP("    "));
-	restext.m_part.push_back(RichTextP(RICHTEXT_ICON, ICON_FOOD)); restext.m_part.push_back(RichTextP(" Food: 100 +1/")); restext.m_part.push_back(RichTextP(RICHTEXT_ICON, ICON_TIME)); restext.m_part.push_back(RichTextP("    "));
+	restext.m_part.push_back(RichTextP(RICHTEXT_ICON, ICON_WSFOOD)); restext.m_part.push_back(RichTextP(" Wholesale Food: 100 +1/")); restext.m_part.push_back(RichTextP(RICHTEXT_ICON, ICON_TIME)); restext.m_part.push_back(RichTextP("    "));
+	restext.m_part.push_back(RichTextP(RICHTEXT_ICON, ICON_RETFOOD)); restext.m_part.push_back(RichTextP(" Retail Food: 100 +1/")); restext.m_part.push_back(RichTextP(RICHTEXT_ICON, ICON_TIME)); restext.m_part.push_back(RichTextP("    "));
 	restext.m_part.push_back(RichTextP(RICHTEXT_ICON, ICON_CHEMICALS)); restext.m_part.push_back(RichTextP(" Chemicals: 100 +1/")); restext.m_part.push_back(RichTextP(RICHTEXT_ICON, ICON_TIME)); restext.m_part.push_back(RichTextP("    "));
 	restext.m_part.push_back(RichTextP(RICHTEXT_ICON, ICON_ELECTRONICS)); restext.m_part.push_back(RichTextP(" Electronics: 100 +1/")); restext.m_part.push_back(RichTextP(RICHTEXT_ICON, ICON_TIME)); restext.m_part.push_back(RichTextP("    "));
 	restext.m_part.push_back(RichTextP(RICHTEXT_ICON, ICON_RESEARCH)); restext.m_part.push_back(RichTextP(" Research: 100 +1/")); restext.m_part.push_back(RichTextP(RICHTEXT_ICON, ICON_TIME)); restext.m_part.push_back(RichTextP("    "));
@@ -414,7 +415,7 @@ void UpdateResTicker()
 
 	int len = restext.texlen();
 
-	tickerpos += 0.5f * g_drawfrinterval * 100;
+	tickerpos += 0.5f * g_drawfrinterval * 20;
 
 	if((int)tickerpos > len)
 		tickerpos = 0;

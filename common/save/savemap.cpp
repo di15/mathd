@@ -23,7 +23,6 @@
 #include "../sim/country.h"
 #include "../sim/selection.h"
 #include "../ai/collidertile.h"
-#include "../sys/workthread.h"
 #include "../ai/pathjob.h"
 #include "../ai/pathnode.h"
 
@@ -150,9 +149,7 @@ void LoadJPGMap(const char* relative)
 	g_hmap4.remesh(4);
 	g_hmap8.remesh(8);
 #endif
-	MutexWait(g_drawmutex);
 	g_hmap.prerender();
-	MutexRelease(g_drawmutex);
 
 #if 1
 	for(int x=0; x<g_hmap.m_widthx; x++)
@@ -382,9 +379,7 @@ void ReadHeightmap(FILE *fp)
 	g_hmap4.remesh(4);
 	g_hmap8.remesh(8);
 #endif
-	MutexWait(g_drawmutex);
 	g_hmap.prerender();
-	MutexRelease(g_drawmutex);
 
 	AllocGrid(widthx, widthz);
 

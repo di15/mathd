@@ -9,7 +9,6 @@
 #include "../render/heightmap.h"
 #include "../math/vec3f.h"
 #include "../math/vec2i.h"
-#include "../sys/workthread.h"
 #include "../platform.h"
 
 class Unit;

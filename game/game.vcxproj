@@ -126,7 +126,7 @@
     <LinkIncremental>true</LinkIncremental>
     <IncludePath>$(SolutionDir)\libs\lpng;$(SolutionDir)\libs\;$(SolutionDir)\libs\libzip-0.11.1\lib;$(SolutionDir)\libs\jpeglib;$(IncludePath)</IncludePath>
     <LibraryPath>$(SolutionDir)\libs\GL;$(SolutionDir)\libs\zlib-1.2.5\build\Release;$(SolutionDir)\libs\libzip-0.11.1\build\lib\Release;$(SolutionDir)\libs\lpng\lib;$(SolutionDir)\libs\jpeglib;$(LibraryPath)</LibraryPath>
-    <TargetName>CorpStatesDbg</TargetName>
+    <TargetName>StatesCorpsDbg</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
@@ -135,7 +135,7 @@
     <LinkIncremental>false</LinkIncremental>
     <IncludePath>$(SolutionDir)\libs\lpng;$(SolutionDir)\libs\jpeglib;$(SolutionDir)\libs\libzip-0.11.1\lib;$(SolutionDir)\libs\;$(SolutionDir)\libs\win\SDL-1.2.15\include;$(IncludePath)</IncludePath>
     <LibraryPath>$(SolutionDir)\libs\lpng\lib;$(SolutionDir)\libs\jpeglib;$(SolutionDir)\libs\win\SDL-1.2.15\lib\x86;$(SolutionDir)\libs\zlib-1.2.5\build\Release;$(SolutionDir)\libs\GL;$(SolutionDir)\libs\libzip-0.11.1\build\lib\Release;$(LibraryPath)</LibraryPath>
-    <TargetName>CorpStates</TargetName>
+    <TargetName>StatesCorps</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='32 bit release|Win32'">
     <LinkIncremental>false</LinkIncremental>
@@ -304,6 +304,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\common\ai\astarpath.cpp" />
     <ClCompile Include="..\common\ai\binheap.cpp" />
     <ClCompile Include="..\common\ai\jpsexpansion.cpp" />
     <ClCompile Include="..\common\ai\jpspath.cpp" />
@@ -335,6 +336,7 @@
     <ClCompile Include="..\common\gui\widgets\link.cpp" />
     <ClCompile Include="..\common\gui\widgets\listbox.cpp" />
     <ClCompile Include="..\common\gui\widgets\spez\bottompanel.cpp" />
+    <ClCompile Include="..\common\gui\widgets\spez\buildpreview.cpp" />
     <ClCompile Include="..\common\gui\widgets\spez\resticker.cpp" />
     <ClCompile Include="..\common\gui\widgets\text.cpp" />
     <ClCompile Include="..\common\gui\widgets\textarea.cpp" />
@@ -368,7 +370,6 @@
     <ClCompile Include="..\common\render\ms3d.cpp" />
     <ClCompile Include="..\common\render\particle.cpp" />
     <ClCompile Include="..\common\render\projectile.cpp" />
-    <ClCompile Include="..\common\render\rendst.cpp" />
     <ClCompile Include="..\common\render\screenshot.cpp" />
     <ClCompile Include="..\common\render\shader.cpp" />
     <ClCompile Include="..\common\render\shadow.cpp" />
@@ -386,6 +387,7 @@
     <ClCompile Include="..\common\sim\labourer.cpp" />
     <ClCompile Include="..\common\sim\crudepipeline.cpp" />
     <ClCompile Include="..\common\sim\order.cpp" />
+    <ClCompile Include="..\common\sim\player.cpp" />
     <ClCompile Include="..\common\sim\powerline.cpp" />
     <ClCompile Include="..\common\sim\resources.cpp" />
     <ClCompile Include="..\common\sim\road.cpp" />
@@ -395,9 +397,6 @@
     <ClCompile Include="..\common\sim\unitmove.cpp" />
     <ClCompile Include="..\common\sim\unittype.cpp" />
     <ClCompile Include="..\common\sound\sound.cpp" />
-    <ClCompile Include="..\common\sys\threadjob.cpp" />
-    <ClCompile Include="..\common\sys\updthread.cpp" />
-    <ClCompile Include="..\common\sys\workthread.cpp" />
     <ClCompile Include="..\common\texture.cpp" />
     <ClCompile Include="..\common\ustring.cpp" />
     <ClCompile Include="..\common\utils.cpp" />
@@ -412,6 +411,7 @@
     <ClCompile Include="keymap.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\common\ai\astarpath.h" />
     <ClInclude Include="..\common\ai\binheap.h" />
     <ClInclude Include="..\common\ai\jpsexpansion.h" />
     <ClInclude Include="..\common\ai\jpspath.h" />
@@ -443,6 +443,7 @@
     <ClInclude Include="..\common\gui\widgets\link.h" />
     <ClInclude Include="..\common\gui\widgets\listbox.h" />
     <ClInclude Include="..\common\gui\widgets\spez\bottompanel.h" />
+    <ClInclude Include="..\common\gui\widgets\spez\buildpreview.h" />
     <ClInclude Include="..\common\gui\widgets\spez\resticker.h" />
     <ClInclude Include="..\common\gui\widgets\text.h" />
     <ClInclude Include="..\common\gui\widgets\textarea.h" />
@@ -479,7 +480,6 @@
     <ClInclude Include="..\common\render\ms3d.h" />
     <ClInclude Include="..\common\render\particle.h" />
     <ClInclude Include="..\common\render\projectile.h" />
-    <ClInclude Include="..\common\render\rendst.h" />
     <ClInclude Include="..\common\render\screenshot.h" />
     <ClInclude Include="..\common\render\shader.h" />
     <ClInclude Include="..\common\render\shadow.h" />
@@ -497,6 +497,7 @@
     <ClInclude Include="..\common\sim\labourer.h" />
     <ClInclude Include="..\common\sim\crudepipeline.h" />
     <ClInclude Include="..\common\sim\order.h" />
+    <ClInclude Include="..\common\sim\player.h" />
     <ClInclude Include="..\common\sim\powerline.h" />
     <ClInclude Include="..\common\sim\resources.h" />
     <ClInclude Include="..\common\sim\road.h" />
@@ -506,9 +507,6 @@
     <ClInclude Include="..\common\sim\unitmove.h" />
     <ClInclude Include="..\common\sim\unittype.h" />
     <ClInclude Include="..\common\sound\sound.h" />
-    <ClInclude Include="..\common\sys\threadjob.h" />
-    <ClInclude Include="..\common\sys\updthread.h" />
-    <ClInclude Include="..\common\sys\workthread.h" />
     <ClInclude Include="..\common\texture.h" />
     <ClInclude Include="..\common\ustring.h" />
     <ClInclude Include="..\common\utils.h" />

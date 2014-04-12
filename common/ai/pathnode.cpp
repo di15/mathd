@@ -5,10 +5,12 @@
 #include "../math/3dmath.h"
 #include "pathjob.h"
 #include "../sim/unittype.h"
-#include "../sys/workthread.h"
 #include "collidertile.h"
+#include "binheap.h"
 
 Vec2i g_pathdim(0,0);
+PathNode* g_pathnode = NULL;
+Heap g_openlist;
 
 // Offsets for straights moves
 Vec2i straightoffsets[4] = {
@@ -61,7 +63,7 @@ PathNode::PathNode(int startx, int startz, int endx, int endz, int nx, int nz, P
 	expansion = expan;
 }
 
-PathNode* PathNodeAt(WorkThread* wt, int nx, int nz)
+PathNode* PathNodeAt(int nx, int nz)
 {
 	if(nx < 0)
 		return NULL;
@@ -75,7 +77,7 @@ PathNode* PathNodeAt(WorkThread* wt, int nx, int nz)
 	if(nz >= g_pathdim.y)
 		return NULL;
 
-	return &wt->pathnode[ nz * g_pathdim.x + nx ];
+	return &g_pathnode[ nz * g_pathdim.x + nx ];
 }
 
 int PathNodeIndex(int nx, int nz)
@@ -83,12 +85,12 @@ int PathNodeIndex(int nx, int nz)
 	return nz * g_pathdim.x + nx;
 }
 
-Vec2i PathNodePos(WorkThread* wt, PathNode* node)
+Vec2i PathNodePos(PathNode* node)
 {
 	if(!node)
 		return Vec2i(-1,-1);
 
-	const int i = node - wt->pathnode;
+	const int i = node - g_pathnode;
 	const int nz = i / g_pathdim.x;
 	const int nx = i % g_pathdim.x;
 	return Vec2i(nx, nz);
@@ -96,7 +98,7 @@ Vec2i PathNodePos(WorkThread* wt, PathNode* node)
 
 bool AtGoal(PathJob* pj, PathNode* node)
 {
-	Vec2i cpos = PathNodePos(pj->wt, node);
+	Vec2i cpos = PathNodePos(node);
 	int cmposx = cpos.x * PATHNODE_SIZE + PATHNODE_SIZE/2;
 	int cmposz = cpos.y * PATHNODE_SIZE + PATHNODE_SIZE/2;
 
@@ -133,10 +135,10 @@ void SnapToNode(PathJob* pj)
 	Vec2i npos_se = Vec2i( npos_max.x, npos_max.y );
 	
 #if 1
-	PathNode* node_nw = PathNodeAt(pj->wt, npos_nw.x, npos_nw.y);
-	PathNode* node_ne = PathNodeAt(pj->wt, npos_ne.x, npos_ne.y);
-	PathNode* node_sw = PathNodeAt(pj->wt, npos_sw.x, npos_sw.y);
-	PathNode* node_se = PathNodeAt(pj->wt, npos_se.x, npos_se.y);
+	PathNode* node_nw = PathNodeAt(npos_nw.x, npos_nw.y);
+	PathNode* node_ne = PathNodeAt(npos_ne.x, npos_ne.y);
+	PathNode* node_sw = PathNodeAt(npos_sw.x, npos_sw.y);
+	PathNode* node_se = PathNodeAt(npos_se.x, npos_se.y);
 #endif
 	
 	bool walkable_nw = Walkable(pj, npos_nw.x, npos_nw.y);
@@ -291,13 +293,13 @@ void SnapToNode(PathJob* pj)
 	startnode->F = startnode->totalD + Manhattan( Vec2i(pj->cmgoalx, pj->cmgoalz) - cmpos );
 	startnode->previous = NULL;
 
-	pj->wt->openlist.insert(startnode);
+	g_openlist.insert(startnode);
 
 	startnode->opened = true;
-	pj->wt->toclear.push_back(startnode);
+	g_toclear.push_back(startnode);
 
 #if 0
-	PathNode* startnode = PathNodeAt(pj->wt, npos.x, npos.y);
+	PathNode* startnode = PathNodeAt(npos.x, npos.y);
 
 	Vec2i cmpos = Vec2i( npos.x * PATHNODE_SIZE + PATHNODE_SIZE/2, npos.y * PATHNODE_SIZE + PATHNODE_SIZE/2 );
 
@@ -305,10 +307,23 @@ void SnapToNode(PathJob* pj)
 	startnode->F = startnode->totalD + Manhattan( Vec2i(pj->cmgoalx, pj->cmgoalz) - cmpos );
 	startnode->previous = NULL;
 
-	pj->wt->openlist.insert(startnode);
+	g_openlist.insert(startnode);
 	pj->wt->opennode[ startnode - pj->wt->pathnode ] = pj->wt->pathcnt;
 #endif
 
 	//startNode._opened = true
 	//toClear[startNode] = true
+}
+
+//long long g_lastpath;
+
+void ResetPathNodes()
+{
+	for(int i = 0; i < g_pathdim.x * g_pathdim.y; i++)
+	{
+		PathNode* n = &g_pathnode[i];
+		n->closed = false;
+		n->opened = false;
+	}
+	g_openlist.resetelems();
 }

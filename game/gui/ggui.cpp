@@ -26,7 +26,6 @@
 #include "../../common/render/water.h"
 #include "../../common/sim/order.h"
 #include "../../common/ai/pathdebug.h"
-#include "../../common/sys/workthread.h"
 
 //bool g_canselect = true;
 
@@ -272,10 +271,10 @@ void Resize_LoadingStatus(Widget* thisw)
 
 void Click_NewGame()
 {
-#if 1
+#if 0
 	LoadJPGMap("heightmaps/heightmap0e2.jpg");
-#elif 0
-	LoadJPGMap("heightmaps/heightmap0b.jpg");
+#elif 1
+	LoadJPGMap("heightmaps/heightmap0c.jpg");
 #else
 	char fullpath[MAX_PATH+1];
 	FullPath("maps/testmap", fullpath);
@@ -283,11 +282,7 @@ void Click_NewGame()
 	LoadMap(fullpath);
 #endif
 
-	g_curthread = 0;
-
-	MutexWait(g_glovarmutex);
 	g_mode = PLAY;
-	MutexRelease(g_glovarmutex);
 
 	OpenSoleView("play gui");
 	OpenAnotherView("play right opener");
@@ -299,9 +294,7 @@ void Click_OpenEditor()
 {
 	LoadJPGMap("heightmaps/heightmap0e2.jpg");
 	
-	MutexWait(g_glovarmutex);
 	g_mode = EDITOR;
-	MutexRelease(g_glovarmutex);
 
 	OpenSoleView("editor gui");
 
@@ -466,7 +459,7 @@ void RotateAbout()
 	Vec3f line[2];
 	line[0] = g_camera.zoompos();
 
-	//g_camera.rotateabout(g_camera.m_view, dy / 100.0f, g_camera.m_strafe.x, g_camera.m_strafe.y, g_camera.m_strafe.z);
+	g_camera.rotateabout(g_camera.m_view, dy / 100.0f, g_camera.m_strafe.x, g_camera.m_strafe.y, g_camera.m_strafe.z);
 	g_camera.rotateabout(g_camera.m_view, dx / 100.0f, g_camera.m_up.x, g_camera.m_up.y, g_camera.m_up.z);
 	
 	line[1] = g_camera.zoompos();

@@ -3,7 +3,6 @@
 #include "collidertile.h"
 #include "../math/vec2i.h"
 #include "../math/3dmath.h"
-#include "../sys/workthread.h"
 #include "../sim/unit.h"
 #include "../sim/unittype.h"
 #include "../sim/building.h"
@@ -34,16 +33,16 @@ list<PathNode*> GetNeighbours(PathJob* pj, PathNode* node)
 {
 	list<PathNode*> neighbours;
 
-	Vec2i pos = PathNodePos(pj->wt, node);
+	Vec2i pos = PathNodePos(node);
 
 	for( int i=0; i<ARRSZ(straightoffsets); i++ )
 	{
-		PathNode* n = PathNodeAt(pj->wt, 
+		PathNode* n = PathNodeAt(
 			pos.x + straightoffsets[i].x,
 			pos.y + straightoffsets[i].y
 			);
 
-		Vec2i p = PathNodePos(pj->wt, n);
+		Vec2i p = PathNodePos(n);
 
 		if( n && Walkable(pj, p.x, p.y) )
 		{
@@ -55,12 +54,12 @@ list<PathNode*> GetNeighbours(PathJob* pj, PathNode* node)
 
 	for( int i=0; i<ARRSZ(diagonaloffsets); i++ )
 	{
-		PathNode* n = PathNodeAt(pj->wt, 
+		PathNode* n = PathNodeAt(
 			pos.x + diagonaloffsets[i].x,
 			pos.y + diagonaloffsets[i].y
 			);
 
-		Vec2i p = PathNodePos(pj->wt, n);
+		Vec2i p = PathNodePos(n);
 
 		bool tunnel = false;
 
@@ -73,10 +72,10 @@ list<PathNode*> GetNeighbours(PathJob* pj, PathNode* node)
 			else
 			{
 				bool skip = false;
-				PathNode* n1 = PathNodeAt(pj->wt, p.x+diagonaloffsets[i].x, p.y);
-				PathNode* n2 = PathNodeAt(pj->wt, p.x, p.y+diagonaloffsets[i].y);
-				Vec2i p1 = PathNodePos(pj->wt, n1);
-				Vec2i p2 = PathNodePos(pj->wt, n2);
+				PathNode* n1 = PathNodeAt(p.x+diagonaloffsets[i].x, p.y);
+				PathNode* n2 = PathNodeAt(p.x, p.y+diagonaloffsets[i].y);
+				Vec2i p1 = PathNodePos(n1);
+				Vec2i p2 = PathNodePos(n2);
 
 				if( (n1 && n2) && !Walkable(pj, p1.x, p1.y) && !Walkable(pj, p2.x, p2.y) ) 
 				{
@@ -109,12 +108,12 @@ list<PathNode*> FindNeighbours(PathJob* pj, PathNode* node)
 	{
 		list<PathNode*> neighbours;
 
-		Vec2i pos = PathNodePos(pj->wt, node);
+		Vec2i pos = PathNodePos(node);
 
 		// Node have a parent, we will prune some neighbours
 		// Gets the direction of move
-		Vec2i delta = pos - PathNodePos(pj->wt, node->previous);
-		Vec2i prevpos = PathNodePos(pj->wt, node->previous);
+		Vec2i delta = pos - PathNodePos(node->previous);
+		Vec2i prevpos = PathNodePos(node->previous);
 		delta.x = (pos.x-prevpos.x)/max(abs(pos.x-prevpos.x),1);
 		delta.y = (pos.y-prevpos.y)/max(abs(pos.y-prevpos.y),1);
 
@@ -127,30 +126,30 @@ list<PathNode*> FindNeighbours(PathJob* pj, PathNode* node)
 			// Natural neighbours
 			if( Walkable(pj, pos.x, pos.y+delta.y) ) 
 			{
-				neighbours.push_back(PathNodeAt(pj->wt, pos.x, pos.y+delta.y));
+				neighbours.push_back(PathNodeAt(pos.x, pos.y+delta.y));
 				walkY = true;
 			}
 			if( Walkable(pj, pos.x+delta.x, pos.y) ) 
 			{
-				neighbours.push_back(PathNodeAt(pj->wt, pos.x+delta.x, pos.y));
+				neighbours.push_back(PathNodeAt(pos.x+delta.x, pos.y));
 				walkX = true;
 			}
 			
 #if 0
-			if( walkX || walkY ) neighbours.push_back(PathNodeAt(pj->wt, pos.x+delta.x, pos.y+delta.y));
+			if( walkX || walkY ) neighbours.push_back(PathNodeAt(pos.x+delta.x, pos.y+delta.y));
 #else
 			// Denis edit - trip corners
-			if( walkX && walkY ) neighbours.push_back(PathNodeAt(pj->wt, pos.x+delta.x, pos.y+delta.y));
+			if( walkX && walkY ) neighbours.push_back(PathNodeAt(pos.x+delta.x, pos.y+delta.y));
 #endif
 
 			// Forced neighbours
 #if 0
-			if( !Walkable(pj, pos.x-delta.x, pos.y) && walkY ) neighbours.push_back(PathNodeAt(pj->wt, pos.x-delta.x, pos.y+delta.y));
-			if( !Walkable(pj, pos.x, pos.y-delta.y) && walkX ) neighbours.push_back(PathNodeAt(pj->wt, pos.x+delta.x, pos.y-delta.y));
+			if( !Walkable(pj, pos.x-delta.x, pos.y) && walkY ) neighbours.push_back(PathNodeAt(pos.x-delta.x, pos.y+delta.y));
+			if( !Walkable(pj, pos.x, pos.y-delta.y) && walkX ) neighbours.push_back(PathNodeAt(pos.x+delta.x, pos.y-delta.y));
 #elif 0
 			// Denis edit - trip corners
-			if( !Walkable(pj, pos.x-delta.x, pos.y) && walkY && walkX ) neighbours.push_back(PathNodeAt(pj->wt, pos.x-delta.x, pos.y+delta.y));
-			if( !Walkable(pj, pos.x, pos.y-delta.y) && walkX && walkY ) neighbours.push_back(PathNodeAt(pj->wt, pos.x+delta.x, pos.y-delta.y));
+			if( !Walkable(pj, pos.x-delta.x, pos.y) && walkY && walkX ) neighbours.push_back(PathNodeAt(pos.x-delta.x, pos.y+delta.y));
+			if( !Walkable(pj, pos.x, pos.y-delta.y) && walkX && walkY ) neighbours.push_back(PathNodeAt(pos.x+delta.x, pos.y-delta.y));
 #else
 			// Denis edit - trip corners
 
@@ -165,18 +164,18 @@ list<PathNode*> FindNeighbours(PathJob* pj, PathNode* node)
 
 				if( Walkable(pj, pos.x, pos.y+delta.y) ) 
 				{
-					neighbours.push_back( PathNodeAt(pj->wt, pos.x, pos.y+delta.y) );
+					neighbours.push_back( PathNodeAt(pos.x, pos.y+delta.y) );
 
 #if 0
 					// Forced neighbours are left and right ahead along Y
-					if( !Walkable(pj, pos.x+1, pos.y) ) neighbours.push_back( PathNodeAt(pj->wt, pos.x+1, pos.y+delta.y) );
-					if( !Walkable(pj, pos.x-1, pos.y) ) neighbours.push_back( PathNodeAt(pj->wt, pos.x-1, pos.y+delta.y) );
+					if( !Walkable(pj, pos.x+1, pos.y) ) neighbours.push_back( PathNodeAt(pos.x+1, pos.y+delta.y) );
+					if( !Walkable(pj, pos.x-1, pos.y) ) neighbours.push_back( PathNodeAt(pos.x-1, pos.y+delta.y) );
 #elif 0
 					//Denis edit - trip corners
 					if( Walkable(pj, pos.x, pos.y+delta.y) )
 					{
-						if( !Walkable(pj, pos.x+1, pos.y-delta.y) && Walkable(pj, pos.x+1, pos.y) ) neighbours.push_back( PathNodeAt(pj->wt, pos.x+1, pos.y+delta.y) );
-						if( !Walkable(pj, pos.x-1, pos.y-delta.y) && Walkable(pj, pos.x-1, pos.y) ) neighbours.push_back( PathNodeAt(pj->wt, pos.x-1, pos.y+delta.y) );
+						if( !Walkable(pj, pos.x+1, pos.y-delta.y) && Walkable(pj, pos.x+1, pos.y) ) neighbours.push_back( PathNodeAt(pos.x+1, pos.y+delta.y) );
+						if( !Walkable(pj, pos.x-1, pos.y-delta.y) && Walkable(pj, pos.x-1, pos.y) ) neighbours.push_back( PathNodeAt(pos.x-1, pos.y+delta.y) );
 					}
 #else
 				}
@@ -184,24 +183,24 @@ list<PathNode*> FindNeighbours(PathJob* pj, PathNode* node)
 				//Denis edit - trip corners
 				if( !Walkable(pj, pos.x+1, pos.y-delta.y) )
 				{
-						neighbours.push_back( PathNodeAt(pj->wt, pos.x+1, pos.y) );
+						neighbours.push_back( PathNodeAt(pos.x+1, pos.y) );
 
 						if( Walkable(pj, pos.x, pos.y+delta.y) && Walkable(pj, pos.x+1, pos.y) )
-							neighbours.push_back( PathNodeAt(pj->wt, pos.x+1, pos.y+delta.y) );
+							neighbours.push_back( PathNodeAt(pos.x+1, pos.y+delta.y) );
 				}
 				if( !Walkable(pj, pos.x-1, pos.y-delta.y) )
 				{
-						neighbours.push_back( PathNodeAt(pj->wt, pos.x-1, pos.y) );
+						neighbours.push_back( PathNodeAt(pos.x-1, pos.y) );
 						
 						if( Walkable(pj, pos.x, pos.y+delta.y) && Walkable(pj, pos.x-1, pos.y) )
-							neighbours.push_back( PathNodeAt(pj->wt, pos.x-1, pos.y+delta.y) );
+							neighbours.push_back( PathNodeAt(pos.x-1, pos.y+delta.y) );
 				}
 
 				// In case diagonal moves are forbidden : Needs to be optimized
 				if( !1 ) //if not allow diagonal
 				{
-					if( Walkable(pj, pos.x+1, pos.y) ) neighbours.push_back( PathNodeAt(pj->wt, pos.x+1, pos.y) );
-					if( Walkable(pj, pos.x-1, pos.y) ) neighbours.push_back( PathNodeAt(pj->wt, pos.x-1, pos.y) );
+					if( Walkable(pj, pos.x+1, pos.y) ) neighbours.push_back( PathNodeAt(pos.x+1, pos.y) );
+					if( Walkable(pj, pos.x-1, pos.y) ) neighbours.push_back( PathNodeAt(pos.x-1, pos.y) );
 				}
 			}
 			else
@@ -209,18 +208,18 @@ list<PathNode*> FindNeighbours(PathJob* pj, PathNode* node)
 				// Move along X-axis case
 				if( Walkable(pj, pos.x+delta.x, pos.y) ) 
 				{
-					neighbours.push_back( PathNodeAt(pj->wt, pos.x+delta.x, pos.y) );
+					neighbours.push_back( PathNodeAt(pos.x+delta.x, pos.y) );
 
 					// Forced neighbours are up and down ahead along X
 #if 0
-					if( !Walkable(pj, pos.x, pos.y+1) ) neighbours.push_back( PathNodeAt(pj->wt, pos.x+delta.x, pos.y+1) );
-					if( !Walkable(pj, pos.x, pos.y-1) ) neighbours.push_back( PathNodeAt(pj->wt, pos.x+delta.x, pos.y-1) );
+					if( !Walkable(pj, pos.x, pos.y+1) ) neighbours.push_back( PathNodeAt(pos.x+delta.x, pos.y+1) );
+					if( !Walkable(pj, pos.x, pos.y-1) ) neighbours.push_back( PathNodeAt(pos.x+delta.x, pos.y-1) );
 #elseif 0
 					//Denis edit - trip corners
 					if( Walkable(pj, pos.x+delta.x, pos.y) )
 					{
-						if( !Walkable(pj, pos.x-delta.x, pos.y+1) && Walkable(pj, pos.x, pos.y+1) ) neighbours.push_back( PathNodeAt(pj->wt, pos.x+delta.x, pos.y+1) );
-						if( !Walkable(pj, pos.x-delta.x, pos.y-1) && Walkable(pj, pos.x, pos.y-1) ) neighbours.push_back( PathNodeAt(pj->wt, pos.x+delta.x, pos.y-1) );
+						if( !Walkable(pj, pos.x-delta.x, pos.y+1) && Walkable(pj, pos.x, pos.y+1) ) neighbours.push_back( PathNodeAt(pos.x+delta.x, pos.y+1) );
+						if( !Walkable(pj, pos.x-delta.x, pos.y-1) && Walkable(pj, pos.x, pos.y-1) ) neighbours.push_back( PathNodeAt(pos.x+delta.x, pos.y-1) );
 					}
 #else
 				}
@@ -229,24 +228,24 @@ list<PathNode*> FindNeighbours(PathJob* pj, PathNode* node)
 				//Denis edit - trip corners
 				if( !Walkable(pj, pos.x-delta.x, pos.y+1) )
 				{
-					neighbours.push_back( PathNodeAt(pj->wt, pos.x, pos.y+1) );
+					neighbours.push_back( PathNodeAt(pos.x, pos.y+1) );
 
 					if( Walkable(pj, pos.x+delta.x, pos.y) && Walkable(pj, pos.x, pos.y+1) )
-						neighbours.push_back( PathNodeAt(pj->wt, pos.x+delta.x, pos.y+1) );
+						neighbours.push_back( PathNodeAt(pos.x+delta.x, pos.y+1) );
 				}
 				if( !Walkable(pj, pos.x-delta.x, pos.y-1) )
 				{
-					neighbours.push_back( PathNodeAt(pj->wt, pos.x, pos.y-1) );
+					neighbours.push_back( PathNodeAt(pos.x, pos.y-1) );
 
 					if( Walkable(pj, pos.x+delta.x, pos.y) && Walkable(pj, pos.x, pos.y-1) )
-						neighbours.push_back( PathNodeAt(pj->wt, pos.x+delta.x, pos.y-1) );
+						neighbours.push_back( PathNodeAt(pos.x+delta.x, pos.y-1) );
 				}
 
 				// : In case diagonal moves are forbidden
 				if( !1 ) //if no diagonal
 				{
-					if( Walkable(pj, pos.x, pos.y+1) ) neighbours.push_back( PathNodeAt(pj->wt, pos.x, pos.y+1) );
-					if( Walkable(pj, pos.x, pos.y-1) ) neighbours.push_back( PathNodeAt(pj->wt, pos.x, pos.y-1) );
+					if( Walkable(pj, pos.x, pos.y+1) ) neighbours.push_back( PathNodeAt(pos.x, pos.y+1) );
+					if( Walkable(pj, pos.x, pos.y-1) ) neighbours.push_back( PathNodeAt(pos.x, pos.y-1) );
 				}
 			}
 		}
@@ -274,8 +273,8 @@ PathNode* Jump(PathJob* pj, PathNode* node, PathNode* parent)
 {
 	if(!node) return NULL;
 
-	Vec2i pos = PathNodePos(pj->wt, node);
-	Vec2i delta = pos - PathNodePos(pj->wt, parent);
+	Vec2i pos = PathNodePos(node);
+	Vec2i delta = pos - PathNodePos(parent);
 
 	// If the node to be examined is unwalkable, return nil
 	if( !Walkable(pj, pos.x, pos.y) ) { return NULL; }
@@ -349,8 +348,8 @@ PathNode* Jump(PathJob* pj, PathNode* node, PathNode* parent)
 	// Recursive horizontal/vertical search
 	if( delta.x!=0 && delta.y!=0 ) 
 	{
-		if( Jump(pj, PathNodeAt(pj->wt, pos.x+delta.x, pos.y), node) ) { return node; }
-		if( Jump(pj, PathNodeAt(pj->wt, pos.x, pos.y+delta.y), node) ) { return node; }
+		if( Jump(pj, PathNodeAt(pos.x+delta.x, pos.y), node) ) { return node; }
+		if( Jump(pj, PathNodeAt(pos.x, pos.y+delta.y), node) ) { return node; }
 	}
 
 	// Recursive diagonal search
@@ -359,13 +358,13 @@ PathNode* Jump(PathJob* pj, PathNode* node, PathNode* parent)
 #if 0
 		if( Walkable(pj, pos.x+delta.x, pos.y) || Walkable(pj, pos.x, pos.y+delta.y) ) 
 		{
-			return Jump(pj, PathNodeAt(pj->wt, pos.x+delta.x, pos.y+delta.y), node);
+			return Jump(pj, PathNodeAt(pos.x+delta.x, pos.y+delta.y), node);
 		}
 #else
 		// Denis edit - tripping on corners
 		if( Walkable(pj, pos.x+delta.x, pos.y) && Walkable(pj, pos.x, pos.y+delta.y) ) 
 		{
-			return Jump(pj, PathNodeAt(pj->wt, pos.x+delta.x, pos.y+delta.y), node);
+			return Jump(pj, PathNodeAt(pos.x+delta.x, pos.y+delta.y), node);
 		}
 #endif
 	}
@@ -386,7 +385,7 @@ node currently expanded in a straight mode search, we skip this jump point.
 void IdentifySuccessors_JPS(PathJob* pj, PathNode* node)
 {
 	PathNode* endnode = NULL;
-	Vec2i pos = PathNodePos(pj->wt, node);
+	Vec2i pos = PathNodePos(node);
 
 	// Gets the valid neighbours of the given node
 	// Looks for a jump point in the direction of each neighbour
@@ -397,11 +396,11 @@ void IdentifySuccessors_JPS(PathJob* pj, PathNode* node)
 		bool skip = false;
 		PathNode* neighbour = *niter;
 
-		Vec2i npos = PathNodePos(pj->wt, neighbour);
+		Vec2i npos = PathNodePos(neighbour);
 
 		PathNode* jumpnode = Jump(pj, neighbour, node);
 
-		Vec2i jumppos = PathNodePos(pj->wt, jumpnode);
+		Vec2i jumppos = PathNodePos(jumpnode);
 
 		// : in case a diagonal jump point was found in straight mode, skip it.
 		if( jumpnode && !1 ) // and not allow diagonal
@@ -412,7 +411,7 @@ void IdentifySuccessors_JPS(PathJob* pj, PathNode* node)
 		// Performs regular A-star on a set of jump points
 		if( jumpnode && !skip )
 		{
-			int jumpi = jumpnode - pj->wt->pathnode;
+			int jumpi = jumpnode - g_pathnode;
 
 			// Update the jump node and move it in the closed list if it wasn't there
 			if( !jumpnode->closed )
@@ -422,7 +421,7 @@ void IdentifySuccessors_JPS(PathJob* pj, PathNode* node)
 
 				if( !jumpnode->opened || newD < jumpnode->totalD )
 				{
-					pj->wt->toclear.push_back(jumpnode); // Records this node to reset its properties later.
+					g_toclear.push_back(jumpnode); // Records this node to reset its properties later.
 					jumpnode->totalD = newD;
 					int H = Manhattan( jumppos - Vec2i(pj->ngoalx, pj->ngoalz) );
 					jumpnode->F = jumpnode->totalD + H;
@@ -430,12 +429,12 @@ void IdentifySuccessors_JPS(PathJob* pj, PathNode* node)
 
 					if( !jumpnode->opened ) 
 					{
-						pj->wt->openlist.insert(jumpnode);
+						g_openlist.insert(jumpnode);
 						jumpnode->opened = true;
 					}
 					else
 					{
-						pj->wt->openlist.heapify(jumpnode);
+						g_openlist.heapify(jumpnode);
 					}
 				}					
 			}

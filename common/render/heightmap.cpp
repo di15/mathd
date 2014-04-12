@@ -26,7 +26,7 @@
 #include "../save/savemap.h"
 #include "../texture.h"
 #include "compilebl.h"
-#include "../sys/workthread.h"
+#include "water.h"
 
 unsigned int g_tiletexs[TILE_TYPES];
 Vec2i g_mapview[2];
@@ -128,6 +128,8 @@ void Heightmap::allocate(int wx, int wz)
 
 	remesh(1);
 	//retexture();
+	
+	AllocWater(wx, wz);
 }
 
 void FreeGrid()
@@ -197,6 +199,8 @@ void Heightmap::destroy()
 	m_widthz = 0;
 
 	g_borders.destroy();
+
+	FreeWater();
 	
 	FreePathGrid();
 }
@@ -1221,7 +1225,7 @@ void Heightmap::draw()
 {
 	if(m_widthx <= 0 || m_widthz <= 0)
 		return;
-
+	//return;
 	Shader* s = &g_shader[g_curS];
 	
 	glActiveTextureARB(GL_TEXTURE0);
@@ -1257,6 +1261,9 @@ void Heightmap::draw()
 	glUniform1f(s->m_slot[SSLOT_MAPMAXX], m_widthx*TILE_SIZE*m_tilescale);
 	glUniform1f(s->m_slot[SSLOT_MAPMINY], ConvertHeight(0));
 	glUniform1f(s->m_slot[SSLOT_MAPMAXY], ConvertHeight(255));
+	
+	glUniform1f(s->m_slot[SSLOT_MIND], MIN_DISTANCE);
+	glUniform1f(s->m_slot[SSLOT_MAXD], MAX_DISTANCE / g_zoom);
 
 	/*
 	for(int x=0; x<m_widthx; x++)

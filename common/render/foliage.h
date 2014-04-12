@@ -46,8 +46,9 @@ public:
 };
 #pragma pack(pop)
 
-//#define FOLIAGES	6000
-#define FOLIAGES	30000
+//#define FOLIAGES	128
+#define FOLIAGES	6000
+//#define FOLIAGES	30000
 //#define FOLIAGES	240000
 
 extern Foliage g_foliage[FOLIAGES];

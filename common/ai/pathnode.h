@@ -1,6 +1,6 @@
 
-#ifndef TRYSTEP_H
-#define TRYSTEP_H
+#ifndef PATHNODE_H
+#define PATHNODE_H
 
 #include "../platform.h"
 #include "../math/vec2i.h"
@@ -40,15 +40,18 @@ public:
 
 #pragma pack(pop)
 
-extern Vec2i g_pathdim;
-
+class Heap;
 class PathJob;
-class WorkThread;
 
-Vec2i PathNodePos(WorkThread* wt, PathNode* node);
-PathNode* PathNodeAt(WorkThread* wt, int nx, int nz);
+extern Vec2i g_pathdim;
+extern PathNode* g_pathnode;
+extern Heap g_openlist;
+
+Vec2i PathNodePos(PathNode* node);
+PathNode* PathNodeAt(int nx, int nz);
 int PathNodeIndex(int nx, int nz);
 bool AtGoal(PathJob* pj, PathNode* node);
 void SnapToNode(PathJob* pj);
+void ResetPathNodes();
 
 #endif

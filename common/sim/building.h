@@ -40,7 +40,8 @@ public:
 		bool finished;
 		int pownetw;
 		int crpipenetw;
-		list<int> roadnetw;
+		list<int>roadnetw;
+
 	};
 
 	void destroy();

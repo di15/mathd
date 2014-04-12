@@ -111,19 +111,19 @@ void Resize(int width, int height)
 
 void CalcDrawFrameRate()
 {
-	static double frametime = 0.0f;				// This stores the last frame's time
+	static unsigned int frametime = 0.0f;				// This stores the last frame's time
 	static int framecounter = 0;
-	static double lasttime;
+	static unsigned int lasttime;
 
 	// Get the current time in seconds
-    double currtime = timeGetTime() * 0.001f;				
+    unsigned int currtime = timeGetTime();				
 
 	// We added a small value to the frame interval to account for some video
 	// cards (Radeon's) with fast computers falling through the floor without it.
 
 	// Here we store the elapsed time between the current and last frame,
 	// then keep the current frame in our static variable for the next frame.
- 	g_drawfrinterval = currtime - frametime;	// + 0.005f;
+ 	g_drawfrinterval = (currtime - frametime) / 1000.0f;	// + 0.005f;
 	
 	//g_instantdrawfps = 1.0f / (g_currentTime - frameTime);
 	//g_instantdrawfps = 1.0f / g_drawfrinterval;
@@ -135,7 +135,7 @@ void CalcDrawFrameRate()
 
 	// Now we want to subtract the current time by the last time that was stored
 	// to see if the time elapsed has been over a second, which means we found our FPS.
-    if( currtime - lasttime > 1.0f )
+    if( currtime - lasttime > 1000 )
 	{
 		g_instantdrawfps = framecounter;
 
@@ -149,12 +149,12 @@ void CalcDrawFrameRate()
 
 bool DrawNextFrame(int desiredFrameRate)
 {
-	static double lastTime = GetTickCount() * 0.001;
-	static double elapsedTime = 0.0f;
+	static long long lastTime = GetTickCount64();
+	static long long elapsedTime = 0;
 
-	double currentTime = GetTickCount64() * 0.001; // Get the time (milliseconds = seconds * .001)
-	double deltaTime = currentTime - lastTime; // Get the slice of time
-	double desiredFPS = 1.0 / (double)desiredFrameRate; // Store 1 / desiredFrameRate
+	long long currentTime = GetTickCount64(); // Get the time (milliseconds = seconds * .001)
+	long long deltaTime = currentTime - lastTime; // Get the slice of time
+	int desiredFPS = 1000 / (float)desiredFrameRate; // Store 1 / desiredFrameRate
 
 	elapsedTime += deltaTime; // Add to the elapsed time
 	lastTime = currentTime; // Update lastTime

@@ -3,7 +3,6 @@
 #include "../ai/collidertile.h"
 #include "../math/vec2i.h"
 #include "../math/3dmath.h"
-#include "../sys/workthread.h"
 #include "../sim/unit.h"
 #include "../sim/unittype.h"
 #include "../sim/building.h"

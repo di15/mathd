@@ -4,7 +4,6 @@
 #include "collidertile.h"
 #include "../math/vec2i.h"
 #include "../math/3dmath.h"
-#include "../sys/workthread.h"
 #include "../sim/unit.h"
 #include "../sim/unittype.h"
 #include "../sim/building.h"
@@ -31,13 +30,9 @@ void JPSPath(int utype, int umode, int cmstartx, int cmstartz, int target, int t
 			 list<Vec2i> *path, Vec2i *subgoal, Unit* thisu, Unit* ignoreu, Building* ignoreb, 
 			 int cmgoalx, int cmgoalz, int cmgoalminx, int cmgoalminz, int cmgoalmaxx, int cmgoalmaxz)
 {
-	g_curthread = (g_curthread+1)%WORKTHREADS;
-	WorkThread* wt = &g_workthread[g_curthread];
-
 	UnitT* ut = &g_unitT[utype];
 
 	PathJob* pj = new PathJob;
-	pj->tjtype = THREADJOB_PATH;
 	pj->utype = utype;
 	pj->umode = umode;
 	pj->cmstartx = cmstartx;
@@ -80,16 +75,12 @@ void JPSPath(int utype, int umode, int cmstartx, int cmstartz, int target, int t
 	pj->landborne = ut->landborne;
 	pj->seaborne = ut->seaborne;
 	pj->airborne = ut->airborne;
-	pj->wt = wt;
 	pj->callback = Callback_UnitPath;
 	pj->pjtype = PATHJOB_JPS;
-
+	
 	// Returns the path from location `<startX, startY>` to location `<endX, endY>`.
 	//return function(finder, startNode, endNode, clearance, toClear)
 
-	MutexWait(wt->mutex);
-	wt->jobs.push_back(pj);
-	MutexRelease(wt->mutex);
-
-	thisu->threadwait = true;
+	pj->process();
+	delete pj;
 }

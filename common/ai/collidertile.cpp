@@ -3,7 +3,6 @@
 #include "collidertile.h"
 #include "../math/vec2i.h"
 #include "../math/3dmath.h"
-#include "../sys/workthread.h"
 #include "../sim/unit.h"
 #include "../sim/unittype.h"
 #include "../sim/building.h"
@@ -68,8 +67,13 @@ void FreePathGrid()
 
 	g_pathdim = Vec2i(0,0);
 
-	for(int i=0; i<WORKTHREADS; i++)
-		g_workthread[i].destroy();
+	if(g_pathnode)
+	{
+		delete [] g_pathnode;
+		g_pathnode = NULL;
+	}
+
+	g_openlist.freemem();
 }
 
 void AllocPathGrid(int cmwx, int cmwz)
@@ -81,10 +85,23 @@ void AllocPathGrid(int cmwx, int cmwz)
 
 	g_log<<"path gr allc "<<g_pathdim.x<<","<<g_pathdim.y<<endl;
 
-	for(int i=0; i<WORKTHREADS; i++)
-	{
-		g_workthread[i].alloc(g_pathdim.x, g_pathdim.y);
-	}
+	int cwx = g_pathdim.x;
+	int cwz = g_pathdim.y;
+
+	g_pathnode = new PathNode [ cwx * cwz ];
+	g_openlist.alloc( cwx * cwz );
+
+	for(int x=0; x<cwx; x++)
+		for(int z=0; z<cwz; z++)
+		{
+			PathNode* n = PathNodeAt(x, z);
+			n->nx = x;
+			n->nz = z;
+			n->opened = false;
+			n->closed = false;
+		}
+		
+	//g_lastpath = g_simframe;
 }
 
 ColliderTile* ColliderTileAt(int nx, int nz)
@@ -206,8 +223,7 @@ void FillColliderGrid()
 		b->fillcollider();
 	}
 
-	for(int i=0; i<WORKTHREADS; i++)
-		g_workthread[i].resetcells();
+	ResetPathNodes();
 }
 
 void Unit::fillcollider()

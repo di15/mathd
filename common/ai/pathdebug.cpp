@@ -5,7 +5,6 @@
 #include "collidertile.h"
 #include "../math/vec2i.h"
 #include "../math/3dmath.h"
-#include "../sys/workthread.h"
 #include "../sim/unit.h"
 #include "../sim/unittype.h"
 #include "../sim/building.h"
@@ -36,8 +35,6 @@ void DrawSteps()
 	int ui = *g_selection.units.begin();
 	Unit* u = &g_unit[ui];
 
-	WorkThread* wt = &g_workthread[0];
-
 	vector<Vec3f> lines;
 
 #if 1
@@ -51,12 +48,12 @@ void DrawSteps()
 	for(int x = nminx; x <= nmaxx; x ++)
 		for(int z = nminz; z <= nmaxz; z++)
 		{
-			PathNode* n = PathNodeAt(wt, x, z);
+			PathNode* n = PathNodeAt(x, z);
 
 			if(!n->previous)
 				continue;
 
-			Vec2i nprevpos = PathNodePos(wt, n->previous);
+			Vec2i nprevpos = PathNodePos(n->previous);
 
 			Vec3f to;
 			Vec3f from;

@@ -19,11 +19,11 @@
 #include "../sim/sim.h"
 #include "../phys/trace.h"
 #include "binheap.h"
-#include "partialpath.h"
+#include "astarpath.h"
 #include "reconstructpath.h"
 #include "pathdebug.h"
 
-void PartialPath(int utype, int umode, int cmstartx, int cmstartz, int target, int target2, int targtype, 
+void AStarPath(int utype, int umode, int cmstartx, int cmstartz, int target, int target2, int targtype, 
 			  list<Vec2i> *path, Vec2i *subgoal, Unit* thisu, Unit* ignoreu, Building* ignoreb, 
 			  int cmgoalx, int cmgoalz, int cmgoalminx, int cmgoalminz, int cmgoalmaxx, int cmgoalmaxz,
 			  int maxsearch)
@@ -74,7 +74,7 @@ void PartialPath(int utype, int umode, int cmstartx, int cmstartz, int target, i
 	pj->seaborne = ut->seaborne;
 	pj->airborne = ut->airborne;
 	pj->callback = Callback_UnitPath;
-	pj->pjtype = PATHJOB_QUICKPARTIAL;
+	pj->pjtype = PATHJOB_ASTAR;
 	pj->maxsearch = maxsearch;
 
 	// Returns the path from location `<startX, startY>` to location `<endX, endY>`.
@@ -84,7 +84,7 @@ void PartialPath(int utype, int umode, int cmstartx, int cmstartz, int target, i
 	delete pj;
 }
 
-void IdentifySuccessors_QP(PathJob* pj, PathNode* node)
+void IdentifySuccessors_A(PathJob* pj, PathNode* node)
 {
 	Vec2i npos = PathNodePos(node);
 

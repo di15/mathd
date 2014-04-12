@@ -11,6 +11,8 @@
 #define BODY_LOWER	0
 #define BODY_UPPER	1
 
+class Demand;
+
 class Unit
 {
 public:
@@ -64,24 +66,10 @@ public:
 	
 	bool threadwait;
 
+	list<Demand*> demands;
+
 	// used for debugging - don't save to file
 	bool collided;
-
-	bool oldon;
-
-	class RenderState
-	{
-	public:
-		bool on;
-		Vec3f drawpos;
-		float frame[2];
-		int hp;
-		int type;
-		unsigned char mode;
-		Vec2f rotation;
-
-		RenderState();
-	};
 
 	Unit();
 	virtual ~Unit();

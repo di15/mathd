@@ -11,6 +11,103 @@
 unsigned int g_water;
 unsigned int g_watertex[WATER_TEXS];
 
+Vec3f* g_waterverts = NULL;
+Vec2f* g_watertexcos = NULL;
+Vec3f* g_waternorms = NULL;
+
+void AllocWater(int wx, int wz)
+{
+	FreeWater();
+	g_waterverts = new Vec3f[ (wx) * (wz) * 4 ];
+	g_watertexcos = new Vec2f[ (wx) * (wz) * 4 ];
+	g_waternorms = new Vec3f[ (wx) * (wz) * 4 ];
+
+	for(int x=0; x<wx; x++)
+		for(int z=0; z<wz; z++)
+		{
+			g_waterverts[ z*(wx) * 4 + x * 4 + 0 ] = Vec3f(x*TILE_SIZE, WATER_LEVEL, z*TILE_SIZE);
+			g_waterverts[ z*(wx) * 4 + x * 4 + 1 ] = Vec3f((x+1)*TILE_SIZE, WATER_LEVEL, z*TILE_SIZE);
+			g_waterverts[ z*(wx) * 4 + x * 4 + 2 ] = Vec3f((x+1)*TILE_SIZE, WATER_LEVEL, (z+1)*TILE_SIZE);
+			g_waterverts[ z*(wx) * 4 + x * 4 + 3 ] = Vec3f(x*TILE_SIZE, WATER_LEVEL, (z+1)*TILE_SIZE);
+			
+			g_watertexcos[ z*(wx) * 4 + x * 4 + 0 ] = Vec2f(0, 0);
+			g_watertexcos[ z*(wx) * 4 + x * 4 + 1 ] = Vec2f(1, 0);
+			g_watertexcos[ z*(wx) * 4 + x * 4 + 2 ] = Vec2f(1, 1);
+			g_watertexcos[ z*(wx) * 4 + x * 4 + 3 ] = Vec2f(0, 1);
+			
+			g_waternorms[ z*(wx) * 4 + x * 4 + 0 ] = Vec3f(0, 1, 0);
+			g_waternorms[ z*(wx) * 4 + x * 4 + 1 ] = Vec3f(0, 1, 0);
+			g_waternorms[ z*(wx) * 4 + x * 4 + 2 ] = Vec3f(0, 1, 0);
+			g_waternorms[ z*(wx) * 4 + x * 4 + 3 ] = Vec3f(0, 1, 0);
+		}
+}
+
+void FreeWater()
+{
+	if(g_waterverts)
+	{
+		delete [] g_waterverts;
+		g_waterverts = NULL;
+	}
+	
+	if(g_watertexcos)
+	{
+		delete [] g_watertexcos;
+		g_watertexcos = NULL;
+	}
+	
+	if(g_waternorms)
+	{
+		delete [] g_waternorms;
+		g_waternorms = NULL;
+	}
+}
+
+void DrawWater3()
+{
+	Shader* s = &g_shader[g_curS];
+    
+	glActiveTextureARB(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, g_texture[g_water].texname);
+	glUniform1i(s->m_slot[SSLOT_TEXTURE0], 0);
+	
+	glActiveTextureARB(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, g_texture[ g_watertex[WATER_TEX_GRADIENT] ].texname);
+	glUniform1iARB(s->m_slot[SSLOT_GRADIENTTEX], 0);
+
+	glActiveTextureARB(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_2D, g_texture[ g_watertex[WATER_TEX_DETAIL] ].texname);
+	glUniform1iARB(s->m_slot[SSLOT_DETAILTEX], 1);
+
+	glActiveTextureARB(GL_TEXTURE2);
+	glBindTexture(GL_TEXTURE_2D, g_texture[ g_watertex[WATER_TEX_SPECULAR] ].texname);
+	glUniform1iARB(s->m_slot[SSLOT_SPECULARMAP], 2);
+
+	glActiveTextureARB(GL_TEXTURE3);
+	glBindTexture(GL_TEXTURE_2D, g_texture[ g_watertex[WATER_TEX_NORMAL] ].texname);
+	glUniform1iARB(s->m_slot[SSLOT_NORMALMAP], 3);
+	
+	glUniform1f(s->m_slot[SSLOT_MIND], MIN_DISTANCE);
+	glUniform1f(s->m_slot[SSLOT_MAXD], MAX_DISTANCE / g_zoom);
+	
+#if 0
+	glEnable(GL_POLYGON_OFFSET_FILL);
+	//glPolygonOffset(2.0, 500.0);
+	glPolygonOffset(1.0, 0.001/(g_zoom));
+	//glPolygonOffset(1.0, 250.0);
+#endif
+
+	glVertexAttribPointer(s->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, g_waterverts);
+	glVertexAttribPointer(s->m_slot[SSLOT_TEXCOORD0], 2, GL_FLOAT, GL_FALSE, 0, g_watertexcos);
+	glVertexAttribPointer(s->m_slot[SSLOT_NORMAL], 3, GL_FLOAT, GL_FALSE, 0, g_waternorms);
+    
+	glDrawArrays(GL_QUADS, 0, g_hmap.m_widthx * g_hmap.m_widthz * 4 );
+
+#if 0
+	glDisable(GL_POLYGON_OFFSET_FILL);
+#endif
+}
+
 void DrawWater()
 {
 	Shader* s = &g_shader[g_curS];
@@ -74,20 +171,26 @@ void DrawWater()
 		0, 1, 0,
 		0, 1, 0
 	};
-
 	
+	glUniform1f(s->m_slot[SSLOT_MIND], MIN_DISTANCE);
+	glUniform1f(s->m_slot[SSLOT_MAXD], MAX_DISTANCE / g_zoom);
+	
+#if 0
 	glEnable(GL_POLYGON_OFFSET_FILL);
 	//glPolygonOffset(2.0, 500.0);
-	glPolygonOffset(1.0, 0.01/(g_zoom));
+	glPolygonOffset(1.0, 0.001/(g_zoom));
 	//glPolygonOffset(1.0, 250.0);
-    
+#endif
+
 	glVertexAttribPointer(s->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, vertices);
 	glVertexAttribPointer(s->m_slot[SSLOT_TEXCOORD0], 2, GL_FLOAT, GL_FALSE, 0, texcoords0);
 	glVertexAttribPointer(s->m_slot[SSLOT_NORMAL], 3, GL_FLOAT, GL_FALSE, 0, normals);
     
 	glDrawArrays(GL_TRIANGLES, 0, 6);
 
+#if 0
 	glDisable(GL_POLYGON_OFFSET_FILL);
+#endif
 }
 
 void DrawWater2()

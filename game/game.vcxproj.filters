@@ -245,9 +245,6 @@
     <ClCompile Include="..\common\sim\unitmove.cpp">
       <Filter>Source Files\common\sim</Filter>
     </ClCompile>
-    <ClCompile Include="..\common\sys\workthread.cpp">
-      <Filter>Source Files\common\sys</Filter>
-    </ClCompile>
     <ClCompile Include="..\common\render\transaction.cpp">
       <Filter>Source Files\common\render</Filter>
     </ClCompile>
@@ -286,9 +283,6 @@
     </ClCompile>
     <ClCompile Include="..\common\sound\sound.cpp">
       <Filter>Source Files\common\sound</Filter>
-    </ClCompile>
-    <ClCompile Include="..\common\sys\threadjob.cpp">
-      <Filter>Source Files\common\sys</Filter>
     </ClCompile>
     <ClCompile Include="..\common\ai\partialpath.cpp">
       <Filter>Source Files\common\ai</Filter>
@@ -374,14 +368,17 @@
     <ClCompile Include="..\common\render\compilebl.cpp">
       <Filter>Source Files\common\render</Filter>
     </ClCompile>
-    <ClCompile Include="..\common\sys\updthread.cpp">
-      <Filter>Source Files\common\sys</Filter>
-    </ClCompile>
     <ClCompile Include="..\common\econ\demand.cpp">
       <Filter>Source Files\common\econ</Filter>
     </ClCompile>
-    <ClCompile Include="..\common\render\rendst.cpp">
-      <Filter>Source Files\common\render</Filter>
+    <ClCompile Include="..\common\sim\player.cpp">
+      <Filter>Source Files\common\sim</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\gui\widgets\spez\buildpreview.cpp">
+      <Filter>Source Files\common\gui\widgets\spez</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\ai\astarpath.cpp">
+      <Filter>Source Files\common\ai</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -589,9 +586,6 @@
     <ClInclude Include="..\common\sim\unitmove.h">
       <Filter>Source Files\common\sim</Filter>
     </ClInclude>
-    <ClInclude Include="..\common\sys\workthread.h">
-      <Filter>Source Files\common\sys</Filter>
-    </ClInclude>
     <ClInclude Include="..\common\render\transaction.h">
       <Filter>Source Files\common\render</Filter>
     </ClInclude>
@@ -630,9 +624,6 @@
     </ClInclude>
     <ClInclude Include="..\common\sound\sound.h">
       <Filter>Source Files\common\sound</Filter>
-    </ClInclude>
-    <ClInclude Include="..\common\sys\threadjob.h">
-      <Filter>Source Files\common\sys</Filter>
     </ClInclude>
     <ClInclude Include="..\common\ai\partialpath.h">
       <Filter>Source Files\common\ai</Filter>
@@ -718,14 +709,17 @@
     <ClInclude Include="..\common\render\compilebl.h">
       <Filter>Source Files\common\render</Filter>
     </ClInclude>
-    <ClInclude Include="..\common\sys\updthread.h">
-      <Filter>Source Files\common\sys</Filter>
-    </ClInclude>
     <ClInclude Include="..\common\econ\demand.h">
       <Filter>Source Files\common\econ</Filter>
     </ClInclude>
-    <ClInclude Include="..\common\render\rendst.h">
-      <Filter>Source Files\common\render</Filter>
+    <ClInclude Include="..\common\sim\player.h">
+      <Filter>Source Files\common\sim</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\gui\widgets\spez\buildpreview.h">
+      <Filter>Source Files\common\gui\widgets\spez</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\ai\astarpath.h">
+      <Filter>Source Files\common\ai</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

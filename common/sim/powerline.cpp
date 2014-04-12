@@ -18,7 +18,6 @@
 #include "../../game/gmain.h"
 #include "building.h"
 #include "../math/polygon.h"
-#include "../sys/workthread.h"
 
 PowlTileType g_powlT[CONNECTION_TYPES][2];
 PowlTile* g_powl = NULL;
@@ -242,10 +241,8 @@ void DrawPowl(int x, int z, bool plan)
 	else
 		p = PowlAt(x, z);
     
-	MutexWait(g_drawmutex);
 	if(!p->on)
 	{
-		MutexRelease(g_drawmutex);
 		return;
 	}
     
@@ -258,7 +255,6 @@ void DrawPowl(int x, int z, bool plan)
 	m->usetex();
     
 	DrawVA(&p->drawva, p->drawpos);
-	MutexRelease(g_drawmutex);
 }
 
 void DrawPowls()

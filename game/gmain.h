@@ -7,7 +7,7 @@
 
 #define VERSION				3
 #define CONFIGFILE			"config.ini"
-#define TITLE				"Corporations and States"
+#define TITLE				"States and Corporations"
 #define SERVER_ADDR			"corpstates.com"
 #define CYCLE_FRAMES		(DRAW_FRAME_RATE*60)
 
@@ -23,6 +23,9 @@ enum APPMODE{LOGO, INTRO, LOADING, RELOADING, MENU, PLAY, PAUSE, EDITOR};
 extern APPMODE g_mode;
 extern int g_reStage;
 extern bool g_mouseout;
+
+extern double g_instantupdfps;
+extern double g_updfrinterval;
 
 void WriteConfig();
 void DrawScene(Matrix projection, Matrix viewmat, Matrix modelmat, Matrix modelviewinv, float mvLightPos[3], float lightDir[3]);

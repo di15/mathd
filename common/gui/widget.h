@@ -49,6 +49,7 @@
 #define WIDGET_FRAME				16
 #define WIDGET_RESTICKER			17
 #define WIDGET_BOTTOMPANEL			18
+#define WIDGET_BUILDPREVIEW			19
 
 class Widget
 {

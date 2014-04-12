@@ -5,23 +5,22 @@
 
 #include "../platform.h"
 #include "../math/vec2i.h"
-#include "../sys/workthread.h"
-#include "../sys/threadjob.h"
 
 class Unit;
 class Building;
+class PathNode;
 
 #define PATH_DELAY		200
 //#define PATH_DELAY		0
 
 #define PATHJOB_JPS					0
 #define PATHJOB_QUICKPARTIAL		1
-#define PATHJOB_FULL				2
+#define PATHJOB_ASTAR				2
 
 // byte-align structures
 #pragma pack(push, 1)
 
-class PathJob : public ThreadJob
+class PathJob
 {
 public:
 	unsigned char utype;
@@ -48,7 +47,6 @@ public:
 	bool landborne;
 	bool seaborne;
 	bool airborne;
-	WorkThread* wt;
 	int maxsearch;
 	unsigned char pjtype;
 	PathNode* closestnode;
@@ -59,6 +57,8 @@ public:
 	virtual bool process();
 };
 #pragma pack(pop)
+
+extern list<PathNode*> g_toclear;
 
 void Callback_UnitPath(bool result, PathJob* pj);
 

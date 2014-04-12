@@ -32,17 +32,6 @@ public:
 	VertexArray drawva;
 	int transporter[RESOURCES];
 	Vec3f drawpos;
-
-	class RenderState
-	{
-	public:
-		bool on;
-		int type;
-		bool finished;
-		int stateowner;
-		int conmat;
-		Vec3f drawpos;
-	};
     
 	RoadTile();
 	~RoadTile();

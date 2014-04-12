@@ -7,6 +7,8 @@
 
 extern long long g_simframe;
 
+#define SIM_FRAME_RATE		30
+
 void Queue();
 
 #endif

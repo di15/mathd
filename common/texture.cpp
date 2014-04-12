@@ -3,7 +3,6 @@
 #include "render/model.h"
 #include "gui/gui.h"
 #include "utils.h"
-#include "sys/workthread.h"
 
 Texture g_texture[TEXTURES];
 vector<TextureToLoad> g_texLoad;
@@ -742,10 +741,8 @@ void FindTextureExtension(char *relative)
 
 bool Load1Texture()
 {
-	MutexWait(g_drawmutex);
 	if(g_lastLTex+1 < g_texLoad.size())
 		Status(g_texLoad[g_lastLTex+1].relative);
-	MutexRelease(g_drawmutex);
 
 	if(g_lastLTex >= 0)
 	{
@@ -862,7 +859,7 @@ bool CreateTexture(unsigned int &texindex, const char* relative, bool clamp, boo
 		transp = true;
 	}
 		
-#if 0
+#if 1
 	// Option 1: with mipmaps
 	gluBuild2DMipmaps(GL_TEXTURE_2D, pImage->channels, pImage->sizeX, pImage->sizeY, textureType, GL_UNSIGNED_BYTE, pImage->data);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_NEAREST);
@@ -879,10 +876,15 @@ bool CreateTexture(unsigned int &texindex, const char* relative, bool clamp, boo
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 	}
 	
-#else
+#elif 0
 	// Option 2: without mipmaps
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexImage2D(GL_TEXTURE_2D, 0, textureType, pImage->sizeX, pImage->sizeY, 0, textureType, GL_UNSIGNED_BYTE, pImage->data);
+#else
+	// Option 3: without mipmaps linear
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexImage2D(GL_TEXTURE_2D, 0, textureType, pImage->sizeX, pImage->sizeY, 0, textureType, GL_UNSIGNED_BYTE, pImage->data);
 #endif
 

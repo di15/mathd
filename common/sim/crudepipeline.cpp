@@ -21,7 +21,6 @@
 #include "../../game/gmain.h"
 #include "../../game/gui/ggui.h"
 #include "../math/polygon.h"
-#include "../sys/workthread.h"
 
 CrPipeTileType g_crpipeT[CONNECTION_TYPES][2];
 CrPipeTile* g_crpipe = NULL;
@@ -248,10 +247,8 @@ void DrawCrPipe(int x, int z, bool plan)
 	else
 		p = CrPipeAt(x, z);
     
-	MutexWait(g_drawmutex);
 	if(!p->on)
 	{
-		MutexRelease(g_drawmutex);
 		return;
 	}
 
@@ -271,7 +268,6 @@ void DrawCrPipe(int x, int z, bool plan)
 	m->usetex();
     
 	DrawVA(&p->drawva, p->drawpos);
-	MutexRelease(g_drawmutex);
 }
 
 void DrawCrPipes()

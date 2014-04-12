@@ -5,6 +5,7 @@
 #include "../sim/country.h"
 #include "water.h"
 #include "shader.h"
+#include "../window.h"
 
 Borders g_borders;
 
@@ -173,10 +174,15 @@ void DrawBorders()
 		}
 		*/
 	
+	glUniform1f(s->m_slot[SSLOT_MIND], MIN_DISTANCE);
+	glUniform1f(s->m_slot[SSLOT_MAXD], MAX_DISTANCE / g_zoom);
+
+#if 0
 	glEnable(GL_POLYGON_OFFSET_FILL);
 	//glPolygonOffset(-2.0, -500.0);
 	//glPolygonOffset(-10.0, -2500.0);
 	glPolygonOffset(-0.0, -0.2);
+#endif
 
 	// Draw all tiles
 	glVertexAttribPointer(s->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, g_borders.drawtris);

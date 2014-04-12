@@ -8,7 +8,6 @@
 #include "../render/foliage.h"
 #include "../phys/collision.h"
 #include "../render/water.h"
-#include "../sys/workthread.h"
 
 Building g_building[BUILDINGS];
 
@@ -256,10 +255,8 @@ void DrawBuildings()
 	{
 		Building* b = &g_building[i];
 
-		MutexWait(g_drawmutex);
 		if(!b->on)
 		{
-			MutexRelease(g_drawmutex);
 			continue;
 		}
 
@@ -270,6 +267,5 @@ void DrawBuildings()
 			m = &g_model[ t->cmodel ];
 
 		m->draw(0, b->drawpos, 0);
-		MutexRelease(g_drawmutex);
 	}
 }
