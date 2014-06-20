@@ -1,26 +1,4 @@
-
-
 #include "sim.h"
-#include "../platform.h"
-#include "../texture.h"
-#include "../render/heightmap.h"
-#include "../render/model.h"
-#include "resources.h"
-#include "../gui/icon.h"
-#include "buildingtype.h"
-#include "unittype.h"
-#include "../render/foliage.h"
-#include "road.h"
-#include "powl.h"
-#include "crpipe.h"
-#include "../render/water.h"
-#include "selection.h"
-#include "../sound/sound.h"
-#include "../render/particle.h"
-#include "../common/render/skybox.h"
-#include "player.h"
-#include "../gui/sprite.h"
-#include "../gui/cursor.h"
 
 long long g_simframe = 0;
 

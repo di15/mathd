@@ -1,5 +1,3 @@
-
-
 #ifndef _PARTICLE_H
 #define _PARTICLE_H
 
@@ -7,6 +5,7 @@
 
 #include "../math/3dmath.h"
 #include "../math/vec3f.h"
+#include "../utils.h"
 
 class Particle;
 class Billboard;

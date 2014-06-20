@@ -20,7 +20,9 @@ Sound::Sound(const char* fp)
 
 void Sound::play()
 {
+#ifdef PLATFORM_WIN
 	PlaySound(filepath, NULL, SND_ASYNC | SND_FILENAME | SND_NODEFAULT);
+#endif
 }
 
 void Sound_Order()

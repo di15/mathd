@@ -531,8 +531,8 @@ void Heightmap::remesh(float tilescale)
 			which diagonal is steeper.
 			*/
 
-			diag1010 = max( aD, cD );
-			diag0101 = max( bD, dD );
+			diag1010 = fmax( aD, cD );
+			diag0101 = fmax( bD, dD );
 
 			/*
 			If diagonal a-to-c has a greater
@@ -1213,9 +1213,9 @@ void Heightmap::remesh(float tilescale)
 		m_rimva.vertices[index + 4] = Vec3f((x+0)*TILE_SIZE, lowy, 0);
 		m_rimva.vertices[index + 5] = Vec3f((x+1)*TILE_SIZE, lowy, 0);
 		
-		m_rimva.vertices[index + 0].y = max(m_rimva.vertices[index + 0].y, WATER_LEVEL);
-		m_rimva.vertices[index + 1].y = max(m_rimva.vertices[index + 1].y, WATER_LEVEL);
-		m_rimva.vertices[index + 3].y = max(m_rimva.vertices[index + 3].y, WATER_LEVEL);
+		m_rimva.vertices[index + 0].y = fmax(m_rimva.vertices[index + 0].y, WATER_LEVEL);
+		m_rimva.vertices[index + 1].y = fmax(m_rimva.vertices[index + 1].y, WATER_LEVEL);
+		m_rimva.vertices[index + 3].y = fmax(m_rimva.vertices[index + 3].y, WATER_LEVEL);
 
 		for(int i=0; i<6; i++)
 		{
@@ -1237,9 +1237,9 @@ void Heightmap::remesh(float tilescale)
 		m_rimva.vertices[index + 4] = Vec3f((x+1)*TILE_SIZE, lowy, (m_widthz)*TILE_SIZE);
 		m_rimva.vertices[index + 5] = Vec3f((x+0)*TILE_SIZE, lowy, (m_widthz)*TILE_SIZE);
 		
-		m_rimva.vertices[index + 0].y = max(m_rimva.vertices[index + 0].y, WATER_LEVEL);
-		m_rimva.vertices[index + 1].y = max(m_rimva.vertices[index + 1].y, WATER_LEVEL);
-		m_rimva.vertices[index + 3].y = max(m_rimva.vertices[index + 3].y, WATER_LEVEL);
+		m_rimva.vertices[index + 0].y = fmax(m_rimva.vertices[index + 0].y, WATER_LEVEL);
+		m_rimva.vertices[index + 1].y = fmax(m_rimva.vertices[index + 1].y, WATER_LEVEL);
+		m_rimva.vertices[index + 3].y = fmax(m_rimva.vertices[index + 3].y, WATER_LEVEL);
 
 		for(int i=0; i<6; i++)
 		{
@@ -1261,9 +1261,9 @@ void Heightmap::remesh(float tilescale)
 		m_rimva.vertices[index + 4] = Vec3f(0, lowy, (z+1)*TILE_SIZE);
 		m_rimva.vertices[index + 5] = Vec3f(0, lowy, (z+0)*TILE_SIZE);
 		
-		m_rimva.vertices[index + 0].y = max(m_rimva.vertices[index + 0].y, WATER_LEVEL);
-		m_rimva.vertices[index + 1].y = max(m_rimva.vertices[index + 1].y, WATER_LEVEL);
-		m_rimva.vertices[index + 3].y = max(m_rimva.vertices[index + 3].y, WATER_LEVEL);
+		m_rimva.vertices[index + 0].y = fmax(m_rimva.vertices[index + 0].y, WATER_LEVEL);
+		m_rimva.vertices[index + 1].y = fmax(m_rimva.vertices[index + 1].y, WATER_LEVEL);
+		m_rimva.vertices[index + 3].y = fmax(m_rimva.vertices[index + 3].y, WATER_LEVEL);
 
 		for(int i=0; i<6; i++)
 		{
@@ -1285,9 +1285,9 @@ void Heightmap::remesh(float tilescale)
 		m_rimva.vertices[index + 4] = Vec3f((m_widthx)*TILE_SIZE, lowy, (z+0)*TILE_SIZE);
 		m_rimva.vertices[index + 5] = Vec3f((m_widthx)*TILE_SIZE, lowy, (z+1)*TILE_SIZE);
 		
-		m_rimva.vertices[index + 0].y = max(m_rimva.vertices[index + 0].y, WATER_LEVEL);
-		m_rimva.vertices[index + 1].y = max(m_rimva.vertices[index + 1].y, WATER_LEVEL);
-		m_rimva.vertices[index + 3].y = max(m_rimva.vertices[index + 3].y, WATER_LEVEL);
+		m_rimva.vertices[index + 0].y = fmax(m_rimva.vertices[index + 0].y, WATER_LEVEL);
+		m_rimva.vertices[index + 1].y = fmax(m_rimva.vertices[index + 1].y, WATER_LEVEL);
+		m_rimva.vertices[index + 3].y = fmax(m_rimva.vertices[index + 3].y, WATER_LEVEL);
 
 		for(int i=0; i<6; i++)
 		{
