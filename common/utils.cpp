@@ -1,5 +1,3 @@
-
-
 #include "utils.h"
 #include "platform.h"
 #include "window.h"
@@ -152,7 +150,7 @@ void ExePath(char* exepath)
 	char szTmp[32];
     //char buffer[MAX_PATH+1];
 	sprintf(szTmp, "/proc/%d/exe", getpid());
-	int bytes = MIN(readlink(szTmp, exepath, MAX_PATH+1), MAX_PATH);
+	int bytes = std::min(readlink(szTmp, exepath, MAX_PATH+1), MAX_PATH);
 	if(bytes >= 0)
 		exepath[bytes] = '\0';
 	//string strexepath = StripFile(string(buffer));
@@ -214,7 +212,7 @@ int StrToInt(const char *s)
 void CorrectSlashes(char* corrected)
 {
 	int strl = strlen(corrected);
-	for(int i=0; i<strl; i++)
+	for(int i=0; i<strl; i++) {
 #ifdef PLATFORM_WIN
 		if(corrected[i] == '/')
 			corrected[i] = '\\';
@@ -224,6 +222,7 @@ void CorrectSlashes(char* corrected)
 			corrected[i] = '/';
                         */
 #endif
+        }
 }
 
 void BackSlashes(char* corrected)
@@ -263,7 +262,7 @@ void OutOfMem(const char* file, int line)
 	g_quit = true;
 }
 
-#ifndef PLATFORM_WIN
+static long long g_starttick = -1;
 long timeGetTime()
 {
         return GetTickCount();
@@ -286,4 +285,3 @@ void Sleep(int ms)
 {
         SDL_Delay(ms);
 }
-#endif //PLATFORM_WIN

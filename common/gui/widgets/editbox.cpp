@@ -130,7 +130,7 @@ void EditBox::frameupd()
 
 		if(py->mouse.x >= m_pos[2]-5)
 		{
-			m_scroll[0] -= max(1, g_font[m_font].gheight/4.0f);
+			m_scroll[0] -= fmax(1, g_font[m_font].gheight/4.0f);
 
 			RichText val = drawvalue();
 			int vallen = val.texlen();
@@ -147,7 +147,7 @@ void EditBox::frameupd()
 		}
 		else if(py->mouse.x <= m_pos[0]+5)
 		{
-			m_scroll[0] += max(1, g_font[m_font].gheight/4.0f);
+			m_scroll[0] += fmax(1, g_font[m_font].gheight/4.0f);
 
 			if(m_scroll[0] > 0.0f)
 				m_scroll[0] = 0.0f;
@@ -648,6 +648,7 @@ void EditBox::copyval()
 	g_log.flush();
 #endif
 
+#ifdef PLATFORM_WIN
 	if(m_highl[1] > 0 && m_highl[0] != m_highl[1])
 	{
 		RichText highl = m_value.substr(m_highl[0], m_highl[1]-m_highl[0]);
@@ -673,12 +674,14 @@ void EditBox::copyval()
 		SetClipboardData(CF_TEXT, hMem);
 		CloseClipboard();
 	}
+#endif // PLATFORM_WIN
 
 	//return true;
 }
 
 void EditBox::pasteval()
 {
+#ifdef PLATFORM_WIN
 #ifdef PASTE_DEBUG
 	g_log<<"paste"<<endl;
 #endif
@@ -716,6 +719,7 @@ void EditBox::pasteval()
 	CloseClipboard();
 
 	//return true;
+#endif // PLATFORM_WIN
 }
 
 void EditBox::selectall()

@@ -1,4 +1,3 @@
-
 #ifndef PLATFORM_H
 #define PLATFORM_H
 
@@ -43,6 +42,13 @@
 #include <commdlg.h>
 #endif
 
+#ifdef PLATFORM_LINUX
+/* POSIX! getpid(), readlink() */
+#include <sys/types.h>
+#include <unistd.h>
+#endif
+
+
 #include <string>
 #include <sstream>
 #include <stdio.h>
@@ -61,6 +67,10 @@
 #include <zip.h>
 #endif
 
+#ifdef PLATFORM_LINUX
+#include <jpeglib.h>
+#include <png.h>
+#endif
 //#define NO_SDL_GLEXT
 
 #include <GL/glew.h>
@@ -71,6 +81,7 @@
 #ifdef PLATFORM_LINUX
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_opengl.h>
+#include <GL/glut.h>
 #endif
 
 #ifdef PLATFORM_MAC
@@ -117,8 +128,12 @@ using namespace std;
 #define SOCKET int
 typedef unsigned char byte;
 typedef unsigned int UINT;
+typedef int16_t WORD;
 #define _isnan isnan
 #define stricmp strcasecmp
+#define _stricmp strcasecmp
+
+#define ERROR 0
 #endif
 
 /*
@@ -132,12 +147,12 @@ extern HINSTANCE g_hInstance;
 #endif
 
 #ifdef PLATFORM_LINUX
-extern Display *g_display;
-extern Window g_window;
+//extern Display *g_display;
+//extern Window g_window;
 #endif
 
 extern SDL_Window *g_window;
 extern SDL_Renderer* g_renderer;
 extern SDL_GLContext g_glcontext;
 
-#endif
+#endif // #define LIBRARY_H

@@ -62,7 +62,7 @@ void VScroll::reframe()
 	m_barpos[0] = m_pos[0];
 	m_barpos[1] = m_uppos[3] + (m_downpos[1]-m_uppos[3])*m_scroll[1];
 	m_barpos[2] = m_pos[2];
-	m_barpos[3] = m_barpos[1] + max(w, m_domain*(m_downpos[1]-m_uppos[3]));
+	m_barpos[3] = m_barpos[1] + fmax(w, m_domain*(m_downpos[1]-m_uppos[3]));
 
 
 
@@ -159,7 +159,7 @@ void VScroll::inev(InEv* ev)
 			int w = m_pos[2]-m_pos[0];
 
 			m_barpos[1] = m_uppos[3] + (m_downpos[1]-m_uppos[3])*m_scroll[1];
-			m_barpos[3] = m_barpos[1] + max(w, m_domain*(m_downpos[1]-m_uppos[3]));
+			m_barpos[3] = m_barpos[1] + fmax(w, m_domain*(m_downpos[1]-m_uppos[3]));
 			
 			float overy = m_barpos[3] - m_downpos[1];
 

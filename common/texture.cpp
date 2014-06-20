@@ -41,7 +41,7 @@ LoadedTex::~LoadedTex()
 
 LoadedTex *LoadBMP(const char *fullpath)
 {
-	AUX_RGBImageRec *pBitbldg = NULL;
+	LoadedTex *pImage = new LoadedTex;
 	FILE *pFile = NULL;
 
 	if((pFile = fopen(fullpath, "rb")) == NULL) 
@@ -52,13 +52,15 @@ LoadedTex *LoadBMP(const char *fullpath)
 		return NULL;
 	}
 
-	// Load the bitbldg using the aux function stored in glaux.lib
-	pBitbldg = auxDIBImageLoad(fullpath);				
-
-	LoadedTex *pImage = new LoadedTex;
-
 	if(!pImage)
 		OutOfMem(__FILE__, __LINE__);
+
+
+#ifdef PLATFORM_WIN
+	AUX_RGBImageRec *pBitbldg = NULL;
+
+	// Load the bitbldg using the aux function stored in glaux.lib
+	pBitbldg = auxDIBImageLoad(fullpath);				
 
 	pImage->channels = 3;
 	pImage->sizeX = pBitbldg->sizeX;
@@ -66,6 +68,16 @@ LoadedTex *LoadBMP(const char *fullpath)
 	pImage->data  = pBitbldg->data;
 
 	free(pBitbldg);
+#endif // PLATFORM_WIN
+#ifdef PLATFORM_LINUX
+        SDL_Surface *s = nullptr;
+        s = SDL_LoadBMP(fullpath);
+
+	pImage->channels = 3;
+	pImage->sizeX = s->h;
+	pImage->sizeY = s->w;
+	pImage->data  = (unsigned char*)s->pixels; // Dunno if this right. TODO Confirm.
+#endif // PLATFORM_LINUX
 
 	/*
 	int stride = pImage->channels * pBitbldg->sizeX;
@@ -1313,6 +1325,7 @@ void FlipImage(LoadedTex* image)
 // Warning: this function modifies the image data to switch RGB to BGR
 int SaveBMP(const char* fullpath, LoadedTex* image)
 {
+#ifdef PLATFORM_WIN
 	FILE* filePtr;
 	BITMAPFILEHEADER bitmapFileHeader;
 	BITMAPINFOHEADER bitmapInfoHeader;
@@ -1367,6 +1380,7 @@ int SaveBMP(const char* fullpath, LoadedTex* image)
 
 	fclose(filePtr);
 
+#endif // PLATFORM_WIN
 	return 1;
 }
 

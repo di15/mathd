@@ -1,9 +1,3 @@
-
-
-
-
-
-
 #include "../gmain.h"
 #include "../../common/gui/gui.h"
 #include "../keymap.h"
@@ -170,6 +164,7 @@ void Reload()
 
 void Click_LoadMapButton()
 {
+#ifdef PLATFORM_WIN
 	OPENFILENAME ofn;
 
 	char filepath[MAX_PATH+1];
@@ -183,19 +178,19 @@ void Click_LoadMapButton()
 	FullPath("map projects\\map project", filepath);
 	CorrectSlashes(filepath);
 
-	ofn.lStructSize = sizeof ( ofn );
-	ofn.hwndOwner = NULL;
+	ofn.lStructSize     = sizeof ( ofn );
+	ofn.hwndOwner       = NULL;
 	ofn.lpstrInitialDir = initdir;
-	ofn.lpstrFile = filepath;
-	//ofn.lpstrFile[0] = '\0';
-	ofn.nMaxFile = sizeof( filepath );
-	//ofn.lpstrFilter = "Save\0*.map\0All\0*.*\0";
-	ofn.lpstrFilter = "All\0*.*\0";
-	ofn.nFilterIndex =1;
-	ofn.lpstrFileTitle = NULL;
-	ofn.nMaxFileTitle = MAX_PATH;	//0;
+	ofn.lpstrFile       = filepath;
+	//ofn.lpstrFile[0]  = '\0';
+	ofn.nMaxFile        = sizeof( filepath );
+	//ofn.lpstrFilter   = "Save\0*.map\0All\0*.*\0";
+	ofn.lpstrFilter     = "All\0*.*\0";
+	ofn.nFilterIndex    = 1;
+	ofn.lpstrFileTitle  = NULL;
+	ofn.nMaxFileTitle   = MAX_PATH;	//0;
 	ofn.lpstrInitialDir = NULL;
-	ofn.Flags = OFN_PATHMUSTEXIST|OFN_FILEMUSTEXIST;
+	ofn.Flags           = OFN_PATHMUSTEXIST|OFN_FILEMUSTEXIST;
 
 	if(!GetOpenFileName(&ofn))
 		return;
@@ -205,10 +200,12 @@ void Click_LoadMapButton()
 
 	if(LoadMap(filepath))
 		strcpy(g_lastsave, filepath);
+#endif //PLATFORM_WIN
 }
 
 void Click_SaveMapButton()
 {
+#ifdef PLATFORM_WIN
 	OPENFILENAME ofn;
 
 	char filepath[MAX_PATH+1];
@@ -242,6 +239,7 @@ void Click_SaveMapButton()
 	//CorrectSlashes(filepath);
 	SaveMap(filepath);
 	strcpy(g_lastsave, filepath);
+#endif //PLATFORM_WIN
 }
 
 void Click_QSaveMapButton()

@@ -3,9 +3,9 @@
 #ifndef WEVIEWPORT_H
 #define WEVIEWPORT_H
 
-#include "../common/math/3dmath.h"
-#include "../common/math/camera.h"
-#include "../common/math/vec2i.h"
+#include "../../common/math/3dmath.h"
+#include "../../common/math/camera.h"
+#include "../../common/math/vec2i.h"
 
 #define VIEWPORT_MINIMAP		0
 #define VIEWPORT_ENTVIEW		1

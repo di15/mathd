@@ -67,12 +67,12 @@ void DrawMarquee()
 	float vertices[] =
 	{
 		//posx, posy    texx, texy
-		py->mousestart.x, py->mousestart.y, 0,          0, 0,
-		py->mousestart.x, py->mouse.y,0,         1, 0,
-		py->mouse.x, py->mouse.y,0,      1, 1,
+		static_cast<float>(py->mousestart.x), static_cast<float>(py->mousestart.y), 0,          0, 0,
+		static_cast<float>(py->mousestart.x), static_cast<float>(py->mouse.y),0,         1, 0,
+		static_cast<float>(py->mouse.x), static_cast<float>(py->mouse.y),0,      1, 1,
 
-		py->mouse.x, py->mousestart.y,0,      1, 1,
-		py->mousestart.x, py->mousestart.y,0,       0, 1
+		static_cast<float>(py->mouse.x), static_cast<float>(py->mousestart.y),0,      1, 1,
+		static_cast<float>(py->mousestart.x), static_cast<float>(py->mousestart.y),0,       0, 1
 	};
 
 	glVertexAttribPointer(g_shader[SHADER_COLOR2D].m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, sizeof(float)*5, &vertices[0]);
@@ -123,12 +123,12 @@ void DrawSel(Matrix* projection, Matrix* modelmat, Matrix* viewmat)
 		const float vertices[] =
 		{
 			//posx, posy posz 
-			cmmaxx + off, y1, cmminz - off,
-			cmmaxx + off, y2, cmmaxz + off,
-			cmminx - off, y3, cmmaxz + off,
+			static_cast<float>(cmmaxx + off), y1, static_cast<float>(cmminz - off),
+			static_cast<float>(cmmaxx + off), y2, static_cast<float>(cmmaxz + off),
+			static_cast<float>(cmminx - off), y3, static_cast<float>(cmmaxz + off),
 
-			cmminx - off, y4, cmminz - off,
-			cmmaxx + off, y1, cmminz - off
+			static_cast<float>(cmminx - off), y4, static_cast<float>(cmminz - off),
+			static_cast<float>(cmmaxx + off), y1, static_cast<float>(cmminz - off)
 		};
 
 		glVertexAttribPointer(s->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, &vertices[0]);

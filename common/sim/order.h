@@ -1,7 +1,7 @@
 
 
-#include "../common/platform.h"
-#include "../common/math/vec3f.h"
+#include "../platform.h"
+#include "../math/vec3f.h"
 
 class OrderMarker
 {

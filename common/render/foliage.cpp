@@ -34,7 +34,7 @@ void Foliage::reinstance()
 	{
 		float pitch = 0;
 		m->loadIdentity();
-		float radians[] = {DEGTORAD(pitch), DEGTORAD(yaw), 0};
+		float radians[] = {static_cast<float>(DEGTORAD(pitch)), static_cast<float>(DEGTORAD(yaw)), 0};
 		m->setTranslation((const float*)&pos);
 		Matrix rotation;
 		rotation.setRotationRadians(radians);
