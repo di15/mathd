@@ -1,5 +1,3 @@
-
-
 #include "particle.h"
 #include "../texture.h"
 #include "../platform.h"

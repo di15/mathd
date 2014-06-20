@@ -127,7 +127,7 @@ void Model::draw(int frame, Vec3f pos, float yaw)
 
 	float pitch = 0;
 	Matrix modelmat;
-	float radians[] = {DEGTORAD(pitch), DEGTORAD(yaw), 0};
+	float radians[] = {static_cast<float>(DEGTORAD(pitch)), static_cast<float>(DEGTORAD(yaw)), 0};
 	modelmat.setTranslation((const float*)&pos);
 	Matrix rotation;
 	rotation.setRotationRadians(radians);

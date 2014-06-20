@@ -1,6 +1,3 @@
-
-
-
 #include <string>
 #include <stdio.h>
 #include <stdlib.h>
@@ -9,7 +6,7 @@
 
 using namespace std;
 
-#define CORRECT_SLASH '\\'
+#define CORRECT_SLASH '/'
 
 #define ARRSZ(a)	(sizeof(a)/sizeof(a[0]))
 
@@ -34,3 +31,8 @@ void ErrorMessage(const char* title, const char* message);
 void InfoMessage(const char* title, const char* message);
 void WarningMessage(const char* title, const char* message);
 void OutOfMem(const char* file, int line);
+
+long timeGetTime();
+long GetTickCount();
+long long GetTickCount64();
+void Sleep(int ms);

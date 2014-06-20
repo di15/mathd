@@ -1,13 +1,4 @@
-
-
-#include "../platform.h"
 #include "brushside.h"
-#include "plane.h"
-#include "../render/shader.h"
-#include "../texture.h"
-#include "../utils.h"
-#include "brush.h"
-#include "../save/compilemap.h"
 
 BrushSide& BrushSide::operator=(const BrushSide &original)
 {

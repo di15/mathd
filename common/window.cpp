@@ -33,6 +33,7 @@ void AddRes(int w, int h)
 
 void EnumerateDisplay()
 {
+#ifdef PLATFORM_WIN
 	DEVMODE dm;
 	int index=0;
 	while(0 != EnumDisplaySettings(NULL, index++, &dm))
@@ -71,6 +72,7 @@ void EnumerateDisplay()
 		if(!found)
 			g_bpps.push_back(bpp);
 	}
+#endif // PLATFORM_WIN
 }
 
 void Resize(int width, int height)

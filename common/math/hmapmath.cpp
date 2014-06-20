@@ -366,19 +366,19 @@ bool FastMapIntersectOld(Heightmap* hmap, Vec3f line[2], Vec3f* intersection)
 		int maxtilez = currtilez;
 
 		//Are we close to the previous tile on the x axis?
-		if( max(0, currpoint.x/TILE_SIZE-0.1f) < mintilex)
+		if( max(0.0f, currpoint.x/TILE_SIZE-0.1f) < mintilex)
 			mintilex--;
 
 		//Are we close to the previous tile on the z axis?
-		if( max(0, currpoint.z/TILE_SIZE-0.1f) < mintilez)
+		if( max(0.0f, currpoint.z/TILE_SIZE-0.1f) < mintilez)
 			mintilez--;
 
 		//Are we close to the next tile on the x axis?
-		if( min(hmap->m_widthx-1, currpoint.x/TILE_SIZE+0.1f) > maxtilex)
+		if( min(hmap->m_widthx-1.0f, currpoint.x/TILE_SIZE+0.1f) > maxtilex)
 			maxtilex++;
 
 		//Are we close to the next tile on the z axis?
-		if( min(hmap->m_widthz-1, currpoint.z/TILE_SIZE+0.1f) > maxtilez)
+		if( min(hmap->m_widthz-1.0f, currpoint.z/TILE_SIZE+0.1f) > maxtilez)
 			maxtilez++;
 
 		for(int itertilex = mintilex; itertilex <= maxtilex; itertilex ++)

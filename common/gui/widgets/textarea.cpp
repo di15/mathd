@@ -465,6 +465,7 @@ void TextArea::copyval()
 	g_log.flush();
 #endif
 
+#ifdef PLATFORM_WIN
 	if(m_highl[1] > 0 && m_highl[0] != m_highl[1])
 	{
 		RichText highl = m_value.substr(m_highl[0], m_highl[1]-m_highl[0]);
@@ -492,10 +493,12 @@ void TextArea::copyval()
 	}
 
 	//return true;
+#endif //PLATFORM_WIN
 }
 
 void TextArea::pasteval()
 {
+#ifdef PLATFORM_WIN
 #ifdef PASTE_DEBUG
 	g_log<<"paste"<<endl;
 #endif
@@ -533,6 +536,7 @@ void TextArea::pasteval()
 	CloseClipboard();
 
 	//return true;
+#endif //PLATFORM_WIN
 }
 
 void TextArea::placechar(unsigned int k)

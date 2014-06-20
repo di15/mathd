@@ -328,7 +328,7 @@ void DrawPreview(Matrix projection, Matrix viewmat, Matrix modelmat, Matrix mode
 	int frame = 0;
 	Vec3f pos(0,0,0);
 	Matrix modelmat2;
-	float radians[] = {DEGTORAD(pitch), DEGTORAD(yaw), 0};
+	float radians[] = {static_cast<float>(DEGTORAD(pitch)), static_cast<float>(DEGTORAD(yaw)), 0};
 	modelmat2.setTranslation((const float*)&pos);
 	Matrix rotation;
 	rotation.setRotationRadians(radians);
@@ -383,7 +383,7 @@ void DrawPreviewDepth()
 	int frame = 0;
 	Vec3f pos(0,0,0);
 	Matrix modelmat;
-	float radians[] = {DEGTORAD(pitch), DEGTORAD(yaw), 0};
+	float radians[] = {static_cast<float>(DEGTORAD(pitch)), static_cast<float>(DEGTORAD(yaw)), 0};
 	modelmat.setTranslation((const float*)&pos);
 	Matrix rotation;
 	rotation.setRotationRadians(radians);
