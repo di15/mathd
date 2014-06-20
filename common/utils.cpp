@@ -215,8 +215,15 @@ void CorrectSlashes(char* corrected)
 {
 	int strl = strlen(corrected);
 	for(int i=0; i<strl; i++)
+#ifdef PLATFORM_WIN
 		if(corrected[i] == '/')
 			corrected[i] = '\\';
+#elif defined(PLATFORM_LINUX)
+                /*
+		if(corrected[i] == '\\')
+			corrected[i] = '/';
+                        */
+#endif
 }
 
 void BackSlashes(char* corrected)
@@ -255,3 +262,28 @@ void OutOfMem(const char* file, int line)
 	ErrorMessage("Out of memory", msg);
 	g_quit = true;
 }
+
+#ifndef PLATFORM_WIN
+long timeGetTime()
+{
+        return GetTickCount();
+}
+
+long GetTickCount()
+{
+        if(g_starttick < 0)
+                g_starttick = GetTickCount64();
+
+        return (long)(GetTickCount64() - g_starttick);
+}
+
+long long GetTickCount64()
+{
+        return SDL_GetTicks();
+}
+
+void Sleep(int ms)
+{
+        SDL_Delay(ms);
+}
+#endif //PLATFORM_WIN
