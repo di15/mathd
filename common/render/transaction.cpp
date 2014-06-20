@@ -6,12 +6,15 @@
 #include "../math/vec4f.h"
 #include "../window.h"
 #include "../utils.h"
+#include "../sim/player.h"
 
 list<Transaction> g_transx;
 
 void DrawTransactions(Matrix projmodlview)
 {
 	//return;
+
+	Player* py = &g_player[g_currP];
 
 	Vec3f* pos;
 	Vec4f screenpos;
@@ -33,14 +36,16 @@ void DrawTransactions(Matrix projmodlview)
 
 		screenpos.transform(projmodlview);
 		screenpos = screenpos / screenpos.w;
-		screenpos.x = (screenpos.x * 0.5f + 0.5f) * g_width;
-		screenpos.y = (-screenpos.y * 0.5f + 0.5f) * g_height;
+		screenpos.x = (screenpos.x * 0.5f + 0.5f) * py->width;
+		screenpos.y = (-screenpos.y * 0.5f + 0.5f) * py->height;
 
 		int x1 = screenpos.x - triter->halfwidth;
 		int y1 = screenpos.y;
 		color[3] = triter->life * 0.9f;
-
+		
 		DrawShadowedText(MAINFONT8, x1, y1, &triter->rtext, color);
+		//DrawBoxShadText(MAINFONT8, x1, y1, py->width, py->height, &triter->rtext, color, 0, -1);
+		//DrawCenterShadText(MAINFONT8, x1, y1, &triter->rtext, color, -1);
 
 		triter->drawpos.y += TRANSACTION_RISE;
 		triter->life -= TRANSACTION_DECAY;

@@ -2,6 +2,7 @@
 
 #include "utils.h"
 #include "platform.h"
+#include "window.h"
 
 ofstream g_log;
 
@@ -75,15 +76,6 @@ string MakePathRelative(const char* full)
     return sub;
 }
 
-void ExePath(char* exepath) 
-{
-    char buffer[MAX_PATH];
-    GetModuleFileName(NULL, buffer, MAX_PATH);
-    string::size_type pos = string( buffer ).find_last_of( "\\/" );
-    string strexepath = string( buffer ).substr( 0, pos);
-	strcpy(exepath, strexepath.c_str());
-}
-
 string StripFile(string filepath)
 {
 	int lastof = filepath.find_last_of("/\\");
@@ -147,10 +139,32 @@ void StripPathExtension(const char* n, char* o)
 	strcpy(o, s2.c_str());
 }
 
+#ifndef PLATFORM_IOS
+void ExePath(char* exepath) 
+{
+#ifdef PLATFORM_WIN
+    //char buffer[MAX_PATH+1];
+    GetModuleFileName(NULL, exepath, MAX_PATH+1);
+    //string::size_type pos = string( buffer ).find_last_of( "\\/" );
+    //string strexepath = string( buffer ).substr( 0, pos);
+	//strcpy(exepath, strexepath.c_str());
+#else
+	char szTmp[32];
+    //char buffer[MAX_PATH+1];
+	sprintf(szTmp, "/proc/%d/exe", getpid());
+	int bytes = MIN(readlink(szTmp, exepath, MAX_PATH+1), MAX_PATH);
+	if(bytes >= 0)
+		exepath[bytes] = '\0';
+	//string strexepath = StripFile(string(buffer));
+	//strcpy(exepath, strexepath.c_str());
+#endif
+}
+#endif
+
 void FullPath(const char* filename, char* full)
 {
 	char exepath[MAX_PATH+1];
-	GetModuleFileName(NULL, exepath, MAX_PATH);
+	ExePath(exepath);
 	string path = StripFile(exepath);
 
 	//char full[MAX_PATH+1];
@@ -215,27 +229,29 @@ void BackSlashes(char* corrected)
 
 void ErrorMessage(const char* title, const char* message)
 {
-#ifdef PLATFORM_WIN32
-    MessageBox(g_hWnd, message, title, MB_OK);
-#else
+	SDL_ShowCursor(true);
     SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, title, message, NULL);
-#endif
+	SDL_ShowCursor(false);
 }
 
 void InfoMessage(const char* title, const char* message)
 {
-#ifdef PLATFORM_WIN32
-		MessageBox(g_hWnd, message, title, MB_OK);
-#else
+	SDL_ShowCursor(true);
     SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_INFORMATION, title, message, NULL);
-#endif
+	SDL_ShowCursor(false);
 }
 
 void WarningMessage(const char* title, const char* message)
 {
-#ifdef PLATFORM_WIN32
-		MessageBox(g_hWnd, message, title, MB_OK);
-#else
+	SDL_ShowCursor(true);
     SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_WARNING, title, message, NULL);
-#endif
+	SDL_ShowCursor(false);
+}
+
+void OutOfMem(const char* file, int line)
+{
+	char msg[2048];
+	sprintf(msg, "Failed to allocate memory in %s on line %d.", file, line);
+	ErrorMessage("Out of memory", msg);
+	g_quit = true;
 }

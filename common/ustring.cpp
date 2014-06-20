@@ -13,6 +13,23 @@ UString::UString()
 
 UString::~UString()
 {
+#ifdef USTR_DEBUG
+	g_log<<"delete UString...";
+	g_log.flush();
+
+	for(int i=0; i<m_length; i++)
+	{
+		g_log<<(char)m_data[i];
+		g_log.flush();
+	}
+	
+	g_log<<endl;
+	g_log.flush();
+
+	//g_log<<"'"<<rawstr()<<"'"<<endl;
+	//g_log.flush();
+#endif
+
 	delete [] m_data;
 }
 
@@ -27,6 +44,11 @@ UString::UString(const UString& original)
 
 UString::UString(const char* cstr)
 {
+#ifdef USTR_DEBUG
+	g_log<<"UString::UString(const char* cstr)"<<endl;
+	g_log.flush();
+#endif
+
 	m_length = strlen(cstr);
 	m_data = new unsigned int [m_length+1];
 	for(int i=0; i<m_length+1; i++)
@@ -39,6 +61,22 @@ UString::UString(unsigned int k)
 	m_data = new unsigned int [m_length+1];
 	m_data[0] = k;
 	m_data[1] = 0;
+}
+
+UString::UString(unsigned int* k)
+{
+	if(!k)
+	{
+		m_length = 0;
+		m_data = new unsigned int [m_length+1];
+		m_data[0] = 0;
+		return;
+	}
+
+	for(m_length=0; k[m_length]; m_length++)
+		;
+	m_data = new unsigned int [m_length+1];
+	memcpy(m_data, k, sizeof(unsigned int) * (m_length+1));
 }
 
 //#define USTR_DEBUG
@@ -129,8 +167,26 @@ string UString::rawstr() const
 {
 	string finstr;
 
+//#ifdef USTR_DEBUG
+#if 0
+	g_log<<"\t\tstring UString::rawstr() const..."<<endl;
+	g_log.flush();
+
+	g_log<<"\t\t\t"<<endl;
+	g_log.flush();
+
+	for(int i=0; i<m_length; i++)
+	{
+		g_log<<"#"<<i;
+		g_log<<"'"<<(char)m_data[i]<<"' ";
+		g_log.flush();
+	}
+
+#endif
+
 	for(int i=0; i<m_length; i++)
 		finstr += (char)m_data[i];
 
 	return finstr;
 }
+

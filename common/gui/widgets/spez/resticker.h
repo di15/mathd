@@ -19,22 +19,9 @@ public:
 	Image whitebg;
 
 	void draw();
-	void draw2();
+	void drawover();
 	void reframe();
-	bool prelbuttonup(bool moved);
-	bool lbuttonup(bool moved);
-	bool prelbuttondown();
-	bool lbuttondown();
-	void premousemove();
-	bool mousemove();
-	bool prerbuttonup(bool moved);
-	bool rbuttonup(bool moved);
-	bool prerbuttondown();
-	bool rbuttondown();
-	bool keyup(int k);
-	bool keydown(int k);
-	bool charin(int k);
-	bool mousewheel(int delta);
+	void inev(InEv* ev);
 	void frameupd();
 };
 

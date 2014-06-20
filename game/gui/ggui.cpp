@@ -21,23 +21,26 @@
 #include "../../common/sim/buildingtype.h"
 #include "../../common/sim/selection.h"
 #include "../../common/sim/road.h"
-#include "../../common/sim/powerline.h"
-#include "../../common/sim/crudepipeline.h"
+#include "../../common/sim/powl.h"
+#include "../../common/sim/crpipe.h"
 #include "../../common/render/water.h"
 #include "../../common/sim/order.h"
 #include "../../common/ai/pathdebug.h"
+#include "../../common/ai/pathnode.h"
+#include "../../common/sim/build.h"
+#include "../../common/sim/player.h"
+#include "../../common/gui/widgets/windoww.h"
+#include "../../common/debug.h"
 
 //bool g_canselect = true;
 
-int g_build = BUILDING_NONE;
-Vec3f g_vdrag[2];
 char g_lastsave[MAX_PATH+1];
 
 
 #if 0
 void Change_Fullscreen()
 {
-	int selected = g_GUI.getview("settings")->getwidget("fullscreen", DROPDOWN)->selected;
+	int selected = gui->get("settings")->get("fullscreen", DROPDOWN)->selected;
 
 	if(g_fullscreen == (bool)selected)
 		return;
@@ -52,7 +55,7 @@ void Change_Fullscreen()
 
 void Change_Resolution()
 {
-	int selected = g_GUI.getview("settings")->getwidget("resolution", DROPDOWN)->selected;
+	int selected = gui->get("settings")->get("resolution", DROPDOWN)->selected;
 
 	if(g_selectedRes.width == g_resolution[selected].width && g_selectedRes.height == g_resolution[selected].height)
 		return;
@@ -96,12 +99,12 @@ void Change_Resolution()
 
 void Change_BPP()
 {
-	int selected = g_GUI.getview("settings")->getwidget("bpp", DROPDOWN)->selected;
+	int selected = gui->get("settings")->get("bpp", DROPDOWN)->selected;
 
-	if(g_bpp == g_bpps[selected])
+	if(py->bpp == g_bpps[selected])
 		return;
 
-	g_bpp = g_bpps[selected];
+	py->bpp = g_bpps[selected];
 	WriteConfig();
 	DestroyWindow();
 	MakeWindow();
@@ -111,23 +114,21 @@ void Change_BPP()
 
 void Click_BuildNum(int param)
 {
-	if(param == NOTHING && g_mode != EDITOR)
+	if(param == NOTHING && g_mode != APPMODE_EDITOR)
 		g_canselect = true;
 	
-	//if(g_mode != EDITOR)
-		CloseView("build selector");
+	//if(g_mode != APPMODE_EDITOR)
+		gui->close("build selector");
 
-	g_build = param;
+	py->build = param;
 
-	if(g_mode == EDITOR)
+	if(g_mode == APPMODE_EDITOR)
 		g_edTool = EDTOOL::NOTOOL;
-
-	//MessageBox(g_hWnd, "buildnum", "", NULL);
 }
 
 void Click_OutBuild()
 {
-	CView* v = g_GUI.getview("build selector");
+	CView* v = gui->get("build selector");
 	/*
 	Widget* sw = &v->widget[0];
 	sw->ldown = false;
@@ -142,12 +143,12 @@ void Click_OutBuild()
 	*/
 	g_canselect = true;
 
-	CloseView("build selector");
+	gui->close("build selector");
 }
 
 void Reload()
 {
-	g_mode = RELOADING;
+	g_mode = APPMODE_RELOADING;
 	g_reStage = 0;
 	g_lastLTex = -1;
 
@@ -260,19 +261,33 @@ void Resize_NewGameLink(Widget* thisw)
 
 void Resize_LoadingStatus(Widget* thisw)
 {
-	thisw->m_pos[0] = g_width/2;
-	thisw->m_pos[1] = g_height/2;
-	thisw->m_pos[2] = g_width;
-	thisw->m_pos[3] = g_height;
-	thisw->m_tpos[0] = g_width/2;
-	thisw->m_tpos[1] = g_height/2;
+	Player* py = &g_player[g_currP];
+
+	thisw->m_pos[0] = py->width/2;
+	thisw->m_pos[1] = py->height/2;
+	thisw->m_pos[2] = py->width;
+	thisw->m_pos[3] = py->height;
+	thisw->m_tpos[0] = py->width/2;
+	thisw->m_tpos[1] = py->height/2;
 }
 
+void Resize_WinText(Widget* thisw)
+{
+	Widget* parent = thisw->m_parent;
+
+	thisw->m_pos[0] = parent->m_pos[0];
+	thisw->m_pos[1] = parent->m_pos[1];
+	thisw->m_pos[2] = thisw->m_pos[0] + 400;
+	thisw->m_pos[3] = thisw->m_pos[1] + 2000;
+}
 
 void Click_NewGame()
 {
-#if 0
-	LoadJPGMap("heightmaps/heightmap0e2.jpg");
+	CheckGLError(__FILE__, __LINE__);
+#if 1
+	//LoadJPGMap("heightmaps/heightmap0e2s.jpg");
+	//LoadJPGMap("heightmaps/heightmap0e2.jpg");
+	LoadJPGMap("heightmaps/heightmap0e.jpg");
 #elif 1
 	LoadJPGMap("heightmaps/heightmap0c.jpg");
 #else
@@ -282,45 +297,146 @@ void Click_NewGame()
 	LoadMap(fullpath);
 #endif
 
-	g_mode = PLAY;
+	CheckGLError(__FILE__, __LINE__);
+	
+	for(int i=0; i<10; i++)
+	for(int j=0; j<20; j++)
+	{
 
-	OpenSoleView("play gui");
-	OpenAnotherView("play right opener");
+		Vec3i cmpos((g_hmap.m_widthx+4)*TILE_SIZE/2 + (i+2)*PATHNODE_SIZE, 0, g_hmap.m_widthz*TILE_SIZE/2 + (j+2)*PATHNODE_SIZE);
+		cmpos.y = g_hmap.accheight(cmpos.x, cmpos.z);
+		
+		PlaceUnit(UNIT_ROBOSOLDIER, cmpos, 0);
+		//PlaceUnit(UNIT_LABOURER, cmpos, 0);
+	}
+	
+	CheckGLError(__FILE__, __LINE__);
+
+	PlaceBuilding(BUILDING_HARBOUR, Vec2i(g_hmap.m_widthx/2-1, g_hmap.m_widthz/2-3), true, 0);
+	PlaceBuilding(BUILDING_APARTMENT, Vec2i(g_hmap.m_widthx/2+2, g_hmap.m_widthz/2-2), true, 0);
+	PlaceBuilding(BUILDING_APARTMENT, Vec2i(g_hmap.m_widthx/2+4, g_hmap.m_widthz/2-3), true, 0);
+	PlaceBuilding(BUILDING_APARTMENT, Vec2i(g_hmap.m_widthx/2+6, g_hmap.m_widthz/2-3), true, 0);
+	PlaceRoad(g_hmap.m_widthx/2+1, g_hmap.m_widthz/2-1, 1, false);
+	PlaceRoad(g_hmap.m_widthx/2+2, g_hmap.m_widthz/2-1, 1, false);
+	PlaceRoad(g_hmap.m_widthx/2+3, g_hmap.m_widthz/2-1, 1, false);
+	PlaceRoad(g_hmap.m_widthx/2+3, g_hmap.m_widthz/2-2, 1, false);
+	PlaceRoad(g_hmap.m_widthx/2+4, g_hmap.m_widthz/2-2, 1, false);
+	PlaceRoad(g_hmap.m_widthx/2+5, g_hmap.m_widthz/2-2, 1, false);
+	PlaceRoad(g_hmap.m_widthx/2+6, g_hmap.m_widthz/2-2, 1, false);
+	PlaceRoad(g_hmap.m_widthx/2+7, g_hmap.m_widthz/2-2, 1, false);
+	PlaceRoad(g_hmap.m_widthx/2+7, g_hmap.m_widthz/2-3, 1, false);
+	PlaceRoad(g_hmap.m_widthx/2+7, g_hmap.m_widthz/2-4, 1, false);
+	PlaceRoad(g_hmap.m_widthx/2+7, g_hmap.m_widthz/2-5, 1, false);
+	PlaceRoad(g_hmap.m_widthx/2+7, g_hmap.m_widthz/2-6, 1, false);
+	PlaceRoad(g_hmap.m_widthx/2+7, g_hmap.m_widthz/2-7, 1, false);
+	PlaceRoad(g_hmap.m_widthx/2+8, g_hmap.m_widthz/2-2, 1, false);
+	PlaceRoad(g_hmap.m_widthx/2+9, g_hmap.m_widthz/2-2, 1, false);
+	PlaceRoad(g_hmap.m_widthx/2+10, g_hmap.m_widthz/2-2, 1, false);
+	PlaceBuilding(BUILDING_FACTORY, Vec2i(g_hmap.m_widthx/2+9, g_hmap.m_widthz/2-3), true, 0);
+	PlaceBuilding(BUILDING_REFINERY, Vec2i(g_hmap.m_widthx/2+11, g_hmap.m_widthz/2-3), true, 0);
+	PlaceBuilding(BUILDING_NUCPOW, Vec2i(g_hmap.m_widthx/2+13, g_hmap.m_widthz/2-3), true, 0);
+	PlaceRoad(g_hmap.m_widthx/2+11, g_hmap.m_widthz/2-2, 1, false);
+	PlaceRoad(g_hmap.m_widthx/2+12, g_hmap.m_widthz/2-2, 1, false);
+	PlaceRoad(g_hmap.m_widthx/2+13, g_hmap.m_widthz/2-2, 1, false);
+	PlaceRoad(g_hmap.m_widthx/2+14, g_hmap.m_widthz/2-2, 1, false);
+	PlaceRoad(g_hmap.m_widthx/2+14, g_hmap.m_widthz/2-3, 1, false);
+	PlaceRoad(g_hmap.m_widthx/2+14, g_hmap.m_widthz/2-4, 1, false);
+	PlaceRoad(g_hmap.m_widthx/2+14, g_hmap.m_widthz/2-5, 1, false);
+	PlaceRoad(g_hmap.m_widthx/2+14, g_hmap.m_widthz/2-6, 1, false);
+	PlaceRoad(g_hmap.m_widthx/2+14, g_hmap.m_widthz/2-7, 1, false);
+	PlaceRoad(g_hmap.m_widthx/2+15, g_hmap.m_widthz/2-2, 1, false);
+	PlaceBuilding(BUILDING_FARM, Vec2i(g_hmap.m_widthx/2+6, g_hmap.m_widthz/2-0), true, 0);
+	PlaceRoad(g_hmap.m_widthx/2+10, g_hmap.m_widthz/2-1, 1, false);
+	PlaceRoad(g_hmap.m_widthx/2+10, g_hmap.m_widthz/2-0, 1, false);
+	PlaceRoad(g_hmap.m_widthx/2+10, g_hmap.m_widthz/2+1, 1, false);
+	PlaceBuilding(BUILDING_STORE, Vec2i(g_hmap.m_widthx/2+9, g_hmap.m_widthz/2-1), true, 0);
+	PlaceBuilding(BUILDING_OILWELL, Vec2i(g_hmap.m_widthx/2+9, g_hmap.m_widthz/2-0), true, 0);
+	PlaceBuilding(BUILDING_MINE, Vec2i(g_hmap.m_widthx/2+11, g_hmap.m_widthz/2-0), true, 0);
+	PlaceBuilding(BUILDING_MINE, Vec2i(g_hmap.m_widthx/2+12, g_hmap.m_widthz/2-0), true, 0);
+	PlaceRoad(g_hmap.m_widthx/2+13, g_hmap.m_widthz/2-1, 1, false);
+	PlaceRoad(g_hmap.m_widthx/2+13, g_hmap.m_widthz/2-0, 1, false);
+	PlaceRoad(g_hmap.m_widthx/2+13, g_hmap.m_widthz/2+1, 1, false);
+	CheckGLError(__FILE__, __LINE__);
+	PlaceBuilding(BUILDING_GASSTATION, Vec2i(g_hmap.m_widthx/2+14, g_hmap.m_widthz/2-1), true, 0);
+	
+	CheckGLError(__FILE__, __LINE__);
+
+	g_mode = APPMODE_PLAY;
+	
+	Player* py = &g_player[g_currP];
+	GUI* gui = &py->gui;
+
+	gui->closeall();
+	gui->open("play gui");
+	gui->open("play right opener");
+
+	CheckGLError(__FILE__, __LINE__);
+
+	gui->add(new WindowW(gui, "window", Resize_Window));
+	gui->open("window");
+
+	WindowW* win = (WindowW*)gui->get("window");
+
+	RichText bigtext;
+
+	for(int i=0; i<2000; i++)
+	{
+		bigtext.m_part.push_back(RichTextP((unsigned int)(rand()%3000+16000)));
+
+		if(rand()%10 == 1)
+			bigtext.m_part.push_back(RichTextP((unsigned int)'\n'));
+	}
+
+	win->add(new TextBlock(win, "text block", bigtext, MAINFONT16, Resize_WinText));
 
 	g_lastsave[0] = '\0';
 }
 
 void Click_OpenEditor()
 {
+	CheckGLError(__FILE__, __LINE__);
 	LoadJPGMap("heightmaps/heightmap0e2.jpg");
+	CheckGLError(__FILE__, __LINE__);
 	
-	g_mode = EDITOR;
+	g_mode = APPMODE_EDITOR;
 
-	OpenSoleView("editor gui");
+	
+	Player* py = &g_player[g_currP];
+	GUI* gui = &py->gui;
+
+	gui->closeall();
+	gui->open("editor gui");
 
 	g_lastsave[0] = '\0';
 }
 
 void FillMenuGUI()
 {
-	// Main View
-	View* mainmenuview = AddView("mainmenu");
+	Player* py = &g_player[g_currP];
+	GUI* gui = &py->gui;
 
-	mainmenuview->widget.push_back(new Link(NULL, "new game link", RichText("New Game"), MAINFONT8, Resize_NewGameLink, Click_NewGame));
+	// Main ViewLayer
+	gui->add(new ViewLayer(gui, "mainmenu"));
+	ViewLayer* mainmenuview = (ViewLayer*)gui->get("mainmenu");
+
+	mainmenuview->add(new Link(NULL, "new game link", RichText("New Game"), MAINFONT8, Resize_NewGameLink, Click_NewGame));
 }
 
 void StartRoadPlacement()
 {
-	g_vdrag[0] = Vec3f(-1,-1,-1);
-	g_vdrag[1] = Vec3f(-1,-1,-1);
+	Player* py = &g_player[g_currP];
+	Camera* c = &py->camera;
 
-	Vec3f ray = ScreenPerspRay(g_mouse.x, g_mouse.y, g_width, g_height, g_camera.zoompos(), g_camera.m_strafe, g_camera.up2(), g_camera.m_view - g_camera.m_pos, FIELD_OF_VIEW);
+	py->vdrag[0] = Vec3f(-1,-1,-1);
+	py->vdrag[1] = Vec3f(-1,-1,-1);
+
+	Vec3f ray = ScreenPerspRay(py->mouse.x, py->mouse.y, py->width, py->height, c->zoompos(), c->m_strafe, c->up2(), c->m_view - c->m_pos, FIELD_OF_VIEW);
 
 	Vec3f intersection;
 
 	Vec3f line[2];
-	line[0] = g_camera.zoompos();
-	line[1] = line[0] + ray * MAX_DISTANCE / 3 / g_zoom;
+	line[0] = c->zoompos();
+	line[1] = line[0] + ray * MAX_DISTANCE / 3 / py->zoom;
 
 #if 1
 	if(!FastMapIntersect(&g_hmap, line, &intersection))
@@ -329,13 +445,13 @@ void StartRoadPlacement()
 #endif
 		return;
 
-	g_vdrag[0] = intersection;
-	g_vdrag[1] = intersection;
+	py->vdrag[0] = intersection;
+	py->vdrag[1] = intersection;
 }
 
 void MouseLDown()
 {
-	if(g_mode == EDITOR)
+	if(g_mode == APPMODE_EDITOR)
 	{
 		int edtool = GetEdTool();
 
@@ -346,21 +462,25 @@ void MouseLDown()
 			StartRoadPlacement();
 		}
 	}
-	else if(g_mode == PLAY)
+	else if(g_mode == APPMODE_PLAY)
 	{
-		g_mousestart = g_mouse;
+		Player* py = &g_player[g_currP];
+		py->mousestart = py->mouse;
 	}
 }
 
 void EdPlaceUnit()
 {
-	Vec3f ray = ScreenPerspRay(g_mouse.x, g_mouse.y, g_width, g_height, g_camera.zoompos(), g_camera.m_strafe, g_camera.up2(), g_camera.m_view - g_camera.m_pos, FIELD_OF_VIEW);
+	Player* py = &g_player[g_currP];
+	Camera* c = &py->camera;
+
+	Vec3f ray = ScreenPerspRay(py->mouse.x, py->mouse.y, py->width, py->height, c->zoompos(), c->m_strafe, c->up2(), c->m_view - c->m_pos, FIELD_OF_VIEW);
 
 	Vec3f intersection;
 
 	Vec3f line[2];
-	line[0] = g_camera.zoompos();
-	line[1] = line[0] + ray * MAX_DISTANCE / 3 / g_zoom;
+	line[0] = c->zoompos();
+	line[1] = line[0] + ray * MAX_DISTANCE / 3 / py->zoom;
 
 #if 1
 	if(!FastMapIntersect(&g_hmap, line, &intersection))
@@ -373,8 +493,9 @@ void EdPlaceUnit()
 
 	int country = GetPlaceUnitCountry();
 	int company = GetPlaceUnitCompany();
-
-	PlaceUnit(type, Vec3i(intersection.x, intersection.y, intersection.z), country, company, -1);
+	
+	//PlaceUnit(type, Vec3i(intersection.x, intersection.y, intersection.z), country, company, -1);
+	PlaceUnit(type, Vec3i(intersection.x, intersection.y, intersection.z), country);
 #if 0
 	g_hmap.setheight( intersection.x / TILE_SIZE, intersection.z / TILE_SIZE, 0);
 	g_hmap.remesh();
@@ -383,13 +504,16 @@ void EdPlaceUnit()
 
 void EdPlaceBuilding()
 {
-	Vec3f ray = ScreenPerspRay(g_mouse.x, g_mouse.y, g_width, g_height, g_camera.zoompos(), g_camera.m_strafe, g_camera.up2(), g_camera.m_view - g_camera.m_pos, FIELD_OF_VIEW);
+	Player* py = &g_player[g_currP];
+	Camera* c = &py->camera;
+
+	Vec3f ray = ScreenPerspRay(py->mouse.x, py->mouse.y, py->width, py->height, c->zoompos(), c->m_strafe, c->up2(), c->m_view - c->m_pos, FIELD_OF_VIEW);
 
 	Vec3f intersection;
 
 	Vec3f line[2];
-	line[0] = g_camera.zoompos();
-	line[1] = line[0] + ray * MAX_DISTANCE / 3 / g_zoom;
+	line[0] = c->zoompos();
+	line[1] = line[0] + ray * MAX_DISTANCE / 3 / py->zoom;
 
 #if 1
 	if(!FastMapIntersect(&g_hmap, line, &intersection))
@@ -407,7 +531,7 @@ void EdPlaceBuilding()
 	Vec2i tilepos (intersection.x/TILE_SIZE, intersection.z/TILE_SIZE);
 
 	if(CheckCanPlace(type, tilepos))
-		PlaceBuilding(type, tilepos, true, -1, -1, -1);
+		PlaceBuilding(type, tilepos, true, -1);
 #if 0
 	g_hmap.setheight( intersection.x / TILE_SIZE, intersection.z / TILE_SIZE, 0);
 	g_hmap.remesh();
@@ -416,7 +540,10 @@ void EdPlaceBuilding()
 
 void EdDeleteObject()
 {
-	Selection sel = DoSelection(g_camera.zoompos(), g_camera.m_strafe, g_camera.up2(), g_camera.m_view - g_camera.m_pos);
+	Player* py = &g_player[g_currP];
+	Camera* c = &py->camera;
+
+	Selection sel = DoSel(c->zoompos(), c->m_strafe, c->up2(), c->m_view - c->m_pos);
 
 	for(auto unititer = sel.units.begin(); unititer != sel.units.end(); unititer++)
 	{
@@ -427,7 +554,7 @@ void EdDeleteObject()
 
 void MouseLUp()
 {
-	if(g_mode == EDITOR)
+	if(g_mode == APPMODE_EDITOR)
 	{
 		int edtool = GetEdTool();
 
@@ -444,25 +571,64 @@ void MouseLUp()
 		else if(edtool == EDTOOL_PLACEPOWERLINES)
 			PlacePowl();
 	}
-	else if(g_mode == PLAY)
+	else if(g_mode == APPMODE_PLAY)
 	{
-		g_selection = DoSelection(g_camera.zoompos(), g_camera.m_strafe, g_camera.up2(), Normalize(g_camera.m_view - g_camera.zoompos()));
+		Player* py = &g_player[g_currP];
+		Camera* c = &py->camera;
+		GUI* gui = &py->gui;
+
+		if(py->build == BUILDING_NONE)
+		{
+			gui->close("construction view");
+			py->sel = DoSel(c->zoompos(), c->m_strafe, c->up2(), Normalize(c->m_view - c->zoompos()));
+			AfterSel(&py->sel);
+		}
+		else if(py->build < BUILDING_TYPES)
+		{
+			if(py->canplace)
+			{
+				PlaceBuilding(py->build, Vec2i(py->vdrag[0].x/TILE_SIZE, py->vdrag[0].z/TILE_SIZE), false, g_localP);
+			}
+			else
+			{
+			}
+
+			py->build = -1;
+		}
+		else if(py->build == BUILDING_ROAD)
+		{
+			PlaceRoad();
+			py->build = -1;
+		}
+		else if(py->build == BUILDING_POWL)
+		{
+			PlacePowl();
+			py->build = -1;
+		}
+		else if(py->build == BUILDING_CRPIPE)
+		{
+			PlaceCrPipe();
+			py->build = -1;
+		}
 	}
 }
 
 void RotateAbout()
 {
-	float dx = g_mouse.x - g_width/2;
-	float dy = g_mouse.y - g_height/2;
+	Player* py = &g_player[g_currP];
+	Camera* c = &py->camera;
 
-	Camera oldcam = g_camera;
+	float dx = py->mouse.x - py->width/2;
+	float dy = py->mouse.y - py->height/2;
+
+	Camera oldcam = py->camera;
 	Vec3f line[2];
-	line[0] = g_camera.zoompos();
+	line[0] = c->zoompos();
 
-	g_camera.rotateabout(g_camera.m_view, dy / 100.0f, g_camera.m_strafe.x, g_camera.m_strafe.y, g_camera.m_strafe.z);
-	g_camera.rotateabout(g_camera.m_view, dx / 100.0f, g_camera.m_up.x, g_camera.m_up.y, g_camera.m_up.z);
+	c->rotateabout(c->m_view, dy / 100.0f, c->m_strafe.x, c->m_strafe.y, c->m_strafe.z);
+	c->rotateabout(c->m_view, dx / 100.0f, c->m_up.x, c->m_up.y, c->m_up.z);
 	
-	line[1] = g_camera.zoompos();
+	line[1] = c->zoompos();
 
 	Vec3f ray = Normalize(line[1] - line[0]) * TILE_SIZE;
 
@@ -476,23 +642,26 @@ void RotateAbout()
 #else
 	if(FastMapIntersect(&g_hmap, line, &clip))
 #endif
-		g_camera = oldcam;
-	else
-		CalcMapView();
+		py->camera = oldcam;
+	//else
+	//	CalcMapView();
 
 }
 
 void UpdateRoadPlans()
 {
-	g_vdrag[1] = g_vdrag[0];
+	Player* py = &g_player[g_currP];
+	Camera* c = &py->camera;
 
-	Vec3f ray = ScreenPerspRay(g_mouse.x, g_mouse.y, g_width, g_height, g_camera.zoompos(), g_camera.m_strafe, g_camera.up2(), g_camera.m_view - g_camera.m_pos, FIELD_OF_VIEW);
+	py->vdrag[1] = py->vdrag[0];
+
+	Vec3f ray = ScreenPerspRay(py->mouse.x, py->mouse.y, py->width, py->height, c->zoompos(), c->m_strafe, c->up2(), c->m_view - c->m_pos, FIELD_OF_VIEW);
 
 	Vec3f intersection;
 
 	Vec3f line[2];
-	line[0] = g_camera.zoompos();
-	line[1] = line[0] + ray * MAX_DISTANCE / 3 / g_zoom;
+	line[0] = c->zoompos();
+	line[1] = line[0] + ray * MAX_DISTANCE / 3 / py->zoom;
 
 #if 1
 	if(!FastMapIntersect(&g_hmap, line, &intersection))
@@ -501,22 +670,25 @@ void UpdateRoadPlans()
 #endif
 		return;
 
-	g_vdrag[1] = intersection;
+	py->vdrag[1] = intersection;
 
-	UpdateRoadPlans(0, g_vdrag[0], g_vdrag[1]);
+	UpdateRoadPlans(0, py->vdrag[0], py->vdrag[1]);
 }
 
 void UpdateCrPipePlans()
 {
-	g_vdrag[1] = g_vdrag[0];
+	Player* py = &g_player[g_currP];
+	Camera* c = &py->camera;
 
-	Vec3f ray = ScreenPerspRay(g_mouse.x, g_mouse.y, g_width, g_height, g_camera.zoompos(), g_camera.m_strafe, g_camera.up2(), g_camera.m_view - g_camera.m_pos, FIELD_OF_VIEW);
+	py->vdrag[1] = py->vdrag[0];
+
+	Vec3f ray = ScreenPerspRay(py->mouse.x, py->mouse.y, py->width, py->height, c->zoompos(), c->m_strafe, c->up2(), c->m_view - c->m_pos, FIELD_OF_VIEW);
 
 	Vec3f intersection;
 
 	Vec3f line[2];
-	line[0] = g_camera.zoompos();
-	line[1] = line[0] + ray * MAX_DISTANCE / 3 / g_zoom;
+	line[0] = c->zoompos();
+	line[1] = line[0] + ray * MAX_DISTANCE / 3 / py->zoom;
 
 #if 1
 	if(!FastMapIntersect(&g_hmap, line, &intersection))
@@ -525,22 +697,25 @@ void UpdateCrPipePlans()
 #endif
 		return;
 
-	g_vdrag[1] = intersection;
+	py->vdrag[1] = intersection;
 
-	UpdateCrPipePlans(0, g_vdrag[0], g_vdrag[1]);
+	UpdateCrPipePlans(0, py->vdrag[0], py->vdrag[1]);
 }
 
 void UpdatePowlPlans()
 {
-	g_vdrag[1] = g_vdrag[0];
+	Player* py = &g_player[g_currP];
+	Camera* c = &py->camera;
 
-	Vec3f ray = ScreenPerspRay(g_mouse.x, g_mouse.y, g_width, g_height, g_camera.zoompos(), g_camera.m_strafe, g_camera.up2(), g_camera.m_view - g_camera.m_pos, FIELD_OF_VIEW);
+	py->vdrag[1] = py->vdrag[0];
+
+	Vec3f ray = ScreenPerspRay(py->mouse.x, py->mouse.y, py->width, py->height, c->zoompos(), c->m_strafe, c->up2(), c->m_view - c->m_pos, FIELD_OF_VIEW);
 
 	Vec3f intersection;
 
 	Vec3f line[2];
-	line[0] = g_camera.zoompos();
-	line[1] = line[0] + ray * MAX_DISTANCE / 3 / g_zoom;
+	line[0] = c->zoompos();
+	line[1] = line[0] + ray * MAX_DISTANCE / 3 / py->zoom;
 
 #if 1
 	if(!FastMapIntersect(&g_hmap, line, &intersection))
@@ -549,22 +724,26 @@ void UpdatePowlPlans()
 #endif
 		return;
 
-	g_vdrag[1] = intersection;
+	py->vdrag[1] = intersection;
 
-	UpdatePowlPlans(0, g_vdrag[0], g_vdrag[1]);
+	UpdatePowlPlans(0, py->vdrag[0], py->vdrag[1]);
 }
 
 void MouseMove()
 {
-	if(g_mode == PLAY || g_mode == EDITOR)
+	if(g_mode == APPMODE_PLAY || g_mode == APPMODE_EDITOR)
 	{
-		if(g_mousekeys[MOUSEKEY_MIDDLE])
+		Player* py = &g_player[g_currP];
+
+		if(py->mousekeys[MOUSE_MIDDLE])
 		{
 			RotateAbout();
 			CenterMouse();
 		}
 
-		else if(g_mousekeys[MOUSEKEY_LEFT])
+		UpdateSBuild();
+
+		if(py->mousekeys[MOUSE_LEFT])
 		{
 			int edtool = GetEdTool();
 
@@ -590,11 +769,14 @@ void MouseRDown()
 
 void MouseRUp()
 {
-	if(g_mode == PLAY)
+	if(g_mode == APPMODE_PLAY)
 	{
-		if(!g_keyintercepted)
+		Player* py = &g_player[g_currP];
+		Camera* c = &py->camera;
+
+		if(!py->keyintercepted)
 		{
-			Order(g_mouse.x, g_mouse.y, g_width, g_height, g_camera.zoompos(), g_camera.m_view, Normalize(g_camera.m_view - g_camera.zoompos()), g_camera.m_strafe, g_camera.up2());
+			Order(py->mouse.x, py->mouse.y, py->width, py->height, c->zoompos(), c->m_view, Normalize(c->m_view - c->zoompos()), c->m_strafe, c->up2());
 		}
 	}
 }
@@ -603,20 +785,30 @@ void FillGUI()
 {
 	//DrawSceneFunc = DrawScene;
 	//DrawSceneDepthFunc = DrawSceneDepth;
+
+	for(int i=0; i<PLAYERS; i++)
+	{
+		Player* py = &g_player[i];
+		GUI* gui = &py->gui;
 	
-	AssignKey(VK_F1, SaveScreenshot, NULL);
-	AssignKey(VK_F2, LogPathDebug, NULL);
-	AssignLButton(MouseLDown, MouseLUp);
-	AssignRButton(MouseRDown, MouseRUp);
-	AssignMouseMove(MouseMove);
+		gui->assignkey(SDLK_F1, SaveScreenshot, NULL);
+		gui->assignkey(SDLK_F2, LogPathDebug, NULL);
+		gui->assignlbutton(MouseLDown, MouseLUp);
+		gui->assignrbutton(MouseRDown, MouseRUp);
+		gui->assignmousemove(MouseMove);
+	}
 
-	// Loading View
+	// Loading ViewLayer
+	Player* py = &g_player[g_currP];
+	GUI* gui = &py->gui;
 
-	View* loadingview = AddView("loading");
+	gui->add(new ViewLayer(gui, "loading"));
+	ViewLayer* loadingview = (ViewLayer*)gui->get("loading");
 
-	loadingview->widget.push_back(new Text(NULL, "status", RichText("Loading..."), MAINFONT8, Resize_LoadingStatus));
+	loadingview->add(new Text(NULL, "status", RichText("Loading..."), MAINFONT8, Resize_LoadingStatus));
 	
-	OpenSoleView("loading");
+	gui->closeall();
+	gui->open("loading");
 
 	FillMenuGUI();
 	FillEditorGUI();

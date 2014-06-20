@@ -13,6 +13,11 @@
 #define COLLIDER_TERRAIN	2
 #define COLLIDER_NOROAD		3
 #define COLLIDER_OTHER		4
+#define COLLIDER_NOLAND		5
+#define COLLIDER_NOSEA		6
+#define COLLIDER_NOCOAST	7
+#define COLLIDER_ROAD		8
+#define COLLIDER_OFFMAP		9
 extern int g_lastcollider;
 extern int g_collidertype;
 extern bool g_ignored;

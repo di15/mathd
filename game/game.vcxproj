@@ -124,18 +124,18 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>$(SolutionDir)\libs\lpng;$(SolutionDir)\libs\;$(SolutionDir)\libs\libzip-0.11.1\lib;$(SolutionDir)\libs\jpeglib;$(IncludePath)</IncludePath>
-    <LibraryPath>$(SolutionDir)\libs\GL;$(SolutionDir)\libs\zlib-1.2.5\build\Release;$(SolutionDir)\libs\libzip-0.11.1\build\lib\Release;$(SolutionDir)\libs\lpng\lib;$(SolutionDir)\libs\jpeglib;$(LibraryPath)</LibraryPath>
-    <TargetName>StatesCorpsDbg</TargetName>
+    <IncludePath>$(SolutionDir)\libs\win\SDL2-2.0.3\include;$(SolutionDir)\libs\glew\include;$(SolutionDir)\libs\lpng;$(SolutionDir)\libs\;$(SolutionDir)\libs\libzip-0.11.1\lib;$(SolutionDir)\libs\jpeglib;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)\libs\win\SDL2-2.0.3\lib;$(SolutionDir)\libs\glew\lib\Release\Win32;$(SolutionDir)\libs\GL;$(SolutionDir)\libs\zlib-1.2.5\build\Release;$(SolutionDir)\libs\libzip-0.11.1\build\lib\Release;$(SolutionDir)\libs\lpng\lib;$(SolutionDir)\libs\jpeglib;$(LibraryPath)</LibraryPath>
+    <TargetName>CorpStatesDbg</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>$(SolutionDir)\libs\lpng;$(SolutionDir)\libs\jpeglib;$(SolutionDir)\libs\libzip-0.11.1\lib;$(SolutionDir)\libs\;$(SolutionDir)\libs\win\SDL-1.2.15\include;$(IncludePath)</IncludePath>
-    <LibraryPath>$(SolutionDir)\libs\lpng\lib;$(SolutionDir)\libs\jpeglib;$(SolutionDir)\libs\win\SDL-1.2.15\lib\x86;$(SolutionDir)\libs\zlib-1.2.5\build\Release;$(SolutionDir)\libs\GL;$(SolutionDir)\libs\libzip-0.11.1\build\lib\Release;$(LibraryPath)</LibraryPath>
-    <TargetName>StatesCorps</TargetName>
+    <IncludePath>$(SolutionDir)\libs\win\SDL2-2.0.3\include;$(SolutionDir)\libs\glew\include;$(SolutionDir)\libs\lpng;$(SolutionDir)\libs\jpeglib;$(SolutionDir)\libs\libzip-0.11.1\lib;$(SolutionDir)\libs\;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)\libs\win\SDL2-2.0.3\lib;$(SolutionDir)\libs\glew\lib\Release\Win32;$(SolutionDir)\libs\lpng\lib;$(SolutionDir)\libs\jpeglib;$(SolutionDir)\libs\zlib-1.2.5\build\Release;$(SolutionDir)\libs\GL;$(SolutionDir)\libs\libzip-0.11.1\build\lib\Release;$(LibraryPath)</LibraryPath>
+    <TargetName>CorpStates</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='32 bit release|Win32'">
     <LinkIncremental>false</LinkIncremental>
@@ -307,6 +307,7 @@
     <ClCompile Include="..\common\ai\astarpath.cpp" />
     <ClCompile Include="..\common\ai\binheap.cpp" />
     <ClCompile Include="..\common\ai\jpsexpansion.cpp" />
+    <ClCompile Include="..\common\ai\jpspartpath.cpp" />
     <ClCompile Include="..\common\ai\jpspath.cpp" />
     <ClCompile Include="..\common\ai\localavoid.cpp" />
     <ClCompile Include="..\common\ai\mempool.cpp" />
@@ -318,12 +319,15 @@
     <ClCompile Include="..\common\ai\pathnode.cpp" />
     <ClCompile Include="..\common\debug.cpp" />
     <ClCompile Include="..\common\econ\demand.cpp" />
+    <ClCompile Include="..\common\gui\cursor.cpp" />
     <ClCompile Include="..\common\gui\draw2d.cpp" />
     <ClCompile Include="..\common\gui\font.cpp" />
     <ClCompile Include="..\common\gui\gui.cpp" />
     <ClCompile Include="..\common\gui\icon.cpp" />
+    <ClCompile Include="..\common\gui\inevent.cpp" />
     <ClCompile Include="..\common\gui\richtext.cpp" />
-    <ClCompile Include="..\common\gui\view.cpp" />
+    <ClCompile Include="..\common\gui\sprite.cpp" />
+    <ClCompile Include="..\common\gui\viewlayer.cpp" />
     <ClCompile Include="..\common\gui\widget.cpp" />
     <ClCompile Include="..\common\gui\widgets\barbutton.cpp" />
     <ClCompile Include="..\common\gui\widgets\button.cpp" />
@@ -331,19 +335,24 @@
     <ClCompile Include="..\common\gui\widgets\dropdowns.cpp" />
     <ClCompile Include="..\common\gui\widgets\editbox.cpp" />
     <ClCompile Include="..\common\gui\widgets\frame.cpp" />
+    <ClCompile Include="..\common\gui\widgets\hscrollbar.cpp" />
     <ClCompile Include="..\common\gui\widgets\image.cpp" />
     <ClCompile Include="..\common\gui\widgets\insdraw.cpp" />
     <ClCompile Include="..\common\gui\widgets\link.cpp" />
     <ClCompile Include="..\common\gui\widgets\listbox.cpp" />
     <ClCompile Include="..\common\gui\widgets\spez\bottompanel.cpp" />
     <ClCompile Include="..\common\gui\widgets\spez\buildpreview.cpp" />
+    <ClCompile Include="..\common\gui\widgets\spez\constructionview.cpp" />
     <ClCompile Include="..\common\gui\widgets\spez\resticker.cpp" />
     <ClCompile Include="..\common\gui\widgets\text.cpp" />
     <ClCompile Include="..\common\gui\widgets\textarea.cpp" />
     <ClCompile Include="..\common\gui\widgets\textblock.cpp" />
     <ClCompile Include="..\common\gui\widgets\touchlistener.cpp" />
     <ClCompile Include="..\common\gui\widgets\viewportw.cpp" />
+    <ClCompile Include="..\common\gui\widgets\vscrollbar.cpp" />
+    <ClCompile Include="..\common\gui\widgets\windoww.cpp" />
     <ClCompile Include="..\common\math\3dmath.cpp" />
+    <ClCompile Include="..\common\math\barycentric.cpp" />
     <ClCompile Include="..\common\math\brush.cpp" />
     <ClCompile Include="..\common\math\camera.cpp" />
     <ClCompile Include="..\common\math\edge.cpp" />
@@ -364,6 +373,7 @@
     <ClCompile Include="..\common\platform.cpp" />
     <ClCompile Include="..\common\render\billboard.cpp" />
     <ClCompile Include="..\common\render\compilebl.cpp" />
+    <ClCompile Include="..\common\render\dmdmodel.cpp" />
     <ClCompile Include="..\common\render\foliage.cpp" />
     <ClCompile Include="..\common\render\heightmap.cpp" />
     <ClCompile Include="..\common\render\model.cpp" />
@@ -373,22 +383,21 @@
     <ClCompile Include="..\common\render\screenshot.cpp" />
     <ClCompile Include="..\common\render\shader.cpp" />
     <ClCompile Include="..\common\render\shadow.cpp" />
-    <ClCompile Include="..\common\render\border.cpp" />
+    <ClCompile Include="..\common\render\skybox.cpp" />
     <ClCompile Include="..\common\render\transaction.cpp" />
     <ClCompile Include="..\common\render\vertexarray.cpp" />
     <ClCompile Include="..\common\render\water.cpp" />
     <ClCompile Include="..\common\save\savemap.cpp" />
+    <ClCompile Include="..\common\sim\build.cpp" />
     <ClCompile Include="..\common\sim\building.cpp" />
     <ClCompile Include="..\common\sim\buildingtype.cpp" />
-    <ClCompile Include="..\common\sim\company.cpp" />
     <ClCompile Include="..\common\sim\connectable.cpp" />
-    <ClCompile Include="..\common\sim\country.cpp" />
     <ClCompile Include="..\common\sim\deposit.cpp" />
     <ClCompile Include="..\common\sim\labourer.cpp" />
-    <ClCompile Include="..\common\sim\crudepipeline.cpp" />
+    <ClCompile Include="..\common\sim\crpipe.cpp" />
     <ClCompile Include="..\common\sim\order.cpp" />
     <ClCompile Include="..\common\sim\player.cpp" />
-    <ClCompile Include="..\common\sim\powerline.cpp" />
+    <ClCompile Include="..\common\sim\powl.cpp" />
     <ClCompile Include="..\common\sim\resources.cpp" />
     <ClCompile Include="..\common\sim\road.cpp" />
     <ClCompile Include="..\common\sim\selection.cpp" />
@@ -397,12 +406,11 @@
     <ClCompile Include="..\common\sim\unitmove.cpp" />
     <ClCompile Include="..\common\sim\unittype.cpp" />
     <ClCompile Include="..\common\sound\sound.cpp" />
+    <ClCompile Include="..\common\sys\unicode.cpp" />
     <ClCompile Include="..\common\texture.cpp" />
     <ClCompile Include="..\common\ustring.cpp" />
     <ClCompile Include="..\common\utils.cpp" />
     <ClCompile Include="..\common\window.cpp" />
-    <ClCompile Include="..\libs\objectscript\objectscript.cpp" />
-    <ClCompile Include="..\libs\objectscript\os-heap.cpp" />
     <ClCompile Include="gmain.cpp" />
     <ClCompile Include="gui\editorgui.cpp" />
     <ClCompile Include="gui\ggui.cpp" />
@@ -414,6 +422,7 @@
     <ClInclude Include="..\common\ai\astarpath.h" />
     <ClInclude Include="..\common\ai\binheap.h" />
     <ClInclude Include="..\common\ai\jpsexpansion.h" />
+    <ClInclude Include="..\common\ai\jpspartpath.h" />
     <ClInclude Include="..\common\ai\jpspath.h" />
     <ClInclude Include="..\common\ai\localavoid.h" />
     <ClInclude Include="..\common\ai\mempool.h" />
@@ -425,12 +434,15 @@
     <ClInclude Include="..\common\ai\pathnode.h" />
     <ClInclude Include="..\common\debug.h" />
     <ClInclude Include="..\common\econ\demand.h" />
+    <ClInclude Include="..\common\gui\cursor.h" />
     <ClInclude Include="..\common\gui\draw2d.h" />
     <ClInclude Include="..\common\gui\font.h" />
     <ClInclude Include="..\common\gui\gui.h" />
     <ClInclude Include="..\common\gui\icon.h" />
+    <ClInclude Include="..\common\gui\inevent.h" />
     <ClInclude Include="..\common\gui\richtext.h" />
-    <ClInclude Include="..\common\gui\view.h" />
+    <ClInclude Include="..\common\gui\sprite.h" />
+    <ClInclude Include="..\common\gui\viewlayer.h" />
     <ClInclude Include="..\common\gui\widget.h" />
     <ClInclude Include="..\common\gui\widgets\barbutton.h" />
     <ClInclude Include="..\common\gui\widgets\button.h" />
@@ -438,19 +450,24 @@
     <ClInclude Include="..\common\gui\widgets\dropdowns.h" />
     <ClInclude Include="..\common\gui\widgets\editbox.h" />
     <ClInclude Include="..\common\gui\widgets\frame.h" />
+    <ClInclude Include="..\common\gui\widgets\hscrollbar.h" />
     <ClInclude Include="..\common\gui\widgets\image.h" />
     <ClInclude Include="..\common\gui\widgets\insdraw.h" />
     <ClInclude Include="..\common\gui\widgets\link.h" />
     <ClInclude Include="..\common\gui\widgets\listbox.h" />
     <ClInclude Include="..\common\gui\widgets\spez\bottompanel.h" />
     <ClInclude Include="..\common\gui\widgets\spez\buildpreview.h" />
+    <ClInclude Include="..\common\gui\widgets\spez\constructionview.h" />
     <ClInclude Include="..\common\gui\widgets\spez\resticker.h" />
     <ClInclude Include="..\common\gui\widgets\text.h" />
     <ClInclude Include="..\common\gui\widgets\textarea.h" />
     <ClInclude Include="..\common\gui\widgets\textblock.h" />
     <ClInclude Include="..\common\gui\widgets\touchlistener.h" />
     <ClInclude Include="..\common\gui\widgets\viewportw.h" />
+    <ClInclude Include="..\common\gui\widgets\vscrollbar.h" />
+    <ClInclude Include="..\common\gui\widgets\windoww.h" />
     <ClInclude Include="..\common\math\3dmath.h" />
+    <ClInclude Include="..\common\math\barycentric.h" />
     <ClInclude Include="..\common\math\brush.h" />
     <ClInclude Include="..\common\math\camera.h" />
     <ClInclude Include="..\common\math\edge.h" />
@@ -474,6 +491,7 @@
     <ClInclude Include="..\common\platform.h" />
     <ClInclude Include="..\common\render\billboard.h" />
     <ClInclude Include="..\common\render\compilebl.h" />
+    <ClInclude Include="..\common\render\dmdmodel.h" />
     <ClInclude Include="..\common\render\foliage.h" />
     <ClInclude Include="..\common\render\heightmap.h" />
     <ClInclude Include="..\common\render\model.h" />
@@ -483,22 +501,21 @@
     <ClInclude Include="..\common\render\screenshot.h" />
     <ClInclude Include="..\common\render\shader.h" />
     <ClInclude Include="..\common\render\shadow.h" />
-    <ClInclude Include="..\common\render\border.h" />
+    <ClInclude Include="..\common\render\skybox.h" />
     <ClInclude Include="..\common\render\transaction.h" />
     <ClInclude Include="..\common\render\vertexarray.h" />
     <ClInclude Include="..\common\render\water.h" />
     <ClInclude Include="..\common\save\savemap.h" />
+    <ClInclude Include="..\common\sim\build.h" />
     <ClInclude Include="..\common\sim\building.h" />
     <ClInclude Include="..\common\sim\buildingtype.h" />
-    <ClInclude Include="..\common\sim\company.h" />
     <ClInclude Include="..\common\sim\connectable.h" />
-    <ClInclude Include="..\common\sim\country.h" />
     <ClInclude Include="..\common\sim\deposit.h" />
     <ClInclude Include="..\common\sim\labourer.h" />
-    <ClInclude Include="..\common\sim\crudepipeline.h" />
+    <ClInclude Include="..\common\sim\crpipe.h" />
     <ClInclude Include="..\common\sim\order.h" />
     <ClInclude Include="..\common\sim\player.h" />
-    <ClInclude Include="..\common\sim\powerline.h" />
+    <ClInclude Include="..\common\sim\powl.h" />
     <ClInclude Include="..\common\sim\resources.h" />
     <ClInclude Include="..\common\sim\road.h" />
     <ClInclude Include="..\common\sim\selection.h" />
@@ -507,16 +524,11 @@
     <ClInclude Include="..\common\sim\unitmove.h" />
     <ClInclude Include="..\common\sim\unittype.h" />
     <ClInclude Include="..\common\sound\sound.h" />
+    <ClInclude Include="..\common\sys\unicode.h" />
     <ClInclude Include="..\common\texture.h" />
     <ClInclude Include="..\common\ustring.h" />
     <ClInclude Include="..\common\utils.h" />
     <ClInclude Include="..\common\window.h" />
-    <ClInclude Include="..\libs\objectscript\objectscript.h" />
-    <ClInclude Include="..\libs\objectscript\os-binder-arg-cc-functions.h" />
-    <ClInclude Include="..\libs\objectscript\os-binder-cc-functions.h" />
-    <ClInclude Include="..\libs\objectscript\os-binder-function.h" />
-    <ClInclude Include="..\libs\objectscript\os-binder.h" />
-    <ClInclude Include="..\libs\objectscript\os-heap.h" />
     <ClInclude Include="gmain.h" />
     <ClInclude Include="gres.h" />
     <ClInclude Include="gui\editorgui.h" />

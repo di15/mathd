@@ -8,26 +8,14 @@
 class DropDownS : public Widget
 {
 public:
+
+	int m_mousedown[2];
+
 	DropDownS(Widget* parent, const char* n, int f, void (*reframef)(Widget* thisw), void (*change)());
 
 	void draw();
-	void draw2();
-	bool prelbuttonup(bool moved);
-	bool lbuttonup(bool moved);
-	bool prelbuttondown();
-	bool lbuttondown();
-	bool mousemove();
-	bool mousewheel(int delta)
-	{
-		if(m_opened)
-		{
-
-
-			return true;	// intercept mouse event
-		}
-
-		return false;
-	}
+	void drawover();
+	void inev(InEv* ev);
 
 	int rowsshown();
 	int square();

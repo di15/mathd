@@ -16,6 +16,7 @@
 #include "vec3i.h"
 #include "plane3f.h"
 #include "../window.h"
+#include "../sim/player.h"
 
 float Clipf(float n, float lower, float upper)
 {
@@ -142,7 +143,7 @@ Vec3f Normal2(Vec3f vTriangle[])
 	return vNormal;
 }
 
-bool IntersectedPlane(Vec3f vPoly[], Vec3f vLine[], Vec3f &vNormal, float &originDistance)
+bool InterPlane(Vec3f vPoly[], Vec3f vLine[], Vec3f &vNormal, float &originDistance)
 {
 	float distance1=0, distance2=0;						// The distances from the 2 points of the line from the plane
 			
@@ -721,20 +722,22 @@ Vec4f ScreenPos(Matrix* mvp, Vec3f vec, float width, float height, bool persp)
 
 Vec3f OnNear(int x, int y, int width, int height, Vec3f posvec, Vec3f sidevec, Vec3f upvec)
 {
+	Player* py = &g_player[g_currP];
+
 	/*
-	float halfWidth = g_width / 2.0f;
-	float halfHeight = g_height / 2.0f;
+	float halfWidth = py->width / 2.0f;
+	float halfHeight = py->height / 2.0f;
 
 	float ratioX = (x - halfWidth) / halfWidth;
 
 	float ratioY = -(y - halfHeight) / halfHeight;
 
-	Vec3f direction = Normalize( g_camera.m_view - g_camera.m_pos );
+	Vec3f direction = Normalize( c->m_view - c->m_pos );
 
 	float Hnear = 2 * tan( DEGTORAD(FIELD_OF_VIEW) / 2) * MIN_DISTANCE;
-	float Wnear = Hnear * g_width/g_height;
+	float Wnear = Hnear * py->width/py->height;
 
-	return ( direction * MIN_DISTANCE + g_camera.m_strafe * ratioX * Wnear/2.0f + g_camera.up2() * ratioY * Hnear/2.0f );
+	return ( direction * MIN_DISTANCE + c->m_strafe * ratioX * Wnear/2.0f + c->up2() * ratioY * Hnear/2.0f );
 	*/
 	
 	float halfWidth = (float)width / 2.0f;
@@ -744,17 +747,17 @@ Vec3f OnNear(int x, int y, int width, int height, Vec3f posvec, Vec3f sidevec, V
 
 	float ratioy = -(y - halfHeight) / halfHeight;
 
-	//Vec3f direction = Normalize( g_camera.m_view - g_camera.m_pos );
+	//Vec3f direction = Normalize( c->m_view - c->m_pos );
 
-	//-PROJ_RIGHT*aspect/g_zoom, PROJ_RIGHT*aspect/g_zoom, PROJ_RIGHT/g_zoom, -PROJ_RIGHT/g_zoom
-	//PROJ_RIGHT*aspect/g_zoom + PROJ_RIGHT*aspect/g_zoom = 2.0f*PROJ_RIGHT*aspect/g_zoom
+	//-PROJ_RIGHT*aspect/py->zoom, PROJ_RIGHT*aspect/py->zoom, PROJ_RIGHT/py->zoom, -PROJ_RIGHT/py->zoom
+	//PROJ_RIGHT*aspect/py->zoom + PROJ_RIGHT*aspect/py->zoom = 2.0f*PROJ_RIGHT*aspect/py->zoom
 	//
 
 	float aspect = fabsf((float)width / (float)height);
-	float Wnear = PROJ_RIGHT * aspect / g_zoom;
-	float Hnear = PROJ_RIGHT / g_zoom;
+	float Wnear = PROJ_RIGHT * aspect / py->zoom;
+	float Hnear = PROJ_RIGHT / py->zoom;
 	
-	//return ( g_camera.m_pos + g_camera.m_strafe * ratioX * Wnear + g_camera.up2() * ratioY * Hnear );
+	//return ( c->m_pos + c->m_strafe * ratioX * Wnear + c->up2() * ratioY * Hnear );
 	Vec3f result = posvec + sidevec * ratiox * Wnear + upvec * ratioy * Hnear;
 
 	//g_log<<"--------------"<<endl;
@@ -779,7 +782,7 @@ Vec3f OnNearPersp(int x, int y, int width, int height, Vec3f posvec, Vec3f sidev
 	float Hnear = 2 * tan( DEGTORAD(fov) / 2) * mind;
 	float Wnear = Hnear * aspect;
 	
-	//return ( g_camera.m_pos + g_camera.m_strafe * ratioX * Wnear + g_camera.up2() * ratioY * Hnear );
+	//return ( c->m_pos + c->m_strafe * ratioX * Wnear + c->up2() * ratioY * Hnear );
 	Vec3f result = viewdir * mind + posvec + sidevec * ratiox * Wnear + upvec * ratioy * Hnear;
 
 	//g_log<<"--------------"<<endl;
@@ -806,19 +809,19 @@ Vec3f ScreenPerspRay(int x, int y, int width, int height, Vec3f posvec, Vec3f si
 	return Normalize(viewdir) + sidevec * ratiox * Wnear/2.0f + upvec * ratioy * Hnear/2.0f;
 
 #if 0
-	float halfWidth = g_width / 2.0f;
-	float halfHeight = g_height / 2.0f;
+	float halfWidth = py->width / 2.0f;
+	float halfHeight = py->height / 2.0f;
 
 	float ratioX = (x - halfWidth) / halfWidth;
 
 	float ratioY = -(y - halfHeight) / halfHeight;
 
-	Vec3f direction = Normalize( g_camera.m_view - g_camera.m_pos );
+	Vec3f direction = Normalize( c->m_view - c->m_pos );
 
 	float Hnear = 2 * tan( DEGTORAD(FIELD_OF_VIEW) / 2) * MIN_DISTANCE;
-	float Wnear = Hnear * g_width/g_height;
+	float Wnear = Hnear * py->width/py->height;
 
-	return ( direction * MIN_DISTANCE + g_camera.m_strafe * ratioX * Wnear/2.0f + g_camera.up2() * ratioY * Hnear/2.0f );
+	return ( direction * MIN_DISTANCE + c->m_strafe * ratioX * Wnear/2.0f + c->up2() * ratioY * Hnear/2.0f );
 #endif
 }
 

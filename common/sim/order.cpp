@@ -13,6 +13,7 @@
 #include "../math/matrix.h"
 #include "../math/hmapmath.h"
 #include "../sound/sound.h"
+#include "player.h"
 
 list<OrderMarker> g_order;
 
@@ -20,21 +21,21 @@ void DrawOrders(Matrix* projection, Matrix* modelmat, Matrix* viewmat)
 {
 	UseS(SHADER_BILLBOARD);
 	//glBegin(GL_QUADS);
-	
+
 	OrderMarker* o;
 	Vec3f p;
 	float r;
 	float a;
 
 	Shader* s = &g_shader[g_curS];
-	
+
 	glUniformMatrix4fv(s->m_slot[SSLOT_PROJECTION], 1, 0, projection->m_matrix);
 	glUniformMatrix4fv(s->m_slot[SSLOT_MODELMAT], 1, 0, modelmat->m_matrix);
 	glUniformMatrix4fv(s->m_slot[SSLOT_VIEWMAT], 1, 0, viewmat->m_matrix);
 	glUniform4f(s->m_slot[SSLOT_COLOR], 0, 1, 0, 1);
-	glEnableVertexAttribArray(s->m_slot[SSLOT_POSITION]);
-	glEnableVertexAttribArray(s->m_slot[SSLOT_TEXCOORD0]);
-	glEnableVertexAttribArray(s->m_slot[SSLOT_NORMAL]);
+	//glEnableVertexAttribArray(s->m_slot[SSLOT_POSITION]);
+	//glEnableVertexAttribArray(s->m_slot[SSLOT_TEXCOORD0]);
+	//glEnableVertexAttribArray(s->m_slot[SSLOT_NORMAL]);
 
 	glActiveTextureARB(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, g_texture[ g_circle ].texname);
@@ -51,15 +52,15 @@ void DrawOrders(Matrix* projection, Matrix* modelmat, Matrix* viewmat)
 
 		/*
 		glColor4f(1, 1, 1, a);
-	
-		glTexCoord2f(0, 0);		glVertex3f(p.x - r, p.y + 1, p.z - r);
-		glTexCoord2f(0, 1);		glVertex3f(p.x - r, p.y + 1, p.z + r);
-		glTexCoord2f(1, 1);		glVertex3f(p.x + r, p.y + 1, p.z + r);
-		glTexCoord2f(1, 0);		glVertex3f(p.x + r, p.y + 1, p.z - r);
+
+		0, 0);		glVertex3f(p.x - r, p.y + 1, p.z - r);
+		0, 1);		glVertex3f(p.x - r, p.y + 1, p.z + r);
+		1, 1);		glVertex3f(p.x + r, p.y + 1, p.z + r);
+		1, 0);		glVertex3f(p.x + r, p.y + 1, p.z - r);
 		*/
-		
+
 		glUniform4f(s->m_slot[SSLOT_COLOR], 0, 1, 0, a);
-		
+
 #if 0
 		float y1 = Bilerp(&g_hmap, p.x + r, p.z - r);
 		float y2 = Bilerp(&g_hmap, p.x + r, p.z + r);
@@ -80,23 +81,23 @@ void DrawOrders(Matrix* projection, Matrix* modelmat, Matrix* viewmat)
 		float vertices[] =
 		{
 			//posx, posy posz   texx, texy
-			p.x + r, y1 + TILE_SIZE/100, p.z - r,          1, 0,
-			p.x + r, y2	+ TILE_SIZE/100, p.z + r,          1, 1,
-			p.x - r, y3 + TILE_SIZE/100, p.z + r,          0, 1,
+			p.x + r, y1 + TILE_SIZE/20, p.z - r,          1, 0,
+			p.x + r, y2	+ TILE_SIZE/20, p.z + r,          1, 1,
+			p.x - r, y3 + TILE_SIZE/20, p.z + r,          0, 1,
 
-			p.x - r, y3 + TILE_SIZE/100, p.z + r,          0, 1,
-			p.x - r, y4 + TILE_SIZE/100, p.z - r,          0, 0,
-			p.x + r, y1 + TILE_SIZE/100, p.z - r,          1, 0
+			p.x - r, y3 + TILE_SIZE/20, p.z + r,          0, 1,
+			p.x - r, y4 + TILE_SIZE/20, p.z - r,          0, 0,
+			p.x + r, y1 + TILE_SIZE/20, p.z - r,          1, 0
 		};
-		
+
 		//glVertexPointer(3, GL_FLOAT, sizeof(float)*5, &vertices[0]);
 		//glTexCoordPointer(2, GL_FLOAT, sizeof(float)*5, &vertices[3]);
-		
+
 		glVertexAttribPointer(s->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, sizeof(float) * 5, &vertices[0]);
 		glVertexAttribPointer(s->m_slot[SSLOT_TEXCOORD0], 2, GL_FLOAT, GL_FALSE, sizeof(float) * 5, &vertices[3]);
 		//glVertexAttribPointer(s->m_slot[SLOT::NORMAL], 3, GL_FLOAT, GL_FALSE, sizeof(float) * 5, va->normals);
 
-        glDrawArrays(GL_TRIANGLES, 0, 6);
+		glDrawArrays(GL_TRIANGLES, 0, 6);
 
 		if(GetTickCount() - o->tick > ORDER_EXPIRE)
 		{
@@ -110,6 +111,8 @@ void DrawOrders(Matrix* projection, Matrix* modelmat, Matrix* viewmat)
 	//glEnd();
 	//glColor4f(1, 1, 1, 1);
 	//glUniform4f(s->m_slot[SSLOT_COLOR], 1, 1, 1, 1);
+
+	EndS();
 }
 
 void Order(int mousex, int mousey, int viewwidth, int viewheight, Vec3f campos, Vec3f camfocus, Vec3f camviewdir, Vec3f camside, Vec3f camup2)
@@ -121,39 +124,12 @@ void Order(int mousex, int mousey, int viewwidth, int viewheight, Vec3f campos, 
 	Vec3f line[2];
 
 	Vec3f ray = ScreenPerspRay(mousex, mousey, viewwidth, viewheight, campos, camside, camup2, camviewdir, FIELD_OF_VIEW);
-	
+
 	line[0] = campos;
 	line[1] = campos + (ray * 100000.0f);
 
-#if 0
-	bool foundsurface = false;
-
-	for(int brushindex = 0; brushindex < g_map.m_nbrush; brushindex++)
-	{
-		Brush* pbrush = &g_map.m_brush[brushindex];
-
-		unsigned int texindex = pbrush->m_texture;
-		Texture* ptex = &g_texture[texindex];
-
-		if(ptex->sky)
-			continue;
-
-		Vec3f internormal;
-		Vec3f trace = pbrush->traceray(line, &internormal);
-
-		if(trace != line[1] && trace.y <= g_maxelev && internormal.y >= 0.2f)
-		{
-			line[1] = trace;
-			foundsurface = true;
-		}
-	}
-
-	if(!foundsurface)
-		return;
-#endif
-
 	Vec3f mapgoal;
-	
+
 #if 0
 	if(!GetMapIntersection(&g_hmap, line, &mapgoal))
 #else
@@ -165,21 +141,21 @@ void Order(int mousex, int mousey, int viewwidth, int viewheight, Vec3f campos, 
 	InfoMessage("asd", "found surf");
 #endif
 
-	//vector<int> selection = g_selection;
+	//vector<int> selection = py->sel;
 	//int selecttype = g_selectType;
 
-	//g_selection.clear();
+	//py->sel.clear();
 
 	//SelectOne();
 
-	//vector<int> targets = g_selection;
+	//vector<int> targets = py->sel;
 	//int targettype = g_selectType;
 
-	//g_selection = selection;
+	//py->sel = selection;
 	//g_selectType = selecttype;
 
 	//char msg[128];
-	//sprintf(msg, "s.size()=%d, stype=%d", (int)g_selection.size(), g_selectType);
+	//sprintf(msg, "s.size()=%d, stype=%d", (int)py->sel.size(), g_selectType);
 	//Chat(msg);
 
 	Vec3f vmin = Vec3f(0,0,0);
@@ -187,10 +163,12 @@ void Order(int mousex, int mousey, int viewwidth, int viewheight, Vec3f campos, 
 	Vec3f center(0,0,0);
 
 #if 0
-		char msg[256];
-		sprintf(msg, "mapmaxmin:(%f,%f)->(%f,%f)", vmin.x, vmin.z, vmax.x, vmax.z);
-		InfoMessage("asd", msg);
+	char msg[256];
+	sprintf(msg, "mapmaxmin:(%f,%f)->(%f,%f)", vmin.x, vmin.z, vmax.x, vmax.z);
+	InfoMessage("asd", msg);
 #endif
+
+	Player* py = &g_player[g_currP];
 
 	//if(targets.size() <= 0 || (targettype != SELECT_UNIT && targettype != SELECT_BUILDING))
 	{
@@ -200,29 +178,29 @@ void Order(int mousex, int mousey, int viewwidth, int viewheight, Vec3f campos, 
 		Unit* u;
 		UnitT* t;
 		Vec3f order = mapgoal;
-	
-	#if 0
+
+#if 0
 		g_order.push_back(OrderMarker(order, GetTickCount(), 100));
-	#endif
+#endif
 		//order.x = Clip(order.x, 0, g_hmap.m_widthX*TILE_SIZE);
 		//order.z = Clip(order.z, 0, g_hmap.m_widthZ*TILE_SIZE);
 		Vec3f p;
 
-		auto selitr = g_selection.units.begin();
+		auto selitr = py->sel.units.begin();
 		int counted = 0;
 
-		while(selitr != g_selection.units.end())
+		while(selitr != py->sel.units.end())
 		{
 			u = &g_unit[*selitr];
 
 #if 0
 			if(e->hp <= 0.0f)
 			{
-				g_selection.erase( selitr );
+				py->sel.erase( selitr );
 				continue;
 			}
 #endif
-			
+
 			p = Vec3f(u->cmpos.x, 0, u->cmpos.y);
 			//e->target = -1;
 			//e->underOrder = true;
@@ -235,7 +213,7 @@ void Order(int mousex, int mousey, int viewwidth, int viewheight, Vec3f campos, 
 				vmax.x = p.x;
 			if(p.z > vmax.z)
 				vmax.z = p.z;
-		
+
 			//center = center + p;
 			center = (center * counted + p) / (float)(counted+1);
 
@@ -243,7 +221,7 @@ void Order(int mousex, int mousey, int viewwidth, int viewheight, Vec3f campos, 
 			selitr++;
 		}
 
-		//center = center / (float)g_selection.size();
+		//center = center / (float)py->sel.size();
 		//Vec3f half = (min + max) / 2.0f;
 
 #if 0
@@ -259,12 +237,12 @@ void Order(int mousex, int mousey, int viewwidth, int viewheight, Vec3f campos, 
 #if 0
 			InfoMessage("asd", "typ 1");
 #endif
-			
+
 			int radius = 0;
-			selitr = g_selection.units.begin();
+			selitr = py->sel.units.begin();
 
 			// Get the biggest unit width/radius
-			while(selitr != g_selection.units.end())
+			while(selitr != py->sel.units.end())
 			{
 				u = &g_unit[*selitr];
 				u->resetpath();
@@ -293,10 +271,10 @@ void Order(int mousex, int mousey, int viewwidth, int viewheight, Vec3f campos, 
 #endif
 
 			Vec3f offset;
-			
-			selitr = g_selection.units.begin();
 
-			while(selitr != g_selection.units.end())
+			selitr = py->sel.units.begin();
+
+			while(selitr != py->sel.units.end())
 			{
 				u = &g_unit[*selitr];
 				p = Vec3f(u->cmpos.x, 0, u->cmpos.y);
@@ -319,7 +297,7 @@ void Order(int mousex, int mousey, int viewwidth, int viewheight, Vec3f campos, 
 
 			Sound_Order();
 		}
-	
+
 		//AckSnd();
 	}
 #if 0
@@ -334,16 +312,16 @@ void Order(int mousex, int mousey, int viewwidth, int viewheight, Vec3f campos, 
 
 		MakeWar(g_localP, targu->owner);
 
-		for(int j=0; j<g_selection.size(); j++)
+		for(int j=0; j<py->sel.size(); j++)
 		{
-			int i = g_selection[j];
+			int i = py->sel[j];
 			CUnit* u = &g_unit[i];
 			u->goal = p;
 			u->underOrder = true;
 			u->targetU = true;
 			u->target = targi;
 		}
-		
+
 		AckSnd();
 	}
 	else if(targets.size() > 0 && targettype == SELECT_BUILDING)
@@ -357,16 +335,16 @@ void Order(int mousex, int mousey, int viewwidth, int viewheight, Vec3f campos, 
 
 		MakeWar(g_localP, targb->owner);
 
-		for(int j=0; j<g_selection.size(); j++)
+		for(int j=0; j<py->sel.size(); j++)
 		{
-			int i = g_selection[j];
+			int i = py->sel[j];
 			CUnit* u = &g_unit[i];
 			u->goal = p;
 			u->underOrder = true;
 			u->targetU = false;
 			u->target = targi;
 		}
-		
+
 		AckSnd();
 	}
 #endif

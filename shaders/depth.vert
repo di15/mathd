@@ -1,11 +1,14 @@
-attribute vec4 position;
+
+#version 150
+
+in vec4 position;
 
 uniform mat4 projection;
 uniform mat4 model;
 uniform mat4 view;
 
-attribute vec2 texCoordIn0;
-varying vec2 texCoordOut0;
+in vec2 texCoordIn0;
+out vec2 texCoordOut0;
 
 void main(void)
 {

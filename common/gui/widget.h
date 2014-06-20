@@ -9,27 +9,9 @@
 #include "../window.h"
 #include "draw2d.h"
 #include "richtext.h"
-
+#include "inevent.h"
 
 #define MAX_OPTIONS_SHOWN	7
-
-#if 0
-//left overs
-#define LBAR_WIDTH		100
-#define MMBAR_WIDTH		(LBAR_WIDTH*128.0f/110.0f)
-#define MMBAR_HEIGHT	(MMBAR_WIDTH*1.0f/1.0f)
-#define MINIMAP_X1		(MMBAR_WIDTH*6.0f/128.0f)
-#define MINIMAP_X2		(MMBAR_WIDTH*121.0f/128.0f)
-#define MINIMAP_Y1		(MMBAR_HEIGHT*6.0f/128.0f)
-#define MINIMAP_Y2		(MMBAR_HEIGHT*114.0f/128.0f)
-#define TBAR_HEIGHT		15
-#endif
-
-#define HSCROLLER_SPACING	16
-#define HSCROLLER_OPTIONW	173
-#define HSCROLLER_SIDESP	(((14+17-7)+(20+18-11))/2)
-
-#define STATUS_ALPHA	(0.75f)
 
 #define WIDGET_IMAGE				1
 #define WIDGET_BUTTON				2
@@ -50,6 +32,15 @@
 #define WIDGET_RESTICKER			17
 #define WIDGET_BOTTOMPANEL			18
 #define WIDGET_BUILDPREVIEW			19
+#define WIDGET_CONSTRUCTIONVIEW		20
+#define WIDGET_GUI					21
+#define WIDGET_VIEWLAYER			22
+#define WIDGET_WINDOW				23
+#define WIDGET_VSCROLLBAR			24
+#define WIDGET_HSCROLLBAR			25
+
+#define CHCALL_VSCROLL				0
+#define CHCAlL_HSCROLL				1
 
 class Widget
 {
@@ -57,6 +48,7 @@ public:
 	int m_type;
 	Widget* m_parent;
 	float m_pos[4];
+	float m_frame[4];
 	float m_texc[4];	//texture coordinates
     float m_tpos[4];	//text pos
 	unsigned int m_tex;
@@ -73,7 +65,6 @@ public:
 	int m_selected;
 	float m_scroll[2];
 	bool m_mousescroll;
-	int m_mousedown[2];
 	float m_vel[2];
 	int m_param;
 	float m_rgba[4];
@@ -86,6 +77,7 @@ public:
 	int m_lines;
 	int m_alignment;
 	RichText m_label;
+	bool m_popup;
 	
 	void (*clickfunc)();
 	void (*clickfunc2)(int p);
@@ -121,49 +113,17 @@ public:
 	}
 	
 	virtual void draw()	{}
-	virtual void draw2()	{}
-	//virtual void newover()	{}
-	virtual bool prelbuttonup(bool moved)	{ return false; }
-	virtual bool lbuttonup(bool moved)	{ return false; }
-	virtual bool prelbuttondown() { return false; }
-	virtual bool lbuttondown() { return false; }
-	virtual bool prerbuttonup(bool moved)	{ return false; }
-	virtual bool rbuttonup(bool moved)	{ return false; }
-	virtual bool prerbuttondown() { return false; }
-	virtual bool rbuttondown() { return false; }
-	virtual void premousemove()	{}
+	virtual void drawover()	{}
+	virtual void inev(InEv* ev) {}
 	virtual void frameupd()	{}
-	virtual bool mousemove() { return false; }
-	virtual bool keyup(int k) { return false; }
-	virtual bool keydown(int k) { return false; }
-	virtual bool charin(int k) { return false; }
-	virtual bool mousewheel(int delta) { return false; }
-	virtual void changevalue(const char* newv);
-	virtual void placechar(unsigned int k);
-	virtual void select(int which);
-	virtual void clear();
-	virtual void erase(int which)	{}
 	virtual void reframe();	//resized or moved
-	virtual void changetext(const char* newt);
-	virtual int scrollframe(int i) const	{ return m_pos[i];	}
-	virtual int frame(int i)	const { return m_pos[i];	}
-	virtual Widget* getsubwidg(const char* name, int type)
-	{
-		for(auto i=m_subwidg.begin(); i!=m_subwidg.end(); i++)
-			if((*i)->m_type == type && _stricmp((*i)->m_name.c_str(), name) == 0)
-				return *i;
-
-		return NULL;
-	}
-	virtual bool delprev();
-	virtual bool delnext();
-	virtual void copyval() {}
-	virtual void pasteval() {}
-	virtual void selectall() {}
+	virtual void subframe(float* fr) { memcpy((void*)fr, (void*)m_pos, sizeof(float)*4); }
+	virtual Widget* get(const char* name);
+	virtual void add(Widget* neww);
+	virtual void close();
+	virtual void chcall(Widget* ch, int type, void* data);	//child callback
 };
 
-extern bool g_mouseoveraction;
-
 void CenterLabel(Widget* w);
-
+void SubFrame(float *a, float *b, float *c);
 #endif

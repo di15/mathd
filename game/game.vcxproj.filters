@@ -161,12 +161,6 @@
     <ClCompile Include="..\common\math\hmapmath.cpp">
       <Filter>Source Files\common\math</Filter>
     </ClCompile>
-    <ClCompile Include="..\common\sim\country.cpp">
-      <Filter>Source Files\common\sim</Filter>
-    </ClCompile>
-    <ClCompile Include="..\common\render\border.cpp">
-      <Filter>Source Files\common\render</Filter>
-    </ClCompile>
     <ClCompile Include="..\common\render\billboard.cpp">
       <Filter>Source Files\common\render</Filter>
     </ClCompile>
@@ -203,31 +197,16 @@
     <ClCompile Include="..\common\sim\building.cpp">
       <Filter>Source Files\common\sim</Filter>
     </ClCompile>
-    <ClCompile Include="..\libs\objectscript\objectscript.cpp">
-      <Filter>Source Files\libs\objectscript</Filter>
-    </ClCompile>
-    <ClCompile Include="..\libs\objectscript\os-heap.cpp">
-      <Filter>Source Files\libs\objectscript</Filter>
-    </ClCompile>
     <ClCompile Include="..\common\math\brush.cpp">
       <Filter>Source Files\common\math</Filter>
     </ClCompile>
     <ClCompile Include="..\common\sim\selection.cpp">
       <Filter>Source Files\common\sim</Filter>
     </ClCompile>
-    <ClCompile Include="..\common\sim\company.cpp">
-      <Filter>Source Files\common\sim</Filter>
-    </ClCompile>
-    <ClCompile Include="..\common\sim\powerline.cpp">
-      <Filter>Source Files\common\sim</Filter>
-    </ClCompile>
     <ClCompile Include="..\common\sim\road.cpp">
       <Filter>Source Files\common\sim</Filter>
     </ClCompile>
     <ClCompile Include="..\common\sim\connectable.cpp">
-      <Filter>Source Files\common\sim</Filter>
-    </ClCompile>
-    <ClCompile Include="..\common\sim\crudepipeline.cpp">
       <Filter>Source Files\common\sim</Filter>
     </ClCompile>
     <ClCompile Include="..\common\phys\trace.cpp">
@@ -300,9 +279,6 @@
       <Filter>Source Files\common\gui</Filter>
     </ClCompile>
     <ClCompile Include="..\common\gui\richtext.cpp">
-      <Filter>Source Files\common\gui</Filter>
-    </ClCompile>
-    <ClCompile Include="..\common\gui\view.cpp">
       <Filter>Source Files\common\gui</Filter>
     </ClCompile>
     <ClCompile Include="..\common\gui\widget.cpp">
@@ -379,6 +355,54 @@
     </ClCompile>
     <ClCompile Include="..\common\ai\astarpath.cpp">
       <Filter>Source Files\common\ai</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\ai\jpspartpath.cpp">
+      <Filter>Source Files\common\ai</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\render\dmdmodel.cpp">
+      <Filter>Source Files\common\render</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\math\barycentric.cpp">
+      <Filter>Source Files\common\math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\render\skybox.cpp">
+      <Filter>Source Files\common\render</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\sim\build.cpp">
+      <Filter>Source Files\common\sim</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\gui\widgets\spez\constructionview.cpp">
+      <Filter>Source Files\common\gui\widgets\spez</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\gui\cursor.cpp">
+      <Filter>Source Files\common\gui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\sim\powl.cpp">
+      <Filter>Source Files\common\sim</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\sim\crpipe.cpp">
+      <Filter>Source Files\common\sim</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\gui\inevent.cpp">
+      <Filter>Source Files\common\gui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\gui\viewlayer.cpp">
+      <Filter>Source Files\common\gui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\gui\widgets\windoww.cpp">
+      <Filter>Source Files\common\gui\widgets</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\gui\sprite.cpp">
+      <Filter>Source Files\common\gui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\sys\unicode.cpp">
+      <Filter>Source Files\common\sys</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\gui\widgets\hscrollbar.cpp">
+      <Filter>Source Files\common\gui\widgets</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\gui\widgets\vscrollbar.cpp">
+      <Filter>Source Files\common\gui\widgets</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -490,12 +514,6 @@
     <ClInclude Include="..\common\math\hmapmath.h">
       <Filter>Source Files\common\math</Filter>
     </ClInclude>
-    <ClInclude Include="..\common\sim\country.h">
-      <Filter>Source Files\common\sim</Filter>
-    </ClInclude>
-    <ClInclude Include="..\common\render\border.h">
-      <Filter>Source Files\common\render</Filter>
-    </ClInclude>
     <ClInclude Include="..\common\render\billboard.h">
       <Filter>Source Files\common\render</Filter>
     </ClInclude>
@@ -532,43 +550,16 @@
     <ClInclude Include="..\common\sim\building.h">
       <Filter>Source Files\common\sim</Filter>
     </ClInclude>
-    <ClInclude Include="..\libs\objectscript\objectscript.h">
-      <Filter>Source Files\libs\objectscript</Filter>
-    </ClInclude>
-    <ClInclude Include="..\libs\objectscript\os-binder.h">
-      <Filter>Source Files\libs\objectscript</Filter>
-    </ClInclude>
-    <ClInclude Include="..\libs\objectscript\os-binder-arg-cc-functions.h">
-      <Filter>Source Files\libs\objectscript</Filter>
-    </ClInclude>
-    <ClInclude Include="..\libs\objectscript\os-binder-cc-functions.h">
-      <Filter>Source Files\libs\objectscript</Filter>
-    </ClInclude>
-    <ClInclude Include="..\libs\objectscript\os-heap.h">
-      <Filter>Source Files\libs\objectscript</Filter>
-    </ClInclude>
-    <ClInclude Include="..\libs\objectscript\os-binder-function.h">
-      <Filter>Source Files\libs\objectscript</Filter>
-    </ClInclude>
     <ClInclude Include="..\common\math\brush.h">
       <Filter>Source Files\common\math</Filter>
     </ClInclude>
     <ClInclude Include="..\common\sim\selection.h">
       <Filter>Source Files\common\sim</Filter>
     </ClInclude>
-    <ClInclude Include="..\common\sim\company.h">
-      <Filter>Source Files\common\sim</Filter>
-    </ClInclude>
-    <ClInclude Include="..\common\sim\powerline.h">
-      <Filter>Source Files\common\sim</Filter>
-    </ClInclude>
     <ClInclude Include="..\common\sim\road.h">
       <Filter>Source Files\common\sim</Filter>
     </ClInclude>
     <ClInclude Include="..\common\sim\connectable.h">
-      <Filter>Source Files\common\sim</Filter>
-    </ClInclude>
-    <ClInclude Include="..\common\sim\crudepipeline.h">
       <Filter>Source Files\common\sim</Filter>
     </ClInclude>
     <ClInclude Include="..\common\phys\trace.h">
@@ -641,9 +632,6 @@
       <Filter>Source Files\common\gui</Filter>
     </ClInclude>
     <ClInclude Include="..\common\gui\richtext.h">
-      <Filter>Source Files\common\gui</Filter>
-    </ClInclude>
-    <ClInclude Include="..\common\gui\view.h">
       <Filter>Source Files\common\gui</Filter>
     </ClInclude>
     <ClInclude Include="..\common\gui\widget.h">
@@ -720,6 +708,54 @@
     </ClInclude>
     <ClInclude Include="..\common\ai\astarpath.h">
       <Filter>Source Files\common\ai</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\ai\jpspartpath.h">
+      <Filter>Source Files\common\ai</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\render\dmdmodel.h">
+      <Filter>Source Files\common\render</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\math\barycentric.h">
+      <Filter>Source Files\common\math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\render\skybox.h">
+      <Filter>Source Files\common\render</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\sim\build.h">
+      <Filter>Source Files\common\sim</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\gui\widgets\spez\constructionview.h">
+      <Filter>Source Files\common\gui\widgets\spez</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\gui\cursor.h">
+      <Filter>Source Files\common\gui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\sim\powl.h">
+      <Filter>Source Files\common\sim</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\sim\crpipe.h">
+      <Filter>Source Files\common\sim</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\gui\inevent.h">
+      <Filter>Source Files\common\gui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\gui\viewlayer.h">
+      <Filter>Source Files\common\gui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\gui\widgets\windoww.h">
+      <Filter>Source Files\common\gui\widgets</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\gui\sprite.h">
+      <Filter>Source Files\common\gui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\sys\unicode.h">
+      <Filter>Source Files\common\sys</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\gui\widgets\hscrollbar.h">
+      <Filter>Source Files\common\gui\widgets</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\gui\widgets\vscrollbar.h">
+      <Filter>Source Files\common\gui\widgets</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

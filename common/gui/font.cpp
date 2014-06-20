@@ -12,6 +12,8 @@
 #include "gui.h"
 #include "icon.h"
 #include "richtext.h"
+#include "../sim/player.h"
+#include "../debug.h"
 
 Font g_font[FONTS];
 
@@ -38,10 +40,11 @@ static int goffstartx;
 static float frame[4];
 static std::list<RichTextP>::const_iterator g_rtextp;
 static int pi;	//RichText part's [i] index
+static float currcolor[4];
 
 void BreakLine()
 {
-    Font* f = &g_font[g_currfont];
+	Font* f = &g_font[g_currfont];
 	line++;
 	x = goffstartx;
 	y += f->gheight;
@@ -49,18 +52,18 @@ void BreakLine()
 
 void NextLineBreak()
 {
-    Font* f = &g_font[g_currfont];
-    Glyph* g2;
+	Font* f = &g_font[g_currfont];
+	Glyph* g2;
 
 	if(nextlb != starti)
-    {
+	{
 		BreakLine();
 	}
-            
+
 	int lastspace = -1;
 	int x0 = gstartx;
 	auto p = g_rtextp;
-            
+
 	for(int pj=pi, j=i; j<size; j++)
 	{
 		if(p->m_type == RICHTEXT_TEXT)
@@ -71,10 +74,10 @@ void NextLineBreak()
 				nextlb = j+1;
 				return;
 			}
-			
+
 			g2 = &f->glyph[k];
 			x0 += g2->origsize[0];
-                
+
 			if(k == ' ' || k == '\t')
 				lastspace = j;
 
@@ -95,7 +98,7 @@ void NextLineBreak()
 			p++;
 			pj = 0;
 		}
-		
+
 		if(x0 > w+gstartx)
 		{
 			if(lastspace < 0)
@@ -107,7 +110,7 @@ void NextLineBreak()
 
 				return;
 			}
-                    
+
 			nextlb = lastspace+1;
 			return;
 		}
@@ -116,14 +119,15 @@ void NextLineBreak()
 
 void DrawGlyph()
 {
-    Font* f = &g_font[g_currfont];
+	Font* f = &g_font[g_currfont];
 
 	if(g_rtextp->m_type == RICHTEXT_ICON)
 	{
 		Icon* icon = &g_icon[g_rtextp->m_icon];
 		float hscale = f->gheight / (float)icon->m_height;
-		
+
 		UseIconTex(g_rtextp->m_icon);
+		glUniform4f(g_shader[g_curS].m_slot[SSLOT_COLOR], 1, 1, 1, 1);
 
 		int left = x;
 		int right = left + (float)icon->m_width * hscale;
@@ -132,6 +136,9 @@ void DrawGlyph()
 		DrawGlyph(left, top, right, bottom, 0, 0, 1, 1);
 
 		UseFontTex();
+		glUniform4f(g_shader[g_curS].m_slot[SSLOT_COLOR], currcolor[0], currcolor[1], currcolor[2], currcolor[3]);
+
+		//g_log<<"color[3] = "<<currcolor[3]<<endl;
 	}
 	else if(g_rtextp->m_type == RICHTEXT_TEXT)
 	{
@@ -148,14 +155,15 @@ void DrawGlyph()
 
 void DrawGlyphF()
 {
-    Font* f = &g_font[g_currfont];
+	Font* f = &g_font[g_currfont];
 
 	if(g_rtextp->m_type == RICHTEXT_ICON)
 	{
 		Icon* icon = &g_icon[g_rtextp->m_icon];
 		float hscale = f->gheight / (float)icon->m_height;
-		
+
 		UseIconTex(g_rtextp->m_icon);
+		glUniform4f(g_shader[g_curS].m_slot[SSLOT_COLOR], 1, 1, 1, 1);
 
 		int left = x;
 		int right = left + (float)icon->m_width * hscale;
@@ -164,6 +172,9 @@ void DrawGlyphF()
 		DrawGlyphF(left, top, right, bottom, 0, 0, 1, 1);
 
 		UseFontTex();
+		glUniform4f(g_shader[g_curS].m_slot[SSLOT_COLOR], currcolor[0], currcolor[1], currcolor[2], currcolor[3]);
+
+		//g_log<<"color[3] = "<<currcolor[3]<<endl;
 	}
 	else if(g_rtextp->m_type == RICHTEXT_TEXT)
 	{
@@ -181,12 +192,12 @@ void DrawGlyphF()
 void HighlGlyphF()
 {
 	/*
-    Font* f = &g_font[g_currfont];
-    Glyph* g = &f->glyph[g_str[i]];
+	Font* f = &g_font[g_currfont];
+	Glyph* g = &f->glyph[g_str[i]];
 
 	int left = x;
 	int right = x + g->offset[0] + g->texsize[0];
-    int top = y;
+	int top = y;
 	int bottom = y + g->offset[1] + g->texsize[1];
 	HighlGlyphF(left, top, right, bottom);*/
 
@@ -196,7 +207,7 @@ void HighlGlyphF()
 	{
 		Icon* icon = &g_icon[g_rtextp->m_icon];
 		float hscale = f->gheight / (float)icon->m_height;
-		
+
 		UseIconTex(g_rtextp->m_icon);
 
 		int left = x;
@@ -222,33 +233,33 @@ void HighlGlyphF()
 
 void DrawCaret()
 {
-    Font* f = &g_font[g_currfont];
-    Glyph* g = &f->glyph['|'];
+	Font* f = &g_font[g_currfont];
+	Glyph* g = &f->glyph['|'];
 
 	int left = x - g->origsize[1]/14;
 	int right = left + g->texsize[0];
-    int top = y + g->offset[1];
+	int top = y + g->offset[1];
 	int bottom = top + g->texsize[1];
 	DrawGlyph(left, top, right, bottom, g->texcoord[0], g->texcoord[1], g->texcoord[2], g->texcoord[3]);
 }
 
 void DrawCaretF()
 {
-    Font* f = &g_font[g_currfont];
-    Glyph* g = &f->glyph['|'];
+	Font* f = &g_font[g_currfont];
+	Glyph* g = &f->glyph['|'];
 
 	int left = x - g->origsize[1]/14;
 	int right = left + g->texsize[0];
-    int top = y + g->offset[1];
+	int top = y + g->offset[1];
 	int bottom = top + g->texsize[1];
 	DrawGlyphF(left, top, right, bottom, g->texcoord[0], g->texcoord[1], g->texcoord[2], g->texcoord[3]);
 }
 
 void AdvanceGlyph()
 {
-    Font* f = &g_font[g_currfont];
-    //Glyph* g = &f->glyph[g_str[i]];
-    //x += g->origsize[0];
+	Font* f = &g_font[g_currfont];
+	//Glyph* g = &f->glyph[g_str[i]];
+	//x += g->origsize[0];
 
 	if(g_rtextp->m_type == RICHTEXT_ICON)
 	{
@@ -293,16 +304,16 @@ void StartText(const RichText* text, int fnt, float width, float height, int ln,
 
 void UseFontTex()
 {
-    glActiveTextureARB(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, g_texture[ g_font[g_currfont].texindex ].texname);
-    glUniform1i(g_shader[SHADER_ORTHO].m_slot[SSLOT_TEXTURE0], 0);
+	glActiveTextureARB(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, g_texture[ g_font[g_currfont].texindex ].texname);
+	glUniform1i(g_shader[SHADER_ORTHO].m_slot[SSLOT_TEXTURE0], 0);
 }
 
 void UseIconTex(int ico)
 {
-    glActiveTextureARB(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, g_texture[ g_icon[ico].m_tex ].texname);
-    glUniform1i(g_shader[SHADER_ORTHO].m_slot[SSLOT_TEXTURE0], 0);
+	glActiveTextureARB(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, g_texture[ g_icon[ico].m_tex ].texname);
+	glUniform1i(g_shader[SHADER_ORTHO].m_slot[SSLOT_TEXTURE0], 0);
 }
 
 void StartTextF(const RichText* text, int fnt, float width, float height, int ln, int realstartx, int framex1, int framey1, int framex2, int framey2)
@@ -329,7 +340,7 @@ void TextLayer(int offstartx, int offstarty)
 void FSub(const char* substr)
 {
 	int subsize = strlen(substr);
-    
+
 	string subsubstr[9];
 
 	int k = 0;
@@ -352,17 +363,17 @@ void FSub(const char* substr)
 		}
 	}
 
-    unsigned int n = StrToInt(subsubstr[0].c_str());
+	unsigned int n = StrToInt(subsubstr[0].c_str());
 	Font* f = &g_font[g_currfont];
 	Glyph* g = &f->glyph[n];
-    g->pixel[0] = StrToInt(subsubstr[1].c_str());
+	g->pixel[0] = StrToInt(subsubstr[1].c_str());
 	g->pixel[1] = StrToInt(subsubstr[2].c_str());
-    g->texsize[0] = StrToInt(subsubstr[3].c_str());
-    g->texsize[1] = StrToInt(subsubstr[4].c_str());
+	g->texsize[0] = StrToInt(subsubstr[3].c_str());
+	g->texsize[1] = StrToInt(subsubstr[4].c_str());
 	g->offset[0] = StrToInt(subsubstr[5].c_str());
-    g->offset[1] = StrToInt(subsubstr[6].c_str());
-    g->origsize[0] = StrToInt(subsubstr[7].c_str());
-    g->origsize[1] = StrToInt(subsubstr[8].c_str());
+	g->offset[1] = StrToInt(subsubstr[6].c_str());
+	g->origsize[0] = StrToInt(subsubstr[7].c_str());
+	g->origsize[1] = StrToInt(subsubstr[8].c_str());
 	g->texcoord[0] = (float)g->pixel[0] / f->width;
 	g->texcoord[1] = (float)g->pixel[1] / f->height;
 	g->texcoord[2] = (float)(g->pixel[0]+g->texsize[0]) / f->width;
@@ -371,49 +382,50 @@ void FSub(const char* substr)
 
 void LoadFont(int id, const char* fontfile)
 {
-    Font* f = &g_font[id];
+	Font* f = &g_font[id];
 	char texfile[128];
 	strcpy(texfile, fontfile);
 	FindTextureExtension(texfile);
-    CreateTexture(f->texindex, texfile, true);
-    f->width = g_texwidth;
-    f->height = g_texheight;
+	CheckGLError(__FILE__, __LINE__);
+	CreateTexture(f->texindex, texfile, true, false);
+	f->width = g_texwidth;
+	f->height = g_texheight;
 
-    char fullfontpath[MAX_PATH+1];
+	char fullfontpath[MAX_PATH+1];
 	string fontfileext = string(fontfile) + ".fnt";
 	sprintf(fullfontpath, "%s.fnt", fontfile);
 	FullPath(fontfileext.c_str(), fullfontpath);
-    FILE* fp = fopen(fullfontpath, "rb");
-    if(!fp)
-    {
-        g_log<<"Error loading font "<<fontfile<<endl;
+	FILE* fp = fopen(fullfontpath, "rb");
+	if(!fp)
+	{
+		g_log<<"Error loading font "<<fontfile<<endl;
 		g_log<<"Full path: "<<fullfontpath<<endl;
-        return;
-    }
-    
-    fseek(fp, 0, SEEK_END);
-    size = ftell(fp);
-    rewind(fp);
-    
-    char* file = new char[size];
-    fread(file, 1, size, fp);
-    fclose(fp);
-    
-    //NSLog(@"%s", file);
-    
-    string substr;
+		return;
+	}
+
+	fseek(fp, 0, SEEK_END);
+	size = ftell(fp);
+	rewind(fp);
+
+	char* file = new char[size];
+	fread(file, 1, size, fp);
+	fclose(fp);
+
+	//NSLog(@"%s", file);
+
+	string substr;
 	//g_str = file;
-    
+
 	g_currfont = id;
 
-        //skip 2 lines
-    for(i=0; i<size; i++)
+	//skip 2 lines
+	for(i=0; i<size; i++)
 	{
 		if(file[i] == '\n')
 			break;
 	}
 	i++;
-    for(; i<size; i++)
+	for(; i<size; i++)
 	{
 		if(file[i] == '\n')
 			break;
@@ -423,7 +435,7 @@ void LoadFont(int id, const char* fontfile)
 	do
 	{
 		substr = "";
-		
+
 		for(; i<size; i++)
 		{
 			if(file[i] == '\n')
@@ -431,7 +443,7 @@ void LoadFont(int id, const char* fontfile)
 
 			substr += file[i];
 		}
-		
+
 		i++;
 
 		if(substr.length() > 9)
@@ -439,37 +451,37 @@ void LoadFont(int id, const char* fontfile)
 	}while(i<size);
 
 	f->gheight = f->glyph['A'].origsize[1];
-    
-    delete [] file;
-    g_log<<fontfile<<".fnt"<<endl;
+
+	delete [] file;
+	g_log<<fontfile<<".fnt"<<endl;
 }
 
 void DrawGlyph(float left, float top, float right, float bottom, float texleft, float textop, float texright, float texbottom)
 {   
-    float vertices[] =
-    {
-        //posx, posy    texx, texy
-        left, top,0,          texleft, textop,
-        right, top,0,         texright, textop,
-        right, bottom,0,      texright, texbottom,
-        
-        right, bottom,0,      texright, texbottom,
-        left, bottom,0,       texleft, texbottom,
-        left, top,0,          texleft, textop
-    };
+	float vertices[] =
+	{
+		//posx, posy    texx, texy
+		left, top,0,          texleft, textop,
+		right, top,0,         texright, textop,
+		right, bottom,0,      texright, texbottom,
+
+		right, bottom,0,      texright, texbottom,
+		left, bottom,0,       texleft, texbottom,
+		left, top,0,          texleft, textop
+	};
 
 	//g_log<<"draw glyph: "<<texleft<<","<<textop<<","<<texright<<","<<texbottom<<endl;
-    
-    //glVertexAttribPointer(g_slots[SHADER_ORTHO][POSITION], 3, GL_FLOAT, GL_FALSE, sizeof(float)*5, &vertices[0]);
-    //glVertexAttribPointer(g_slots[SHADER_ORTHO][TEXCOORD], 2, GL_FLOAT, GL_FALSE, sizeof(float)*5, &vertices[3]);
-	
+
+	//glVertexAttribPointer(g_slots[SHADER_ORTHO][POSITION], 3, GL_FLOAT, GL_FALSE, sizeof(float)*5, &vertices[0]);
+	//glVertexAttribPointer(g_slots[SHADER_ORTHO][TEXCOORD], 2, GL_FLOAT, GL_FALSE, sizeof(float)*5, &vertices[3]);
+
 	//glVertexPointer(3, GL_FLOAT, sizeof(float)*5, &vertices[0]);
 	//glTexCoordPointer(2, GL_FLOAT, sizeof(float)*5, &vertices[3]);
-	
-    glVertexAttribPointer(g_shader[SHADER_ORTHO].m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, sizeof(float)*5, &vertices[0]);
-    glVertexAttribPointer(g_shader[SHADER_ORTHO].m_slot[SSLOT_TEXCOORD0], 2, GL_FLOAT, GL_FALSE, sizeof(float)*5, &vertices[3]);
-    
-    glDrawArrays(GL_TRIANGLES, 0, 6);
+
+	glVertexAttribPointer(g_shader[SHADER_ORTHO].m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, sizeof(float)*5, &vertices[0]);
+	glVertexAttribPointer(g_shader[SHADER_ORTHO].m_slot[SSLOT_TEXCOORD0], 2, GL_FLOAT, GL_FALSE, sizeof(float)*5, &vertices[3]);
+
+	glDrawArrays(GL_TRIANGLES, 0, 6);
 }
 
 void DrawGlyphF(float left, float top, float right, float bottom, float texleft, float textop, float texright, float texbottom)
@@ -582,22 +594,22 @@ void DrawGlyphF(float left, float top, float right, float bottom, float texleft,
 
 
 
-    float vertices[] =
-    {
-        //posx, posy    texx, texy
-        newleft, newtop,0,          newtexleft, newtextop,
-        newright, newtop,0,         newtexright, newtextop,
-        newright, newbottom,0,      newtexright, newtexbottom,
-        
-        newright, newbottom,0,      newtexright, newtexbottom,
-        newleft, newbottom,0,       newtexleft, newtexbottom,
-        newleft, newtop,0,          newtexleft, newtextop
-    };
-	
-    glVertexAttribPointer(g_shader[SHADER_ORTHO].m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, sizeof(float)*5, &vertices[0]);
-    glVertexAttribPointer(g_shader[SHADER_ORTHO].m_slot[SSLOT_TEXCOORD0], 2, GL_FLOAT, GL_FALSE, sizeof(float)*5, &vertices[3]);
-    
-    glDrawArrays(GL_TRIANGLES, 0, 6);
+	float vertices[] =
+	{
+		//posx, posy    texx, texy
+		newleft, newtop,0,          newtexleft, newtextop,
+		newright, newtop,0,         newtexright, newtextop,
+		newright, newbottom,0,      newtexright, newtexbottom,
+
+		newright, newbottom,0,      newtexright, newtexbottom,
+		newleft, newbottom,0,       newtexleft, newtexbottom,
+		newleft, newtop,0,          newtexleft, newtextop
+	};
+
+	glVertexAttribPointer(g_shader[SHADER_ORTHO].m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, sizeof(float)*5, &vertices[0]);
+	glVertexAttribPointer(g_shader[SHADER_ORTHO].m_slot[SSLOT_TEXCOORD0], 2, GL_FLOAT, GL_FALSE, sizeof(float)*5, &vertices[3]);
+
+	glDrawArrays(GL_TRIANGLES, 0, 6);
 }
 
 void HighlGlyphF(float left, float top, float right, float bottom)
@@ -627,21 +639,21 @@ void HighlGlyphF(float left, float top, float right, float bottom)
 	else if(newbottom > frame[3])
 		newbottom = frame[3];
 
-    float vertices[] =
-    {
-        //posx, posy
-        newleft, newtop,0,
-        newright, newtop,0,
-        newright, newbottom,0,
-        
-        newright, newbottom,0,
-        newleft, newbottom,0,
-        newleft, newtop,0
-    };
-	
-    glVertexAttribPointer(g_shader[SHADER_ORTHO].m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, &vertices[0]);
-    
-    glDrawArrays(GL_TRIANGLES, 0, 6);
+	float vertices[] =
+	{
+		//posx, posy
+		newleft, newtop,0,
+		newright, newtop,0,
+		newright, newbottom,0,
+
+		newright, newbottom,0,
+		newleft, newbottom,0,
+		newleft, newtop,0
+	};
+
+	glVertexAttribPointer(g_shader[SHADER_ORTHO].m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, &vertices[0]);
+
+	glDrawArrays(GL_TRIANGLES, 0, 6);
 }
 
 void DrawLine(int caret)
@@ -649,13 +661,13 @@ void DrawLine(int caret)
 	if(caret == 0)
 		DrawCaret();
 	for(; i<size; i++)
-    {
+	{
 		if(caret == i)
 			DrawCaret();
 
 		DrawGlyph();
-        AdvanceGlyph();
-    }
+		AdvanceGlyph();
+	}
 	if(caret == size)
 		DrawCaret();
 }
@@ -665,118 +677,182 @@ void DrawLineF(int caret)
 	if(caret == 0)
 		DrawCaretF();
 	for(; i<size; i++)
-    {
+	{
 		if(caret == i)
 			DrawCaretF();
 
 		DrawGlyphF();
-        AdvanceGlyph();
-    }
+		AdvanceGlyph();
+	}
 	if(caret == size)
 		DrawCaretF();
 }
 
 void DrawLine(int fnt, float startx, float starty, const RichText* text, const float* color, int caret)
 {
-	StartText(text, fnt, g_currw*2, g_currh*2, 0, startx);
+	if(color == NULL)
+	{
+		glUniform4f(g_shader[SHADER_ORTHO].m_slot[SSLOT_COLOR], 1, 1, 1, 1);
+		//glColor4f(1, 1, 1, 1);
+		for(int c=0; c<4; c++) currcolor[c] = 1;
+	}
+	else
+	{
+		glUniform4f(g_shader[SHADER_ORTHO].m_slot[SSLOT_COLOR], color[0], color[1], color[2], color[3]);
+		//glColor4f(color[0], color[1], color[2], color[3]);
+		for(int c=0; c<4; c++) currcolor[c] = color[c];
+	}
+	
+	Player* py = &g_player[g_currP];
+	StartText(text, fnt, py->currw*2, py->currh*2, 0, startx);
 	UseFontTex();
 	TextLayer(startx, starty);
-    DrawLine(caret);
+	DrawLine(caret);
 }
 
 void DrawShadowedText(int fnt, float startx, float starty, const RichText* text, const float* color, int caret)
 {
-    //glUniform4f(g_shader[SHADER_ORTHO].m_slot[SSLOT_COLOR], 0, 0, 0, 1);
-    glUniform4f(g_shader[SHADER_ORTHO].m_slot[SSLOT_COLOR], 0.0f, 0.0f, 0.0f, color != NULL ? color[3] : 1);
+	//glUniform4f(g_shader[SHADER_ORTHO].m_slot[SSLOT_COLOR], 0, 0, 0, 1);
+	glUniform4f(g_shader[SHADER_ORTHO].m_slot[SSLOT_COLOR], 0.0f, 0.0f, 0.0f, color != NULL ? color[3] : 1);
 	//glColor4f(0, 0, 0, 1);
-
-	StartText(text, fnt, g_currw*2, g_currh*2, 0, startx);
+	currcolor[0] = 0;
+	currcolor[1] = 0;
+	currcolor[2] = 0;
+	currcolor[3] = color != NULL ? color[3] : 1;
+	
+	Player* py = &g_player[g_currP];
+	StartText(text, fnt, py->currw*2, py->currh*2, 0, startx);
 	UseFontTex();
 	TextLayer(startx+1, starty);
-    DrawLine(caret);
+	DrawLine(caret);
 	TextLayer(startx, starty+1);
-    DrawLine(caret);
+	DrawLine(caret);
 	TextLayer(startx+1, starty+1);
-    DrawLine(caret);
-    
-    if(color == NULL)
-        glUniform4f(g_shader[SHADER_ORTHO].m_slot[SSLOT_COLOR], 1, 1, 1, 1);
+	DrawLine(caret);
+
+	if(color == NULL)
+	{
+		glUniform4f(g_shader[SHADER_ORTHO].m_slot[SSLOT_COLOR], 1, 1, 1, 1);
 		//glColor4f(1, 1, 1, 1);
-    else
-        glUniform4f(g_shader[SHADER_ORTHO].m_slot[SSLOT_COLOR], color[0], color[1], color[2], color[3]);
+		for(int c=0; c<4; c++) currcolor[c] = 1;
+	}
+	else
+	{
+		glUniform4f(g_shader[SHADER_ORTHO].m_slot[SSLOT_COLOR], color[0], color[1], color[2], color[3]);
 		//glColor4f(color[0], color[1], color[2], color[3]);
+		for(int c=0; c<4; c++) currcolor[c] = color[c];
+	}
 
 	TextLayer(startx, starty);
-    DrawLine(caret);
-    
-    glUniform4f(g_shader[SHADER_ORTHO].m_slot[SSLOT_COLOR], 1, 1, 1, 1);
+	DrawLine(caret);
+
+	glUniform4f(g_shader[SHADER_ORTHO].m_slot[SSLOT_COLOR], 1, 1, 1, 1);
 	//glColor4f(1, 1, 1, 1);
 }
 
+void DrawLineF(int fnt, float startx, float starty, float framex1, float framey1, float framex2, float framey2,  const RichText* text, const float* color, int caret)
+{
+	if(color == NULL)
+	{
+		glUniform4f(g_shader[SHADER_ORTHO].m_slot[SSLOT_COLOR], 1, 1, 1, 1);
+		//glColor4f(1, 1, 1, 1);
+		for(int c=0; c<4; c++) currcolor[c] = 1;
+	}
+	else
+	{
+		glUniform4f(g_shader[SHADER_ORTHO].m_slot[SSLOT_COLOR], color[0], color[1], color[2], color[3]);
+		//glColor4f(color[0], color[1], color[2], color[3]);
+		for(int c=0; c<4; c++) currcolor[c] = color[c];
+	}
+	
+	Player* py = &g_player[g_currP];
+	StartTextF(text, fnt, py->currw*2, py->currh*2, 0, startx, framex1, framey1, framex2, framey2);
+	UseFontTex();
+	TextLayer(startx, starty);
+	DrawLineF(caret);
+}
 
 void DrawShadowedTextF(int fnt, float startx, float starty, float framex1, float framey1, float framex2, float framey2, const RichText* text, const float* color, int caret)
 {
-    glUniform4f(g_shader[SHADER_ORTHO].m_slot[SSLOT_COLOR], 0.0f, 0.0f, 0.0f, color != NULL ? color[3] : 1);
-
-	StartTextF(text, fnt, g_currw*2, g_currh*2, 0, startx, framex1, framey1, framex2, framey2);
+	glUniform4f(g_shader[SHADER_ORTHO].m_slot[SSLOT_COLOR], 0.0f, 0.0f, 0.0f, color != NULL ? color[3] : 1);
+	currcolor[0] = 0;
+	currcolor[1] = 0;
+	currcolor[2] = 0;
+	currcolor[3] = color != NULL ? color[3] : 1;
+	
+	Player* py = &g_player[g_currP];
+	StartTextF(text, fnt, py->currw*2, py->currh*2, 0, startx, framex1, framey1, framex2, framey2);
 	UseFontTex();
 	TextLayer(startx+1, starty);
-    DrawLineF(caret);
+	DrawLineF(caret);
 	TextLayer(startx, starty+1);
-    DrawLineF(caret);
+	DrawLineF(caret);
 	TextLayer(startx+1, starty+1);
-    DrawLineF(caret);
-    
-    if(color == NULL)
-        glUniform4f(g_shader[SHADER_ORTHO].m_slot[SSLOT_COLOR], 1, 1, 1, 1);
+	DrawLineF(caret);
+
+	if(color == NULL)
+	{
+		glUniform4f(g_shader[SHADER_ORTHO].m_slot[SSLOT_COLOR], 1, 1, 1, 1);
 		//glColor4f(1, 1, 1, 1);
-    else
-        glUniform4f(g_shader[SHADER_ORTHO].m_slot[SSLOT_COLOR], color[0], color[1], color[2], color[3]);
+		for(int c=0; c<4; c++) currcolor[c] = 1;
+	}
+	else
+	{
+		glUniform4f(g_shader[SHADER_ORTHO].m_slot[SSLOT_COLOR], color[0], color[1], color[2], color[3]);
 		//glColor4f(color[0], color[1], color[2], color[3]);
+		for(int c=0; c<4; c++) currcolor[c] = color[c];
+	}
 
 	TextLayer(startx, starty);
-    DrawLineF(caret);
-    
-    glUniform4f(g_shader[SHADER_ORTHO].m_slot[SSLOT_COLOR], 1, 1, 1, 1);
+	DrawLineF(caret);
+
+	glUniform4f(g_shader[SHADER_ORTHO].m_slot[SSLOT_COLOR], 1, 1, 1, 1);
 }
 
 void HighlightF(int fnt, float startx, float starty, float framex1, float framey1, float framex2, float framey2, const RichText* text, int highlstarti, int highlendi)
 {
+	Player* py = &g_player[g_currP];
+	EndS();
 	UseS(SHADER_COLOR2D);
-    glUniform1f(g_shader[SHADER_COLOR2D].m_slot[SSLOT_WIDTH], (float)g_currw);
-    glUniform1f(g_shader[SHADER_COLOR2D].m_slot[SSLOT_HEIGHT], (float)g_currh);
+	glUniform1f(g_shader[SHADER_COLOR2D].m_slot[SSLOT_WIDTH], (float)py->currw);
+	glUniform1f(g_shader[SHADER_COLOR2D].m_slot[SSLOT_HEIGHT], (float)py->currh);
 	glUniform4f(g_shader[SHADER_COLOR2D].m_slot[SSLOT_COLOR], 1, 1, 1, 0.5f);
+
+	currcolor[0] = 1;
+	currcolor[1] = 1;
+	currcolor[2] = 1;
+	currcolor[3] = 0.5f;
 	
-	StartTextF(text, fnt, g_currw*2, g_currh*2, 0, startx, framex1, framey1, framex2, framey2);
-	
+	StartTextF(text, fnt, py->currw*2, py->currh*2, 0, startx, framex1, framey1, framex2, framey2);
+
 	TextLayer(startx, starty);
 
 	for(i=0; i<highlstarti; i++)
-        AdvanceGlyph();
-	
+		AdvanceGlyph();
+
 	for(; i<highlendi; i++)
-    {
+	{
 		HighlGlyphF();
-        AdvanceGlyph();
-    }
+		AdvanceGlyph();
+	}
 	
-	Ortho(g_currw, g_currh, 1, 1, 1, 1);
+	Ortho(py->currw, py->currh, 1, 1, 1, 1);
 }
 
 void DrawCenterShadText(int fnt, float startx, float starty, const RichText* text, const float* color, int caret)
 {
 	float linew = 0;
-	int len = g_rtext->texlen();
+	int len = text->texlen();
 	//for(int k=0; k<len; k++)
 	//	linew += g_font[g_currfont].glyph[ text[k] ].origsize[0];
-	
+
 	/*
-    for(int i=0; i<strlen(m_label.c_str()); i++)
+	for(int i=0; i<strlen(m_label.c_str()); i++)
 	{
-        length += g_font[m_font].glyph[m_label[i]].origsize[0];
+	length += g_font[m_font].glyph[m_label[i]].origsize[0];
 	}*/
 
-	Font* f = &g_font[g_currfont];
+	Font* f = &g_font[fnt];
 	for(auto p=text->m_part.begin(); p!=text->m_part.end(); p++)
 	{
 		if(p->m_type == RICHTEXT_TEXT)
@@ -786,7 +862,7 @@ void DrawCenterShadText(int fnt, float startx, float starty, const RichText* tex
 				linew += f->glyph[ p->m_text.m_data[j] ].origsize[0];
 			}
 		}
-		else
+		else if(p->m_type == RICHTEXT_ICON)
 		{
 			Icon* icon = &g_icon[p->m_icon];
 			float hscale = f->gheight / (float)icon->m_height;
@@ -799,129 +875,256 @@ void DrawCenterShadText(int fnt, float startx, float starty, const RichText* tex
 	float a = 1;
 	if(color != NULL)
 		a = color[3];
-	
-    //glUniform4f(g_shader[SHADER_ORTHO].m_slot[SSLOT_COLOR], 0, 0, 0, a);
-    glUniform4f(g_shader[SHADER_ORTHO].m_slot[SSLOT_COLOR], 0.0f, 0.0f, 0.0f, color != NULL ? color[3] : 1);
 
-	StartText(text, fnt, g_currw*2, g_currh*2, 0, startx);
+	//glUniform4f(g_shader[SHADER_ORTHO].m_slot[SSLOT_COLOR], 0, 0, 0, a);
+	glUniform4f(g_shader[SHADER_ORTHO].m_slot[SSLOT_COLOR], 0.0f, 0.0f, 0.0f, color != NULL ? color[3] : 1);
+	currcolor[0] = 0.0f;
+	currcolor[1] = 0.0f;
+	currcolor[2] = 0.0f;
+	currcolor[3] = color != NULL ? color[3] : 1;
+
+	Player* py = &g_player[g_currP];
+	StartText(text, fnt, py->currw*2, py->currh*2, 0, startx);
 	UseFontTex();
 	TextLayer(startx+1, starty);
-    DrawLine(caret);
+	DrawLine(caret);
 	TextLayer(startx, starty+1);
-    DrawLine(caret);
+	DrawLine(caret);
 	TextLayer(startx+1, starty+1);
-    for(; i<size; i++)
-    DrawLine(caret);
-    
-    if(color == NULL)
-        glUniform4f(g_shader[SHADER_ORTHO].m_slot[SSLOT_COLOR], 1, 1, 1, 1);
-    else
-        glUniform4f(g_shader[SHADER_ORTHO].m_slot[SSLOT_COLOR], color[0], color[1], color[2], color[3]);
+	DrawLine(caret);
+
+	if(color == NULL)
+	{
+		glUniform4f(g_shader[SHADER_ORTHO].m_slot[SSLOT_COLOR], 1, 1, 1, 1);
+		for(int c=0; c<4; c++) currcolor[c] = 1;
+	}
+	else
+	{
+		glUniform4f(g_shader[SHADER_ORTHO].m_slot[SSLOT_COLOR], color[0], color[1], color[2], color[3]);
+		for(int c=0; c<4; c++) currcolor[c] = color[c];
+	}
 
 	TextLayer(startx, starty);
-    for(; i<size; i++)
-    {
+	for(; i<size; i++)
+	{
 		DrawGlyph();
-        AdvanceGlyph();
-    }
-    
-    glUniform4f(g_shader[SHADER_ORTHO].m_slot[SSLOT_COLOR], 1, 1, 1, 1);
+		AdvanceGlyph();
+	}
+
+	glUniform4f(g_shader[SHADER_ORTHO].m_slot[SSLOT_COLOR], 1, 1, 1, 1);
 }
 
 void DrawBoxShadText(int fnt, float startx, float starty, float width, float height, const RichText* text, const float* color, int ln, int caret)
 {
-    //glUniform4f(g_shader[SHADER_ORTHO].m_slot[SSLOT_COLOR], 0, 0, 0, 1);
-    glUniform4f(g_shader[SHADER_ORTHO].m_slot[SSLOT_COLOR], 0.3f, 0.3f, 0.3f, 1);
+	//glUniform4f(g_shader[SHADER_ORTHO].m_slot[SSLOT_COLOR], 0, 0, 0, 1);
+	glUniform4f(g_shader[SHADER_ORTHO].m_slot[SSLOT_COLOR], 0.3f, 0.3f, 0.3f, color ? color[3] : 1);
+	currcolor[0] = 0.3f;
+	currcolor[1] = 0.3f;
+	currcolor[2] = 0.3f;
+	currcolor[3] = color != NULL ? color[3] : 1;
 
 	StartText(text, fnt, width, height, ln, startx);
 	UseFontTex();
 	TextLayer(startx+1, starty);
 	if(caret == 0)
 		DrawCaret();
-    for(; i<size; i++)
-    {
-        if(i == nextlb)
-            NextLineBreak();
-		
+	for(; i<size; i++)
+	{
+		if(i == nextlb)
+			NextLineBreak();
+
 		if(caret == i)
 			DrawCaret();
-        
-        DrawGlyph();
-        AdvanceGlyph();
-    }
+
+		DrawGlyph();
+		AdvanceGlyph();
+	}
 	if(caret == size)
 	{
-		if(g_str[size-1] == '\n')
-			BreakLine();
+		//if(g_str[size-1] == '\n')
+		//	BreakLine();
 		DrawCaret();
 	}
-	
+
 	TextLayer(startx, starty+1);
 	if(caret == 0)
 		DrawCaret();
-    for(; i<size; i++)
-    {
-        if(i == nextlb)
-            NextLineBreak();
-		
+	for(; i<size; i++)
+	{
+		if(i == nextlb)
+			NextLineBreak();
+
 		if(caret == i)
 			DrawCaret();
-        
-        DrawGlyph();
-        AdvanceGlyph();
-    }
+
+		DrawGlyph();
+		AdvanceGlyph();
+	}
 	if(caret == size)
 	{
-		if(g_str[size-1] == '\n')
-			BreakLine();
+		//if(g_str[size-1] == '\n')
+		//	BreakLine();
 		DrawCaret();
 	}
 
 	TextLayer(startx+1, starty+1);
 	if(caret == 0)
 		DrawCaret();
-    for(; i<size; i++)
-    {
-        if(i == nextlb)
-            NextLineBreak();
+	for(; i<size; i++)
+	{
+		if(i == nextlb)
+			NextLineBreak();
 
 		if(caret == i)
 			DrawCaret();
-        
-        DrawGlyph();
-        AdvanceGlyph();
-    }
+
+		DrawGlyph();
+		AdvanceGlyph();
+	}
 	if(caret == size)
 	{
-		if(g_str[size-1] == '\n')
-			BreakLine();
+		//if(g_str[size-1] == '\n')
+		//	BreakLine();
 		DrawCaret();
 	}
 
-    if(color == NULL)
-        glUniform4f(g_shader[SHADER_ORTHO].m_slot[SSLOT_COLOR], 1, 1, 1, 1);
-    else
-        glUniform4f(g_shader[SHADER_ORTHO].m_slot[SSLOT_COLOR], color[0], color[1], color[2], color[3]);
+	if(color == NULL)
+	{
+		glUniform4f(g_shader[SHADER_ORTHO].m_slot[SSLOT_COLOR], 1, 1, 1, 1);
+		for(int c=0; c<4; c++) currcolor[c] = 1;
+	}
+	else
+	{
+		glUniform4f(g_shader[SHADER_ORTHO].m_slot[SSLOT_COLOR], color[0], color[1], color[2], color[3]);
+		for(int c=0; c<4; c++) currcolor[c] = color[c];
+	}
 
 	TextLayer(startx, starty);
 	if(caret == 0)
 		DrawCaret();
-    for(; i<size; i++)
-    {
-        if(i == nextlb)
-            NextLineBreak();
-		
+	for(; i<size; i++)
+	{
+		if(i == nextlb)
+			NextLineBreak();
+
 		if(caret == i)
 			DrawCaret();
-        
-        DrawGlyph();
-        AdvanceGlyph();
-    }
+
+		DrawGlyph();
+		AdvanceGlyph();
+	}
 	if(caret == size)
 	{
-		if(g_str[size-1] == '\n')
-			BreakLine();
+		//if(g_str[size-1] == '\n')
+		//	BreakLine();
 		DrawCaret();
+	}
+}
+
+void DrawBoxShadTextF(int fnt, float startx, float starty, float width, float height, const RichText* text, const float* color, int ln, int caret, float framex1, float framey1, float framex2, float framey2)
+{
+	//glUniform4f(g_shader[SHADER_ORTHO].m_slot[SSLOT_COLOR], 0, 0, 0, 1);
+	glUniform4f(g_shader[SHADER_ORTHO].m_slot[SSLOT_COLOR], 0.3f, 0.3f, 0.3f, color ? color[3] : 1);
+	currcolor[0] = 0.3f;
+	currcolor[1] = 0.3f;
+	currcolor[2] = 0.3f;
+	currcolor[3] = color != NULL ? color[3] : 1;
+
+	StartTextF(text, fnt, width, height, ln, startx, framex1, framey1, framex2, framey2);
+	UseFontTex();
+	TextLayer(startx+1, starty);
+	if(caret == 0)
+		DrawCaretF();
+	for(; i<size; i++)
+	{
+		if(i == nextlb)
+			NextLineBreak();
+
+		if(caret == i)
+			DrawCaretF();
+
+		DrawGlyphF();
+		AdvanceGlyph();
+	}
+	if(caret == size)
+	{
+		//if(g_str[size-1] == '\n')
+		//	BreakLine();
+		DrawCaretF();
+	}
+
+	TextLayer(startx, starty+1);
+	if(caret == 0)
+		DrawCaretF();
+	for(; i<size; i++)
+	{
+		if(i == nextlb)
+			NextLineBreak();
+
+		if(caret == i)
+			DrawCaretF();
+
+		DrawGlyphF();
+		AdvanceGlyph();
+	}
+	if(caret == size)
+	{
+		//if(g_str[size-1] == '\n')
+		//	BreakLine();
+		DrawCaretF();
+	}
+
+	TextLayer(startx+1, starty+1);
+	if(caret == 0)
+		DrawCaretF();
+	for(; i<size; i++)
+	{
+		if(i == nextlb)
+			NextLineBreak();
+
+		if(caret == i)
+			DrawCaretF();
+
+		DrawGlyphF();
+		AdvanceGlyph();
+	}
+	if(caret == size)
+	{
+		//if(g_str[size-1] == '\n')
+		//	BreakLine();
+		DrawCaretF();
+	}
+
+	if(color == NULL)
+	{
+		glUniform4f(g_shader[SHADER_ORTHO].m_slot[SSLOT_COLOR], 1, 1, 1, 1);
+		for(int c=0; c<4; c++) currcolor[c] = 1;
+	}
+	else
+	{
+		glUniform4f(g_shader[SHADER_ORTHO].m_slot[SSLOT_COLOR], color[0], color[1], color[2], color[3]);
+		for(int c=0; c<4; c++) currcolor[c] = color[c];
+	}
+
+	TextLayer(startx, starty);
+	if(caret == 0)
+		DrawCaretF();
+	for(; i<size; i++)
+	{
+		if(i == nextlb)
+			NextLineBreak();
+
+		if(caret == i)
+			DrawCaretF();
+
+		DrawGlyphF();
+		AdvanceGlyph();
+	}
+	if(caret == size)
+	{
+		//if(g_str[size-1] == '\n')
+		//	BreakLine();
+		DrawCaretF();
 	}
 }
 
@@ -930,13 +1133,13 @@ int CountLines(const RichText* text, int fnt, float startx, float starty, float 
 	StartText(text, fnt, width, height, 0, startx);
 	TextLayer(startx, starty);
 
-    for(i=0; i<size; i++)
-    {
-        if(i == nextlb)
-            NextLineBreak();
-     
+	for(i=0; i<size; i++)
+	{
+		if(i == nextlb)
+			NextLineBreak();
+
 		AdvanceGlyph();
-    }
+	}
 	if(g_str[size-1] == '\n')
 		BreakLine();
 
@@ -945,45 +1148,56 @@ int CountLines(const RichText* text, int fnt, float startx, float starty, float 
 
 int EndX(const RichText* text, int lastc, int fnt, float startx, float starty)
 {
-	StartText(text, fnt, g_currw*100, g_currh*100, 0, startx);
+	Player* py = &g_player[g_currP];
+	StartText(text, fnt, py->currw*100, py->currh*100, 0, startx);
 	TextLayer(startx, starty);
 
 	//g_log<<"size = "<<size<<endl;
 	//g_log<<"lastc = "<<lastc<<endl;
 
-    for(i=0; i<size && i<lastc; i++)
-    {
+	int highx = startx;
+
+	for(i=0; i<size && i<lastc; i++)
+	{
+		if(i == nextlb)
+			NextLineBreak();
+
 		//g_log<<"g_str[i] = "<<g_str[i]<<endl;
 		AdvanceGlyph();
-    }
 
-	return x;
+		if(x > highx)
+			highx = x;
+	}
+
+	return highx;
 }
 
 int MatchGlyphF(const RichText* text, int fnt, int matchx, float startx, float starty, float framex1, float framey1, float framex2, float framey2)
 {
+	Player* py = &g_player[g_currP];
+
 	int lastclose = 0;
-	
-	//StartTextF(text, fnt, g_currw*2, g_currh*2, 0, startx, framex1, framey1, framex2, framey2);
-	StartTextF(text, fnt, g_width*2, g_height*2, 0, startx, framex1, framey1, framex2, framey2);
+
+	//StartTextF(text, fnt, py->currw*2, py->currh*2, 0, startx, framex1, framey1, framex2, framey2);
+	StartTextF(text, fnt, py->width*2, py->height*2, 0, startx, framex1, framey1, framex2, framey2);
 	TextLayer(startx, starty);
 
 	if(x >= matchx || size <= 0)
 		return lastclose;
-	
+
 	int lastx = x;
 
 	for(i=0; i<size && x <= framex2; i++)
-    {
+	{
 		AdvanceGlyph();
-		
+
 		lastclose = i;
-		
+
 		if((float)(x+lastx)/2.0f >= matchx)
 			return lastclose;
 
 		lastx = x;
-    }
+	}
 
 	return lastclose+1;
 }
@@ -995,7 +1209,10 @@ int TextWidth(int fnt, const RichText* text)
 
 void LoadFonts()
 {
-    LoadFont(FONT_EUROSTILE32, "fonts/eurostile32");
-    LoadFont(FONT_MSUIGOTHIC16, "fonts/msuigothic16");
-    LoadFont(FONT_SMALLFONTS10, "fonts/smallfonts10");
+	LoadFont(FONT_EUROSTILE32, "fonts/eurostile32");
+	LoadFont(FONT_MSUIGOTHIC16, "fonts/msuigothic16");
+	LoadFont(FONT_SMALLFONTS10, "fonts/smallfonts10");
+	LoadFont(FONT_GULIM32, "fonts/gulim32");
+	LoadFont(FONT_EUROSTILE16, "fonts/eurostile16");
+	LoadFont(FONT_CALIBRILIGHT16, "fonts/calibrilight16");
 }

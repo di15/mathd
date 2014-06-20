@@ -53,28 +53,10 @@ public:
 
 extern Foliage g_foliage[FOLIAGES];
 
-extern int g_forestmodel;
-
-class Forest
-{
-public:
-	bool on;
-	VertexArray va;
-	void remesh();
-	Vec3f drawpos;
-
-	Forest(){ on = false; }
-};
-
-extern Forest *g_forest;
-
-void DefineFoliage(int type, const char* modelrelative, Vec3f scale, Vec3f translate, Vec3i size);
+void DefF(int type, const char* modelrelative, Vec3f scale, Vec3f translate, Vec3i size);
 bool PlaceFoliage(int type, Vec3i ipos);
 void DrawFoliage(Vec3f zoompos, Vec3f vertical, Vec3f horizontal);
 void ClearFoliage(int minx, int minz, int maxx, int maxz);
 void FreeFoliage();
-void CondenseForest(int tminx, int tminz, int tmaxx, int tmaxz);
 void FillForest();
-int NTree(int tx, int tz);
-Forest* ForestAt(int tx, int tz);
 #endif

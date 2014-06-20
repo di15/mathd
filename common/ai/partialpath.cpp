@@ -88,7 +88,7 @@ void IdentifySuccessors_QP(PathJob* pj, PathNode* node)
 {
 	Vec2i npos = PathNodePos(node);
 
-	int thisdistance = Magnitude(Vec2i(npos.x - pj->ngoalx, npos.y - pj->ngoalz));
+	int thisdistance = Magnitude2(Vec2i(npos.x - pj->ngoalx, npos.y - pj->ngoalz));
 
 	if( !pj->closestnode || thisdistance < pj->closest )
 	{

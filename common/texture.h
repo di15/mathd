@@ -22,9 +22,12 @@ public:
 	bool ladder;
 	bool water;
 	bool fabric;
+	bool clamp;
+	bool mipmaps;
 
 	Texture()
 	{
+		filepath[0] = '\0';
 		loaded = false;
 	}
 };
@@ -67,6 +70,7 @@ struct TextureToLoad
 	char relative[MAX_PATH+1];
 	bool clamp;
 	bool reload;
+	bool mipmaps;
 };
 
 extern int g_texwidth;
@@ -81,18 +85,19 @@ LoadedTex *LoadJPG(const char *fullpath);
 LoadedTex *LoadPNG(const char *fullpath);
 bool FindTexture(unsigned int &texture, const char* relative);
 int NewTexture();
-bool TextureLoaded(unsigned int texture, const char* relative, bool transp, unsigned int& texindex);
+bool TextureLoaded(unsigned int texture, const char* relative, bool transp, bool clamp, bool mipmaps, unsigned int& texindex);
 void FindTextureExtension(char *relative);
 void FreeTextures();
 bool Load1Texture();
-void QueueTexture(unsigned int* texindex, const char* relative, bool clamp);
-void RequeueTexture(unsigned int texindex, const char* relative, bool clamp);
+void QueueTexture(unsigned int* texindex, const char* relative, bool clamp, bool mipmaps);
+void RequeueTexture(unsigned int texindex, const char* relative, bool clamp, bool mipmaps);
 LoadedTex* LoadTexture(const char* full);
-bool CreateTexture(unsigned int &texindex, const char* relative, bool clamp, bool reload=false);
+bool CreateTexture(unsigned int &texindex, const char* relative, bool clamp, bool mipmaps, bool reload=false);
 void ReloadTextures();
 void FreeTexture(const char* relative);
 void FreeTexture(int i);
 void DiffPath(const char* basepath, char* diffpath);
+void DiffPathPNG(const char* basepath, char* diffpath);
 void SpecPath(const char* basepath, char* specpath);
 void NormPath(const char* basepath, char* normpath);
 void OwnPath(const char* basepath, char* ownpath);

@@ -11,250 +11,15 @@
 #include "../common/math/hmapmath.h"
 #include "../common/render/heightmap.h"
 #include "../common/window.h"
-
-#if 0
-#include "3dmath.h"
-#include "gui.h"
-#include "menu.h"
-#include "sound.h"
-#include "map.h"
-#include "building.h"
-#include "road.h"
-#include "powerline.h"
-#include "pipeline.h"
-#include "unit.h"
-#include "selection.h"
-#include "order.h"
-#include "waves.h"
-#include "chat.h"
-#include "tileset.h"
-#include "editor.h"
-#include "minimap.h"
-#include "script.h"
-#include "player.h"
-
-void SkipIntro()
-{
-	if(g_mode != INTRO)
-		return;
-
-	g_mode = MENU;
-	RedoGUI();
-}
-
-void Escape()
-{
-	SkipIntro();
-
-	if(g_mode != PLAY && g_mode != EDITOR)
-		return;
-
-	//Click_Quit();
-
-	bool play = (g_mode == PLAY);
-
-	g_mode = MENU;
-	OpenMenu();
-
-	if(play)
-		OpenSoleView("ingame");
-
-	//OpenAnotherView("quit");
-	//g_mode = PAUSE;
-	//OpenSoleView("pause");
-}
-
-void MouseLeftButtonDown()
-{
-	if(g_mode == LOGO)
-		SkipLogo();
-	else if(g_mode == PLAY || g_mode == EDITOR)
-	{
-		if(g_gameover)
-			return;
-
-		if(OverMinimap())
-		{
-			g_minimapdrag = true;
-			ScrollToMouse();
-			return;
-		}
-
-		EdApply();
-
-		if(g_build >= 0 && g_build < BUILDING_TYPES)
-		{
-		}
-		else if(g_build == ROAD || g_build == POWERLINE || g_build == PIPELINE)
-		{
-			g_vStart = g_vTile;
-			g_vMouseStart = g_vMouse;
-
-			if(g_build == ROAD)
-				UpdateRoadPlans();
-			else if(g_build == POWERLINE)
-				UpdatePowlPlans();
-			else if(g_build == PIPELINE)
-				UpdateCrPipePlans();
-		}
-		else
-		{
-			g_mousestart = g_mouse;
-		}
-
-		//CloseOverWin();
-	}
-	/*
-	else if(g_mode == EDITOR)
-	{
-		//g_vStart = g_vTile;
-		EdApply();
-
-		CloseOverWin();
-	}*/
-}
-
-void MouseLeftButtonUp()
-{
-	if(g_mode == PLAY || g_mode == EDITOR)
-	{
-		if(g_gameover)
-			return;
-
-		if(g_minimapdrag)
-		{
-			g_minimapdrag = false;
-			return;
-		}
-
-		if(g_mode == EDITOR)
-		{
-			EdApplyUp();
-
-			g_vStart = g_vTile;
-			g_vMouseStart = g_vMouse;
-		}
-
-		if(g_build >= 0 && g_build < BUILDING_TYPES)
-		{
-			if(g_canPlace)
-				PlaceB(g_selP, g_build, g_vTile);
-			else
-				Chat("Can't build there.");
-			if(g_mode != EDITOR)
-				g_canselect = true;
-			//Start();
-			if(g_canPlace)
-				OnPlaceB(g_build);
-			g_build = NOTHING;
-		}
-		else if(g_build == ROAD)
-		{
-			PlaceRoad();
-			g_build = NOTHING;
-			if(g_mode != EDITOR)
-				g_canselect = true;
-			OnPlaceB(ROAD);
-			//Start();
-		}
-		else if(g_build == POWERLINE)
-		{
-			PlacePowl();
-			g_build = NOTHING;
-			if(g_mode != EDITOR)
-				g_canselect = true;
-			OnPlaceB(POWERLINE);
-			//Start();
-		}
-		else if(g_build == PIPELINE)
-		{
-			PlaceCrPipe();
-			g_build = NOTHING;
-			if(g_mode != EDITOR)
-				g_canselect = true;
-			OnPlaceB(PIPELINE);
-		}
-		else if(g_canselect)
-		{
-			Selection();
-		}
-	}
-}
-
-void MouseRightButtonUp()
-{
-	if(g_mode == PLAY)
-	{
-		if(g_gameover)
-			return;
-
-		if(g_selection.size() <= 0)
-			return;
-
-		int i = g_selection[0];
-		Unit* u = &g_unit[i];
-
-		if(u->type == LABOURER || u->type == TRUCK)
-			return;
-
-		if(u->owner != g_localP)
-			return;
-
-		Order();
-	}
-}
-
-void MouseWheel(int delta)
-{
-	if(g_mode == PLAY || g_mode == EDITOR)
-	{
-		g_camera.Rise(-delta*10);
-
-		float y = g_camera.Position().y;
-		if(y < 2)
-			g_camera.Rise(-y+2);
-
-		UpdateMouse3D();
-	}
-}
-
-void MouseMove()
-{
-	if(g_mode == PLAY || g_mode == EDITOR)
-	{
-		if(g_mousekeys[MOUSEKEY_MIDDLE])
-			g_camera.SetViewByMouse();
-
-		if(g_mousekeys[MOUSEKEY_LEFT] && g_minimapdrag)
-		{
-			if(OverMinimap())
-			{
-				ScrollToMouse();
-			}
-		}
-
-		UpdateMouse3D();
-
-		if(g_mode == EDITOR)
-		{
-			if(!g_mousekeys[MOUSEKEY_LEFT])
-			{
-				g_vStart = g_vTile;
-				g_vMouseStart = g_vMouse;
-			}
-			else
-				EdApply();
-		}
-	}
-}
-
-#endif
+#include "../common/sim/player.h"
 
 void MouseMidButtonDown()
 {
-	if(g_mode == PLAY || g_mode == EDITOR)
+	if(g_mode == APPMODE_PLAY || g_mode == APPMODE_EDITOR)
 	{
-		if(g_mousekeys[MOUSEKEY_MIDDLE])
+		Player* py = &g_player[g_currP];
+
+		if(py->mousekeys[MOUSE_MIDDLE])
 		{
 			CenterMouse();
 		}
@@ -267,20 +32,23 @@ void MouseMidButtonUp()
 
 void MouseWheel(int delta)
 {        
-	if(g_mode == PLAY || g_mode == EDITOR)
+	if(g_mode == APPMODE_PLAY || g_mode == APPMODE_EDITOR)
 	{
-		if(g_zoom <= MIN_ZOOM && delta < 0)
+		Player* py = &g_player[g_currP];
+		Camera* c = &py->camera;
+
+		if(py->zoom <= MIN_ZOOM && delta < 0)
 			return;
 
-		if(g_zoom >= MAX_ZOOM && delta > 0)
+		if(py->zoom >= MAX_ZOOM && delta > 0)
 			return;
 
-		float oldzoom = g_zoom;
+		float oldzoom = py->zoom;
 		Vec3f line[2];
-		line[0] = g_camera.zoompos();
+		line[0] = c->zoompos();
 
-		g_zoom *= 1.0f + (float)delta / 10.0f;
-		line[1] = g_camera.zoompos();
+		py->zoom *= 1.0f + (float)delta / 10.0f;
+		line[1] = c->zoompos();
 
 		Vec3f ray = Normalize( line[1] - line[0] );
 
@@ -293,9 +61,9 @@ void MouseWheel(int delta)
 #else
 		if(FastMapIntersect(&g_hmap, line, &clip))
 #endif
-			g_zoom = oldzoom;
-		else
-			CalcMapView();
+			py->zoom = oldzoom;
+		//else
+		//	CalcMapView();
 	}
 }
 
@@ -313,15 +81,20 @@ void ZoomOut()
 void MapKeys()
 {	
 #if 0
-	AssignKey(VK_ESCAPE, &Escape, NULL);
+	AssignKey(SDLK_ESCAPE, &Escape, NULL);
 	AssignLButton(&MouseLeftButtonDown, &MouseLeftButtonUp);
 	AssignRButton(NULL, &MouseRightButtonUp);
 #endif
 	
-	AssignMouseWheel(&MouseWheel);
-	AssignMButton(MouseMidButtonDown, MouseMidButtonUp);
-	AssignKey('R', ZoomOut, NULL);
-	AssignKey('F', ZoomIn, NULL);
+	for(int i=0; i<PLAYERS; i++)
+	{
+		Player* py = &g_player[i];
+		GUI* gui = &py->gui;
+		gui->assignmousewheel(&MouseWheel);
+		gui->assignmbutton(MouseMidButtonDown, MouseMidButtonUp);
+		gui->assignkey('R', ZoomOut, NULL);
+		gui->assignkey('F', ZoomIn, NULL);
+	}
 
 	/*
 	int key;
@@ -343,23 +116,23 @@ void MapKeys()
 		getline(f, line);
 		sscanf(line.c_str(), "%s %s", keystr, actstr);
 
-		if(stricmp(keystr, "VK_ESCAPE") == 0)			key = VK_ESCAPE;
-		else if(stricmp(keystr, "VK_SHIFT") == 0)		key = VK_SHIFT;
-		else if(stricmp(keystr, "VK_CONTROL") == 0)		key = VK_CONTROL;
-		else if(stricmp(keystr, "VK_SPACE") == 0)		key = VK_SPACE;
+		if(stricmp(keystr, "SDLK_ESCAPE") == 0)			key = SDLK_ESCAPE;
+		else if(stricmp(keystr, "SDLK_SHIFT") == 0)		key = SDLK_SHIFT;
+		else if(stricmp(keystr, "SDLK_CONTROL") == 0)		key = SDLK_CONTROL;
+		else if(stricmp(keystr, "SDLK_SPACE") == 0)		key = SDLK_SPACE;
 		else if(stricmp(keystr, "MouseLButton") == 0)	key = -2;
-		else if(stricmp(keystr, "F1") == 0)				key = VK_F1;
-		else if(stricmp(keystr, "F2") == 0)				key = VK_F2;
-		else if(stricmp(keystr, "F3") == 0)				key = VK_F3;
-		else if(stricmp(keystr, "F4") == 0)				key = VK_F4;
-		else if(stricmp(keystr, "F5") == 0)				key = VK_F5;
-		else if(stricmp(keystr, "F6") == 0)				key = VK_F6;
-		else if(stricmp(keystr, "F7") == 0)				key = VK_F7;
-		else if(stricmp(keystr, "F8") == 0)				key = VK_F8;
-		else if(stricmp(keystr, "F9") == 0)				key = VK_F9;
-		else if(stricmp(keystr, "F10") == 0)			key = VK_F10;
-		else if(stricmp(keystr, "F11") == 0)			key = VK_F11;
-		else if(stricmp(keystr, "F12") == 0)			key = VK_F12;
+		else if(stricmp(keystr, "F1") == 0)				key = SDLK_F1;
+		else if(stricmp(keystr, "F2") == 0)				key = SDLK_F2;
+		else if(stricmp(keystr, "F3") == 0)				key = SDLK_F3;
+		else if(stricmp(keystr, "F4") == 0)				key = SDLK_F4;
+		else if(stricmp(keystr, "F5") == 0)				key = SDLK_F5;
+		else if(stricmp(keystr, "F6") == 0)				key = SDLK_F6;
+		else if(stricmp(keystr, "F7") == 0)				key = SDLK_F7;
+		else if(stricmp(keystr, "F8") == 0)				key = SDLK_F8;
+		else if(stricmp(keystr, "F9") == 0)				key = SDLK_F9;
+		else if(stricmp(keystr, "F10") == 0)			key = SDLK_F10;
+		else if(stricmp(keystr, "F11") == 0)			key = SDLK_F11;
+		else if(stricmp(keystr, "F12") == 0)			key = SDLK_F12;
 		else if(stricmp(keystr, "'A'") == 0)			key = 'A';
 		else if(stricmp(keystr, "'B'") == 0)			key = 'B';
 		else if(stricmp(keystr, "'C'") == 0)			key = 'C';

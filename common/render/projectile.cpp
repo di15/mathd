@@ -5,6 +5,7 @@
 #include "../render/shader.h"
 #include "../platform.h"
 #include "../math/camera.h"
+#include "../sim/player.h"
 
 ProjectileType g_projectileType[PROJECTILE_TYPES];
 Projectile g_projectile[PROJECTILES];
@@ -12,12 +13,12 @@ Projectile g_projectile[PROJECTILES];
 void ProjectileType::Define(char* texpath)
 {
 	//CreateTexture(tex, texpath);
-	QueueTexture(&tex, texpath, true);
+	QueueTexture(&tex, texpath, true, true);
 }
 
 void LoadProjectiles()
 {
-	g_projectileType[GUNPROJ].Define("particles\\gunproj.png");
+	g_projectileType[GUNPROJ].Define("particles/gunproj.png");
 }
 
 int NewProjectile()
@@ -41,6 +42,9 @@ void NewProjectile(Vec3f start, Vec3f end, int type)
 
 void DrawProjectiles()
 {
+	Player* py = &g_player[g_currP];
+	Camera* cam = &py->camera;
+
 	Projectile* proj;
 	ProjectileType* t;
 	Vec3f start;
@@ -53,7 +57,7 @@ void DrawProjectiles()
 	Vec3f center;
 	Vec3f parallel;
 	Vec3f perpindicular;
-	Vec3f view = Normalize(g_camera.m_view - g_camera.m_pos);
+	Vec3f view = Normalize(cam->m_view - cam->m_pos);
 	Vec3f a, b, c, d;
 
 	Shader* s = &g_shader[SHADER_BILLBOARD];
@@ -84,10 +88,10 @@ void DrawProjectiles()
 		glBindTexture(GL_TEXTURE_2D, t->tex);
 		glBegin(GL_QUADS);
 
-		glTexCoord2f(0, 0);		glVertex3f(a.x, a.y, a.z);
-		glTexCoord2f(0, 1);		glVertex3f(b.x, b.y, b.z);
-		glTexCoord2f(1, 1);		glVertex3f(c.x, c.y, c.z);
-		glTexCoord2f(1, 0);		glVertex3f(d.x, d.y, d.z);
+		0, 0);		glVertex3f(a.x, a.y, a.z);
+		0, 1);		glVertex3f(b.x, b.y, b.z);
+		1, 1);		glVertex3f(c.x, c.y, c.z);
+		1, 0);		glVertex3f(d.x, d.y, d.z);
 
 		glEnd();*/
 

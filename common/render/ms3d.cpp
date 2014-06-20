@@ -101,17 +101,17 @@ void MS3DModel::loadtex(unsigned int& diffm, unsigned int& specm, unsigned int& 
 
 			if(dontqueue)
 			{
-				CreateTexture(diffm, difffile, false);
-				CreateTexture(specm, specfile, false);
-				CreateTexture(normm, normfile, false);
-				CreateTexture(ownm, ownfile, false);
+				CreateTexture(diffm, difffile, false, true);
+				CreateTexture(specm, specfile, false, true);
+				CreateTexture(normm, normfile, false, true);
+				CreateTexture(ownm, ownfile, false, true);
 			}
 			else
 			{
-				QueueTexture(&diffm, difffile, false);
-				QueueTexture(&specm, specfile, false);
-				QueueTexture(&normm, normfile, false);
-				QueueTexture(&ownm, ownfile, false);
+				QueueTexture(&diffm, difffile, false, true);
+				QueueTexture(&specm, specfile, false, true);
+				QueueTexture(&normm, normfile, false, true);
+				QueueTexture(&ownm, ownfile, false, true);
 			}
 		}
 		//else
@@ -363,7 +363,7 @@ bool MS3DModel::load(const char *relative, unsigned int& diffm, unsigned int& sp
 	return true;
 }
 
-void MS3DModel::genva(VertexArray** vertexArrays, Vec3f scale, Vec3f translate, const char* filepath)
+void MS3DModel::genva(VertexArray** vertexArrays, Vec3f scale, Vec3f translate, const char* filepath, bool blendnorm)
 {
 	(*vertexArrays) = new VertexArray[ m_totalFrames ];
 
@@ -521,8 +521,9 @@ void MS3DModel::genva(VertexArray** vertexArrays, Vec3f scale, Vec3f translate, 
 						g_log.flush();
 					}*/
 
-#if 0	// Smooth normals?
-					normals[vert] = weighsum;
+#if 1	// Smooth normals?
+					if(blendnorm)
+						normals[vert] = weighsum;
 #endif
 
 					//vert ++;

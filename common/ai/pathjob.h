@@ -16,6 +16,7 @@ class PathNode;
 #define PATHJOB_JPS					0
 #define PATHJOB_QUICKPARTIAL		1
 #define PATHJOB_ASTAR				2
+#define PATHJOB_JPSPART				3
 
 // byte-align structures
 #pragma pack(push, 1)
@@ -52,6 +53,11 @@ public:
 	PathNode* closestnode;
 	int closest;
 	int searchdepth;
+	int maxsubsearch;
+	int maxsubstraight;
+	int maxsubdiag;
+	int maxsubdiagstraight;
+	int subsearchdepth;
 	void (*callback)(bool result, PathJob* pj);
 
 	virtual bool process();

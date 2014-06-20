@@ -8,12 +8,13 @@
 class ListBox : public Widget
 {
 public:
+
+	int m_mousedown[2];
+
 	ListBox(Widget* parent, const char* n, int f, void (*reframef)(Widget* thisw), void (*change)());
 
 	void draw();
-	bool lbuttonup(bool moved);
-	bool lbuttondown();
-	bool mousemove();
+	void inev(InEv* ev);
 	int rowsshown();
 	int square();
 	void erase(int which);

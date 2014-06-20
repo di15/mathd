@@ -19,6 +19,7 @@
 #include "../../../platform.h"
 #include "../viewportw.h"
 #include "../../../../game/gui/gviewport.h"
+#include "../../../sim/player.h"
 
 BottomPanel::BottomPanel(Widget* parent, const char* n, void (*reframef)(Widget* thisw))
 {
@@ -27,48 +28,23 @@ BottomPanel::BottomPanel(Widget* parent, const char* n, void (*reframef)(Widget*
 	m_name = n;
 	reframefunc = reframef;
 	m_ldown = false;
-
-#if 0
-	Text restext;
-	Image leftinnerdiagblur;
-	Image rightinnerdiagblur;
-	Image innerbottom;
-	Image lefthlineblur;
-	Image righthlineblur;
-	Image whitebg;
-#endif
 	
-#if 0
-	restext = Text(this, "res ticker", RichText("asdadasdasads"), MAINFONT16, NULL, true, 1, 1, 1, 1);
-	leftinnerdiagblur = Image(this, "gui/frames/innerdiagblur32x24halfwht.png", NULL, 1, 1, 1, 1,		0, 0, 1, 1);
-	rightinnerdiagblur = Image(this, "gui/frames/innerdiagblur32x24halfwht.png", NULL, 1, 1, 1, 1,		1, 0, 0, 1);
-	innerbottom = Image(this, "gui/frames/innerbottom3x3.png", NULL, 1, 1, 1, 1,		0, 0, 1, 1);
-	lefthlineblur = Image(this, "gui/frames/innerhlineblur30x3.png", NULL, 1, 1, 1, 1,		0, 0, 1, 1);
-	righthlineblur = Image(this, "gui/frames/innerhlineblur30x3.png", NULL, 1, 1, 1, 1,		1, 0, 0, 1);
-	whitebg = Image(this, "gui/backg/white.jpg", NULL, 1, 1, 1, 1,		0, 0, 1, 1);
-#endif
-	
-	left_outer_toprightcorner = Image(this, "gui/frames/outertopleft64x64.png", NULL, 1, 1, 1, 1,		1, 0, 0, 1);
-	left_outer_top = Image(this, "gui/frames/outertop2x64.png", NULL, 1, 1, 1, 1,		0, 0, 1, 1);
+	left_outer_toprightcorner = Image(this, "gui/frames/outertopleft64x64.png", true, NULL, 1, 1, 1, 1,		1, 0, 0, 1);
+	left_outer_top = Image(this, "gui/frames/outertop2x64.png", true, NULL, 1, 1, 1, 1,		0, 0, 1, 1);
 	left_minimap = ViewportW(this, "minimap viewport", NULL, &DrawViewport, &ViewportLDown, &ViewportLUp, &ViewportMousemove, &ViewportRDown, &ViewportRUp, ViewportMousewheel, VIEWPORT_MINIMAP);
 	
-	right_outer_topleftcorner = Image(this, "gui/frames/outertopleft64x64.png", NULL, 1, 1, 1, 1,		0, 0, 1, 1);
-	right_outer_top = Image(this, "gui/frames/outertop2x64.png", NULL, 1, 1, 1, 1,		0, 0, 1, 1);
+	right_outer_topleftcorner = Image(this, "gui/frames/outertopleft64x64.png", true, NULL, 1, 1, 1, 1,		0, 0, 1, 1);
+	right_outer_top = Image(this, "gui/frames/outertop2x64.png", true, NULL, 1, 1, 1, 1,		0, 0, 1, 1);
 	
-	middle_outer_top = Image(this, "gui/frames/outertop2x12.png", NULL, 1, 1, 1, 1,		0, 0, 1, 1);
+	middle_outer_top = Image(this, "gui/frames/outertop2x12.png", true, NULL, 1, 1, 1, 1,		0, 0, 1, 1);
 
-	white_bg = Image(this, "gui/backg/white.jpg", NULL, 1, 1, 1, 1,		0, 0, 1, 1);
-
-#if 0
-	Button bottomright_button[9];
-	bool bottomright_button_on[9];
-#endif
+	white_bg = Image(this, "gui/backg/white.jpg", true, NULL, 1, 1, 1, 1,		0, 0, 1, 1);
 
 	for(int i=0; i<9; i++)
 	{
 		//bottomright_button[i] = Button(this, "gui/transp.png", RichText(""), MAINFONT8, NULL, NULL, NULL, NULL, i);
-		bottomright_button[i] = Button(this, "gui/brbut/apartment1.png", RichText(""), MAINFONT8, NULL, NULL, NULL, NULL, i);
-		bottomright_button_on[i] = true;
+		//bottomright_button[i] = Button(this, "gui/brbut/apartment1.png", RichText(""), MAINFONT8, NULL, NULL, NULL, NULL, i);
+		bottomright_button_on[i] = false;
 	}
 
 	reframe();
@@ -230,6 +206,9 @@ void BottomPanel::draw()
 		{
 			int i = y*3 + x;
 
+			if(!bottomright_button_on[i])
+				continue;
+
 			Button* b = &bottomright_button[i];
 
 			b->draw();
@@ -253,137 +232,24 @@ void BottomPanel::draw()
 #endif
 }
 
-void BottomPanel::draw2()
+void BottomPanel::drawover()
 {
 	for(auto i=m_subwidg.begin(); i!=m_subwidg.end(); i++)
-		(*i)->draw2();
+		(*i)->drawover();
 }
 
-bool BottomPanel::prelbuttonup(bool moved)
+void BottomPanel::inev(InEv* ev)
 {
+	for(int i=0; i<9; i++)
+		if(bottomright_button_on[i])
+			bottomright_button[i].inev(ev);
+
 	for(auto i=m_subwidg.rbegin(); i!=m_subwidg.rend(); i++)
-		if((*i)->prelbuttonup(moved))
-			return true;
-
-	return false;
-}
-
-bool BottomPanel::lbuttonup(bool moved)
-{
-	for(auto i=m_subwidg.rbegin(); i!=m_subwidg.rend(); i++)
-		if((*i)->lbuttonup(moved))
-			return true;
-
-	return false;
-}
-
-bool BottomPanel::prelbuttondown()
-{
-	for(auto i=m_subwidg.rbegin(); i!=m_subwidg.rend(); i++)
-		if((*i)->prelbuttondown())
-			return true;
-
-	return false;
-}
-
-bool BottomPanel::lbuttondown()
-{
-	for(auto i=m_subwidg.rbegin(); i!=m_subwidg.rend(); i++)
-		if((*i)->lbuttondown())
-			return true;
-
-	return false;
-}
-
-void BottomPanel::premousemove()
-{
-	for(auto i=m_subwidg.rbegin(); i!=m_subwidg.rend(); i++)
-		(*i)->premousemove();
-}
-
-bool BottomPanel::mousemove()
-{
-	for(auto i=m_subwidg.rbegin(); i!=m_subwidg.rend(); i++)
-		if((*i)->mousemove())
-			return true;
-
-	return false;
-}
-
-bool BottomPanel::prerbuttonup(bool moved)
-{
-	for(auto i=m_subwidg.rbegin(); i!=m_subwidg.rend(); i++)
-		if((*i)->prerbuttonup(moved))
-			return true;
-
-	return false;
-}
-
-bool BottomPanel::rbuttonup(bool moved)
-{
-	for(auto i=m_subwidg.rbegin(); i!=m_subwidg.rend(); i++)
-		if((*i)->rbuttonup(moved))
-			return true;
-
-	return false;
-}
-
-bool BottomPanel::prerbuttondown()
-{
-	for(auto i=m_subwidg.rbegin(); i!=m_subwidg.rend(); i++)
-		if((*i)->prerbuttondown())
-			return true;
-
-	return false;
-}
-
-bool BottomPanel::rbuttondown()
-{
-	for(auto i=m_subwidg.rbegin(); i!=m_subwidg.rend(); i++)
-		if((*i)->rbuttondown())
-			return true;
-
-	return false;
-}
-
-bool BottomPanel::mousewheel(int delta) 
-{ 
-	for(auto i=m_subwidg.rbegin(); i!=m_subwidg.rend(); i++)
-		if((*i)->mousewheel(delta))
-			return true;
-
-	return false; 
+		(*i)->inev(ev);
 }
 
 void BottomPanel::frameupd()
 {
 	for(auto i=m_subwidg.rbegin(); i!=m_subwidg.rend(); i++)
 		(*i)->frameupd();
-}
-
-bool BottomPanel::keyup(int k)
-{
-	for(auto i=m_subwidg.rbegin(); i!=m_subwidg.rend(); i++)
-		if((*i)->keyup(k))
-			return true;
-
-	return false;
-}
-
-bool BottomPanel::keydown(int k)
-{
-	for(auto i=m_subwidg.rbegin(); i!=m_subwidg.rend(); i++)
-		if((*i)->keydown(k))
-			return true;
-
-	return false;
-}
-
-bool BottomPanel::charin(int k)
-{
-	for(auto i=m_subwidg.rbegin(); i!=m_subwidg.rend(); i++)
-		if((*i)->charin(k))
-			return true;
-
-	return false;
 }

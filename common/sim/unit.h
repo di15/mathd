@@ -18,9 +18,7 @@ class Unit
 public:
 	bool on;
 	int type;
-	int stateowner;
-	int corpowner;
-	int unitowner;
+	int owner;
 
 	/*
 	The draw (floating-point) position vectory is used for drawing.
@@ -85,7 +83,7 @@ public:
 extern Unit g_unit[UNITS];
 
 void DrawUnits();
-bool PlaceUnit(int type, Vec3i cmpos, int stateowner, int corpowner, int unitowner);
+bool PlaceUnit(int type, Vec3i cmpos, int owner);
 void FreeUnits();
 void UpdateUnits();
 

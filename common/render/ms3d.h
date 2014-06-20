@@ -151,7 +151,7 @@ class MS3DModel
 		void destroy();
 
 		void loadtex(unsigned int& diffm, unsigned int& specm, unsigned int& normm, unsigned int& ownm, bool dontqueue);
-		void genva(VertexArray** vertexArrays, Vec3f scale, Vec3f translate, const char* filepath);
+		void genva(VertexArray** vertexArrays, Vec3f scale, Vec3f translate, const char* filepath, bool blendnorm);
 
 	//protected:
 		/*	

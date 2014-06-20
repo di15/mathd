@@ -6,10 +6,6 @@
 #include "../../widget.h"
 #include "../viewportw.h"
 
-#define MINIMAP_SIZE				100
-#define BOTTOM_MID_PANEL_HEIGHT		200
-#define MINIMAP_OFF					5
-
 class BuildPreview : public Widget
 {
 public:
@@ -39,22 +35,9 @@ public:
 	Image white_bg;
 
 	void draw();
-	void draw2();
+	void drawover();
 	void reframe();
-	bool prelbuttonup(bool moved);
-	bool lbuttonup(bool moved);
-	bool prelbuttondown();
-	bool lbuttondown();
-	void premousemove();
-	bool mousemove();
-	bool prerbuttonup(bool moved);
-	bool rbuttonup(bool moved);
-	bool prerbuttondown();
-	bool rbuttondown();
-	bool keyup(int k);
-	bool keydown(int k);
-	bool charin(int k);
-	bool mousewheel(int delta);
+	void inev(InEv* ev);
 	void frameupd();
 };
 

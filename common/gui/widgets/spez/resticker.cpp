@@ -17,6 +17,7 @@
 #include "../frame.h"
 #include "resticker.h"
 #include "../../../platform.h"
+#include "../../../sim/player.h"
 
 ResTicker::ResTicker(Widget* parent, const char* n, void (*reframef)(Widget* thisw))
 {
@@ -36,16 +37,19 @@ ResTicker::ResTicker(Widget* parent, const char* n, void (*reframef)(Widget* thi
 	Image whitebg;
 #endif
 	
-	restext = Text(this, "res ticker", RichText("asdadasdasads"), MAINFONT16, NULL, true, 1, 1, 1, 1);
-	leftinnerdiagblur = Image(this, "gui/frames/innerdiagblur32x24halfwht.png", NULL, 1, 1, 1, 1,		0, 0, 1, 1);
-	rightinnerdiagblur = Image(this, "gui/frames/innerdiagblur32x24halfwht.png", NULL, 1, 1, 1, 1,		1, 0, 0, 1);
-	innerbottom = Image(this, "gui/frames/innerbottom3x3.png", NULL, 1, 1, 1, 1,		0, 0, 1, 1);
-	lefthlineblur = Image(this, "gui/frames/innerhlineblur30x3.png", NULL, 1, 1, 1, 1,		0, 0, 1, 1);
-	righthlineblur = Image(this, "gui/frames/innerhlineblur30x3.png", NULL, 1, 1, 1, 1,		1, 0, 0, 1);
-	whitebg = Image(this, "gui/backg/white.jpg", NULL, 1, 1, 1, 1,		0, 0, 1, 1);
+	//restext = Text(this, "res ticker", RichText("asdadasdasads"), MAINFONT16, NULL, true, 1, 1, 1, 1);
+	restext = Text(this, "res ticker", RichText("asdadasdasads"), MAINFONT16, NULL, false, 0.2, 0.7, 0.8, 1);
+	leftinnerdiagblur = Image(this, "gui/frames/innerdiagblur32x24halfwht.png", true, NULL, 1, 1, 1, 1,		0, 0, 1, 1);
+	rightinnerdiagblur = Image(this, "gui/frames/innerdiagblur32x24halfwht.png", true, NULL, 1, 1, 1, 1,		1, 0, 0, 1);
+	innerbottom = Image(this, "gui/frames/innerbottom3x3.png", true, NULL, 1, 1, 1, 1,		0, 0, 1, 1);
+	lefthlineblur = Image(this, "gui/frames/innerhlineblur30x3.png", true, NULL, 1, 1, 1, 1,		0, 0, 1, 1);
+	righthlineblur = Image(this, "gui/frames/innerhlineblur30x3.png", true, NULL, 1, 1, 1, 1,		1, 0, 0, 1);
+	whitebg = Image(this, "gui/backg/white.jpg", true, NULL, 1, 1, 1, 1,		0, 0, 1, 1);
 
 	reframe();
 }
+
+#define RESTICKER_HEIGHT	24
 
 void ResTicker::reframe()	//resized or moved
 {
@@ -58,23 +62,23 @@ void ResTicker::reframe()	//resized or moved
 	leftinnerdiagblur.m_pos[0] = m_pos[0];
 	leftinnerdiagblur.m_pos[1] = m_pos[1];
 	leftinnerdiagblur.m_pos[2] = m_pos[0]+32;
-	leftinnerdiagblur.m_pos[3] = m_pos[1]+24;
+	leftinnerdiagblur.m_pos[3] = m_pos[1]+RESTICKER_HEIGHT;
 	
 	rightinnerdiagblur.m_pos[0] = m_pos[2]-32;
 	rightinnerdiagblur.m_pos[1] = m_pos[1];
 	rightinnerdiagblur.m_pos[2] = m_pos[2];
-	rightinnerdiagblur.m_pos[3] = m_pos[1]+24;
+	rightinnerdiagblur.m_pos[3] = m_pos[1]+RESTICKER_HEIGHT;
 
 	restext.m_pos[0] = m_pos[0]+32;
 	restext.m_pos[1] = m_pos[1];
 	restext.m_pos[2] = m_pos[2]-32;
-	restext.m_pos[3] = m_pos[1]+24-3;
+	restext.m_pos[3] = m_pos[1]+RESTICKER_HEIGHT-3;
 
 #if 1
 	whitebg.m_pos[0] = m_pos[0]+32;
 	whitebg.m_pos[1] = m_pos[1];
 	whitebg.m_pos[2] = m_pos[2]-32;
-	whitebg.m_pos[3] = m_pos[1]+24;
+	whitebg.m_pos[3] = m_pos[1]+RESTICKER_HEIGHT;
 #else
 	whitebg.m_pos[0] = m_pos[0];
 	whitebg.m_pos[1] = m_pos[1];
@@ -83,21 +87,21 @@ void ResTicker::reframe()	//resized or moved
 #endif
 
 	innerbottom.m_pos[0] = m_pos[0]+32;
-	innerbottom.m_pos[1] = m_pos[1]+24-3;
+	innerbottom.m_pos[1] = m_pos[1]+RESTICKER_HEIGHT-3;
 	innerbottom.m_pos[2] = m_pos[2]-32;
-	innerbottom.m_pos[3] = m_pos[1]+24;
+	innerbottom.m_pos[3] = m_pos[1]+RESTICKER_HEIGHT;
 
 	float centerw = (m_pos[0]+m_pos[2])/2;
 
 	lefthlineblur.m_pos[0] = m_pos[0]+32;
-	lefthlineblur.m_pos[1] = m_pos[1]+24-3;
+	lefthlineblur.m_pos[1] = m_pos[1]+RESTICKER_HEIGHT-3;
 	lefthlineblur.m_pos[2] = centerw;
-	lefthlineblur.m_pos[3] = m_pos[1]+24;
+	lefthlineblur.m_pos[3] = m_pos[1]+RESTICKER_HEIGHT;
 	
 	righthlineblur.m_pos[0] = centerw;
-	righthlineblur.m_pos[1] = m_pos[1]+24-3;
+	righthlineblur.m_pos[1] = m_pos[1]+RESTICKER_HEIGHT-3;
 	righthlineblur.m_pos[2] = m_pos[2]-32;
-	righthlineblur.m_pos[3] = m_pos[1]+24;
+	righthlineblur.m_pos[3] = m_pos[1]+RESTICKER_HEIGHT;
 }
 
 void ResTicker::draw()
@@ -131,137 +135,22 @@ void ResTicker::draw()
 	//innerbottom.draw();
 }
 
-void ResTicker::draw2()
+void ResTicker::drawover()
 {
 	for(auto i=m_subwidg.begin(); i!=m_subwidg.end(); i++)
-		(*i)->draw2();
+		(*i)->drawover();
 }
 
-bool ResTicker::prelbuttonup(bool moved)
+void ResTicker::inev(InEv* ev)
 {
+	Player* py = &g_player[g_currP];
+
 	for(auto i=m_subwidg.rbegin(); i!=m_subwidg.rend(); i++)
-		if((*i)->prelbuttonup(moved))
-			return true;
-
-	return false;
-}
-
-bool ResTicker::lbuttonup(bool moved)
-{
-	for(auto i=m_subwidg.rbegin(); i!=m_subwidg.rend(); i++)
-		if((*i)->lbuttonup(moved))
-			return true;
-
-	return false;
-}
-
-bool ResTicker::prelbuttondown()
-{
-	for(auto i=m_subwidg.rbegin(); i!=m_subwidg.rend(); i++)
-		if((*i)->prelbuttondown())
-			return true;
-
-	return false;
-}
-
-bool ResTicker::lbuttondown()
-{
-	for(auto i=m_subwidg.rbegin(); i!=m_subwidg.rend(); i++)
-		if((*i)->lbuttondown())
-			return true;
-
-	return false;
-}
-
-void ResTicker::premousemove()
-{
-	for(auto i=m_subwidg.rbegin(); i!=m_subwidg.rend(); i++)
-		(*i)->premousemove();
-}
-
-bool ResTicker::mousemove()
-{
-	for(auto i=m_subwidg.rbegin(); i!=m_subwidg.rend(); i++)
-		if((*i)->mousemove())
-			return true;
-
-	return false;
-}
-
-bool ResTicker::prerbuttonup(bool moved)
-{
-	for(auto i=m_subwidg.rbegin(); i!=m_subwidg.rend(); i++)
-		if((*i)->prerbuttonup(moved))
-			return true;
-
-	return false;
-}
-
-bool ResTicker::rbuttonup(bool moved)
-{
-	for(auto i=m_subwidg.rbegin(); i!=m_subwidg.rend(); i++)
-		if((*i)->rbuttonup(moved))
-			return true;
-
-	return false;
-}
-
-bool ResTicker::prerbuttondown()
-{
-	for(auto i=m_subwidg.rbegin(); i!=m_subwidg.rend(); i++)
-		if((*i)->prerbuttondown())
-			return true;
-
-	return false;
-}
-
-bool ResTicker::rbuttondown()
-{
-	for(auto i=m_subwidg.rbegin(); i!=m_subwidg.rend(); i++)
-		if((*i)->rbuttondown())
-			return true;
-
-	return false;
-}
-
-bool ResTicker::mousewheel(int delta) 
-{ 
-	for(auto i=m_subwidg.rbegin(); i!=m_subwidg.rend(); i++)
-		if((*i)->mousewheel(delta))
-			return true;
-
-	return false; 
+		(*i)->inev(ev);
 }
 
 void ResTicker::frameupd()
 {
 	for(auto i=m_subwidg.rbegin(); i!=m_subwidg.rend(); i++)
 		(*i)->frameupd();
-}
-
-bool ResTicker::keyup(int k)
-{
-	for(auto i=m_subwidg.rbegin(); i!=m_subwidg.rend(); i++)
-		if((*i)->keyup(k))
-			return true;
-
-	return false;
-}
-
-bool ResTicker::keydown(int k)
-{
-	for(auto i=m_subwidg.rbegin(); i!=m_subwidg.rend(); i++)
-		if((*i)->keydown(k))
-			return true;
-
-	return false;
-}
-
-bool ResTicker::charin(int k)
-{
-	for(auto i=m_subwidg.rbegin(); i!=m_subwidg.rend(); i++)
-		if((*i)->charin(k))
-			return true;
-
-	return false;
 }

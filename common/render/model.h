@@ -33,7 +33,7 @@ public:
 
 	~Model();
 
-	bool load(const char* relative, Vec3f scale, Vec3f translate, bool dontqueue);
+	bool load(const char* relative, Vec3f scale, Vec3f translate, bool dontqueue, bool blendnorm);
 	void usetex();
 	void draw(int frame, Vec3f pos, float yaw);
 	void destroy();
@@ -48,11 +48,12 @@ struct ModelToLoad
 	char filepath[MAX_PATH];
 	Vec3f scale;
 	Vec3f translate;
+	bool blendnorm;
 };
 
 int NewModel();
 int FindModel(const char* relative);
-void QueueModel(int* id, const char* relative, Vec3f scale, Vec3f translate);
+void QueueModel(int* id, const char* relative, Vec3f scale, Vec3f translate, bool blendnorm=false);
 bool Load1Model();
 void DrawVA(VertexArray* va, Vec3f pos);
 void BeginVertexArrays();
@@ -60,6 +61,6 @@ void EndVertexArrays();
 bool PlayAnimation(float& frame, int first, int last, bool loop, float rate);
 bool PlayAnimationB(float& frame, int first, int last, bool loop, float rate);	//Play animation backwards
 void FreeModels();
-int LoadModel(const char* relative, Vec3f scale, Vec3f translate, bool dontqueue);
+int LoadModel(const char* relative, Vec3f scale, Vec3f translate, bool dontqueue, bool blendnorm);
 
 #endif

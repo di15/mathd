@@ -29,13 +29,7 @@ public:
 		bool (*rupf)(int p, int relx, int rely, int w, int h),
 		bool (*mousewf)(int p, int d),
 		int parm);
-	bool mousemove();
-	void premousemove();
-	bool lbuttondown();
-	bool lbuttonup(bool moved);
-	bool rbuttondown();
-	bool rbuttonup(bool moved);
-	bool mousewheel(int delta);
+	void inev(InEv* ev);
 	void draw();
 };
 

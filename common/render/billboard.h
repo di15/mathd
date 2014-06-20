@@ -42,7 +42,7 @@ public:
 	}
 };
 
-#define BILLBOARDS  512
+#define BILLBOARDS  256
 extern Billboard g_billb[BILLBOARDS];
 
 extern unsigned int g_muzzle[4];

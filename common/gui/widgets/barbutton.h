@@ -4,8 +4,9 @@
 #define BARBUTTON_H
 
 #include "../widget.h"
+#include "button.h"
 
-class BarButton : public Widget
+class BarButton : public Button
 {
 public:
 	float m_healthbar;
@@ -13,39 +14,6 @@ public:
 	BarButton(Widget* parent, unsigned int sprite, float bar, void (*reframef)(Widget* thisw), void (*click)(), void (*overf)(), void (*out)());
 
 	void draw();
-	bool lbuttonup(bool moved)
-	{
-		mousemove();
-
-		if(m_over && m_ldown)
-		{
-			if(clickfunc != NULL)
-				clickfunc();
-
-			m_over = false;
-			m_ldown = false;
-
-			return true;	// intercept mouse event
-		}
-
-		m_over = false;
-		m_ldown = false;
-
-		return false;
-	}
-	bool lbuttondown()
-	{
-		mousemove();
-
-		if(m_over)
-		{
-			m_ldown = true;
-			return true;	// intercept mouse event
-		}
-
-		return false;
-	}
-	bool mousemove();
 };
 
 #endif

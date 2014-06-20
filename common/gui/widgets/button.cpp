@@ -15,6 +15,8 @@
 #include "touchlistener.h"
 #include "../icon.h"
 #include "../../ustring.h"
+#include "../gui.h"
+#include "../../sim/player.h"
 
 Button::Button() : Widget()
 {
@@ -27,11 +29,12 @@ Button::Button() : Widget()
     //    length += g_font[f].glyph[t[i]].w;
     //m_tpos[0] = (left+right)/2.0f - length/2.0f;
     //m_tpos[1] = (top+bottom)/2.0f - g_font[f].gheight/2.0f;
+	m_style = BUTTON_LINEBASED;
 	m_over = false;
 	m_ldown = false;
-	CreateTexture(m_tex, "gui/transp.png", true);
-	CreateTexture(m_bgtex, "gui/buttonbg.png", true);
-	CreateTexture(m_bgovertex, "gui/buttonbgover.png", true);
+	CreateTexture(m_tex, "gui/transp.png", true, false);
+	CreateTexture(m_bgtex, "gui/corrodbutton.png", true, false);
+	CreateTexture(m_bgovertex, "gui/corrodbuttonover.png", true, false);
 	reframefunc = NULL;
 	clickfunc = NULL;
 	overfunc = NULL;
@@ -42,89 +45,14 @@ Button::Button() : Widget()
 	//reframe();
 }
 
-Button::Button(Widget* parent, const char* n, const char* filepath, const RichText label, const RichText t, int f, void (*reframef)(Widget* thisw), void (*click)(), void (*overf)(), void (*out)()) : Widget()
+Button::Button(Widget* parent, const char* name, const char* filepath, const RichText label, const RichText tooltip, int f, int style, void (*reframef)(Widget* thisw), void (*click)(), void (*click2)(int p), void (*overf)(), void (*overf2)(int p), void (*out)(), int parm) : Widget()
 {
 	m_parent = parent;
 	m_type = WIDGET_BUTTON;
-	m_name = n;
-    m_text = t;
+	m_name = name;
+	m_style = style;
+    m_text = tooltip;
 	m_label = label;
-    m_font = f;
-    //float length = 0;
-    //for(int i=0; i<strlen(t); i++)
-    //    length += g_font[f].glyph[t[i]].w;
-	//m_tpos[0] = (left+right)/2.0f - length/2.0f;
-	//m_tpos[1] = (top+bottom)/2.0f - g_font[f].gheight/2.0f;
-	m_over = false;
-	m_ldown = false;
-	CreateTexture(m_tex, filepath, true);
-	CreateTexture(m_bgtex, "gui\\buttonbg.png", true);
-	CreateTexture(m_bgovertex, "gui\\buttonbgover.png", true);
-	reframefunc = reframef;
-	clickfunc = click;
-	overfunc = overf;
-	clickfunc2 = NULL;
-	overfunc2 = NULL;
-	outfunc = out;
-	reframe();
-}
-
-Button::Button(Widget* parent, const char* filepath, const RichText t, int f, void (*reframef)(Widget* thisw), void (*click)(), void (*overf)(), void (*out)()) : Widget()
-{
-	m_parent = parent;
-	m_type = WIDGET_BUTTON;
-    m_text = t;
-    m_font = f;
-   // float length = 0;
-    //for(int i=0; i<strlen(t); i++)
-    //    length += g_font[f].glyph[t[i]].w;
-    //m_tpos[0] = (left+right)/2.0f - length/2.0f;
-    //m_tpos[1] = (top+bottom)/2.0f - g_font[f].gheight/2.0f;
-	m_over = false;
-	m_ldown = false;
-	CreateTexture(m_tex, filepath, true);
-	CreateTexture(m_bgtex, "gui\\buttonbg.png", true);
-	CreateTexture(m_bgovertex, "gui\\buttonbgover.png", true);
-	reframefunc = reframef;
-	clickfunc = click;
-	overfunc = overf;
-	clickfunc2 = NULL;
-	overfunc2 = NULL;
-	outfunc = out;
-	reframe();
-}
-
-Button::Button(Widget* parent, const char* filepath, const RichText t, int f, void (*reframef)(Widget* thisw), void (*click2)(int p), int parm) : Widget()
-{
-	m_parent = parent;
-	m_type = WIDGET_BUTTON;
-    m_text = t;
-    m_font = f;
-    //float length = 0;
-    //for(int i=0; i<strlen(t); i++)
-    //    length += g_font[f].glyph[t[i]].w;
-    //m_tpos[0] = (left+right)/2.0f - length/2.0f;
-    //m_tpos[1] = (top+bottom)/2.0f - g_font[f].gheight/2.0f;
-	m_over = false;
-	m_ldown = false;
-	CreateTexture(m_tex, filepath, true);
-	CreateTexture(m_bgtex, "gui\\buttonbg.png", true);
-	CreateTexture(m_bgovertex, "gui\\buttonbgover.png", true);
-	reframefunc = reframef;
-	clickfunc = NULL;
-	overfunc = NULL;
-	clickfunc2 = click2;
-	overfunc2 = NULL;
-	outfunc = NULL;
-	m_param = parm;
-	reframe();
-}
-
-Button::Button(Widget* parent, const char* filepath, const RichText t, int f, void (*reframef)(Widget* thisw), void (*click2)(int p), void (*overf2)(int p), void (*out)(), int parm) : Widget()
-{
-	m_parent = parent;
-	m_type = WIDGET_BUTTON;
-    m_text = t;
     m_font = f;
     float length = 0;
     //for(int i=0; i<strlen(t); i++)
@@ -134,13 +62,18 @@ Button::Button(Widget* parent, const char* filepath, const RichText t, int f, vo
     //m_tpos[1] = (top+bottom)/2.0f - g_font[f].gheight/2.0f;
 	m_over = false;
 	m_ldown = false;
-	CreateTexture(m_tex, filepath, true);
-	CreateTexture(m_bgtex, "gui\\buttonbg.png", true);
-	CreateTexture(m_bgovertex, "gui\\buttonbgover.png", true);
+	CreateTexture(m_tex, filepath, true, false);
+
+	if(style == BUTTON_CORRODE)
+	{
+		CreateTexture(m_bgtex, "gui/corrodbutton.png", true, false);
+		CreateTexture(m_bgovertex, "gui/corrodbuttonover.png", true, false);
+	}
+
 	reframefunc = reframef;
-	clickfunc = NULL;
-	overfunc = NULL;
+	clickfunc = click;
 	clickfunc2 = click2;
+	overfunc = overf;
 	overfunc2 = overf2;
 	outfunc = out;
 	m_param = parm;
@@ -149,79 +82,156 @@ Button::Button(Widget* parent, const char* filepath, const RichText t, int f, vo
 
 void Button::reframe()
 {
-#if 0
-	m_pos[0].recalc(m_parent);
-	m_pos[1].recalc(m_parent);
-	m_pos[2].recalc(m_parent);
-	m_pos[3].recalc(m_parent);
-    float length = 0;
-    for(int i=0; i<strlen(m_label.c_str()); i++)
-	{
-        length += g_font[m_font].glyph[m_label[i]].origsize[0];
-	}
-
-	m_tpos[0] = Margin(MARGIN_SOURCE_WIDTH, MARGIN_FUNC_PIXELS, (m_pos[2]-m_pos[0])/2.0f-length/2.0f);
-	m_tpos[1] = Margin(MARGIN_SOURCE_HEIGHT, MARGIN_FUNC_PIXELS, (m_pos[3]-m_pos[1])/2.0f-g_font[m_font].gheight/2.0f);
-	m_tpos[0].recalc(this);
-	m_tpos[1].recalc(this);
-	//m_tpos[2].recalc(this);
-	//m_tpos[3].recalc(this);
-#endif
-
 	if(reframefunc)
 		reframefunc(this);
 }
 
-void Button::premousemove()
+void Button::inev(InEv* ev)
 {
-	if(g_mouse.x >= m_pos[0] && g_mouse.x <= m_pos[2] && g_mouse.y >= m_pos[1] && g_mouse.y <= m_pos[3])
+	Player* py = &g_player[g_currP];
+
+	if(ev->type == INEV_MOUSEUP && ev->key == MOUSE_LEFT && !ev->intercepted)
 	{
-	}
-	else
-	{
-		if(m_over && outfunc != NULL)
-			outfunc();
+		//mousemove();
+
+		if(m_over && m_ldown)
+		{
+			if(clickfunc != NULL)
+				clickfunc();
+
+			if(clickfunc2 != NULL)
+				clickfunc2(m_param);
+
+			m_over = false;
+			m_ldown = false;
+
+			ev->intercepted = true;
+			return;	// intercept mouse event
+		}
+		
+		if(m_ldown)
+		{
+			m_ldown = false;
+			ev->intercepted = true;
+			return;
+		}
 
 		m_over = false;
 	}
-}
-
-bool Button::mousemove()
-{
-	if(g_mouse.x >= m_pos[0] && g_mouse.x <= m_pos[2] && g_mouse.y >= m_pos[1] && g_mouse.y <= m_pos[3])
+	else if(ev->type == INEV_MOUSEDOWN && ev->key == MOUSE_LEFT && !ev->intercepted)
 	{
-		if(overfunc != NULL)
-			overfunc();
-		if(overfunc2 != NULL)
-			overfunc2(m_param);
-			
-		m_over = true;
+		//mousemove();
 
-		return true;
+		if(m_over)
+		{
+			m_ldown = true;
+			ev->intercepted = true;
+			return;	// intercept mouse event
+		}
 	}
+	else if(ev->type == INEV_MOUSEMOVE)
+	{
+		if(py->mouse.x >= m_pos[0] && py->mouse.x <= m_pos[2] && py->mouse.y >= m_pos[1] && py->mouse.y <= m_pos[3])
+		{
+		}
+		else
+		{
+			if(m_over && outfunc != NULL)
+				outfunc();
 
-	return false;
+			m_over = false;
+		}
+
+		if(!ev->intercepted)
+		{
+			if(py->mouse.x >= m_pos[0] && py->mouse.x <= m_pos[2] && py->mouse.y >= m_pos[1] && py->mouse.y <= m_pos[3])
+			{
+				if(overfunc != NULL)
+					overfunc();
+				if(overfunc2 != NULL)
+					overfunc2(m_param);
+			
+				m_over = true;
+
+				ev->intercepted = true;
+				return;
+			}
+		}
+	}
 }
 
 void Button::draw()
 {
-	if(m_over)
-		DrawImage(g_texture[m_bgovertex].texname, m_pos[0], m_pos[1], m_pos[2], m_pos[3]);
-	else
-		DrawImage(g_texture[m_bgtex].texname, m_pos[0], m_pos[1], m_pos[2], m_pos[3]);
+	if(m_style == BUTTON_CORRODE)
+	{
+		if(m_over)
+			DrawImage(g_texture[m_bgovertex].texname, m_pos[0], m_pos[1], m_pos[2], m_pos[3]);
+		else
+			DrawImage(g_texture[m_bgtex].texname, m_pos[0], m_pos[1], m_pos[2], m_pos[3]);
 
-	DrawImage(g_texture[m_tex].texname, m_pos[0], m_pos[1], m_pos[2], m_pos[3]);  
+		DrawImage(g_texture[m_tex].texname, m_pos[0], m_pos[1], m_pos[2], m_pos[3]);  
 
-	DrawShadowedText(m_font, m_tpos[0], m_tpos[1], &m_label);
+		DrawShadowedText(m_font, m_tpos[0], m_tpos[1], &m_label);
+	}
+	else if(m_style == BUTTON_LEFTIMAGE)
+	{
+		Player* py = &g_player[g_currP];
+
+		EndS();
+
+		UseS(SHADER_COLOR2D);
+		glUniform1f(g_shader[g_curS].m_slot[SSLOT_WIDTH], (float)py->currw);
+		glUniform1f(g_shader[g_curS].m_slot[SSLOT_HEIGHT], (float)py->currh);
+
+		float midcolor[] = {0.7f,0.7f,0.7f,0.8f};
+		float lightcolor[] = {0.8f,0.8f,0.8f,0.8f};
+		float darkcolor[] = {0.5f,0.5f,0.5f,0.8f};
+
+		if(m_over)
+		{
+			for(int i=0; i<3; i++)
+			{
+				midcolor[i] = 0.8f;
+				lightcolor[i] = 0.9f;
+				darkcolor[i] = 0.6f;
+			}
+		}
+
+		DrawSquare(midcolor[0], midcolor[1], midcolor[2], midcolor[3], m_pos[0], m_pos[1], m_pos[2], m_pos[3]);
+
+		DrawLine(lightcolor[0], lightcolor[1], lightcolor[2], lightcolor[3], m_pos[2], m_pos[1], m_pos[2], m_pos[3]-1);
+		DrawLine(lightcolor[0], lightcolor[1], lightcolor[2], lightcolor[3], m_pos[0], m_pos[1], m_pos[2]-1, m_pos[1]);
+
+		DrawLine(darkcolor[0], darkcolor[1], darkcolor[2], darkcolor[3], m_pos[0]+1, m_pos[3], m_pos[2], m_pos[3]);
+		DrawLine(darkcolor[0], darkcolor[1], darkcolor[2], darkcolor[3], m_pos[2], m_pos[1]+1, m_pos[2], m_pos[3]);
+
+		EndS();
+		Ortho(py->currw, py->currh, 1, 1, 1, 1);
+
+		float w = m_pos[2]-m_pos[0]-2;
+		float h = m_pos[3]-m_pos[1]-2;
+		float minsz = min(w, h);
+
+		DrawImage(g_texture[m_tex].texname, m_pos[0]+1, m_pos[1]+1, m_pos[0]+minsz, m_pos[1]+minsz);  
+
+		float gheight = g_font[m_font].gheight;
+		float texttop = m_pos[1] + h/2.0f - gheight/2.0f;
+		float textleft = m_pos[0]+minsz+1;
+
+		DrawShadowedText(m_font, textleft, texttop, &m_label);
+	}
 
 	//if(_stricmp(m_name.c_str(), "choose texture") == 0)
 	//	g_log<<"draw choose texture"<<endl;
 }
 
-void Button::draw2()
+void Button::drawover()
 {
 	if(m_over)
+	{
+		Player* py = &g_player[g_currP];
 		//DrawShadowedText(m_font, m_tpos[0], m_tpos[1], m_text.c_str());
-		DrawShadowedText(m_font, g_mouse.x, g_mouse.y-g_font[m_font].gheight, &m_text);
+		DrawShadowedText(m_font, py->mouse.x, py->mouse.y-g_font[m_font].gheight, &m_text);
+	}
 }
 

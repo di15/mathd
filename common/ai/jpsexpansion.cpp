@@ -275,6 +275,31 @@ PathNode* Jump(PathJob* pj, PathNode* node, PathNode* parent)
 
 	Vec2i pos = PathNodePos(node);
 	Vec2i delta = pos - PathNodePos(parent);
+	
+	pj->searchdepth++;
+	pj->subsearchdepth++;
+	
+	int prevsubmax = pj->maxsubsearch;
+	int prevdepth = pj->subsearchdepth;
+
+	if(pj->pjtype == PATHJOB_JPSPART)
+	{
+		if(pj->searchdepth > pj->maxsearch)
+			return node;
+
+		if(delta.x != 0 && delta.y != 0)
+			pj->maxsubsearch = pj->maxsubdiag;
+		
+		if(pj->subsearchdepth > pj->maxsubsearch)
+			return node;
+	}
+
+	int thisdistance = Magnitude2(Vec2i(pos.x - pj->ngoalx, pos.y - pj->ngoalz));
+	if( !pj->closestnode || thisdistance < pj->closest )
+	{
+		pj->closestnode = node;
+		pj->closest = thisdistance;
+	}
 
 	// If the node to be examined is unwalkable, return nil
 	if( !Walkable(pj, pos.x, pos.y) ) { return NULL; }
@@ -348,25 +373,35 @@ PathNode* Jump(PathJob* pj, PathNode* node, PathNode* parent)
 	// Recursive horizontal/vertical search
 	if( delta.x!=0 && delta.y!=0 ) 
 	{
-		if( Jump(pj, PathNodeAt(pos.x+delta.x, pos.y), node) ) { return node; }
-		if( Jump(pj, PathNodeAt(pos.x, pos.y+delta.y), node) ) { return node; }
-	}
+		int diagtravleft = pj->maxsubsearch - pj->subsearchdepth;
+		pj->maxsubsearch = diagtravleft;
+		pj->subsearchdepth = 0;
+		if( Jump(pj, PathNodeAt(pos.x+delta.x, pos.y), node) ) { pj->maxsubsearch=prevsubmax; pj->subsearchdepth=prevdepth; return node; }
+		pj->subsearchdepth = 0;
+		if( Jump(pj, PathNodeAt(pos.x, pos.y+delta.y), node) ) { pj->maxsubsearch=prevsubmax; pj->subsearchdepth=prevdepth; return node; }
 
-	// Recursive diagonal search
-	if( 1 ) //allow diagonal?
-	{
+		// Recursive diagonal search
+		if( 1 ) //allow diagonal?
+		{
 #if 0
-		if( Walkable(pj, pos.x+delta.x, pos.y) || Walkable(pj, pos.x, pos.y+delta.y) ) 
-		{
-			return Jump(pj, PathNodeAt(pos.x+delta.x, pos.y+delta.y), node);
-		}
+			if( Walkable(pj, pos.x+delta.x, pos.y) || Walkable(pj, pos.x, pos.y+delta.y) ) 
+			{
+				return Jump(pj, PathNodeAt(pos.x+delta.x, pos.y+delta.y), node);
+			}
 #else
-		// Denis edit - tripping on corners
-		if( Walkable(pj, pos.x+delta.x, pos.y) && Walkable(pj, pos.x, pos.y+delta.y) ) 
-		{
-			return Jump(pj, PathNodeAt(pos.x+delta.x, pos.y+delta.y), node);
-		}
+			// Denis edit - tripping on corners
+			if( Walkable(pj, pos.x+delta.x, pos.y) && Walkable(pj, pos.x, pos.y+delta.y) ) 
+			{
+				pj->maxsubsearch = pj->maxsubdiag;
+				//pj->subsearchdepth = 0;
+				pj->subsearchdepth = prevdepth;
+				PathNode* jump = Jump(pj, PathNodeAt(pos.x+delta.x, pos.y+delta.y), node);
+				pj->maxsubsearch = prevsubmax; 
+				//pj->subsearchdepth = prevdepth;
+				return jump;
+			}
 #endif
+		}
 	}
 
 	return NULL;
@@ -387,6 +422,13 @@ void IdentifySuccessors_JPS(PathJob* pj, PathNode* node)
 	PathNode* endnode = NULL;
 	Vec2i pos = PathNodePos(node);
 
+	int thisdistance = Magnitude2(Vec2i(pos.x - pj->ngoalx, pos.y - pj->ngoalz));
+	if( !pj->closestnode || thisdistance < pj->closest )
+	{
+		pj->closestnode = node;
+		pj->closest = thisdistance;
+	}
+
 	// Gets the valid neighbours of the given node
 	// Looks for a jump point in the direction of each neighbour
 	list<PathNode*> neighbours = FindNeighbours(pj, node);
@@ -397,6 +439,9 @@ void IdentifySuccessors_JPS(PathJob* pj, PathNode* node)
 		PathNode* neighbour = *niter;
 
 		Vec2i npos = PathNodePos(neighbour);
+
+		pj->subsearchdepth = 0;
+		pj->maxsubsearch = pj->maxsubstraight;
 
 		PathNode* jumpnode = Jump(pj, neighbour, node);
 

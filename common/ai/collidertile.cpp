@@ -44,10 +44,8 @@ ColliderTile::ColliderTile()
 	//abrupt = false;
 	flags = 0;
 	building = -1;
-	units[0] = -1;
-	units[1] = -1;
-	units[2] = -1;
-	units[3] = -1;
+	for(int i=0; i<MAX_COLLIDER_UNITS; i++)
+		units[i] = -1;
 }
 
 inline Vec2i PathNodePos(int cmposx, int cmposz)
@@ -230,7 +228,7 @@ void Unit::fillcollider()
 {
 	UnitT* t = &g_unitT[type];
 	int ui = this - g_unit;
-
+	
 	//cm = centimeter position
 	int cmminx = cmpos.x - t->size.x/2;
 	int cmminz = cmpos.y - t->size.z/2;
@@ -248,7 +246,7 @@ void Unit::fillcollider()
 		{
 			ColliderTile* c = ColliderTileAt(nx, nz);
 
-			for(short uiter = 0; uiter < 4; uiter++)
+			for(short uiter = 0; uiter < MAX_COLLIDER_UNITS; uiter++)
 			{
 				if(c->units[uiter] < 0)
 				{
@@ -312,7 +310,7 @@ void Unit::freecollider()
 		{
 			ColliderTile* c = ColliderTileAt(nx, nz);
 
-			for(short uiter = 0; uiter < 4; uiter++)
+			for(short uiter = 0; uiter < MAX_COLLIDER_UNITS; uiter++)
 			{
 				if(c->units[uiter] == ui)
 					c->units[uiter] = -1;
@@ -353,6 +351,8 @@ void Building::freecollider()
 		}
 }
 
+// Uses cm pos instead of pathnode pos
+// Uses cm-accurate intersection checks
 bool Walkable2(PathJob* pj, int cmposx, int cmposz)
 {
 	const int nx = cmposx / PATHNODE_SIZE;
@@ -437,7 +437,7 @@ bool Walkable2(PathJob* pj, int cmposx, int cmposz)
 				}
 			}
 
-			for(short uiter = 0; uiter < 4; uiter++)
+			for(short uiter = 0; uiter < MAX_COLLIDER_UNITS; uiter++)
 			{
 				short uindex = cell->units[uiter];
 
@@ -550,7 +550,7 @@ bool Walkable(const PathJob* pj, const int nx, const int nz)
 #endif
 			}
 			
-			for(short uiter = 0; uiter < 4; uiter++)
+			for(short uiter = 0; uiter < MAX_COLLIDER_UNITS; uiter++)
 			{
 				short uindex = cell->units[uiter];
 

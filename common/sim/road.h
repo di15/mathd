@@ -32,6 +32,7 @@ public:
 	VertexArray drawva;
 	int transporter[RESOURCES];
 	Vec3f drawpos;
+	int maxcost[RESOURCES];
     
 	RoadTile();
 	~RoadTile();
@@ -71,6 +72,7 @@ void TypeRoadsAround(int x, int z, bool plan=false);
 void TypeRoad(int x, int z, bool plan=false);
 Vec2i RoadPos(RoadTile* r);
 Vec2i RoadPlanPos(RoadTile* r);
+void ClearRoadPlans();
 
 #endif
 

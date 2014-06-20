@@ -15,7 +15,7 @@
 #include "textarea.h"
 #include "textblock.h"
 #include "touchlistener.h"
-
+#include "../../sim/player.h"
 
 
 ListBox::ListBox(Widget* parent, const char* n, int f, void (*reframef)(Widget* thisw), void (*change)()) : Widget()
@@ -31,10 +31,10 @@ ListBox::ListBox(Widget* parent, const char* n, int f, void (*reframef)(Widget* 
 	m_mousescroll = false;
 	m_ldown = false;
 	changefunc = change;
-	CreateTexture(m_frametex, "gui\\frame.jpg", true);
-	CreateTexture(m_filledtex, "gui\\filled.jpg", true);
-	CreateTexture(m_uptex, "gui\\up.jpg", true);
-	CreateTexture(m_downtex, "gui\\down.jpg", true);
+	CreateTexture(m_frametex, "gui/frame.jpg", true, false);
+	CreateTexture(m_filledtex, "gui/filled.jpg", true, false);
+	CreateTexture(m_uptex, "gui/up.jpg", true, false);
+	//CreateTexture(m_downtex, "gui/down.jpg", true, false);
 	reframe();
 }
 
@@ -96,139 +96,151 @@ void ListBox::draw()
 		DrawShadowedText(m_font, m_pos[0]+3, m_pos[1]+g_font[m_font].gheight*(i-(int)m_scroll[1]), &m_options[i]);
 }
 
-bool ListBox::mousemove()
+void ListBox::inev(InEv* ev)
 {
-	if(!m_mousescroll)
-		return false;
+	Player* py = &g_player[g_currP];
 
-	int dy = g_mouse.y - m_mousedown[1];
-
-	float topy = m_pos[3]+square()+scrollspace()*topratio();
-	float newtopy = topy + dy;
-
-	//topratio = (float)scroll / (float)(options.size());
-	//topy = pos[3]+square+scrollspace*topratio
-	//topy = pos[3]+square+scrollspace*((float)scroll / (float)(options.size()))
-	//topy - pos[3] - square = scrollspace*(float)scroll / (float)(options.size())
-	//(topy - pos[3] - square)*(float)(options.size())/scrollspace = scroll
-
-	m_scroll[1] = (newtopy - m_pos[3] - square())*(float)(m_options.size())/scrollspace();
-
-	if(m_scroll[1] < 0)
+	if(ev->type == INEV_MOUSEMOVE && !ev->intercepted)
 	{
-		m_scroll[1] = 0;
-		return true;
+		if(!m_mousescroll)
+			return;
+
+		int dy = py->mouse.y - m_mousedown[1];
+
+		float topy = m_pos[3]+square()+scrollspace()*topratio();
+		float newtopy = topy + dy;
+
+		//topratio = (float)scroll / (float)(options.size());
+		//topy = pos[3]+square+scrollspace*topratio
+		//topy = pos[3]+square+scrollspace*((float)scroll / (float)(options.size()))
+		//topy - pos[3] - square = scrollspace*(float)scroll / (float)(options.size())
+		//(topy - pos[3] - square)*(float)(options.size())/scrollspace = scroll
+
+		m_scroll[1] = (newtopy - m_pos[3] - square())*(float)(m_options.size())/scrollspace();
+
+		if(m_scroll[1] < 0)
+		{
+			m_scroll[1] = 0;
+			ev->intercepted = true;
+			return;
+		}
+		else if(m_scroll[1] + rowsshown() > m_options.size())
+		{
+			m_scroll[1] = m_options.size() - rowsshown();
+			ev->intercepted = true;
+			return;
+		}
+
+		m_mousedown[1] = py->mouse.y;
+
+		ev->intercepted = true;
 	}
-	else if(m_scroll[1] + rowsshown() > m_options.size())
+	else if(ev->type == INEV_MOUSEDOWN && ev->key == MOUSE_LEFT && !ev->intercepted)
 	{
-		m_scroll[1] = m_options.size() - rowsshown();
-		return true;
-	}
+		Font* f = &g_font[m_font];
 
-	m_mousedown[1] = g_mouse.y;
+		for(int i=(int)m_scroll[1]; i<(int)m_scroll[1]+rowsshown(); i++)
+		{
+			int row = i-(int)m_scroll[1];
+			// list item?
+			if(py->mouse.x >= m_pos[0] && py->mouse.x <= m_pos[2]-square() && py->mouse.y >= m_pos[1]+f->gheight*row
+				&& py->mouse.y <= m_pos[1]+f->gheight*(row+1))
+			{
+				m_ldown = true;
+				ev->intercepted = true;
+				return;	// intercept mouse event
+			}
+		}
 
-	return true;
-}
-
-bool ListBox::lbuttondown()
-{
-	Font* f = &g_font[m_font];
-
-	for(int i=(int)m_scroll[1]; i<(int)m_scroll[1]+rowsshown(); i++)
-	{
-		int row = i-(int)m_scroll[1];
-		// list item?
-		if(g_mouse.x >= m_pos[0] && g_mouse.x <= m_pos[2]-square() && g_mouse.y >= m_pos[1]+f->gheight*row
-			&& g_mouse.y <= m_pos[1]+f->gheight*(row+1))
+		// scroll bar?
+		if(py->mouse.x >= m_pos[2]-square() && py->mouse.y >= m_pos[1]+square()+scrollspace()*topratio() && py->mouse.x <= m_pos[2] && 
+				py->mouse.y <= m_pos[1]+square()+scrollspace()*bottomratio())
 		{
 			m_ldown = true;
-			return true;	// intercept mouse event
+			m_mousescroll = true;
+			m_mousedown[1] = py->mouse.y;
+			ev->intercepted = true;
+			return;	// intercept mouse event
 		}
-	}
 
-	// scroll bar?
-	if(g_mouse.x >= m_pos[2]-square() && g_mouse.y >= m_pos[1]+square()+scrollspace()*topratio() && g_mouse.x <= m_pos[2] && 
-			g_mouse.y <= m_pos[1]+square()+scrollspace()*bottomratio())
-	{
-		m_ldown = true;
-		m_mousescroll = true;
-		m_mousedown[1] = g_mouse.y;
-		return true;	// intercept mouse event
-	}
-
-	// up button?
-	if(g_mouse.x >= m_pos[2]-square() && g_mouse.y >= m_pos[1] && g_mouse.x <= m_pos[2] && g_mouse.y <= m_pos[1]+square())
-	{
-		m_ldown = true;
-		return true;
-	}
-
-	// down button?
-	if(g_mouse.x >= m_pos[2]-square() && g_mouse.y >= m_pos[3]-square() && g_mouse.x <= m_pos[2] && g_mouse.y <= m_pos[3])
-	{
-		m_ldown = true;
-		return true;
-	}
-
-	return false;
-}
-
-bool ListBox::lbuttonup(bool moved)
-{
-	if(!m_ldown)
-		return false;
-	
-	m_ldown = false;
-
-	if(m_mousescroll)
-	{
-		m_mousescroll = false;
-		return true;	// intercept mouse event
-	}
-	
-	Font* f = &g_font[m_font];
-
-	for(int i=(int)m_scroll[1]; i<(int)m_scroll[1]+rowsshown(); i++)
-	{
-		int row = i-(int)m_scroll[1];
-
-		// list item?
-		if(g_mouse.x >= m_pos[0] && g_mouse.x <= m_pos[2]-square() && g_mouse.y >= m_pos[1]+f->gheight*row
-			&& g_mouse.y <= m_pos[1]+f->gheight*(row+1))
+		// up button?
+		if(py->mouse.x >= m_pos[2]-square() && py->mouse.y >= m_pos[1] && py->mouse.x <= m_pos[2] && py->mouse.y <= m_pos[1]+square())
 		{
-			m_selected = i;
-			if(changefunc != NULL)
-				changefunc();
-
-			return true;	// intercept mouse event
+			m_ldown = true;
+			ev->intercepted = true;
+			return;
 		}
-	}
 
-	// up button?
-	if(g_mouse.x >= m_pos[2]-square() && g_mouse.y >= m_pos[1] && g_mouse.x <= m_pos[2] && g_mouse.y <= m_pos[1]+square())
-	{
-		if(rowsshown() < (int)((m_pos[3]-m_pos[1])/f->gheight))
+		// down button?
+		if(py->mouse.x >= m_pos[2]-square() && py->mouse.y >= m_pos[3]-square() && py->mouse.x <= m_pos[2] && py->mouse.y <= m_pos[3])
 		{
-			return true;
+			m_ldown = true;
+			ev->intercepted = true;
+			return;
+		}
+	}
+	else if(ev->type == INEV_MOUSEUP && ev->key == MOUSE_LEFT && !ev->intercepted)
+	{
+		if(!m_ldown)
+			return;
+	
+		m_ldown = false;
+
+		if(m_mousescroll)
+		{
+			m_mousescroll = false;
+			ev->intercepted = true;
+			return;	// intercept mouse event
+		}
+	
+		Font* f = &g_font[m_font];
+
+		for(int i=(int)m_scroll[1]; i<(int)m_scroll[1]+rowsshown(); i++)
+		{
+			int row = i-(int)m_scroll[1];
+
+			// list item?
+			if(py->mouse.x >= m_pos[0] && py->mouse.x <= m_pos[2]-square() && py->mouse.y >= m_pos[1]+f->gheight*row
+				&& py->mouse.y <= m_pos[1]+f->gheight*(row+1))
+			{
+				m_selected = i;
+				if(changefunc != NULL)
+					changefunc();
+
+				ev->intercepted = true;
+				return;	// intercept mouse event
+			}
 		}
 
-		m_scroll[1]--;
-		if(m_scroll[1] < 0)
-			m_scroll[1] = 0;
+		// up button?
+		if(py->mouse.x >= m_pos[2]-square() && py->mouse.y >= m_pos[1] && py->mouse.x <= m_pos[2] && py->mouse.y <= m_pos[1]+square())
+		{
+			if(rowsshown() < (int)((m_pos[3]-m_pos[1])/f->gheight))
+			{
+				ev->intercepted = true;
+				return;
+			}
 
-		return true;
+			m_scroll[1]--;
+			if(m_scroll[1] < 0)
+				m_scroll[1] = 0;
+
+			ev->intercepted = true;
+			return;
+		}
+
+		// down button?
+		if(py->mouse.x >= m_pos[2]-square() && py->mouse.y >= m_pos[3]-square() && py->mouse.x <= m_pos[2] && py->mouse.y <= m_pos[3])
+		{
+			m_scroll[1]++;
+			if(m_scroll[1]+rowsshown() > m_options.size())
+				m_scroll[1] = m_options.size() - rowsshown();
+
+			ev->intercepted = true;
+			return;
+		}
+
+		ev->intercepted = true;	// intercept mouse event
 	}
-
-	// down button?
-	if(g_mouse.x >= m_pos[2]-square() && g_mouse.y >= m_pos[3]-square() && g_mouse.x <= m_pos[2] && g_mouse.y <= m_pos[3])
-	{
-		m_scroll[1]++;
-		if(m_scroll[1]+rowsshown() > m_options.size())
-			m_scroll[1] = m_options.size() - rowsshown();
-
-		return true;
-	}
-
-	return true;	// intercept mouse event
 }
 

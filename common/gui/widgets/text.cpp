@@ -34,8 +34,7 @@ void Text::draw()
 #endif
 	else
 	{
-		glUniform4f(g_shader[SHADER_ORTHO].m_slot[SSLOT_COLOR], m_rgba[0], m_rgba[1], m_rgba[2], m_rgba[3]);
-		DrawLine(m_font, m_pos[0], m_pos[1], &m_text);
+		DrawLineF(m_font, m_pos[0], m_pos[1], m_pos[0], m_pos[1], m_pos[2], m_pos[3], &m_text, m_rgba);
 	}
 	//glColor4f(1, 1, 1, 1);
 	glUniform4f(g_shader[SHADER_ORTHO].m_slot[SSLOT_COLOR], 1, 1, 1, 1);

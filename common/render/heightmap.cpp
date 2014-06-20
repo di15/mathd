@@ -16,10 +16,9 @@
 #include "../window.h"
 #include "../math/polygon.h"
 #include "../math/physics.h"
-#include "border.h"
 #include "../sim/road.h"
-#include "../sim/powerline.h"
-#include "../sim/crudepipeline.h"
+#include "../sim/powl.h"
+#include "../sim/crpipe.h"
 #include "../math/plane3f.h"
 #include "../ai/collidertile.h"
 #include "foliage.h"
@@ -27,6 +26,8 @@
 #include "../texture.h"
 #include "compilebl.h"
 #include "water.h"
+#include "../sim/player.h"
+#include "../debug.h"
 
 unsigned int g_tiletexs[TILE_TYPES];
 Vec2i g_mapview[2];
@@ -34,6 +35,7 @@ Heightmap g_hmap;
 Heightmap g_hmap2;
 Heightmap g_hmap4;
 Heightmap g_hmap8;
+unsigned int g_rimtexs[TEX_TYPES];
 
 void AllocGrid(int wx, int wz)
 {
@@ -46,6 +48,13 @@ void AllocGrid(int wx, int wz)
 	g_powlplan = new PowlTile [ (wx * wz) ];
 	g_crpipe = new CrPipeTile[ (wx * wz) ];
 	g_crpipeplan = new CrPipeTile[ (wx * wz) ];
+
+	if(!g_road) OutOfMem(__FILE__, __LINE__);
+	if(!g_roadplan) OutOfMem(__FILE__, __LINE__);
+	if(!g_powl) OutOfMem(__FILE__, __LINE__);
+	if(!g_powlplan) OutOfMem(__FILE__, __LINE__);
+	if(!g_crpipe) OutOfMem(__FILE__, __LINE__);
+	if(!g_crpipeplan) OutOfMem(__FILE__, __LINE__);
 }
 
 /*
@@ -61,45 +70,6 @@ void Heightmap::allocate(int wx, int wz)
 	m_widthx = wx;
 	m_widthz = wz;
 
-	/*
-	float* heightpoints;
-	Vec3f* vertices;
-	Vec2f* texcoords0;
-	Vec3f* normals;
-	int* tiletype;
-	unsigned int* tex;
-	*/
-	g_forest = new Forest [ wx * wz ];
-
-	//g_pathfindszx = (int)(wx*TILE_SIZE/(MIN_RADIUS*2.0f));
-	//g_pathfindszz = (int)(wz*TILE_SIZE/(MIN_RADIUS*2.0f));
-	//g_open = new unsigned int [ g_pathfindszx * g_pathfindszz ];
-
-	//for(int i=0; i<(g_pathfindszx-1)*(g_pathfindszz-1); i++)
-	//	g_open[i] = g_curpath;
-	//g_log<<"g_open = new bool [ "<<g_pathfindszx<<" * "<<g_pathfindszz<<" = "<<(g_pathfindszx * g_pathfindszz)<<" ]"<<endl;
-	//g_log.flush();
-
-	/*
-	g_log<<"constructing class arrays"<<endl;
-	g_log.flush();
-
-	for(int i=0; i<wx*wz; i++)
-	{
-		g_road[i] = RoadTile();
-		g_roadplan[i] = RoadTile();
-		g_powl[i] = PowlTile();
-		g_powlplan[i] = PowlTile();
-	}*/
-
-	//g_road.resize( wx * wz );
-	//g_roadplan.resize( wx * wz );
-	//g_powl.resize( wx * wz );
-	//g_powlplan.resize( wx * wz );
-
-	//g_log<<"allocating map primitive arrays"<<endl;
-	//g_log.flush();
-
 	m_heightpoints = new float [ (wx+1) * (wz+1) ];
 	m_drawvertices = new Vec3f [ numverts ];
 	m_collverts = new Vec3f [ numverts ];
@@ -108,6 +78,15 @@ void Heightmap::allocate(int wx, int wz)
 	m_countryowner = new int [ wx * wz ];
 	m_triconfig = new bool [ wx * wz ];
 	m_tridivider = new Plane3f [ wx * wz ];
+
+	if(!m_heightpoints) OutOfMem(__FILE__, __LINE__);
+	if(!m_drawvertices) OutOfMem(__FILE__, __LINE__);
+	if(!m_collverts) OutOfMem(__FILE__, __LINE__);
+	if(!m_normals) OutOfMem(__FILE__, __LINE__);
+	if(!m_texcoords0) OutOfMem(__FILE__, __LINE__);
+	if(!m_countryowner) OutOfMem(__FILE__, __LINE__);
+	if(!m_triconfig) OutOfMem(__FILE__, __LINE__);
+	if(!m_tridivider) OutOfMem(__FILE__, __LINE__);
 
 	//g_log<<"setting heights to 0"<<endl;
 	//g_log.flush();
@@ -122,7 +101,6 @@ void Heightmap::allocate(int wx, int wz)
 	for(int x=0; x<wx; x++)
 		for(int z=0; z<wz; z++)
 		{
-			g_forest[ z*wx + x ].on = false;
 			m_countryowner[ z*wx + x ] = -1;
 		}
 
@@ -179,12 +157,6 @@ void Heightmap::destroy()
 	g_log.flush();
 	*/
 
-	if(g_forest)
-	{
-		delete [] g_forest;
-		g_forest = NULL;
-	}
-
 	delete [] m_heightpoints;
 	delete [] m_drawvertices;
 	delete [] m_collverts;
@@ -197,8 +169,6 @@ void Heightmap::destroy()
 
 	m_widthx = 0;
 	m_widthz = 0;
-
-	g_borders.destroy();
 
 	FreeWater();
 	
@@ -415,6 +385,8 @@ void Heightmap::remesh(float tilescale)
 	*/
 	vector<Vec3f**> *addedvertnormals = new vector<Vec3f**>[ m_widthx * m_widthz * 6 ];
 
+	if(!addedvertnormals) OutOfMem(__FILE__, __LINE__);
+
 	/*
 	Because triangles will alternate, we need to keep an ordered list
 	for the tile corner vertex normals for each tile, for 
@@ -451,6 +423,8 @@ void Heightmap::remesh(float tilescale)
 	*/
 
 	TileNormals *tilenormals = new TileNormals[ m_widthx * m_widthz ];
+
+	if(!tilenormals) OutOfMem(__FILE__, __LINE__);
 
 	for(int x=0; x<m_widthx; x++)
 		for(int z=0; z<m_widthz; z++)
@@ -1160,6 +1134,8 @@ void Heightmap::remesh(float tilescale)
 
 	Vec3f* tempnormals = new Vec3f[ m_widthx * m_widthz * 3 * 2 ];
 
+	if(!tempnormals) OutOfMem(__FILE__, __LINE__);
+
 	// Average the added up normals and store them in tempnormals.
 	for(int x=0; x<m_widthx; x++)
 		for(int z=0; z<m_widthz; z++)
@@ -1219,6 +1195,125 @@ void Heightmap::remesh(float tilescale)
 	delete [] tempnormals;
 	delete [] addedvertnormals;
 	delete [] tilenormals;
+
+	// Now to remesh the rim (underground)
+	m_rimva.alloc( 3 * 2 * (m_widthx + m_widthz) * 2 + 6 );
+	float lowy = ConvertHeight(0);
+
+	// North side
+	for(int x=0; x<m_widthx; x++)
+	{
+		int index = 3 * 2 * x + 0;
+
+		m_rimva.vertices[index + 0] = Vec3f((x+1)*TILE_SIZE, getheight(x+1, 0), 0);
+		m_rimva.vertices[index + 1] = Vec3f((x+0)*TILE_SIZE, getheight(x+0, 0), 0);
+		m_rimva.vertices[index + 2] = Vec3f((x+0)*TILE_SIZE, lowy, 0);
+		
+		m_rimva.vertices[index + 3] = Vec3f((x+1)*TILE_SIZE, getheight(x+1, 0), 0);
+		m_rimva.vertices[index + 4] = Vec3f((x+0)*TILE_SIZE, lowy, 0);
+		m_rimva.vertices[index + 5] = Vec3f((x+1)*TILE_SIZE, lowy, 0);
+		
+		m_rimva.vertices[index + 0].y = max(m_rimva.vertices[index + 0].y, WATER_LEVEL);
+		m_rimva.vertices[index + 1].y = max(m_rimva.vertices[index + 1].y, WATER_LEVEL);
+		m_rimva.vertices[index + 3].y = max(m_rimva.vertices[index + 3].y, WATER_LEVEL);
+
+		for(int i=0; i<6; i++)
+		{
+			m_rimva.normals[index + i] = Vec3f(0,0,-1);
+			m_rimva.texcoords[index + i] = Vec2f(-m_rimva.vertices[index + i].x/TILE_SIZE/10, m_rimva.vertices[index + i].y/TILE_SIZE/10);
+		}
+	}
+	
+	// South side
+	for(int x=0; x<m_widthx; x++)
+	{
+		int index = 3 * 2 * x + 3*2*m_widthx + 0;
+
+		m_rimva.vertices[index + 0] = Vec3f((x+0)*TILE_SIZE, getheight(x+0, m_widthz), (m_widthz)*TILE_SIZE);
+		m_rimva.vertices[index + 1] = Vec3f((x+1)*TILE_SIZE, getheight(x+1, m_widthz), (m_widthz)*TILE_SIZE);
+		m_rimva.vertices[index + 2] = Vec3f((x+1)*TILE_SIZE, lowy, (m_widthz)*TILE_SIZE);
+		
+		m_rimva.vertices[index + 3] = Vec3f((x+0)*TILE_SIZE, getheight(x+0, m_widthz), (m_widthz)*TILE_SIZE);
+		m_rimva.vertices[index + 4] = Vec3f((x+1)*TILE_SIZE, lowy, (m_widthz)*TILE_SIZE);
+		m_rimva.vertices[index + 5] = Vec3f((x+0)*TILE_SIZE, lowy, (m_widthz)*TILE_SIZE);
+		
+		m_rimva.vertices[index + 0].y = max(m_rimva.vertices[index + 0].y, WATER_LEVEL);
+		m_rimva.vertices[index + 1].y = max(m_rimva.vertices[index + 1].y, WATER_LEVEL);
+		m_rimva.vertices[index + 3].y = max(m_rimva.vertices[index + 3].y, WATER_LEVEL);
+
+		for(int i=0; i<6; i++)
+		{
+			m_rimva.normals[index + i] = Vec3f(0,0,1);
+			m_rimva.texcoords[index + i] = Vec2f(m_rimva.vertices[index + i].x/TILE_SIZE/10, m_rimva.vertices[index + i].y/TILE_SIZE/10);
+		}
+	}
+	
+	// West side
+	for(int z=0; z<m_widthz; z++)
+	{
+		int index = 3 * 2 * z + 3*2*m_widthx*2 + 0;
+
+		m_rimva.vertices[index + 0] = Vec3f(0, getheight(0, z+0), (z+0)*TILE_SIZE);
+		m_rimva.vertices[index + 1] = Vec3f(0, getheight(0, z+1), (z+1)*TILE_SIZE);
+		m_rimva.vertices[index + 2] = Vec3f(0, lowy, (z+1)*TILE_SIZE);
+		
+		m_rimva.vertices[index + 3] = Vec3f(0, getheight(0, z+0), (z+0)*TILE_SIZE);
+		m_rimva.vertices[index + 4] = Vec3f(0, lowy, (z+1)*TILE_SIZE);
+		m_rimva.vertices[index + 5] = Vec3f(0, lowy, (z+0)*TILE_SIZE);
+		
+		m_rimva.vertices[index + 0].y = max(m_rimva.vertices[index + 0].y, WATER_LEVEL);
+		m_rimva.vertices[index + 1].y = max(m_rimva.vertices[index + 1].y, WATER_LEVEL);
+		m_rimva.vertices[index + 3].y = max(m_rimva.vertices[index + 3].y, WATER_LEVEL);
+
+		for(int i=0; i<6; i++)
+		{
+			m_rimva.normals[index + i] = Vec3f(-1,0,0);
+			m_rimva.texcoords[index + i] = Vec2f(m_rimva.vertices[index + i].z/TILE_SIZE/10, m_rimva.vertices[index + i].y/TILE_SIZE/10);
+		}
+	}
+	
+	// East side
+	for(int z=0; z<m_widthz; z++)
+	{
+		int index = 3 * 2 * z + 3*2*m_widthx*2 + 3*2*m_widthz;
+
+		m_rimva.vertices[index + 0] = Vec3f((m_widthx)*TILE_SIZE, getheight(m_widthx, z+1), (z+1)*TILE_SIZE);
+		m_rimva.vertices[index + 1] = Vec3f((m_widthx)*TILE_SIZE, getheight(m_widthx, z+0), (z+0)*TILE_SIZE);
+		m_rimva.vertices[index + 2] = Vec3f((m_widthx)*TILE_SIZE, lowy, (z+0)*TILE_SIZE);
+		
+		m_rimva.vertices[index + 3] = Vec3f((m_widthx)*TILE_SIZE, getheight(m_widthx, z+1), (z+1)*TILE_SIZE);
+		m_rimva.vertices[index + 4] = Vec3f((m_widthx)*TILE_SIZE, lowy, (z+0)*TILE_SIZE);
+		m_rimva.vertices[index + 5] = Vec3f((m_widthx)*TILE_SIZE, lowy, (z+1)*TILE_SIZE);
+		
+		m_rimva.vertices[index + 0].y = max(m_rimva.vertices[index + 0].y, WATER_LEVEL);
+		m_rimva.vertices[index + 1].y = max(m_rimva.vertices[index + 1].y, WATER_LEVEL);
+		m_rimva.vertices[index + 3].y = max(m_rimva.vertices[index + 3].y, WATER_LEVEL);
+
+		for(int i=0; i<6; i++)
+		{
+			m_rimva.normals[index + i] = Vec3f(1,0,0);
+			m_rimva.texcoords[index + i] = Vec2f(-m_rimva.vertices[index + i].z/TILE_SIZE/10, m_rimva.vertices[index + i].y/TILE_SIZE/10);
+		}
+	}
+
+	// Bottom side
+	{
+		int index = 3*2*m_widthx*2 + 3*2*m_widthz*2;
+
+		m_rimva.vertices[index + 0] = Vec3f((m_widthx)*TILE_SIZE, lowy, (m_widthz)*TILE_SIZE);
+		m_rimva.vertices[index + 1] = Vec3f((m_widthx)*TILE_SIZE, lowy, (0)*TILE_SIZE);
+		m_rimva.vertices[index + 2] = Vec3f((0)*TILE_SIZE, lowy, (0)*TILE_SIZE);
+		
+		m_rimva.vertices[index + 3] = Vec3f((m_widthx)*TILE_SIZE, lowy, (m_widthz)*TILE_SIZE);
+		m_rimva.vertices[index + 4] = Vec3f((0)*TILE_SIZE, lowy, (0)*TILE_SIZE);
+		m_rimva.vertices[index + 5] = Vec3f((0)*TILE_SIZE, lowy, (m_widthz)*TILE_SIZE);
+
+		for(int i=0; i<6; i++)
+		{
+			m_rimva.normals[index + i] = Vec3f(0,-1,0);
+			m_rimva.texcoords[index + i] = Vec2f(-m_rimva.vertices[index + i].x/TILE_SIZE/10, m_rimva.vertices[index + i].z/TILE_SIZE/10);
+		}
+	}
 }
 
 void Heightmap::draw()
@@ -1261,9 +1356,6 @@ void Heightmap::draw()
 	glUniform1f(s->m_slot[SSLOT_MAPMAXX], m_widthx*TILE_SIZE*m_tilescale);
 	glUniform1f(s->m_slot[SSLOT_MAPMINY], ConvertHeight(0));
 	glUniform1f(s->m_slot[SSLOT_MAPMAXY], ConvertHeight(255));
-	
-	glUniform1f(s->m_slot[SSLOT_MIND], MIN_DISTANCE);
-	glUniform1f(s->m_slot[SSLOT_MAXD], MAX_DISTANCE / g_zoom);
 
 	/*
 	for(int x=0; x<m_widthx; x++)
@@ -1313,24 +1405,130 @@ void Heightmap::draw2()
 	glActiveTextureARB(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, g_texture[ g_tiletexs[TILE_SAND] ].texname);
 	glUniform1iARB(s->m_slot[SSLOT_SANDTEX], 0);
+
+	CheckGLError(__FILE__, __LINE__);
+
 	glActiveTextureARB(GL_TEXTURE1);
 	glBindTexture(GL_TEXTURE_2D, g_texture[ g_tiletexs[TILE_GRASS] ].texname);
 	glUniform1iARB(s->m_slot[SSLOT_GRASSTEX], 1);
+
+	CheckGLError(__FILE__, __LINE__);
+
 	glActiveTextureARB(GL_TEXTURE2);
 	glBindTexture(GL_TEXTURE_2D, g_texture[ g_tiletexs[TILE_SNOW] ].texname);
 	glUniform1iARB(s->m_slot[SSLOT_SNOWTEX], 2);
+
+	CheckGLError(__FILE__, __LINE__);
+
 	glActiveTextureARB(GL_TEXTURE3);
 	glBindTexture(GL_TEXTURE_2D, g_texture[ g_tiletexs[TILE_ROCK] ].texname);
 	glUniform1iARB(s->m_slot[SSLOT_ROCKTEX], 3);
+
+	CheckGLError(__FILE__, __LINE__);
+
 	glActiveTextureARB(GL_TEXTURE4);
 	glBindTexture(GL_TEXTURE_2D, g_texture[ g_tiletexs[TILE_CRACKEDROCK] ].texname);
 	glUniform1iARB(s->m_slot[SSLOT_CRACKEDROCKTEX], 4);
+
+	CheckGLError(__FILE__, __LINE__);
+
 	glActiveTextureARB(GL_TEXTURE5);
 	glBindTexture(GL_TEXTURE_2D, g_texture[ g_tiletexs[TILE_CRACKEDROCK_NORM] ].texname);
 	glUniform1iARB(s->m_slot[SSLOT_CRACKEDROCKNORMTEX], 5);
+
+	CheckGLError(__FILE__, __LINE__);
+
 	glActiveTextureARB(GL_TEXTURE6);
 	glBindTexture(GL_TEXTURE_2D, g_texture[ g_tiletexs[TILE_ROCK_NORM] ].texname);
 	glUniform1iARB(s->m_slot[SSLOT_ROCKNORMTEX], 6);
+
+	CheckGLError(__FILE__, __LINE__);
+
+	
+	//float yscale = TILE_Y_SCALE / 2000.0f;
+	glUniform1f(s->m_slot[SSLOT_SANDONLYMAXY], ELEV_SANDONLYMAXY);
+	glUniform1f(s->m_slot[SSLOT_SANDGRASSMAXY], ELEV_SANDGRASSMAXY);
+	glUniform1f(s->m_slot[SSLOT_GRASSONLYMAXY], ELEV_GRASSONLYMAXY);
+	glUniform1f(s->m_slot[SSLOT_GRASSROCKMAXY], ELEV_GRASSROCKMAXY);
+	glUniform1f(s->m_slot[SSLOT_MAPMINZ], 0);
+	glUniform1f(s->m_slot[SSLOT_MAPMAXZ], m_widthz*TILE_SIZE*m_tilescale);
+	glUniform1f(s->m_slot[SSLOT_MAPMINX], 0);
+	glUniform1f(s->m_slot[SSLOT_MAPMAXX], m_widthx*TILE_SIZE*m_tilescale);
+	glUniform1f(s->m_slot[SSLOT_MAPMINY], ConvertHeight(0));
+	glUniform1f(s->m_slot[SSLOT_MAPMAXY], ConvertHeight(255));
+
+	CheckGLError(__FILE__, __LINE__);
+
+
+	/*
+	for(int x=0; x<m_widthx; x++)
+		for(int z=0; z<m_widthz; z++)
+		{
+			glVertexAttribPointer(s->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, &m_drawvertices[ (z * m_widthx + x) * 3 * 2 + 0 ]);
+			glVertexAttribPointer(s->m_slot[SSLOT_TEXCOORD0], 2, GL_FLOAT, GL_FALSE, 0, &m_texcoords0[ (z * m_widthx + x) * 3 * 2 + 0 ]);
+			glVertexAttribPointer(s->m_slot[SSLOT_NORMAL], 3, GL_FLOAT, GL_FALSE, 0, &m_normals[ (z * m_widthx + x) * 3 * 2 + 0 ]);
+
+			glDrawArrays(GL_TRIANGLES, 0, 6);
+		}
+		*/
+
+#if 1
+	// Draw all tiles
+	glVertexAttribPointer(s->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, m_collverts);
+
+	CheckGLError(__FILE__, __LINE__);
+
+	glVertexAttribPointer(s->m_slot[SSLOT_TEXCOORD0], 2, GL_FLOAT, GL_FALSE, 0, m_texcoords0);
+
+	CheckGLError(__FILE__, __LINE__);
+
+	if(s->m_slot[SSLOT_NORMAL] != -1)
+		glVertexAttribPointer(s->m_slot[SSLOT_NORMAL], 3, GL_FLOAT, GL_FALSE, 0, m_normals);
+
+	CheckGLError(__FILE__, __LINE__);
+
+	glDrawArrays(GL_TRIANGLES, 0, (m_widthx) * (m_widthz) * 3 * 2);
+
+	CheckGLError(__FILE__, __LINE__);
+
+
+#else
+	int tilescale = m_tilescale;
+
+	// Draw only visible tiles in strips
+	for(int z=g_mapview[0].y/tilescale; z<=g_mapview[1].y/tilescale; z++)
+	{
+		int starti = m_widthx*z + g_mapview[0].x/tilescale;
+		int spanx = g_mapview[1].x/tilescale - g_mapview[0].x/tilescale;
+		int spanz = g_mapview[1].y/tilescale - g_mapview[0].y/tilescale;
+		//int stridei = m_widthx - spanx;
+		int stridei = 0;
+	
+		glVertexAttribPointer(s->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, m_drawvertices);
+		glVertexAttribPointer(s->m_slot[SSLOT_TEXCOORD0], 2, GL_FLOAT, GL_FALSE, 0, m_texcoords0);
+		glVertexAttribPointer(s->m_slot[SSLOT_NORMAL], 3, GL_FLOAT, GL_FALSE, 0, m_normals);
+		glDrawArrays(GL_TRIANGLES, starti * 2 * 3, spanx * 3 * 2);
+	}
+#endif
+}
+
+void Heightmap::drawrim()
+{
+	if(m_widthx <= 0 || m_widthz <= 0)
+		return;
+	//return;
+	Shader* s = &g_shader[g_curS];
+	
+	glActiveTextureARB(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, g_texture[ g_rimtexs[TEX_DIFF] ].texname);
+	glUniform1iARB(s->m_slot[SSLOT_TEXTURE0], 0);
+	glActiveTextureARB(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_2D, g_texture[ g_rimtexs[TEX_SPEC] ].texname);
+	glUniform1iARB(s->m_slot[SSLOT_SPECULARMAP], 1);
+	glActiveTextureARB(GL_TEXTURE2);
+	glBindTexture(GL_TEXTURE_2D, g_texture[ g_rimtexs[TEX_NORM] ].texname);
+	glUniform1iARB(s->m_slot[SSLOT_NORMALMAP], 2);
+	glActiveTextureARB(GL_TEXTURE3);
 	
 	//float yscale = TILE_Y_SCALE / 2000.0f;
 	glUniform1f(s->m_slot[SSLOT_SANDONLYMAXY], ELEV_SANDONLYMAXY);
@@ -1355,260 +1553,13 @@ void Heightmap::draw2()
 			glDrawArrays(GL_TRIANGLES, 0, 6);
 		}
 		*/
-
 #if 1
 	// Draw all tiles
-	glVertexAttribPointer(s->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, m_collverts);
-	glVertexAttribPointer(s->m_slot[SSLOT_TEXCOORD0], 2, GL_FLOAT, GL_FALSE, 0, m_texcoords0);
-	glVertexAttribPointer(s->m_slot[SSLOT_NORMAL], 3, GL_FLOAT, GL_FALSE, 0, m_normals);
-	glDrawArrays(GL_TRIANGLES, 0, (m_widthx) * (m_widthz) * 3 * 2);
-
-#else
-	int tilescale = m_tilescale;
-
-	// Draw only visible tiles in strips
-	for(int z=g_mapview[0].y/tilescale; z<=g_mapview[1].y/tilescale; z++)
-	{
-		int starti = m_widthx*z + g_mapview[0].x/tilescale;
-		int spanx = g_mapview[1].x/tilescale - g_mapview[0].x/tilescale;
-		int spanz = g_mapview[1].y/tilescale - g_mapview[0].y/tilescale;
-		//int stridei = m_widthx - spanx;
-		int stridei = 0;
-	
-		glVertexAttribPointer(s->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, m_drawvertices);
-		glVertexAttribPointer(s->m_slot[SSLOT_TEXCOORD0], 2, GL_FLOAT, GL_FALSE, 0, m_texcoords0);
-		glVertexAttribPointer(s->m_slot[SSLOT_NORMAL], 3, GL_FLOAT, GL_FALSE, 0, m_normals);
-		glDrawArrays(GL_TRIANGLES, starti * 2 * 3, spanx * 3 * 2);
-	}
-#endif
-}
-
-void PrerenderHMDepth()
-{
-	g_hmap.draw2();
-}
-
-void PrerenderHM(Matrix projection, Matrix viewmat, Matrix modelmat, Matrix modelviewinv, float mvLightPos[3], float lightDir[3])
-{
-	Matrix mvpmat;
-	mvpmat.set(projection.m_matrix);
-	mvpmat.postMultiply(viewmat);
-
-#if 1
-	UseShadow(SHADER_MAPTILESPREREND, projection, viewmat, modelmat, modelviewinv, mvLightPos, lightDir);
-	glActiveTextureARB(GL_TEXTURE8);
-	glBindTexture(GL_TEXTURE_2D, g_depth);
-	glUniform1iARB(g_shader[g_curS].m_slot[SSLOT_SHADOWMAP], 8);
-	g_hmap.draw2();
-#endif
-}
-
-#define PRERENDER_SIZE		2048
-
-void Heightmap::prerender()
-{
-	int fullwidthx = m_widthx*256/5.3;
-	int fullwidthz = m_widthz*256/5.3;
-	
-	m_fulltex.destroy();
-#if 0
-	AllocTex(&m_fulltex, fullwidthx, fullwidthz, 3);
-#endif
-	float aspect = fabsf((float)PRERENDER_SIZE / (float)PRERENDER_SIZE);
-	Matrix projection = BuildPerspProjMat(FIELD_OF_VIEW, aspect, MIN_DISTANCE, MAX_DISTANCE/g_zoom);
-	//Matrix projection = setorthographicmat(-PROJ_RIGHT*aspect/g_zoom, PROJ_RIGHT*aspect/g_zoom, PROJ_RIGHT/g_zoom, -PROJ_RIGHT/g_zoom, MIN_DISTANCE, MAX_DISTANCE);
-
-	Vec3f focusvec = g_camera.m_view;
-	Vec3f posvec = g_camera.zoompos();
-	Vec3f upvec = g_camera.m_up;
-
-	Matrix viewmat = gluLookAt3(posvec.x, posvec.y, posvec.z, focusvec.x, focusvec.y, focusvec.z, upvec.x, upvec.y, upvec.z);
-
-	Matrix modelview;
-	Matrix modelmat;
-	float translation[] = {0, 0, 0};
-	modelview.setTranslation(translation);
-	modelmat.setTranslation(translation);
-	modelview.postMultiply(viewmat);
-
-	Matrix mvpmat;
-	mvpmat.set(projection.m_matrix);
-	mvpmat.postMultiply(viewmat);
-
-	Vec3f focus(g_hmap.m_widthx*TILE_SIZE, 0, g_hmap.m_widthz*TILE_SIZE);
-	Vec3f vLine[2];
-	Vec3f ray = Normalize(g_camera.m_view - posvec);
-	Vec3f onnear = posvec;	//OnNear(g_width/2, g_height/2);
-
-	glDisable(GL_CULL_FACE);
-	RenderToShadowMap(projection, viewmat, modelmat, focus, focus + g_lightOff / MIN_ZOOM, PrerenderHMDepth);
-	glEnable(GL_CULL_FACE);
-
-	unsigned int rendbuffer;
-	unsigned int framebuffer;
-	unsigned int rendtex;
-
-	glGenTextures(1, &rendtex);
-	glBindTexture(GL_TEXTURE_2D, rendtex);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
-	
-#if 1
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16, PRERENDER_SIZE, PRERENDER_SIZE, 0, GL_RGBA, GL_UNSIGNED_SHORT, 0);
-#else
-	//glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT32F, g_depthSizeX, g_depthSizeY, 0, GL_RGBA, GL_UNSIGNED_SHORT, 0);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT32F, g_depthSizeX, g_depthSizeY, 0, GL_RED, GL_UNSIGNED_SHORT, 0);
-#endif
-	glBindTexture(GL_TEXTURE_2D, 0);
-
-	glGenRenderbuffersEXT(1, &rendbuffer);
-	glBindRenderbufferEXT(GL_RENDERBUFFER_EXT, rendbuffer);
-	glRenderbufferStorageEXT(GL_RENDERBUFFER_EXT, GL_DEPTH_COMPONENT24, PRERENDER_SIZE, PRERENDER_SIZE);
-	glBindRenderbufferEXT(GL_RENDERBUFFER_EXT, 0);
-	
-	glGenFramebuffersEXT(1, &framebuffer);
-	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, framebuffer);
-	glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_2D, rendtex, 0);
-	glFramebufferRenderbufferEXT(GL_FRAMEBUFFER_EXT, GL_DEPTH_ATTACHMENT_EXT, GL_RENDERBUFFER_EXT, rendbuffer);
-	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
-
-	int viewport[4];
-	glGetIntegerv(GL_VIEWPORT, viewport);
-
-	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, framebuffer);
-	glViewport(0, 0, PRERENDER_SIZE, PRERENDER_SIZE);
-
-#if 0
-	for(int x=0; x<fullwidthx; x+=PRERENDER_SIZE)
-		for(int z=0; z<fullwidthz; z+=PRERENDER_SIZE)
-		{
-#endif
-			glClearColor(1.0, 1.0, 1.0, 1.0);
-			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-#if 0	
-			int portionwx = min((fullwidthx-x), PRERENDER_SIZE);
-			int portionwz = min((fullwidthz-z), PRERENDER_SIZE);
-#endif
-			RenderShadowedScene(projection, viewmat, modelmat, modelview, PrerenderHM);
-#if 0
-			LoadedTex portiontex;
-			//AllocTex(&portiontex, portionwx, portionwz, 3);
-			
-			unsigned int pbo;
-			glGenBuffers(1, &pbo);
-			glBindBuffer(GL_PIXEL_PACK_BUFFER_ARB, pbo);
-			glBufferData(GL_PIXEL_PACK_BUFFER_ARB, portionwx*portionwz*3, NULL, GL_STREAM_READ_ARB );
-			
-			glBindBuffer(GL_PIXEL_PACK_BUFFER_ARB, pbo);
-			glReadBuffer(GL_COLOR_ATTACHMENT0_EXT);
-			//glReadBuffer(GL_DEPTH_ATTACHMENT_EXT);
-			glReadPixels(0, 0, portionwx, portionwz, GL_RGB, GL_UNSIGNED_BYTE, 0);
-
-
-			portiontex.sizeX = portionwx;
-			portiontex.sizeY = portionwz;
-			portiontex.channels = 3;
-			portiontex.data = (unsigned char*) glMapBuffer(GL_PIXEL_PACK_BUFFER_ARB, GL_READ_ONLY_ARB);
-
-			if(portiontex.data)
-			{
-				Blit(&portiontex, &m_fulltex, Vec2i(x,z));
-
-				glUnmapBuffer(GL_PIXEL_PACK_BUFFER_ARB);
-			}
-
-			portiontex.data = NULL;
-
-			glBindBuffer(GL_PIXEL_PACK_BUFFER_ARB, NULL);
-
-			glDeleteBuffers(1, &pbo);
-		}
-
-	char fullpath[MAX_PATH+1];
-	FullPath("temp/terrain.raw", fullpath);
-	SaveRAW(fullpath, &m_fulltex);
-	m_fulltex.destroy();
-#endif
-	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
-
-	//glViewport(0, 0, g_width, g_height);
-	glViewport(viewport[0], viewport[1], viewport[2], viewport[3]);
-
-	g_tiletexs[TILE_PRERENDER] = rendtex;
-}
-
-void Heightmap::draw3()
-{
-	if(m_widthx <= 0 || m_widthz <= 0)
-		return;
-
-	Shader* s = &g_shader[g_curS];
-	
-	glActiveTextureARB(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, g_tiletexs[TILE_PRERENDER]);
-	glUniform1iARB(s->m_slot[SSLOT_TEXTURE0], 0);
-	
-	glUniform1f(s->m_slot[SSLOT_MAPMINZ], 0);
-	glUniform1f(s->m_slot[SSLOT_MAPMAXZ], m_widthz*TILE_SIZE*m_tilescale);
-	glUniform1f(s->m_slot[SSLOT_MAPMINX], 0);
-	glUniform1f(s->m_slot[SSLOT_MAPMAXX], m_widthx*TILE_SIZE*m_tilescale);
-	//glUniform1f(s->m_slot[SSLOT_MAPMINY], ConvertHeight(0));
-	//glUniform1f(s->m_slot[SSLOT_MAPMAXY], ConvertHeight(255));
-
-#if 1
-	// Draw all tiles
-	glVertexAttribPointer(s->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, m_drawvertices);
-	glVertexAttribPointer(s->m_slot[SSLOT_TEXCOORD0], 2, GL_FLOAT, GL_FALSE, 0, m_texcoords0);
-	glVertexAttribPointer(s->m_slot[SSLOT_NORMAL], 3, GL_FLOAT, GL_FALSE, 0, m_normals);
-	glDrawArrays(GL_TRIANGLES, 0, (m_widthx) * (m_widthz) * 3 * 2);
-
-#else
-	int tilescale = m_tilescale;
-
-	// Draw only visible tiles in strips
-	for(int z=g_mapview[0].y/tilescale; z<=g_mapview[1].y/tilescale; z++)
-	{
-		int starti = m_widthx*z + g_mapview[0].x/tilescale;
-		int spanx = g_mapview[1].x/tilescale - g_mapview[0].x/tilescale;
-		int spanz = g_mapview[1].y/tilescale - g_mapview[0].y/tilescale;
-		//int stridei = m_widthx - spanx;
-		int stridei = 0;
-	
-		glVertexAttribPointer(s->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, m_drawvertices);
-		glVertexAttribPointer(s->m_slot[SSLOT_TEXCOORD0], 2, GL_FLOAT, GL_FALSE, 0, m_texcoords0);
-		glVertexAttribPointer(s->m_slot[SSLOT_NORMAL], 3, GL_FLOAT, GL_FALSE, 0, m_normals);
-		glDrawArrays(GL_TRIANGLES, starti * 2 * 3, spanx * 3 * 2);
-	}
-#endif
-}
-
-
-void Heightmap::draw4()
-{
-	if(m_widthx <= 0 || m_widthz <= 0)
-		return;
-
-	Shader* s = &g_shader[g_curS];
-	
-	glActiveTextureARB(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, g_tiletexs[TILE_PRERENDER]);
-	glUniform1iARB(s->m_slot[SSLOT_TEXTURE0], 0);
-	
-	glUniform1f(s->m_slot[SSLOT_MAPMINZ], 0);
-	glUniform1f(s->m_slot[SSLOT_MAPMAXZ], m_widthz*TILE_SIZE*m_tilescale);
-	glUniform1f(s->m_slot[SSLOT_MAPMINX], 0);
-	glUniform1f(s->m_slot[SSLOT_MAPMAXX], m_widthx*TILE_SIZE*m_tilescale);
-	glUniform1f(s->m_slot[SSLOT_MAPMINY], ConvertHeight(0));
-	glUniform1f(s->m_slot[SSLOT_MAPMAXY], ConvertHeight(255));
-
-#if 1
-	// Draw all tiles
-	glVertexAttribPointer(s->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, m_collverts);
-	glVertexAttribPointer(s->m_slot[SSLOT_TEXCOORD0], 2, GL_FLOAT, GL_FALSE, 0, m_texcoords0);
-	glVertexAttribPointer(s->m_slot[SSLOT_NORMAL], 3, GL_FLOAT, GL_FALSE, 0, m_normals);
-	glDrawArrays(GL_TRIANGLES, 0, (m_widthx) * (m_widthz) * 3 * 2);
+	glVertexAttribPointer(s->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, m_rimva.vertices);
+	glVertexAttribPointer(s->m_slot[SSLOT_TEXCOORD0], 2, GL_FLOAT, GL_FALSE, 0, m_rimva.texcoords);
+	if(s->m_slot[SSLOT_NORMAL] != -1)
+		glVertexAttribPointer(s->m_slot[SSLOT_NORMAL], 3, GL_FLOAT, GL_FALSE, 0, m_rimva.normals);
+	glDrawArrays(GL_TRIANGLES, 0, m_rimva.numverts);
 
 #else
 	int tilescale = m_tilescale;

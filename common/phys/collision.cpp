@@ -6,8 +6,8 @@
 #include "../sim/unit.h"
 #include "../sim/unittype.h"
 #include "../render/heightmap.h"
-#include "../sim/crudepipeline.h"
-#include "../sim/powerline.h"
+#include "../sim/crpipe.h"
+#include "../sim/powl.h"
 
 int g_lastcollider = -1;
 int g_collidertype;

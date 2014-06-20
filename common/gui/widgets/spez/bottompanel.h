@@ -15,16 +15,6 @@ class BottomPanel : public Widget
 public:
 	BottomPanel(Widget* parent, const char* n, void (*reframef)(Widget* thisw));
 
-#if 0
-	Text restext;
-	Image leftinnerdiagblur;
-	Image rightinnerdiagblur;
-	Image innerbottom;
-	Image lefthlineblur;
-	Image righthlineblur;
-	Image whitebg;
-#endif
-
 	Image left_outer_toprightcorner;
 	Image left_outer_top;
 	ViewportW left_minimap;
@@ -40,22 +30,9 @@ public:
 	bool bottomright_button_on[9];
 
 	void draw();
-	void draw2();
+	void drawover();
 	void reframe();
-	bool prelbuttonup(bool moved);
-	bool lbuttonup(bool moved);
-	bool prelbuttondown();
-	bool lbuttondown();
-	void premousemove();
-	bool mousemove();
-	bool prerbuttonup(bool moved);
-	bool rbuttonup(bool moved);
-	bool prerbuttondown();
-	bool rbuttondown();
-	bool keyup(int k);
-	bool keydown(int k);
-	bool charin(int k);
-	bool mousewheel(int delta);
+	void inev(InEv* ev);
 	void frameupd();
 };
 

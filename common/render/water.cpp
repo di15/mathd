@@ -7,6 +7,7 @@
 #include "heightmap.h"
 #include "../window.h"
 #include "../save/savemap.h"
+#include "../sim/player.h"
 
 unsigned int g_water;
 unsigned int g_watertex[WATER_TEXS];
@@ -22,6 +23,15 @@ void AllocWater(int wx, int wz)
 	g_watertexcos = new Vec2f[ (wx) * (wz) * 4 ];
 	g_waternorms = new Vec3f[ (wx) * (wz) * 4 ];
 
+	if(!g_waterverts)
+		OutOfMem(__FILE__, __LINE__);
+
+	if(!g_watertexcos)
+		OutOfMem(__FILE__, __LINE__);
+
+	if(!g_waternorms)
+		OutOfMem(__FILE__, __LINE__);
+
 	for(int x=0; x<wx; x++)
 		for(int z=0; z<wz; z++)
 		{
@@ -29,11 +39,22 @@ void AllocWater(int wx, int wz)
 			g_waterverts[ z*(wx) * 4 + x * 4 + 1 ] = Vec3f((x+1)*TILE_SIZE, WATER_LEVEL, z*TILE_SIZE);
 			g_waterverts[ z*(wx) * 4 + x * 4 + 2 ] = Vec3f((x+1)*TILE_SIZE, WATER_LEVEL, (z+1)*TILE_SIZE);
 			g_waterverts[ z*(wx) * 4 + x * 4 + 3 ] = Vec3f(x*TILE_SIZE, WATER_LEVEL, (z+1)*TILE_SIZE);
+
+			if(g_hmap.getheight(x, z) > WATER_LEVEL &&
+				g_hmap.getheight(x+1, z) > WATER_LEVEL &&
+				g_hmap.getheight(x, z+1) > WATER_LEVEL &&
+				g_hmap.getheight(x+1, z+1) > WATER_LEVEL)
+			{
+				g_waterverts[ z*(wx) * 4 + x * 4 + 0 ] = Vec3f(0,0,0);
+				g_waterverts[ z*(wx) * 4 + x * 4 + 1 ] = Vec3f(0,0,0);
+				g_waterverts[ z*(wx) * 4 + x * 4 + 2 ] = Vec3f(0,0,0);
+				g_waterverts[ z*(wx) * 4 + x * 4 + 3 ] = Vec3f(0,0,0);
+			}
 			
-			g_watertexcos[ z*(wx) * 4 + x * 4 + 0 ] = Vec2f(0, 0);
-			g_watertexcos[ z*(wx) * 4 + x * 4 + 1 ] = Vec2f(1, 0);
-			g_watertexcos[ z*(wx) * 4 + x * 4 + 2 ] = Vec2f(1, 1);
-			g_watertexcos[ z*(wx) * 4 + x * 4 + 3 ] = Vec2f(0, 1);
+			g_watertexcos[ z*(wx) * 4 + x * 4 + 0 ] = Vec2f(x, z);
+			g_watertexcos[ z*(wx) * 4 + x * 4 + 1 ] = Vec2f(x+1, z);
+			g_watertexcos[ z*(wx) * 4 + x * 4 + 2 ] = Vec2f(x+1, z+1);
+			g_watertexcos[ z*(wx) * 4 + x * 4 + 3 ] = Vec2f(x, z+1);
 			
 			g_waternorms[ z*(wx) * 4 + x * 4 + 0 ] = Vec3f(0, 1, 0);
 			g_waternorms[ z*(wx) * 4 + x * 4 + 1 ] = Vec3f(0, 1, 0);
@@ -65,6 +86,11 @@ void FreeWater()
 
 void DrawWater3()
 {
+	static int wavephase = 0;
+
+	wavephase ++;
+	wavephase = wavephase % 2000;
+
 	Shader* s = &g_shader[g_curS];
     
 	glActiveTextureARB(GL_TEXTURE0);
@@ -86,14 +112,17 @@ void DrawWater3()
 	glActiveTextureARB(GL_TEXTURE3);
 	glBindTexture(GL_TEXTURE_2D, g_texture[ g_watertex[WATER_TEX_NORMAL] ].texname);
 	glUniform1iARB(s->m_slot[SSLOT_NORMALMAP], 3);
+
+	Player* py = &g_player[g_currP];
 	
 	glUniform1f(s->m_slot[SSLOT_MIND], MIN_DISTANCE);
-	glUniform1f(s->m_slot[SSLOT_MAXD], MAX_DISTANCE / g_zoom);
+	glUniform1f(s->m_slot[SSLOT_MAXD], MAX_DISTANCE / py->zoom);
+	glUniform1iARB(s->m_slot[SSLOT_WAVEPHASE], wavephase);
 	
 #if 0
 	glEnable(GL_POLYGON_OFFSET_FILL);
 	//glPolygonOffset(2.0, 500.0);
-	glPolygonOffset(1.0, 0.001/(g_zoom));
+	glPolygonOffset(1.0, 0.001/(py->zoom));
 	//glPolygonOffset(1.0, 250.0);
 #endif
 
@@ -110,6 +139,11 @@ void DrawWater3()
 
 void DrawWater()
 {
+	static int wavephase = 0;
+
+	wavephase ++;
+	wavephase = wavephase % 200;
+
 	Shader* s = &g_shader[g_curS];
     
 	glActiveTextureARB(GL_TEXTURE0);
@@ -131,6 +165,8 @@ void DrawWater()
 	glActiveTextureARB(GL_TEXTURE3);
 	glBindTexture(GL_TEXTURE_2D, g_texture[ g_watertex[WATER_TEX_NORMAL] ].texname);
 	glUniform1iARB(s->m_slot[SSLOT_NORMALMAP], 3);
+	
+	glUniform1iARB(s->m_slot[SSLOT_WAVEPHASE], wavephase);
     
 	Vec3f a, b, c, d;
     
@@ -142,7 +178,7 @@ void DrawWater()
 	c = Vec3f(0, WATER_LEVEL, 0);
 	d = Vec3f(wx * TILE_SIZE, WATER_LEVEL, 0);
     
-	float vertices[] =
+	const float vertices[] =
 	{
 		a.x, a.y, a.z,
 		b.x, b.y, b.z,
@@ -152,7 +188,7 @@ void DrawWater()
 		c.x, c.y, c.z
 	};
     
-	float texcoords0[] =
+	const float texcoords0[] =
 	{
 		(float)(wx+1), (float)(wz+1),
 		0, (float)(wz+1),
@@ -162,7 +198,7 @@ void DrawWater()
 		0, 0
 	};
     
-	static const float normals[] =
+	const float normals[] =
 	{
 		0, 1, 0,
 		0, 1, 0,
@@ -171,14 +207,16 @@ void DrawWater()
 		0, 1, 0,
 		0, 1, 0
 	};
+
+	Player* py = &g_player[g_currP];
 	
 	glUniform1f(s->m_slot[SSLOT_MIND], MIN_DISTANCE);
-	glUniform1f(s->m_slot[SSLOT_MAXD], MAX_DISTANCE / g_zoom);
+	glUniform1f(s->m_slot[SSLOT_MAXD], MAX_DISTANCE / py->zoom);
 	
 #if 0
 	glEnable(GL_POLYGON_OFFSET_FILL);
 	//glPolygonOffset(2.0, 500.0);
-	glPolygonOffset(1.0, 0.001/(g_zoom));
+	glPolygonOffset(1.0, 0.001/(py->zoom));
 	//glPolygonOffset(1.0, 250.0);
 #endif
 
@@ -264,10 +302,11 @@ void DrawWater2()
 		0, 1, 0
 	};
 
+	Player* py = &g_player[g_currP];
 	
 	glEnable(GL_POLYGON_OFFSET_FILL);
 	//glPolygonOffset(2.0, 500.0);
-	glPolygonOffset(1.0, 0.01/(g_zoom));
+	glPolygonOffset(1.0, 0.01/(py->zoom));
 	//glPolygonOffset(1.0, 250.0);
     
 	glVertexAttribPointer(s->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, vertices);

@@ -8,6 +8,19 @@
 #include "../render/foliage.h"
 #include "../phys/collision.h"
 #include "../render/water.h"
+#include "../render/shader.h"
+#include "../math/barycentric.h"
+#include "../math/physics.h"
+#include "player.h"
+#include "../render/transaction.h"
+#include "selection.h"
+#include "../gui/gui.h"
+#include "../gui/widget.h"
+#include "../gui/widgets/spez/constructionview.h"
+#include "powl.h"
+#include "road.h"
+#include "crpipe.h"
+#include "../../game/gmain.h"
 
 Building g_building[BUILDINGS];
 
@@ -44,151 +57,26 @@ int NewBuilding()
 	return -1;
 }
 
-
-bool BuildingLevel(int type, Vec2i tpos)
+float CompletPct(int* cost, int* current)
 {
-#if 1
-	BuildingT* t = &g_buildingT[type];
-    
-	Vec2i tmin;
-	Vec2i tmax;
+	int totalreq = 0;
 
-	tmin.x = tpos.x - t->widthx/2;
-	tmin.y = tpos.y - t->widthz/2;
-	tmax.x = tmin.x + t->widthx;
-	tmax.y = tmin.y + t->widthz;
-    
-	float miny = g_hmap.getheight(tmin.x, tmin.y);
-	float maxy = g_hmap.getheight(tmin.x, tmin.y);
-	
-	bool haswater = false;
-	bool hasland = false;
-    
-	for(int x=tmin.x; x<=tmax.x; x++)
-		for(int z=tmin.y; z<=tmax.y; z++)
-		{
-			float thisy = g_hmap.getheight(x, z);
-
-			if(thisy < miny)
-				miny = thisy;
-
-			if(thisy > maxy)
-				maxy = thisy;
-
-			// Must have two adject water tiles to be water-vessel-accessible
-			if(thisy < WATER_LEVEL)
-			{
-				// If z is along building edge and x and x+1 are water tiles
-				if((z==tmin.y || z==tmax.y) && x+1 <= g_hmap.m_widthx && x+1 <= tmax.x && g_hmap.getheight(x+1, z) < WATER_LEVEL)
-						haswater = true;
-				// If x is along building edge and z and z+1 are water tiles
-				if((x==tmin.x || x==tmax.x) && z+1 <= g_hmap.m_widthz && z+1 <= tmax.y && g_hmap.getheight(x, z+1) < WATER_LEVEL)
-						haswater = true;
-			}
-			// Must have two adjacent land tiles to be road-accessible
-			else if(thisy > WATER_LEVEL)
-			{
-				// If z is along building edge and x and x+1 are land tiles
-				if((z==tmin.y || z==tmax.y) && x+1 <= g_hmap.m_widthx && x+1 <= tmax.x && g_hmap.getheight(x+1, z) > WATER_LEVEL)
-						hasland = true;
-				// If x is along building edge and z and z+1 are land tiles
-				if((x==tmin.x || x==tmax.x) && z+1 <= g_hmap.m_widthz && z+1 <= tmax.y && g_hmap.getheight(x, z+1) > WATER_LEVEL)
-						hasland = true;
-			}
-		}
-
-	if(miny < WATER_LEVEL)
+	for(int i=0; i<RESOURCES; i++)
 	{
-#if 0
-		haswater = true;
-#endif
-		miny = WATER_LEVEL;
+		totalreq += cost[i];
 	}
 
-#if 0
-	if(maxy > WATER_LEVEL)
-		hasland = true;
-#endif
+	int totalhave = 0;
 
-	if(maxy - miny > MAX_CLIMB_INCLINE)
-		return false;
-
-	if(t->foundation == FOUNDATION_LAND)
+	for(int i=0; i<RESOURCES; i++)
 	{
-		if(haswater)
-			return false;
-		if(!hasland)
-			return false;
-	}
-	else if(t->foundation == FOUNDATION_SEA)
-	{
-		if(!haswater)
-			return false;
-		if(hasland)
-			return false;
-	}
-	else if(t->foundation == FOUNDATION_COASTAL)
-	{
-		if(!haswater || !hasland)
-			return false;
+		totalhave += min(cost[i], current[i]);
 	}
 
-#if 0
-	for(int x=tmin.x; x<=tmax.x; x++)
-		for(int z=tmin.y; z<=tmax.y; z++)
-		{
-			if(g_hmap.getheight(x, z) != compare)
-				return false;
-            
-			if(g_hmap.getheight(x, z) <= WATER_LEVEL)
-				return false;
-		}
-#endif
-#endif
-    
-	return true;
+	return (float)totalhave/(float)totalreq;
 }
 
-bool CheckCanPlace(int type, Vec2i pos)
-{
-	BuildingT* t = &g_buildingT[type];
-
-	if(!BuildingLevel(type, pos))
-		return false;
-
-	Vec2i tmin;
-	Vec2i tmax;
-
-	tmin.x = pos.x - t->widthx/2;
-	tmin.y = pos.y - t->widthz/2;
-	tmax.x = tmin.x + t->widthx - 1;
-	tmax.y = tmin.y + t->widthz - 1;
-
-	for(int i=0; i<BUILDINGS; i++)
-	{
-		Building* b = &g_building[i];
-
-		if(!b->on)
-			continue;
-		
-		BuildingT* t2 = &g_buildingT[b->type];
-
-		Vec2i tmin2;
-		Vec2i tmax2;
-
-		tmin2.x = b->tilepos.x - t2->widthx/2;
-		tmin2.y = b->tilepos.y - t2->widthz/2;
-		tmax2.x = tmin2.x + t2->widthx - 1;
-		tmax2.y = tmin2.y + t2->widthz - 1;
-
-		if(tmin.x <= tmax2.x && tmax.x >= tmin2.x && tmin.y <= tmax2.y && tmax.y >= tmin2.y)
-			return false;
-	}
-
-	return true;
-}
-
-bool PlaceBuilding(int type, Vec2i pos, bool finished, int stateowner, int corpowner, int unitowner)
+bool PlaceBuilding(int type, Vec2i pos, bool finished, int owner)
 {
 	int i = NewBuilding();
 
@@ -210,7 +98,7 @@ bool PlaceBuilding(int type, Vec2i pos, bool finished, int stateowner, int corpo
 	tmax.x = tmin.x + t->widthx;
 	tmax.y = tmin.y + t->widthz;
 
-	b->drawpos = Vec3f(pos.x*TILE_SIZE, Highest(tmin.x, tmin.y, tmax.x, tmax.y), pos.y*TILE_SIZE);
+	b->drawpos = Vec3f(pos.x*TILE_SIZE, Lowest(tmin.x, tmin.y, tmax.x, tmax.y), pos.y*TILE_SIZE);
 
 	if(t->foundation == FOUNDATION_SEA)
 		b->drawpos.y = WATER_LEVEL;
@@ -222,11 +110,13 @@ bool PlaceBuilding(int type, Vec2i pos, bool finished, int stateowner, int corpo
 	if(t->widthz % 2 == 1)
 		b->drawpos.z += TILE_SIZE/2;
 
-	b->stateowner = stateowner;
-	b->corpowner = corpowner;
-	b->unitowner = unitowner;
+	b->owner = owner;
 
 	b->finished = finished;
+
+	Zero(b->conmat);
+	Zero(b->stocked);
+	Zero(b->maxcost);
 
 	int cmminx = tmin.x*TILE_SIZE;
 	int cmminz = tmin.y*TILE_SIZE;
@@ -234,22 +124,153 @@ bool PlaceBuilding(int type, Vec2i pos, bool finished, int stateowner, int corpo
 	int cmmaxz = cmminz + t->widthz*TILE_SIZE;
 
 	ClearFoliage(cmminx, cmminz, cmmaxx, cmmaxz);
-
-#endif
-
 #if 0
-	char msg[128];
-
-	sprintf(msg, "place at %f,%f,%f", u->fpos.x, u->fpos.y, u->fpos.z);
-
-	MessageBox(g_hWnd, msg, "asd", NULL);
+	ClearPowerlines(cmminx, cmminz, cmmaxx, cmmaxz);
+	ClearPipelines(cmminx, cmminz, cmmaxx, cmmaxz);
+	RePow();
+	RePipe();
+	ReRoadNetw();
 #endif
+
+#endif
+	
+	b->remesh();
+
+	if(g_mode == APPMODE_PLAY)
+	{
+		//b->allocres();
+		b->inoperation = false;
+
+		Player* py = &g_player[g_currP];
+
+		ClearSel(&py->sel);
+		py->sel.buildings.push_back(i);
+
+		if(!b->finished)
+		{
+			Player* py = &g_player[g_currP];
+			GUI* gui = &py->gui;
+			ConstructionView* cv = (ConstructionView*)gui->get("construction view")->get("construction view");
+			cv->regen(&py->sel);
+			gui->open("construction view");
+		}
+	}
+	else
+	{
+		b->inoperation = true;
+	}
+
+	b->fillcollider();
 
 	return true;
 }
 
-void DrawBuildings()
+void Building::allocres()
 {
+	BuildingT* t = &g_buildingT[type];
+	Player* py = &g_player[owner];
+    
+	int alloc;
+    
+	RichText transx;
+    
+	for(int i=0; i<RESOURCES; i++)
+	{
+		if(t->conmat[i] <= 0)
+			continue;
+        
+		if(i == RES_LABOUR)
+			continue;
+        
+		alloc = t->conmat[i] - conmat[i];
+        
+		if(py->global[i] < alloc)
+			alloc = py->global[i];
+        
+		conmat[i] += alloc;
+		py->global[i] -= alloc;
+        
+		if(alloc > 0)
+		{
+			char numpart[128];
+			sprintf(numpart, "%+d", -alloc);
+			transx.m_part.push_back( RichTextP( numpart ) );
+			transx.m_part.push_back( RichTextP( RICHTEXT_ICON, g_resource[i].icon ) );
+			transx.m_part.push_back( RichTextP( g_resource[i].name.c_str() ) );
+			transx.m_part.push_back( RichTextP( "\n" ) );
+		}
+	}
+    
+	if(transx.m_part.size() > 0
+#ifdef LOCAL_TRANSX
+       && owner == g_localP
+#endif
+       )
+		NewTransx(drawpos, &transx);
+    
+	checkconstruction();
+}
+
+void Building::remesh()
+{
+	BuildingT* t = &g_buildingT[type];
+
+	if(finished)
+		CopyVA(&drawva, &g_model[t->model].m_va[0]);
+	else
+	{
+		float pct = 0.2f + 0.8f * CompletPct(t->conmat, conmat);
+		StageCopyVA(&drawva, &g_model[t->cmodel].m_va[0], pct);
+	}
+
+	if(t->hugterr)
+		HugTerrain(&drawva, drawpos);
+}
+
+bool Building::checkconstruction()
+{
+	BuildingT* t = &g_buildingT[type];
+
+	bool haveall = true;
+
+	for(int i=0; i<RESOURCES; i++)
+		if(conmat[i] < t->conmat[i])
+		{
+			haveall = false;
+			break;
+		}
+
+#if 0
+	if(owner == g_localP)
+	{
+		char msg[128];
+		sprintf(msg, "%s construction complete.", t->name);
+		Chat(msg);
+		ConCom();
+	}
+#endif
+
+	if(haveall && !finished)
+	{
+		RePow();
+		ReCrPipe();
+		ReRoadNetw();
+	}
+
+	//if(owner == g_localP)
+	//	OnFinishedB(type);
+
+	finished = haveall;
+
+	remesh();
+
+	return finished;
+}
+
+void DrawBl()
+{
+	Shader* s = &g_shader[g_curS];
+
 	//return;
 	for(int i=0; i<BUILDINGS; i++)
 	{
@@ -259,13 +280,275 @@ void DrawBuildings()
 		{
 			continue;
 		}
-
+		
 		const BuildingT* t = &g_buildingT[b->type];
+		//const BuildingT* t = &g_buildingT[BUILDING_APARTMENT];
 		Model* m = &g_model[ t->model ];
 
 		if(!b->finished)
 			m = &g_model[ t->cmodel ];
 
+		/*
 		m->draw(0, b->drawpos, 0);
+		*/
+
+		float pitch = 0;
+		float yaw = 0;
+		Matrix modelmat;
+		float radians[] = {DEGTORAD(pitch), DEGTORAD(yaw), 0};
+		modelmat.setTranslation((const float*)&b->drawpos);
+		Matrix rotation;
+		rotation.setRotationRadians(radians);
+		modelmat.postMultiply(rotation);
+		glUniformMatrix4fv(s->m_slot[SSLOT_MODELMAT], 1, 0, modelmat.m_matrix);
+
+		VertexArray* va = &b->drawva;
+
+		m->usetex();
+    
+		glVertexAttribPointer(s->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, va->vertices);
+		glVertexAttribPointer(s->m_slot[SSLOT_TEXCOORD0], 2, GL_FLOAT, GL_FALSE, 0, va->texcoords);
+
+		if(s->m_slot[SSLOT_NORMAL] != -1)
+			glVertexAttribPointer(s->m_slot[SSLOT_NORMAL], 3, GL_FLOAT, GL_FALSE, 0, va->normals);
+
+		glDrawArrays(GL_TRIANGLES, 0, va->numverts);
+	}
+}
+
+void UpdateBuildings()
+{
+#if 0
+	static float completion = 2.0f;
+
+	if(completion+EPSILON >= 1 && completion-EPSILON <= 1)
+		Explode(&g_building[1]);
+
+#if 1
+	//StageCopyVA(&g_building[0].drawva, &g_model[g_buildingT[g_building[0].type].model].m_va[0], completion);
+	HeightCopyVA(&g_building[1].drawva, &g_model[g_buildingT[g_building[1].type].model].m_va[0], Clipf(completion, 0, 1));
+
+	completion -= 0.01f;
+
+	if(completion < -1.0f)
+		completion = 2.0f;
+#elif 1
+	HeightCopyVA(&g_building[0].drawva, &g_model[g_buildingT[g_building[0].type].model].m_va[0], completion);
+	
+	completion *= 0.95f;
+
+	if(completion < 0.001f)
+		completion = 1.0f;
+#endif
+#elif 0
+	static float completion = 2.0f;
+
+	StageCopyVA(&g_building[0].drawva, &g_model[g_buildingT[g_building[0].type].cmodel].m_va[0], completion);
+
+	completion += 0.005f;
+
+	if(completion < 2.0f && completion >= 1.0f)
+	{
+		g_building[0].finished = true;
+		CopyVA(&g_building[0].drawva, &g_model[g_buildingT[g_building[0].type].model].m_va[0]);
+	}
+	if(completion >= 2.0f)
+	{
+		completion = 0.1f;
+		g_building[0].finished = false;
+	}
+#endif
+
+	for(int i=0; i<BUILDINGS; i++)
+	{
+		Building* b = &g_building[i];
+
+		if(!b->on)
+			continue;
+
+		BuildingT* t = &g_buildingT[b->type];
+		EmitterPlace* ep;
+		ParticleT* pt;
+    
+		if(!b->finished)
+			continue;
+
+		for(int j=0; j<MAX_B_EMITTERS; j++)
+		{
+			//first = true;
+
+			//if(completion < 1)
+			//	continue;
+        
+			ep = &t->emitterpl[j];
+
+			if(!ep->on)
+				continue;
+
+			pt = &g_particleT[ep->type];
+        
+			if(b->emitterco[j].EmitNext(pt->delay))
+				EmitParticle(ep->type, b->drawpos + ep->offset);
+		}
+	}
+}
+
+void StageCopyVA(VertexArray* to, VertexArray* from, float completion)
+{
+	CopyVA(to, from);
+
+	float maxy = 0;
+	for(int i=0; i<to->numverts; i++)
+		if(to->vertices[i].y > maxy)
+			maxy = to->vertices[i].y;
+
+	float limity = maxy*completion;
+
+	for(int tri=0; tri<to->numverts/3; tri++)
+	{
+		Vec3f* belowv = NULL;
+		Vec3f* belowv2 = NULL;
+
+		for(int v=tri*3; v<tri*3+3; v++)
+		{
+			if(to->vertices[v].y <= limity)
+			{
+				if(!belowv)
+					belowv = &to->vertices[v];
+				else if(!belowv2)
+					belowv2 = &to->vertices[v];
+
+				//break;
+			}
+		}
+
+		Vec3f prevt[3];
+		prevt[0] = to->vertices[tri*3+0];
+		prevt[1] = to->vertices[tri*3+1];
+		prevt[2] = to->vertices[tri*3+2];
+
+		Vec2f prevc[3];
+		prevc[0] = to->texcoords[tri*3+0];
+		prevc[1] = to->texcoords[tri*3+1];
+		prevc[2] = to->texcoords[tri*3+2];
+		
+		for(int v=tri*3; v<tri*3+3; v++)
+		{
+			if(to->vertices[v].y > limity)
+			{
+				float prevy = to->vertices[v].y;
+				to->vertices[v].y = limity;
+#if 0
+#if 0
+				void barycent(double x0, double y0, double z0, double x1, double y1, double z1, double x2, double y2, double z2,
+                         double vx, double vy, double vz,
+                         double *u, double *v, double *w)
+#endif
+
+				double ratio0 = 0;
+				double ratio1 = 0;
+				double ratio2 = 0;
+
+				barycent(prevt[0].x, prevt[0].y, prevt[0].z,
+					prevt[1].x, prevt[1].y, prevt[1].z,
+					prevt[2].x, prevt[2].y, prevt[2].z,
+					to->vertices[v].x, to->vertices[v].y, to->vertices[v].z,
+					&ratio0, &ratio1, &ratio2);
+				
+				to->texcoords[v].x = ratio0 * prevc[0].x + ratio1 * prevc[1].x + ratio2 * prevc[2].x;
+				to->texcoords[v].y = ratio0 * prevc[0].y + ratio1 * prevc[1].y + ratio2 * prevc[2].y;
+#elif 0
+				Vec3f* closebelowv = NULL;
+
+				if(belowv)
+					closebelowv = belowv;
+
+				if(belowv2 && (!closebelowv || Magnitude2((*closebelowv) - to->vertices[v]) > Magnitude2((*belowv2) - to->vertices[v])))
+					closebelowv = belowv2;
+
+				float yratio = (closebelowv->y - prevy);
+#endif
+			}
+		}
+	}
+}
+
+
+void HeightCopyVA(VertexArray* to, VertexArray* from, float completion)
+{
+	CopyVA(to, from);
+
+	float maxy = 0;
+	for(int i=0; i<to->numverts; i++)
+		if(to->vertices[i].y > maxy)
+			maxy = to->vertices[i].y;
+
+	float dy = maxy*(1.0f-completion);
+
+	for(int tri=0; tri<to->numverts/3; tri++)
+	{
+		Vec3f* belowv = NULL;
+		Vec3f* belowv2 = NULL;
+
+		for(int v=tri*3; v<tri*3+3; v++)
+		{
+			to->vertices[v].y -= dy;
+		}
+	}
+}
+
+void HugTerrain(VertexArray* va, Vec3f pos)
+{
+	for(int i=0; i<va->numverts; i++)
+	{
+		va->vertices[i].y += Bilerp(&g_hmap, pos.x + va->vertices[i].x, pos.z + va->vertices[i].z) - pos.y;
+	}
+}
+
+void Explode(Building* b)
+{
+	BuildingT* t = &g_buildingT[b->type];
+	float hwx = t->widthx*TILE_SIZE/2.0f;
+	float hwz = t->widthz*TILE_SIZE/2.0f;
+	Vec3f p;
+    
+	for(int i=0; i<5; i++)
+	{
+		p.x = hwx * (float)(rand()%1000 - 500)/500.0f;
+		p.y = TILE_SIZE/2.5f;
+		p.z = hwz * (float)(rand()%1000 - 500)/500.0f;
+		EmitParticle(PARTICLE_FIREBALL, p + b->drawpos);
+	}
+    
+	for(int i=0; i<10; i++)
+	{
+		p.x = hwx * (float)(rand()%1000 - 500)/500.0f;
+		p.y = TILE_SIZE/2.5f;
+		p.z = hwz * (float)(rand()%1000 - 500)/500.0f;
+		EmitParticle(PARTICLE_FIREBALL2, p + b->drawpos);
+	}
+	/*
+     for(int i=0; i<5; i++)
+     {
+     p.x = hwx * (float)(rand()%1000 - 500)/500.0f;
+     p.y = 8;
+     p.z = hwz * (float)(rand()%1000 - 500)/500.0f;
+     EmitParticle(SMOKE, p + pos);
+     }
+     
+     for(int i=0; i<5; i++)
+     {
+     p.x = hwx * (float)(rand()%1000 - 500)/500.0f;
+     p.y = 8;
+     p.z = hwz * (float)(rand()%1000 - 500)/500.0f;
+     EmitParticle(SMOKE2, p + pos);
+     }
+     */
+	for(int i=0; i<20; i++)
+	{
+		p.x = hwx * (float)(rand()%1000 - 500)/500.0f;
+		p.y = TILE_SIZE/2.5f;
+		p.z = hwz * (float)(rand()%1000 - 500)/500.0f;
+		EmitParticle(PARTICLE_DEBRIS, p + b->drawpos);
 	}
 }

@@ -20,7 +20,7 @@ public:
 	void freeva();
 };
 
-bool InsidePolygon(Vec3f vIntersection, Vec3f Poly[], long verticeCount);
-bool IntersectedPolygon(Vec3f vPoly[], Vec3f vLine[], int verticeCount, Vec3f* vIntersection=NULL);
+bool InsidePoly(Vec3f vIntersection, Vec3f Poly[], long verticeCount);
+bool InterPoly(Vec3f vPoly[], Vec3f vLine[], int verticeCount, Vec3f* vIntersection=NULL);
 
 #endif

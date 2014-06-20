@@ -11,9 +11,7 @@ public:
 	CheckBox(Widget* parent, const char* n, const RichText t, int f, void (*reframef)(Widget* thisw), int sel=0, float r=1, float g=1, float b=1, float a=1, void (*change)()=NULL);
 
 	void draw();
-	bool lbuttonup(bool moved);
-	bool lbuttondown();
-	bool mousemove();
+	void inev(InEv* ev);
 	int square();
 };
 

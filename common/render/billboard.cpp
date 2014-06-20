@@ -10,6 +10,7 @@
 #include "../utils.h"
 #include "../math/vec3f.h"
 #include "../math/camera.h"
+#include "../sim/player.h"
 
 BillboardT g_billbT[BILLBOARD_TYPES];
 Billboard g_billb[BILLBOARDS];
@@ -17,10 +18,10 @@ unsigned int g_muzzle[4];
 
 void Effects()
 {
-	QueueTexture(&g_muzzle[0], "effects\\muzzle0.png", true);
-	QueueTexture(&g_muzzle[1], "effects\\muzzle1.png", true);
-	QueueTexture(&g_muzzle[2], "effects\\muzzle2.png", true);
-	QueueTexture(&g_muzzle[3], "effects\\muzzle3.png", true);
+	QueueTexture(&g_muzzle[0], "effects\\muzzle0.png", true, true);
+	QueueTexture(&g_muzzle[1], "effects\\muzzle1.png", true, true);
+	QueueTexture(&g_muzzle[2], "effects\\muzzle2.png", true, true);
+	QueueTexture(&g_muzzle[3], "effects\\muzzle3.png", true, true);
 }
 
 int NewBillbT()
@@ -49,7 +50,7 @@ int NewBillboard(const char* tex)
 	sprintf(texpath, "billboards\\%s", rawtex);
 	FindTextureExtension(texpath);
 	//CreateTexture(t.tex, texpath);
-	QueueTexture(&t->tex, texpath, true);
+	QueueTexture(&t->tex, texpath, true, true);
 	//g_billbT.push_back(t);
 	//return g_billbT.size() - 1;
 	return i;
@@ -106,14 +107,19 @@ void PlaceBillboard(int type, Vec3f pos, float size, int particle)
 
 void SortBillboards()
 {
-	Vec3f pos = g_camera.m_pos;
+	Player* py = &g_player[g_currP];
+	Camera* c = &py->camera;
+
+	Vec3f pos = c->m_pos;
+	Vec3f dir = Normalize( c->m_view - c->m_pos );
 
 	for(int i=0; i<BILLBOARDS; i++)
 	{
 		if(!g_billb[i].on)
 			continue;
 
-		g_billb[i].dist = Magnitude2(pos - g_billb[i].pos);
+		//g_billb[i].dist = Magnitude2(pos - g_billb[i].pos);
+		g_billb[i].dist = Dot(dir, g_billb[i].pos);
 	}
 
 	Billboard temp;
@@ -159,8 +165,11 @@ void DrawBillboards()
 	BillboardT* t;
 	float size;
 
-	Vec3f vertical = g_camera.up2();
-	Vec3f horizontal = g_camera.m_strafe;
+	Player* py = &g_player[g_currP];
+	Camera* cam = &py->camera;
+
+	Vec3f vertical = cam->up2();
+	Vec3f horizontal = cam->m_strafe;
 	Vec3f a, b, c, d;
 	Vec3f vert, horiz;
 
@@ -169,6 +178,8 @@ void DrawBillboards()
 
 	Shader* s = &g_shader[SHADER_BILLBOARD];
 
+	//glDisable(GL_CULL_FACE);
+
 	for(int i=0; i<BILLBOARDS; i++)
 	{
 		billb = &g_billb[i];
@@ -176,7 +187,10 @@ void DrawBillboards()
 			continue;
 
 		t = &g_billbT[billb->type];
-		glBindTexture(GL_TEXTURE_2D, t->tex);
+		
+		glActiveTextureARB(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, g_texture[t->tex].texname);
+		glUniform1iARB(s->m_slot[SSLOT_TEXTURE0], 0);
 
 		if(billb->particle >= 0)
 		{
@@ -195,11 +209,11 @@ void DrawBillboards()
 		horiz = horizontal*size;
 
 		a = billb->pos - horiz + vert;
-		b = billb->pos - horiz - vert;
+		b = billb->pos + horiz + vert;
 		c = billb->pos + horiz - vert;
-		d = billb->pos + horiz + vert;
+		d = billb->pos - horiz - vert;
 
-		float vertices[] =
+		const float vertices[] =
 		{
 			//posx, posy posz   texx, texy
 			a.x, a.y, a.z,          1, 0,
@@ -219,7 +233,11 @@ void DrawBillboards()
 		//glVertexAttribPointer(s->m_slot[SSLOT_NORMAL], 3, GL_FLOAT, GL_FALSE, sizeof(float) * 5, va->normals);
 
 		glDrawArrays(GL_TRIANGLES, 0, 6);
+
+		//g_log<<"draw"<<endl;
 	}
+
+	//glEnable(GL_CULL_FACE);
 
 	/*
 	CEntity* e;

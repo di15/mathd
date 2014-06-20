@@ -36,24 +36,46 @@ void DefineParticle(int i, char* texpath, int del, float dec, Vec3f minV, Vec3f 
 
 void LoadParticles()
 {
+#if 1
 	//void Particle(int i, char* texpath, int del, float dec, Vec3f minV, Vec3f maxV, Vec3f minA, Vec3f maxA, float minS, float maxS, void (*collision)(Particle* part, Billboard* billb, Vec3f trace, Vec3f normal))
-	DefineParticle(EXHAUST, "billboards\\exhaust.png", 500, 0.003f, Vec3f(0, 0.05f, 0), Vec3f(0.01f, 0.08f, -0.01f), Vec3f(-0.0001f, 0.0f, -0.0001f), Vec3f(-0.0001f, 0.0f, -0.0001f), 2.0f, 10.0f, NULL);
-	DefineParticle(EXHAUSTBIG, "billboards\\exhaust.png", 500, 0.003f, Vec3f(0, 0.05f, 0), Vec3f(0.01f, 0.08f, -0.01f), Vec3f(-0.0001f, 0.0f, -0.0001f), Vec3f(-0.0001f, 0.0f, -0.0001f), 5.0f, 17.0f, NULL);
-	DefineParticle(FIREBALL, "billboards\\fireball.png", 500, 0.02f, Vec3f(0, 0.08f, 0), Vec3f(0.0f, 0.08f, 0.0f), Vec3f(0, 0.0f, 0), Vec3f(0.0f, 0.0f, 0.0f), 16.0f, 16.0f, NULL);
-	DefineParticle(FIREBALL2, "billboards\\fireball2.png", 500, 0.02f, Vec3f(0, 0.08f, 0), Vec3f(0.0f, 0.08f, 0.0f), Vec3f(0, 0.0f, 0), Vec3f(0.0f, 0.0f, 0.0f), 16.0f, 16.0f, NULL);
-	DefineParticle(SMOKE, "billboards\\smoke.png", 500, 0.01f, Vec3f(0, 0.4f, 0), Vec3f(0.0f, 0.4f, 0.0f), Vec3f(0, 0.0f, 0), Vec3f(0.0f, 0.0f, 0.0f), 10.0f, 10.0f, NULL);
-	DefineParticle(SMOKE2, "billboards\\smoke2.png", 500, 0.01f, Vec3f(0, 0.4f, 0), Vec3f(0.0f, 0.4f, 0.0f), Vec3f(0, 0.0f, 0), Vec3f(0.0f, 0.0f, 0.0f), 10.0f, 10.0f, NULL);
-	DefineParticle(DEBRIS, "billboards\\debris.png", 500, 0.01f, Vec3f(-0.8f, 0.8f, -0.8f), Vec3f(0.8f, 0.8f, 0.8f), Vec3f(0, -0.05f, 0), Vec3f(0.0f, -0.09f, 0.0f), 0.5f, 1.0f, NULL);
-	DefineParticle(FLAME, "billboards\\flame.png", 50, 0.01f, Vec3f(-0.05f, 0.1f, -0.05f), Vec3f(0.06f, 0.3f, 0.06f), Vec3f(0, 0.0f, 0), Vec3f(0, 0.0f, 0), 5.5f, 6.0f, NULL);
-	DefineParticle(PLUME, "billboards\\plume.png", 25, 0.01f, Vec3f(-0.05f, 0.2f, -0.05f), Vec3f(0.06f, 0.5f, 0.06f), Vec3f(0, 0.0f, 0), Vec3f(0, 0.0f, 0), 5.5f, 12.0f, NULL);
+	DefineParticle(PARTICLE_EXHAUST, "billboards/exhaust.png", 500, 0.002f, Vec3f(0.01f, 0.05f, -0.01f)*100, Vec3f(0.05f, 0.08f, -0.05f)*100, Vec3f(-0.0001f, 0.0f, -0.0001f)*100, Vec3f(-0.0001f, 0.0f, -0.0001f)*100, 300.0f, 1000.0f, NULL);
+	DefineParticle(PARTICLE_EXHAUST2, "billboards/exhaust2.png", 410, 0.003f,Vec3f(0.01f, 0.05f, -0.01f)*100, Vec3f(0.05f, 0.08f, -0.05f)*100, Vec3f(-0.0001f, 0.0f, -0.0001f)*100, Vec3f(-0.0001f, 0.0f, -0.0001f)*100, 300.0f, 1000.0f, NULL);
+	DefineParticle(PARTICLE_EXHAUSTBIG, "billboards/exhaust.png", 500, 0.003f, Vec3f(0.01f, 0.05f, -0.01f)*100, Vec3f(0.05f, 0.08f, -0.05f)*100, Vec3f(-0.0001f, 0.0f, -0.0001f)*100, Vec3f(-0.0001f, 0.0f, -0.0001f)*100, 5.0f*100, 17.0f*100, NULL);
+	DefineParticle(PARTICLE_FIREBALL, "billboards/fireball.png", 500, 0.03f, Vec3f(0, 0.08f, 0)*100, Vec3f(0.0f, 0.08f, 0.0f)*100, Vec3f(0, 0.0f, 0)*100, Vec3f(0.0f, 0.0f, 0.0f)*100, 16.0f*100, 16.0f*100, NULL);
+	DefineParticle(PARTICLE_FIREBALL2, "billboards/fireball2.png", 500, 0.03f, Vec3f(0, 0.08f, 0)*100, Vec3f(0.0f, 0.08f, 0.0f)*100, Vec3f(0, 0.0f, 0)*100, Vec3f(0.0f, 0.0f, 0.0f)*100, 16.0f*100, 16.0f*100, NULL);
+	DefineParticle(PARTICLE_SMOKE, "billboards/smoke.png", 500, 0.005f, Vec3f(0, 0.4f, 0)*100, Vec3f(0.0f, 0.4f, 0.0f)*100, Vec3f(0, 0.0f, 0)*100, Vec3f(0.0f, 0.0f, 0.0f)*100, 10.0f*100, 10.0f*100, NULL);
+	DefineParticle(PARTICLE_SMOKE2, "billboards/smoke2.png", 500, 0.005f, Vec3f(0, 0.4f, 0)*100, Vec3f(0.0f, 0.4f, 0.0f)*100, Vec3f(0, 0.0f, 0)*100, Vec3f(0.0f, 0.0f, 0.0f)*100, 10.0f*100, 10.0f*100, NULL);
+	DefineParticle(PARTICLE_DEBRIS, "billboards/debris.png", 500, 0.005f, Vec3f(-0.8f, 0.8f, -0.8f)*100, Vec3f(0.8f, 0.8f, 0.8f)*100, Vec3f(0, -0.05f, 0)*100, Vec3f(0.0f, -0.09f, 0.0f)*100, 0.5f*100, 1.0f*100, NULL);
+	DefineParticle(PARTICLE_FLAME, "billboards/flame.png", 50, 0.005f, Vec3f(-0.05f, 0.1f, -0.05f)*100, Vec3f(0.06f, 0.3f, 0.06f)*100, Vec3f(0, 0.0f, 0)*100, Vec3f(0, 0.0f, 0)*100, 5.5f*100, 6.0f*100, NULL);
+	DefineParticle(PARTICLE_PLUME, "billboards/plume.png", 25, 0.005f, Vec3f(-0.05f, 0.2f, -0.05f)*100, Vec3f(0.06f, 0.5f, 0.06f)*100, Vec3f(0, 0.0f, 0)*100, Vec3f(0, 0.0f, 0)*100, 5.5f*100, 12.0f*100, NULL);
+#else
+	DefineParticle(PARTICLE_EXHAUST, "billboards/exhaust.png", 500, 0.99f, Vec3f(0.01f, 0.05f, -0.01f)*100, Vec3f(0.05f, 0.08f, -0.05f)*100, Vec3f(-0.0001f, 0.0f, -0.0001f)*100, Vec3f(-0.0001f, 0.0f, -0.0001f)*100, 200.0f, 1000.0f, NULL);
+	DefineParticle(PARTICLE_EXHAUST2, "billboards/exhaust2.png", 410, 0.99f,Vec3f(0.01f, 0.05f, -0.01f)*100, Vec3f(0.05f, 0.08f, -0.05f)*100, Vec3f(-0.0001f, 0.0f, -0.0001f)*100, Vec3f(-0.0001f, 0.0f, -0.0001f)*100, 200.0f, 1000.0f, NULL);
+	DefineParticle(PARTICLE_EXHAUSTBIG, "billboards/exhaust.png", 500, 0.99f, Vec3f(0.01f, 0.05f, -0.01f)*100, Vec3f(0.05f, 0.08f, -0.05f)*100, Vec3f(-0.0001f, 0.0f, -0.0001f)*100, Vec3f(-0.0001f, 0.0f, -0.0001f)*100, 5.0f*100, 17.0f*100, NULL);
+	DefineParticle(PARTICLE_FIREBALL, "billboards/fireball.png", 500, 0.9f, Vec3f(0, 0.08f, 0)*100, Vec3f(0.0f, 0.08f, 0.0f)*100, Vec3f(0, 0.0f, 0)*100, Vec3f(0.0f, 0.0f, 0.0f)*100, 16.0f*100, 16.0f*100, NULL);
+	DefineParticle(PARTICLE_FIREBALL2, "billboards/fireball2.png", 500, 0.9f, Vec3f(0, 0.08f, 0)*100, Vec3f(0.0f, 0.08f, 0.0f)*100, Vec3f(0, 0.0f, 0)*100, Vec3f(0.0f, 0.0f, 0.0f)*100, 16.0f*100, 16.0f*100, NULL);
+	DefineParticle(PARTICLE_SMOKE, "billboards/smoke.png", 500, 0.999f, Vec3f(0, 0.4f, 0)*100, Vec3f(0.0f, 0.4f, 0.0f)*100, Vec3f(0, 0.0f, 0)*100, Vec3f(0.0f, 0.0f, 0.0f)*100, 10.0f*100, 10.0f*100, NULL);
+	DefineParticle(PARTICLE_SMOKE2, "billboards/smoke2.png", 500, 0.999f, Vec3f(0, 0.4f, 0)*100, Vec3f(0.0f, 0.4f, 0.0f)*100, Vec3f(0, 0.0f, 0)*100, Vec3f(0.0f, 0.0f, 0.0f)*100, 10.0f*100, 10.0f*100, NULL);
+	DefineParticle(PARTICLE_DEBRIS, "billboards/debris.png", 500, 0.999f, Vec3f(-0.8f, 0.8f, -0.8f)*100, Vec3f(0.8f, 0.8f, 0.8f)*100, Vec3f(0, -0.05f, 0)*100, Vec3f(0.0f, -0.09f, 0.0f)*100, 0.5f*100, 1.0f*100, NULL);
+	DefineParticle(PARTICLE_FLAME, "billboards/flame.png", 50, 0.999f, Vec3f(-0.05f, 0.1f, -0.05f)*100, Vec3f(0.06f, 0.3f, 0.06f)*100, Vec3f(0, 0.0f, 0)*100, Vec3f(0, 0.0f, 0)*100, 5.5f*100, 6.0f*100, NULL);
+	DefineParticle(PARTICLE_PLUME, "billboards/plume.png", 25, 0.99f, Vec3f(-0.05f, 0.2f, -0.05f)*100, Vec3f(0.06f, 0.5f, 0.06f)*100, Vec3f(0, 0.0f, 0)*100, Vec3f(0, 0.0f, 0)*100, 5.5f*100, 12.0f*100, NULL);
+#endif
 }
 
 void Particle::Update(Billboard* billb)
 {
 	ParticleT* t = &g_particleT[type];
+#if 1
 	life -= t->decay;
+#else
+	life *= t->decay;
+#endif
 
+#if 1
 	if(life <= 0.0f)
+#else
+	if(life <= 0.001f)
+#endif
 	{
 		on = false;
 		billb->on = false;

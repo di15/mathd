@@ -47,12 +47,13 @@ public:
 #define ICON_LOGS			29
 #define ICON_LUMBER			30
 #define ICON_WATER			31
-#define ICONS				32
+#define ICON_EXCLAMATION	32
+#define ICONS				33
 
 extern Icon g_icon[ICONS];
 
 #ifndef _SERVER
-void DefineIcon(int type, const char* relative, const UString tag);
+void DefI(int type, const char* relative, const UString tag);
 #endif
 
 #endif

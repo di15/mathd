@@ -14,7 +14,7 @@
 #include "textarea.h"
 #include "textblock.h"
 #include "touchlistener.h"
-
+#include "../../sim/player.h"
 
 CheckBox::CheckBox(Widget* parent, const char* n, const RichText t, int f, void (*reframef)(Widget* thisw), int sel, float r, float g, float b, float a, void (*change)()) : Widget()
 {
@@ -31,27 +31,9 @@ CheckBox::CheckBox(Widget* parent, const char* n, const RichText t, int f, void 
 	m_rgba[3] = a;
 	m_selected = sel;
 	changefunc = change;
-	CreateTexture(m_frametex, "gui\\frame.jpg", true);
-	CreateTexture(m_filledtex, "gui\\accept.png", true);
+	CreateTexture(m_frametex, "gui/frame.jpg", true, false);
+	CreateTexture(m_filledtex, "gui/accept.png", true, false);
 	reframe();
-}
-
-bool CheckBox::mousemove()
-{
-	if(g_mouse.x >= m_pos[0] && g_mouse.y >= m_pos[1] && 
-		g_mouse.x <= m_pos[2] && 
-		g_mouse.y <= m_pos[3])
-	{
-		m_over = true;
-
-		return true;
-	}
-	else
-	{
-		m_over = false;
-
-		return false;
-	}
 }
 
 int CheckBox::square()
@@ -69,36 +51,54 @@ void CheckBox::draw()
 	DrawShadowedText(m_font, m_pos[0]+square()+5, m_pos[1], &m_text);
 }
 
-bool CheckBox::lbuttondown()
+void CheckBox::inev(InEv* ev)
 {
-	if(m_over)
-	{
-		m_ldown = true;
-		return true;	// intercept mouse event
-	}
+	Player* py = &g_player[g_currP];
 
-	return false;
-}
-
-bool CheckBox::lbuttonup(bool moved)
-{
-	if(m_over && m_ldown)
+	if(ev->type == INEV_MOUSEMOVE && !ev->intercepted)
 	{
-		if(m_selected <= 0)
-			m_selected = 1;
+		if(py->mouse.x >= m_pos[0] && py->mouse.y >= m_pos[1] && 
+		py->mouse.x <= m_pos[2] && 
+		py->mouse.y <= m_pos[3])
+		{
+			m_over = true;
+			ev->intercepted = true;
+			return;
+		}
 		else
-			m_selected  = 0;
-
-		if(changefunc != NULL)
-			changefunc();
-
-		m_ldown = false;
-
-		return true;
+		{
+			m_over = false;
+			return;
+		}
 	}
-	
-	m_ldown = false;
+	else if(ev->type == INEV_MOUSEDOWN && ev->key == MOUSE_LEFT && !ev->intercepted)
+	{
+		if(m_over)
+		{
+			m_ldown = true;
+			ev->intercepted = true;
+			return;	// intercept mouse event
+		}
+	}
+	else if(ev->type == INEV_MOUSEUP && ev->key == MOUSE_LEFT && !ev->intercepted)
+	{
+		if(m_over && m_ldown)
+		{
+			if(m_selected <= 0)
+				m_selected = 1;
+			else
+				m_selected  = 0;
 
-	return false;
+			if(changefunc != NULL)
+				changefunc();
+
+			m_ldown = false;
+
+			ev->intercepted = true;
+			return;
+		}
+	
+		m_ldown = false;
+	}
 }
 

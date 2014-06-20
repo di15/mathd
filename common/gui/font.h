@@ -57,12 +57,19 @@ public:
 #define FONT_EUROSTILE32	0
 #define FONT_MSUIGOTHIC16	1
 #define FONT_SMALLFONTS10	2
-#define FONTS				3
+#define FONT_GULIM32		3
+#define FONT_EUROSTILE16	4
+#define FONT_CALIBRILIGHT16	5
+#define FONTS				6
 extern Font g_font[FONTS];
 
-#define MAINFONT8 (FONT_SMALLFONTS10)
-#define MAINFONT16 (FONT_MSUIGOTHIC16)
-#define MAINFONT32 (FONT_EUROSTILE32)
+//#define MAINFONT8 (FONT_SMALLFONTS10)
+#define MAINFONT8 (FONT_CALIBRILIGHT16)
+//#define MAINFONT16 (FONT_MSUIGOTHIC16)
+//#define MAINFONT16 (FONT_EUROSTILE16)
+#define MAINFONT16 (FONT_CALIBRILIGHT16)
+//#define MAINFONT32 (FONT_EUROSTILE32)
+#define MAINFONT32 (FONT_GULIM32)
 
 class RichText;
 
@@ -73,10 +80,12 @@ void DrawGlyph(float left, float top, float right, float bottom, float texleft, 
 void DrawGlyphF(float left, float top, float right, float bottom, float texleft, float textop, float texright, float texbottom);
 void HighlGlyphF(float left, float top, float right, float bottom);
 void DrawLine(int fnt, float startx, float starty, const RichText* text, const float* color=NULL, int caret=-1);
+void DrawLineF(int fnt, float startx, float starty,  float framex1, float framey1, float framex2, float framey2, const RichText* text, const float* color=NULL, int caret=-1);
 void DrawShadowedText(int fnt, float startx, float starty, const RichText* text, const float* color=NULL, int caret=-1);
 void DrawShadowedTextF(int fnt, float startx, float starty, float framex1, float framey1, float framex2, float framey2, const RichText* text, const float* color=NULL, int caret=-1);
 void DrawCenterShadText(int fnt, float startx, float starty, const RichText* text, const float* color=NULL, int caret=-1);
 void DrawBoxShadText(int fnt, float startx, float starty, float width, float height, const RichText* text, const float* color, int ln, int caret);
+void DrawBoxShadTextF(int fnt, float startx, float starty, float width, float height, const RichText* text, const float* color, int ln, int caret, float framex1, float framey1, float framex2, float framey2);
 int CountLines(const RichText* text, int fnt, float startx, float starty, float width, float height);
 int EndX(const RichText* text, int lastc, int fnt, float startx, float starty);
 int MatchGlyphF(const RichText* text, int fnt, int matchx, float startx, float starty, float framex1, float framey1, float framex2, float framey2);

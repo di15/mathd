@@ -14,6 +14,7 @@ public:
 		m_type = WIDGET_TEXT;
 		m_name = "";
 		//m_text = "";
+		m_font = MAINFONT8;
 		reframefunc = NULL;
 		m_ldown = false;
 		m_rgba[0] = 1;
@@ -23,12 +24,26 @@ public:
 		m_shadow = false;
 	}
 
-	Text(Widget* parent, const char* n, const RichText t, int f, void (*reframef)(Widget* thisw), bool shdw=true, float r=0.8f, float g=0.8f, float b=0.8f, float a=1) : Widget()
+	Text(Widget* parent, const char* n, const RichText& t, int f, void (*reframef)(Widget* thisw), bool shdw=true, float r=0.8f, float g=0.8f, float b=0.8f, float a=1) : Widget()
 	{
 		m_parent = parent;
 		m_type = WIDGET_TEXT;
 		m_name = n;
+		//g_log<<"t.rawstr "<<t.rawstr()<<endl;
+		//g_log.flush();
+
+#ifdef USTR_DEBUG
+		g_log<<"Text(Widget* parent, const char* n, const RichText t, int f, void (*reframef)(Widget* thisw), bool shdw=true, float r=0.8f, float g=0.8f, float b=0.8f, float a=1) : Widget()"<<endl;
+		g_log.flush();
+#endif
+
 		m_text = t;
+
+#ifdef USTR_DEBUG
+		g_log<<"m_text end assign"<<endl;
+		g_log.flush();
+#endif
+
 		m_font = f;
 		reframefunc = reframef;
 		m_ldown = false;

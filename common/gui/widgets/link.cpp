@@ -15,7 +15,7 @@
 #include "textarea.h"
 #include "textblock.h"
 #include "touchlistener.h"
-
+#include "../../sim/player.h"
 
 
 void Link::draw()
@@ -46,36 +46,68 @@ void Link::draw()
 	//glEnable(GL_TEXTURE_2D);
 }
 
-void Link::premousemove()
+void Link::inev(InEv* ev)
 {
-	int texlen = m_text.texlen();
-	if(g_mouse.x >= m_pos[0] && g_mouse.y >= m_pos[1] && 
-		g_mouse.x <= m_pos[0]+texlen*g_font[m_font].gheight/2 && 
-		g_mouse.y <= m_pos[1]+g_font[m_font].gheight)
+	Player* py = &g_player[g_currP];
+
+	if(ev->type == INEV_MOUSEUP && ev->key == MOUSE_LEFT && !ev->intercepted)
 	{
-	}
-	else
-	{
+		//mousemove();
+
+		if(m_over && m_ldown)
+		{
+			if(clickfunc != NULL)
+				clickfunc();
+
+			m_over = false;
+			m_ldown = false;
+
+			ev->intercepted = true;
+			return;	// intercept mouse event
+		}
+		
 		m_over = false;
+		m_ldown = false;
 	}
-}
-
-bool Link::mousemove()
-{
-	int texlen = m_text.texlen();
-	if(g_mouse.x >= m_pos[0] && g_mouse.y >= m_pos[1] && 
-		g_mouse.x <= m_pos[0]+texlen*g_font[m_font].gheight/2 && 
-		g_mouse.y <= m_pos[1]+g_font[m_font].gheight)
+	else if(ev->type == INEV_MOUSEDOWN && ev->key == MOUSE_LEFT && !ev->intercepted)
 	{
-		m_over = true;
+		//mousemove();
 
-		return true;
+		if(m_over)
+		{
+			m_ldown = true;
+			ev->intercepted = true;
+			return;	// intercept mouse event
+		}
 	}
-	else
+	else if(ev->type == INEV_MOUSEMOVE)
 	{
-		m_over = false;
+		int texlen = m_text.texlen();
+		if(py->mouse.x >= m_pos[0] && py->mouse.y >= m_pos[1] && 
+			py->mouse.x <= m_pos[0]+texlen*g_font[m_font].gheight/2 && 
+			py->mouse.y <= m_pos[1]+g_font[m_font].gheight)
+		{
+		}
+		else
+		{
+			m_over = false;
+		}
 
-		return false;
+		if(!ev->intercepted)
+		{
+			if(py->mouse.x >= m_pos[0] && py->mouse.y >= m_pos[1] && 
+				py->mouse.x <= m_pos[0]+texlen*g_font[m_font].gheight/2 && 
+				py->mouse.y <= m_pos[1]+g_font[m_font].gheight)
+			{
+				m_over = true;
+				
+				ev->intercepted = true;
+			}
+			else
+			{
+				m_over = false;
+			}
+		}
 	}
 }
 

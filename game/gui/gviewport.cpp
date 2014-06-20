@@ -20,16 +20,20 @@
 #include "../../common/sim/sim.h"
 #include "gviewport.h"
 #include "../../common/math/hmapmath.h"
-#include "../../common/render/border.h"
 #include "../../common/render/water.h"
 #include "../../common/save/savemap.h"
 #include "../../common/gui/widgets/spez/bottompanel.h"
+#include "../../common/sim/buildingtype.h"
+#include "../../common/sim/road.h"
+#include "../../common/sim/powl.h"
+#include "../../common/sim/crpipe.h"
+#include "../../common/sim/unittype.h"
+#include "../../common/sim/player.h"
+#include "../../common/debug.h"
 
 ViewportT g_viewportT[VIEWPORT_TYPES];
 Viewport g_viewport[4];
 //Vec3f g_focus;
-static Vec3f accum(0,0,0);
-bool g_changed = false;
 
 ViewportT::ViewportT(Vec3f offset, Vec3f up, const char* label, bool axial)
 {
@@ -57,7 +61,10 @@ Viewport::Viewport(int type)
 
 Vec3f Viewport::up()
 {
-    Vec3f upvec = g_camera.m_up;
+	Player* py = &g_player[g_currP];
+	Camera* c = &py->camera;
+
+	Vec3f upvec = c->m_up;
 	ViewportT* t = &g_viewportT[m_type];
 
 	if(t->m_axial)
@@ -68,7 +75,10 @@ Vec3f Viewport::up()
 
 Vec3f Viewport::up2()
 {
-    Vec3f upvec = g_camera.up2();
+	Player* py = &g_player[g_currP];
+	Camera* c = &py->camera;
+
+	Vec3f upvec = c->up2();
 	ViewportT* t = &g_viewportT[m_type];
 
 	if(t->m_axial)
@@ -84,14 +94,17 @@ Vec3f Viewport::strafe()
 	Vec3f sidevec = Normalize(Cross(Vec3f(0,0,0)-t->m_offset, upvec));
 
 	//if(!t->m_axial)
-	//	sidevec = g_camera.m_strafe;
+	//	sidevec = c->m_strafe;
 
 	return sidevec;
 }
 
 Vec3f Viewport::focus()
 {
-	Vec3f viewvec = g_camera.m_view;
+	Player* py = &g_player[g_currP];
+	Camera* c = &py->camera;
+
+	Vec3f viewvec = c->m_view;
 	return viewvec;
 }
 
@@ -106,57 +119,63 @@ Vec3f Viewport::viewdir()
 
 Vec3f Viewport::pos()
 {
-    Vec3f posvec = g_camera.m_pos;
+	Player* py = &g_player[g_currP];
+	Camera* c = &py->camera;
+
+	Vec3f posvec = c->m_pos;
 
 #if 0
 	if(g_projtype == PROJ_PERSP && !t->m_axial)
 	{
-		Vec3f dir = Normalize( g_camera.m_view - g_camera.m_pos );
-		posvec = g_camera.m_view - dir * 1000.0f / g_zoom;
+		Vec3f dir = Normalize( c->m_view - c->m_pos );
+		posvec = c->m_view - dir * 1000.0f / py->zoom;
 	}
 #endif
 
 	ViewportT* t = &g_viewportT[m_type];
 
 	if(t->m_axial)
-		posvec = g_camera.m_view + t->m_offset;
+		posvec = c->m_view + t->m_offset;
 
 	return posvec;
 }
 
 void DrawMMFrust()
 {
-	Vec3f campos = g_camera.zoompos();
-	Vec3f camside = g_camera.m_strafe;
-	Vec3f camup2 = g_camera.up2();
-	Vec3f viewdir = Normalize(g_camera.m_view - g_camera.m_pos);
+	Player* py = &g_player[g_currP];
+	Camera* c = &py->camera;
+
+	Vec3f campos = c->zoompos();
+	Vec3f camside = c->m_strafe;
+	Vec3f camup2 = c->up2();
+	Vec3f viewdir = Normalize(c->m_view - c->m_pos);
 
 	int minx = 0;
-	int maxx = g_width;
+	int maxx = py->width;
 	int miny = 0;
-	int maxy = g_height;
+	int maxy = py->height;
 
-	//Vec3f campos = g_camera.m_pos;
-	//Vec3f camside = g_camera.m_strafe;
-	//Vec3f camup2 = g_camera.up2();
-	//Vec3f viewdir = Normalize( g_camera.m_view - g_camera.m_pos );
+	//Vec3f campos = c->m_pos;
+	//Vec3f camside = c->m_strafe;
+	//Vec3f camup2 = c->up2();
+	//Vec3f viewdir = Normalize( c->m_view - c->m_pos );
 
-	Vec3f topLeftRay = ScreenPerspRay(minx, miny, g_width, g_height, campos, camside, camup2, viewdir, FIELD_OF_VIEW);
+	Vec3f topLeftRay = ScreenPerspRay(minx, miny, py->width, py->height, campos, camside, camup2, viewdir, FIELD_OF_VIEW);
 	Vec3f lineTopLeft[2];
 	lineTopLeft[0] = campos;
 	lineTopLeft[1] = campos + (topLeftRay * 1000000.0f);
 
-	Vec3f topRightRay = ScreenPerspRay(maxx, miny, g_width, g_height, campos, camside, camup2, viewdir, FIELD_OF_VIEW);
+	Vec3f topRightRay = ScreenPerspRay(maxx, miny, py->width, py->height, campos, camside, camup2, viewdir, FIELD_OF_VIEW);
 	Vec3f lineTopRight[2];
 	lineTopRight[0] = campos;
 	lineTopRight[1] = campos + (topRightRay * 1000000.0f);
 
-	Vec3f bottomLeftRay = ScreenPerspRay(minx, maxy, g_width, g_height, campos, camside, camup2, viewdir, FIELD_OF_VIEW);
+	Vec3f bottomLeftRay = ScreenPerspRay(minx, maxy, py->width, py->height, campos, camside, camup2, viewdir, FIELD_OF_VIEW);
 	Vec3f lineBottomLeft[2];
 	lineBottomLeft[0] = campos;
 	lineBottomLeft[1] = campos + (bottomLeftRay * 1000000.0f);
 
-	Vec3f bottomRightRay = ScreenPerspRay(maxx, maxy, g_width, g_height, campos, camside, camup2, viewdir, FIELD_OF_VIEW);
+	Vec3f bottomRightRay = ScreenPerspRay(maxx, maxy, py->width, py->height, campos, camside, camup2, viewdir, FIELD_OF_VIEW);
 	Vec3f lineBottomRight[2];
 	lineBottomRight[0] = campos;
 	lineBottomRight[1] = campos + (bottomRightRay * 1000000.0f);
@@ -177,30 +196,34 @@ void DrawMMFrust()
 
 	float mmxscale = (float)MINIMAP_SIZE / (g_hmap.m_widthx*TILE_SIZE);
 	float mmzscale = (float)MINIMAP_SIZE / (g_hmap.m_widthz*TILE_SIZE);
-	
+
 	interTopLeft.x = interTopLeft.x * mmxscale;
 	interTopRight.x = interTopRight.x * mmxscale;
 	interBottomLeft.x = interBottomLeft.x * mmxscale;
 	interBottomRight.x = interBottomRight.x * mmxscale;
-	
+
 	interTopLeft.z = interTopLeft.z * mmzscale;
 	interTopRight.z = interTopRight.z * mmzscale;
 	interBottomLeft.z = interBottomLeft.z * mmzscale;
 	interBottomRight.z = interBottomRight.z * mmzscale;
 
-    float vertices[] =
-    {
-        //posx, posy
-        interTopLeft.x, interTopLeft.z,0,
-        interTopRight.x, interTopRight.z,0,
-        interBottomRight.x, interBottomRight.z,0,
-        interBottomLeft.x, interBottomLeft.z,0,
-        interTopLeft.x, interTopLeft.z,0
-    };
-	
-    glVertexAttribPointer(g_shader[SHADER_COLOR2D].m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, &vertices[0]);
-    
-    glDrawArrays(GL_LINE_STRIP, 0, 5);
+	float* color = g_player[g_localP].colorcode;
+
+	glUniform4f(g_shader[SHADER_COLOR2D].m_slot[SSLOT_COLOR], color[0], color[1], color[2], 0.3f);
+
+	float vertices[] =
+	{
+		//posx, posy
+		interTopLeft.x, interTopLeft.z,0,
+		interTopRight.x, interTopRight.z,0,
+		interBottomRight.x, interBottomRight.z,0,
+		interBottomLeft.x, interBottomLeft.z,0,
+		interTopLeft.x, interTopLeft.z,0
+	};
+
+	glVertexAttribPointer(g_shader[SHADER_COLOR2D].m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, &vertices[0]);
+
+	glDrawArrays(GL_LINE_STRIP, 0, 5);
 }
 
 void DrawMinimap(Matrix projection, Matrix viewmat, Matrix modelmat, Matrix modelviewinv, float mvLightPos[3], float lightDir[3])
@@ -216,16 +239,18 @@ void DrawMinimap(Matrix projection, Matrix viewmat, Matrix modelmat, Matrix mode
 	glActiveTextureARB(GL_TEXTURE8);
 	glBindTexture(GL_TEXTURE_2D, g_depth);
 	glUniform1iARB(g_shader[g_curS].m_slot[SSLOT_SHADOWMAP], 8);
-	g_hmap.draw4();
+	g_hmap.draw2();
+	EndS();
 #endif
-	
+
 	UseShadow(SHADER_WATERMM, projection, viewmat, modelmat, modelviewinv, mvLightPos, lightDir);
 	glActiveTextureARB(GL_TEXTURE8);
 	glBindTexture(GL_TEXTURE_2D, g_depth);
 	glUniform1iARB(g_shader[g_curS].m_slot[SSLOT_SHADOWMAP], 8);
 	DrawWater2();
+	EndS();
 
-#if 1
+#if 0
 	UseShadow(SHADER_BORDERSMM, projection, viewmat, modelmat, modelviewinv, mvLightPos, lightDir);
 	//glActiveTextureARB(GL_TEXTURE8);
 	//glBindTexture(GL_TEXTURE_2D, g_depth);
@@ -239,21 +264,141 @@ void DrawMinimap(Matrix projection, Matrix viewmat, Matrix modelmat, Matrix mode
 	glUniform1f(s->m_slot[SSLOT_MAPMAXY], ConvertHeight(255));
 	glUniform4f(g_shader[g_curS].m_slot[SSLOT_COLOR], 1, 1, 1, 0.5f);
 	DrawBorders();
+	EndS();
 #endif
-	
+
 	glDisable(GL_DEPTH_TEST);
 
 	UseS(SHADER_COLOR2D);
-    glUniform1f(g_shader[SHADER_COLOR2D].m_slot[SSLOT_WIDTH], (float)MINIMAP_SIZE);
-    glUniform1f(g_shader[SHADER_COLOR2D].m_slot[SSLOT_HEIGHT], (float)MINIMAP_SIZE);
+	glUniform1f(g_shader[SHADER_COLOR2D].m_slot[SSLOT_WIDTH], (float)MINIMAP_SIZE);
+	glUniform1f(g_shader[SHADER_COLOR2D].m_slot[SSLOT_HEIGHT], (float)MINIMAP_SIZE);
 	glUniform4f(g_shader[SHADER_COLOR2D].m_slot[SSLOT_COLOR], 1, 1, 1, 0.5f);
 	DrawMMFrust();
+	EndS();
 }
 
 void DrawMinimapDepth()
 {
 	//if(rand()%2 == 1)
-	g_hmap.draw4();
+	g_hmap.draw2();
+}
+
+void DrawPreview(Matrix projection, Matrix viewmat, Matrix modelmat, Matrix modelviewinv, float mvLightPos[3], float lightDir[3])
+{
+	Matrix mvpmat;
+	mvpmat.set(projection.m_matrix);
+	mvpmat.postMultiply(viewmat);
+
+	UseShadow(SHADER_OWNED, projection, viewmat, modelmat, modelviewinv, mvLightPos, lightDir);
+	//UseShadow(SHADER_UNIT, projection, viewmat, modelmat, modelviewinv, mvLightPos, lightDir);
+	glActiveTextureARB(GL_TEXTURE8);
+	glBindTexture(GL_TEXTURE_2D, g_depth);
+	glUniform1iARB(g_shader[g_curS].m_slot[SSLOT_SHADOWMAP], 8);
+
+	glUniform4f(g_shader[g_curS].m_slot[SSLOT_OWNCOLOR], 1, 0, 0, 0);
+
+	Shader* s = &g_shader[g_curS];
+	Model* m = NULL;
+
+	Player* py = &g_player[g_currP];
+
+	if(py->bptype >= 0 && py->bptype < BUILDING_TYPES)
+	{
+		BuildingT* t = &g_buildingT[py->bptype];
+		m = &g_model[t->model];
+	}
+	else if(py->bptype == BUILDING_ROAD)
+	{
+		m = &g_model[g_roadT[CONNECTION_EASTWEST][1].model];
+	}
+	else if(py->bptype == BUILDING_POWL)
+	{
+		m = &g_model[g_powlT[CONNECTION_EASTWEST][1].model];
+	}
+	else if(py->bptype == BUILDING_CRPIPE)
+	{
+		m = &g_model[g_crpipeT[CONNECTION_EASTWEST][1].model];
+	}
+
+	if(!m)
+		return;
+
+	float pitch = 0;
+	float yaw = py->bpyaw;
+	int frame = 0;
+	Vec3f pos(0,0,0);
+	Matrix modelmat2;
+	float radians[] = {DEGTORAD(pitch), DEGTORAD(yaw), 0};
+	modelmat2.setTranslation((const float*)&pos);
+	Matrix rotation;
+	rotation.setRotationRadians(radians);
+	modelmat2.postMultiply(rotation);
+	glUniformMatrix4fv(s->m_slot[SSLOT_MODELMAT], 1, 0, modelmat2.m_matrix);
+
+	VertexArray* va = &m->m_va[frame];
+
+	m->usetex();
+
+	glVertexAttribPointer(s->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, va->vertices);
+	glVertexAttribPointer(s->m_slot[SSLOT_TEXCOORD0], 2, GL_FLOAT, GL_FALSE, 0, va->texcoords);
+	glVertexAttribPointer(s->m_slot[SSLOT_NORMAL], 3, GL_FLOAT, GL_FALSE, 0, va->normals);
+
+	glDrawArrays(GL_TRIANGLES, 0, va->numverts);
+	EndS();
+}
+
+void DrawPreviewDepth()
+{
+	Shader* s = &g_shader[g_curS];
+
+	Model* m = NULL;
+
+	Player* py = &g_player[g_currP];
+
+	if(py->bptype >= 0 && py->bptype < BUILDING_TYPES)
+	{
+		BuildingT* t = &g_buildingT[py->bptype];
+		m = &g_model[t->model];
+	}
+	else if(py->bptype == BUILDING_ROAD)
+	{
+		m = &g_model[g_roadT[CONNECTION_EASTWEST][1].model];
+	}
+	else if(py->bptype == BUILDING_POWL)
+	{
+		m = &g_model[g_powlT[CONNECTION_EASTWEST][1].model];
+	}
+	else if(py->bptype == BUILDING_CRPIPE)
+	{
+		m = &g_model[g_crpipeT[CONNECTION_EASTWEST][1].model];
+	}
+
+	if(!m)
+		return;
+
+	py->bpyaw = (int)(py->bpyaw+2)%360;
+
+	float pitch = 0;
+	float yaw = py->bpyaw;
+	int frame = 0;
+	Vec3f pos(0,0,0);
+	Matrix modelmat;
+	float radians[] = {DEGTORAD(pitch), DEGTORAD(yaw), 0};
+	modelmat.setTranslation((const float*)&pos);
+	Matrix rotation;
+	rotation.setRotationRadians(radians);
+	modelmat.postMultiply(rotation);
+	glUniformMatrix4fv(s->m_slot[SSLOT_MODELMAT], 1, 0, modelmat.m_matrix);
+
+	VertexArray* va = &m->m_va[frame];
+
+	m->usetex();
+
+	glVertexAttribPointer(s->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, va->vertices);
+	glVertexAttribPointer(s->m_slot[SSLOT_TEXCOORD0], 2, GL_FLOAT, GL_FALSE, 0, va->texcoords);
+	//glVertexAttribPointer(s->m_slot[SSLOT_NORMAL], 3, GL_FLOAT, GL_FALSE, 0, va->normals);
+
+	glDrawArrays(GL_TRIANGLES, 0, va->numverts);
 }
 
 void DrawViewport(int which, int x, int y, int width, int height)
@@ -263,90 +408,18 @@ void DrawViewport(int which, int x, int y, int width, int height)
 	glClear(GL_DEPTH_BUFFER_BIT);
 	Viewport* v = &g_viewport[which];
 	ViewportT* t = &g_viewportT[v->m_type];
+	Player* py = &g_player[g_currP];
+	Camera* c = &py->camera;
 
-#if 0
-	float aspect = fabsf((float)width / (float)height);
-	Matrix projection;
-
-	bool persp = false;
-
-#if 0
-	if(g_projtype == PROJ_PERSP && v->!t->m_axial)
-	{
-		projection = BuildPerspProjMat(FIELD_OF_VIEW, aspect, MIN_DISTANCE, MAX_DISTANCE);
-		persp = true;
-	}
-	else if(g_projtype == PROJ_ORTHO || v->t->m_axial)
-	{
-		projection = setorthographicmat(-PROJ_RIGHT*aspect/g_zoom, PROJ_RIGHT*aspect/g_zoom, PROJ_RIGHT/g_zoom, -PROJ_RIGHT/g_zoom, MIN_DISTANCE, MAX_DISTANCE);
-	}
-#endif
-
-	//Vec3f viewvec = g_focus;	//g_camera.m_view;
-	//Vec3f viewvec = g_camera.m_view;
-	Vec3f focusvec = v->focus();
-    //Vec3f posvec = g_focus + t->m_offset;
-    //Vec3f posvec = g_camera.m_pos;
-	Vec3f posvec = v->pos();
-
-	//if(v->t->m_axial)
-	//	posvec = g_camera.m_view + t->m_offset;
-
-	//viewvec = posvec + Normalize(viewvec-posvec);
-    //Vec3f posvec2 = g_camera.lookpos() + t->m_offset;
-    //Vec3f upvec = t->m_up;
-    //Vec3f upvec = g_camera.m_up;
-	Vec3f upvec = v->up();
-
-	//if(v->t->m_axial)
-	//	upvec = t->m_up;
-
-    Matrix viewmat = gluLookAt3(posvec.x, posvec.y, posvec.z, focusvec.x, focusvec.y, focusvec.z, upvec.x, upvec.y, upvec.z);
-
-	Matrix modelview;
-	Matrix modelmat;
-	float translation[] = {0, 0, 0};
-	modelview.setTranslation(translation);
-	modelmat.setTranslation(translation);
-	modelview.postMultiply(viewmat);
-
-	Matrix mvpmat;
-	mvpmat.set(projection.m_matrix);
-	mvpmat.postMultiply(viewmat);
-#endif
-
-#if 0
-	//if(v->!t->m_axial)
-	{
-		//RenderToShadowMap(projection, viewmat, modelmat, g_focus);
-		//RenderToShadowMap(projection, viewmat, modelmat, g_camera.m_view);
-		RenderToShadowMap(projection, viewmat, modelmat, Vec3f(0,0,0));
-		RenderShadowedScene(projection, viewmat, modelmat, modelview);
-	}
-#endif
-
-#if 0
-	if(v->m_type == VIEWPORT_FRONT || v->m_type == VIEWPORT_LEFT || v->m_type == VIEWPORT_TOP)
-	{
-		UseS(SHADER_COLOR3D);
-		Shader* s = &g_shader[g_curS];
-		glUniformMatrix4fv(s->m_slot[SSLOT_PROJECTION], 1, GL_FALSE, projection.m_matrix);
-		glUniformMatrix4fv(s->m_slot[SSLOT_VIEWMAT], 1, GL_FALSE, viewmat.m_matrix);
-		glUniformMatrix4fv(s->m_slot[SSLOT_MODELMAT], 1, GL_FALSE, modelmat.m_matrix);
-		glEnableVertexAttribArray(s->m_slot[SSLOT_POSITION]);
-		DrawGrid(vmin, vmax);
-	}
-#endif
-	
-	if(v->m_type == VIEWPORT_MINIMAP)
+	if(which == VIEWPORT_ENTVIEW)
 	{
 		float aspect = fabsf((float)width / (float)height);
-		Matrix projection = BuildPerspProjMat(FIELD_OF_VIEW, aspect, MIN_DISTANCE, MAX_DISTANCE/g_zoom);
-		//Matrix projection = setorthographicmat(-PROJ_RIGHT*aspect/g_zoom, PROJ_RIGHT*aspect/g_zoom, PROJ_RIGHT/g_zoom, -PROJ_RIGHT/g_zoom, MIN_DISTANCE, MAX_DISTANCE);
+		Matrix projection = BuildPerspProjMat(FIELD_OF_VIEW, aspect, MIN_DISTANCE, MAX_DISTANCE);
+		//Matrix projection = setorthographicmat(-PROJ_RIGHT*aspect/py->zoom, PROJ_RIGHT*aspect/py->zoom, PROJ_RIGHT/py->zoom, -PROJ_RIGHT/py->zoom, MIN_DISTANCE, MAX_DISTANCE);
 
-		Vec3f focusvec = g_camera.m_view;
-		Vec3f posvec = g_camera.zoompos();
-		Vec3f upvec = g_camera.m_up;
+		Vec3f focusvec = py->bpcam.m_view;
+		Vec3f posvec = py->bpcam.m_pos;
+		Vec3f upvec = py->bpcam.m_up;
 
 		Matrix viewmat = gluLookAt3(posvec.x, posvec.y, posvec.z, focusvec.x, focusvec.y, focusvec.z, upvec.x, upvec.y, upvec.z);
 
@@ -363,12 +436,12 @@ void DrawViewport(int which, int x, int y, int width, int height)
 
 		//if(v->m_type == VIEWPORT_MAIN3D)
 		{
-			//RenderToShadowMap(projection, viewmat, modelmat, g_camera.m_view);
+			//RenderToShadowMap(projection, viewmat, modelmat, c->m_view);
 			//RenderToShadowMap(projection, viewmat, modelmat, Vec3f(0,0,0));
-			Vec3f focus(g_hmap.m_widthx*TILE_SIZE, 0, g_hmap.m_widthz*TILE_SIZE);
+			Vec3f focus(0, 0, 0);
 			Vec3f vLine[2];
-			Vec3f ray = Normalize(g_camera.m_view - posvec);
-			Vec3f onnear = posvec;	//OnNear(g_width/2, g_height/2);
+			Vec3f ray = Normalize(c->m_view - posvec);
+			Vec3f onnear = posvec;	//OnNear(py->width/2, py->height/2);
 #if 0
 			vLine[0] = onnear;
 			vLine[1] = onnear + (ray * 100000.0f);
@@ -377,6 +450,52 @@ void DrawViewport(int which, int x, int y, int width, int height)
 				//if(!GetMapIntersection(&g_hmap, vLine, &focus))
 					GetMapIntersection2(&g_hmap, vLine, &focus);
 #endif
+			CheckGLError(__FILE__, __LINE__);
+			RenderToShadowMap(projection, viewmat, modelmat, focus, focus + g_lightOff, DrawPreviewDepth);
+			RenderShadowedScene(projection, viewmat, modelmat, modelview, DrawPreview);
+		}
+	}
+
+	if(which == VIEWPORT_MINIMAP)
+	{
+		float aspect = fabsf((float)width / (float)height);
+		Matrix projection = BuildPerspProjMat(FIELD_OF_VIEW, aspect, MIN_DISTANCE, MAX_DISTANCE/py->zoom);
+		//Matrix projection = setorthographicmat(-PROJ_RIGHT*aspect/py->zoom, PROJ_RIGHT*aspect/py->zoom, PROJ_RIGHT/py->zoom, -PROJ_RIGHT/py->zoom, MIN_DISTANCE, MAX_DISTANCE);
+
+		Vec3f focusvec = c->m_view;
+		Vec3f posvec = c->zoompos();
+		Vec3f upvec = c->m_up;
+
+		Matrix viewmat = gluLookAt3(posvec.x, posvec.y, posvec.z, focusvec.x, focusvec.y, focusvec.z, upvec.x, upvec.y, upvec.z);
+
+		Matrix modelview;
+		Matrix modelmat;
+		float translation[] = {0, 0, 0};
+		modelview.setTranslation(translation);
+		modelmat.setTranslation(translation);
+		modelview.postMultiply(viewmat);
+
+		Matrix mvpmat;
+		mvpmat.set(projection.m_matrix);
+		mvpmat.postMultiply(viewmat);
+
+		//if(v->m_type == VIEWPORT_MAIN3D)
+		{
+			//RenderToShadowMap(projection, viewmat, modelmat, c->m_view);
+			//RenderToShadowMap(projection, viewmat, modelmat, Vec3f(0,0,0));
+			Vec3f focus(g_hmap.m_widthx*TILE_SIZE, 0, g_hmap.m_widthz*TILE_SIZE);
+			Vec3f vLine[2];
+			Vec3f ray = Normalize(c->m_view - posvec);
+			Vec3f onnear = posvec;	//OnNear(py->width/2, py->height/2);
+#if 0
+			vLine[0] = onnear;
+			vLine[1] = onnear + (ray * 100000.0f);
+			//if(!GetMapIntersection(&g_hmap, vLine, &focus))
+			if(!FastMapIntersect(&g_hmap, vLine, &focus))
+				//if(!GetMapIntersection(&g_hmap, vLine, &focus))
+					GetMapIntersection2(&g_hmap, vLine, &focus);
+#endif
+			CheckGLError(__FILE__, __LINE__);
 			RenderToShadowMap(projection, viewmat, modelmat, focus, focus + g_lightOff / MIN_ZOOM, DrawMinimapDepth);
 			RenderShadowedScene(projection, viewmat, modelmat, modelview, DrawMinimap);
 		}
@@ -384,6 +503,7 @@ void DrawViewport(int which, int x, int y, int width, int height)
 
 
 #if 0
+	EndS();
 	Ortho(width, height, 1, 0, 0, 1);
 	glDisable(GL_DEPTH_TEST);
 	RichText rt = RichText(t->m_label);
@@ -393,6 +513,7 @@ void DrawViewport(int which, int x, int y, int width, int height)
 	//if(persp)
 	//	DrawVertexDebug(&projection, &modelmat, &viewmat, width, height);
 
+	glDisable(GL_DEPTH_TEST);
 	glFlush();
 }
 
@@ -424,33 +545,33 @@ bool ViewportLDown(int which, int relx, int rely, int width, int height)
 	}
 	else
 	{
-		projection = setorthographicmat(-PROJ_RIGHT*aspect/g_zoom, PROJ_RIGHT*aspect/g_zoom, PROJ_RIGHT/g_zoom, -PROJ_RIGHT/g_zoom, MIN_DISTANCE, MAX_DISTANCE);
+		projection = setorthographicmat(-PROJ_RIGHT*aspect/py->zoom, PROJ_RIGHT*aspect/py->zoom, PROJ_RIGHT/py->zoom, -PROJ_RIGHT/py->zoom, MIN_DISTANCE, MAX_DISTANCE);
 	}
 #endif
 
-	//Vec3f viewvec = g_focus; //g_camera.m_view;
-	//Vec3f viewvec = g_camera.m_view;
+	//Vec3f viewvec = g_focus; //c->m_view;
+	//Vec3f viewvec = c->m_view;
 	Vec3f focusvec = v->focus();
-    //Vec3f posvec = g_focus + t->m_offset;
-	//Vec3f posvec = g_camera.m_pos;
+	//Vec3f posvec = g_focus + t->m_offset;
+	//Vec3f posvec = c->m_pos;
 	Vec3f posvec = v->pos();
 
 	//if(v->t->m_axial)
 	{
-	//	posvec = g_camera.m_view + t->m_offset;
-		//viewvec = posvec + Normalize(g_camera.m_view-posvec);
+		//	posvec = c->m_view + t->m_offset;
+		//viewvec = posvec + Normalize(c->m_view-posvec);
 	}
 
 	//viewvec = posvec + Normalize(viewvec-posvec);
-    //Vec3f posvec2 = g_camera.lookpos() + t->m_offset;
-    //Vec3f upvec = t->m_up;
-    //Vec3f upvec = g_camera.m_up;
+	//Vec3f posvec2 = c->lookpos() + t->m_offset;
+	//Vec3f upvec = t->m_up;
+	//Vec3f upvec = c->m_up;
 	Vec3f upvec = v->up();
 
 	//if(v->t->m_axial)
 	//	upvec = t->m_up;
 
-    Matrix viewmat = gluLookAt3(posvec.x, posvec.y, posvec.z, focusvec.x, focusvec.y, focusvec.z, upvec.x, upvec.y, upvec.z);
+	Matrix viewmat = gluLookAt3(posvec.x, posvec.y, posvec.z, focusvec.x, focusvec.y, focusvec.z, upvec.x, upvec.y, upvec.z);
 	Matrix mvpmat;
 	mvpmat.set(projection.m_matrix);
 	mvpmat.postMultiply(viewmat);
@@ -506,7 +627,7 @@ bool ViewportMousewheel(int which, int delta)
 #if 0
 	//if(v->!t->m_axial)
 	{
-		g_zoom *= 1.0f + (float)delta / 10.0f;
+		py->zoom *= 1.0f + (float)delta / 10.0f;
 		return true;
 	}
 #endif

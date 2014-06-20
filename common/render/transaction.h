@@ -16,8 +16,8 @@ public:
 	float halfwidth;
 };
 
-#define TRANSACTION_RISE		10.0f
-#define TRANSACTION_DECAY		0.025f
+#define TRANSACTION_RISE		15.0f
+#define TRANSACTION_DECAY		0.015f
 
 extern list<Transaction> g_transx;
 

@@ -68,7 +68,7 @@ bool PathJob::process()
 	{
 		searchdepth ++;
 
-		if(pjtype == PATHJOB_QUICKPARTIAL && searchdepth > maxsearch)
+		if((pjtype == PATHJOB_QUICKPARTIAL || pjtype == PATHJOB_JPSPART) && searchdepth > maxsearch)
 			break;
 
 		// Pops the lowest F-cost node, moves it in the closed list
@@ -92,14 +92,19 @@ bool PathJob::process()
 		}
 
 		// otherwise, identify successors of the popped node
-		if(pjtype == PATHJOB_JPS)
+		if(pjtype == PATHJOB_JPS || pjtype == PATHJOB_JPSPART)
 			IdentifySuccessors_JPS(this, node);
 		else if(pjtype == PATHJOB_QUICKPARTIAL)
 			IdentifySuccessors_QP(this, node);
 	}
 
-	if(pjtype == PATHJOB_QUICKPARTIAL && closestnode)
+	if((pjtype == PATHJOB_QUICKPARTIAL || pjtype == PATHJOB_JPSPART) && closestnode)
+	{
 		ReconstructPath(this, closestnode);
+		
+		if(callback)
+			callback(true, this);
+	}
 
 	ClearNodes(g_toclear);
 

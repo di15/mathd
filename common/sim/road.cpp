@@ -8,7 +8,7 @@
 
 #include "road.h"
 #include "../render/heightmap.h"
-#include "country.h"
+#include "player.h"
 #include "../render/shader.h"
 #include "../math/hmapmath.h"
 #include "../render/foliage.h"
@@ -23,6 +23,10 @@
 #include "../utils.h"
 #include "../ai/pathnode.h"
 #include "../ai/collidertile.h"
+#include "../sim/selection.h"
+#include "../gui/gui.h"
+#include "../gui/widgets/spez/constructionview.h"
+#include "../../game/gui/gviewport.h"
 
 RoadTileType g_roadT[CONNECTION_TYPES][2];
 RoadTile* g_road = NULL;
@@ -375,7 +379,7 @@ void DrawRoad(int x, int z)
 	//int model = g_roadT[r->type][(int)r->finished].model;
 	int model = g_roadT[r->type][1].model;
 
-	const float* owncol = g_country[r->stateowner].colorcode;
+	const float* owncol = g_player[r->stateowner].colorcode;
 	glUniform4f(g_shader[g_curS].m_slot[SSLOT_OWNCOLOR], owncol[0], owncol[1], owncol[2], owncol[3]);
 
 	Model* m = &g_model[model];
@@ -406,7 +410,7 @@ void DrawRoadPlan(int x, int z)
 
 	int model = g_roadT[r->type][(int)r->finished].model;
 
-	const float* owncol = g_country[r->stateowner].colorcode;
+	const float* owncol = g_player[r->stateowner].colorcode;
 	glUniform4f(g_shader[g_curS].m_slot[SSLOT_OWNCOLOR], owncol[0], owncol[1], owncol[2], owncol[3]);
 
 	Model* m = &g_model[model];
@@ -421,6 +425,8 @@ void DrawRoads()
 
 	//int type;
 	//RoadTile* r;
+
+	Player* py = &g_player[g_currP];
 
 	for(int x=0; x<g_hmap.m_widthx; x++)
 		for(int z=0; z<g_hmap.m_widthz; z++)
@@ -439,7 +445,7 @@ void DrawRoads()
 			DrawRoad(x, z);
 		}
 
-		if(g_build != BUILDING_ROAD)
+		if(py->build != BUILDING_ROAD)
 			return;
 
 		//glColor4f(1,1,1,0.5f);
@@ -523,6 +529,15 @@ void MeshRoad(int x, int z, bool plan)
 	rva->vertices = new Vec3f[ rva->numverts ];
 	rva->texcoords = new Vec2f[ rva->numverts ];
 	rva->normals = new Vec3f[ rva->numverts ];
+
+	if(!rva->vertices)
+		OutOfMem(__FILE__, __LINE__);
+
+	if(!rva->texcoords)
+		OutOfMem(__FILE__, __LINE__);
+
+	if(!rva->normals)
+		OutOfMem(__FILE__, __LINE__);
 
 	float realx, realz;
 	r->drawpos = RoadPosition(x, z);
@@ -1006,15 +1021,16 @@ void PlaceRoad(int x, int z, int stateowner, bool plan)
 
 	r->on = true;
 	r->stateowner = stateowner;
+	Zero(r->maxcost);
 
-	if(!plan && g_mode == PLAY)
-		r->allocate();
+	//if(!plan && g_mode == APPMODE_PLAY)
+	//	r->allocate();
 
 	r->drawpos = RoadPosition(x, z);
 
-	if(g_mode == PLAY)
+	if(g_mode == APPMODE_PLAY)
 		r->finished = false;
-	//if(plan || g_mode == EDITOR)
+	//if(plan || g_mode == APPMODE_EDITOR)
 	if(plan)
 		r->finished = true;
 
@@ -1053,6 +1069,12 @@ void PlaceRoad()
 	g_log<<"place road 1"<<endl;
 	g_log.flush();
 #endif
+	Player* py = &g_player[g_currP];
+
+	if(g_mode == APPMODE_PLAY)
+	{
+		ClearSel(&py->sel);
+	}
 
 	for(int x=0; x<g_hmap.m_widthx; x++)
 	{
@@ -1077,7 +1099,10 @@ void PlaceRoad()
 
 				PlaceRoad(x, z, plan->stateowner);
 
-				if(g_mode == PLAY && willchange)
+				if(g_mode == APPMODE_PLAY && !actual->finished)
+					py->sel.roads.push_back(Vec2i(x,z));
+
+				if(g_mode == APPMODE_PLAY && willchange)
 				{
 #if 0
 					NewJob(GOINGTOROADJOB, x, z);
@@ -1089,6 +1114,19 @@ void PlaceRoad()
 
 	ClearRoadPlans();
 	ReRoadNetw();
+
+	if(g_mode == APPMODE_PLAY)
+	{
+		Player* py = &g_player[g_currP];
+		GUI* gui = &py->gui;
+
+		if(py->sel.roads.size() > 0)
+		{
+			ConstructionView* cv = (ConstructionView*)gui->get("construction view")->get("construction view");
+			cv->regen(&py->sel);
+			gui->open("construction view");
+		}
+	}
 }
 
 bool RoadLevel(float iterx, float iterz, float testx, float testz, float dx, float dz, int i, float d, RoadTile* (*planfunc)(int x, int z))
@@ -1267,7 +1305,7 @@ void UpdateRoadPlans(int stateowner, Vec3f start, Vec3f end)
 	g_log<<"road plan "<<x1<<","<<z1<<"->"<<x2<<","<<z2<<endl;
 	g_log.flush();
 #endif
-	/*if(!g_mousekeys[MOUSEKEY_LEFT])
+	/*if(!py->mousekeys[MOUSE_LEFT])
 	{
 	x1 = x2;
 	z1 = z2;
@@ -1349,7 +1387,7 @@ bool RoadIntersect(int x, int z, Vec3f line[])
 		poly[1] = va->vertices[v+1] + pos;
 		poly[2] = va->vertices[v+2] + pos;
 
-		if(IntersectedPolygon(poly, line, 3))
+		if(InterPoly(poly, line, 3))
 			return true;
 	}
 

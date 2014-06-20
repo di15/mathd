@@ -4,7 +4,7 @@
 #include "unittype.h"
 #include "../texture.h"
 #include "../utils.h"
-#include "country.h"
+#include "player.h"
 #include "../render/model.h"
 #include "../math/hmapmath.h"
 #include "unitmove.h"
@@ -17,6 +17,7 @@
 #include "../sim/buildingtype.h"
 #include "../sim/building.h"
 #include "../ai/jpspath.h"
+#include "../ai/jpspartpath.h"
 #include "../ai/pathnode.h"
 #include "../ai/partialpath.h"
 
@@ -27,6 +28,17 @@ bool UnitCollides(Unit* u)
 	int minz = u->cmpos.y - t->size.z/2;
 	int maxx = minx + t->size.x - 1;
 	int maxz = minz + t->size.z - 1;
+
+	int cx = u->cmpos.x / PATHNODE_SIZE;
+	int cz = u->cmpos.y / PATHNODE_SIZE;
+
+	ColliderTile* cell = ColliderTileAt(cx, cz);
+
+	if(!t->seaborne && !(cell->flags & FLAG_HASLAND))
+		return true;
+
+	if(cell->flags & FLAG_ABRUPT)
+		return true;
 
 	if(u == g_pathunit)
 	{
@@ -117,7 +129,7 @@ bool UnitCollides(Unit* u)
 	for(int x=cminx; x<=cmaxx; x++)
 		for(int z=cminz; z<=cmaxz; z++)
 		{
-			ColliderTile* cell = ColliderTileAt(x, z);
+			cell = ColliderTileAt(x, z);
 
 			if(cell->building >= 0)
 			{
@@ -136,15 +148,17 @@ bool UnitCollides(Unit* u)
 				
 				if(minx <= maxx2 && minz <= maxz2 && maxx >= minx2 && maxz >= minz2)
 				{
+#if 0
 					g_log<<"collides at cell ("<<(minx/PATHNODE_SIZE)<<","<<(minz/PATHNODE_SIZE)<<")->("<<(maxx/PATHNODE_SIZE)<<","<<(maxz/PATHNODE_SIZE)<<")"<<endl;
 					g_log<<"subgoal = "<<(u->subgoal.x/PATHNODE_SIZE)<<","<<(u->subgoal.y/PATHNODE_SIZE)<<endl;
 					g_log.flush();
+#endif
 
 					return true;
 				}
 			}
 
-			for(short uiter = 0; uiter < 4; uiter ++)
+			for(short uiter = 0; uiter < MAX_COLLIDER_UNITS; uiter ++)
 			{
 				short uindex = cell->units[uiter];
 
@@ -210,14 +224,22 @@ void MoveUnit(Unit* u)
 			u->lastpath = g_simframe;
 
 			int nodesdist = Magnitude( u->goal - u->cmpos ) / PATHNODE_SIZE;
-
+#if 1
 			PartialPath(u->type, u->mode,
 				u->cmpos.x, u->cmpos.y, u->target, u->target2, u->targtype, &u->path, &u->subgoal, 
 				u, NULL, NULL, 
 				u->goal.x, u->goal.y,
 				u->goal.x, u->goal.y, u->goal.x, u->goal.y,
-				nodesdist*2);
+				nodesdist*10);
 				//TILE_SIZE*4/PATHNODE_SIZE);
+#else
+			JPSPartPath(u->type, u->mode,
+				u->cmpos.x, u->cmpos.y, u->target, u->target2, u->targtype, &u->path, &u->subgoal,
+				u, NULL, NULL,
+				u->goal.x, u->goal.y,
+				u->goal.x, u->goal.y, u->goal.x, u->goal.y,
+				nodesdist*4);
+#endif
 			
 #if 0
 			RichText rtext("ppathf");

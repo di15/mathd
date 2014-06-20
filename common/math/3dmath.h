@@ -43,7 +43,7 @@ int Dot(Vec2i vVector1, Vec2i vVector2);
 Vec3f Vector(Vec3f vPoint1, Vec3f vPoint2);
 Vec3f Normal(Vec3f vTriangle[]);
 Vec3f Normal2(Vec3f vTriangle[]);
-bool IntersectedPlane(Vec3f vPoly[], Vec3f vLine[], Vec3f &vNormal, float &originDistance);
+bool InterPlane(Vec3f vPoly[], Vec3f vLine[], Vec3f &vNormal, float &originDistance);
 bool WithinYaw(Camera* c, Vec3f p, float angle);
 float DYaw(Camera* c, Vec3f p);
 double AngleBetweenVectors(Vec3f Vector1, Vec3f Vector2);

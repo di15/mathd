@@ -7,7 +7,7 @@
 
 #define VERSION				3
 #define CONFIGFILE			"config.ini"
-#define TITLE				"States and Corporations"
+#define TITLE				"Corporation-States"
 #define SERVER_ADDR			"corpstates.com"
 #define CYCLE_FRAMES		(DRAW_FRAME_RATE*60)
 
@@ -19,10 +19,16 @@
 
 class Heightmap;
 
-enum APPMODE{LOGO, INTRO, LOADING, RELOADING, MENU, PLAY, PAUSE, EDITOR};
-extern APPMODE g_mode;
+#define APPMODE_LOGO		0
+#define APPMODE_INTRO		1
+#define APPMODE_LOADING		2
+#define APPMODE_RELOADING	3
+#define APPMODE_MENU		4
+#define APPMODE_PLAY		5
+#define APPMODE_PAUSE		6
+#define APPMODE_EDITOR		7
+extern int g_mode;
 extern int g_reStage;
-extern bool g_mouseout;
 
 extern double g_instantupdfps;
 extern double g_updfrinterval;

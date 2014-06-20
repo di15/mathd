@@ -1,7 +1,7 @@
 
 #version 150
 
-attribute vec4 position;
+in vec4 position;
 
 uniform mat4 projection;
 uniform mat4 model;
@@ -12,20 +12,20 @@ uniform mat4 lightMatrix;
 uniform vec3 lightPos;
 uniform vec3 lightDir;
 
-varying vec4 lpos;
-varying vec3 light_vec;
-varying vec3 light_dir;
+out vec4 lpos;
+out vec3 light_vec;
+out vec3 light_dir;
 
-attribute vec3 normalIn;
-varying vec3 normalOut;
+in vec3 normalIn;
+out vec3 normalOut;
 
-attribute vec2 texCoordIn0;
-varying vec2 texCoordOut0;
+in vec2 texCoordIn0;
+out vec2 texCoordOut0;
 
 //uniform mat4 invModelView;
 //uniform mat4 normalMat;
 
-varying vec3 eyevec;
+out vec3 eyevec;
 //attribute vec3 tangent;
 
 //varying float elevy;
@@ -39,13 +39,19 @@ uniform float grassrockmaxy;	// 90,000
 uniform float mapminz;
 uniform float mapmaxz;
 
-varying float sandalpha;
-varying float grassalpha;
-varying float rockalpha;
-varying float snowalpha;
-varying float crackedrockalpha;
+out float sandalpha;
+out float grassalpha;
+out float rockalpha;
+out float snowalpha;
+out float crackedrockalpha;
 
 uniform vec3 sundirection;
+
+uniform float mind;
+uniform float maxd;
+
+out float logz;
+const float C = 0.1;
 
 void main(void)
 {
@@ -61,6 +67,14 @@ void main(void)
 	lpos.w = 1;
 	gl_Position = projection * (view * (model * position));
 	//gl_Position.w = 1;
+
+	//gl_Position.z = 2.0*log(gl_Position.w/mind)/log(maxd/mind) - 1; 
+    	//gl_Position.z *= gl_Position.w;
+
+	float FC = 1.0/log(maxd*C + 1);
+ 
+	logz = log(gl_Position.w*C + 1)*FC;
+	gl_Position.z = (2*logz - 1)*gl_Position.w;
 
 	//elevy = position.y;
 
@@ -102,66 +116,6 @@ void main(void)
 		rockalpha = 1;
 	}
 
-	float mapzspan = mapmaxz - mapminz;
-	float mapz10percent = mapzspan * 0.1;
-
-	float snowupperz = mapmaxz - mapz10percent*2.0;
-	float snowlowerz = mapminz + mapz10percent*2.0;
-
-	float snowtransition = 0;
-
-	if(position.z > snowupperz)
-	{
-		snowtransition = (position.z - snowupperz) / (mapz10percent*2.0);
-	}
-	else if(position.z < snowlowerz)
-	{
-		snowtransition = 1.0 - (position.z - mapminz) / (mapz10percent*2.0);
-	}
-
-	if(snowtransition > 0.0)
-	{
-		float otheralpha = sandalpha + grassalpha + rockalpha;
-		float alphascale = (1.0 - snowtransition) / otheralpha;
-
-		sandalpha *= alphascale;
-		grassalpha *= alphascale;
-		rockalpha *= alphascale;
-		snowalpha = snowtransition;
-	}
-	else
-	{
-		float mapcenterz = mapminz + mapzspan/2.0;
-		float equatorlower = mapcenterz - mapz10percent*2.0;
-		float equatorupper = mapcenterz + mapz10percent*2.0;
-
-		float sandtransition = 0;
-
-		if(position.z > equatorlower && position.z <= mapcenterz)
-		{
-			sandtransition = (position.z - equatorlower) / (mapz10percent*2.0);
-		}
-		else if(position.z >= mapcenterz && position.z < equatorupper)
-		{
-			sandtransition = (equatorupper - position.z) / (mapz10percent*2.0);
-		}
-
-		if(sandtransition > 0.0 && sandtransition > sandalpha)
-		{
-			float otheralpha = snowalpha + grassalpha + rockalpha;
-
-			if(otheralpha > 0.0)
-			{
-				float alphascale = (1.0 - sandtransition) / otheralpha;
-				
-				snowalpha *= alphascale;
-				grassalpha *= alphascale;
-				rockalpha *= alphascale;
-				sandalpha = sandtransition;
-			}
-		}
-	}
-
 	// Make cracked rock ridges appear at more horizontal-facing polygons.
 	// Higher normal.y means the polygon is more upward-facing.
 	crackedrockalpha = min(1, 
@@ -181,7 +135,23 @@ void main(void)
 	grassalpha *= alphascale;
 	rockalpha *= alphascale;
 	sandalpha *= alphascale;
-	
+
+	const float minalph = 0.25;
+	const float maxalph = 0.75;
+	const float arange = maxalph - minalph;
+
+	sandalpha = (max(minalph, min(maxalph, sandalpha)) - minalph) / arange;
+	grassalpha = (max(minalph, min(maxalph, grassalpha)) - minalph) / arange;
+	rockalpha = (max(minalph, min(maxalph, rockalpha)) - minalph) / arange;
+	snowalpha = (max(minalph, min(maxalph, snowalpha)) - minalph) / arange;
+	crackedrockalpha = (max(minalph, min(maxalph, crackedrockalpha)) - minalph) / arange;
+
+	float totalalpha = sandalpha + grassalpha + rockalpha + snowalpha + crackedrockalpha;
+	sandalpha /= totalalpha;
+	grassalpha /= totalalpha;
+	rockalpha /= totalalpha;
+	snowalpha /= totalalpha;
+	crackedrockalpha /= totalalpha;
 
 /*
 	sandalpha = 1;

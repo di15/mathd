@@ -1,7 +1,7 @@
 
 #include "polygon.h"
 #include "3dmath.h"
-
+#include "../utils.h"
 
 Polyg::Polyg()
 {
@@ -45,7 +45,7 @@ void Polyg::freeva()
 	}
 }
 
-bool InsidePolygon(Vec3f vIntersection, Vec3f Poly[], long verticeCount)
+bool InsidePoly(Vec3f vIntersection, Vec3f Poly[], long verticeCount)
 {
 	const double MATCH_FACTOR = 0.9999;		// Used to cover up the error in floating point
 	double Angle = 0.0;						// Initialize the angle
@@ -87,7 +87,7 @@ bool InsidePolygon(Vec3f vIntersection, Vec3f Poly[], long verticeCount)
 	return false;								// If you get here, it obviously wasn't inside the polygon, so Return FALSE
 }
 
-bool IntersectedPolygon(Vec3f vPoly[], Vec3f vLine[], int verticeCount, Vec3f* vIntersection)
+bool InterPoly(Vec3f vPoly[], Vec3f vLine[], int verticeCount, Vec3f* vIntersection)
 {
 	Vec3f vNormal;// = {0};
 	float originDistance = 0;
@@ -97,10 +97,10 @@ bool IntersectedPolygon(Vec3f vPoly[], Vec3f vLine[], int verticeCount, Vec3f* v
 	// We pass in address of vNormal and originDistance so we only calculate it once
 
 									 // Reference   // Reference
-	if(!IntersectedPlane(vPoly, vLine,   vNormal,   originDistance))
+	if(!InterPlane(vPoly, vLine,   vNormal,   originDistance))
 		return false;
 
-	// Now that we have our normal and distance passed back from IntersectedPlane(), 
+	// Now that we have our normal and distance passed back from InterPlane(), 
 	// we can use it to calculate the intersection point.  The intersection point
 	// is the point that actually is ON the plane.  It is between the line.  We need
 	// this point test next, if we are inside the polygon.  To get the I-Point, we
@@ -112,7 +112,7 @@ bool IntersectedPolygon(Vec3f vPoly[], Vec3f vLine[], int verticeCount, Vec3f* v
 	// To do this, we pass in :
 	// (our intersection point, the polygon, and the number of vertices our polygon has)
 
-	if(InsidePolygon(vTemp, vPoly, verticeCount))
+	if(InsidePoly(vTemp, vPoly, verticeCount))
 	{
 		if(vIntersection != NULL)
 			(*vIntersection) = vTemp;

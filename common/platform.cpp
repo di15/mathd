@@ -1,10 +1,7 @@
 
 #include "platform.h"
 
-#ifdef PLATFORM_WIN32
-HDC g_hDC = NULL;
-HGLRC g_hRC = NULL;
-HWND g_hWnd = NULL;
+#ifdef PLATFORM_WIN
 HINSTANCE g_hInstance = NULL;
 #endif
 
@@ -12,3 +9,7 @@ HINSTANCE g_hInstance = NULL;
 Display *g_display;
 Window g_window;
 #endif
+
+SDL_Window *g_window;
+SDL_Renderer* g_renderer;
+SDL_GLContext g_glcontext;

@@ -1,5 +1,5 @@
 
-#define SCROLL_BORDER	30
+#define SCROLL_BORDER	5
 
 void Escape();
 void Scroll();

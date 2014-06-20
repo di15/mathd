@@ -9,6 +9,7 @@
 #include "../math/hmapmath.h"
 #include "../gui/gui.h"
 #include "../math/vec4f.h"
+#include "player.h"
 
 Deposit g_deposit[DEPOSITS];
 
@@ -42,6 +43,8 @@ void DrawDeposits(const Matrix projection, const Matrix viewmat)
 	mvp.set(projection.m_matrix);
 	mvp.postMultiply(viewmat);
 
+	Player* py = &g_player[g_currP];
+
 	for(int i=0; i<DEPOSITS; i++)
 	{
 		Deposit* d = &g_deposit[i];
@@ -59,7 +62,7 @@ void DrawDeposits(const Matrix projection, const Matrix viewmat)
 		pos.y = Bilerp(&g_hmap, pos.x, pos.z);
 #endif
 		//Vec4f ScreenPos(Matrix* mvp, Vec3f vec, float width, float height)
-		Vec4f spos = ScreenPos(&mvp, pos, g_currw, g_currh, true);
+		Vec4f spos = ScreenPos(&mvp, pos, py->currw, py->currh, true);
 
 		Resource* res = &g_resource[d->restype];
 		Icon* ic = &g_icon[res->icon];

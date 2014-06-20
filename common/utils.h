@@ -33,3 +33,4 @@ void BackSlashes(char* corrected);
 void ErrorMessage(const char* title, const char* message);
 void InfoMessage(const char* title, const char* message);
 void WarningMessage(const char* title, const char* message);
+void OutOfMem(const char* file, int line);

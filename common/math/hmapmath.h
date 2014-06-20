@@ -11,13 +11,12 @@ bool GetMapIntersection2(Heightmap* hmap, Vec3f* vLine, Vec3f* vIntersection);
 bool GetMapIntersection(Heightmap* hmap, Vec3f* vLine, Vec3f* vIntersection);
 bool FastMapIntersect(Heightmap* hmap, Vec3f* line, Vec3f* intersection);
 float Highest(int minx, int minz, int maxx, int maxz);
+float Lowest(int minx, int minz, int maxx, int maxz);
 bool TileUnclimable(float px, float pz);
 bool AnyLandi(int tx, int tz);
 bool AnyWateri(int tx, int tz);
 bool AnyWater(int cmx, int cmz);
 bool AtWater(int cmx, int cmz);
 bool AtLand(int cmx, int cmz);
-Heightmap* SelectHMZoom(float zoom);
-void CalcMapView();
 
 #endif

@@ -30,6 +30,11 @@ RichTextP::RichTextP(const char* cstr)
 {
 	m_type = RICHTEXT_TEXT;
 	m_text = UString(cstr);
+
+#ifdef USTR_DEBUG
+	g_log<<"RichTextP::RichTextP(const char* cstr) end '"<<m_text.rawstr()<<"'"<<endl;
+	g_log.flush();
+#endif
 }
 
 RichTextP::RichTextP(UString ustr)
@@ -90,7 +95,19 @@ string RichTextP::texval() const
 {
 	if(m_type == RICHTEXT_TEXT)
 	{
-		m_text.rawstr();
+#if 0
+//#ifdef USTR_DEBUG
+		g_log<<"\tstring RichTextP::texval() const..."<<endl;
+		g_log.flush();
+#endif
+
+		return m_text.rawstr();
+		
+#if 0
+//#ifdef USTR_DEBUG
+		g_log<<"\tstring RichTextP::texval() const = "<<m_text.rawstr()<<endl;
+		g_log.flush();
+#endif
 	}
 	else if(m_type == RICHTEXT_ICON)
 	{
@@ -126,13 +143,25 @@ RichText::RichText(const RichText& original)
 
 RichText::RichText(const char* cstr)
 {
+#ifdef USTR_DEBUG
+	g_log<<"RichText::RichText(const char* cstr)"<<endl;
+	g_log.flush();
+#endif
+
 	m_part.push_back( RichTextP(cstr) );
 }
 
 RichText& RichText::operator=(const RichText &original)
 {
 #ifdef USTR_DEBUG
+//#if 1
 	g_log<<"richtext::= ";
+	g_log.flush();
+	g_log<<"from: ";
+	g_log.flush();
+	g_log<<rawstr()<<endl;
+	g_log.flush();
+	g_log<<"to: ";
 	g_log.flush();
 	g_log<<original.rawstr()<<endl;
 	g_log.flush();
@@ -269,9 +298,25 @@ RichText RichText::substr(int start, int length) const
 string RichText::rawstr() const
 {
 	string raws;
+	
+#ifdef USTR_DEBUG
+	//int parti = 0;
+	//g_log<<"string RichText::rawstr() const before loop..."<<parti<<endl;
+	//g_log.flush();
+#endif
 
 	for(auto i=m_part.begin(); i!=m_part.end(); i++)
+	{
+#ifdef USTR_DEBUG
+		//g_log<<"string RichText::rawstr() const parti="<<parti<<endl;
+		//g_log.flush();
+		//g_log<<"\tstring RichText::rawstr() const = "<<i->texval()<<endl;
+		//g_log.flush();
+		//parti++;
+#endif
+
 		raws += i->texval();
+	}
 
 	return raws;
 }

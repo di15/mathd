@@ -4,8 +4,9 @@
 #include "../platform.h"
 #include "../econ/demand.h"
 #include "unittype.h"
-#include "country.h"
+#include "player.h"
 
+#if 0
 void UpdFoodDem(Unit* u)
 {
 	Demand* foodd = NULL;
@@ -32,7 +33,7 @@ void UpdFoodDem(Unit* u)
 	}
 
 	UnitT* ut = &g_unitT[u->type]; 
-	unsigned char curry = g_country[u->stateowner].currencyres;
+	unsigned char curry = g_player[u->owner].currencyres;
 
 	foodd->cmpos = u->cmpos;
 	foodd->cmdist = (u->belongings[RES_RETFOOD] - 1) / ut->cmspeed;
@@ -68,7 +69,7 @@ void UpdHousDem(Unit* u)
 	}
 
 	UnitT* ut = &g_unitT[u->type]; 
-	unsigned char curry = g_country[u->stateowner].currencyres;
+	unsigned char curry = g_player[u->owner].currencyres;
 
 	housd->cmpos = u->cmpos;
 	housd->cmdist = (STARTING_LABOUR - u->belongings[RES_LABOUR]) / ut->cmspeed;
@@ -80,4 +81,11 @@ void UpdateLabourer(Unit* u)
 {
 	UpdFoodDem(u);
 	UpdHousDem(u);
+}
+
+#endif
+
+void UpdateLabourer(Unit* u)
+{
+
 }

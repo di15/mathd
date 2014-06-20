@@ -5,7 +5,7 @@
 #include "unittype.h"
 #include "../texture.h"
 #include "../utils.h"
-#include "country.h"
+#include "player.h"
 #include "../render/model.h"
 #include "../math/hmapmath.h"
 #include "unitmove.h"
@@ -42,8 +42,8 @@ void Unit::resetpath()
 #if 0
 void DrawUnits()
 {
-	Vec3f vertical = g_camera.up2();
-	Vec3f horizontal = g_camera.m_strafe;
+	Vec3f vertical = c->up2();
+	Vec3f horizontal = c->m_strafe;
 	Vec3f a, b, c, d;
 	Vec3f vert, horiz;
 
@@ -139,10 +139,9 @@ void StartingBelongings(Unit* u)
 
 	if(u->type == UNIT_LABOURER)
 	{
-		if(u->stateowner >= 0)
+		if(u->owner >= 0)
 		{
-			Country* c = &g_country[u->stateowner];
-			u->belongings[ c->currencyres ] = 100;
+			u->belongings[ RES_FUNDS ] = 100;
 		}
 
 		u->belongings[ RES_RETFOOD ] = STARTING_RETFOOD;
@@ -150,7 +149,7 @@ void StartingBelongings(Unit* u)
 	}
 }
 
-bool PlaceUnit(int type, Vec3i cmpos, int stateowner, int corpowner, int unitowner)
+bool PlaceUnit(int type, Vec3i cmpos, int owner)
 {
 	int i = NewUnit();
 
@@ -209,9 +208,7 @@ bool PlaceUnit(int type, Vec3i cmpos, int stateowner, int corpowner, int unitown
 	u->type = type;
 	u->cmpos = Vec2i(cmpos.x, cmpos.z);
 	u->drawpos = Vec3f(cmpos.x, cmpos.y, cmpos.z);
-	u->stateowner = stateowner;
-	u->corpowner = corpowner;
-	u->unitowner = unitowner;
+	u->owner = owner;
 	u->path.clear();
 	u->goal = Vec2i(cmpos.x, cmpos.z);
 	u->target = -1;
@@ -237,13 +234,7 @@ bool PlaceUnit(int type, Vec3i cmpos, int stateowner, int corpowner, int unitown
 	u->pathdelay = 0;
 	u->lastpath = g_simframe;
 
-#if 0
-	char msg[128];
-
-	sprintf(msg, "place at %f,%f,%f", u->fpos.x, u->fpos.y, u->fpos.z);
-
-	MessageBox(g_hWnd, msg, "asd", NULL);
-#endif
+	u->fillcollider();
 
 	return true;
 }

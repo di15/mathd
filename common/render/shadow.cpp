@@ -19,15 +19,15 @@
 #include "../math/camera.h"
 
 unsigned int g_depth = -1;
-const int g_depthSizeX = 2048;	//512;	//4096;
-const int g_depthSizeY = 2048;	//512;	//4096;
+const int g_depthSizeX = 1024;	//2048;	//512;	//4096;
+const int g_depthSizeY = 1024;	//2048;	//512;	//4096;
 unsigned int g_rbDepth;
 unsigned int g_fbDepth;
 
 //#define LIGHT_MAX_D		(1000.0f * 100.0f)
 //#define LIGHT_MIN_D		1.0f
 
-Vec3f g_lightOff(-MAX_DISTANCE/5, MAX_DISTANCE/3, MAX_DISTANCE/4);
+Vec3f g_lightOff(-MAX_DISTANCE/4, MAX_DISTANCE/4, MAX_DISTANCE/4);
 //Vec3f g_lightOff(-LIGHT_MAX_D/5, LIGHT_MAX_D/3, LIGHT_MAX_D/4);
 Vec3f g_lightPos;	//(-MAX_DISTANCE/2, MAX_DISTANCE/5, MAX_DISTANCE/3);
 Vec3f g_lightEye;	//(-MAX_DISTANCE/2+1.0f/2.0f, MAX_DISTANCE/3-1.0f/3.0f, MAX_DISTANCE/3-1.0f/3.0f);
@@ -266,6 +266,8 @@ void Transpose(Matrix mat, Matrix transpMat)
 
 void RenderToShadowMap(Matrix projection, Matrix viewmat, Matrix modelmat, Vec3f focus, Vec3f lightpos, void (*drawscenedepthfunc)())
 {
+	CheckGLError(__FILE__, __LINE__);
+
 	glDisable(GL_CULL_FACE);
 
 	int viewport[4];
@@ -281,6 +283,8 @@ void RenderToShadowMap(Matrix projection, Matrix viewmat, Matrix modelmat, Vec3f
 	//glPolygonOffset(2.0, 500.0);
 	glPolygonOffset(10.0, 2500.0);
 	//glPolygonOffset(1.0, 250.0);
+
+	CheckGLError(__FILE__, __LINE__);
 
 	g_lightPos = lightpos;
 	g_lightEye = focus;
@@ -309,26 +313,37 @@ void RenderToShadowMap(Matrix projection, Matrix viewmat, Matrix modelmat, Vec3f
 		//timelightpos.x, timelightpos.y, timelightpos.z,
 		g_lightEye.x, g_lightEye.y, g_lightEye.z, 
 		g_lightUp.x, g_lightUp.y, g_lightUp.z);
+	CheckGLError(__FILE__, __LINE__);
 	
 	UseS(SHADER_DEPTH);
 	glUniformMatrix4fv(g_shader[SHADER_DEPTH].m_slot[SSLOT_PROJECTION], 1, 0, g_lightProjectionMatrix.m_matrix);
 	glUniformMatrix4fv(g_shader[SHADER_DEPTH].m_slot[SSLOT_MODELMAT], 1, 0, modelmat.m_matrix);
 	glUniformMatrix4fv(g_shader[SHADER_DEPTH].m_slot[SSLOT_VIEWMAT], 1, 0, g_lightModelViewMatrix.m_matrix);
-	glUniform4f(g_shader[SHADER_MODEL].m_slot[SSLOT_COLOR], 1, 1, 1, 1);
-	glEnableVertexAttribArray(g_shader[SHADER_DEPTH].m_slot[SSLOT_POSITION]);
-	glEnableVertexAttribArray(g_shader[SHADER_DEPTH].m_slot[SSLOT_TEXCOORD0]);
+	glUniform4f(g_shader[SHADER_DEPTH].m_slot[SSLOT_COLOR], 1, 1, 1, 1);
+	//glEnableVertexAttribArray(g_shader[SHADER_DEPTH].m_slot[SSLOT_POSITION]);
+	//glEnableVertexAttribArray(g_shader[SHADER_DEPTH].m_slot[SSLOT_TEXCOORD0]);
+	
+	CheckGLError(__FILE__, __LINE__);
 
 	if(drawscenedepthfunc != NULL)
 		drawscenedepthfunc();
+	
+	CheckGLError(__FILE__, __LINE__);
 
-	TurnOffShader();
+	EndS();
+	
+	CheckGLError(__FILE__, __LINE__);
+
+	//TurnOffShader();
 
 	glDisable(GL_POLYGON_OFFSET_FILL);
 	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
 
-	//glViewport(0, 0, g_width, g_height);
+	//glViewport(0, 0, py->width, py->height);
 	glViewport(viewport[0], viewport[1], viewport[2], viewport[3]);
 	glEnable(GL_CULL_FACE);
+
+	CheckGLError(__FILE__, __LINE__);
 }
 
 void UseShadow(int shader, Matrix projection, Matrix viewmat, Matrix modelmat, Matrix modelviewinv, float mvLightPos[3], float lightDir[3])
@@ -356,17 +371,17 @@ void UseShadow(int shader, Matrix projection, Matrix viewmat, Matrix modelmat, M
 
 void RenderShadowedScene(Matrix projection, Matrix viewmat, Matrix modelmat, Matrix modelview, void (*drawscenefunc)(Matrix projection, Matrix viewmat, Matrix modelmat, Matrix modelviewinv, float mvLightPos[3], float lightDir[3]))
 {
-	//glViewport(0, 0, g_width, g_height);
+	//glViewport(0, 0, py->width, py->height);
 	//glClearColor(0.0, 0.0, 0.0, 1.0);
 	glClearColor(1.0, 1.0, 1.0, 1.0);
 
 	//glMatrixMode(GL_PROJECTION);
 	//glLoadIdentity();
-	//gluPerspective(FIELD_OF_VIEW, double(g_width) / double(g_height), MIN_DISTANCE, MAX_DISTANCE);
-	//g_cameraProjectionMatrix = BuildPerspProjMat(FIELD_OF_VIEW, double(g_width) / double(g_height), MIN_DISTANCE, MAX_DISTANCE);
+	//gluPerspective(FIELD_OF_VIEW, double(py->width) / double(py->height), MIN_DISTANCE, MAX_DISTANCE);
+	//g_cameraProjectionMatrix = BuildPerspProjMat(FIELD_OF_VIEW, double(py->width) / double(py->height), MIN_DISTANCE, MAX_DISTANCE);
 	//glMatrixMode(GL_MODELVIEW);
 	//glLoadIdentity();
-	//g_camera.Look();
+	//c->Look();
 
 	//glGetFloatv(GL_PROJECTION_MATRIX, g_cameraProjectionMatrix);
 	g_cameraProjectionMatrix = projection;
@@ -374,7 +389,7 @@ void RenderShadowedScene(Matrix projection, Matrix viewmat, Matrix modelmat, Mat
 	g_cameraModelViewMatrix = modelview;
 
 	// Do non-shadowed drawing here
-	//DrawSkyBox(g_camera.LookPos());
+	//DrawSkyBox(c->LookPos());
 	
 	InverseMatrix(&g_cameraInverseModelViewMatrix, modelview);
 
@@ -418,7 +433,7 @@ void RenderShadowedScene(Matrix projection, Matrix viewmat, Matrix modelmat, Mat
 	glBindTexture(GL_TEXTURE_2D, 0);
 	glActiveTextureARB(GL_TEXTURE0_ARB);
 	/*
-	if(g_mode == EDITOR)
+	if(g_mode == APPMODE_EDITOR)
 	{
 		UseS(COLOR3D);
 		glUniformMatrix4fv(g_shader[SHADER_COLOR3D].m_slot[SSLOT_PROJECTION], 1, 0, projection.m_matrix);
@@ -431,7 +446,7 @@ void RenderShadowedScene(Matrix projection, Matrix viewmat, Matrix modelmat, Mat
 	}*/
 	
 	TurnOffShader();
-	//g_camera.Look();
+	//c->Look();
 }
 
 

@@ -52,6 +52,4 @@ public:
 	Vec3f zoompos();
 };									
 
-extern Camera g_camera;
-
 #endif

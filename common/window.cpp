@@ -6,21 +6,15 @@
 #include "gui/font.h"
 #include "render/shadow.h"
 #include "math/3dmath.h"
+#include "gui/cursor.h"
+#include "sim/player.h"
 
 bool g_quit = false;
 double g_drawfrinterval = 0.0f;
-int g_width = INI_WIDTH;
-int g_height = INI_HEIGHT;
-int g_bpp = INI_BPP;
 bool g_fullscreen = false;
 Resolution g_selectedRes;
 vector<Resolution> g_resolution;
 vector<int> g_bpps;
-Vec2i g_mouse;
-Vec2i g_mousestart;
-bool g_keyintercepted = false;
-bool g_keys[256];
-bool g_mousekeys[3];
 #if 0
 double g_currentTime;
 double g_lastTime = 0.0f;		// This will hold the time from the last frame
@@ -28,17 +22,6 @@ double g_framesPerSecond = 0.0f;		// This will store our fps
 #endif
 double g_instantdrawfps = 0.0f;
 long long g_lasttime = GetTickCount();
-float g_zoom = INI_ZOOM;
-
-void TrackMouse()
-{
-	TRACKMOUSEEVENT tme;
-	tme.cbSize = sizeof(tme);
-	tme.dwFlags = TME_LEAVE | TME_HOVER;
-	tme.dwHoverTime = HOVER_DEFAULT;	//100;
-	tme.hwndTrack = g_hWnd;
-	TrackMouseEvent(&tme);
-}
 
 void AddRes(int w, int h)
 {
@@ -97,15 +80,18 @@ void Resize(int width, int height)
 	
 	glViewport(0, 0, width, height);
 
-	if(g_width != width || g_height != height)
+	Player* py = &g_player[g_currP];
+	GUI* gui = &py->gui;
+
+	if(py->width != width || py->height != height)
 	{
-		g_width = width;
-		g_height = height;
+		py->width = width;
+		py->height = height;
 
 		//if(g_fullscreen)
 			//Reload();
 			//loadtex();
-		g_GUI.resize();
+		gui->reframe();
 	}
 }
 
@@ -185,7 +171,31 @@ bool DrawNextFrame(int desiredFrameRate)
 }
 
 bool InitWindow()
-{
+{	
+	char path[MAX_PATH+1];
+	FullPath("gui/trigear-64x64.png", path);
+	LoadedTex* pixels = LoadPNG(path);
+
+	if(!pixels)
+	{
+		ErrorMessage("Error", "Couldn't load icon");
+	}
+
+	SDL_Surface* surf = SDL_CreateRGBSurfaceFrom(pixels->data, pixels->sizeX, pixels->sizeY, pixels->channels*8, pixels->channels*pixels->sizeX, 0x000000FF, 0x0000FF00, 0x00FF0000, 0xFF000000);
+
+	if(!surf)
+	{
+		char message[256];
+		sprintf(message, "Couldn't create icon: %s", SDL_GetError());
+		ErrorMessage("Error", message);
+	}
+
+	// The icon is attached to the window pointer
+	SDL_SetWindowIcon(g_window, surf); 
+
+	// ...and the surface containing the icon pixel data is no longer required.
+	SDL_FreeSurface(surf);
+
 	glShadeModel(GL_SMOOTH);
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 	//glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
@@ -200,16 +210,6 @@ bool InitWindow()
 	glFrontFace(GL_CW);
 	glCullFace(GL_BACK);
 
-	glActiveTextureARB = (PFNGLACTIVETEXTUREARBPROC)wglGetProcAddress("glActiveTextureARB");
-	glMultiTexCoord2fARB = (PFNGLMULTITEXCOORD2FARBPROC)wglGetProcAddress("glMultiTexCoord2fARB");
-    glClientActiveTextureARB = (PFNGLACTIVETEXTUREARBPROC)wglGetProcAddress("glClientActiveTextureARB");
-
-	if(!glActiveTextureARB || !glMultiTexCoord2fARB || !glClientActiveTextureARB)
-	{
-		MessageBox(g_hWnd, TEXT("Your current setup does not support multitexturing"), TEXT("Error"), MB_OK);
-		return false;
-	}
-
 	InitGLSL();
 	InitShadows();
 	LoadFonts();
@@ -222,189 +222,98 @@ void DestroyWindow(const char* title)
 	FreeTextures();
 	ReleaseShaders();
 
-	if(g_fullscreen)
-		ChangeDisplaySettings(NULL, 0);
-
-	if(g_hRC)
-	{
-		if(!wglMakeCurrent(NULL, NULL))
-			MessageBox(NULL, TEXT("Release of DC and RC failed"), TEXT("Error"), MB_OK | MB_ICONINFORMATION);
-
-		if(!wglDeleteContext(g_hRC))
-			MessageBox(NULL, TEXT("Release of rendering context failed"), TEXT("Error"), MB_OK | MB_ICONINFORMATION);
-
-		g_hRC = NULL;
-	}
-
-	if(g_hDC && !ReleaseDC(g_hWnd, g_hDC))
-	{
-		MessageBox(NULL, TEXT("Release device context failed"), TEXT("Error"), MB_OK | MB_ICONINFORMATION);
-		g_hDC = NULL;
-	}
-
-	if(g_hWnd && !DestroyWindow(g_hWnd))
-	{
-		MessageBox(NULL, TEXT("Could not release hWnd"), TEXT("Error"), MB_OK | MB_ICONINFORMATION);
-		g_hWnd = NULL;
-	}
-
-	if(!UnregisterClass(title, g_hInstance))
-	{
-		MessageBox(NULL, TEXT("Could not unregister class"), TEXT("Error"), MB_OK | MB_ICONINFORMATION);
-		g_hInstance = NULL;
-	}
+    // Close and destroy the window
+	SDL_GL_DeleteContext(g_glcontext);
+#if 0
+    SDL_DestroyRenderer(g_renderer);
+#endif
+    SDL_DestroyWindow(g_window);
 }
 
-bool MakeWindow(const char* title, HICON icon, WNDPROC wndproc)
+bool MakeWindow(const char* title)
 {
-	unsigned int PixelFormat;
-	WNDCLASS wc;
-	DWORD dwExStyle;
-	DWORD dwStyle;
-	RECT WindowRect;
-	WindowRect.left=(long)0;
-	WindowRect.right=(long)g_selectedRes.width;
-	WindowRect.top=(long)0;
-	WindowRect.bottom=(long)g_selectedRes.height;
+	// Request compatibility because GLEW doesn't play well with core contexts.
+#if 1
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_COMPATIBILITY);
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3); 
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2); 
+	SDL_GL_SetAttribute(SDL_GL_ACCELERATED_VISUAL, 1);
+	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
+	SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24); 
+#endif
 
-	wc.style = CS_HREDRAW | CS_VREDRAW | CS_OWNDC;
-	wc.lpfnWndProc = (WNDPROC)wndproc;
-	wc.cbClsExtra = 0;
-	wc.cbWndExtra = 0;
-	wc.hInstance = g_hInstance;
-	wc.hIcon = icon; //LoadIcon(g_hInstance, MAKEINTRESOURCE(IDI_GUN));
-	wc.hCursor = LoadCursor(NULL, IDC_ARROW);
-	wc.hbrBackground = (HBRUSH)GetStockObject(BLACK_BRUSH);
-	wc.lpszMenuName = NULL;
-	wc.lpszClassName = title;
-
-	if(!RegisterClass(&wc))
-	{
-		MessageBox(NULL, TEXT("Failed to register the window class"), TEXT("Error"), MB_OK | MB_ICONEXCLAMATION);
-		return FALSE;
-	}
-	
-	if(g_fullscreen)
-	{
-		DEVMODE dmScreenSettings;								// Device Mode
-		memset(&dmScreenSettings,0,sizeof(dmScreenSettings));	// Makes Sure Memory's Cleared
-		dmScreenSettings.dmSize=sizeof(dmScreenSettings);		// Size Of The Devmode Structure
-		dmScreenSettings.dmPelsWidth	= g_selectedRes.width;				// Selected Screen Width
-		dmScreenSettings.dmPelsHeight	= g_selectedRes.height;				// Selected Screen Height
-		dmScreenSettings.dmBitsPerPel	= g_bpp;					// Selected Bits Per Pixel
-		dmScreenSettings.dmFields=DM_BITSPERPEL|DM_PELSWIDTH|DM_PELSHEIGHT;
-
-		if (ChangeDisplaySettings(&dmScreenSettings, CDS_FULLSCREEN) != DISP_CHANGE_SUCCESSFUL)
-		{
-			char msg[128];
-			wsprintf(msg, TEXT("The requested fullscreen mode %dx%dx%d is not supported by\nyour video card. Use windowed mode instead?"), g_width, g_height, g_bpp);
-
-			if(MessageBox(NULL, msg, title, MB_YESNO | MB_ICONEXCLAMATION) == IDYES)
-				g_fullscreen = false;
-			else
-			{
-				MessageBox(NULL, TEXT("Program will now close"), TEXT("Error"), MB_OK | MB_ICONSTOP);
-				g_quit = true;
-				return FALSE;
-			}
-		}
-	}
-
-	int startx = 0;
-	int starty = 0;
+	unsigned int flags;
+	int startx;
+	int starty;
 
 	if(g_fullscreen)
 	{
-		dwExStyle = WS_EX_APPWINDOW;
-		dwStyle = WS_POPUP;
+		startx = SDL_WINDOWPOS_UNDEFINED;
+		starty = SDL_WINDOWPOS_UNDEFINED;
+		flags = SDL_WINDOW_OPENGL | SDL_WINDOW_FULLSCREEN;
 	}
 	else
 	{
-		dwExStyle = WS_EX_APPWINDOW | WS_EX_WINDOWEDGE;
-		dwStyle = WS_OVERLAPPEDWINDOW;
-		//startx = CW_USEDEFAULT;
-		//starty = CW_USEDEFAULT
-		startx = GetSystemMetrics(SM_CXSCREEN)/2 - g_selectedRes.width/2;
-		starty = GetSystemMetrics(SM_CYSCREEN)/2 - g_selectedRes.height/2;
+#if 0
+		SDL_DisplayMode current;
+		SDL_GetCurrentDisplayMode(0, &current);
+		int screenw = current.w;
+		int screenh = current.h;
+
+		startx = screenw/2 - g_selectedRes.width/2;
+		starty = screenh/2 - g_selectedRes.height/2;
+#else
+		startx = SDL_WINDOWPOS_UNDEFINED;
+		starty = SDL_WINDOWPOS_UNDEFINED;
+#endif
+		flags = SDL_WINDOW_OPENGL;
 	}
 
-	AdjustWindowRectEx(&WindowRect, dwStyle, FALSE, dwExStyle);
+	// Create an application window with the following settings:
+    g_window = SDL_CreateWindow(
+        title,                  // window title
+        startx,           // initial x position
+        starty,           // initial y position
+        g_selectedRes.width,                               // width, in pixels
+        g_selectedRes.height,                               // height, in pixels
+        flags                  // flags - see below
+    );
 
-	if (!(g_hWnd = CreateWindowEx(dwExStyle, title, title, dwStyle | WS_CLIPSIBLINGS | WS_CLIPCHILDREN,
-								startx, starty,	WindowRect.right-WindowRect.left, WindowRect.bottom-WindowRect.top,
-								NULL, NULL,	g_hInstance, NULL)))
-	{
-		DestroyWindow(title);
-		MessageBox(NULL, TEXT("Window creation error"), TEXT("Error"), MB_OK | MB_ICONEXCLAMATION);
-		return false;
-	}
+    // Check that the window was successfully made
+    if (g_window == NULL) {
+        // In the event that the window could not be made...
+		char msg[256];
+        sprintf(msg, "Could not create window: %s\n", SDL_GetError());
+		ErrorMessage("Error", msg);
+        return false;
+    }
 
-	static PIXELFORMATDESCRIPTOR pfd=
-	{
-		sizeof(PIXELFORMATDESCRIPTOR),				// Size Of This Pixel Format Descriptor
-		1,											// Version Number
-		PFD_DRAW_TO_WINDOW |						// Format Must Support Window
-		PFD_SUPPORT_OPENGL |						// Format Must Support OpenGL
-		PFD_DOUBLEBUFFER,							// Must Support Double Buffering
-		PFD_TYPE_RGBA,								// Request An RGBA Format
-		g_bpp,										// Select Our Color Depth
-		0, 0, 0, 0, 0, 0,							// Color Bits Ignored
-		0,											// No Alpha Buffer
-		0,											// Shift Bit Ignored
-		0,											// No Accumulation Buffer
-		0, 0, 0, 0,									// Accumulation Bits Ignored
-		24,											// 16Bit Z-Buffer (Depth Buffer)  
-		0,											// No Stencil Buffer
-		0,											// No Auxiliary Buffer
-		PFD_MAIN_PLANE,								// Main Drawing Layer
-		0,											// Reserved
-		0, 0, 0										// Layer Masks Ignored
-	};
-	
-	if (!(g_hDC = GetDC(g_hWnd)))	
-	{
-		DestroyWindow(title);
-		MessageBox(NULL, TEXT("Can't create a GL device context"), TEXT("Error"), MB_OK | MB_ICONEXCLAMATION);
-		return false;
-	}
+#if 0
+	g_renderer = SDL_CreateRenderer(g_window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
 
-	if (!(PixelFormat = ChoosePixelFormat(g_hDC, &pfd)))
-	{
-		DestroyWindow(title);
-		MessageBox(NULL, TEXT("Can't find a suitable pixel format"), TEXT("Error"), MB_OK | MB_ICONEXCLAMATION);
-		return false;
-	}
+	if (g_renderer == NULL) {
+        // In the event that the window could not be made...
+		char msg[256];
+        sprintf(msg, "Could not create renderer: %s\n", SDL_GetError());
+		ErrorMessage("Error", msg);
+        return false;
+    }
+#endif
 
-	if(!SetPixelFormat(g_hDC, PixelFormat, &pfd))
-	{
-		DestroyWindow(title);
-		MessageBox(NULL, TEXT("Can't set the pixel format"), TEXT("Error"), MB_OK | MB_ICONEXCLAMATION);
-		return false;
-	}
+	g_glcontext = SDL_GL_CreateContext(g_window);
+	//SDL_GL_SetSwapInterval(1);
 
-	if (!(g_hRC = wglCreateContext(g_hDC)))
-	{
-		DestroyWindow(title);
-		MessageBox(NULL, TEXT("Can't create a GL rendering context"), TEXT("ERROR"), MB_OK | MB_ICONEXCLAMATION);
-		return false;
-	}
+	//SDL_Delay(7000);
+	//SDL_Delay(7000);
 
-	if(!wglMakeCurrent(g_hDC, g_hRC))
-	{
-		DestroyWindow(title);
-		MessageBox(NULL, TEXT("Can't activate the GL rendering context"), TEXT("Error"), MB_OK | MB_ICONEXCLAMATION);
-		return false;
-	}
-
-	ShowWindow(g_hWnd, SW_SHOW);
-	SetForegroundWindow(g_hWnd);
-	SetFocus(g_hWnd);
-	//Resize(g_width, g_height);
+	Vec2i winsz;
+	SDL_GetWindowSize(g_window, &winsz.x, &winsz.y);
+	Resize(winsz.x, winsz.y);
 
 	if(!InitWindow())
 	{
 		DestroyWindow(title);
-		MessageBox(NULL, TEXT("Initialization failed"), TEXT("Error"), MB_OK | MB_ICONEXCLAMATION);
+		ErrorMessage("Error", "Initialization failed");
 		return false;
 	}
 

@@ -15,6 +15,7 @@
 #include "textblock.h"
 #include "touchlistener.h"
 #include "../icon.h"
+#include "../../sim/player.h"
 
 TextArea::TextArea(Widget* parent, const char* n, const RichText t, int f, void (*reframef)(Widget* thisw), float r, float g, float b, float a, void (*change)()) : Widget()
 {
@@ -36,10 +37,10 @@ TextArea::TextArea(Widget* parent, const char* n, const RichText t, int f, void 
 	m_highl[0] = 0;
 	m_highl[1] = 0;
 	m_caret = m_value.texlen();
-	CreateTexture(m_frametex, "gui\\frame.jpg", true);
-	CreateTexture(m_filledtex, "gui\\filled.jpg", true);
-	CreateTexture(m_uptex, "gui\\up.jpg", true);
-	CreateTexture(m_downtex, "gui\\down.jpg", true);
+	CreateTexture(m_frametex, "gui/frame.jpg", true, false);
+	CreateTexture(m_filledtex, "gui/filled.jpg", true, false);
+	CreateTexture(m_uptex, "gui/up.jpg", true, false);
+	//CreateTexture(m_downtex, "gui/down.jpg", true, false);
 	reframe();
 	m_lines = CountLines(&m_value, f, m_pos[0], m_pos[1], m_pos[2]-m_pos[0]-square(), m_pos[3]-m_pos[1]);
 }
@@ -82,126 +83,239 @@ float TextArea::scrollspace()
 	return (m_pos[3]-m_pos[1]-square()*2);
 }
 
-bool TextArea::mousemove()
+void TextArea::inev(InEv* ev)
 {
-	if(m_ldown)
+	Player* py = &g_player[g_currP];
+
+	if(ev->type == INEV_MOUSEMOVE && !ev->intercepted)
 	{
-		int newcaret = MatchGlyphF(&m_value, m_font, g_mouse.x, m_pos[0]+m_scroll[0], m_pos[1], m_pos[0], m_pos[1], m_pos[2], m_pos[3]);
-		
-		if(newcaret > m_caret)
+		if(m_ldown)
 		{
-			m_highl[0] = m_caret;
-			m_highl[1] = newcaret;
-			//g_log<<"hihgl "<<m_highl[0]<<"->"<<m_highl[1]<<endl;
-			//g_log.flush();
+			int newcaret = MatchGlyphF(&m_value, m_font, py->mouse.x, m_pos[0]+m_scroll[0], m_pos[1], m_pos[0], m_pos[1], m_pos[2], m_pos[3]);
+		
+			if(newcaret > m_caret)
+			{
+				m_highl[0] = m_caret;
+				m_highl[1] = newcaret;
+				//g_log<<"hihgl "<<m_highl[0]<<"->"<<m_highl[1]<<endl;
+				//g_log.flush();
+			}
+			else
+			{
+				m_highl[0] = newcaret;
+				m_highl[1] = m_caret;
+				//g_log<<"hihgl "<<m_highl[0]<<"->"<<m_highl[1]<<endl;
+				//g_log.flush();
+			}
+
+			ev->intercepted = true;
+			return;
+		}
+
+		if(py->mouse.x >= m_pos[0] && py->mouse.x <= m_pos[2] && py->mouse.y >= m_pos[1] && py->mouse.y <= m_pos[3])
+		{
+			m_over = true;
+			
+			ev->intercepted = true;
+			return;
 		}
 		else
 		{
-			m_highl[0] = newcaret;
-			m_highl[1] = m_caret;
-			//g_log<<"hihgl "<<m_highl[0]<<"->"<<m_highl[1]<<endl;
-			//g_log.flush();
+			m_over = false;
+
+			return;
+		}
+	}
+	else if(ev->type == INEV_MOUSEDOWN && ev->key == MOUSE_LEFT && !ev->intercepted)
+	{
+		if(m_over)
+		{
+			m_ldown = true;
+			ev->intercepted = true;
+			return;
+		}
+	}
+	else if(ev->type == INEV_MOUSEUP && ev->key == MOUSE_LEFT && !ev->intercepted)
+	{
+		if(m_over && m_ldown)
+		{
+			m_ldown = false;
+			ev->intercepted = true;
+			gainfocus();
+			return;
 		}
 
-		return true;
-	}
-
-	if(g_mouse.x >= m_pos[0] && g_mouse.x <= m_pos[2] && g_mouse.y >= m_pos[1] && g_mouse.y <= m_pos[3])
-	{
-		m_over = true;
-
-		return true;
-	}
-	else
-	{
-		m_over = false;
-
-		return false;
-	}
-}
-
-bool TextArea::lbuttondown()
-{
-	if(m_over)
-	{
-		m_ldown = true;
-		return true;
-	}
-
-	return false;
-}
-
-bool TextArea::lbuttonup(bool moved)
-{
-	if(m_over && m_ldown)
-	{
-		m_opened = true;
 		m_ldown = false;
-		return true;
+
+		if(m_opened)
+		{
+			m_opened = false;
+			return;
+		}
 	}
-
-	m_ldown = false;
-
-	if(m_opened)
+	else if(ev->type == INEV_KEYDOWN && !ev->intercepted)
 	{
-		m_opened = false;
-		return true;
-	}
+		if(!m_opened)
+			return;
 
-	return false;
-}
-
-bool TextArea::keydown(int k)
-{
-	if(!m_opened)
-		return false;
-	
-	//int len = m_value.length();
-	int len = m_value.texlen();
-
-	if(m_caret > len)
-		m_caret = len;
-
-	if(k == VK_LEFT)
-	{
-		if(m_caret <= 0)
-			return true;
-
-		m_caret --;
-	}
-	else if(k == VK_RIGHT)
-	{
+		//int len = m_value.length();
 		int len = m_value.texlen();
-		
-		if(m_caret >= len)
-			return true;
 
-		m_caret ++;
+		if(m_caret > len)
+			m_caret = len;
+
+		if(ev->key == SDLK_LEFT)
+		{
+			if(m_caret <= 0)
+			{
+				ev->intercepted = true;
+				return;
+			}
+
+			m_caret --;
+		}
+		else if(ev->key == SDLK_RIGHT)
+		{
+			int len = m_value.texlen();
+
+			if(m_caret >= len)
+			{
+				ev->intercepted = true;
+				return;
+			}
+
+			m_caret ++;
+		}
+		else if(ev->key == SDLK_DELETE)
+		{
+			len = m_value.texlen();
+
+			if((m_highl[1] <= 0 || m_highl[0] == m_highl[1]) && m_caret >= len || len <= 0)
+			{
+				ev->intercepted = true;
+				return;
+			}
+
+			delnext();
+
+			if(!m_passw)
+				m_value = ParseTags(m_value, &m_caret);
+		}
+#if 0
+		else if(ev->key == 190 && !py->keys[SDLK_SHIFT])
+		{
+			//placechar('.');
+		}
+#endif
+
+		if(changefunc != NULL)
+			changefunc();
+
+		if(changefunc2 != NULL)
+			changefunc2(m_param);
+
+		ev->intercepted = true;
 	}
-	else if(k == VK_DELETE)
+	else if(ev->type == INEV_KEYUP && !ev->intercepted)
 	{
-		len = m_value.texlen();
-		
-		if((m_highl[1] <= 0 || m_highl[0] == m_highl[1]) && m_caret >= len || len <= 0)
-			return true;
+		if(!m_opened)
+			return;
 
-		delnext();
-
-		if(!m_passw)
-			m_value = ParseTags(m_value, &m_caret);
+		ev->intercepted = true;
 	}
-	else if(k == 190 && !g_keys[VK_SHIFT])
+	else if(ev->type == INEV_CHARIN && !ev->intercepted)
 	{
-		//placechar('.');
+		if(!m_opened)
+			return;
+
+		int len = m_value.texlen();
+
+		if(m_caret > len)
+			m_caret = len;
+
+		if(ev->key == SDLK_BACKSPACE)
+		{
+			len = m_value.texlen();
+
+			if((m_highl[1] <= 0 || m_highl[0] == m_highl[1]) && m_caret >= len || len <= 0)
+			{
+				ev->intercepted = true;
+				return;
+			}
+
+			delprev();
+
+			if(!m_passw)
+				m_value = ParseTags(m_value, &m_caret);
+		}/*
+		 else if(k == SDLK_DELETE)
+		 {
+		 len = m_value.texlen();
+
+		 if((m_highl[1] <= 0 || m_highl[0] == m_highl[1]) && m_caret >= len || len <= 0)
+		 return true;
+
+		 delnext();
+
+		 if(!m_passw)
+		 m_value = ParseTags(m_value, &m_caret);
+		 }*/
+		else if(ev->key == SDLK_LSHIFT || ev->key == SDLK_RSHIFT)
+		{
+			ev->intercepted = true;
+			return;
+		}
+		else if(ev->key == SDLK_CAPSLOCK)
+		{
+			ev->intercepted = true;
+			return;
+		}
+		else if(ev->key == SDLK_SPACE)
+		{
+			placechar(' ');
+		}
+		else if(ev->key == SDLK_RETURN)
+		{
+			placechar('\n');
+		}
+		//else if(k >= 'A' && k <= 'Z' || k >= 'a' && k <= 'z')
+		//else if(k == 190 || k == 188)
+		//else if((k >= '!' && k <= '@') || (k >= '[' && k <= '`') || (k >= '{' && k <= '~') || (k >= '0' || k <= '9'))
+		else 
+		{
+
+#ifdef PASTE_DEBUG
+			g_log<<"charin "<<(char)k<<" ("<<k<<")"<<endl;
+			g_log.flush();
+#endif
+
+			//if(k == 'C' && py->keys[SDLK_CONTROL])
+			if(ev->key == 3)	//copy
+			{
+				copyval();
+			}
+			//else if(k == 'V' && py->keys[SDLK_CONTROL])
+			else if(ev->key == 22)	//paste
+			{
+				pasteval();
+			}
+			//else if(k == 'A' && py->keys[SDLK_CONTROL])
+			else if(ev->key == 1)	//select all
+			{
+				selectall();
+			}
+			else
+				placechar(ev->key);
+		}
+
+		if(changefunc != NULL)
+			changefunc();
+
+		if(changefunc2 != NULL)
+			changefunc2(m_param);
+
+		ev->intercepted = true;
 	}
-	
-	if(changefunc != NULL)
-		changefunc();
-
-	if(changefunc2 != NULL)
-		changefunc2(m_param);
-
-	return true;
 }
 
 void TextArea::changevalue(const char* newv)
@@ -210,14 +324,6 @@ void TextArea::changevalue(const char* newv)
 	if(m_caret > strlen(newv))
 		m_caret = strlen(newv);
 	m_lines = CountLines(&m_value, MAINFONT8, m_pos[0], m_pos[1], m_pos[2]-m_pos[0]-square(), m_pos[3]-m_pos[1]);
-}
-
-bool TextArea::keyup(int k)
-{
-	if(!m_opened)
-		return false;
-
-	return true;
 }
 
 void TextArea::placestr(const char* str)
@@ -234,6 +340,9 @@ void TextArea::placestr(const char* str)
 		addlen = m_maxlen - len;
 
 	char* addstr = new char[addlen+1];
+
+	if(!addstr)
+		OutOfMem(__FILE__, __LINE__);
 	
 	if(addlen > 0)
 	{
@@ -426,6 +535,87 @@ void TextArea::pasteval()
 	//return true;
 }
 
+void TextArea::placechar(unsigned int k)
+{
+	//int len = m_value.length();
+
+	//if(m_type == WIDGET_EDITBOX && len >= m_maxlen)
+	//	return;
+
+	//char addchar = k;
+
+	//string before = m_value.substr(0, m_caret);
+	//string after = m_value.substr(m_caret, len-m_caret);
+	//m_value = before + addchar + after;
+
+	RichText newval;
+
+	int currplace = 0;
+	bool changed = false;
+	for(auto i=m_value.m_part.begin(); i!=m_value.m_part.end(); i++)
+	{
+		if(currplace + i->texlen() >= m_caret && !changed)
+		{
+			changed = true;
+
+			if(i->m_type == RICHTEXT_TEXT)
+			{
+				if(i->m_text.m_length <= 1)
+					continue;
+
+				RichTextP chpart;
+
+				chpart.m_type = RICHTEXT_TEXT;
+
+				int subplace = m_caret - currplace;
+
+				if(subplace > 0)
+				{
+					chpart.m_text = chpart.m_text + i->m_text.substr(0, subplace);
+				}
+
+				chpart.m_text = chpart.m_text + UString(k);
+
+				if(i->m_text.m_length - subplace > 0)
+				{
+					chpart.m_text = chpart.m_text + i->m_text.substr(subplace, i->m_text.m_length-subplace);
+				}
+
+				chpart.m_text = i->m_text.substr(0, i->m_text.m_length-1);
+
+				newval = newval + RichText(chpart);
+			}
+			else if(i->m_type == RICHTEXT_ICON)
+			{
+				Icon* icon = &g_icon[i->m_icon];
+				
+				int subplace = m_caret - currplace;
+
+				if(subplace <= 0)
+				{
+					newval = newval + RichText(RichTextP(UString(k)));
+					newval = newval + RichText(*i);
+				}
+				else
+				{
+					newval = newval + RichText(*i);
+					newval = newval + RichText(RichTextP(UString(k)));
+				}
+			}
+
+		}
+		else
+		{
+			newval = newval + RichText(*i);
+			currplace += i->texlen();
+		}
+	}
+
+	m_value = newval;
+
+	m_caret ++;
+}
+
 void TextArea::selectall()
 {
 	m_highl[0] = 0;
@@ -444,88 +634,51 @@ void TextArea::selectall()
 	//return true;
 }
 
-bool TextArea::charin(int k)
+void TextArea::close()
 {
-	if(!m_opened)
-		return false;
-	
-	int len = m_value.texlen();
+	losefocus();
 
-	if(m_caret > len)
-		m_caret = len;
-
-	if(k == VK_BACK)
-	{
-		len = m_value.texlen();
-
-		if((m_highl[1] <= 0 || m_highl[0] == m_highl[1]) && m_caret >= len || len <= 0)
-			return true;
-
-		delprev();
-
-		if(!m_passw)
-			m_value = ParseTags(m_value, &m_caret);
-	}/*
-	else if(k == VK_DELETE)
-	{
-		len = m_value.texlen();
-		
-		if((m_highl[1] <= 0 || m_highl[0] == m_highl[1]) && m_caret >= len || len <= 0)
-			return true;
-
-		delnext();
-
-		if(!m_passw)
-			m_value = ParseTags(m_value, &m_caret);
-	}*/
-	else if(k == VK_SHIFT)
-		return true;
-	else if(k == VK_CAPITAL)
-		return true;
-	else if(k == VK_SPACE)
-	{
-		placechar(' ');
-	}
-	else if(k == VK_RETURN)
-	{
-		placechar('\n');
-	}
-	//else if(k >= 'A' && k <= 'Z' || k >= 'a' && k <= 'z')
-	//else if(k == 190 || k == 188)
-	//else if((k >= '!' && k <= '@') || (k >= '[' && k <= '`') || (k >= '{' && k <= '~') || (k >= '0' || k <= '9'))
-	else 
-	{
-		
-#ifdef PASTE_DEBUG
-		g_log<<"charin "<<(char)k<<" ("<<k<<")"<<endl;
-		g_log.flush();
-#endif
-
-		//if(k == 'C' && g_keys[VK_CONTROL])
-		if(k == 3)	//copy
-		{
-			copyval();
-		}
-		//else if(k == 'V' && g_keys[VK_CONTROL])
-		else if(k == 22)	//paste
-		{
-			pasteval();
-		}
-		//else if(k == 'A' && g_keys[VK_CONTROL])
-		else if(k == 1)	//select all
-		{
-			selectall();
-		}
-		else
-			placechar(k);
-	}
-	
-	if(changefunc != NULL)
-		changefunc();
-
-	if(changefunc2 != NULL)
-		changefunc2(m_param);
-
-	return true;
+	for(auto i=m_subwidg.begin(); i!=m_subwidg.end(); i++)
+		(*i)->close();
 }
 
+
+void TextArea::gainfocus()
+{
+	if(!m_opened)
+	{
+		Player* py = &g_player[g_currP];
+
+		if(py->kbfocus > 0)
+		{
+			SDL_StopTextInput();
+			py->kbfocus--;
+		}
+
+		m_opened = true;
+		SDL_StartTextInput();
+		SDL_Rect r;
+		r.x = m_pos[0];
+		r.y = m_pos[3];
+		r.w = py->width - m_pos[0];
+		r.h = py->height - m_pos[3];
+		SDL_SetTextInputRect(&r);
+		py->kbfocus++;
+	}
+}
+
+void TextArea::losefocus()
+{
+	if(m_opened)
+	{
+		Player* py = &g_player[g_currP];
+
+		if(py->kbfocus > 0)
+		{
+			SDL_StopTextInput();
+			py->kbfocus--;
+		}
+
+		m_opened = false;
+	}
+}

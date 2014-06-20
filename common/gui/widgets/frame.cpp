@@ -33,106 +33,10 @@ void Frame::draw()
 		(*i)->draw();
 }
 
-void Frame::draw2()
+void Frame::drawover()
 {
 	for(auto i=m_subwidg.begin(); i!=m_subwidg.end(); i++)
-		(*i)->draw2();
-}
-
-bool Frame::prelbuttonup(bool moved)
-{
-	for(auto i=m_subwidg.rbegin(); i!=m_subwidg.rend(); i++)
-		if((*i)->prelbuttonup(moved))
-			return true;
-
-	return false;
-}
-
-bool Frame::lbuttonup(bool moved)
-{
-	for(auto i=m_subwidg.rbegin(); i!=m_subwidg.rend(); i++)
-		if((*i)->lbuttonup(moved))
-			return true;
-
-	return false;
-}
-
-bool Frame::prelbuttondown()
-{
-	for(auto i=m_subwidg.rbegin(); i!=m_subwidg.rend(); i++)
-		if((*i)->prelbuttondown())
-			return true;
-
-	return false;
-}
-
-bool Frame::lbuttondown()
-{
-	for(auto i=m_subwidg.rbegin(); i!=m_subwidg.rend(); i++)
-		if((*i)->lbuttondown())
-			return true;
-
-	return false;
-}
-
-void Frame::premousemove()
-{
-	for(auto i=m_subwidg.rbegin(); i!=m_subwidg.rend(); i++)
-		(*i)->premousemove();
-}
-
-bool Frame::mousemove()
-{
-	for(auto i=m_subwidg.rbegin(); i!=m_subwidg.rend(); i++)
-		if((*i)->mousemove())
-			return true;
-
-	return false;
-}
-
-bool Frame::prerbuttonup(bool moved)
-{
-	for(auto i=m_subwidg.rbegin(); i!=m_subwidg.rend(); i++)
-		if((*i)->prerbuttonup(moved))
-			return true;
-
-	return false;
-}
-
-bool Frame::rbuttonup(bool moved)
-{
-	for(auto i=m_subwidg.rbegin(); i!=m_subwidg.rend(); i++)
-		if((*i)->rbuttonup(moved))
-			return true;
-
-	return false;
-}
-
-bool Frame::prerbuttondown()
-{
-	for(auto i=m_subwidg.rbegin(); i!=m_subwidg.rend(); i++)
-		if((*i)->prerbuttondown())
-			return true;
-
-	return false;
-}
-
-bool Frame::rbuttondown()
-{
-	for(auto i=m_subwidg.rbegin(); i!=m_subwidg.rend(); i++)
-		if((*i)->rbuttondown())
-			return true;
-
-	return false;
-}
-
-bool Frame::mousewheel(int delta) 
-{ 
-	for(auto i=m_subwidg.rbegin(); i!=m_subwidg.rend(); i++)
-		if((*i)->mousewheel(delta))
-			return true;
-
-	return false; 
+		(*i)->drawover();
 }
 
 void Frame::frameupd()
@@ -141,29 +45,8 @@ void Frame::frameupd()
 		(*i)->frameupd();
 }
 
-bool Frame::keyup(int k)
+void Frame::inev(InEv* ev)
 {
 	for(auto i=m_subwidg.rbegin(); i!=m_subwidg.rend(); i++)
-		if((*i)->keyup(k))
-			return true;
-
-	return false;
-}
-
-bool Frame::keydown(int k)
-{
-	for(auto i=m_subwidg.rbegin(); i!=m_subwidg.rend(); i++)
-		if((*i)->keydown(k))
-			return true;
-
-	return false;
-}
-
-bool Frame::charin(int k)
-{
-	for(auto i=m_subwidg.rbegin(); i!=m_subwidg.rend(); i++)
-		if((*i)->charin(k))
-			return true;
-
-	return false;
+		(*i)->inev(ev);
 }

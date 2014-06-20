@@ -5,6 +5,8 @@
 
 #include "platform.h"
 
+//#define USTR_DEBUG
+
 class UString
 {
 public:
@@ -16,6 +18,7 @@ public:
 	UString(const UString& original);
 	UString(const char* cstr);
 	UString(unsigned int k);
+	UString(unsigned int* k);
 	UString& operator=(const UString &original);
 	UString operator+(const UString &other);
 	UString substr(int start, int len) const;

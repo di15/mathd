@@ -7,6 +7,7 @@
 class TextBlock : public Widget
 {
 public:
+
 	TextBlock(Widget* parent, const char* n, const RichText t, int f, void (*reframef)(Widget* thisw), float r=1, float g=1, float b=1, float a=1) : Widget()
 	{
 		m_parent = parent;

@@ -1,8 +1,15 @@
 
 
+#ifndef BUILDINGTYPE_H
+#define BUILDINGTYPE_H
+
 #include "../math/vec3f.h"
 #include "../math/vec2i.h"
 #include "resources.h"
+#include "../render/billboard.h"
+#include "../render/particle.h"
+
+#define MAX_B_EMITTERS	10
 
 class BuildingT
 {
@@ -25,6 +32,10 @@ public:
 	
 	int reqdeposit;
 
+	EmitterPlace emitterpl[MAX_B_EMITTERS];
+
+	bool hugterr;
+
 	BuildingT();
 };
 
@@ -33,6 +44,7 @@ public:
 #define FOUNDATION_SEA			2
 
 #define BUILDING_NONE			-1
+#if 0
 #define BUILDING_APARTMENT		0
 #define BUILDING_HOUSE			1
 #define BUILDING_STORE		2
@@ -67,19 +79,35 @@ public:
 #define BUILDING_WATERTOWER		31
 #define BUILDING_WATERPUMPSTN	32
 #define BUILDING_OFFSHOREOILRIG	33
-
 #define BUILDING_TYPES			34
+#else
+#define BUILDING_APARTMENT		0
+#define BUILDING_FACTORY		1
+#define BUILDING_REFINERY		2
+#define BUILDING_NUCPOW			3
+#define BUILDING_FARM			4
+#define BUILDING_STORE			5
+#define BUILDING_HARBOUR		6
+#define BUILDING_OILWELL		7
+#define BUILDING_MINE			8
+#define BUILDING_GASSTATION		9
+#define BUILDING_TYPES			10
+#endif
+
 
 #define BUILDING_ROAD			(BUILDING_TYPES+1)
-#define BUILDING_POWERL			(BUILDING_TYPES+2)
-#define BUILDING_CRUDEPIPE		(BUILDING_TYPES+3)
+#define BUILDING_POWL			(BUILDING_TYPES+2)
+#define BUILDING_CRPIPE		(BUILDING_TYPES+3)
 #define BUILDING_WATERPIPE		(BUILDING_TYPES+4)
 
 #define TOTAL_BUILDABLES		(BUILDING_TYPES+5)
 
 extern BuildingT g_buildingT[BUILDING_TYPES];
 
-void DefineBuildingType(int type, const char* name, Vec2i size, const char* modelrelative, Vec3f scale, Vec3f translate, const char* cmodelrelative,  Vec3f cscale, Vec3f ctranslate, int foundation, int reqdeposit);
-void BuildingConMat(int type, int res, int amt);
-void BuildingInput(int type, int res, int amt);
-void BuildingOutput(int type, int res, int amt);
+void DefB(int type, const char* name, Vec2i size, bool hugterr, const char* modelrelative, Vec3f scale, Vec3f translate, const char* cmodelrelative,  Vec3f cscale, Vec3f ctranslate, int foundation, int reqdeposit);
+void BConMat(int type, int res, int amt);
+void BInput(int type, int res, int amt);
+void BOutput(int type, int res, int amt);
+void BEmitter(int type, int emitterindex, int ptype, Vec3f offset);
+
+#endif

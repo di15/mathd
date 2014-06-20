@@ -3,8 +3,7 @@
 #include "3dmath.h"
 #include "physics.h"
 #include "../window.h"
-
-Camera g_camera;
+#include "../sim/player.h"
 
 Vec3f Camera::up2()		
 {
@@ -371,7 +370,8 @@ void Camera::calcstrafe()
 
 Vec3f Camera::zoompos()
 {
+	Player* py = &g_player[g_currP];
 	Vec3f dir = Normalize( m_view - m_pos );
-	Vec3f posvec = m_view - dir * 1000.0f / g_zoom;
+	Vec3f posvec = m_view - dir * 1000.0f / py->zoom;
 	return posvec;
 }

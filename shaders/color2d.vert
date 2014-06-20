@@ -1,4 +1,7 @@
-attribute vec4 position;
+
+#version 150
+
+in vec4 position;
 
 uniform float width;
 uniform float height;

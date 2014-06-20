@@ -5,44 +5,11 @@
 #define DEBUG_H
 
 #include "platform.h"
+#include "gui/richtext.h"
 
-#if 0
-
-enum PROFILE{FRAME, UPDATE, DRAW, UPDATEUNITS, UPDATEBUILDINGS, DRAWBUILDINGS, DRAWUNITS, SORTPARTICLES, DRAWPARTICLES, DRAWMAP, SHADOWS, DRAWSKY, DRAWPOWERLINES, DRAWROADS, DRAWMODEL1, DRAWMODEL2, DRAWMODEL3, PROFILES};
-
-class Profile
-{
-public:
-	char name[64];
-	double averagems;
-	long lastframe;
-	double frames;
-	//double framems;
-	long starttick;
-	//double timescountedperframe;
-	//double lastframeaverage;
-	double lastframetotal;
-	int inside;
-
-	Profile()
-	{
-		lastframe = 0;
-		frames = 0;
-		inside = -1;
-	}
-};
-
-extern Profile g_profile[PROFILES];
-
-void StartProfile(int id);
-void EndProfile(int id);
-void WriteProfiles(int in, int layer);
-void InitProfiles();
-void UpdateFPS();
-void UDebug(int i);
-
-#endif
-
+void LogRich(const RichText* rt);
+void CheckNum(const char* num);
 void LastNum(const char* l);
+void CheckGLError(const char* file, int line);
 
 #endif	//DEBUG_H

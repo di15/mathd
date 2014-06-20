@@ -23,16 +23,19 @@
 #include "jpspath.h"
 #include "pathnode.h"
 #include "../render/shader.h"
+#include "../sim/player.h"
 
 static vector<Vec3f> gridvecs;
 Unit* g_pathunit = NULL;
 
 void DrawSteps()
 {
-	if(g_selection.units.size() <= 0)
+	Player* py = &g_player[g_currP];
+
+	if(py->sel.units.size() <= 0)
 		return;
 
-	int ui = *g_selection.units.begin();
+	int ui = *py->sel.units.begin();
 	Unit* u = &g_unit[ui];
 
 	vector<Vec3f> lines;
@@ -60,11 +63,11 @@ void DrawSteps()
 			
 			to.x = x * PATHNODE_SIZE + PATHNODE_SIZE/2;
 			to.z = z * PATHNODE_SIZE + PATHNODE_SIZE/2;
-			to.y = g_hmap.accheight(to.x, to.z) + TILE_SIZE/200;
+			to.y = g_hmap.accheight(to.x, to.z) + TILE_SIZE/20;
 			
 			from.x = nprevpos.x * PATHNODE_SIZE + PATHNODE_SIZE/2;
 			from.z = nprevpos.y * PATHNODE_SIZE + PATHNODE_SIZE/2;
-			from.y = g_hmap.accheight(from.x, from.z) + TILE_SIZE/200;
+			from.y = g_hmap.accheight(from.x, from.z) + TILE_SIZE/20;
 
 			lines.push_back(from);
 			lines.push_back(to);
@@ -121,9 +124,11 @@ void DrawGrid()
 #if 1
 	glUniform4f(g_shader[SHADER_COLOR3D].m_slot[SSLOT_COLOR],  0.5f, 0, 0, 1);
     
-	if(g_selection.units.size() > 0)
+	Player* py = &g_player[g_currP];
+
+	if(py->sel.units.size() > 0)
 	{
-		int i = *g_selection.units.begin();
+		int i = *py->sel.units.begin();
 		Unit* u = &g_unit[i];
         
 		bool roadVeh = false;
@@ -278,12 +283,14 @@ void DrawUnitSquares()
 void DrawPaths()
 {   
 #if 1
+	Player* py = &g_player[g_currP];
+
 	int i = 0;
 
-	if(g_selection.units.size() <= 0)
+	if(py->sel.units.size() <= 0)
 		return;
 
-	i = *g_selection.units.begin();
+	i = *py->sel.units.begin();
 #else
 	for(int i=0; i<UNITS; i++)
 #endif
@@ -302,13 +309,13 @@ void DrawPaths()
 		Vec3f p;
 		p.x = u->cmpos.x;
 		p.z = u->cmpos.y;
-		p.y = g_hmap.accheight(p.x, p.z) + TILE_SIZE/100;
+		p.y = g_hmap.accheight(p.x, p.z) + TILE_SIZE/20;
         
 		for(auto piter = u->path.begin(); piter != u->path.end(); piter++)
 		{
 			p.x = piter->x;
 			p.z = piter->y;
-			p.y = g_hmap.accheight(p.x, p.z) + TILE_SIZE/100;
+			p.y = g_hmap.accheight(p.x, p.z) + TILE_SIZE/20;
 			//glVertex3f(p->x, p->y + 5, p->z);
 			vecs.push_back(p);
 			//vecs.push_back(p+Vec3f(0,10,0));
@@ -340,13 +347,14 @@ void DrawPaths()
 	}
 }
 
-#if 0
+#if 1
 void DrawVelocities()
 {
-	CUnit* u;
+	Unit* u;
 	Vec3f p;
+	UnitT* t;
     
-	glUniform4f(g_shader[SHADER::COLOR3D].m_slot[SLOT::COLOR], 1, 0, 1, 1);
+	glUniform4f(g_shader[SHADER_COLOR3D].m_slot[SSLOT_COLOR], 1, 0, 1, 1);
     
 	for(int i=0; i<UNITS; i++)
 	{
@@ -354,15 +362,18 @@ void DrawVelocities()
         
 		if(!u->on)
 			continue;
+
+		t = &g_unitT[u->type];
         
 		vector<Vec3f> vecs;
         
-        vecs.push_back(u->camera.Position() + Vec3f(0, 1, 0));
-        vecs.push_back(u->camera.Position() + u->camera.Velocity()*100.0f + Vec3f(0, 1, 0));
+        vecs.push_back(u->drawpos + Vec3f(0, TILE_SIZE/20, 0));
+		Vec3f prevpos = Vec3f(u->prevpos.x, g_hmap.accheight(u->prevpos.x, u->prevpos.y), u->prevpos.y);
+        vecs.push_back(u->drawpos + (u->drawpos - prevpos) * (10*t->cmspeed) + Vec3f(0, TILE_SIZE/20, 0));
         
 		if(vecs.size() > 0)
 		{
-            glVertexAttribPointer(g_shader[SHADER::COLOR3D].m_slot[SLOT::POSITION], 3, GL_FLOAT, GL_FALSE, 0, &vecs[0]);
+            glVertexAttribPointer(g_shader[SHADER_COLOR3D].m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, &vecs[0]);
             glDrawArrays(GL_LINE_STRIP, 0, vecs.size());
 		}
 	}
@@ -379,10 +390,12 @@ void LogPathDebug()
 		return;
 	}
 
-	if(g_selection.units.size() <= 0)
+	Player* py = &g_player[g_currP];
+
+	if(py->sel.units.size() <= 0)
 		return;
 
-	int i = *g_selection.units.begin();
+	int i = *py->sel.units.begin();
 
 	g_pathunit = &g_unit[i];
 }

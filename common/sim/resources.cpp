@@ -7,7 +7,7 @@
 Resource g_resource[RESOURCES];
 int g_resEd;
 
-void DefineRes(int resi, const char* n, const char* depn, int iconindex, bool phys, bool cap, bool glob, float r, float g, float b, float a)
+void DefR(int resi, const char* n, const char* depn, int iconindex, bool phys, bool cap, bool glob, float r, float g, float b, float a)
 {
 	Resource* res = &g_resource[resi];
 	res->name = n;

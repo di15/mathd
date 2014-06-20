@@ -3,6 +3,7 @@
 #include "mempool.h"
 #include "pathnode.h"
 #include "../platform.h"
+#include "../utils.h"
 
 MemPool::MemPool()
 {
@@ -32,6 +33,10 @@ void MemPool::allocsys(int nunits, int unitsz)
 	m_ulUnitSize = unitsz;
 
 	m_pMemBlock = malloc(m_ulBlockSize);			//Allocate a memory block.
+
+	if(!m_pMemBlock)
+		OutOfMem(__FILE__, __LINE__);
+
 	resetunits();	
 }
 

@@ -11,6 +11,7 @@
 #define FLAG_ABRUPT		4
 
 #define LARGEST_UNIT_NODES		4
+#define MAX_COLLIDER_UNITS		9
 
 // byte-align structures
 #pragma pack(push, 1)
@@ -23,7 +24,7 @@ public:
 	//bool abrupt;	//abrupt incline?
 	unsigned char flags;
 	short building;
-	short units[4];
+	short units[MAX_COLLIDER_UNITS];
 	list<int> foliage;
 
 	ColliderTile();

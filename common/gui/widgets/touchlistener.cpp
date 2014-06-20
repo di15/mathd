@@ -14,7 +14,22 @@
 #include "textarea.h"
 #include "textblock.h"
 #include "touchlistener.h"
+#include "../../sim/player.h"
 
+TouchListener::TouchListener() : Widget()
+{
+	m_parent = NULL;
+	m_type = WIDGET_TOUCHLISTENER;
+	m_over = false;
+	m_ldown = false;
+	reframefunc = NULL;
+	clickfunc = NULL;
+	overfunc = NULL;
+	clickfunc2 = NULL;
+	overfunc2 = NULL;
+	outfunc = NULL;
+	m_param = -1;
+}
 
 TouchListener::TouchListener(Widget* parent, void (*reframef)(Widget* thisw), void (*click2)(int p), void (*overf2)(int p), void (*out)(), int parm) : Widget()
 {
@@ -32,28 +47,69 @@ TouchListener::TouchListener(Widget* parent, void (*reframef)(Widget* thisw), vo
 	reframe();
 }
 
-bool TouchListener::mousemove()
+void TouchListener::inev(InEv* ev)
 {
-	if(g_mouse.x >= m_pos[0] && g_mouse.x <= m_pos[2] && g_mouse.y >= m_pos[1] && g_mouse.y <= m_pos[3])
-	{
-		if(overfunc != NULL)
-			overfunc();
-		if(overfunc2 != NULL)
-			overfunc2(m_param);
-			
-		m_over = true;
+	Player* py = &g_player[g_currP];
 
-		return true;
-	}
-	else
+	if(ev->type == INEV_MOUSEUP && ev->key == MOUSE_LEFT && !ev->intercepted)
 	{
-		if(m_over && outfunc != NULL)
-			outfunc();
+		//mousemove();
+
+		if(m_over && m_ldown)
+		{
+			if(clickfunc != NULL)
+				clickfunc();
+
+			if(clickfunc2 != NULL)
+				clickfunc2(m_param);
+
+			m_over = false;
+			m_ldown = false;
+			
+			ev->intercepted = true;
+			return;	// intercept mouse event
+		}
+		
+		if(m_ldown)
+		{
+			m_ldown = false;
+			ev->intercepted = true;
+			return;
+		}
 
 		m_over = false;
-
-		return false;
 	}
+	else if(ev->type == INEV_MOUSEDOWN && ev->key == MOUSE_LEFT && !ev->intercepted)
+	{
+		//mousemove();
 
-	return false;
+		if(m_over)
+		{
+			m_ldown = true;
+			ev->intercepted = true;
+			return;	// intercept mouse event
+		}
+	}
+	else if(ev->type == INEV_MOUSEMOVE && !ev->intercepted)
+	{
+		if(py->mouse.x >= m_pos[0] && py->mouse.x <= m_pos[2] && py->mouse.y >= m_pos[1] && py->mouse.y <= m_pos[3])
+		{
+			if(overfunc != NULL)
+				overfunc();
+			if(overfunc2 != NULL)
+				overfunc2(m_param);
+			
+			m_over = true;
+
+			ev->intercepted = true;
+			return;
+		}
+		else
+		{
+			if(m_over && outfunc != NULL)
+				outfunc();
+
+			m_over = false;
+		}
+	}
 }

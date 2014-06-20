@@ -3,6 +3,7 @@
 #include "render/model.h"
 #include "gui/gui.h"
 #include "utils.h"
+#include "debug.h"
 
 Texture g_texture[TEXTURES];
 vector<TextureToLoad> g_texLoad;
@@ -45,7 +46,9 @@ LoadedTex *LoadBMP(const char *fullpath)
 
 	if((pFile = fopen(fullpath, "rb")) == NULL) 
 	{
-		MessageBox(g_hWnd, ("Unable to load BMP File!"), ("Error"), MB_OK);
+		char msg[MAX_PATH+1];
+		sprintf(msg, "Unable to load BMP File: %s", fullpath);
+		ErrorMessage("Error", msg);
 		return NULL;
 	}
 
@@ -53,6 +56,9 @@ LoadedTex *LoadBMP(const char *fullpath)
 	pBitbldg = auxDIBImageLoad(fullpath);				
 
 	LoadedTex *pImage = new LoadedTex;
+
+	if(!pImage)
+		OutOfMem(__FILE__, __LINE__);
 
 	pImage->channels = 3;
 	pImage->sizeX = pBitbldg->sizeX;
@@ -109,12 +115,17 @@ LoadedTex *LoadTGA(const char *fullpath)
 
 	if((pFile = fopen(fullpath, "rb")) == NULL) 
 	{
-		MessageBox(g_hWnd, ("Unable to load TGA File!"), ("Error"), MB_OK);
+		char msg[MAX_PATH+1];
+		sprintf(msg, "Unable to load TGA File: %s", fullpath);
+		ErrorMessage("Error", msg);
 		return NULL;
 	}
 
 	// allocate the structure that will hold our eventual image data (must free it!)
 	pImageData = new LoadedTex;
+
+	if(!pImageData)
+		OutOfMem(__FILE__, __LINE__);
 
 	// Read in the length in bytes from the header to the pixel data
 	fread(&length, sizeof(byte), 1, pFile);
@@ -148,6 +159,13 @@ LoadedTex *LoadTGA(const char *fullpath)
 			stride = channels * width;
 			pImageData->data = ((unsigned char*)malloc(sizeof(unsigned char)*stride*height));
 
+			if(!pImageData->data)
+			{
+				OutOfMem(__FILE__, __LINE__);
+				fclose(pFile);
+				return NULL;
+			}
+
 			// Load in all the pixel data line by line
 			for(int y = 0; y < height; y++)
 			{
@@ -178,6 +196,13 @@ LoadedTex *LoadTGA(const char *fullpath)
 			channels = 3;
 			stride = channels * width;
 			pImageData->data = ((unsigned char*)malloc(sizeof(unsigned char)*stride*height));
+			
+			if(!pImageData->data)
+			{
+				OutOfMem(__FILE__, __LINE__);
+				fclose(pFile);
+				return NULL;
+			}
 
 			// Load in all the pixel data pixel by pixel
 			for(int i = 0; i < width*height; i++)
@@ -214,6 +239,13 @@ LoadedTex *LoadTGA(const char *fullpath)
 		// depending on the channel count, to read in for each pixel.
 		pImageData->data = ((unsigned char*)malloc(sizeof(unsigned char)*stride*height));
 		byte *pColors = ((byte*)malloc(sizeof(byte)*channels));
+
+		if(!pImageData->data)
+		{
+			OutOfMem(__FILE__, __LINE__);
+			fclose(pFile);
+			return NULL;
+		}
 
 		// Load in all the pixel data
 		while(i < width*height)
@@ -346,8 +378,20 @@ void DecodeJPG(jpeg_decompress_struct* cinfo, LoadedTex *pImageData)
 	// allocate memory for the pixel buffer
 	pImageData->data = ((unsigned char*)malloc(sizeof(unsigned char)*rowSpan*pImageData->sizeY));
 
+	if(!pImageData->data)
+	{
+		OutOfMem(__FILE__, __LINE__);
+		return;
+	}
+
 	// Create an array of row pointers
 	unsigned char** rowPtr = new unsigned char*[pImageData->sizeY];
+
+	if(!rowPtr)
+	{
+		OutOfMem(__FILE__, __LINE__);
+		return;
+	}
 
 	for (int i = 0; i < pImageData->sizeY; i++)
 		rowPtr[i] = &(pImageData->data[i * rowSpan]);
@@ -378,7 +422,9 @@ LoadedTex *LoadJPG(const char *fullpath)
 	if((pFile = fopen(fullpath, "rb")) == NULL) 
 	{
 		// Display an error message saying the file was not found, then return NULL
-		//MessageBox(g_hWnd, "Unable to load JPG File!", "Error", MB_OK);
+		char msg[MAX_PATH+1];
+		sprintf(msg, "Unable to load JPG File: %s", fullpath);
+		ErrorMessage("Error", msg);
 		return NULL;
 	}
 
@@ -396,6 +442,9 @@ LoadedTex *LoadJPG(const char *fullpath)
 
 	// allocate the structure that will hold our eventual jpeg data (must free it!)
 	pImageData = new LoadedTex;
+
+	if(!pImageData)
+		OutOfMem(__FILE__, __LINE__);
 
 	// Decode the jpeg file and fill in the image data structure to pass back
 	DecodeJPG(&cinfo, pImageData);
@@ -516,6 +565,9 @@ LoadedTex *LoadPNG(const char *fullpath)
 
 	pImageData = new LoadedTex;
 
+	if(!pImageData)
+		OutOfMem(__FILE__, __LINE__);
+
 	pImageData->sizeX = png_get_image_width(png_ptr, info_ptr); //info_ptr->width;
     pImageData->sizeY = png_get_image_height(png_ptr, info_ptr); //info_ptr->height;
     //switch (info_ptr->color_type) 
@@ -538,6 +590,13 @@ LoadedTex *LoadPNG(const char *fullpath)
 
 	unsigned int row_bytes = png_get_rowbytes(png_ptr, info_ptr);
 	pImageData->data = (unsigned char*) malloc(row_bytes * pImageData->sizeY);
+
+	if(!pImageData->data)
+	{
+		OutOfMem(__FILE__, __LINE__);
+		fclose(fp);
+		return NULL;
+	}
 
 	png_bytepp row_pointers = png_get_rows(png_ptr, info_ptr);
 
@@ -623,7 +682,7 @@ int NewTexture()
 	return -1;
 }
 
-bool TextureLoaded(unsigned int texture, const char* relative, bool transp, unsigned int& texindex, bool reload)
+bool TextureLoaded(unsigned int texture, const char* relative, bool transp, bool clamp, bool mipmaps, unsigned int& texindex, bool reload)
 {
 	char corrected[1024];
 	strcpy(corrected, relative);
@@ -648,6 +707,8 @@ bool TextureLoaded(unsigned int texture, const char* relative, bool transp, unsi
 	t->width = g_texwidth;
 	t->height = g_texheight;
 	t->transp = transp;
+	t->clamp = clamp;
+	t->mipmaps = mipmaps;
 
 	t->sky = false;
 	t->breakable = false;
@@ -744,13 +805,15 @@ bool Load1Texture()
 	if(g_lastLTex+1 < g_texLoad.size())
 		Status(g_texLoad[g_lastLTex+1].relative);
 
+	CheckGLError(__FILE__, __LINE__);
+
 	if(g_lastLTex >= 0)
 	{
 		TextureToLoad* t = &g_texLoad[g_lastLTex];
 		if(t->reload)
-			CreateTexture(t->texindex, t->relative, t->clamp, t->reload);
+			CreateTexture(t->texindex, t->relative, t->clamp, t->mipmaps, t->reload);
 		else
-			CreateTexture(*t->ptexindex, t->relative, t->clamp, t->reload);
+			CreateTexture(*t->ptexindex, t->relative, t->clamp, t->mipmaps, t->reload);
 	}
 
 	g_lastLTex ++;
@@ -764,24 +827,26 @@ bool Load1Texture()
 	return true;	// Not finished loading textures
 }
 
-void QueueTexture(unsigned int* texindex, const char* relative, bool clamp)
+void QueueTexture(unsigned int* texindex, const char* relative, bool clamp, bool mipmaps)
 {
 	TextureToLoad toLoad;
 	toLoad.ptexindex = texindex;
 	strcpy(toLoad.relative, relative);
 	toLoad.clamp = clamp;
 	toLoad.reload = false;
+	toLoad.mipmaps = mipmaps;
 
 	g_texLoad.push_back(toLoad);
 }
 
-void RequeueTexture(unsigned int texindex, const char* relative, bool clamp)
+void RequeueTexture(unsigned int texindex, const char* relative, bool clamp, bool mipmaps)
 {
 	TextureToLoad toLoad;
 	toLoad.texindex = texindex;
 	strcpy(toLoad.relative, relative);
 	toLoad.clamp = clamp;
 	toLoad.reload = true;
+	toLoad.mipmaps = mipmaps;
 
 	g_texLoad.push_back(toLoad);
 }
@@ -809,8 +874,10 @@ LoadedTex* LoadTexture(const char* full)
 	return NULL;
 }
 
-bool CreateTexture(unsigned int &texindex, const char* relative, bool clamp, bool reload)
+bool CreateTexture(unsigned int &texindex, const char* relative, bool clamp, bool mipmaps, bool reload)
 {
+	CheckGLError(__FILE__, __LINE__);
+
 	if(!relative) 
 		return false;
 
@@ -841,13 +908,16 @@ bool CreateTexture(unsigned int &texindex, const char* relative, bool clamp, boo
 	unsigned int texname;
 	// Generate a texture with the associative texture ID stored in the array
 	glGenTextures(1, &texname);
-
+	
+	CheckGLError(__FILE__, __LINE__);
 	// This sets the alignment requirements for the start of each pixel row in memory.
 	glPixelStorei (GL_UNPACK_ALIGNMENT, 1);
+	CheckGLError(__FILE__, __LINE__);
 
 	// Bind the texture to the texture arrays index and init the texture
 	glBindTexture(GL_TEXTURE_2D, texname);
-
+	
+	CheckGLError(__FILE__, __LINE__);
 	// Assume that the texture is a 24 bit RGB texture (We convert 16-bit ones to 24-bit)
 	int textureType = GL_RGB;
 	bool transp = false;
@@ -859,28 +929,63 @@ bool CreateTexture(unsigned int &texindex, const char* relative, bool clamp, boo
 		transp = true;
 	}
 		
-#if 1
-	// Option 1: with mipmaps
-	gluBuild2DMipmaps(GL_TEXTURE_2D, pImage->channels, pImage->sizeX, pImage->sizeY, textureType, GL_UNSIGNED_BYTE, pImage->data);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_NEAREST);
-	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 
-	if(clamp)
+	CheckGLError(__FILE__, __LINE__);
+
+#if 1
+
+	//g_log<<"mipmaps:"<<(int)mipmaps<<" :"<<relative<<endl;
+
+	if(mipmaps)
 	{
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
+		glEnable(GL_TEXTURE_2D);	// ATI fix
+		// Option 1: with mipmaps
+
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_NEAREST);
+		//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 4);
+		
+		if(clamp)
+		{
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
+		}
+		else
+		{
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+		}
+
+		glTexImage2D(GL_TEXTURE_2D, 0, textureType, pImage->sizeX, pImage->sizeY, 0, textureType, GL_UNSIGNED_BYTE, pImage->data);
+		glGenerateMipmap(GL_TEXTURE_2D);
+
+		CheckGLError(__FILE__, __LINE__);
 	}
 	else
 	{
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+		// Option 2: without mipmaps
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+		
+		if(clamp)
+		{
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
+		}
+		else
+		{
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+		}
+
+		glTexImage2D(GL_TEXTURE_2D, 0, textureType, pImage->sizeX, pImage->sizeY, 0, textureType, GL_UNSIGNED_BYTE, pImage->data);
+
+		CheckGLError(__FILE__, __LINE__);
 	}
-	
-#elif 0
-	// Option 2: without mipmaps
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexImage2D(GL_TEXTURE_2D, 0, textureType, pImage->sizeX, pImage->sizeY, 0, textureType, GL_UNSIGNED_BYTE, pImage->data);
+
+	CheckGLError(__FILE__, __LINE__);
 #else
 	// Option 3: without mipmaps linear
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -899,7 +1004,7 @@ bool CreateTexture(unsigned int &texindex, const char* relative, bool clamp, boo
 		g_log.flush();
 	}
 
-	TextureLoaded(texname, relative, transp, texindex, reload);
+	TextureLoaded(texname, relative, transp, clamp, mipmaps, texindex, reload);
 
 	// Return a success
 	return true;
@@ -912,7 +1017,7 @@ void RequeueTextures()
 	for(int i=0; i<TEXTURES; i++)
 	{
 		if(g_texture[i].loaded)
-			RequeueTexture(i, g_texture[i].filepath, i);
+			RequeueTexture(i, g_texture[i].filepath, g_texture[i].clamp, g_texture[i].mipmaps);
 	}
 	
 	//LoadParticles();
@@ -927,6 +1032,13 @@ void DiffPath(const char* basepath, char* diffpath)
 	strcpy(diffpath, basepath);
 	//StripExtension(diffpath);
 	strcat(diffpath, ".jpg");
+}
+
+void DiffPathPNG(const char* basepath, char* diffpath)
+{
+	strcpy(diffpath, basepath);
+	//StripExtension(diffpath);
+	strcat(diffpath, ".png");
 }
 
 void SpecPath(const char* basepath, char* specpath)
@@ -956,6 +1068,11 @@ void AllocTex(LoadedTex* empty, int width, int height, int channels)
     empty->sizeX = width;
     empty->sizeY = height;
 	empty->channels = channels;
+
+	if(!empty->data)
+	{
+		OutOfMem(__FILE__, __LINE__);
+	}
 }
 
 void Blit(LoadedTex* src, LoadedTex* dest, Vec2i pos)
@@ -1100,6 +1217,13 @@ int SavePNG(const char* fullpath, LoadedTex* image)
 
    
    png_bytep* row_pointers = (png_bytep*) malloc(sizeof(png_bytep) * image->sizeY);
+
+   if(!row_pointers)
+   {
+	   OutOfMem(__FILE__, __LINE__);
+	   return NULL;
+   }
+
    for (int y=0; y<image->sizeY; y++)
 	   row_pointers[y] = (png_byte*)&image->data[y*image->sizeX*image->channels];
    
