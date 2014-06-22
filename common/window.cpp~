@@ -240,16 +240,12 @@ void DestroyWindow(const char* title)
 
 bool MakeWindow(const char* title)
 {
-	// Request compatibility because GLEW doesn't play well with core contexts.
+// Request compatibility because GLEW doesn't play well with core contexts.
 #if 1
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_COMPATIBILITY);
-	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3); 
-	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2); 
-	SDL_GL_SetAttribute(SDL_GL_ACCELERATED_VISUAL, 1);
-	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
-	SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24); 
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 1); 
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1);
 #endif
-
 	unsigned int flags;
 	int startx;
 	int starty;
@@ -313,6 +309,12 @@ bool MakeWindow(const char* title)
 
 	//SDL_Delay(7000);
 	//SDL_Delay(7000);
+
+#if 1
+	SDL_GL_SetAttribute(SDL_GL_ACCELERATED_VISUAL, 1);
+	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
+	SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24); 
+#endif
 
 	Vec2i winsz;
 	SDL_GetWindowSize(g_window, &winsz.x, &winsz.y);

@@ -150,7 +150,7 @@ void ExePath(char* exepath)
 	char szTmp[32];
     //char buffer[MAX_PATH+1];
 	sprintf(szTmp, "/proc/%d/exe", getpid());
-	int bytes = std::min((int)readlink(szTmp, exepath, MAX_PATH+1), MAX_PATH);
+	int bytes = std::min(readlink(szTmp, exepath, MAX_PATH+1), MAX_PATH);
 	if(bytes >= 0)
 		exepath[bytes] = '\0';
 	//string strexepath = StripFile(string(buffer));

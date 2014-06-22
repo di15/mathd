@@ -999,9 +999,6 @@ int main(int argc, char* argv[])
 {
 	Init();
 
-	g_log<<"0"<<endl;
-	g_log.flush();
-
 	MakeWindow(TITLE);
 	
 	g_log<<"1"<<endl;
