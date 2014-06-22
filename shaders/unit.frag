@@ -28,6 +28,7 @@ const vec2 poissonDisk[4] = vec2[](
 );
 
 out vec4 outfrag;
+in float logz;
 
 void main (void)
 {
@@ -37,6 +38,8 @@ void main (void)
 
 	if(alph < 0.5)
 		discard;
+
+	gl_FragDepth = logz;
 
 	alph = color.w;
 

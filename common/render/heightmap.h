@@ -31,13 +31,12 @@ class Plane3f;
 
 #define TILE_SAND				0
 #define TILE_GRASS				1
-#define TILE_SNOW				2
-#define TILE_ROCK				3
-#define TILE_ROCK_NORM			4
-#define TILE_CRACKEDROCK		5
-#define TILE_CRACKEDROCK_NORM	6
-#define TILE_PRERENDER			7
-#define TILE_TYPES				8
+#define TILE_ROCK				2
+#define TILE_ROCK_NORM			3
+#define TILE_CRACKEDROCK		4
+#define TILE_CRACKEDROCK_NORM	5
+#define TILE_PRERENDER			6
+#define TILE_TYPES				7
 
 extern unsigned int g_tiletexs[TILE_TYPES];
 extern Vec2i g_mapview[2];
@@ -83,7 +82,12 @@ public:
 	void draw();
 	void draw2();
 	void drawrim();
-	float getheight(int tx, int tz);
+
+	inline float getheight(int tx, int tz)
+    {
+        return m_heightpoints[ (tz)*(m_widthx+1) + tx ];
+    }
+
 	float accheight(int x, int z);
 	float accheight2(int x, int z);
 	void changeheight(int x, int z, float change);

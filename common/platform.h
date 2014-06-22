@@ -22,13 +22,6 @@
     #define PLATFORM_LINUX
 #endif
 
-#pragma warning(disable: 4996)
-#pragma warning(disable: 4018)
-#pragma warning(disable: 4160)
-#pragma warning(disable: 4244)
-#pragma warning(disable: 4800)
-#pragma warning(disable: 4305)
-
 #define _CRT_SECURE_NO_WARNINGS
 #define _USE_MATH_DEFINES
 

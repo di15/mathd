@@ -47,10 +47,15 @@ uniform int wavephase;
 void main(void)
 {
 	//vec4 vpos = (view * (model * position));
-	vec4 vpos = position;
-	//vpos.w = 1;
+	vec4 vpos = model * position;
+	//vec4 vpos = position;
+	vpos.w = 1;
 	lpos = lightMatrix * vpos;
-	//lpos.w = 1;
+/*
+	lpos.xy /= 2.0;
+	lpos.xy += vec2(0.5, 0.5);
+*/
+	lpos.w = 1;
 	gl_Position = projection * (view * (model * position));
 	//gl_Position.w = 1;
 
@@ -102,6 +107,7 @@ void main(void)
 	//vec3 b = normalOut;
 
 	vec3 vVertex = vec3(view * (model * position));
+	//vec3 vVertex = vec3(view * model * position);
 
 	//light_vec = vpos.xyz - lightPos;
 	//vec3 tmpVec = lightPos - vVertex;

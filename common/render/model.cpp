@@ -79,13 +79,13 @@ bool Load1Model()
 }
 
 void DrawVA(VertexArray* va, Vec3f pos)
-{	
+{
 	Shader* s = &g_shader[g_curS];
 
 	Matrix modelmat;
 	modelmat.setTranslation((const float*)&pos);
 	glUniformMatrix4fv(s->m_slot[SSLOT_MODELMAT], 1, 0, modelmat.m_matrix);
-	
+
     Matrix modelview;
     modelview.set(modelmat.m_matrix);
     modelview.postMultiply(g_cameraViewMatrix);
@@ -107,29 +107,29 @@ void DrawVA(VertexArray* va, Vec3f pos)
 }
 
 void Model::usetex()
-{	
+{
 	Shader* s = &g_shader[g_curS];
 
-	glActiveTextureARB(GL_TEXTURE0);
+	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, g_texture[ m_diffusem ].texname);
-	glUniform1iARB(s->m_slot[SSLOT_TEXTURE0], 0);
+	glUniform1i(s->m_slot[SSLOT_TEXTURE0], 0);
 
-	glActiveTextureARB(GL_TEXTURE1);
+	glActiveTexture(GL_TEXTURE1);
 	glBindTexture(GL_TEXTURE_2D, g_texture[ m_specularm ].texname);
-	glUniform1iARB(s->m_slot[SSLOT_SPECULARMAP], 1);
+	glUniform1i(s->m_slot[SSLOT_SPECULARMAP], 1);
 
 	if(s->m_slot[SSLOT_NORMAL] != -1)
 	{
-		glActiveTextureARB(GL_TEXTURE2);
+		glActiveTexture(GL_TEXTURE2);
 		glBindTexture(GL_TEXTURE_2D, g_texture[ m_normalm ].texname);
-		glUniform1iARB(s->m_slot[SSLOT_NORMALMAP], 2);
+		glUniform1i(s->m_slot[SSLOT_NORMALMAP], 2);
 	}
 
 	if(s->m_slot[SSLOT_OWNERMAP] != -1)
 	{
-		glActiveTextureARB(GL_TEXTURE3);
+		glActiveTexture(GL_TEXTURE3);
 		glBindTexture(GL_TEXTURE_2D, g_texture[ m_ownerm ].texname);
-		glUniform1iARB(s->m_slot[SSLOT_OWNERMAP], 3);
+		glUniform1i(s->m_slot[SSLOT_OWNERMAP], 3);
 	}
 }
 
@@ -145,7 +145,7 @@ void Model::draw(int frame, Vec3f pos, float yaw)
 	rotation.setRotationRadians(radians);
 	modelmat.postMultiply(rotation);
 	glUniformMatrix4fv(s->m_slot[SSLOT_MODELMAT], 1, 0, modelmat.m_matrix);
-	
+
     Matrix modelview;
     modelview.set(modelmat.m_matrix);
     modelview.postMultiply(g_cameraViewMatrix);

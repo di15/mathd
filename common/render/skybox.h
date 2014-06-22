@@ -1,10 +1,15 @@
 
 
 
-#define SKYBOX_SIZE	1600.0f
+#define SKYBOX_SIZE	100.0f
 
+#if 1   //why doesn't it clamp?
 #define SKY_TEX_0	0.002f
 #define SKY_TEX_1	0.998f
+#else
+#define SKY_TEX_0	0
+#define SKY_TEX_1	1
+#endif
 
 #define SKY_TOP_0	0.002f
 #define SKY_TOP_1	0.998f

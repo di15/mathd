@@ -22,7 +22,8 @@ const float C = 0.1;
 
 void main(void)
 {
-	gl_Position = projection * (view * (model * position));
+	//gl_Position = projection * (view * (model * position));	//why doesn't this work?
+	gl_Position = projection * view * model * position;
 	//normalOut = normalIn;
 	texCoordOut0 = texCoordIn0;
 	//gl_Position.w = 1;

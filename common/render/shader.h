@@ -70,22 +70,19 @@ public:
 	Shader()	{			 }
 	~Shader()	{ release(); }
 
-	GLint GetUniform(const char* strVariable);
-	GLint GetAttrib(const char* strVariable);
+	GLint getuniform(const char* strVariable);
+	GLint getattrib(const char* strVariable);
 
-	GLhandleARB GetProgram()	{	return m_hProgramObject; }
-	GLhandleARB GetVertexS()	{	return m_hVertexShader; }
-	GLhandleARB GetFragmentS()	{	return m_hFragmentShader; }
-	void MapUniform(int slot, const char* variable);
-	void MapAttrib(int slot, const char* variable);
-	
+	void mapuniform(int slot, const char* variable);
+	void mapattrib(int slot, const char* variable);
+
 	void release();
 
 	GLint m_slot[SSLOTS];
 
-	GLhandleARB m_hVertexShader;
-	GLhandleARB m_hFragmentShader;
-	GLhandleARB m_hProgramObject;
+	GLhandleARB m_vertshader;
+	GLhandleARB m_fragshader;
+	GLhandleARB m_program;
 };
 
 #define SHADER_DEPTH			0
@@ -100,7 +97,6 @@ public:
 #define SHADER_FOLIAGE			9
 #define SHADER_MAPTILESMM		10
 #define SHADER_WATERMM			11
-#define SHADER_MAPTILESPREREND	12
 #define SHADER_RIM				13
 #define SHADER_SKYBOX			14
 #define SHADER_UNIT				15

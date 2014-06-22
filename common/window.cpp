@@ -321,7 +321,6 @@ bool MakeWindow(const char* title)
 	//SDL_GL_SetSwapInterval(0);
 
 	g_glcontext = SDL_GL_CreateContext(g_window);
-	//SDL_GL_SetSwapInterval(1);
 
 	g_log<<"GL_VERSION: "<<glGetString(GL_VERSION)<<endl;
 	g_log.flush();

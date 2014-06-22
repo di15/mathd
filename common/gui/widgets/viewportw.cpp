@@ -19,6 +19,7 @@
 #include "../../render/shader.h"
 #include "../gui.h"
 #include "../../sim/player.h"
+#include "../../debug.h"
 
 ViewportW::ViewportW()
 {
@@ -38,13 +39,13 @@ ViewportW::ViewportW()
 	//reframe();
 }
 
-ViewportW::ViewportW(Widget* parent, const char* n, void (*reframef)(Widget* thisw), 
-					 void (*drawf)(int p, int x, int y, int w, int h), 
-					 bool (*ldownf)(int p, int x, int y, int w, int h), 
-					 bool (*lupf)(int p, int x, int y, int w, int h), 
-					 bool (*mousemovef)(int p, int x, int y, int w, int h), 
-					bool (*rdownf)(int p, int relx, int rely, int w, int h), 
-					bool (*rupf)(int p, int relx, int rely, int w, int h), 
+ViewportW::ViewportW(Widget* parent, const char* n, void (*reframef)(Widget* thisw),
+					 void (*drawf)(int p, int x, int y, int w, int h),
+					 bool (*ldownf)(int p, int x, int y, int w, int h),
+					 bool (*lupf)(int p, int x, int y, int w, int h),
+					 bool (*mousemovef)(int p, int x, int y, int w, int h),
+					bool (*rdownf)(int p, int relx, int rely, int w, int h),
+					bool (*rupf)(int p, int relx, int rely, int w, int h),
 					bool (*mousewf)(int p, int d),
 					 int parm)
 {
@@ -67,7 +68,7 @@ ViewportW::ViewportW(Widget* parent, const char* n, void (*reframef)(Widget* thi
 void ViewportW::draw()
 {
 	//g_log<<m_pos[0]<<","<<m_pos[1]<<","<<m_pos[2]<<","<<m_pos[3]<<endl;
-	
+
 	Player* py = &g_player[g_currP];
 	int w = m_pos[2] - m_pos[0];
 	int h = m_pos[3] - m_pos[1];
@@ -80,14 +81,19 @@ void ViewportW::draw()
 
 	EndS();
 
+	CheckGLError(__FILE__, __LINE__);
+
 	if(drawfunc != NULL)
 		drawfunc(m_param, m_pos[0], m_pos[1], w, h);
-	
+
+	CheckGLError(__FILE__, __LINE__);
+
 	//glViewport(0, 0, py->width, py->height);
 	glViewport(viewport[0], viewport[1], viewport[2], viewport[3]);
     //glUniform1f(g_shader[SHADER_ORTHO].m_slot[SSLOT_WIDTH], (float)py->width);
     //glUniform1f(g_shader[SHADER_ORTHO].m_slot[SSLOT_HEIGHT], (float)py->height);
 
+	CheckGLError(__FILE__, __LINE__);
     Ortho(py->width, py->height, 1, 1, 1, 1);
 }
 

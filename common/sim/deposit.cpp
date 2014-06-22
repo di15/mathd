@@ -32,13 +32,13 @@ void DrawDeposits(const Matrix projection, const Matrix viewmat)
 {
 	if(g_hmap.m_widthx <= 0 || g_hmap.m_widthz <= 0)
 		return;
-	
+
 	Shader* s = &g_shader[g_curS];
-	
-	//glActiveTextureARB(GL_TEXTURE0);
+
+	//glActiveTexture(GL_TEXTURE0);
 	//glBindTexture(GL_TEXTURE_2D, g_texture[ g_tiletexs[TILE_SAND] ].texname);
-	//glUniform1iARB(s->m_slot[SSLOT_SANDTEX], 0);
-	
+	//glUniform1i(s->m_slot[SSLOT_SANDTEX], 0);
+
 	Matrix mvp;
 	mvp.set(projection.m_matrix);
 	mvp.postMultiply(viewmat);

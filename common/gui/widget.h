@@ -17,7 +17,7 @@
 #define WIDGET_BUTTON				2
 #define WIDGET_TEXT					3
 #define WIDGET_LINK					4
-#define WIDGET_DROPDOWNSELECTOR		5 
+#define WIDGET_DROPDOWNSELECTOR		5
 #define WIDGET_EDITBOX				6
 #define WIDGET_BARBUTTON			7
 #define WIDGET_HSCROLLER			8
@@ -78,7 +78,7 @@ public:
 	int m_alignment;
 	RichText m_label;
 	bool m_popup;
-	
+
 	void (*clickfunc)();
 	void (*clickfunc2)(int p);
 	void (*overfunc)();
@@ -88,7 +88,7 @@ public:
 	void (*changefunc2)(int p);
 	void (*reframefunc)(Widget* thisw);
 
-	Widget() 
+	Widget()
 	{
 		clickfunc = NULL;
 		clickfunc2 = NULL;
@@ -111,7 +111,7 @@ public:
 
 		m_subwidg.clear();
 	}
-	
+
 	virtual void draw()	{}
 	virtual void drawover()	{}
 	virtual void inev(InEv* ev) {}

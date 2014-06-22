@@ -1,5 +1,5 @@
 
-#version 150
+#version 130
 
 in vec4 position;
 
@@ -44,11 +44,19 @@ void main(void)
 {
 	//vec4 vpos = (view * (model * position));
 	vec4 vpos = model * position;
+	//vec4 vpos = position;
 	vpos.w = 1;
 	lpos = lightMatrix * vpos;
+/*
+	lpos.xy /= 2.0;
+	lpos.xy += vec2(0.5, 0.5);
+*/
 	lpos.w = 1;
 	gl_Position = projection * (view * (model * position));
 	//gl_Position.w = 1;
+
+	//gl_Position.z = 2.0*log(gl_Position.w/mind)/log(maxd/mind) - 1; 
+    	//gl_Position.z *= gl_Position.w;
 
 	float FC = 1.0/log(maxd*C + 1);
  

@@ -36,13 +36,15 @@ extern Texture g_texture[TEXTURES];
 #define TGA_A		 3		// This tells us it's an ALPHA file
 #define TGA_RLE		10		// This tells us that the targa is Run-Length Encoded (RLE)
 
-#define png_infopp_NULL (png_infopp)NULL
+#ifndef int_p_NULL
 #define int_p_NULL (int*)NULL
+#endif
+#define png_infopp_NULL (png_infopp)NULL
 #define png_voidp_NULL	(png_voidp)NULL
 
 #define JPEG_BUFFER_SIZE (8 << 10)
 
-typedef struct 
+typedef struct
 {
     struct jpeg_source_mgr  pub;
 } JPEGSource;

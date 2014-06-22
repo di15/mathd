@@ -304,14 +304,14 @@ void StartText(const RichText* text, int fnt, float width, float height, int ln,
 
 void UseFontTex()
 {
-	glActiveTextureARB(GL_TEXTURE0);
+	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, g_texture[ g_font[g_currfont].texindex ].texname);
 	glUniform1i(g_shader[SHADER_ORTHO].m_slot[SSLOT_TEXTURE0], 0);
 }
 
 void UseIconTex(int ico)
 {
-	glActiveTextureARB(GL_TEXTURE0);
+	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, g_texture[ g_icon[ico].m_tex ].texname);
 	glUniform1i(g_shader[SHADER_ORTHO].m_slot[SSLOT_TEXTURE0], 0);
 }
@@ -457,7 +457,7 @@ void LoadFont(int id, const char* fontfile)
 }
 
 void DrawGlyph(float left, float top, float right, float bottom, float texleft, float textop, float texright, float texbottom)
-{   
+{
 	float vertices[] =
 	{
 		//posx, posy    texx, texy
@@ -485,7 +485,7 @@ void DrawGlyph(float left, float top, float right, float bottom, float texleft, 
 }
 
 void DrawGlyphF(float left, float top, float right, float bottom, float texleft, float textop, float texright, float texbottom)
-{   
+{
 	//DrawGlyph(left, top, right, bottom, texleft, textop, texright, texbottom);
 
 	//return;
@@ -613,7 +613,7 @@ void DrawGlyphF(float left, float top, float right, float bottom, float texleft,
 }
 
 void HighlGlyphF(float left, float top, float right, float bottom)
-{   
+{
 	float newleft = left;
 	float newtop = top;
 	float newright = right;
@@ -702,7 +702,7 @@ void DrawLine(int fnt, float startx, float starty, const RichText* text, const f
 		//glColor4f(color[0], color[1], color[2], color[3]);
 		for(int c=0; c<4; c++) currcolor[c] = color[c];
 	}
-	
+
 	Player* py = &g_player[g_currP];
 	StartText(text, fnt, py->currw*2, py->currh*2, 0, startx);
 	UseFontTex();
@@ -719,7 +719,7 @@ void DrawShadowedText(int fnt, float startx, float starty, const RichText* text,
 	currcolor[1] = 0;
 	currcolor[2] = 0;
 	currcolor[3] = color != NULL ? color[3] : 1;
-	
+
 	Player* py = &g_player[g_currP];
 	StartText(text, fnt, py->currw*2, py->currh*2, 0, startx);
 	UseFontTex();
@@ -764,7 +764,7 @@ void DrawLineF(int fnt, float startx, float starty, float framex1, float framey1
 		//glColor4f(color[0], color[1], color[2], color[3]);
 		for(int c=0; c<4; c++) currcolor[c] = color[c];
 	}
-	
+
 	Player* py = &g_player[g_currP];
 	StartTextF(text, fnt, py->currw*2, py->currh*2, 0, startx, framex1, framey1, framex2, framey2);
 	UseFontTex();
@@ -779,7 +779,7 @@ void DrawShadowedTextF(int fnt, float startx, float starty, float framex1, float
 	currcolor[1] = 0;
 	currcolor[2] = 0;
 	currcolor[3] = color != NULL ? color[3] : 1;
-	
+
 	Player* py = &g_player[g_currP];
 	StartTextF(text, fnt, py->currw*2, py->currh*2, 0, startx, framex1, framey1, framex2, framey2);
 	UseFontTex();
@@ -822,7 +822,7 @@ void HighlightF(int fnt, float startx, float starty, float framex1, float framey
 	currcolor[1] = 1;
 	currcolor[2] = 1;
 	currcolor[3] = 0.5f;
-	
+
 	StartTextF(text, fnt, py->currw*2, py->currh*2, 0, startx, framex1, framey1, framex2, framey2);
 
 	TextLayer(startx, starty);
@@ -835,7 +835,9 @@ void HighlightF(int fnt, float startx, float starty, float framex1, float framey
 		HighlGlyphF();
 		AdvanceGlyph();
 	}
-	
+
+	EndS();
+	CheckGLError(__FILE__, __LINE__);
 	Ortho(py->currw, py->currh, 1, 1, 1, 1);
 }
 
@@ -1129,7 +1131,7 @@ void DrawBoxShadTextF(int fnt, float startx, float starty, float width, float he
 }
 
 int CountLines(const RichText* text, int fnt, float startx, float starty, float width, float height)
-{   
+{
 	StartText(text, fnt, width, height, 0, startx);
 	TextLayer(startx, starty);
 

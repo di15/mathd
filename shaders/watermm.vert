@@ -21,6 +21,7 @@ out vec3 normalOut;
 
 in vec2 texCoordIn0;
 out vec2 texCoordOut0;
+out vec2 phasetexCoordOut;
 
 //uniform mat4 invModelView;
 //uniform mat4 normalMat;
@@ -35,6 +36,14 @@ out float elevy;
 uniform vec3 sundirection;
 uniform mat4 normalMat;
 
+uniform float mind;
+uniform float maxd;
+
+out float logz;
+const float C = 0.1;
+
+uniform int wavephase;
+
 uniform float mapminz;
 uniform float mapmaxz;
 uniform float mapminx;
@@ -46,11 +55,13 @@ void main(void)
 {
 	//vec4 vpos = (view * (model * position));
 	vec4 vpos = position;
-	//vpos.w = 1;
+	vpos.w = 1;
 	lpos = lightMatrix * vpos;
-	//lpos.w = 1;
-	//gl_Position = projection * (view * (model * position));
-	//gl_Position.w = 1;
+/*
+	lpos.xy /= 2.0;
+	lpos.xy += vec2(0.5, 0.5);
+*/
+	lpos.w = 1;
 
 	float maprangex = mapmaxx - mapminx;
 	float maprangez = mapmaxz - mapminz;
@@ -115,10 +126,11 @@ void main(void)
 	//light_vec = t * 0.5 + 0.5;
 	//light_vec = b * 0.5 + 0.5;
 
-	tmpVec = -vVertex;
-	eyevec.x = dot(tmpVec, t);
-	eyevec.y = dot(tmpVec, b);
-	eyevec.z = dot(tmpVec, n);
+	eyevec = -vVertex;
 
 	texCoordOut0 = texCoordIn0;
+	vec2 phasetexc;
+	phasetexc.x = texCoordIn0.x + wavephase/200.0;
+	phasetexc.y = texCoordIn0.y + wavephase/100.0;
+	phasetexCoordOut = phasetexc;
 }

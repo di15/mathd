@@ -30,11 +30,14 @@ const vec2 poissonDisk[4] = vec2[](
 );
 
 out vec4 outfrag;
+in float logz;
 
 void main (void)
 {
 	//if(elevy > maxelev)
 	//	discard;
+
+	gl_FragDepth = logz;
 
 	vec4 texel0 = texture(texture0, texCoordOut0);
 	//vec4 texel1 = texture(texture1, texCoordOut0);

@@ -5,7 +5,7 @@
 #include "../window.h"
 #include "../sim/player.h"
 
-Vec3f Camera::up2()		
+Vec3f Camera::up2()
 {
 	return Normalize( Cross( m_strafe, m_view - m_pos ) );
 }
@@ -115,20 +115,20 @@ void Camera::rotatebymouse(int dx, int dy)
 	float angleY = (float)( -dx ) * MOUSE_SENSITIVITY;
 	float angleZ = (float)( -dy ) * MOUSE_SENSITIVITY;
 
-	static float lastRotX = 0.0f; 
+	static float lastRotX = 0.0f;
  	lastRotX = m_orientv.x; // We store off the currentRotX and will use it in when the angle is capped
-	
+
 	// Here we keep track of the current rotation (for up and down) so that
 	// we can restrict the camera from doing a full 360 loop.
 	m_orientv.x += angleZ;
- 
+
 	// If the current rotation (in radians) is greater than 1.0, we want to cap it.
-	if(m_orientv.x > 1.0f)     
+	if(m_orientv.x > 1.0f)
 	{
 		m_orientv.x = 1.0f;
-		
+
 		// Rotate by remaining angle if there is any
-		if(lastRotX != 1.0f) 
+		if(lastRotX != 1.0f)
 		{
 			// To find the axis we need to rotate around for up and down
 			// movements, we need to get a perpendicular vector from the
@@ -136,7 +136,7 @@ void Camera::rotatebymouse(int dx, int dy)
 			// Before using the axis, it's a good idea to normalize it first.
 			Vec3f vAxis = Cross(m_view - m_pos, m_up);
 			vAxis = Normalize(vAxis);
-				
+
 			// rotate the camera by the remaining angle (1.0f - lastRotX)
 			rotateview( 1.0f - lastRotX, vAxis.x, vAxis.y, vAxis.z);
 		}
@@ -145,7 +145,7 @@ void Camera::rotatebymouse(int dx, int dy)
 	else if(m_orientv.x < -1.0f)
 	{
 		m_orientv.x = -1.0f;
-		
+
 		// Rotate by the remaining angle if there is any
 		if(lastRotX != -1.0f)
 		{
@@ -155,21 +155,21 @@ void Camera::rotatebymouse(int dx, int dy)
 			// Before using the axis, it's a good idea to normalize it first.
 			Vec3f vAxis = Cross(m_view - m_pos, m_up);
 			vAxis = Normalize(vAxis);
-			
+
 			// rotate the camera by ( -1.0f - lastRotX)
 			rotateview( -1.0f - lastRotX, vAxis.x, vAxis.y, vAxis.z);
 		}
 	}
 	// Otherwise, we can rotate the view around our position
-	else 
-	{	
+	else
+	{
 		// To find the axis we need to rotate around for up and down
 		// movements, we need to get a perpendicular vector from the
 		// camera's view vector and up vector.  This will be the axis.
 		// Before using the axis, it's a good idea to normalize it first.
 		Vec3f vAxis = Cross(m_view - m_pos, m_up);
 		vAxis = Normalize(vAxis);
-	
+
 		// Rotate around our perpendicular axis
 		rotateview(angleZ, vAxis.x, vAxis.y, vAxis.z);
 	}
@@ -185,7 +185,7 @@ void Camera::rotateabout(Vec3f center, float rad, float x, float y, float z)
 {
 	m_view = RotateAround(m_view, center, rad, x, y, z);
 	m_pos = RotateAround(m_pos, center, rad, x, y, z);
-	
+
 	calcstrafe();
 	calcyaw();
 }
@@ -216,7 +216,7 @@ void Camera::rotateview(float angle, float x, float y, float z)
 {
 	Vec3f vNewView;
 
-	Vec3f vView = m_view - m_pos;		
+	Vec3f vView = m_view - m_pos;
 
 	float cosTheta = (float)cos(angle);
 	float sinTheta = (float)sin(angle);
@@ -291,7 +291,7 @@ void Camera::accelerate(float speed)
 	Vec3f vVector = m_view - m_pos;
 
 	vVector = Normalize(vVector);
-	
+
 	m_vel.x += vVector.x * speed;
 	m_vel.z += vVector.z * speed;
 }
@@ -299,7 +299,7 @@ void Camera::accelerate(float speed)
 void Camera::accelstrafe(float speed)
 {
 	Vec3f vVector = Normalize(m_strafe);
-	
+
 	m_vel.x += vVector.x * speed;
 	m_vel.z += vVector.z * speed;
 }
@@ -307,7 +307,7 @@ void Camera::accelstrafe(float speed)
 void Camera::accelrise(float speed)
 {
 	Vec3f vVector = Normalize(m_up);
-	
+
 	m_vel.y += vVector.y * speed;
 }
 
@@ -332,7 +332,7 @@ void Camera::Rise(float speed)
 	vVector = Normalize(vVector);
 
 	m_vel.y += vVector.y * speed;
-}		
+}
 */
 
 void Camera::rise(float speed)
@@ -340,8 +340,8 @@ void Camera::rise(float speed)
 	Vec3f up = Normalize(m_up);
 
 	m_pos.y += up.y * speed;
-	m_view.y += up.y * speed; 
-}	
+	m_view.y += up.y * speed;
+}
 
 void Camera::move(Vec3f delta)
 {
@@ -362,7 +362,7 @@ void Camera::stop()
 	m_vel = Vec3f(0, 0, 0);
 }
 
-void Camera::calcstrafe() 
+void Camera::calcstrafe()
 {
 	Vec3f vCross = Cross(m_view - m_pos, m_up);
 	m_strafe = Normalize(vCross);
@@ -373,5 +373,6 @@ Vec3f Camera::zoompos()
 	Player* py = &g_player[g_currP];
 	Vec3f dir = Normalize( m_view - m_pos );
 	Vec3f posvec = m_view - dir * 1000.0f / py->zoom;
+	//return Vec3f(0,0,0);
 	return posvec;
 }

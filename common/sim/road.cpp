@@ -564,6 +564,13 @@ void MeshRoad(int x, int z, bool plan)
 		//Chat(msg);
 	}
 
+    for(int i=0; i<rva->numverts; i+=3)
+    {
+        rva->normals[i+0] = Normal(&rva->vertices[i]);
+        rva->normals[i+1] = Normal(&rva->vertices[i]);
+        rva->normals[i+2] = Normal(&rva->vertices[i]);
+    }
+
 	//g_log<<"done meshroad"<<endl;
 	//g_log.flush();
 }

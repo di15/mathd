@@ -53,7 +53,7 @@ void DrawMarquee()
 
 	if(!py->mousekeys[0] || py->keyintercepted || g_mode != APPMODE_PLAY || py->build != BUILDING_NONE)
 		return;
-	
+
 #if 0
 	EndS();
 	UseS(SHADER_COLOR2D);
@@ -122,7 +122,7 @@ void DrawSel(Matrix* projection, Matrix* modelmat, Matrix* viewmat)
 
 		const float vertices[] =
 		{
-			//posx, posy posz 
+			//posx, posy posz
 			static_cast<float>(cmmaxx + off), y1, static_cast<float>(cmminz - off),
 			static_cast<float>(cmmaxx + off), y2, static_cast<float>(cmmaxz + off),
 			static_cast<float>(cmminx - off), y3, static_cast<float>(cmmaxz + off),
@@ -138,7 +138,7 @@ void DrawSel(Matrix* projection, Matrix* modelmat, Matrix* viewmat)
 		glDrawArrays(GL_LINE_STRIP, 0, 5);
 	}
 
-	
+
 	glLineWidth(1);
 	EndS();
 
@@ -160,9 +160,9 @@ void DrawSel(Matrix* projection, Matrix* modelmat, Matrix* viewmat)
 	//glEnableVertexAttribArray(s->m_slot[SSLOT_TEXCOORD0]);
 	//glEnableVertexAttribArray(s->m_slot[SSLOT_NORMAL]);
 
-	glActiveTextureARB(GL_TEXTURE0);
+	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, g_texture[ g_circle ].texname);
-	glUniform1iARB(s->m_slot[SSLOT_TEXTURE0], 0);
+	glUniform1i(s->m_slot[SSLOT_TEXTURE0], 0);
 
 	for(auto seliter = py->sel.units.begin(); seliter != py->sel.units.end(); seliter++)
 	{
@@ -215,7 +215,7 @@ void DrawSel(Matrix* projection, Matrix* modelmat, Matrix* viewmat)
 	}
 	EndS();
 }
-#endif 
+#endif
 
 int SelectOneBuilding(Vec3f *line)
 {
@@ -230,7 +230,7 @@ int SelectOneBuilding(Vec3f *line)
 			continue;
 
 		BuildingT* t = &g_buildingT[ b->type ];
-		
+
 		const int tminx = b->tilepos.x - t->widthx/2;
 		const int tminz = b->tilepos.y - t->widthz/2;
 		const int tmaxx = tminx + t->widthx;
@@ -253,7 +253,7 @@ int SelectOneBuilding(Vec3f *line)
 
 		Vec3f vmin = Vec3f(cmminx, y, cmminz);
 		Vec3f vmax = Vec3f(cmmaxx, maxy, cmmaxz);
-		
+
 		//MakeHull(normals, dists, b->drawpos, vmin, vmax);
 		MakeHull(normals, dists, Vec3f(0,0,0), vmin, vmax);
 
@@ -277,9 +277,9 @@ int SelectOneBuilding(Vec3f *line)
 			if(InterPoly(poly, line, 3, &polyinter))
 			{
 				ispolyinter = true;
-				
+
 				float thisd = Magnitude(line[0] - polyinter);
-				
+
 				if(thisd < closestd || closestd < 0)
 					intersection = polyinter;
 			}
@@ -349,7 +349,7 @@ Selection SelectOne(Vec3f campos, Vec3f camside, Vec3f camup2, Vec3f viewdir)
 	line[1] = campos + (ray * 1000000.0f);
 
 	Selection selection;
-	
+
 	int sel = SelectOneUnit(line);
 #if 0
 	InfoMessage("sel one", "a");
@@ -362,7 +362,7 @@ Selection SelectOne(Vec3f campos, Vec3f camside, Vec3f camup2, Vec3f viewdir)
 #endif
 		selection.units.push_back( sel );
 	}
-	
+
 	sel = SelectOneBuilding(line);
 
 	if(sel >= 0)
@@ -596,7 +596,7 @@ void ClearSel(Selection* s)
 void AfterSel(Selection* s)
 {
 	bool haveconstr = false;
-	
+
 	for(auto seliter = s->buildings.begin(); seliter != s->buildings.end(); seliter++)
 	{
 		int bi = *seliter;
@@ -630,7 +630,7 @@ void AfterSel(Selection* s)
 			break;
 		}
 	}
-	
+
 
 	for(auto seliter = s->roads.begin(); seliter != s->roads.end(); seliter++)
 	{

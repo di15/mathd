@@ -77,12 +77,12 @@ void GetGLVersion(int* major, int* minor)
 void InitGLSL()
 {
 	//strstr("abab", "ba");
-
+	glewExperimental = GL_TRUE;
 	GLenum glewError = glewInit();
     if( glewError != GLEW_OK )
     {
         ErrorMessage("Error initializing GLEW!", (const char*)glewGetErrorString( glewError ));
-        //return;
+        return;
     }
 	
 	g_log<<"Renderer: "<<(char*)glGetString(GL_RENDERER)<<endl;

@@ -234,27 +234,35 @@ void DrawMinimap(Matrix projection, Matrix viewmat, Matrix modelmat, Matrix mode
 
 	//g_frustum.construct(projection.m_matrix, viewmat.m_matrix);
 
+	CheckGLError(__FILE__, __LINE__);
 #if 1
 	UseShadow(SHADER_MAPTILESMM, projection, viewmat, modelmat, modelviewinv, mvLightPos, lightDir);
-	glActiveTextureARB(GL_TEXTURE8);
+	glActiveTexture(GL_TEXTURE8);
 	glBindTexture(GL_TEXTURE_2D, g_depth);
-	glUniform1iARB(g_shader[g_curS].m_slot[SSLOT_SHADOWMAP], 8);
+	glUniform1i(g_shader[g_curS].m_slot[SSLOT_SHADOWMAP], 8);
 	g_hmap.draw2();
 	EndS();
 #endif
+	CheckGLError(__FILE__, __LINE__);
 
+#if 1
 	UseShadow(SHADER_WATERMM, projection, viewmat, modelmat, modelviewinv, mvLightPos, lightDir);
-	glActiveTextureARB(GL_TEXTURE8);
+	CheckGLError(__FILE__, __LINE__);
+	glActiveTexture(GL_TEXTURE8);
 	glBindTexture(GL_TEXTURE_2D, g_depth);
-	glUniform1iARB(g_shader[g_curS].m_slot[SSLOT_SHADOWMAP], 8);
+	glUniform1i(g_shader[g_curS].m_slot[SSLOT_SHADOWMAP], 8);
+	CheckGLError(__FILE__, __LINE__);
 	DrawWater2();
+	CheckGLError(__FILE__, __LINE__);
 	EndS();
+#endif
 
+	CheckGLError(__FILE__, __LINE__);
 #if 0
 	UseShadow(SHADER_BORDERSMM, projection, viewmat, modelmat, modelviewinv, mvLightPos, lightDir);
-	//glActiveTextureARB(GL_TEXTURE8);
+	//glActiveTexture(GL_TEXTURE8);
 	//glBindTexture(GL_TEXTURE_2D, g_depth);
-	//glUniform1iARB(g_shader[g_curS].m_slot[SSLOT_SHADOWMAP], 8);
+	//glUniform1i(g_shader[g_curS].m_slot[SSLOT_SHADOWMAP], 8);
 	Shader* s = &g_shader[g_curS];
 	glUniform1f(s->m_slot[SSLOT_MAPMINZ], 0);
 	glUniform1f(s->m_slot[SSLOT_MAPMAXZ], g_hmap.m_widthz*TILE_SIZE);
@@ -275,6 +283,7 @@ void DrawMinimap(Matrix projection, Matrix viewmat, Matrix modelmat, Matrix mode
 	glUniform4f(g_shader[SHADER_COLOR2D].m_slot[SSLOT_COLOR], 1, 1, 1, 0.5f);
 	DrawMMFrust();
 	EndS();
+	CheckGLError(__FILE__, __LINE__);
 }
 
 void DrawMinimapDepth()
@@ -291,9 +300,9 @@ void DrawPreview(Matrix projection, Matrix viewmat, Matrix modelmat, Matrix mode
 
 	UseShadow(SHADER_OWNED, projection, viewmat, modelmat, modelviewinv, mvLightPos, lightDir);
 	//UseShadow(SHADER_UNIT, projection, viewmat, modelmat, modelviewinv, mvLightPos, lightDir);
-	glActiveTextureARB(GL_TEXTURE8);
+	glActiveTexture(GL_TEXTURE8);
 	glBindTexture(GL_TEXTURE_2D, g_depth);
-	glUniform1iARB(g_shader[g_curS].m_slot[SSLOT_SHADOWMAP], 8);
+	glUniform1i(g_shader[g_curS].m_slot[SSLOT_SHADOWMAP], 8);
 
 	glUniform4f(g_shader[g_curS].m_slot[SSLOT_OWNCOLOR], 1, 0, 0, 0);
 
@@ -411,7 +420,7 @@ void DrawViewport(int which, int x, int y, int width, int height)
 	Player* py = &g_player[g_currP];
 	Camera* c = &py->camera;
 
-	
+
 	Matrix oldview = g_cameraViewMatrix;
 
 	if(which == VIEWPORT_ENTVIEW)
@@ -425,7 +434,7 @@ void DrawViewport(int which, int x, int y, int width, int height)
 		Vec3f upvec = py->bpcam.m_up;
 
 		Matrix viewmat = gluLookAt3(posvec.x, posvec.y, posvec.z, focusvec.x, focusvec.y, focusvec.z, upvec.x, upvec.y, upvec.z);
-		
+
 		g_cameraViewMatrix = viewmat;
 
 		Matrix modelview;
@@ -457,7 +466,9 @@ void DrawViewport(int which, int x, int y, int width, int height)
 #endif
 			CheckGLError(__FILE__, __LINE__);
 			RenderToShadowMap(projection, viewmat, modelmat, focus, focus + g_lightOff, DrawPreviewDepth);
+            CheckGLError(__FILE__, __LINE__);
 			RenderShadowedScene(projection, viewmat, modelmat, modelview, DrawPreview);
+            CheckGLError(__FILE__, __LINE__);
 		}
 	}
 
@@ -472,7 +483,7 @@ void DrawViewport(int which, int x, int y, int width, int height)
 		Vec3f upvec = c->m_up;
 
 		Matrix viewmat = gluLookAt3(posvec.x, posvec.y, posvec.z, focusvec.x, focusvec.y, focusvec.z, upvec.x, upvec.y, upvec.z);
-		
+
 		g_cameraViewMatrix = viewmat;
 
 		Matrix modelview;
@@ -504,7 +515,9 @@ void DrawViewport(int which, int x, int y, int width, int height)
 #endif
 			CheckGLError(__FILE__, __LINE__);
 			RenderToShadowMap(projection, viewmat, modelmat, focus, focus + g_lightOff / MIN_ZOOM, DrawMinimapDepth);
+            CheckGLError(__FILE__, __LINE__);
 			RenderShadowedScene(projection, viewmat, modelmat, modelview, DrawMinimap);
+            CheckGLError(__FILE__, __LINE__);
 		}
 	}
 
@@ -512,10 +525,12 @@ void DrawViewport(int which, int x, int y, int width, int height)
 
 #if 0
 	EndS();
+	CheckGLError(__FILE__, __LINE__);
 	Ortho(width, height, 1, 0, 0, 1);
 	glDisable(GL_DEPTH_TEST);
 	RichText rt = RichText(t->m_label);
 	DrawShadowedText(MAINFONT8, 0, 0, &rt, NULL, -1);
+	EndS();
 #endif
 
 	//if(persp)
@@ -523,6 +538,7 @@ void DrawViewport(int which, int x, int y, int width, int height)
 
 	glDisable(GL_DEPTH_TEST);
 	glFlush();
+	CheckGLError(__FILE__, __LINE__);
 }
 
 bool ViewportLDown(int which, int relx, int rely, int width, int height)

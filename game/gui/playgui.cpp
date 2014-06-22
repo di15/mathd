@@ -137,7 +137,7 @@ void Over_BuildButton(int bwhat)
 		return;
 
 	py->bptype = bwhat;
-	
+
 	gui->open("build preview");
 
 	py->bpcam.position(TILE_SIZE*3, TILE_SIZE*3, TILE_SIZE*3, 0, 0, 0, 0, 1, 0);
@@ -165,28 +165,28 @@ void BuildMenu_OpenPage1()
 
 	bp->bottomright_button[0] = Button(bp, "name", "gui/brbut/apartment2.png", RichText(""), RichText(""), MAINFONT8, BUTTON_CORRODE, NULL, NULL, Click_BuildButton, NULL, Over_BuildButton, Out_BuildButton, BUILDING_APARTMENT);
 	bp->bottomright_button_on[0] = true;
-	
+
 	bp->bottomright_button[1] = Button(bp, "name", "gui/brbut/store1.png", RichText(""), RichText(""), MAINFONT8, BUTTON_CORRODE, NULL, NULL, Click_BuildButton, NULL, Over_BuildButton, Out_BuildButton, BUILDING_STORE);
 	bp->bottomright_button_on[1] = true;
-	
+
 	bp->bottomright_button[2] = Button(bp, "name", "gui/brbut/farm2.png", RichText(""), RichText(""), MAINFONT8, BUTTON_CORRODE, NULL, NULL, Click_BuildButton, NULL, Over_BuildButton, Out_BuildButton, BUILDING_FARM);
 	bp->bottomright_button_on[2] = true;
-	
+
 	bp->bottomright_button[3] = Button(bp, "name", "gui/brbut/oilwell2.png", RichText(""), RichText(""), MAINFONT8, BUTTON_CORRODE, NULL, NULL, Click_BuildButton, NULL, Over_BuildButton, Out_BuildButton, BUILDING_OILWELL);
 	bp->bottomright_button_on[3] = true;
-	
+
 	bp->bottomright_button[4] = Button(bp, "name", "gui/brbut/refinery2.png", RichText(""), RichText(""), MAINFONT8, BUTTON_CORRODE, NULL, NULL, Click_BuildButton, NULL, Over_BuildButton, Out_BuildButton, BUILDING_REFINERY);
 	bp->bottomright_button_on[4] = true;
-	
+
 	bp->bottomright_button[5] = Button(bp, "name", "gui/brbut/gasstation2.png", RichText(""), RichText(""), MAINFONT8, BUTTON_CORRODE, NULL, NULL, Click_BuildButton, NULL, Over_BuildButton, Out_BuildButton, BUILDING_GASSTATION);
 	bp->bottomright_button_on[5] = true;
-	
+
 	bp->bottomright_button[6] = Button(bp, "name", "gui/brbut/mine.png", RichText(""), RichText(""), MAINFONT8, BUTTON_CORRODE, NULL, NULL, Click_BuildButton, NULL, Over_BuildButton, Out_BuildButton, BUILDING_MINE);
 	bp->bottomright_button_on[6] = true;
-	
+
 	bp->bottomright_button[7] = Button(bp, "name", "gui/brbut/factory3.png", RichText(""), RichText(""), MAINFONT8, BUTTON_CORRODE, NULL, NULL, Click_BuildButton, NULL, Over_BuildButton, Out_BuildButton, BUILDING_FACTORY);
 	bp->bottomright_button_on[7] = true;
-	
+
 	bp->bottomright_button[8] = Button(bp, "name", "gui/next.png", RichText(""), RichText(""), MAINFONT8, BUTTON_CORRODE, NULL, NULL, Click_NextBuildButton, NULL, NULL, NULL, 2);
 	bp->bottomright_button_on[8] = true;
 
@@ -204,28 +204,28 @@ void BuildMenu_OpenPage2()
 
 	bp->bottomright_button[0] = Button(bp, "name", "gui/brbut/nucpow2.png", RichText(""), RichText(""), MAINFONT8, BUTTON_CORRODE, NULL, NULL, Click_BuildButton, NULL, Over_BuildButton, Out_BuildButton, BUILDING_NUCPOW);
 	bp->bottomright_button_on[0] = true;
-	
-	bp->bottomright_button[1] = Button(bp, "name", "gui/brbut/harbour2.png", RichText(""), RichText(""), MAINFONT8, BUTTON_CORRODE, NULL, NULL, Click_BuildButton, NULL, Over_BuildButton, Out_BuildButton, BUILDING_HARBOUR);
+
+	bp->bottomright_button[1] = Button(bp, "name", "gui/brbut/harbour2.png", RichText(""), RichText(""), MAINFONT8, BUTTON_CORRODE, NULL, NULL, Click_BuildButton, NULL, Over_BuildButton, Out_BuildButton, BUILDING_HOUR);
 	bp->bottomright_button_on[1] = true;
-	
+
 	bp->bottomright_button[2] = Button(bp, "name", "gui/brbut/road.png", RichText(""), RichText(""), MAINFONT8, BUTTON_CORRODE, NULL, NULL, Click_BuildButton, NULL, Over_BuildButton, Out_BuildButton, BUILDING_ROAD);
 	bp->bottomright_button_on[2] = true;
-	
+
 	bp->bottomright_button[3] = Button(bp, "name", "gui/brbut/crudepipeline.png", RichText(""), RichText(""), MAINFONT8, BUTTON_CORRODE, NULL, NULL, Click_BuildButton, NULL, Over_BuildButton, Out_BuildButton, BUILDING_CRPIPE);
 	bp->bottomright_button_on[3] = true;
-	
+
 	bp->bottomright_button[4] = Button(bp, "name", "gui/brbut/powerline.png", RichText(""), RichText(""), MAINFONT8, BUTTON_CORRODE, NULL, NULL, Click_BuildButton, NULL, Over_BuildButton, Out_BuildButton, BUILDING_POWL);
 	bp->bottomright_button_on[4] = true;
 
 	bp->bottomright_button[5] = Button(bp, "name", "gui/next.png", RichText(""), RichText(""), MAINFONT8, BUTTON_CORRODE, NULL, NULL, Click_NextBuildButton, NULL, NULL, NULL, 1);
 	bp->bottomright_button_on[5] = true;
-	
+
 	bp->bottomright_button[6] = Button(bp, "name", "gui/brbut/mine.png", RichText(""), RichText(""), MAINFONT8, BUTTON_CORRODE, NULL, NULL, Click_BuildButton, NULL, Over_BuildButton, Out_BuildButton, BUILDING_MINE);
 	bp->bottomright_button_on[6] = false;
-	
+
 	bp->bottomright_button[7] = Button(bp, "name", "gui/brbut/factory3.png", RichText(""), RichText(""), MAINFONT8, BUTTON_CORRODE, NULL, NULL, Click_BuildButton, NULL, Over_BuildButton, Out_BuildButton, BUILDING_FACTORY);
 	bp->bottomright_button_on[7] = false;
-	
+
 	bp->bottomright_button[8] = Button(bp, "name", "gui/next.png", RichText(""), RichText(""), MAINFONT8, BUTTON_CORRODE, NULL, NULL, Click_NextBuildButton, NULL, NULL, NULL, 2);
 	bp->bottomright_button_on[8] = false;
 
@@ -292,7 +292,7 @@ void Click_MoveConstruction()
 			totalloc += b->conmat[i];
 		}
 	}
-	
+
 	for(auto siter = py->sel.roads.begin(); siter != py->sel.roads.end(); siter++)
 	{
 		Vec2i tpos = *siter;
@@ -304,7 +304,7 @@ void Click_MoveConstruction()
 			totalloc += r->conmat[i];
 		}
 	}
-	
+
 	for(auto siter = py->sel.powls.begin(); siter != py->sel.powls.end(); siter++)
 	{
 		Vec2i tpos = *siter;
@@ -316,7 +316,7 @@ void Click_MoveConstruction()
 			totalloc += p->conmat[i];
 		}
 	}
-	
+
 	for(auto siter = py->sel.crpipes.begin(); siter != py->sel.crpipes.end(); siter++)
 	{
 		Vec2i tpos = *siter;
@@ -412,7 +412,7 @@ void Click_ProceedConstruction()
 
 	ViewLayer* cv = (ViewLayer*)gui->get("construction view");
 	ConstructionView* cvw = (ConstructionView*)cv->get("construction view");
-	
+
 	int maxcost[RESOURCES];
 	Zero(maxcost);
 
@@ -432,7 +432,7 @@ void Click_ProceedConstruction()
 
 		b->allocres();
 	}
-	
+
 	for(auto siter = py->sel.roads.begin(); siter != py->sel.roads.end(); siter++)
 	{
 		Vec2i tpos = *siter;
@@ -443,7 +443,7 @@ void Click_ProceedConstruction()
 
 		r->allocate();
 	}
-	
+
 	for(auto siter = py->sel.powls.begin(); siter != py->sel.powls.end(); siter++)
 	{
 		Vec2i tpos = *siter;
@@ -454,7 +454,7 @@ void Click_ProceedConstruction()
 
 		p->allocate();
 	}
-	
+
 	for(auto siter = py->sel.crpipes.begin(); siter != py->sel.crpipes.end(); siter++)
 	{
 		Vec2i tpos = *siter;
@@ -552,8 +552,8 @@ void FillPlayGUI()
 
 	gui->add(new ViewLayer(gui, "play gui"));
 	ViewLayer* playguiview = (ViewLayer*)gui->get("play gui");
-	
-	//playguiview->add(new Image(NULL, "gui/backg/white.png", Resize_ResTicker)); 
+
+	//playguiview->add(new Image(NULL, "gui/backg/white.png", Resize_ResTicker));
 	//playguiview->add(new Text(NULL, "res ticker", RichText(" "), MAINFONT16, Resize_ResTicker, true, 1, 1, 1, 1));
 	playguiview->add(new ResTicker(NULL, "res ticker", Resize_ResTicker));
 	playguiview->add(new BottomPanel(NULL, "bottom panel", Resize_BottomPanel));
@@ -564,7 +564,7 @@ void FillPlayGUI()
 
 	gui->add(new ViewLayer(gui, "construction view"));
 	ViewLayer* constrview = (ViewLayer*)gui->get("construction view");
-	
+
 	constrview->add(new ConstructionView(NULL, "construction view", Resize_ConstructionView, Click_MoveConstruction, Click_CancelConstruction, Click_ProceedConstruction, Click_EstimateConstruction));
 
 	gui->add(new ViewLayer(gui, "build preview"));
@@ -572,7 +572,7 @@ void FillPlayGUI()
 
 	//buildpreview->add(new TouchListener(NULL, Resize_Fullscreen, NULL, NULL, NULL, -1));
 	buildpreview->add(new BuildPreview(NULL, "build preview", Resize_BuildPreview));
-	
+
 	gui->add(new ViewLayer(gui, "construction estimate view"));
 	ViewLayer* cev = (ViewLayer*)gui->get("construction estimate view");
 

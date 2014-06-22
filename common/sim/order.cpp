@@ -37,9 +37,9 @@ void DrawOrders(Matrix* projection, Matrix* modelmat, Matrix* viewmat)
 	//glEnableVertexAttribArray(s->m_slot[SSLOT_TEXCOORD0]);
 	//glEnableVertexAttribArray(s->m_slot[SSLOT_NORMAL]);
 
-	glActiveTextureARB(GL_TEXTURE0);
+	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, g_texture[ g_circle ].texname);
-	glUniform1iARB(s->m_slot[SSLOT_TEXTURE0], 0);
+	glUniform1i(s->m_slot[SSLOT_TEXTURE0], 0);
 
 	auto oitr = g_order.begin();
 
@@ -233,7 +233,7 @@ void Order(int mousex, int mousey, int viewwidth, int viewheight, Vec3f campos, 
 		// All units to one goal
 		//if(fabs(center.x - order.x) < half.x && fabs(center.z - order.z) < half.z)
 		if(order.x <= vmax.x && order.x >= vmin.x && order.z <= vmax.z && order.z >= vmin.z)
-		{	
+		{
 #if 0
 			InfoMessage("asd", "typ 1");
 #endif

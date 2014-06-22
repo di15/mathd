@@ -240,12 +240,27 @@ void DestroyWindow(const char* title)
 
 bool MakeWindow(const char* title)
 {
-// Request compatibility because GLEW doesn't play well with core contexts.
+
+	g_log<<"samw0"<<endl;
+	g_log.flush();
+
+	//g_log<<"GL_VERSION: "<<(char*)glGetString(GL_VERSION)<<endl;
+	//g_log.flush();
+
+	g_log<<"sa"<<endl;
+	g_log.flush();
+
+	// Request compatibility because GLEW doesn't play well with core contexts.
 #if 1
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_COMPATIBILITY);
-	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 1); 
-	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1);
+	//SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3); 
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3); 
+	//SDL_GL_SetAttribute(SDL_GL_ACCELERATED_VISUAL, 1);
+	//SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
+	//SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24); 
 #endif
+
 	unsigned int flags;
 	int startx;
 	int starty;
@@ -307,14 +322,20 @@ bool MakeWindow(const char* title)
 	g_glcontext = SDL_GL_CreateContext(g_window);
 	//SDL_GL_SetSwapInterval(1);
 
-	//SDL_Delay(7000);
-	//SDL_Delay(7000);
+	g_log<<"GL_VERSION: "<<glGetString(GL_VERSION)<<endl;
+	g_log.flush();
 
-#if 1
-	SDL_GL_SetAttribute(SDL_GL_ACCELERATED_VISUAL, 1);
-	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
-	SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24); 
-#endif
+	if(!g_glcontext)
+	{
+		DestroyWindow(title);
+		ErrorMessage("Error", "Couldn't create GL context");
+		return false;
+	}
+
+	SDL_GL_MakeCurrent(g_window, g_glcontext); 
+
+	//SDL_Delay(7000);
+	//SDL_Delay(7000);
 
 	Vec2i winsz;
 	SDL_GetWindowSize(g_window, &winsz.x, &winsz.y);

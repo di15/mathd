@@ -57,7 +57,7 @@ void InitShadows()
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
-	
+
 #if 1
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16, g_depthSizeX, g_depthSizeY, 0, GL_RGBA, GL_UNSIGNED_SHORT, 0);
 #else
@@ -70,7 +70,7 @@ void InitShadows()
 	glBindRenderbufferEXT(GL_RENDERBUFFER_EXT, g_rbDepth);
 	glRenderbufferStorageEXT(GL_RENDERBUFFER_EXT, GL_DEPTH_COMPONENT24, g_depthSizeX, g_depthSizeY);
 	glBindRenderbufferEXT(GL_RENDERBUFFER_EXT, 0);
-	
+
 	glGenFramebuffersEXT(1, &g_fbDepth);
 	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, g_fbDepth);
 	glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_2D, g_depth, 0);
@@ -116,116 +116,116 @@ bool Inverse2(Matrix mat, Matrix &invMat)
 
 	const float* m = mat.m_matrix;
 
-    inv[0] = m[5]  * m[10] * m[15] - 
-             m[5]  * m[11] * m[14] - 
-             m[9]  * m[6]  * m[15] + 
+    inv[0] = m[5]  * m[10] * m[15] -
+             m[5]  * m[11] * m[14] -
+             m[9]  * m[6]  * m[15] +
              m[9]  * m[7]  * m[14] +
-             m[13] * m[6]  * m[11] - 
+             m[13] * m[6]  * m[11] -
              m[13] * m[7]  * m[10];
 
-    inv[4] = -m[4]  * m[10] * m[15] + 
-              m[4]  * m[11] * m[14] + 
-              m[8]  * m[6]  * m[15] - 
-              m[8]  * m[7]  * m[14] - 
-              m[12] * m[6]  * m[11] + 
+    inv[4] = -m[4]  * m[10] * m[15] +
+              m[4]  * m[11] * m[14] +
+              m[8]  * m[6]  * m[15] -
+              m[8]  * m[7]  * m[14] -
+              m[12] * m[6]  * m[11] +
               m[12] * m[7]  * m[10];
 
-    inv[8] = m[4]  * m[9] * m[15] - 
-             m[4]  * m[11] * m[13] - 
-             m[8]  * m[5] * m[15] + 
-             m[8]  * m[7] * m[13] + 
-             m[12] * m[5] * m[11] - 
+    inv[8] = m[4]  * m[9] * m[15] -
+             m[4]  * m[11] * m[13] -
+             m[8]  * m[5] * m[15] +
+             m[8]  * m[7] * m[13] +
+             m[12] * m[5] * m[11] -
              m[12] * m[7] * m[9];
 
-    inv[12] = -m[4]  * m[9] * m[14] + 
+    inv[12] = -m[4]  * m[9] * m[14] +
                m[4]  * m[10] * m[13] +
-               m[8]  * m[5] * m[14] - 
-               m[8]  * m[6] * m[13] - 
-               m[12] * m[5] * m[10] + 
+               m[8]  * m[5] * m[14] -
+               m[8]  * m[6] * m[13] -
+               m[12] * m[5] * m[10] +
                m[12] * m[6] * m[9];
 
-    inv[1] = -m[1]  * m[10] * m[15] + 
-              m[1]  * m[11] * m[14] + 
-              m[9]  * m[2] * m[15] - 
-              m[9]  * m[3] * m[14] - 
-              m[13] * m[2] * m[11] + 
+    inv[1] = -m[1]  * m[10] * m[15] +
+              m[1]  * m[11] * m[14] +
+              m[9]  * m[2] * m[15] -
+              m[9]  * m[3] * m[14] -
+              m[13] * m[2] * m[11] +
               m[13] * m[3] * m[10];
 
-    inv[5] = m[0]  * m[10] * m[15] - 
-             m[0]  * m[11] * m[14] - 
-             m[8]  * m[2] * m[15] + 
-             m[8]  * m[3] * m[14] + 
-             m[12] * m[2] * m[11] - 
+    inv[5] = m[0]  * m[10] * m[15] -
+             m[0]  * m[11] * m[14] -
+             m[8]  * m[2] * m[15] +
+             m[8]  * m[3] * m[14] +
+             m[12] * m[2] * m[11] -
              m[12] * m[3] * m[10];
 
-    inv[9] = -m[0]  * m[9] * m[15] + 
-              m[0]  * m[11] * m[13] + 
-              m[8]  * m[1] * m[15] - 
-              m[8]  * m[3] * m[13] - 
-              m[12] * m[1] * m[11] + 
+    inv[9] = -m[0]  * m[9] * m[15] +
+              m[0]  * m[11] * m[13] +
+              m[8]  * m[1] * m[15] -
+              m[8]  * m[3] * m[13] -
+              m[12] * m[1] * m[11] +
               m[12] * m[3] * m[9];
 
-    inv[13] = m[0]  * m[9] * m[14] - 
-              m[0]  * m[10] * m[13] - 
-              m[8]  * m[1] * m[14] + 
-              m[8]  * m[2] * m[13] + 
-              m[12] * m[1] * m[10] - 
+    inv[13] = m[0]  * m[9] * m[14] -
+              m[0]  * m[10] * m[13] -
+              m[8]  * m[1] * m[14] +
+              m[8]  * m[2] * m[13] +
+              m[12] * m[1] * m[10] -
               m[12] * m[2] * m[9];
 
-    inv[2] = m[1]  * m[6] * m[15] - 
-             m[1]  * m[7] * m[14] - 
-             m[5]  * m[2] * m[15] + 
-             m[5]  * m[3] * m[14] + 
-             m[13] * m[2] * m[7] - 
+    inv[2] = m[1]  * m[6] * m[15] -
+             m[1]  * m[7] * m[14] -
+             m[5]  * m[2] * m[15] +
+             m[5]  * m[3] * m[14] +
+             m[13] * m[2] * m[7] -
              m[13] * m[3] * m[6];
 
-    inv[6] = -m[0]  * m[6] * m[15] + 
-              m[0]  * m[7] * m[14] + 
-              m[4]  * m[2] * m[15] - 
-              m[4]  * m[3] * m[14] - 
-              m[12] * m[2] * m[7] + 
+    inv[6] = -m[0]  * m[6] * m[15] +
+              m[0]  * m[7] * m[14] +
+              m[4]  * m[2] * m[15] -
+              m[4]  * m[3] * m[14] -
+              m[12] * m[2] * m[7] +
               m[12] * m[3] * m[6];
 
-    inv[10] = m[0]  * m[5] * m[15] - 
-              m[0]  * m[7] * m[13] - 
-              m[4]  * m[1] * m[15] + 
-              m[4]  * m[3] * m[13] + 
-              m[12] * m[1] * m[7] - 
+    inv[10] = m[0]  * m[5] * m[15] -
+              m[0]  * m[7] * m[13] -
+              m[4]  * m[1] * m[15] +
+              m[4]  * m[3] * m[13] +
+              m[12] * m[1] * m[7] -
               m[12] * m[3] * m[5];
 
-    inv[14] = -m[0]  * m[5] * m[14] + 
-               m[0]  * m[6] * m[13] + 
-               m[4]  * m[1] * m[14] - 
-               m[4]  * m[2] * m[13] - 
-               m[12] * m[1] * m[6] + 
+    inv[14] = -m[0]  * m[5] * m[14] +
+               m[0]  * m[6] * m[13] +
+               m[4]  * m[1] * m[14] -
+               m[4]  * m[2] * m[13] -
+               m[12] * m[1] * m[6] +
                m[12] * m[2] * m[5];
 
-    inv[3] = -m[1] * m[6] * m[11] + 
-              m[1] * m[7] * m[10] + 
-              m[5] * m[2] * m[11] - 
-              m[5] * m[3] * m[10] - 
-              m[9] * m[2] * m[7] + 
+    inv[3] = -m[1] * m[6] * m[11] +
+              m[1] * m[7] * m[10] +
+              m[5] * m[2] * m[11] -
+              m[5] * m[3] * m[10] -
+              m[9] * m[2] * m[7] +
               m[9] * m[3] * m[6];
 
-    inv[7] = m[0] * m[6] * m[11] - 
-             m[0] * m[7] * m[10] - 
-             m[4] * m[2] * m[11] + 
-             m[4] * m[3] * m[10] + 
-             m[8] * m[2] * m[7] - 
+    inv[7] = m[0] * m[6] * m[11] -
+             m[0] * m[7] * m[10] -
+             m[4] * m[2] * m[11] +
+             m[4] * m[3] * m[10] +
+             m[8] * m[2] * m[7] -
              m[8] * m[3] * m[6];
 
-    inv[11] = -m[0] * m[5] * m[11] + 
-               m[0] * m[7] * m[9] + 
-               m[4] * m[1] * m[11] - 
-               m[4] * m[3] * m[9] - 
-               m[8] * m[1] * m[7] + 
+    inv[11] = -m[0] * m[5] * m[11] +
+               m[0] * m[7] * m[9] +
+               m[4] * m[1] * m[11] -
+               m[4] * m[3] * m[9] -
+               m[8] * m[1] * m[7] +
                m[8] * m[3] * m[5];
 
-    inv[15] = m[0] * m[5] * m[10] - 
-              m[0] * m[6] * m[9] - 
-              m[4] * m[1] * m[10] + 
-              m[4] * m[2] * m[9] + 
-              m[8] * m[1] * m[6] - 
+    inv[15] = m[0] * m[5] * m[10] -
+              m[0] * m[6] * m[9] -
+              m[4] * m[1] * m[10] +
+              m[4] * m[2] * m[9] +
+              m[8] * m[1] * m[6] -
               m[8] * m[2] * m[5];
 
     det = m[0] * inv[0] + m[1] * inv[4] + m[2] * inv[8] + m[3] * inv[12];
@@ -304,17 +304,17 @@ void RenderToShadowMap(Matrix projection, Matrix viewmat, Matrix modelmat, Vec3f
 	//g_lightPos = g_lightEye + g_lightOff;
 
 	float zoom = Magnitude(g_lightOff) / Magnitude(g_lightEye - g_lightPos);
-	
+
 #define LIGHT_SCALE		3
 //#define LIGHT_SCALE		1
 
 	//g_lightProjectionMatrix = BuildPerspProjMat(90.0, 1.0, 30.0, 10000.0);
 	g_lightProjectionMatrix = setorthographicmat(
-		-PROJ_RIGHT*LIGHT_SCALE/zoom, 
-		PROJ_RIGHT*LIGHT_SCALE/zoom, 
-		PROJ_RIGHT*LIGHT_SCALE/zoom, 
-		-PROJ_RIGHT*LIGHT_SCALE/zoom, 
-		MIN_DISTANCE, 
+		-PROJ_RIGHT*LIGHT_SCALE/zoom,
+		PROJ_RIGHT*LIGHT_SCALE/zoom,
+		PROJ_RIGHT*LIGHT_SCALE/zoom,
+		-PROJ_RIGHT*LIGHT_SCALE/zoom,
+		MIN_DISTANCE,
 		MAX_DISTANCE/zoom);
 
 	//g_lightPos = RotateAround(g_lightPos, g_lightEye, DEGTORAD((g_simframe%360)), 0, 0, 1);
@@ -322,10 +322,10 @@ void RenderToShadowMap(Matrix projection, Matrix viewmat, Matrix modelmat, Vec3f
 	g_lightModelViewMatrix = gluLookAt2(
 		g_lightPos.x, g_lightPos.y, g_lightPos.z,
 		//timelightpos.x, timelightpos.y, timelightpos.z,
-		g_lightEye.x, g_lightEye.y, g_lightEye.z, 
+		g_lightEye.x, g_lightEye.y, g_lightEye.z,
 		g_lightUp.x, g_lightUp.y, g_lightUp.z);
 	CheckGLError(__FILE__, __LINE__);
-	
+
 	UseS(SHADER_DEPTH);
 	glUniformMatrix4fv(g_shader[SHADER_DEPTH].m_slot[SSLOT_PROJECTION], 1, 0, g_lightProjectionMatrix.m_matrix);
 	glUniformMatrix4fv(g_shader[SHADER_DEPTH].m_slot[SSLOT_MODELMAT], 1, 0, modelmat.m_matrix);
@@ -333,16 +333,16 @@ void RenderToShadowMap(Matrix projection, Matrix viewmat, Matrix modelmat, Vec3f
 	glUniform4f(g_shader[SHADER_DEPTH].m_slot[SSLOT_COLOR], 1, 1, 1, 1);
 	//glEnableVertexAttribArray(g_shader[SHADER_DEPTH].m_slot[SSLOT_POSITION]);
 	//glEnableVertexAttribArray(g_shader[SHADER_DEPTH].m_slot[SSLOT_TEXCOORD0]);
-	
+
 	CheckGLError(__FILE__, __LINE__);
 
 	if(drawscenedepthfunc != NULL)
 		drawscenedepthfunc();
-	
+
 	CheckGLError(__FILE__, __LINE__);
 
 	EndS();
-	
+
 	CheckGLError(__FILE__, __LINE__);
 
 	//TurnOffShader();
@@ -367,17 +367,17 @@ void UseShadow(int shader, Matrix projection, Matrix viewmat, Matrix modelmat, M
 	//glUniformMatrix4fv(s->m_slot[SSLOT_NORMALMAT], 1, 0, modelviewinv.m_matrix);
 	//glUniformMatrix4fv(s->m_slot[SSLOT_INVMODLVIEWMAT], 1, 0, modelviewinv.m_matrix);
 	glUniform4f(s->m_slot[SSLOT_COLOR], 1, 1, 1, 1);
-	glEnableVertexAttribArray(s->m_slot[SSLOT_POSITION]);
-	glEnableVertexAttribArray(s->m_slot[SSLOT_TEXCOORD0]);
+	//glEnableVertexAttribArray(s->m_slot[SSLOT_POSITION]);
+	//glEnableVertexAttribArray(s->m_slot[SSLOT_TEXCOORD0]);
 	//glEnableVertexAttribArray(s->m_slot[SSLOT_TEXCOORD1]);
-	//glEnableVertexAttribArray(s->m_slot[SSLOT_NORMAL]);
-	
-	//glUniformMatrix4fvARB(s->m_slot[SSLOT_LIGHTMATRIX], 1, false, g_lightMatrix);
-	glUniformMatrix4fvARB(s->m_slot[SSLOT_LIGHTMATRIX], 1, false, g_lightMatrix.m_matrix);
-	
-	glUniform3fARB(s->m_slot[SSLOT_LIGHTPOS], mvLightPos[0], mvLightPos[1], mvLightPos[2]);
-	glUniform3fARB(s->m_slot[SSLOT_SUNDIRECTION], lightDir[0], lightDir[1], lightDir[2]);
-	//glUniform1fARB(s->m_slot[SSLOT_MAXELEV], g_maxelev);
+	//if(s->m_slot[SSLOT_NORMAL] != -1)   glEnableVertexAttribArray(s->m_slot[SSLOT_NORMAL]);
+
+	//glUniformMatrix4fv(s->m_slot[SSLOT_LIGHTMATRIX], 1, false, g_lightMatrix);
+	glUniformMatrix4fv(s->m_slot[SSLOT_LIGHTMATRIX], 1, false, g_lightMatrix.m_matrix);
+
+	glUniform3f(s->m_slot[SSLOT_LIGHTPOS], mvLightPos[0], mvLightPos[1], mvLightPos[2]);
+	glUniform3f(s->m_slot[SSLOT_SUNDIRECTION], lightDir[0], lightDir[1], lightDir[2]);
+	//glUniform1f(s->m_slot[SSLOT_MAXELEV], g_maxelev);
 
 #if 0
 	g_log<<"sun "<<lightDir[0]<<","<<lightDir[1]<<","<<lightDir[2]<<endl;
@@ -387,8 +387,8 @@ void UseShadow(int shader, Matrix projection, Matrix viewmat, Matrix modelmat, M
 void RenderShadowedScene(Matrix projection, Matrix viewmat, Matrix modelmat, Matrix modelview, void (*drawscenefunc)(Matrix projection, Matrix viewmat, Matrix modelmat, Matrix modelviewinv, float mvLightPos[3], float lightDir[3]))
 {
 	//glViewport(0, 0, py->width, py->height);
-	//glClearColor(0.0, 0.0, 0.0, 1.0);
-	glClearColor(1.0, 1.0, 1.0, 1.0);
+	glClearColor(0.0, 0.0, 0.0, 1.0);
+	//glClearColor(1.0, 1.0, 1.0, 1.0);
 
 	//glMatrixMode(GL_PROJECTION);
 	//glLoadIdentity();
@@ -405,7 +405,7 @@ void RenderShadowedScene(Matrix projection, Matrix viewmat, Matrix modelmat, Mat
 
 	// Do non-shadowed drawing here
 	//DrawSkyBox(c->LookPos());
-	
+
 	Inverse(&g_cameraInverseModelViewMatrix, modelview);
 
 	// We need to change the clip-space coordinates from range [-1,1] to [0,1] for texture mapping
@@ -425,7 +425,7 @@ void RenderShadowedScene(Matrix projection, Matrix viewmat, Matrix modelmat, Mat
 	Matrix modelviewinv;
 	Inverse2(modelview, modelviewinv);
 	Transpose(modelviewinv, modelviewinv);
-	
+
 	const float* mv = g_cameraModelViewMatrix.m_matrix;
 	float mvLightPos[3];
 	mvLightPos[0] = mv[0] * g_lightPos.x + mv[4] * g_lightPos.y + mv[8] * g_lightPos.z + mv[12];
@@ -455,7 +455,7 @@ void RenderShadowedScene(Matrix projection, Matrix viewmat, Matrix modelmat, Mat
 
 	TurnOffShader();
 	glBindTexture(GL_TEXTURE_2D, 0);
-	glActiveTextureARB(GL_TEXTURE0_ARB);
+	glActiveTexture(GL_TEXTURE0);
 	/*
 	if(g_mode == APPMODE_EDITOR)
 	{
@@ -468,7 +468,7 @@ void RenderShadowedScene(Matrix projection, Matrix viewmat, Matrix modelmat, Mat
 		glEnableVertexAttribArray(g_shader[SHADER_COLOR3D].m_slot[SSLOT_NORMAL]);
 		DrawTileSq();
 	}*/
-	
+
 	TurnOffShader();
 	//c->Look();
 }

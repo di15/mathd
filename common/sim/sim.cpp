@@ -70,7 +70,7 @@ void Queue()
 #define ICON_WATER			30
 #define ICONS				31
 #endif
-	
+
 	DefI(ICON_DOLLARS, "gui/icons/dollars.png", ":dollar:");
 	DefI(ICON_PESOS, "gui/icons/pesos.png", ":peso:");
 	DefI(ICON_EUROS, "gui/icons/euros.png", ":euro:");
@@ -121,7 +121,7 @@ void Queue()
 #define RES_URANIUM			11
 #define RESOURCES			12
 #endif
-	
+
 #if 0
 	void DefR(int resi, const char* n, const char* depn, int iconindex, bool phys, bool cap, bool glob, float r, float g, float b, float a)
 #endif
@@ -141,7 +141,6 @@ void Queue()
 
 	QueueTexture(&g_tiletexs[TILE_SAND], "textures/terrain/default/sand.jpg", false, true);
 	QueueTexture(&g_tiletexs[TILE_GRASS], "textures/terrain/default/grass.png", false, true);
-	QueueTexture(&g_tiletexs[TILE_SNOW], "textures/terrain/default/snow.png", false, true);
 	QueueTexture(&g_tiletexs[TILE_ROCK], "textures/terrain/default/rock.png", false, true);
 	QueueTexture(&g_tiletexs[TILE_ROCK_NORM], "textures/terrain/default/rock.norm.jpg", false, true);
 	QueueTexture(&g_tiletexs[TILE_CRACKEDROCK], "textures/terrain/default/crackedrock.jpg", false, true);
@@ -158,7 +157,7 @@ void Queue()
 	QueueTexture(&g_watertex[WATER_TEX_SPECULAR], "textures/terrain/default/water.spec.jpg", false, true);
 	//QueueTexture(&g_watertex[WATER_TEX_NORMAL], "textures/terrain/default/water.norm.jpg", false, true);
 	QueueTexture(&g_watertex[WATER_TEX_NORMAL], "textures/terrain/default/water5.norm.jpg", false, true);
-	
+
 	QueueTexture(&g_circle, "gui/circle.png", true, true);
 
 	LoadParticles();
@@ -167,7 +166,7 @@ void Queue()
 	QueueModel(&g_playerm, "models/brain/brain.ms3d", Vec3f(50, 50, 50), Vec3f(0,0,0), true);
 
 	//QueueModel(&themodel, "models/battlecomp/battlecomp.ms3d", Vec3f(0.1f,0.1f,0.1f) * 100 / 64, Vec3f(0,100,0));
-	
+
 #if 0
 #define RES_DOLLARS			0
 #define RES_PESOS			1
@@ -213,7 +212,7 @@ void Queue()
 #define UNIT_TYPES			9
 #endif
 #endif
-	
+
 #if 0
 	//int type, const char* texrelative, Vec3i size, Vec2i bilbsize, const char* name, int starthp, bool landborne, bool walker, bool roaded, bool seaborne, bool airborne
 	//DefU(UNIT_LABOURER, "billboards/units/labourer/smiley.png", Vec3i(50, 50, 50));
@@ -287,11 +286,11 @@ void Queue()
 #define BUILDING_CARFACTORY		7
 #define BUILDING_MILITARYBASE	8
 #define BUILDING_TRUCKFACTORY	9
-#define BUILDING_CONCGARBTRFAC	10
+#define BUILDING_CONCGTRFAC	10
 #define BUILDING_TANKERTRFAC	11
 #define BUILDING_CURREXCENTER	12
 #define BUILDING_COALMINE		13
-#define BUILDING_HARBOUR		14
+#define BUILDING_HOUR		14
 #define BUILDING_LUMBERMILL		15
 #define BUILDING_FOREQFACTORY	16
 #define BUILDING_CEMENTPLANT	17
@@ -318,7 +317,7 @@ void Queue()
 	BConMat(BUILDING_APARTMENT, RES_LABOUR, 10);
 	BInput(BUILDING_APARTMENT, RES_ENERGY, 5);
 	BOutput(BUILDING_APARTMENT, RES_HOUSING, 5);
-	
+
 	DefB(BUILDING_FACTORY, "Factory", Vec2i(2,2),  false, "models/factory3/factory3", Vec3f(1,1,1), Vec3f(0,0,0), "models/factory3/factory3", Vec3f(1,1,1), Vec3f(0,0,0), FOUNDATION_LAND, RES_NONE);
 	BConMat(BUILDING_FACTORY, RES_MINERALS, 5);
 	BConMat(BUILDING_FACTORY, RES_LABOUR, 10);
@@ -348,25 +347,25 @@ void Queue()
 	BConMat(BUILDING_FARM, RES_LABOUR, 10);
 	BInput(BUILDING_FARM, RES_ENERGY, 5);
 	BOutput(BUILDING_FARM, RES_FARMPRODUCTS, 5);
-	
+
 	DefB(BUILDING_STORE, "Store", Vec2i(2,1), true, "models/store1/hugterr.ms3d", Vec3f(100,100,100), Vec3f(0,0,0), "models/store1/hugterr.ms3d", Vec3f(100,100,100), Vec3f(0,0,0), FOUNDATION_LAND, RES_NONE);
 	BConMat(BUILDING_STORE, RES_MINERALS, 5);
 	BConMat(BUILDING_STORE, RES_LABOUR, 10);
 	BInput(BUILDING_STORE, RES_ENERGY, 5);
 	BInput(BUILDING_STORE, RES_FARMPRODUCTS, 5);
 	BOutput(BUILDING_STORE, RES_RETFOOD, 5);
-	
-	DefB(BUILDING_HARBOUR, "Harbour", Vec2i(2,2), false, "models/harbour2/harbour2", Vec3f(100,100,100), Vec3f(0,0,0), "models/harbour2/harbour2", Vec3f(100,100,100), Vec3f(0,0,0), FOUNDATION_COASTAL, RES_NONE);
-	BConMat(BUILDING_HARBOUR, RES_MINERALS, 5);
-	BConMat(BUILDING_HARBOUR, RES_LABOUR, 10);
-	BInput(BUILDING_HARBOUR, RES_ENERGY, 5);
-	
+
+	DefB(BUILDING_HOUR, "Harbour", Vec2i(2,2), false, "models/harbour2/harbour2", Vec3f(100,100,100), Vec3f(0,0,0), "models/harbour2/harbour2", Vec3f(100,100,100), Vec3f(0,0,0), FOUNDATION_COASTAL, RES_NONE);
+	BConMat(BUILDING_HOUR, RES_MINERALS, 5);
+	BConMat(BUILDING_HOUR, RES_LABOUR, 10);
+	BInput(BUILDING_HOUR, RES_ENERGY, 5);
+
 	DefB(BUILDING_OILWELL, "Oil Well", Vec2i(1,1), false, "models/oilwell2/oilwell2", Vec3f(1,1,1), Vec3f(0,0,0), "models/oilwell2/oilwell2", Vec3f(1,1,1), Vec3f(0,0,0), FOUNDATION_LAND, RES_CRUDEOIL);
 	BConMat(BUILDING_OILWELL, RES_MINERALS, 5);
 	BConMat(BUILDING_OILWELL, RES_LABOUR, 10);
 	BInput(BUILDING_OILWELL, RES_ENERGY, 5);
 	BOutput(BUILDING_OILWELL, RES_CRUDEOIL, 5);
-	
+
 	DefB(BUILDING_MINE, "Mine", Vec2i(1,1), false, "models/mine/nobottom.ms3d", Vec3f(1,1,1)/32.0f*TILE_SIZE, Vec3f(0,0,0), "models/mine/nobottom.ms3d", Vec3f(1,1,1)/32.0f*TILE_SIZE, Vec3f(0,0,0), FOUNDATION_LAND, -1);
 	BConMat(BUILDING_MINE, RES_MINERALS, 5);
 	BConMat(BUILDING_MINE, RES_LABOUR, 10);
@@ -381,7 +380,7 @@ void Queue()
 	Zero(g_roadcost);
 	g_roadcost[RES_LABOUR] = 1;
 	g_roadcost[RES_MINERALS] = 1;
-    
+
 	DefineRoad(CONNECTION_NOCONNECTION, CONSTRUCTION, "models/road/1_c.ms3d");
 	DefineRoad(CONNECTION_NORTH, CONSTRUCTION, "models/road/n_c.ms3d");
 	DefineRoad(CONNECTION_EAST, CONSTRUCTION, "models/road/e_c.ms3d");
@@ -419,7 +418,7 @@ void Queue()
 	Zero(g_powlcost);
 	g_powlcost[RES_LABOUR] = 1;
 	g_powlcost[RES_MINERALS] = 1;
-    
+
 	DefinePowl(CONNECTION_NOCONNECTION, CONSTRUCTION, "models/powerline/1_c.ms3d");
 	DefinePowl(CONNECTION_NORTH, CONSTRUCTION, "models/powerline/n_c.ms3d");
 	DefinePowl(CONNECTION_EAST, CONSTRUCTION, "models/powerline/e_c.ms3d");
@@ -456,7 +455,7 @@ void Queue()
 	Zero(g_crpipecost);
 	g_crpipecost[RES_LABOUR] = 1;
 	g_crpipecost[RES_MINERALS] = 1;
-    
+
 	DefineCrPipe(CONNECTION_NOCONNECTION, CONSTRUCTION, "models/crpipeline/1_c.ms3d");
 	DefineCrPipe(CONNECTION_NORTH, CONSTRUCTION, "models/crpipeline/n_c.ms3d");
 	DefineCrPipe(CONNECTION_EAST, CONSTRUCTION, "models/crpipeline/e_c.ms3d");

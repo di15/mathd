@@ -3,6 +3,8 @@
 #ifndef MATRIX_H
 #define MATRIX_H
 
+#include "../platform.h"
+
 class Quaternion;
 class Vec4f;
 
@@ -15,9 +17,18 @@ class Matrix
 		Matrix();
 		Matrix(Vec4f a, Vec4f b, Vec4f c, Vec4f d);
 		~Matrix();
-		void loadIdentity();
-		void set( const float *matrix );
-		
+
+		inline void set( const float *matrix )
+        {
+            memcpy( m_matrix, matrix, sizeof( float )*16 );
+        }
+
+        inline void loadIdentity()
+        {
+            memset( m_matrix, 0, sizeof( float )*16 );
+            m_matrix[0] = m_matrix[5] = m_matrix[10] = m_matrix[15] = 1;
+        }
+
 		void postMultiply( const Matrix& matrix );
 		void postMultiply2( const Matrix& matrix );
 

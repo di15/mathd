@@ -49,9 +49,9 @@ void DrawUnits()
 	Vec3f vert, horiz;
 
 	Shader* s = &g_shader[g_curS];
-	
-	glActiveTextureARB(GL_TEXTURE0);
-	glUniform1iARB(s->m_slot[SSLOT_TEXTURE0], 0);
+
+	glActiveTexture(GL_TEXTURE0);
+	glUniform1i(s->m_slot[SSLOT_TEXTURE0], 0);
 
 	//glDisable(GL_CULL_FACE);
 
@@ -63,9 +63,9 @@ void DrawUnits()
 			continue;
 
 		UnitT* t = &g_unitT[u->type];
-		glActiveTextureARB(GL_TEXTURE0);
+		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, g_texture[t->texindex].texname);
-		glUniform1iARB(s->m_slot[SSLOT_TEXTURE0], 0);
+		glUniform1i(s->m_slot[SSLOT_TEXTURE0], 0);
 
 		Vec2i* size = &t->bilbsize;
 
@@ -99,7 +99,7 @@ void DrawUnits()
 		glDrawArrays(GL_TRIANGLES, 0, 6);
 	}
 
-	
+
 	//glEnable(GL_CULL_FACE);
 }
 #endif
@@ -109,7 +109,7 @@ void DrawUnits()
 	for(int i=0; i<UNITS; i++)
 	{
 		Unit* u = &g_unit[i];
-		
+
 		if(!u->on)
 		{
 			continue;
@@ -118,7 +118,7 @@ void DrawUnits()
 		UnitT* t = &g_unitT[u->type];
 
 		Model* m = &g_model[t->model];
-		
+
 		m->draw(u->frame[BODY_LOWER], u->drawpos, u->rotation.y);
 	}
 }
@@ -265,7 +265,7 @@ void AnimateUnit(Unit* u)
 			u->frame[BODY_LOWER] = 0;
 			return;
 		}
-		
+
 		PlayAnimation(u->frame[BODY_LOWER], 0, 29, true, 1.0f);
 	}
 }

@@ -17,6 +17,7 @@
 #include "../../ustring.h"
 #include "../gui.h"
 #include "../../sim/player.h"
+#include "../../debug.h"
 
 Button::Button() : Widget()
 {
@@ -108,7 +109,7 @@ void Button::inev(InEv* ev)
 			ev->intercepted = true;
 			return;	// intercept mouse event
 		}
-		
+
 		if(m_ldown)
 		{
 			m_ldown = false;
@@ -150,7 +151,7 @@ void Button::inev(InEv* ev)
 					overfunc();
 				if(overfunc2 != NULL)
 					overfunc2(m_param);
-			
+
 				m_over = true;
 
 				ev->intercepted = true;
@@ -169,7 +170,7 @@ void Button::draw()
 		else
 			DrawImage(g_texture[m_bgtex].texname, m_pos[0], m_pos[1], m_pos[2], m_pos[3]);
 
-		DrawImage(g_texture[m_tex].texname, m_pos[0], m_pos[1], m_pos[2], m_pos[3]);  
+		DrawImage(g_texture[m_tex].texname, m_pos[0], m_pos[1], m_pos[2], m_pos[3]);
 
 		DrawShadowedText(m_font, m_tpos[0], m_tpos[1], &m_label);
 	}
@@ -206,13 +207,14 @@ void Button::draw()
 		DrawLine(darkcolor[0], darkcolor[1], darkcolor[2], darkcolor[3], m_pos[2], m_pos[1]+1, m_pos[2], m_pos[3]);
 
 		EndS();
+        CheckGLError(__FILE__, __LINE__);
 		Ortho(py->currw, py->currh, 1, 1, 1, 1);
 
 		float w = m_pos[2]-m_pos[0]-2;
 		float h = m_pos[3]-m_pos[1]-2;
 		float minsz = min(w, h);
 
-		DrawImage(g_texture[m_tex].texname, m_pos[0]+1, m_pos[1]+1, m_pos[0]+minsz, m_pos[1]+minsz);  
+		DrawImage(g_texture[m_tex].texname, m_pos[0]+1, m_pos[1]+1, m_pos[0]+minsz, m_pos[1]+minsz);
 
 		float gheight = g_font[m_font].gheight;
 		float texttop = m_pos[1] + h/2.0f - gheight/2.0f;

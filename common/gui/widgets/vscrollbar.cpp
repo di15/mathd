@@ -3,6 +3,7 @@
 #include "vscrollbar.h"
 #include "../../sim/player.h"
 #include "../../render/shader.h"
+#include "../../debug.h"
 
 VScroll::VScroll() : Widget()
 {
@@ -107,6 +108,7 @@ void VScroll::draw()
 	DrawLine(darkcolor[0], darkcolor[1], darkcolor[2], darkcolor[3], m_barpos[2], m_barpos[1]+1, m_barpos[2], m_barpos[3]);
 
 	EndS();
+	CheckGLError(__FILE__, __LINE__);
 	Ortho(py->currw, py->currh, 1, 1, 1, 1);
 
 	for(auto w=m_subwidg.begin(); w!=m_subwidg.end(); w++)
@@ -132,7 +134,7 @@ void VScroll::inev(InEv* ev)
 #if 1
 	if(m_ldown)
 	{
-		if(ev->type == INEV_MOUSEMOVE || 
+		if(ev->type == INEV_MOUSEMOVE ||
 			( (ev->type == INEV_MOUSEDOWN || ev->type == INEV_MOUSEUP) && ev->key == MOUSE_LEFT) )
 			ev->intercepted = true;
 
@@ -153,14 +155,14 @@ void VScroll::inev(InEv* ev)
 			m_mousedown[1] = py->mouse.y;
 
 			float origscroll = m_scroll[1];
-			
+
 			m_scroll[1] += (float)dy / (m_downpos[1] - m_uppos[3]);
-			
+
 			int w = m_pos[2]-m_pos[0];
 
 			m_barpos[1] = m_uppos[3] + (m_downpos[1]-m_uppos[3])*m_scroll[1];
 			m_barpos[3] = m_barpos[1] + fmax(w, m_domain*(m_downpos[1]-m_uppos[3]));
-			
+
 			float overy = m_barpos[3] - m_downpos[1];
 
 			if(overy > 0)
@@ -209,7 +211,7 @@ void VScroll::inev(InEv* ev)
 			}
 		}
 	}
-	
+
 	if(ev->type == INEV_MOUSEMOVE)
 	{
 		if(m_ldown)
@@ -218,7 +220,7 @@ void VScroll::inev(InEv* ev)
 			return;
 		}
 
-		if(!ev->intercepted && 
+		if(!ev->intercepted &&
 			py->mouse.x >= m_pos[0] &&
 			py->mouse.y >= m_pos[1] &&
 			py->mouse.x <= m_pos[2] &&
@@ -247,7 +249,7 @@ void VScroll::inev(InEv* ev)
 			}
 			else
 			{
-				// to do: this will be replaced by code in other 
+				// to do: this will be replaced by code in other
 				//widgets that will set the cursor
 				py->curst = CU_DEFAULT;
 			}

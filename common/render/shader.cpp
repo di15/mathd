@@ -14,31 +14,35 @@
 Shader g_shader[SHADERS];
 int g_curS = 0;
 
-GLint Shader::GetUniform(const char* strVariable)
+GLint Shader::getuniform(const char* strVariable)
 {
-	if(!m_hProgramObject)
+	if(!m_program)
 		return -1;
 
-	return glGetUniformLocation(m_hProgramObject, strVariable);
+	return glGetUniformLocation(m_program, strVariable);
 }
 
-GLint Shader::GetAttrib(const char* strVariable)
+GLint Shader::getattrib(const char* strVariable)
 {
-	if(!m_hProgramObject)
+    g_log<<"shader "<<(int)(this-g_shader)<<" attrib "<<strVariable<<" = ";
+
+	if(!m_program)
 		return -1;
 
-	return glGetAttribLocation(m_hProgramObject, strVariable);
+    g_log<<glGetAttribLocation(m_program, strVariable)<<endl;
+
+	return glGetAttribLocation(m_program, strVariable);
 }
 
-void Shader::MapUniform(int slot, const char* variable)
+void Shader::mapuniform(int slot, const char* variable)
 {
-	m_slot[slot] = GetUniform(variable);
+	m_slot[slot] = getuniform(variable);
 	//g_log<<"\tmap uniform "<<variable<<" = "<<(int)m_slot[slot]<<endl;
 }
 
-void Shader::MapAttrib(int slot, const char* variable)
+void Shader::mapattrib(int slot, const char* variable)
 {
-	m_slot[slot] = GetAttrib(variable);
+	m_slot[slot] = getattrib(variable);
 	//g_log<<"\tmap attrib "<<variable<<" = "<<(int)m_slot[slot]<<endl;
 }
 
@@ -46,7 +50,7 @@ void GetGLVersion(int* major, int* minor)
 {
 	// for all versions
 	char* ver = (char*)glGetString(GL_VERSION); // ver = "3.2.0"
-	
+
 	char vermaj[4];
 
 	for(int i=0; i<4; i++)
@@ -84,7 +88,7 @@ void InitGLSL()
         ErrorMessage("Error initializing GLEW!", (const char*)glewGetErrorString( glewError ));
         return;
     }
-	
+
 	g_log<<"Renderer: "<<(char*)glGetString(GL_RENDERER)<<endl;
 	g_log<<"GL_VERSION = "<<(char*)glGetString(GL_VERSION)<<endl;
 
@@ -105,6 +109,7 @@ void InitGLSL()
     if( !GLEW_VERSION_3_0 )
     {
         ErrorMessage("Error", "OpenGL 3.0 not supported!\n" );
+		g_quit = true;
         return;
     }
 #endif
@@ -118,12 +123,14 @@ void InitGLSL()
 	if(!strstr(szGLExtensions, "GL_ARB_shader_objects"))
 	{
 		ErrorMessage("Error", "GL_ARB_shader_objects extension not supported!");
+		g_quit = true;
 		return;
 	}
 
 	if(!strstr(szGLExtensions, "GL_ARB_shading_language_100"))
 	{
 		ErrorMessage("Error", "GL_ARB_shading_language_100 extension not supported!");
+		g_quit = true;
 		return;
 	}
 #endif
@@ -134,8 +141,9 @@ void InitGLSL()
 	if(major < 3 || ( major == 3 && minor < 0 ))
 	{
 		ErrorMessage("Error", "OpenGL 3.0 is not supported!");
+		g_quit = true;
 	}
-	
+
 	LoadShader(SHADER_ORTHO, "shaders/ortho.vert", "shaders/ortho.frag");
 	LoadShader(SHADER_COLOR2D, "shaders/color2d.vert", "shaders/color2d.frag");
 	LoadShader(SHADER_COLOR3D, "shaders/color3d.vert", "shaders/color3d.frag");
@@ -150,7 +158,6 @@ void InitGLSL()
 	LoadShader(SHADER_FOLIAGE, "shaders/foliage.vert", "shaders/foliage.frag");
 	LoadShader(SHADER_MAPTILESMM, "shaders/maptilesmm2.vert", "shaders/maptilesmm2.frag");
 	LoadShader(SHADER_WATERMM, "shaders/watermm.vert", "shaders/watermm.frag");
-	LoadShader(SHADER_MAPTILESPREREND, "shaders/maptilesprerend.vert", "shaders/maptilesprerend.frag");
 	LoadShader(SHADER_RIM, "shaders/rim.vert", "shaders/rim.frag");
 	LoadShader(SHADER_SKYBOX, "shaders/skybox.vert", "shaders/skybox.frag");
 	LoadShader(SHADER_UNIT, "shaders/unit.vert", "shaders/unit.frag");
@@ -182,11 +189,11 @@ void LoadShader(int shader, char* strVertex, char* strFragment)
 	Shader* s = &g_shader[shader];
 	string strVShader, strFShader;
 
-	if(s->m_hVertexShader || s->m_hFragmentShader || s->m_hProgramObject)
+	if(s->m_vertshader || s->m_fragshader || s->m_program)
 		s->release();
 
-	s->m_hVertexShader = glCreateShader(GL_VERTEX_SHADER);
-	s->m_hFragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
+	s->m_vertshader = glCreateShader(GL_VERTEX_SHADER);
+	s->m_fragshader = glCreateShader(GL_FRAGMENT_SHADER);
 
 	strVShader = LoadTextFile(strVertex);
 	strFShader = LoadTextFile(strFragment);
@@ -194,12 +201,12 @@ void LoadShader(int shader, char* strVertex, char* strFragment)
 	const char *szVShader = strVShader.c_str();
 	const char *szFShader = strFShader.c_str();
 
-	glShaderSource(s->m_hVertexShader, 1, &szVShader, NULL);
-	glShaderSource(s->m_hFragmentShader, 1, &szFShader, NULL);
-	
-	glCompileShader(s->m_hVertexShader);
+	glShaderSource(s->m_vertshader, 1, &szVShader, NULL);
+	glShaderSource(s->m_fragshader, 1, &szFShader, NULL);
+
+	glCompileShader(s->m_vertshader);
 	GLint logLength;
-	glGetShaderiv(s->m_hVertexShader, GL_INFO_LOG_LENGTH, &logLength);
+	glGetShaderiv(s->m_vertshader, GL_INFO_LOG_LENGTH, &logLength);
     if(logLength > 0)
     {
         GLchar *log = (GLchar *)malloc(logLength);
@@ -210,49 +217,49 @@ void LoadShader(int shader, char* strVertex, char* strFragment)
 			return;
 		}
 
-        glGetShaderInfoLog(s->m_hVertexShader, logLength, &logLength, log);
+        glGetShaderInfoLog(s->m_vertshader, logLength, &logLength, log);
         g_log<<"Shader "<<strVertex<<" compile log: "<<endl<<log<<endl;
         free(log);
     }
 
-	glCompileShader(s->m_hFragmentShader);
-	glGetShaderiv(s->m_hFragmentShader, GL_INFO_LOG_LENGTH, &logLength);
+	glCompileShader(s->m_fragshader);
+	glGetShaderiv(s->m_fragshader, GL_INFO_LOG_LENGTH, &logLength);
     if(logLength > 0)
     {
         GLchar *log = (GLchar *)malloc(logLength);
-		
+
 		if(!log)
 		{
 			OutOfMem(__FILE__, __LINE__);
 			return;
 		}
 
-        glGetShaderInfoLog(s->m_hFragmentShader, logLength, &logLength, log);
+        glGetShaderInfoLog(s->m_fragshader, logLength, &logLength, log);
         g_log<<"Shader "<<strFragment<<" compile log: "<<endl<<log<<endl;
         free(log);
     }
 
-	s->m_hProgramObject = glCreateProgramObjectARB();
-	glAttachShader(s->m_hProgramObject, s->m_hVertexShader);
-	glAttachShader(s->m_hProgramObject, s->m_hFragmentShader);
-	glLinkProgram(s->m_hProgramObject);
+	s->m_program = glCreateProgram();
+	glAttachShader(s->m_program, s->m_vertshader);
+	glAttachShader(s->m_program, s->m_fragshader);
+	glLinkProgram(s->m_program);
 
-	//glUseProgramObjectARB(s->m_hProgramObject);
+	//glUseProgramObject(s->m_program);
 
 	//g_log<<"shader "<<strVertex<<","<<strFragment<<endl;
-	
+
 	g_log<<"Program "<<strVertex<<" / "<<strFragment<<" :";
 
-	glGetProgramiv(s->m_hProgramObject, GL_INFO_LOG_LENGTH, &logLength);
+	glGetProgramiv(s->m_program, GL_INFO_LOG_LENGTH, &logLength);
 	if (logLength > 0) {
 		GLchar *log = (GLchar *)malloc(logLength);
-		glGetProgramInfoLog(s->m_hProgramObject, logLength, &logLength, log);
+		glGetProgramInfoLog(s->m_program, logLength, &logLength, log);
 		g_log<<"Program link log:"<<endl<<log<<endl;
 		free(log);
 	}
 
 	GLint status;
-	glGetProgramiv(s->m_hProgramObject, GL_LINK_STATUS, &status);
+	glGetProgramiv(s->m_program, GL_LINK_STATUS, &status);
 	if (status == 0)
 	{
 		g_log<<"link status 0"<<endl;
@@ -263,82 +270,84 @@ void LoadShader(int shader, char* strVertex, char* strFragment)
 	}
 
 	g_log<<endl<<endl;
-	
-	
-    s->MapAttrib(SSLOT_POSITION, "position");
-    s->MapAttrib(SSLOT_NORMAL, "normalIn");
-    s->MapAttrib(SSLOT_TEXCOORD0, "texCoordIn0");
-    s->MapAttrib(SSLOT_TEXCOORD1, "texCoordIn1");
-	s->MapAttrib(SSLOT_VERTCOLORS, "vertcolors");
-    //s->MapAttrib(SSLOT_TANGENT, "tangent");
-	s->MapUniform(SSLOT_SHADOWMAP, "shadowmap");
-	s->MapUniform(SSLOT_LIGHTMATRIX, "lightMatrix");
-	s->MapUniform(SSLOT_LIGHTPOS, "lightPos");
-	//s->MapUniform(SSLOT_LIGHTDIR, "lightDir");
-	s->MapUniform(SSLOT_TEXTURE0, "texture0");
-	s->MapUniform(SSLOT_TEXTURE1, "texture1");
-	s->MapUniform(SSLOT_TEXTURE2, "texture2");
-	s->MapUniform(SSLOT_TEXTURE3, "texture3");
-	s->MapUniform(SSLOT_NORMALMAP, "normalmap");
-	s->MapUniform(SSLOT_SPECULARMAP, "specularmap");
-    s->MapUniform(SSLOT_PROJECTION, "projection");
-    s->MapUniform(SSLOT_MODELMAT, "model");
-    s->MapUniform(SSLOT_VIEWMAT, "view");
-    s->MapUniform(SSLOT_MVPMAT, "mvpmat");
-	s->MapUniform(SSLOT_NORMALMAT, "normalMat");
-	//s->MapUniform(SSLOT_INVMODLVIEWMAT, "invModelView");
-    s->MapUniform(SSLOT_COLOR, "color");
-    s->MapUniform(SSLOT_OWNCOLOR, "owncolor");
-    s->MapUniform(SSLOT_WIDTH, "width");
-    s->MapUniform(SSLOT_HEIGHT, "height");
-    s->MapUniform(SSLOT_MIND, "mind");
-    s->MapUniform(SSLOT_MAXD, "maxd");
-    s->MapUniform(SSLOT_CAMERAPOS, "cameraPos");
-    s->MapUniform(SSLOT_SCALE, "scale");
-	s->MapUniform(SSLOT_MAXELEV, "maxelev");
-	s->MapUniform(SSLOT_SANDONLYMAXY, "sandonlymaxy");
-	s->MapUniform(SSLOT_SANDGRASSMAXY, "sandgrassmaxy");
-	s->MapUniform(SSLOT_GRASSONLYMAXY, "grassonlymaxy");
-	s->MapUniform(SSLOT_GRASSROCKMAXY, "dirtrockmaxy");
-	s->MapUniform(SSLOT_SANDTEX, "sandtex");
-	s->MapUniform(SSLOT_GRASSTEX, "grasstex");
-	s->MapUniform(SSLOT_SNOWTEX, "snowtex");
-	s->MapUniform(SSLOT_ROCKTEX, "rocktex");
-	s->MapUniform(SSLOT_ROCKNORMTEX, "rocknormtex");
-	s->MapUniform(SSLOT_CRACKEDROCKTEX, "crackedrocktex");
-	s->MapUniform(SSLOT_CRACKEDROCKNORMTEX, "crackedrocknormtex");
-	s->MapUniform(SSLOT_SUNDIRECTION, "sundirection");
-	s->MapUniform(SSLOT_GRADIENTTEX, "gradienttex");
-	s->MapUniform(SSLOT_DETAILTEX, "detailtex");
-	s->MapUniform(SSLOT_OWNERMAP, "ownermap");
-	s->MapUniform(SSLOT_MAPMINZ, "mapminz");
-	s->MapUniform(SSLOT_MAPMAXZ, "mapmaxz");
-	s->MapUniform(SSLOT_MODELMATS, "modelmats");
-	s->MapUniform(SSLOT_ONSWITCHES, "onswitches");
-	s->MapUniform(SSLOT_MAPMINX, "mapminx");
-	s->MapUniform(SSLOT_MAPMAXX, "mapmaxx");
-	s->MapUniform(SSLOT_MAPMINY, "mapminy");
-	s->MapUniform(SSLOT_MAPMAXY, "mapmaxy");
-	s->MapUniform(SSLOT_WAVEPHASE, "wavephase");
+
+
+    s->mapattrib(SSLOT_POSITION, "position");
+    s->mapattrib(SSLOT_NORMAL, "normalIn");
+    s->mapattrib(SSLOT_TEXCOORD0, "texCoordIn0");
+    s->mapattrib(SSLOT_TEXCOORD1, "texCoordIn1");
+	s->mapattrib(SSLOT_VERTCOLORS, "vertcolors");
+    //s->mapattrib(SSLOT_TANGENT, "tangent");
+	s->mapuniform(SSLOT_SHADOWMAP, "shadowmap");
+	s->mapuniform(SSLOT_LIGHTMATRIX, "lightMatrix");
+	s->mapuniform(SSLOT_LIGHTPOS, "lightPos");
+	//s->mapuniform(SSLOT_LIGHTDIR, "lightDir");
+	s->mapuniform(SSLOT_TEXTURE0, "texture0");
+	s->mapuniform(SSLOT_TEXTURE1, "texture1");
+	s->mapuniform(SSLOT_TEXTURE2, "texture2");
+	s->mapuniform(SSLOT_TEXTURE3, "texture3");
+	s->mapuniform(SSLOT_NORMALMAP, "normalmap");
+	s->mapuniform(SSLOT_SPECULARMAP, "specularmap");
+    s->mapuniform(SSLOT_PROJECTION, "projection");
+    s->mapuniform(SSLOT_MODELMAT, "model");
+    s->mapuniform(SSLOT_VIEWMAT, "view");
+    s->mapuniform(SSLOT_MVPMAT, "mvpmat");
+	s->mapuniform(SSLOT_NORMALMAT, "normalMat");
+	//s->mapuniform(SSLOT_INVMODLVIEWMAT, "invModelView");
+    s->mapuniform(SSLOT_COLOR, "color");
+    s->mapuniform(SSLOT_OWNCOLOR, "owncolor");
+    s->mapuniform(SSLOT_WIDTH, "width");
+    s->mapuniform(SSLOT_HEIGHT, "height");
+    s->mapuniform(SSLOT_MIND, "mind");
+    s->mapuniform(SSLOT_MAXD, "maxd");
+    s->mapuniform(SSLOT_CAMERAPOS, "cameraPos");
+    s->mapuniform(SSLOT_SCALE, "scale");
+	s->mapuniform(SSLOT_MAXELEV, "maxelev");
+	s->mapuniform(SSLOT_SANDONLYMAXY, "sandonlymaxy");
+	s->mapuniform(SSLOT_SANDGRASSMAXY, "sandgrassmaxy");
+	s->mapuniform(SSLOT_GRASSONLYMAXY, "grassonlymaxy");
+	s->mapuniform(SSLOT_GRASSROCKMAXY, "dirtrockmaxy");
+	s->mapuniform(SSLOT_SANDTEX, "sandtex");
+	s->mapuniform(SSLOT_GRASSTEX, "grasstex");
+	s->mapuniform(SSLOT_SNOWTEX, "snowtex");
+	s->mapuniform(SSLOT_ROCKTEX, "rocktex");
+	s->mapuniform(SSLOT_ROCKNORMTEX, "rocknormtex");
+	s->mapuniform(SSLOT_CRACKEDROCKTEX, "crackedrocktex");
+	s->mapuniform(SSLOT_CRACKEDROCKNORMTEX, "crackedrocknormtex");
+	s->mapuniform(SSLOT_SUNDIRECTION, "sundirection");
+	s->mapuniform(SSLOT_GRADIENTTEX, "gradienttex");
+	s->mapuniform(SSLOT_DETAILTEX, "detailtex");
+	s->mapuniform(SSLOT_OWNERMAP, "ownermap");
+	s->mapuniform(SSLOT_MAPMINZ, "mapminz");
+	s->mapuniform(SSLOT_MAPMAXZ, "mapmaxz");
+	s->mapuniform(SSLOT_MODELMATS, "modelmats");
+	s->mapuniform(SSLOT_ONSWITCHES, "onswitches");
+	s->mapuniform(SSLOT_MAPMINX, "mapminx");
+	s->mapuniform(SSLOT_MAPMAXX, "mapmaxx");
+	s->mapuniform(SSLOT_MAPMINY, "mapminy");
+	s->mapuniform(SSLOT_MAPMAXY, "mapmaxy");
+	s->mapuniform(SSLOT_WAVEPHASE, "wavephase");
+
+	g_log<<"fragloc"<<(int)glGetFragDataLocation(s->m_program, "outfrag")<<endl;
 }
 
-void UseS(int shader)		
-{	
+void UseS(int shader)
+{
 #ifdef DEBUG
 	CheckGLError(__FILE__, __LINE__);
 #endif
 	g_curS = shader;
-	
+
 	Shader* s = &g_shader[g_curS];
 
-	//glUseProgramObjectARB(g_shader[shader].m_hProgramObject); 
-	glUseProgram(s->m_hProgramObject); 
+	//glUseProgramObject(g_shader[shader].m_program);
+	glUseProgram(s->m_program);
 #ifdef DEBUG
 	CheckGLError(__FILE__, __LINE__);
 #endif
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-	
+
 #ifdef DEBUG
 	CheckGLError(__FILE__, __LINE__);
 #endif
@@ -354,11 +363,11 @@ void UseS(int shader)
 #ifdef DEBUG
 	CheckGLError(__FILE__, __LINE__);
 #endif
-	
+
 	Player* py = &g_player[g_currP];
 
-	glUniform1f(s->m_slot[SSLOT_MIND], MIN_DISTANCE);
-	glUniform1f(s->m_slot[SSLOT_MAXD], MAX_DISTANCE / py->zoom);
+	if(s->m_slot[SSLOT_MIND] != -1) glUniform1f(s->m_slot[SSLOT_MIND], MIN_DISTANCE);
+	if(s->m_slot[SSLOT_MAXD] != -1) glUniform1f(s->m_slot[SSLOT_MAXD], MAX_DISTANCE / py->zoom);
 }
 
 void EndS()
@@ -371,7 +380,7 @@ void EndS()
 		return;
 
 	Shader* s = &g_shader[g_curS];
-	
+
 #ifdef DEBUG
 	CheckGLError(__FILE__, __LINE__);
 #endif
@@ -388,37 +397,37 @@ void EndS()
 	CheckGLError(__FILE__, __LINE__);
 #endif
 
-	glUseProgram(0); 
+	glUseProgram(0);
 
 	g_curS = -1;
 }
 
 void Shader::release()
 {
-	if(m_hVertexShader)
+	if(m_vertshader)
 	{
-		glDetachObjectARB(m_hProgramObject, m_hVertexShader);
-		glDeleteObjectARB(m_hVertexShader);
-		m_hVertexShader = NULL;
+		glDetachShader(m_program, m_vertshader);
+		glDeleteShader(m_vertshader);
+		m_vertshader = NULL;
 	}
 
-	if(m_hFragmentShader)
+	if(m_fragshader)
 	{
-		glDetachObjectARB(m_hProgramObject, m_hFragmentShader);
-		glDeleteObjectARB(m_hFragmentShader);
-		m_hFragmentShader = NULL;
+		glDetachShader(m_program, m_fragshader);
+		glDeleteShader(m_fragshader);
+		m_fragshader = NULL;
 	}
 
-	if(m_hProgramObject)
+	if(m_program)
 	{
-		glDeleteObjectARB(m_hProgramObject);
-		m_hProgramObject = NULL;
+		glDeleteProgram(m_program);
+		m_program = NULL;
 	}
 }
 
 void TurnOffShader()
 {
-	glUseProgramObjectARB(0);
+	glUseProgram(0);
 }
 
 void ReleaseShaders()

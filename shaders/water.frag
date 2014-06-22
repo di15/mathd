@@ -66,9 +66,19 @@ void main (void)
 	//float alph = color.w * texel0.w * elevtransp;
 	float alph = color.w * stexel.w;
 
-	outfrag = vec4(color.xyz * stexel.xyz * shadow * diffuse + vspecular, alph);
-	//gl_FragColor = vec4(1,0,0,1);
-	//gl_FragColor = texel0;
+	float minlight = min(shadow, diffuse);
+	//float minlight = shadow * diffuse;
+
+	//outfrag = vec4(color.xyz * stexel.xyz * shadow * diffuse + vspecular, alph);	//buggy on linux for some reason
+	outfrag = vec4(color.xyz * stexel.xyz * minlight + vspecular, alph);
+	//outfrag = vec4(stexel.xyz * shadow * diffuse + vspecular, alph);
+	//outfrag = vec4(1,0,0,1);
+	//outfrag = gradtxl;
+	//outfrag = dettxl;
+	//outfrag = stexel;
+	//outfrag = stexel * diffuse * shadow;
+	//outfrag = vec4(vspecular, 1);
+	//outfrag = color;
 	//gl_FragColor = vec4(light_vec, color.w * texel0.w);	
 	//gl_FragColor = vec4(vspecular, color.w * texel0.w);
 	//gl_FragColor = vec4(eyevec, color.w * texel0.w);

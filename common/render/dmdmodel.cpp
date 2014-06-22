@@ -15,7 +15,7 @@ bool LoadDMDModel(VertexArray** va, unsigned int& diffusem, unsigned int& specul
 
 	if(!fp)
 		return false;
-	
+
 	char realtag[] = TAG_BUILDINGM;
 	char tag[5];
 	fread(tag, sizeof(char), 5, fp);
@@ -26,7 +26,7 @@ bool LoadDMDModel(VertexArray** va, unsigned int& diffusem, unsigned int& specul
 	float realversion = BUILDINGM_VERSION;
 	float version;
 	fread(&version, sizeof(float), 1, fp);
-	
+
 	if(version != realversion)
 		return false;
 
@@ -52,13 +52,13 @@ bool LoadDMDModel(VertexArray** va, unsigned int& diffusem, unsigned int& specul
 #endif
 
 	g_log<<relative<<endl;
-	
+
 	char diffpath[MAX_PATH+1];
 	char diffpathpng[MAX_PATH+1];
 	char specpath[MAX_PATH+1];
 	char normpath[MAX_PATH+1];
 	char ownpath[MAX_PATH+1];
-	
+
 	DiffPath(relative, diffpath);
 	DiffPathPNG(relative, diffpathpng);
 	SpecPath(relative, specpath);
@@ -66,6 +66,7 @@ bool LoadDMDModel(VertexArray** va, unsigned int& diffusem, unsigned int& specul
 	OwnPath(relative, ownpath);
 
 	bool isdiffpng = false;
+	fp = NULL;
 	fp = fopen(diffpathpng, "rb");
 	if(fp)
 	{

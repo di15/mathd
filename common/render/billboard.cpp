@@ -18,10 +18,10 @@ unsigned int g_muzzle[4];
 
 void Effects()
 {
-	QueueTexture(&g_muzzle[0], "effects\\muzzle0.png", true, true);
-	QueueTexture(&g_muzzle[1], "effects\\muzzle1.png", true, true);
-	QueueTexture(&g_muzzle[2], "effects\\muzzle2.png", true, true);
-	QueueTexture(&g_muzzle[3], "effects\\muzzle3.png", true, true);
+	QueueTexture(&g_muzzle[0], "effects/muzzle0.png", true, true);
+	QueueTexture(&g_muzzle[1], "effects/muzzle1.png", true, true);
+	QueueTexture(&g_muzzle[2], "effects/muzzle2.png", true, true);
+	QueueTexture(&g_muzzle[3], "effects/muzzle3.png", true, true);
 }
 
 int NewBillbT()
@@ -33,7 +33,7 @@ int NewBillbT()
 	return -1;
 }
 
-int NewBillboard(const char* tex)
+int DefBillb(const char* tex)
 {
 	//BillboardT t;
 	int i = NewBillbT();
@@ -43,14 +43,18 @@ int NewBillboard(const char* tex)
 	BillboardT* t = &g_billbT[i];
 	t->on = true;
 
+#if 0
 	char rawtex[64];
 	StripPathExtension(tex, rawtex);
 	strcpy(t->name, rawtex);
 	char texpath[128];
-	sprintf(texpath, "billboards\\%s", rawtex);
+	sprintf(texpath, "billboards/%s", rawtex);
 	FindTextureExtension(texpath);
 	//CreateTexture(t.tex, texpath);
 	QueueTexture(&t->tex, texpath, true, true);
+#else
+	QueueTexture(&t->tex, tex, true, true);
+#endif
 	//g_billbT.push_back(t);
 	//return g_billbT.size() - 1;
 	return i;
@@ -70,7 +74,7 @@ int IdentifyBillboard(const char* name)
 	}
 
 	//return NewBillboard(rawname);
-	return NewBillboard(name);
+	return DefBillb(name);
 }
 
 int NewBillboard()
@@ -187,10 +191,10 @@ void DrawBillboards()
 			continue;
 
 		t = &g_billbT[billb->type];
-		
-		glActiveTextureARB(GL_TEXTURE0);
+
+		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, g_texture[t->tex].texname);
-		glUniform1iARB(s->m_slot[SSLOT_TEXTURE0], 0);
+		glUniform1i(s->m_slot[SSLOT_TEXTURE0], 0);
 
 		if(billb->particle >= 0)
 		{

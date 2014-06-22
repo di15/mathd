@@ -106,7 +106,7 @@ void Heightmap::allocate(int wx, int wz)
 
 	remesh(1);
 	//retexture();
-	
+
 	AllocWater(wx, wz);
 }
 
@@ -171,7 +171,7 @@ void Heightmap::destroy()
 	m_widthz = 0;
 
 	FreeWater();
-	
+
 	FreePathGrid();
 }
 
@@ -183,11 +183,6 @@ void Heightmap::changeheight(int x, int z, float change)
 void Heightmap::setheight(int x, int z, float height)
 {
 	m_heightpoints[ (z)*(m_widthx+1) + x ] = height;
-}
-
-inline float Heightmap::getheight(int tx, int tz)
-{
-	return m_heightpoints[ (tz)*(m_widthx+1) + tx ];
 }
 
 float Heightmap::accheight(int x, int z)
@@ -379,8 +374,8 @@ void Heightmap::remesh(float tilescale)
 	tiles, so that the terrain doesn't look blocky.
 
 	Each tile has 6 vertices for two triangles.
-	
-	We need pointers for this because we construct the normals as we go along, 
+
+	We need pointers for this because we construct the normals as we go along,
 	and only blend them in the end.
 	*/
 	vector<Vec3f**> *addedvertnormals = new vector<Vec3f**>[ m_widthx * m_widthz * 6 ];
@@ -389,13 +384,13 @@ void Heightmap::remesh(float tilescale)
 
 	/*
 	Because triangles will alternate, we need to keep an ordered list
-	for the tile corner vertex normals for each tile, for 
+	for the tile corner vertex normals for each tile, for
 	figuring out the corner vertex normals of neighbouring tiles.
 	*/
 	struct TileNormals
 	{
 		/*
-		Depending on the triangle configuration, 
+		Depending on the triangle configuration,
 		there might be two normals at a corner,
 		one for either triangle.
 		*/
@@ -409,7 +404,7 @@ void Heightmap::remesh(float tilescale)
 		Vec3f *normal_d_rightmost;
 	};
 
-	
+
 	/*
 	(0,0)      (1,0)
 	c or 2     d or 3
@@ -448,19 +443,19 @@ void Heightmap::remesh(float tilescale)
 			(0,1)      (1,1)
 
 			We need to decide which way the diagonal (shared edge of the
-			triangles) will be, because it doesn't look nice where the 
+			triangles) will be, because it doesn't look nice where the
 			land meets the water if we don't alternate them according
 			to which diagonal has the greater height difference. And also,
 			it doesn't look good in general anywhere where there's
 			mountains or ridges.
 
 			What we're going to do here is give smoothness to changing
-			slopes, instead of hard corners. 
+			slopes, instead of hard corners.
 
-			Imagine if there's a really strong difference in height 
-			along the diagonal c-to-a. 
+			Imagine if there's a really strong difference in height
+			along the diagonal c-to-a.
 
-			If we break the tile into triangles like this, 
+			If we break the tile into triangles like this,
 
 			(0,0)      (1,0)
 			c or 2     d or 3
@@ -476,7 +471,7 @@ void Heightmap::remesh(float tilescale)
 
 			However, if we cut the tile into triangles like this,
 
-			
+
 			(0,0)      (1,0)
 			c or 2     d or 3
 			------------
@@ -487,7 +482,7 @@ void Heightmap::remesh(float tilescale)
 			b or 1     a or 0
 			(0,1)      (1,1)
 
-			then this will be a bevelled corner. 
+			then this will be a bevelled corner.
 
 			Combined with other tiles this will look like:
 
@@ -516,7 +511,7 @@ void Heightmap::remesh(float tilescale)
 
 			/*
 			Get the difference between each tile vertex
-			and the average of the two neighbouring 
+			and the average of the two neighbouring
 			(diagonal) vertices.
 			*/
 
@@ -536,7 +531,7 @@ void Heightmap::remesh(float tilescale)
 
 			/*
 			If diagonal a-to-c has a greater
-			height difference, 
+			height difference,
 
 			(0,0)      (1,0)
 			c or 2     d or 3
@@ -583,7 +578,7 @@ void Heightmap::remesh(float tilescale)
 				m_drawvertices[ tileindex6v + 5 ] = d;
 
 
-				// Need triangles to figure out 
+				// Need triangles to figure out
 				// the tile normals.
 				tri0[0] = a;
 				tri0[1] = b;
@@ -609,7 +604,7 @@ void Heightmap::remesh(float tilescale)
 				Now we have to remember that the triangle indices don't correspond to the vertex numbers;
 				there's 6 triangle vertices (2 repeated) and only 4 unique tile corner vertices.
 				*/
-				
+
 				tilenormals[ tileindex ].normal_a_rightmost = &m_normals[ tileindex6v + 0 ];
 				tilenormals[ tileindex ].normal_a_bottommost = &m_normals[ tileindex6v + 0 ];
 				tilenormals[ tileindex ].normal_b_leftmost = &m_normals[ tileindex6v + 3 ];
@@ -638,7 +633,7 @@ void Heightmap::remesh(float tilescale)
 				{
 					int nearbytileindex = (z * m_widthx + (x-1));
 					TileNormals* nearbytilenormals = &tilenormals[ nearbytileindex ];
-					
+
 					// vertex 4 of the triangles (corner c(2)) is corner d(3) of the neighbouring tile
 					addedvertnormals[ tileindex6v + 4 ].push_back( &nearbytilenormals->normal_d_rightmost );
 					addedvertnormals[ tileindex6v + 4 ].push_back( &nearbytilenormals->normal_d_topmost );
@@ -646,13 +641,13 @@ void Heightmap::remesh(float tilescale)
 					// vertex 1 of the triangles (corner b(1)) is corner a(0) of the neighbouring tile
 					addedvertnormals[ tileindex6v + 1 ].push_back( &nearbytilenormals->normal_a_rightmost );
 					addedvertnormals[ tileindex6v + 1 ].push_back( &nearbytilenormals->normal_a_bottommost );
-					
+
 					// vertex 3 of the triangles (corner b(1)) is corner a(0) of the neighbouring tile
 					addedvertnormals[ tileindex6v + 3 ].push_back( &nearbytilenormals->normal_a_rightmost );
 					addedvertnormals[ tileindex6v + 3 ].push_back( &nearbytilenormals->normal_a_bottommost );
 				}
 
-				
+
 				/*
 				(0,0)      (1,0)
 				c or 2     d or 3
@@ -683,20 +678,20 @@ void Heightmap::remesh(float tilescale)
 					// vertex 5 of the triangles (corner d(3)) is corner c(2) of the neighbouring tile
 					addedvertnormals[ tileindex6v + 5 ].push_back( &nearbytilenormals->normal_c_leftmost );
 					addedvertnormals[ tileindex6v + 5 ].push_back( &nearbytilenormals->normal_c_topmost );
-					
+
 					// vertex 0 of the triangles (corner a(0)) is corner b(1) of the neighbouring tile
 					addedvertnormals[ tileindex6v + 0 ].push_back( &nearbytilenormals->normal_b_leftmost );
 					addedvertnormals[ tileindex6v + 0 ].push_back( &nearbytilenormals->normal_b_bottommost );
 				}
 
-				//If there's a tile in the z-1 direction, add its normal to corners c(2) and d(3). 
+				//If there's a tile in the z-1 direction, add its normal to corners c(2) and d(3).
 				// c(2) is the vertex index 4 of the two triangle vertices.
 				// d(3) is the vertex index 2 and 5 of the two triangle vertices.
 				if(z > 0)
 				{
 					int nearbytileindex = ((z-1) * m_widthx + x);
 					TileNormals* nearbytilenormals = &tilenormals[ nearbytileindex ];
-					
+
 					// vertex 4 of the triangles (corner c(2)) is corner b(1) of the neighbouring tile
 					addedvertnormals[ tileindex6v + 4 ].push_back( &nearbytilenormals->normal_b_bottommost );
 					addedvertnormals[ tileindex6v + 4 ].push_back( &nearbytilenormals->normal_b_leftmost );
@@ -704,12 +699,12 @@ void Heightmap::remesh(float tilescale)
 					// vertex 2 of the triangles (corner d(3)) is corner a(0) of the neighbouring tile
 					addedvertnormals[ tileindex6v + 2 ].push_back( &nearbytilenormals->normal_a_bottommost );
 					addedvertnormals[ tileindex6v + 2 ].push_back( &nearbytilenormals->normal_a_rightmost );
-					
+
 					// vertex 5 of the triangles (corner d(3)) is corner a(0) of the neighbouring tile
 					addedvertnormals[ tileindex6v + 5 ].push_back( &nearbytilenormals->normal_a_bottommost );
 					addedvertnormals[ tileindex6v + 5 ].push_back( &nearbytilenormals->normal_a_rightmost );
 				}
-				
+
 				/*
 				(0,0)      (1,0)
 				c or 2     d or 3
@@ -740,7 +735,7 @@ void Heightmap::remesh(float tilescale)
 					// vertex 3 of the triangles (corner b(1)) is corner c(2) of the neighbouring tile
 					addedvertnormals[ tileindex6v + 3 ].push_back( &nearbytilenormals->normal_c_topmost );
 					addedvertnormals[ tileindex6v + 3 ].push_back( &nearbytilenormals->normal_c_leftmost );
-					
+
 					// vertex 0 of the triangles (corner a(0)) is corner d(3) of the neighbouring tile
 					addedvertnormals[ tileindex6v + 0 ].push_back( &nearbytilenormals->normal_d_topmost );
 					addedvertnormals[ tileindex6v + 0 ].push_back( &nearbytilenormals->normal_d_rightmost );
@@ -755,12 +750,12 @@ void Heightmap::remesh(float tilescale)
 				{
 					int nearbytileindex = ((z-1) * m_widthx + x-1);
 					TileNormals* nearbytilenormals = &tilenormals[ nearbytileindex ];
-					
+
 					// vertex 4 of the triangles (corner c(2)) is corner a(0) of the neighbouring tile
 					addedvertnormals[ tileindex6v + 4 ].push_back( &nearbytilenormals->normal_a_rightmost );
 					addedvertnormals[ tileindex6v + 4 ].push_back( &nearbytilenormals->normal_a_bottommost );
 				}
-				
+
 				/*
 				(0,0)      (1,0)
 				c or 2     d or 3
@@ -775,14 +770,14 @@ void Heightmap::remesh(float tilescale)
 				tri 0 = a,b,d
 				tri 1 = b,c,d
 				*/
-				
+
 				//If there's a tile in the x+1,z-1 direction, add its normal to corner d(3).
 				// d(3) is the vertex index 2 and 5 of the two triangles.
 				if(x+1 < m_widthx && z-1 >= 0)
 				{
 					int nearbytileindex = ((z-1) * m_widthx + x+1);
 					TileNormals* nearbytilenormals = &tilenormals[ nearbytileindex ];
-					
+
 					// vertex 2,5 of the triangles (corner d(3)) is corner b(1) of the neighbouring tile
 					addedvertnormals[ tileindex6v + 2 ].push_back( &nearbytilenormals->normal_b_leftmost );
 					addedvertnormals[ tileindex6v + 2 ].push_back( &nearbytilenormals->normal_b_bottommost );
@@ -796,12 +791,12 @@ void Heightmap::remesh(float tilescale)
 				{
 					int nearbytileindex = ((z+1) * m_widthx + x+1);
 					TileNormals* nearbytilenormals = &tilenormals[ nearbytileindex ];
-					
+
 					// vertex 0 of the triangles (corner a(0)) is corner c(2) of the neighbouring tile
 					addedvertnormals[ tileindex6v + 0 ].push_back( &nearbytilenormals->normal_c_leftmost );
 					addedvertnormals[ tileindex6v + 0 ].push_back( &nearbytilenormals->normal_c_topmost );
 				}
-				
+
 				/*
 				(0,0)      (1,0)
 				c or 2     d or 3
@@ -816,27 +811,27 @@ void Heightmap::remesh(float tilescale)
 				tri 0 = a,b,d
 				tri 1 = b,c,d
 				*/
-				
+
 				//If there's a tile in the x-1,z+1 direction, add its normal to corner b(1).
 				// b(1) is the vertex index 1,3 of the two triangles.
 				if(x-1 >= 0 && z+1 < m_widthz)
 				{
 					int nearbytileindex = ((z+1) * m_widthx + x-1);
 					TileNormals* nearbytilenormals = &tilenormals[ nearbytileindex ];
-					
+
 					// vertex 1 of the triangles (corner b(1)) is corner d(3) of the neighbouring tile
 					addedvertnormals[ tileindex6v + 1 ].push_back( &nearbytilenormals->normal_d_topmost );
 					addedvertnormals[ tileindex6v + 1 ].push_back( &nearbytilenormals->normal_d_rightmost );
-					
+
 					// vertex 3 of the triangles (corner b(1)) is corner d(3) of the neighbouring tile
 					addedvertnormals[ tileindex6v + 3 ].push_back( &nearbytilenormals->normal_d_topmost );
 					addedvertnormals[ tileindex6v + 3 ].push_back( &nearbytilenormals->normal_d_rightmost );
 				}
 			}
-			
+
 			/*
-			Otherwise, if diagonal d-to-b has a 
-			greater height difference, 
+			Otherwise, if diagonal d-to-b has a
+			greater height difference,
 
 			(0,0)      (1,0)
 			c or 2     d or 3
@@ -856,7 +851,7 @@ void Heightmap::remesh(float tilescale)
 			else
 			{
 				m_triconfig[ tileindex ] = 1;
-				
+
 				Vec3f divnorm = Cross(Normalize(c-a), Vec3f(0,1,0));
 				MakePlane(&m_tridivider[ tileindex ].m_normal, &m_tridivider[ tileindex ].m_d, Vec3f(((float)x+0.5f)*TILE_SIZE, 0, ((float)z+0.5f)*TILE_SIZE), divnorm);
 
@@ -917,7 +912,7 @@ void Heightmap::remesh(float tilescale)
 				{
 					int nearbytileindex = (z * m_widthx + (x-1));
 					TileNormals* nearbytilenormals = &tilenormals[ nearbytileindex ];
-					
+
 					// vertex 2 of the triangles (corner c(2)) is corner d(3) of the neighbouring tile
 					addedvertnormals[ tileindex6v + 2 ].push_back( &nearbytilenormals->normal_d_rightmost );
 					addedvertnormals[ tileindex6v + 2 ].push_back( &nearbytilenormals->normal_d_topmost );
@@ -925,12 +920,12 @@ void Heightmap::remesh(float tilescale)
 					// vertex 5 of the triangles (corner c(2)) is corner d(3) of the neighbouring tile
 					addedvertnormals[ tileindex6v + 5 ].push_back( &nearbytilenormals->normal_d_rightmost );
 					addedvertnormals[ tileindex6v + 5 ].push_back( &nearbytilenormals->normal_d_topmost );
-					
+
 					// vertex 1 of the triangles (corner b(1)) is corner a(0) of the neighbouring tile
 					addedvertnormals[ tileindex6v + 1 ].push_back( &nearbytilenormals->normal_a_rightmost );
 					addedvertnormals[ tileindex6v + 1 ].push_back( &nearbytilenormals->normal_a_bottommost );
 				}
-				
+
 				/*
 				(0,0)      (1,0)
 				c or 2     d or 3
@@ -961,20 +956,20 @@ void Heightmap::remesh(float tilescale)
 					// vertex 0 of the triangles (corner a(0)) is corner b(2) of the neighbouring tile
 					addedvertnormals[ tileindex6v + 0 ].push_back( &nearbytilenormals->normal_b_leftmost );
 					addedvertnormals[ tileindex6v + 0 ].push_back( &nearbytilenormals->normal_b_bottommost );
-					
+
 					// vertex 4 of the triangles (corner a(0)) is corner b(1) of the neighbouring tile
 					addedvertnormals[ tileindex6v + 4 ].push_back( &nearbytilenormals->normal_b_leftmost );
 					addedvertnormals[ tileindex6v + 4 ].push_back( &nearbytilenormals->normal_b_bottommost );
 				}
 
-				//If there's a tile in the z-1 direction, add its normal to corners c(2) and d(3). 
+				//If there's a tile in the z-1 direction, add its normal to corners c(2) and d(3).
 				// c(2) is the vertex index 2 and 5 of the two triangle vertices.
 				// d(3) is the vertex index 3 of the two triangle vertices.
 				if(z > 0)
 				{
 					int nearbytileindex = ((z-1) * m_widthx + x);
 					TileNormals* nearbytilenormals = &tilenormals[ nearbytileindex ];
-					
+
 					// vertex 2 of the triangles (corner c(2)) is corner b(1) of the neighbouring tile
 					addedvertnormals[ tileindex6v + 2 ].push_back( &nearbytilenormals->normal_b_bottommost );
 					addedvertnormals[ tileindex6v + 2 ].push_back( &nearbytilenormals->normal_b_leftmost );
@@ -982,12 +977,12 @@ void Heightmap::remesh(float tilescale)
 					// vertex 5 of the triangles (corner c(2)) is corner b(0) of the neighbouring tile
 					addedvertnormals[ tileindex6v + 5 ].push_back( &nearbytilenormals->normal_b_bottommost );
 					addedvertnormals[ tileindex6v + 5 ].push_back( &nearbytilenormals->normal_b_leftmost );
-					
+
 					// vertex 3 of the triangles (corner d(3)) is corner a(0) of the neighbouring tile
 					addedvertnormals[ tileindex6v + 3 ].push_back( &nearbytilenormals->normal_a_bottommost );
 					addedvertnormals[ tileindex6v + 3 ].push_back( &nearbytilenormals->normal_a_rightmost );
 				}
-				
+
 				/*
 				(0,0)      (1,0)
 				c or 2     d or 3
@@ -1002,7 +997,7 @@ void Heightmap::remesh(float tilescale)
 				tri 0 = a,b,c
 				tri 1 = d,a,c
 				*/
-				
+
 				//If there's a tile in the z+1 direction, add its normal to corners b(1) and a(0).
 				// b(1) is the vertex index 1 of the two triangles vertices.
 				// a(0) is the vertex index 0 and 4 of the two triangles.
@@ -1018,7 +1013,7 @@ void Heightmap::remesh(float tilescale)
 					// vertex 0 of the triangles (corner a(1)) is corner d(2) of the neighbouring tile
 					addedvertnormals[ tileindex6v + 0 ].push_back( &nearbytilenormals->normal_d_topmost );
 					addedvertnormals[ tileindex6v + 0 ].push_back( &nearbytilenormals->normal_d_rightmost );
-					
+
 					// vertex 4 of the triangles (corner a(0)) is corner d(3) of the neighbouring tile
 					addedvertnormals[ tileindex6v + 4 ].push_back( &nearbytilenormals->normal_d_topmost );
 					addedvertnormals[ tileindex6v + 4 ].push_back( &nearbytilenormals->normal_d_rightmost );
@@ -1026,14 +1021,14 @@ void Heightmap::remesh(float tilescale)
 
 				// We've added the normals of the horizontally and vertically neighbouring tiles.
 				// Now we'll add the normals of diagonal tiles.
-				
+
 				//If there's a tile in the x-1,z-1 direction, add its normal to corner c(2).
 				// c(2) is the vertex index 2,5 of the two triangles.
 				if(x-1 >= 0 && z-1 >= 0)
 				{
 					int nearbytileindex = ((z-1) * m_widthx + x-1);
 					TileNormals* nearbytilenormals = &tilenormals[ nearbytileindex ];
-					
+
 					// vertex 2 of the triangles (corner c(2)) is corner a(0) of the neighbouring tile
 					addedvertnormals[ tileindex6v + 2 ].push_back( &nearbytilenormals->normal_a_rightmost );
 					addedvertnormals[ tileindex6v + 2 ].push_back( &nearbytilenormals->normal_a_bottommost );
@@ -1042,7 +1037,7 @@ void Heightmap::remesh(float tilescale)
 					addedvertnormals[ tileindex6v + 5 ].push_back( &nearbytilenormals->normal_a_rightmost );
 					addedvertnormals[ tileindex6v + 5 ].push_back( &nearbytilenormals->normal_a_bottommost );
 				}
-				
+
 				/*
 				(0,0)      (1,0)
 				c or 2     d or 3
@@ -1064,7 +1059,7 @@ void Heightmap::remesh(float tilescale)
 				{
 					int nearbytileindex = ((z-1) * m_widthx + x+1);
 					TileNormals* nearbytilenormals = &tilenormals[ nearbytileindex ];
-					
+
 					// vertex 3 of the triangles (corner d(3)) is corner b(1) of the neighbouring tile
 					addedvertnormals[ tileindex6v + 3 ].push_back( &nearbytilenormals->normal_b_leftmost );
 					addedvertnormals[ tileindex6v + 3 ].push_back( &nearbytilenormals->normal_b_bottommost );
@@ -1076,7 +1071,7 @@ void Heightmap::remesh(float tilescale)
 				{
 					int nearbytileindex = ((z+1) * m_widthx + x+1);
 					TileNormals* nearbytilenormals = &tilenormals[ nearbytileindex ];
-					
+
 					// vertex 0,4 of the triangles (corner a(0)) is corner c(2) of the neighbouring tile
 					addedvertnormals[ tileindex6v + 0 ].push_back( &nearbytilenormals->normal_c_leftmost );
 					addedvertnormals[ tileindex6v + 0 ].push_back( &nearbytilenormals->normal_c_topmost );
@@ -1098,14 +1093,14 @@ void Heightmap::remesh(float tilescale)
 				tri 0 = a,b,c
 				tri 1 = d,a,c
 				*/
-				
+
 				//If there's a tile in the x-1,z+1 direction, add its normal to corner b(1).
 				// b(1) is the vertex index 1 of the two triangles.
 				if(x-1 >= 0 && z+1 < m_widthz)
 				{
 					int nearbytileindex = ((z+1) * m_widthx + x-1);
 					TileNormals* nearbytilenormals = &tilenormals[ nearbytileindex ];
-					
+
 					// vertex 1 of the triangles (corner b(1)) is corner d(3) of the neighbouring tile
 					addedvertnormals[ tileindex6v + 1 ].push_back( &nearbytilenormals->normal_d_topmost );
 					addedvertnormals[ tileindex6v + 1 ].push_back( &nearbytilenormals->normal_d_rightmost );
@@ -1146,7 +1141,7 @@ void Heightmap::remesh(float tilescale)
 				vector<Vec3f**> vertexnormals = addedvertnormals[ tileindex6v ];
 
 				// Before we add up the added normals, we make sure we don't repeat
-				// any normals, since for diagonals we add the two normals for 
+				// any normals, since for diagonals we add the two normals for
 				// the two possible triangles. Now that we have the triangle
 				// configuration, we know which corners have one triangle and
 				// which have two.
@@ -1181,7 +1176,7 @@ void Heightmap::remesh(float tilescale)
 
 				tempnormals[ tileindex6v ] = Normalize( finalnormal / (float)vertexnormals.size() );
 			}
-		
+
 	// Transfer the normals from tempnormals to m_normals.
 	for(int x=0; x<m_widthx; x++)
 		for(int z=0; z<m_widthz; z++)
@@ -1208,11 +1203,11 @@ void Heightmap::remesh(float tilescale)
 		m_rimva.vertices[index + 0] = Vec3f((x+1)*TILE_SIZE, getheight(x+1, 0), 0);
 		m_rimva.vertices[index + 1] = Vec3f((x+0)*TILE_SIZE, getheight(x+0, 0), 0);
 		m_rimva.vertices[index + 2] = Vec3f((x+0)*TILE_SIZE, lowy, 0);
-		
+
 		m_rimva.vertices[index + 3] = Vec3f((x+1)*TILE_SIZE, getheight(x+1, 0), 0);
 		m_rimva.vertices[index + 4] = Vec3f((x+0)*TILE_SIZE, lowy, 0);
 		m_rimva.vertices[index + 5] = Vec3f((x+1)*TILE_SIZE, lowy, 0);
-		
+
 		m_rimva.vertices[index + 0].y = fmax(m_rimva.vertices[index + 0].y, WATER_LEVEL);
 		m_rimva.vertices[index + 1].y = fmax(m_rimva.vertices[index + 1].y, WATER_LEVEL);
 		m_rimva.vertices[index + 3].y = fmax(m_rimva.vertices[index + 3].y, WATER_LEVEL);
@@ -1223,7 +1218,7 @@ void Heightmap::remesh(float tilescale)
 			m_rimva.texcoords[index + i] = Vec2f(-m_rimva.vertices[index + i].x/TILE_SIZE/10, m_rimva.vertices[index + i].y/TILE_SIZE/10);
 		}
 	}
-	
+
 	// South side
 	for(int x=0; x<m_widthx; x++)
 	{
@@ -1232,11 +1227,11 @@ void Heightmap::remesh(float tilescale)
 		m_rimva.vertices[index + 0] = Vec3f((x+0)*TILE_SIZE, getheight(x+0, m_widthz), (m_widthz)*TILE_SIZE);
 		m_rimva.vertices[index + 1] = Vec3f((x+1)*TILE_SIZE, getheight(x+1, m_widthz), (m_widthz)*TILE_SIZE);
 		m_rimva.vertices[index + 2] = Vec3f((x+1)*TILE_SIZE, lowy, (m_widthz)*TILE_SIZE);
-		
+
 		m_rimva.vertices[index + 3] = Vec3f((x+0)*TILE_SIZE, getheight(x+0, m_widthz), (m_widthz)*TILE_SIZE);
 		m_rimva.vertices[index + 4] = Vec3f((x+1)*TILE_SIZE, lowy, (m_widthz)*TILE_SIZE);
 		m_rimva.vertices[index + 5] = Vec3f((x+0)*TILE_SIZE, lowy, (m_widthz)*TILE_SIZE);
-		
+
 		m_rimva.vertices[index + 0].y = fmax(m_rimva.vertices[index + 0].y, WATER_LEVEL);
 		m_rimva.vertices[index + 1].y = fmax(m_rimva.vertices[index + 1].y, WATER_LEVEL);
 		m_rimva.vertices[index + 3].y = fmax(m_rimva.vertices[index + 3].y, WATER_LEVEL);
@@ -1247,7 +1242,7 @@ void Heightmap::remesh(float tilescale)
 			m_rimva.texcoords[index + i] = Vec2f(m_rimva.vertices[index + i].x/TILE_SIZE/10, m_rimva.vertices[index + i].y/TILE_SIZE/10);
 		}
 	}
-	
+
 	// West side
 	for(int z=0; z<m_widthz; z++)
 	{
@@ -1256,11 +1251,11 @@ void Heightmap::remesh(float tilescale)
 		m_rimva.vertices[index + 0] = Vec3f(0, getheight(0, z+0), (z+0)*TILE_SIZE);
 		m_rimva.vertices[index + 1] = Vec3f(0, getheight(0, z+1), (z+1)*TILE_SIZE);
 		m_rimva.vertices[index + 2] = Vec3f(0, lowy, (z+1)*TILE_SIZE);
-		
+
 		m_rimva.vertices[index + 3] = Vec3f(0, getheight(0, z+0), (z+0)*TILE_SIZE);
 		m_rimva.vertices[index + 4] = Vec3f(0, lowy, (z+1)*TILE_SIZE);
 		m_rimva.vertices[index + 5] = Vec3f(0, lowy, (z+0)*TILE_SIZE);
-		
+
 		m_rimva.vertices[index + 0].y = fmax(m_rimva.vertices[index + 0].y, WATER_LEVEL);
 		m_rimva.vertices[index + 1].y = fmax(m_rimva.vertices[index + 1].y, WATER_LEVEL);
 		m_rimva.vertices[index + 3].y = fmax(m_rimva.vertices[index + 3].y, WATER_LEVEL);
@@ -1271,7 +1266,7 @@ void Heightmap::remesh(float tilescale)
 			m_rimva.texcoords[index + i] = Vec2f(m_rimva.vertices[index + i].z/TILE_SIZE/10, m_rimva.vertices[index + i].y/TILE_SIZE/10);
 		}
 	}
-	
+
 	// East side
 	for(int z=0; z<m_widthz; z++)
 	{
@@ -1280,11 +1275,11 @@ void Heightmap::remesh(float tilescale)
 		m_rimva.vertices[index + 0] = Vec3f((m_widthx)*TILE_SIZE, getheight(m_widthx, z+1), (z+1)*TILE_SIZE);
 		m_rimva.vertices[index + 1] = Vec3f((m_widthx)*TILE_SIZE, getheight(m_widthx, z+0), (z+0)*TILE_SIZE);
 		m_rimva.vertices[index + 2] = Vec3f((m_widthx)*TILE_SIZE, lowy, (z+0)*TILE_SIZE);
-		
+
 		m_rimva.vertices[index + 3] = Vec3f((m_widthx)*TILE_SIZE, getheight(m_widthx, z+1), (z+1)*TILE_SIZE);
 		m_rimva.vertices[index + 4] = Vec3f((m_widthx)*TILE_SIZE, lowy, (z+0)*TILE_SIZE);
 		m_rimva.vertices[index + 5] = Vec3f((m_widthx)*TILE_SIZE, lowy, (z+1)*TILE_SIZE);
-		
+
 		m_rimva.vertices[index + 0].y = fmax(m_rimva.vertices[index + 0].y, WATER_LEVEL);
 		m_rimva.vertices[index + 1].y = fmax(m_rimva.vertices[index + 1].y, WATER_LEVEL);
 		m_rimva.vertices[index + 3].y = fmax(m_rimva.vertices[index + 3].y, WATER_LEVEL);
@@ -1303,7 +1298,7 @@ void Heightmap::remesh(float tilescale)
 		m_rimva.vertices[index + 0] = Vec3f((m_widthx)*TILE_SIZE, lowy, (m_widthz)*TILE_SIZE);
 		m_rimva.vertices[index + 1] = Vec3f((m_widthx)*TILE_SIZE, lowy, (0)*TILE_SIZE);
 		m_rimva.vertices[index + 2] = Vec3f((0)*TILE_SIZE, lowy, (0)*TILE_SIZE);
-		
+
 		m_rimva.vertices[index + 3] = Vec3f((m_widthx)*TILE_SIZE, lowy, (m_widthz)*TILE_SIZE);
 		m_rimva.vertices[index + 4] = Vec3f((0)*TILE_SIZE, lowy, (0)*TILE_SIZE);
 		m_rimva.vertices[index + 5] = Vec3f((0)*TILE_SIZE, lowy, (m_widthz)*TILE_SIZE);
@@ -1322,29 +1317,29 @@ void Heightmap::draw()
 		return;
 	//return;
 	Shader* s = &g_shader[g_curS];
-	
-	glActiveTextureARB(GL_TEXTURE0);
+
+	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, g_texture[ g_tiletexs[TILE_SAND] ].texname);
-	glUniform1iARB(s->m_slot[SSLOT_SANDTEX], 0);
-	glActiveTextureARB(GL_TEXTURE1);
+	glUniform1i(s->m_slot[SSLOT_SANDTEX], 0);
+	glActiveTexture(GL_TEXTURE1);
 	glBindTexture(GL_TEXTURE_2D, g_texture[ g_tiletexs[TILE_GRASS] ].texname);
-	glUniform1iARB(s->m_slot[SSLOT_GRASSTEX], 1);
-	glActiveTextureARB(GL_TEXTURE2);
-	glBindTexture(GL_TEXTURE_2D, g_texture[ g_tiletexs[TILE_SNOW] ].texname);
-	glUniform1iARB(s->m_slot[SSLOT_SNOWTEX], 2);
-	glActiveTextureARB(GL_TEXTURE3);
+	glUniform1i(s->m_slot[SSLOT_GRASSTEX], 1);
+	//glActiveTexture(GL_TEXTURE2);
+	//glBindTexture(GL_TEXTURE_2D, g_texture[ g_tiletexs[TILE_SNOW] ].texname);
+	//glUniform1i(s->m_slot[SSLOT_SNOWTEX], 2);
+	glActiveTexture(GL_TEXTURE3);
 	glBindTexture(GL_TEXTURE_2D, g_texture[ g_tiletexs[TILE_ROCK] ].texname);
-	glUniform1iARB(s->m_slot[SSLOT_ROCKTEX], 3);
-	glActiveTextureARB(GL_TEXTURE4);
+	glUniform1i(s->m_slot[SSLOT_ROCKTEX], 3);
+	glActiveTexture(GL_TEXTURE4);
 	glBindTexture(GL_TEXTURE_2D, g_texture[ g_tiletexs[TILE_CRACKEDROCK] ].texname);
-	glUniform1iARB(s->m_slot[SSLOT_CRACKEDROCKTEX], 4);
-	glActiveTextureARB(GL_TEXTURE5);
+	glUniform1i(s->m_slot[SSLOT_CRACKEDROCKTEX], 4);
+	glActiveTexture(GL_TEXTURE5);
 	glBindTexture(GL_TEXTURE_2D, g_texture[ g_tiletexs[TILE_CRACKEDROCK_NORM] ].texname);
-	glUniform1iARB(s->m_slot[SSLOT_CRACKEDROCKNORMTEX], 5);
-	glActiveTextureARB(GL_TEXTURE6);
+	glUniform1i(s->m_slot[SSLOT_CRACKEDROCKNORMTEX], 5);
+	glActiveTexture(GL_TEXTURE6);
 	glBindTexture(GL_TEXTURE_2D, g_texture[ g_tiletexs[TILE_ROCK_NORM] ].texname);
-	glUniform1iARB(s->m_slot[SSLOT_ROCKNORMTEX], 6);
-	
+	glUniform1i(s->m_slot[SSLOT_ROCKNORMTEX], 6);
+
 	//float yscale = TILE_Y_SCALE / 2000.0f;
 	glUniform1f(s->m_slot[SSLOT_SANDONLYMAXY], ELEV_SANDONLYMAXY);
 	glUniform1f(s->m_slot[SSLOT_SANDGRASSMAXY], ELEV_SANDGRASSMAXY);
@@ -1398,7 +1393,7 @@ void Heightmap::draw()
 		int spanz = g_mapview[1].y/tilescale - g_mapview[0].y/tilescale;
 		//int stridei = m_widthx - spanx;
 		int stridei = 0;
-	
+
 		glVertexAttribPointer(s->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, m_drawvertices);
 		glVertexAttribPointer(s->m_slot[SSLOT_TEXCOORD0], 2, GL_FLOAT, GL_FALSE, 0, m_texcoords0);
 		glVertexAttribPointer(s->m_slot[SSLOT_NORMAL], 3, GL_FLOAT, GL_FALSE, 0, m_normals);
@@ -1413,50 +1408,50 @@ void Heightmap::draw2()
 		return;
 
 	Shader* s = &g_shader[g_curS];
-	
-	glActiveTextureARB(GL_TEXTURE0);
+
+	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, g_texture[ g_tiletexs[TILE_SAND] ].texname);
-	glUniform1iARB(s->m_slot[SSLOT_SANDTEX], 0);
+	glUniform1i(s->m_slot[SSLOT_SANDTEX], 0);
 
 	CheckGLError(__FILE__, __LINE__);
 
-	glActiveTextureARB(GL_TEXTURE1);
+	glActiveTexture(GL_TEXTURE1);
 	glBindTexture(GL_TEXTURE_2D, g_texture[ g_tiletexs[TILE_GRASS] ].texname);
-	glUniform1iARB(s->m_slot[SSLOT_GRASSTEX], 1);
+	glUniform1i(s->m_slot[SSLOT_GRASSTEX], 1);
 
 	CheckGLError(__FILE__, __LINE__);
 
-	glActiveTextureARB(GL_TEXTURE2);
-	glBindTexture(GL_TEXTURE_2D, g_texture[ g_tiletexs[TILE_SNOW] ].texname);
-	glUniform1iARB(s->m_slot[SSLOT_SNOWTEX], 2);
+	//glActiveTexture(GL_TEXTURE2);
+	//glBindTexture(GL_TEXTURE_2D, g_texture[ g_tiletexs[TILE_SNOW] ].texname);
+	//glUniform1i(s->m_slot[SSLOT_SNOWTEX], 2);
 
 	CheckGLError(__FILE__, __LINE__);
 
-	glActiveTextureARB(GL_TEXTURE3);
+	glActiveTexture(GL_TEXTURE3);
 	glBindTexture(GL_TEXTURE_2D, g_texture[ g_tiletexs[TILE_ROCK] ].texname);
-	glUniform1iARB(s->m_slot[SSLOT_ROCKTEX], 3);
+	glUniform1i(s->m_slot[SSLOT_ROCKTEX], 3);
 
 	CheckGLError(__FILE__, __LINE__);
 
-	glActiveTextureARB(GL_TEXTURE4);
+	glActiveTexture(GL_TEXTURE4);
 	glBindTexture(GL_TEXTURE_2D, g_texture[ g_tiletexs[TILE_CRACKEDROCK] ].texname);
-	glUniform1iARB(s->m_slot[SSLOT_CRACKEDROCKTEX], 4);
+	glUniform1i(s->m_slot[SSLOT_CRACKEDROCKTEX], 4);
 
 	CheckGLError(__FILE__, __LINE__);
 
-	glActiveTextureARB(GL_TEXTURE5);
+	glActiveTexture(GL_TEXTURE5);
 	glBindTexture(GL_TEXTURE_2D, g_texture[ g_tiletexs[TILE_CRACKEDROCK_NORM] ].texname);
-	glUniform1iARB(s->m_slot[SSLOT_CRACKEDROCKNORMTEX], 5);
+	glUniform1i(s->m_slot[SSLOT_CRACKEDROCKNORMTEX], 5);
 
 	CheckGLError(__FILE__, __LINE__);
 
-	glActiveTextureARB(GL_TEXTURE6);
+	glActiveTexture(GL_TEXTURE6);
 	glBindTexture(GL_TEXTURE_2D, g_texture[ g_tiletexs[TILE_ROCK_NORM] ].texname);
-	glUniform1iARB(s->m_slot[SSLOT_ROCKNORMTEX], 6);
+	glUniform1i(s->m_slot[SSLOT_ROCKNORMTEX], 6);
 
 	CheckGLError(__FILE__, __LINE__);
 
-	
+
 	//float yscale = TILE_Y_SCALE / 2000.0f;
 	glUniform1f(s->m_slot[SSLOT_SANDONLYMAXY], ELEV_SANDONLYMAXY);
 	glUniform1f(s->m_slot[SSLOT_SANDGRASSMAXY], ELEV_SANDGRASSMAXY);
@@ -1527,7 +1522,7 @@ void Heightmap::draw2()
 		int spanz = g_mapview[1].y/tilescale - g_mapview[0].y/tilescale;
 		//int stridei = m_widthx - spanx;
 		int stridei = 0;
-	
+
 		glVertexAttribPointer(s->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, m_drawvertices);
 		glVertexAttribPointer(s->m_slot[SSLOT_TEXCOORD0], 2, GL_FLOAT, GL_FALSE, 0, m_texcoords0);
 		glVertexAttribPointer(s->m_slot[SSLOT_NORMAL], 3, GL_FLOAT, GL_FALSE, 0, m_normals);
@@ -1542,18 +1537,18 @@ void Heightmap::drawrim()
 		return;
 	//return;
 	Shader* s = &g_shader[g_curS];
-	
-	glActiveTextureARB(GL_TEXTURE0);
+
+	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, g_texture[ g_rimtexs[TEX_DIFF] ].texname);
-	glUniform1iARB(s->m_slot[SSLOT_TEXTURE0], 0);
-	glActiveTextureARB(GL_TEXTURE1);
+	glUniform1i(s->m_slot[SSLOT_TEXTURE0], 0);
+	glActiveTexture(GL_TEXTURE1);
 	glBindTexture(GL_TEXTURE_2D, g_texture[ g_rimtexs[TEX_SPEC] ].texname);
-	glUniform1iARB(s->m_slot[SSLOT_SPECULARMAP], 1);
-	glActiveTextureARB(GL_TEXTURE2);
+	glUniform1i(s->m_slot[SSLOT_SPECULARMAP], 1);
+	glActiveTexture(GL_TEXTURE2);
 	glBindTexture(GL_TEXTURE_2D, g_texture[ g_rimtexs[TEX_NORM] ].texname);
-	glUniform1iARB(s->m_slot[SSLOT_NORMALMAP], 2);
-	glActiveTextureARB(GL_TEXTURE3);
-	
+	glUniform1i(s->m_slot[SSLOT_NORMALMAP], 2);
+	glActiveTexture(GL_TEXTURE3);
+
 	//float yscale = TILE_Y_SCALE / 2000.0f;
 	glUniform1f(s->m_slot[SSLOT_SANDONLYMAXY], ELEV_SANDONLYMAXY);
 	glUniform1f(s->m_slot[SSLOT_SANDGRASSMAXY], ELEV_SANDGRASSMAXY);
@@ -1608,7 +1603,7 @@ void Heightmap::drawrim()
 		int spanz = g_mapview[1].y/tilescale - g_mapview[0].y/tilescale;
 		//int stridei = m_widthx - spanx;
 		int stridei = 0;
-	
+
 		glVertexAttribPointer(s->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, m_drawvertices);
 		glVertexAttribPointer(s->m_slot[SSLOT_TEXCOORD0], 2, GL_FLOAT, GL_FALSE, 0, m_texcoords0);
 		glVertexAttribPointer(s->m_slot[SSLOT_NORMAL], 3, GL_FLOAT, GL_FALSE, 0, m_normals);

@@ -59,7 +59,7 @@ void SkipLogo()
 void UpdateLogo()
 {
 	static int stage = 0;
-	
+
 	Player* py = &g_player[g_currP];
 	GUI* gui = &py->gui;
 
@@ -119,7 +119,7 @@ void CalcUpdFrameRate()
 	static unsigned int lasttime;
 
 	// Get the current time in seconds
-    unsigned int currtime = timeGetTime();				
+    unsigned int currtime = timeGetTime();
 
 	// We added a small value to the frame interval to account for some video
 	// cards (Radeon's) with fast computers falling through the floor without it.
@@ -127,7 +127,7 @@ void CalcUpdFrameRate()
 	// Here we store the elapsed time between the current and last frame,
 	// then keep the current frame in our static variable for the next frame.
  	g_updfrinterval = (currtime - frametime) / 1000.0f;	// + 0.005f;
-	
+
 	//g_instantdrawfps = 1.0f / (g_currentTime - frameTime);
 	//g_instantdrawfps = 1.0f / g_drawfrinterval;
 
@@ -207,7 +207,7 @@ void UpdateEditor()
 }
 
 void Update()
-{	
+{
 	if(g_mode == APPMODE_LOGO)
 		UpdateLogo();
 	//else if(g_mode == APPMODE_INTRO)
@@ -236,52 +236,57 @@ void DrawScene(Matrix projection, Matrix viewmat, Matrix modelmat, Matrix modelv
 
 	UseShadow(SHADER_SKYBOX, projection, viewmat, modelmat, modelviewinv, mvLightPos, lightDir);
 	DrawSkyBox(c->zoompos());
+	//DrawSkyBox(Vec3f(0,0,0));
 	EndS();
+	CheckGLError(__FILE__, __LINE__);
 
 	StartTimer(DRAWMAP);
 #if 1
 	UseShadow(SHADER_MAPTILES, projection, viewmat, modelmat, modelviewinv, mvLightPos, lightDir);
-	glActiveTextureARB(GL_TEXTURE8);
+	glActiveTexture(GL_TEXTURE8);
 	glBindTexture(GL_TEXTURE_2D, g_depth);
-	glUniform1iARB(g_shader[g_curS].m_slot[SSLOT_SHADOWMAP], 8);
+	glUniform1i(g_shader[g_curS].m_slot[SSLOT_SHADOWMAP], 8);
 	g_hmap.draw();
 	//g_hmap.draw();
 	EndS();
 #endif
 	StopTimer(DRAWMAP);
-	
-	StartTimer(DRAWRIM);
-	UseShadow(SHADER_RIM, projection, viewmat, modelmat, modelviewinv, mvLightPos, lightDir);
-	glActiveTextureARB(GL_TEXTURE8);
-	glBindTexture(GL_TEXTURE_2D, g_depth);
-	glUniform1iARB(g_shader[g_curS].m_slot[SSLOT_SHADOWMAP], 8);
-	g_hmap.drawrim();
-	EndS();
-	StopTimer(DRAWRIM);
+	CheckGLError(__FILE__, __LINE__);
 
-#if 0
-	UseShadow(SHADER_WATER, projection, viewmat, modelmat, modelviewinv, mvLightPos, lightDir);
-	glActiveTextureARB(GL_TEXTURE4);
+	StartTimer(DRAWRIM);
+#if 1
+	UseShadow(SHADER_RIM, projection, viewmat, modelmat, modelviewinv, mvLightPos, lightDir);
+	CheckGLError(__FILE__, __LINE__);
+	glActiveTexture(GL_TEXTURE8);
 	glBindTexture(GL_TEXTURE_2D, g_depth);
-	glUniform1iARB(g_shader[g_curS].m_slot[SSLOT_SHADOWMAP], 4);
-	DrawWater();
+	glUniform1i(g_shader[g_curS].m_slot[SSLOT_SHADOWMAP], 8);
+	CheckGLError(__FILE__, __LINE__);
+	g_hmap.drawrim();
+	CheckGLError(__FILE__, __LINE__);
 	EndS();
 #endif
-	
+	StopTimer(DRAWRIM);
+	CheckGLError(__FILE__, __LINE__);
+
 	StartTimer(DRAWWATER);
+#if 1
 	UseShadow(SHADER_WATER, projection, viewmat, modelmat, modelviewinv, mvLightPos, lightDir);
-	glActiveTextureARB(GL_TEXTURE4);
+	glActiveTexture(GL_TEXTURE4);
 	glBindTexture(GL_TEXTURE_2D, g_depth);
-	glUniform1iARB(g_shader[g_curS].m_slot[SSLOT_SHADOWMAP], 4);
+	glUniform1i(g_shader[g_curS].m_slot[SSLOT_SHADOWMAP], 4);
 	DrawWater3();
+	//DrawWater();
 	EndS();
+#endif
 	StopTimer(DRAWWATER);
-	
+	CheckGLError(__FILE__, __LINE__);
+
+#if 1
 	UseShadow(SHADER_OWNED, projection, viewmat, modelmat, modelviewinv, mvLightPos, lightDir);
 	//UseShadow(SHADER_UNIT, projection, viewmat, modelmat, modelviewinv, mvLightPos, lightDir);
-	glActiveTextureARB(GL_TEXTURE5);
+	glActiveTexture(GL_TEXTURE5);
 	glBindTexture(GL_TEXTURE_2D, g_depth);
-	glUniform1iARB(g_shader[g_curS].m_slot[SSLOT_SHADOWMAP], 5);
+	glUniform1i(g_shader[g_curS].m_slot[SSLOT_SHADOWMAP], 5);
 	glUniform4f(g_shader[g_curS].m_slot[SSLOT_COLOR], 1, 1, 1, 1);
 	glUniform4f(g_shader[g_curS].m_slot[SSLOT_OWNCOLOR], 1, 0, 0, 1);
 	DrawPy();
@@ -299,35 +304,41 @@ void DrawScene(Matrix projection, Matrix viewmat, Matrix modelmat, Matrix modelv
 	StopTimer(DRAWPOWLS);
 	DrawSBuild();
 	EndS();
+	CheckGLError(__FILE__, __LINE__);
+#endif
 
 	StartTimer(DRAWUNITS);
+#if 1
 	UseShadow(SHADER_UNIT, projection, viewmat, modelmat, modelviewinv, mvLightPos, lightDir);
-	glActiveTextureARB(GL_TEXTURE5);
+	glActiveTexture(GL_TEXTURE5);
 	glBindTexture(GL_TEXTURE_2D, g_depth);
-	glUniform1iARB(g_shader[g_curS].m_slot[SSLOT_SHADOWMAP], 5);
+	glUniform1i(g_shader[g_curS].m_slot[SSLOT_SHADOWMAP], 5);
 	glUniform4f(g_shader[g_curS].m_slot[SSLOT_COLOR], 1, 1, 1, 1);
 	glUniform4f(g_shader[g_curS].m_slot[SSLOT_OWNCOLOR], 1, 0, 0, 1);
 	DrawUnits();
 	EndS();
+#endif
 	StopTimer(DRAWUNITS);
-	
+	CheckGLError(__FILE__, __LINE__);
+
 #if 1
 	StartTimer(DRAWFOLIAGE);
 	UseShadow(SHADER_FOLIAGE, projection, viewmat, modelmat, modelviewinv, mvLightPos, lightDir);
-	glActiveTextureARB(GL_TEXTURE5);
+	glActiveTexture(GL_TEXTURE5);
 	glBindTexture(GL_TEXTURE_2D, g_depth);
-	glUniform1iARB(g_shader[g_curS].m_slot[SSLOT_SHADOWMAP], 5);
+	glUniform1i(g_shader[g_curS].m_slot[SSLOT_SHADOWMAP], 5);
 	glUniform4f(g_shader[g_curS].m_slot[SSLOT_COLOR], 1, 1, 1, 1);
 	DrawFoliage(c->zoompos(), c->m_up, c->m_strafe);
 	EndS();
 	StopTimer(DRAWFOLIAGE);
 #endif
 
+	CheckGLError(__FILE__, __LINE__);
 #if 0
 	UseShadow(SHADER_BILLBOARD, projection, viewmat, modelmat, modelviewinv, mvLightPos, lightDir);
-	glActiveTextureARB(GL_TEXTURE4);
+	glActiveTexture(GL_TEXTURE4);
 	glBindTexture(GL_TEXTURE_2D, g_depth);
-	glUniform1iARB(g_shader[g_curS].m_slot[SSLOT_SHADOWMAP], 4);
+	glUniform1i(g_shader[g_curS].m_slot[SSLOT_SHADOWMAP], 4);
 #if 0
 	DrawUnits();
 #endif
@@ -337,9 +348,9 @@ void DrawScene(Matrix projection, Matrix viewmat, Matrix modelmat, Matrix modelv
 
 #if 0
 	UseShadow(SHADER_BORDERS, projection, viewmat, modelmat, modelviewinv, mvLightPos, lightDir);
-	//glActiveTextureARB(GL_TEXTURE8);
+	//glActiveTexture(GL_TEXTURE8);
 	//glBindTexture(GL_TEXTURE_2D, g_depth);
-	//glUniform1iARB(g_shader[g_curS].m_slot[SSLOT_SHADOWMAP], 8);
+	//glUniform1i(g_shader[g_curS].m_slot[SSLOT_SHADOWMAP], 8);
 	glUniform4f(g_shader[g_curS].m_slot[SSLOT_COLOR], 1, 1, 1, 0.5f);
 	DrawBorderLines();
 #endif
@@ -355,13 +366,24 @@ void DrawScene(Matrix projection, Matrix viewmat, Matrix modelmat, Matrix modelv
 #endif
 
 	DrawSel(&projection, &modelmat, &viewmat);
+	CheckGLError(__FILE__, __LINE__);
 	DrawOrders(&projection, &modelmat, &viewmat);
-		
+	CheckGLError(__FILE__, __LINE__);
+
 #if 1
-	UseShadow(SHADER_BILLBOARD, projection, viewmat, modelmat, modelviewinv, mvLightPos, lightDir);
-	glActiveTextureARB(GL_TEXTURE4);
-	glBindTexture(GL_TEXTURE_2D, g_depth);
-	glUniform1iARB(g_shader[g_curS].m_slot[SSLOT_SHADOWMAP], 4);
+	//UseShadow(SHADER_BILLBOARD, projection, viewmat, modelmat, modelviewinv, mvLightPos, lightDir);
+	//glActiveTexture(GL_TEXTURE4);
+	//glBindTexture(GL_TEXTURE_2D, g_depth);
+	//glUniform1i(g_shader[g_curS].m_slot[SSLOT_SHADOWMAP], 4);
+	UseS(SHADER_BILLBOARD);
+	Shader* s = &g_shader[g_curS];
+	glUniformMatrix4fv(s->m_slot[SSLOT_PROJECTION], 1, 0, projection.m_matrix);
+	glUniformMatrix4fv(s->m_slot[SSLOT_MODELMAT], 1, 0, modelmat.m_matrix);
+	glUniformMatrix4fv(s->m_slot[SSLOT_VIEWMAT], 1, 0, viewmat.m_matrix);
+	//glUniformMatrix4fv(s->m_slot[SSLOT_NORMALMAT], 1, 0, modelviewinv.m_matrix);
+	//glUniformMatrix4fv(s->m_slot[SSLOT_INVMODLVIEWMAT], 1, 0, modelviewinv.m_matrix);
+	glUniform4f(s->m_slot[SSLOT_COLOR], 1, 1, 1, 1);
+	CheckGLError(__FILE__, __LINE__);
 	UpdateParticles();
 	StartTimer(SORTPARTICLES);
 	SortBillboards();
@@ -371,6 +393,7 @@ void DrawScene(Matrix projection, Matrix viewmat, Matrix modelmat, Matrix modelv
 #endif
 
 #if 1
+	CheckGLError(__FILE__, __LINE__);
 	Ortho(py->width, py->height, 1, 1, 1, 1);
 	glDisable(GL_DEPTH_TEST);
 	//DrawDeposits(projection, viewmat);
@@ -382,6 +405,7 @@ void DrawScene(Matrix projection, Matrix viewmat, Matrix modelmat, Matrix modelv
 #endif
 
 #if 0
+	CheckGLError(__FILE__, __LINE__);
 	Ortho(py->width, py->height, 1, 1, 1, 1);
 	glDisable(GL_DEPTH_TEST);
 	FoliageT* t = &g_foliageT[FOLIAGE_TREE1];
@@ -462,7 +486,8 @@ void Draw()
 		Matrix modelmat;
 		float translation[] = {0, 0, 0};
 		modelview.setTranslation(translation);
-		modelmat.setTranslation(translation);
+		//modelmat.setTranslation(translation);
+		modelmat.loadIdentity();
 		modelview.postMultiply(viewmat);
 
 		Matrix mvpmat;
@@ -502,12 +527,12 @@ void Draw()
 #endif
 
 	gui->frameupd();
-	
+
 #if 0
 	g_log<<("before gui dr")<<endl;
 	g_log.flush();
 #endif
-	
+
 	CheckGLError(__FILE__, __LINE__);
 	gui->draw();
 
@@ -522,7 +547,7 @@ void Draw()
 
 	glDrawPixels(blitscreen.sizeX, blitscreen.sizeY, GL_RGB, GL_BYTE, blitscreen.data);
 #endif
-	
+
 	CheckGLError(__FILE__, __LINE__);
 	Ortho(py->width, py->height, 1, 1, 1, 1);
 	CheckGLError(__FILE__, __LINE__);
@@ -531,7 +556,7 @@ void Draw()
 
 #if 0
 	RichText uni;
-	
+
 	for(int i=16000; i<19000; i++)
 	//for(int i=0; i<3000; i++)
 	{
@@ -557,7 +582,7 @@ void Draw()
 	g_log<<("bef sw bf")<<endl;
 	g_log.flush();
 #endif
-	
+
 	SDL_GL_SwapWindow(g_window);
 
 	//CheckNum("post draw");
@@ -580,26 +605,26 @@ void Scroll()
 
 	//const Uint8 *keys = SDL_GetKeyboardState(NULL);
 	//SDL_BUTTON_LEFT;
-	if((!py->keyintercepted && (py->keys[SDL_SCANCODE_UP] || py->keys[SDL_SCANCODE_W])) || (py->mouse.y <= SCROLL_BORDER)) 
-	{				
-		c->accelerate(CAMERA_SPEED / py->zoom * g_drawfrinterval);			
-		moved = true;	
+	if((!py->keyintercepted && (py->keys[SDL_SCANCODE_UP] || py->keys[SDL_SCANCODE_W])) || (py->mouse.y <= SCROLL_BORDER))
+	{
+		c->accelerate(CAMERA_SPEED / py->zoom * g_drawfrinterval);
+		moved = true;
 	}
 
-	if((!py->keyintercepted && (py->keys[SDL_SCANCODE_DOWN] || py->keys[SDL_SCANCODE_S])) || (py->mouse.y >= py->height-SCROLL_BORDER)) 
-	{			
-		c->accelerate(-CAMERA_SPEED / py->zoom * g_drawfrinterval);	
-		moved = true;			
+	if((!py->keyintercepted && (py->keys[SDL_SCANCODE_DOWN] || py->keys[SDL_SCANCODE_S])) || (py->mouse.y >= py->height-SCROLL_BORDER))
+	{
+		c->accelerate(-CAMERA_SPEED / py->zoom * g_drawfrinterval);
+		moved = true;
 	}
 
-	if((!py->keyintercepted && (py->keys[SDL_SCANCODE_LEFT] || py->keys[SDL_SCANCODE_A])) || (py->mouse.x <= SCROLL_BORDER)) 
-	{			
+	if((!py->keyintercepted && (py->keys[SDL_SCANCODE_LEFT] || py->keys[SDL_SCANCODE_A])) || (py->mouse.x <= SCROLL_BORDER))
+	{
 		c->accelstrafe(-CAMERA_SPEED / py->zoom * g_drawfrinterval);
 		moved = true;
 	}
 
-	if((!py->keyintercepted && (py->keys[SDL_SCANCODE_RIGHT] || py->keys[SDL_SCANCODE_D])) || (py->mouse.x >= py->width-SCROLL_BORDER)) 
-	{			
+	if((!py->keyintercepted && (py->keys[SDL_SCANCODE_RIGHT] || py->keys[SDL_SCANCODE_D])) || (py->mouse.x >= py->width-SCROLL_BORDER))
+	{
 		c->accelstrafe(CAMERA_SPEED / py->zoom * g_drawfrinterval);
 		moved = true;
 	}
@@ -631,7 +656,7 @@ void Scroll()
 			c->move(Vec3f(0, 0, -d));
 		}
 #else
-		
+
 		if(c->m_view.x < 0)
 		{
 			float d = 0 - c->m_view.x;
@@ -670,7 +695,7 @@ void Scroll()
 		}
 #endif
 	}
-	
+
 	Vec3f line[2];
 	line[0] = c->zoompos();
 	Camera oldcam = *c;
@@ -703,11 +728,15 @@ void LoadConfig()
 {
 	char cfgfull[MAX_PATH+1];
 	FullPath(CONFIGFILE, cfgfull);
-	
+
 	ifstream f(cfgfull);
+
+	if(!f)
+        return;
+
 	string line;
-	char keystr[32];
-	char actstr[32];
+	char keystr[128];
+	char actstr[128];
 
 	Player* py = &g_player[g_currP];
 
@@ -717,12 +746,16 @@ void LoadConfig()
 		strcpy(actstr, "");
 
 		getline(f, line);
+
+		if(line.length() > 127)
+            continue;
+
 		sscanf(line.c_str(), "%s %s", keystr, actstr);
-		
+
 		float valuef = StrToFloat(actstr);
 		int valuei = StrToInt(actstr);
 		bool valueb = (bool)valuei;
-		
+
 		if(stricmp(keystr, "fullscreen") == 0)					g_fullscreen = valueb;
 		else if(stricmp(keystr, "client_width") == 0)			py->width = g_selectedRes.width = valuei;
 		else if(stricmp(keystr, "client_height") == 0)			py->height = g_selectedRes.height = valuei;
@@ -737,7 +770,7 @@ void Init()
 	OpenLog("log.txt", VERSION);
 
 	srand(GetTickCount64());
-	
+
 	LoadConfig();
 	//EnumerateMaps();
 	//EnumerateDisplay();
@@ -755,12 +788,12 @@ void Deinit()
 }
 
 void EventLoop()
-{	
+{
 #if 0
 	key->keysym.scancode
 	SDLMod  e.key.keysym.mod
 	key->keysym.unicode
-	
+
         if( mod & KMOD_NUM ) printf( "NUMLOCK " );
         if( mod & KMOD_CAPS ) printf( "CAPSLOCK " );
         if( mod & KMOD_LCTRL ) printf( "LCTRL " );
@@ -779,18 +812,22 @@ void EventLoop()
 	Player* py = &g_player[g_currP];
 	GUI* gui = &py->gui;
 
-	while (true) {
+	while (!g_quit) {
 
 		StartTimer(FRAME);
 
         SDL_Event e;
-		InEv ev;
-		ev.intercepted = false;
 
 		StartTimer(EVENT);
 
-        if (SDL_PollEvent(&e)) {
-            if (e.type == SDL_QUIT) {
+        while (SDL_PollEvent(&e))
+        {
+            InEv ev;
+            ev.intercepted = false;
+
+            if (e.type == SDL_QUIT)
+            {
+                g_quit = true;
                 break;
             }
 			else if(e.type == SDL_KEYDOWN)
@@ -803,7 +840,7 @@ void EventLoop()
 
 				if(!ev.intercepted)
 					py->keys[e.key.keysym.scancode] = true;
-			
+
 				py->keyintercepted = ev.intercepted;
 			}
 			else if(e.type == SDL_KEYUP)
@@ -816,7 +853,7 @@ void EventLoop()
 
 				if(!ev.intercepted)
 					py->keys[e.key.keysym.scancode] = false;
-			
+
 				py->keyintercepted = ev.intercepted;
 			}
 			else if(e.type == SDL_TEXTINPUT)
@@ -842,7 +879,7 @@ void EventLoop()
 				ev.text = e.text.text;
 				ev.cursor = e.edit.start;
 				ev.sellen = e.edit.length;
-				
+
 				g_log<<"SDL_TEXTEDITING:";
 				for(int i=0; i<strlen(e.text.text); i++)
 				{
@@ -872,7 +909,7 @@ void EventLoop()
 			ev.type = INEV_CHARIN;
 			ev.key = wParam;
 			ev.scancode = 0;
-			
+
 			gui->inev(&ev);
 #endif
 			break;
@@ -891,10 +928,10 @@ void EventLoop()
 			//{
 			//}
 			else if(e.type == SDL_MOUSEWHEEL)
-			{	
+			{
 				ev.type = INEV_MOUSEWHEEL;
 				ev.amount = e.wheel.y;
-			
+
 				gui->inev(&ev);
 			}
 			else if (e.type == SDL_MOUSEBUTTONDOWN)
@@ -929,7 +966,7 @@ void EventLoop()
                 else if (e.button.button == SDL_BUTTON_MIDDLE)
 				{
 					py->mousekeys[MOUSE_MIDDLE] = true;
-			
+
 					ev.type = INEV_MOUSEDOWN;
 					ev.key = MOUSE_MIDDLE;
 					ev.amount = 1;
@@ -944,7 +981,7 @@ void EventLoop()
                 if (e.button.button == SDL_BUTTON_LEFT)
 				{
 					py->mousekeys[MOUSE_LEFT] = false;
-			
+
 					ev.type = INEV_MOUSEUP;
 					ev.key = MOUSE_LEFT;
 					ev.amount = 1;
@@ -956,7 +993,7 @@ void EventLoop()
                 else if (e.button.button == SDL_BUTTON_RIGHT)
 				{
 					py->mousekeys[MOUSE_RIGHT] = false;
-			
+
 					ev.type = INEV_MOUSEUP;
 					ev.key = MOUSE_RIGHT;
 					ev.amount = 1;
@@ -966,9 +1003,9 @@ void EventLoop()
 					gui->inev(&ev);
 				}
                 else if (e.button.button == SDL_BUTTON_MIDDLE)
-				{	
+				{
 					py->mousekeys[MOUSE_MIDDLE] = false;
-			
+
 					ev.type = INEV_MOUSEUP;
 					ev.key = MOUSE_MIDDLE;
 					ev.amount = 1;
@@ -1000,7 +1037,7 @@ void EventLoop()
 				}
 			}
         }
-		
+
 		StopTimer(EVENT);
 #if 1
 		if ((g_mode == APPMODE_LOADING || g_mode == APPMODE_RELOADING) || true /* DrawNextFrame(DRAW_FRAME_RATE) */ )
@@ -1048,31 +1085,31 @@ int main(int argc, char* argv[])
 	g_log.flush();
 
 	MakeWindow(TITLE);
-	
+
 	g_log<<"1"<<endl;
 	g_log.flush();
 
 	SDL_ShowCursor(false);
 
 	Queue();
-	
+
 	g_log<<"2"<<endl;
 	g_log.flush();
 
 	FillGUI();
-	
+
 	g_log<<"3"<<endl;
 	g_log.flush();
 
     EventLoop();
-	
+
 	g_log<<"4"<<endl;
 	g_log.flush();
 
     //SDL_Delay(3000);  // Pause execution for 3000 milliseconds, for example
 
 	Deinit();
-	
+
 	SDL_ShowCursor(true);
 
     return 0;

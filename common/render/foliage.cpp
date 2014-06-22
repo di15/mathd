@@ -97,9 +97,9 @@ void DrawFoliage()
 	Vec3f vert, horiz;
 
 	Shader* s = &g_shader[g_curS];
-	
-	glActiveTextureARB(GL_TEXTURE0);
-	glUniform1iARB(s->m_slot[SSLOT_TEXTURE0], 0);
+
+	glActiveTexture(GL_TEXTURE0);
+	glUniform1i(s->m_slot[SSLOT_TEXTURE0], 0);
 
 	//glDisable(GL_CULL_FACE);
 
@@ -111,9 +111,9 @@ void DrawFoliage()
 			continue;
 
 		FoliageT* t = &g_foliageT[f->type];
-		glActiveTextureARB(GL_TEXTURE0);
+		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, g_texture[t->texindex].texname);
-		glUniform1iARB(s->m_slot[SSLOT_TEXTURE0], 0);
+		glUniform1i(s->m_slot[SSLOT_TEXTURE0], 0);
 
 		Vec3i* size = &t->size;
 
@@ -147,7 +147,7 @@ void DrawFoliage()
 		glDrawArrays(GL_TRIANGLES, 0, 6);
 	}
 
-	
+
 	//glEnable(GL_CULL_FACE);
 }
 #endif
@@ -160,18 +160,18 @@ void DrawFoliage(Vec3f zoompos, Vec3f vertical, Vec3f horizontal)
 
 	Vec3f a, b, c, d;
 	Vec3f vert, horiz;
-	
+
 	Shader* s = &g_shader[g_curS];
-	
-	glActiveTextureARB(GL_TEXTURE0);
-	glUniform1iARB(s->m_slot[SSLOT_TEXTURE0], 0);
-	
+
+	glActiveTexture(GL_TEXTURE0);
+	glUniform1i(s->m_slot[SSLOT_TEXTURE0], 0);
+
 	//glUniform1f(s->m_slot[SSLOT_MIND], MIN_DISTANCE);
 	//glUniform1f(s->m_slot[SSLOT_MAXD], MAX_DISTANCE / py->zoom);
 
 	FoliageT* t = &g_foliageT[FOLIAGE_TREE1];
 	Vec3i* size = &t->size;
-	Model* m = &g_model[t->model];	
+	Model* m = &g_model[t->model];
 	VertexArray* va = &m->m_va[0];
 	m->usetex();
 	Matrix im;
@@ -188,7 +188,7 @@ void DrawFoliage(Vec3f zoompos, Vec3f vertical, Vec3f horizontal)
 
 		if(!f->on)
 			continue;
-		
+
 		Vec3f vmin(f->pos.x - t->size.x/2, f->pos.y, f->pos.z - t->size.x/2);
 		Vec3f vmax(f->pos.x + t->size.x/2, f->pos.y + t->size.y, f->pos.z + t->size.x/2);
 
