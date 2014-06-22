@@ -64,7 +64,10 @@ void main (void)
 	//float alph = color.w * texel0.w * elevtransp;
 	float alph = color.w * stexel.w;
 
-	outfrag = vec4(color.xyz * stexel.xyz * shadow * diffuse + vspecular, alph);
+	float minlight = min(shadow, diffuse);
+
+	//outfrag = vec4(color.xyz * stexel.xyz * shadow * diffuse + vspecular, alph);	//buggy
+	outfrag = vec4(color.xyz * stexel.xyz * minlight + vspecular, alph);
 	//gl_FragColor = vec4(1,0,0,1);
 	//gl_FragColor = texel0;
 	//gl_FragColor = vec4(light_vec, color.w * texel0.w);	

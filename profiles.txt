@@ -1,0 +1,27 @@
+Frame	...	27.2833ms per frame, 100% of this level's total
+	EventProc	...	0.0336134ms per frame, 0.122175% of this level's total
+	Update();	...	2.31092ms per frame, 8.39951% of this level's total
+		UpdateUnits();	...	0.378151ms per frame, 93.75% of this level's total
+			Upd U On Ch	...	0.134454ms per frame, 57.1429% of this level's total
+			Upd Unit AI	...	0.00840336ms per frame, 3.57143% of this level's total
+			Move Unit	...	0.0840336ms per frame, 35.7143% of this level's total
+			Anim Unit	...	0.00840336ms per frame, 3.57143% of this level's total
+		UpdateBuildings();	...	0.0252101ms per frame, 6.25% of this level's total
+	Draw();	...	25.1681ms per frame, 91.4783% of this level's total
+		DrawBuildings();	...	0.932773ms per frame, 7.33157% of this level's total
+			Draw model 1	...	0ms per frame, -nan% of this level's total
+			Draw model 2	...	0ms per frame, -nan% of this level's total
+			Draw model 3	...	0ms per frame, -nan% of this level's total
+		DrawUnits();	...	8.05042ms per frame, 63.2761% of this level's total
+		DrawRim();	...	0.0756303ms per frame, 0.594452% of this level's total
+		DrawWater();	...	0.462185ms per frame, 3.63276% of this level's total
+		DrawCrPipes();	...	0.252101ms per frame, 1.98151% of this level's total
+		DrawPowls();	...	0.226891ms per frame, 1.78336% of this level's total
+		DrawFoliage();	...	1.43697ms per frame, 11.2946% of this level's total
+		SortParticles();	...	0ms per frame, 0% of this level's total
+		DrawParticles();	...	0ms per frame, 0% of this level's total
+		DrawMap();	...	0.411765ms per frame, 3.23646% of this level's total
+		Shadows	...	0ms per frame, 0% of this level's total
+		DrawSky();	...	0ms per frame, 0% of this level's total
+		DrawPowls();	...	0ms per frame, 0% of this level's total
+		DrawRoads();	...	0.87395ms per frame, 6.86922% of this level's total
