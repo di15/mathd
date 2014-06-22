@@ -8,6 +8,7 @@
 #include "../window.h"
 #include "../save/savemap.h"
 #include "../sim/player.h"
+#include "shadow.h"
 
 unsigned int g_water;
 unsigned int g_watertex[WATER_TEXS];
@@ -119,6 +120,18 @@ void DrawWater3()
 	glUniform1f(s->m_slot[SSLOT_MAXD], MAX_DISTANCE / py->zoom);
 	glUniform1iARB(s->m_slot[SSLOT_WAVEPHASE], wavephase);
 	
+	Matrix modelmat;
+    Matrix modelview;
+    modelview.set(modelmat.m_matrix);
+    modelview.postMultiply(g_cameraViewMatrix);
+    //modelview.set(g_cameraViewMatrix.m_matrix);
+    //modelview.postMultiply(modelmat);
+	Matrix modelviewinv;
+	Transpose(modelview, modelview);
+	Inverse2(modelview, modelviewinv);
+	//Transpose(modelviewinv, modelviewinv);
+    glUniformMatrix4fv(s->m_slot[SSLOT_NORMALMAT], 1, 0, modelviewinv.m_matrix);
+	
 #if 0
 	glEnable(GL_POLYGON_OFFSET_FILL);
 	//glPolygonOffset(2.0, 500.0);
@@ -167,6 +180,18 @@ void DrawWater()
 	glUniform1iARB(s->m_slot[SSLOT_NORMALMAP], 3);
 	
 	glUniform1iARB(s->m_slot[SSLOT_WAVEPHASE], wavephase);
+	
+	Matrix modelmat;
+    Matrix modelview;
+    modelview.set(modelmat.m_matrix);
+    modelview.postMultiply(g_cameraViewMatrix);
+    //modelview.set(g_cameraViewMatrix.m_matrix);
+    //modelview.postMultiply(modelmat);
+	Matrix modelviewinv;
+	Transpose(modelview, modelview);
+	Inverse2(modelview, modelviewinv);
+	//Transpose(modelviewinv, modelviewinv);
+    glUniformMatrix4fv(s->m_slot[SSLOT_NORMALMAT], 1, 0, modelviewinv.m_matrix);
     
 	Vec3f a, b, c, d;
     
@@ -266,6 +291,18 @@ void DrawWater2()
 	glUniform1f(s->m_slot[SSLOT_MAPMAXX], wz*TILE_SIZE);
 	glUniform1f(s->m_slot[SSLOT_MAPMINY], ConvertHeight(0));
 	glUniform1f(s->m_slot[SSLOT_MAPMAXY], ConvertHeight(255));
+
+	Matrix modelmat;
+    Matrix modelview;
+    modelview.set(modelmat.m_matrix);
+    modelview.postMultiply(g_cameraViewMatrix);
+    //modelview.set(g_cameraViewMatrix.m_matrix);
+    //modelview.postMultiply(modelmat);
+	Matrix modelviewinv;
+	Transpose(modelview, modelview);
+	Inverse2(modelview, modelviewinv);
+	//Transpose(modelviewinv, modelviewinv);
+    glUniformMatrix4fv(s->m_slot[SSLOT_NORMALMAT], 1, 0, modelviewinv.m_matrix);
     
 	a = Vec3f(wx * TILE_SIZE, WATER_LEVEL, wz * TILE_SIZE);
 	b = Vec3f(0, WATER_LEVEL, wz * TILE_SIZE);

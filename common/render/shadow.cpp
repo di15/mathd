@@ -17,6 +17,7 @@
 #include "../sim/sim.h"
 #include "model.h"
 #include "../math/camera.h"
+#include "../window.h"
 
 unsigned int g_depth = -1;
 const int g_depthSizeX = 1024;	//2048;	//512;	//4096;
@@ -39,6 +40,7 @@ Matrix g_cameraInverseModelViewMatrix;
 Matrix g_lightMatrix;
 Matrix g_cameraModelViewMatrix;
 Matrix g_cameraProjectionMatrix;
+Matrix g_cameraViewMatrix;
 
 #if 0
 void (*DrawSceneDepthFunc)() = NULL;
@@ -79,7 +81,7 @@ void InitShadows()
 /*
 Doesn't work in all cases but good enough for its purpose in shadow mapping.
 */
-void InverseMatrix(Matrix* dstm, Matrix srcm)
+void Inverse(Matrix* dstm, Matrix srcm)
 {
 	float dst[16];
 	const float* src = srcm.m_matrix;
@@ -107,7 +109,7 @@ void InverseMatrix(Matrix* dstm, Matrix srcm)
 /*
 More robust inverse matrix function.
 */
-bool InverseMatrix2(Matrix mat, Matrix &invMat)
+bool Inverse2(Matrix mat, Matrix &invMat)
 {
     double inv[16], det;
     int i;
@@ -242,7 +244,7 @@ bool InverseMatrix2(Matrix mat, Matrix &invMat)
     return true;
 }
 
-void Transpose(Matrix mat, Matrix transpMat)
+void Transpose(Matrix mat, Matrix &transpMat)
 {
 	const float* m = mat.m_matrix;
 	float transp[16];
@@ -266,6 +268,8 @@ void Transpose(Matrix mat, Matrix transpMat)
 
 void RenderToShadowMap(Matrix projection, Matrix viewmat, Matrix modelmat, Vec3f focus, Vec3f lightpos, void (*drawscenedepthfunc)())
 {
+	//return;
+
 	CheckGLError(__FILE__, __LINE__);
 
 	glDisable(GL_CULL_FACE);
@@ -288,6 +292,13 @@ void RenderToShadowMap(Matrix projection, Matrix viewmat, Matrix modelmat, Vec3f
 
 	g_lightPos = lightpos;
 	g_lightEye = focus;
+
+	//return;
+
+#if 0
+	g_log<<"lposd "<<g_lightPos.x<<","<<g_lightPos.y<<","<<g_lightPos.z<<endl;
+	g_log<<"leyed "<<g_lightEye.x<<","<<g_lightEye.y<<","<<g_lightEye.z<<endl;
+#endif
 
 	//g_lightEye = Vec3f(0,0,0);
 	//g_lightPos = g_lightEye + g_lightOff;
@@ -367,6 +378,10 @@ void UseShadow(int shader, Matrix projection, Matrix viewmat, Matrix modelmat, M
 	glUniform3fARB(s->m_slot[SSLOT_LIGHTPOS], mvLightPos[0], mvLightPos[1], mvLightPos[2]);
 	glUniform3fARB(s->m_slot[SSLOT_SUNDIRECTION], lightDir[0], lightDir[1], lightDir[2]);
 	//glUniform1fARB(s->m_slot[SSLOT_MAXELEV], g_maxelev);
+
+#if 0
+	g_log<<"sun "<<lightDir[0]<<","<<lightDir[1]<<","<<lightDir[2]<<endl;
+#endif
 }
 
 void RenderShadowedScene(Matrix projection, Matrix viewmat, Matrix modelmat, Matrix modelview, void (*drawscenefunc)(Matrix projection, Matrix viewmat, Matrix modelmat, Matrix modelviewinv, float mvLightPos[3], float lightDir[3]))
@@ -391,7 +406,7 @@ void RenderShadowedScene(Matrix projection, Matrix viewmat, Matrix modelmat, Mat
 	// Do non-shadowed drawing here
 	//DrawSkyBox(c->LookPos());
 	
-	InverseMatrix(&g_cameraInverseModelViewMatrix, modelview);
+	Inverse(&g_cameraInverseModelViewMatrix, modelview);
 
 	// We need to change the clip-space coordinates from range [-1,1] to [0,1] for texture mapping
 	g_lightMatrix.loadIdentity();
@@ -408,7 +423,7 @@ void RenderShadowedScene(Matrix projection, Matrix viewmat, Matrix modelmat, Mat
 	//g_lightMatrix.postMultiply(g_cameraInverseModelViewMatrix);
 
 	Matrix modelviewinv;
-	InverseMatrix2(modelview, modelviewinv);
+	Inverse2(modelview, modelviewinv);
 	Transpose(modelviewinv, modelviewinv);
 	
 	const float* mv = g_cameraModelViewMatrix.m_matrix;
@@ -417,16 +432,25 @@ void RenderShadowedScene(Matrix projection, Matrix viewmat, Matrix modelmat, Mat
 	mvLightPos[1] = mv[1] * g_lightPos.x + mv[5] * g_lightPos.y + mv[9] * g_lightPos.z + mv[13];
 	mvLightPos[2] = mv[2] * g_lightPos.x + mv[6] * g_lightPos.y + mv[10] * g_lightPos.z + mv[14];
 
-	float lightDir[3];
+	Vec3f lightDir;
 	//lightDir[0] = g_lightEye.x - g_lightPos.x;
 	//lightDir[1] = g_lightEye.y - g_lightPos.y;
 	//lightDir[2] = g_lightEye.z - g_lightPos.z;
-	lightDir[0] = g_lightPos.x - g_lightEye.x;
-	lightDir[1] = g_lightPos.y - g_lightEye.y;
-	lightDir[2] = g_lightPos.z - g_lightEye.z;
+#if 0
+	g_log<<"lpos "<<g_lightPos.x<<","<<g_lightPos.y<<","<<g_lightPos.z<<endl;
+	g_log<<"leye "<<g_lightEye.x<<","<<g_lightEye.y<<","<<g_lightEye.z<<endl;
+#endif
+	lightDir = g_lightPos - g_lightEye;
+#if 0
+	g_log<<"sun pres "<<lightDir.x<<","<<lightDir.y<<","<<lightDir.z<<endl;
+#endif
+	lightDir = Normalize(lightDir);
+#if 0
+	g_log<<"sun norm "<<lightDir.x<<","<<lightDir.y<<","<<lightDir.z<<endl;
+#endif
 
 	if(drawscenefunc != NULL)
-		drawscenefunc(projection, viewmat, modelmat, modelviewinv, mvLightPos, lightDir);
+		drawscenefunc(projection, viewmat, modelmat, modelviewinv, mvLightPos, (float*)&lightDir);
 		//DrawSceneFunc(projection, viewmat, modelmat, modelviewinv, (float*)&g_lightPos, lightDir);
 
 	TurnOffShader();

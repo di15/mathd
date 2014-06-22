@@ -11,6 +11,7 @@
 #include "unitmove.h"
 #include "sim.h"
 #include "labourer.h"
+#include "../debug.h"
 
 Unit g_unit[UNITS];
 
@@ -279,13 +280,27 @@ void UpdateUnits()
 {
 	for(int i = 0; i < UNITS; i++)
 	{
+
+		StartTimer(UPDUONCHECK);
+
 		Unit* u = &g_unit[i];
 
 		if(!u->on)
+		{
+			StopTimer(UPDUONCHECK);
 			continue;
+		}
 
+		StopTimer(UPDUONCHECK);
+
+		StartTimer(UPDUNITAI);
 		UpdateAI(u);
+		StopTimer(UPDUNITAI);
+		StartTimer(MOVEUNIT);
 		MoveUnit(u);
+		StopTimer(MOVEUNIT);
+		StartTimer(ANIMUNIT);
 		AnimateUnit(u);
+		StopTimer(ANIMUNIT);
 	}
 }

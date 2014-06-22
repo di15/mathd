@@ -9,6 +9,7 @@
 #include "../debug.h"
 #include "vertexarray.h"
 #include "dmdmodel.h"
+#include "shadow.h"
 
 Model g_model[MODELS];
 vector<ModelToLoad> g_modelsToLoad;
@@ -84,6 +85,17 @@ void DrawVA(VertexArray* va, Vec3f pos)
 	Matrix modelmat;
 	modelmat.setTranslation((const float*)&pos);
 	glUniformMatrix4fv(s->m_slot[SSLOT_MODELMAT], 1, 0, modelmat.m_matrix);
+	
+    Matrix modelview;
+    modelview.set(modelmat.m_matrix);
+    modelview.postMultiply(g_cameraViewMatrix);
+    //modelview.set(g_cameraViewMatrix.m_matrix);
+    //modelview.postMultiply(modelmat);
+	Matrix modelviewinv;
+	Transpose(modelview, modelview);
+	Inverse2(modelview, modelviewinv);
+	//Transpose(modelviewinv, modelviewinv);
+    glUniformMatrix4fv(s->m_slot[SSLOT_NORMALMAT], 1, 0, modelviewinv.m_matrix);
 
 	glVertexAttribPointer(s->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, va->vertices);
 	glVertexAttribPointer(s->m_slot[SSLOT_TEXCOORD0], 2, GL_FLOAT, GL_FALSE, 0, va->texcoords);
@@ -133,6 +145,17 @@ void Model::draw(int frame, Vec3f pos, float yaw)
 	rotation.setRotationRadians(radians);
 	modelmat.postMultiply(rotation);
 	glUniformMatrix4fv(s->m_slot[SSLOT_MODELMAT], 1, 0, modelmat.m_matrix);
+	
+    Matrix modelview;
+    modelview.set(modelmat.m_matrix);
+    modelview.postMultiply(g_cameraViewMatrix);
+    //modelview.set(g_cameraViewMatrix.m_matrix);
+    //modelview.postMultiply(modelmat);
+	Matrix modelviewinv;
+	Transpose(modelview, modelview);
+	Inverse2(modelview, modelviewinv);
+	//Transpose(modelviewinv, modelviewinv);
+    glUniformMatrix4fv(s->m_slot[SSLOT_NORMALMAT], 1, 0, modelviewinv.m_matrix);
 
 	VertexArray* va = &m_va[frame];
 

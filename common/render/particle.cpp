@@ -3,6 +3,7 @@
 #include "../platform.h"
 #include "billboard.h"
 #include "../math/vec3f.h"
+#include "../window.h"
 
 ParticleT g_particleT[PARTICLE_TYPES];
 Particle g_particle[PARTICLES];
@@ -22,11 +23,11 @@ void DefineParticle(int i, char* texpath, int del, float dec, Vec3f minV, Vec3f 
 
 	t->billbT = IdentifyBillboard(texpath);
 	t->delay = del;
-	t->decay = dec;
-	t->minvelocity = minV;
-	t->velvariation = maxV-minV;
-	t->minacceleration = minA;
-	t->accelvariation = maxA-minA;
+	t->decay = dec * 30.0f;
+	t->minvelocity = minV * 30.0f;
+	t->velvariation = (maxV-minV) * 30.0f;
+	t->minacceleration = minA * 30.0f;
+	t->accelvariation = (maxA-minA) * 30.0f;
 	t->minsize = minS/2.0f;
 	t->sizevariation = (maxS-minS)/2.0f;
 	t->collision = collision;
@@ -60,11 +61,11 @@ void LoadParticles()
 #endif
 }
 
-void Particle::Update(Billboard* billb)
+void Particle::update(Billboard* billb)
 {
 	ParticleT* t = &g_particleT[type];
 #if 1
-	life -= t->decay;
+	life -= t->decay * g_drawfrinterval;
 #else
 	life *= t->decay;
 #endif
@@ -89,13 +90,13 @@ void Particle::Update(Billboard* billb)
 	t->collision(this, billb, trace, g_edmap.CollisionNormal());
 	*/
 
-	billb->pos = billb->pos + vel;
+	billb->pos = billb->pos + vel * g_drawfrinterval;
 	Vec3f accel;
 	accel.x = t->minacceleration.x + t->accelvariation.x * (float)(rand()%1000)/1000.0f;
 	accel.y = t->minacceleration.y + t->accelvariation.y * (float)(rand()%1000)/1000.0f;
 	accel.z = t->minacceleration.z + t->accelvariation.z * (float)(rand()%1000)/1000.0f;
 
-	vel = vel + accel;
+	vel = vel + accel * g_drawfrinterval;
 }
 
 void EmitParticle(int type, Vec3f pos)
@@ -134,6 +135,6 @@ void UpdateParticles()
 
 		p = &g_particle[b->particle];
 
-		p->Update(b);
+		p->update(b);
 	}
 }

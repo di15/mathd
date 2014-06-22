@@ -59,7 +59,7 @@ void EnumerateDisplay()
 		found = false;
 
 		int bpp = dm.dmBitsPerPel;
-		
+
 		for(int i=0; i<g_bpps.size(); i++)
 		{
 			if(g_bpps[i] == bpp)
@@ -68,7 +68,7 @@ void EnumerateDisplay()
 				break;
 			}
 		}
-		
+
 		if(!found)
 			g_bpps.push_back(bpp);
 	}
@@ -79,7 +79,7 @@ void Resize(int width, int height)
 {
 	if(height == 0)
 		height = 1;
-	
+
 	glViewport(0, 0, width, height);
 
 	Player* py = &g_player[g_currP];
@@ -104,7 +104,7 @@ void CalcDrawFrameRate()
 	static unsigned int lasttime;
 
 	// Get the current time in seconds
-    unsigned int currtime = timeGetTime();				
+    unsigned int currtime = timeGetTime();
 
 	// We added a small value to the frame interval to account for some video
 	// cards (Radeon's) with fast computers falling through the floor without it.
@@ -112,7 +112,7 @@ void CalcDrawFrameRate()
 	// Here we store the elapsed time between the current and last frame,
 	// then keep the current frame in our static variable for the next frame.
  	g_drawfrinterval = (currtime - frametime) / 1000.0f;	// + 0.005f;
-	
+
 	//g_instantdrawfps = 1.0f / (g_currentTime - frameTime);
 	//g_instantdrawfps = 1.0f / g_drawfrinterval;
 
@@ -173,7 +173,7 @@ bool DrawNextFrame(int desiredFrameRate)
 }
 
 bool InitWindow()
-{	
+{
 	g_log<<"Renderer1: "<<(char*)glGetString(GL_RENDERER)<<endl;
 	g_log<<"GL_VERSION1 = "<<(char*)glGetString(GL_VERSION)<<endl;
 	g_log.flush();
@@ -199,7 +199,7 @@ bool InitWindow()
 	}
 
 	// The icon is attached to the window pointer
-	SDL_SetWindowIcon(g_window, surf); 
+	SDL_SetWindowIcon(g_window, surf);
 
 	// ...and the surface containing the icon pixel data is no longer required.
 	SDL_FreeSurface(surf);
@@ -252,13 +252,13 @@ bool MakeWindow(const char* title)
 
 	// Request compatibility because GLEW doesn't play well with core contexts.
 #if 1
-	SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_COMPATIBILITY);
-	//SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
-	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3); 
-	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2); 
-	//SDL_GL_SetAttribute(SDL_GL_ACCELERATED_VISUAL, 1);
-	//SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
-	//SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24); 
+	//SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_COMPATIBILITY);
+	//SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_COMPATIBILITY);
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
+	SDL_GL_SetAttribute(SDL_GL_ACCELERATED_VISUAL, 1);
+	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
+	SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
 #endif
 
 	unsigned int flags;
@@ -318,6 +318,7 @@ bool MakeWindow(const char* title)
         return false;
     }
 #endif
+	//SDL_GL_SetSwapInterval(0);
 
 	g_glcontext = SDL_GL_CreateContext(g_window);
 	//SDL_GL_SetSwapInterval(1);
@@ -332,8 +333,9 @@ bool MakeWindow(const char* title)
 		return false;
 	}
 
-	SDL_GL_MakeCurrent(g_window, g_glcontext); 
+	SDL_GL_MakeCurrent(g_window, g_glcontext);
 
+	SDL_GL_SetSwapInterval(0);
 	//SDL_Delay(7000);
 	//SDL_Delay(7000);
 

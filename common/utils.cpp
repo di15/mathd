@@ -212,17 +212,9 @@ int StrToInt(const char *s)
 void CorrectSlashes(char* corrected)
 {
 	int strl = strlen(corrected);
-	for(int i=0; i<strl; i++) {
-#ifdef PLATFORM_WIN
-		if(corrected[i] == '/')
-			corrected[i] = '\\';
-#elif defined(PLATFORM_LINUX)
-                /*
+	for(int i=0; i<strl; i++)
 		if(corrected[i] == '\\')
 			corrected[i] = '/';
-                        */
-#endif
-        }
 }
 
 void BackSlashes(char* corrected)
@@ -262,6 +254,8 @@ void OutOfMem(const char* file, int line)
 	g_quit = true;
 }
 
+#ifndef PLATFORM_WIN
+
 static long long g_starttick = -1;
 long timeGetTime()
 {
@@ -285,3 +279,19 @@ void Sleep(int ms)
 {
         SDL_Delay(ms);
 }
+#endif
+
+#ifdef PLATFORM_WIN
+
+float fmax(float a, float b)
+{
+	return (((a)>(b))?(a):(b));
+}
+
+
+float fmin(float a, float b)
+{
+	return (((a)<(b))?(a):(b));
+}
+
+#endif

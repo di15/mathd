@@ -13,6 +13,7 @@
 #include "../utils.h"
 #include "../window.h"
 #include "../sim/player.h"
+#include "../render/shadow.h"
 
 FoliageT g_foliageT[FOLIAGE_TYPES];
 Foliage g_foliage[FOLIAGES];
@@ -195,6 +196,18 @@ void DrawFoliage(Vec3f zoompos, Vec3f vertical, Vec3f horizontal)
 			continue;
 
 		glUniformMatrix4fv(s->m_slot[SSLOT_MODELMAT], 1, 0, g_folmodmat[i].m_matrix);
+
+		Matrix modelview;
+		modelview.set(g_folmodmat[i].m_matrix);
+		modelview.postMultiply(g_cameraViewMatrix);
+		//modelview.set(g_cameraViewMatrix.m_matrix);
+		//modelview.postMultiply(modelmat);
+		Matrix modelviewinv;
+		Transpose(modelview, modelview);
+		Inverse2(modelview, modelviewinv);
+		//Transpose(modelviewinv, modelviewinv);
+		glUniformMatrix4fv(s->m_slot[SSLOT_NORMALMAT], 1, 0, modelviewinv.m_matrix);
+
 		glVertexAttribPointer(s->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, va->vertices);
 		glVertexAttribPointer(s->m_slot[SSLOT_TEXCOORD0], 2, GL_FLOAT, GL_FALSE, 0, va->texcoords);
 		if(s->m_slot[SSLOT_NORMAL] != -1)
@@ -262,9 +275,6 @@ void FillForest()
 
 		int maxfoliage = FOLIAGES*g_hmap.m_widthx*g_hmap.m_widthz/MAX_MAP/MAX_MAP;
 		maxfoliage = min(FOLIAGES, maxfoliage);
-		float mindesert = g_hmap.m_widthz*TILE_SIZE/2.0f - g_hmap.m_widthz*TILE_SIZE*0.2f;
-		float maxdesert = g_hmap.m_widthz*TILE_SIZE/2.0f + g_hmap.m_widthz*TILE_SIZE*0.2f;
-		float desertrange = g_hmap.m_widthz*TILE_SIZE*0.3f;
 
 		for(int i=0; i<maxfoliage; i++)
 		{
@@ -283,7 +293,7 @@ void FillForest()
 
 				float offequator = fabs( (float)g_hmap.m_widthz*TILE_SIZE/2.0f - z );
 
-				if(y >= ELEV_SANDONLYMAXY && y <= ELEV_GRASSONLYMAXY && (rand()%((int)desertrange) < offequator) && 1.0f - norm.y <= 0.3f)
+				if(y >= ELEV_SANDONLYMAXY && y <= ELEV_GRASSONLYMAXY && 1.0f - norm.y <= 0.3f)
 				{
 					//int type = rand()%10 == 1 ? UNIT_MECH : UNIT_LABOURER;
 	#if 0

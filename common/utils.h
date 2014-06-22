@@ -1,8 +1,5 @@
-#include <string>
-#include <stdio.h>
-#include <stdlib.h>
-#include <fstream>
-#include <vector>
+
+#include "platform.h"
 
 using namespace std;
 
@@ -32,7 +29,19 @@ void InfoMessage(const char* title, const char* message);
 void WarningMessage(const char* title, const char* message);
 void OutOfMem(const char* file, int line);
 
+#ifndef PLATFORM_WIN
+
 long timeGetTime();
 long GetTickCount();
 long long GetTickCount64();
 void Sleep(int ms);
+
+#endif
+
+#ifdef PLATFORM_WIN
+
+float fmax(float a, float b);
+float fmin(float a, float b);
+
+#endif
+

@@ -269,6 +269,10 @@ void Queue()
 	DefF(FOLIAGE_TREE1, "models/pine/pine.ms3d", Vec3f(200,200,200), Vec3f(0,0,0), Vec3i(40, 60, 500)*20);
 	DefF(FOLIAGE_TREE2, "models/pine/pine.ms3d", Vec3f(200,200,200), Vec3f(0,0,0), Vec3i(40, 60, 500)*20);
 	DefF(FOLIAGE_TREE3, "models/pine/pine.ms3d", Vec3f(200,200,200), Vec3f(0,0,0), Vec3i(40, 60, 500)*20);
+#elif 1
+	DefF(FOLIAGE_TREE1, "models/apartment2/b1911", Vec3f(1,1,1), Vec3f(0,0,0), Vec3i(40, 60, 500)*20);
+	DefF(FOLIAGE_TREE2, "models/apartment2/b1911", Vec3f(1,1,1), Vec3f(0,0,0), Vec3i(40, 60, 500)*20);
+	DefF(FOLIAGE_TREE3, "models/apartment2/b1911", Vec3f(1,1,1), Vec3f(0,0,0), Vec3i(40, 60, 500)*20);
 #endif
 
 #if 0

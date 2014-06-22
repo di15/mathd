@@ -263,7 +263,7 @@ void DrawPowl(int x, int z, bool plan)
 
 void DrawPowls()
 {
-	//StartProfile(DRAWPOWERLINES);
+	//StartTimer(DRAWPOWERLINES);
     
 	//int type;
 	//PowlTile* p;
@@ -318,7 +318,7 @@ void DrawPowls()
 	//glColor4f(1,1,1,1);
 	glUniform4f(g_shader[g_curS].m_slot[SSLOT_COLOR], 1, 1, 1, 1);
 #endif
-	//EndProfile(DRAWPOWERLINES);
+	//StopTimer(DRAWPOWERLINES);
 }
 
 int GetPowlType(int x, int z, bool plan=false)

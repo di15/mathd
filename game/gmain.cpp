@@ -191,8 +191,12 @@ void UpdateGameState()
 {
 	g_simframe ++;
 
+	StartTimer(UPDATEUNITS);
 	UpdateUnits();
+	StopTimer(UPDATEUNITS);
+	StartTimer(UPDATEBUILDINGS);
 	UpdateBuildings();
+	StopTimer(UPDATEBUILDINGS);
 }
 
 void UpdateEditor()
@@ -234,6 +238,7 @@ void DrawScene(Matrix projection, Matrix viewmat, Matrix modelmat, Matrix modelv
 	DrawSkyBox(c->zoompos());
 	EndS();
 
+	StartTimer(DRAWMAP);
 #if 1
 	UseShadow(SHADER_MAPTILES, projection, viewmat, modelmat, modelviewinv, mvLightPos, lightDir);
 	glActiveTextureARB(GL_TEXTURE8);
@@ -243,13 +248,16 @@ void DrawScene(Matrix projection, Matrix viewmat, Matrix modelmat, Matrix modelv
 	//g_hmap.draw();
 	EndS();
 #endif
-
+	StopTimer(DRAWMAP);
+	
+	StartTimer(DRAWRIM);
 	UseShadow(SHADER_RIM, projection, viewmat, modelmat, modelviewinv, mvLightPos, lightDir);
 	glActiveTextureARB(GL_TEXTURE8);
 	glBindTexture(GL_TEXTURE_2D, g_depth);
 	glUniform1iARB(g_shader[g_curS].m_slot[SSLOT_SHADOWMAP], 8);
 	g_hmap.drawrim();
 	EndS();
+	StopTimer(DRAWRIM);
 
 #if 0
 	UseShadow(SHADER_WATER, projection, viewmat, modelmat, modelviewinv, mvLightPos, lightDir);
@@ -260,12 +268,14 @@ void DrawScene(Matrix projection, Matrix viewmat, Matrix modelmat, Matrix modelv
 	EndS();
 #endif
 	
+	StartTimer(DRAWWATER);
 	UseShadow(SHADER_WATER, projection, viewmat, modelmat, modelviewinv, mvLightPos, lightDir);
 	glActiveTextureARB(GL_TEXTURE4);
 	glBindTexture(GL_TEXTURE_2D, g_depth);
 	glUniform1iARB(g_shader[g_curS].m_slot[SSLOT_SHADOWMAP], 4);
 	DrawWater3();
 	EndS();
+	StopTimer(DRAWWATER);
 	
 	UseShadow(SHADER_OWNED, projection, viewmat, modelmat, modelviewinv, mvLightPos, lightDir);
 	//UseShadow(SHADER_UNIT, projection, viewmat, modelmat, modelviewinv, mvLightPos, lightDir);
@@ -275,13 +285,22 @@ void DrawScene(Matrix projection, Matrix viewmat, Matrix modelmat, Matrix modelv
 	glUniform4f(g_shader[g_curS].m_slot[SSLOT_COLOR], 1, 1, 1, 1);
 	glUniform4f(g_shader[g_curS].m_slot[SSLOT_OWNCOLOR], 1, 0, 0, 1);
 	DrawPy();
+	StartTimer(DRAWBUILDINGS);
 	DrawBl();
+	StopTimer(DRAWBUILDINGS);
+	StartTimer(DRAWROADS);
 	DrawRoads();
+	StopTimer(DRAWROADS);
+	StartTimer(DRAWCRPIPES);
 	DrawCrPipes();
+	StopTimer(DRAWCRPIPES);
+	StartTimer(DRAWPOWLS);
 	DrawPowls();
+	StopTimer(DRAWPOWLS);
 	DrawSBuild();
 	EndS();
 
+	StartTimer(DRAWUNITS);
 	UseShadow(SHADER_UNIT, projection, viewmat, modelmat, modelviewinv, mvLightPos, lightDir);
 	glActiveTextureARB(GL_TEXTURE5);
 	glBindTexture(GL_TEXTURE_2D, g_depth);
@@ -290,8 +309,10 @@ void DrawScene(Matrix projection, Matrix viewmat, Matrix modelmat, Matrix modelv
 	glUniform4f(g_shader[g_curS].m_slot[SSLOT_OWNCOLOR], 1, 0, 0, 1);
 	DrawUnits();
 	EndS();
+	StopTimer(DRAWUNITS);
 	
 #if 1
+	StartTimer(DRAWFOLIAGE);
 	UseShadow(SHADER_FOLIAGE, projection, viewmat, modelmat, modelviewinv, mvLightPos, lightDir);
 	glActiveTextureARB(GL_TEXTURE5);
 	glBindTexture(GL_TEXTURE_2D, g_depth);
@@ -299,6 +320,7 @@ void DrawScene(Matrix projection, Matrix viewmat, Matrix modelmat, Matrix modelv
 	glUniform4f(g_shader[g_curS].m_slot[SSLOT_COLOR], 1, 1, 1, 1);
 	DrawFoliage(c->zoompos(), c->m_up, c->m_strafe);
 	EndS();
+	StopTimer(DRAWFOLIAGE);
 #endif
 
 #if 0
@@ -341,7 +363,9 @@ void DrawScene(Matrix projection, Matrix viewmat, Matrix modelmat, Matrix modelv
 	glBindTexture(GL_TEXTURE_2D, g_depth);
 	glUniform1iARB(g_shader[g_curS].m_slot[SSLOT_SHADOWMAP], 4);
 	UpdateParticles();
+	StartTimer(SORTPARTICLES);
 	SortBillboards();
+	StopTimer(SORTPARTICLES);
 	DrawBillboards();
 	EndS();
 #endif
@@ -431,6 +455,8 @@ void Draw()
 		Vec3f upvec = c->m_up;
 
 		Matrix viewmat = gluLookAt3(posvec.x, posvec.y, posvec.z, focusvec.x, focusvec.y, focusvec.z, upvec.x, upvec.y, upvec.z);
+
+        g_cameraViewMatrix = viewmat;
 
 		Matrix modelview;
 		Matrix modelmat;
@@ -716,10 +742,13 @@ void Init()
 	//EnumerateMaps();
 	//EnumerateDisplay();
 	MapKeys();
+
+	InitProfiles();
 }
 
 void Deinit()
 {
+	WriteProfiles(-1, 0);
 	DestroyWindow(TITLE);
     // Clean up
     SDL_Quit();
@@ -751,9 +780,14 @@ void EventLoop()
 	GUI* gui = &py->gui;
 
 	while (true) {
+
+		StartTimer(FRAME);
+
         SDL_Event e;
 		InEv ev;
 		ev.intercepted = false;
+
+		StartTimer(EVENT);
 
         if (SDL_PollEvent(&e)) {
             if (e.type == SDL_QUIT) {
@@ -967,10 +1001,13 @@ void EventLoop()
 			}
         }
 		
+		StopTimer(EVENT);
 #if 1
-		if ((g_mode == APPMODE_LOADING || g_mode == APPMODE_RELOADING) || DrawNextFrame(DRAW_FRAME_RATE))
+		if ((g_mode == APPMODE_LOADING || g_mode == APPMODE_RELOADING) || true /* DrawNextFrame(DRAW_FRAME_RATE) */ )
 #endif
 		{
+			StartTimer(DRAW);
+
 			CalcDrawFrameRate();
 			CheckGLError(__FILE__, __LINE__);
 			Draw();
@@ -981,13 +1018,21 @@ void EventLoop()
 				Scroll();
 				UpdateResTicker();
 			}
+
+			StopTimer(DRAW);
 		}
 
-		if((g_mode == APPMODE_LOADING || g_mode == APPMODE_RELOADING) || UpdNextFrame(SIM_FRAME_RATE))
+		if((g_mode == APPMODE_LOADING || g_mode == APPMODE_RELOADING) || true /* UpdNextFrame(SIM_FRAME_RATE) */ )
 		{
+			StartTimer(UPDATE);
+
 			CalcUpdFrameRate();
 			Update();
+
+			StopTimer(UPDATE);
 		}
+
+		StopTimer(FRAME);
     }
 }
 

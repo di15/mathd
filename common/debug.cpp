@@ -15,6 +15,151 @@
 #include "gui/widgets/spez/constructionview.h"
 #include "sim/player.h"
 #include "window.h"
+#include "../game/gmain.h"
+
+Profile g_profile[PROFILES];
+ofstream g_profF;
+
+void StartTimer(int id)
+{
+	//return;
+
+	//if(g_mode != APPMODE_PLAY)
+	//	return;
+
+	g_profile[id].starttick = GetTickCount();
+}
+
+void StopTimer(int id)
+{
+	//return;
+
+	if(g_mode != APPMODE_PLAY)
+		return;
+
+#ifdef DEBUG
+	if(id == UPDATE)
+	{
+		g_log<<endl<<"upd el = "<<GetTickCount()<<" - "<<g_profile[id].starttick<<endl<<endl;
+	}
+#endif
+
+	int elapsed = GetTickCount() - g_profile[id].starttick;
+	g_profile[id].starttick = GetTickCount();
+	g_profile[id].lastframeelapsed += elapsed;
+	
+#ifdef DEBUG
+	if(id == UPDATE)
+	{
+		g_log<<endl<<"upd el"<<elapsed<<" tot"<<g_profile[id].lastframeelapsed<<" avg"<<g_profile[id].averagems<<endl<<endl;
+	}
+#endif
+
+	if(id == FRAME || g_profile[id].lastframe < g_profile[FRAME].lastframe)
+	{
+		
+#ifdef DEBUG
+		if(id == UPDATE)
+		{
+			g_log<<endl<<"upd ( (double)"<<g_profile[id].lastframeelapsed<<" + "<<g_profile[id].averagems<<"*(double)"<<g_profile[id].frames<<" ) / (double)("<<g_profile[id].frames<<"+1); = ";
+		}
+#endif
+
+		//g_profile[id].averagems = ( g_profile[id].lastframeaverage + g_profile[id].averagems*g_profile[id].frames ) / (g_profile[id].frames+1);
+		g_profile[id].averagems = ( (double)g_profile[id].lastframeelapsed + g_profile[id].averagems*(double)g_profile[id].frames ) / (double)(g_profile[id].frames+1);
+		g_profile[id].frames++;
+		//g_profile[id].timescountedperframe = 0;
+		g_profile[id].lastframeelapsed = 0;
+		g_profile[id].lastframe = g_profile[FRAME].lastframe;
+
+		
+#ifdef DEBUG
+		if(id == UPDATE)
+		{
+			g_log<<g_profile[id].averagems<<endl<<endl;
+		}
+#endif
+
+		//g_log<<g_profile[id].name<<" "<<g_profile[id].averagems<<"ms"<<endl;
+	}
+	if(id == FRAME)
+		g_profile[id].lastframe++;
+
+	//g_profile[id].lastframeaverage = ( elapsed + g_profile[id].lastframeaverage*g_profile[id].timescountedperframe ) / (g_profile[id].timescountedperframe+1);
+	//g_profile[id].timescountedperframe+=1.0f;
+}
+
+void WriteProfiles(int in, int layer)
+{
+	if(in == -1)
+		g_profF.open("profiles.txt", ios_base::out);
+
+	double totalms = 0;
+	double percentage;
+
+	for(int j=0; j<PROFILES; j++)
+	{
+		if(g_profile[j].inside != in)
+			continue;
+
+		totalms += g_profile[j].averagems;
+	}
+
+	for(int j=0; j<PROFILES; j++)
+	{
+		if(g_profile[j].inside != in)
+			continue;
+
+		percentage = 100.0 * g_profile[j].averagems / totalms;
+
+		for(int k=0; k<layer; k++)
+			g_profF<<"\t";
+
+		g_profF<<g_profile[j].name<<"\t...\t"<<g_profile[j].averagems<<"ms per frame, "<<percentage<<"% of this level's total"<<endl;
+
+		WriteProfiles(j, layer+1);
+	}
+
+	if(in == -1)
+		g_profF.flush();
+}
+
+void DefProfile(int id, int inside, char* name)
+{
+	g_profile[id].inside = inside;
+	strcpy(g_profile[id].name, name);
+}
+
+void InitProfiles()
+{
+	DefProfile(FRAME, -1, "Frame");
+	DefProfile(EVENT, FRAME, "EventProc");
+	DefProfile(DRAW, FRAME, "Draw();");
+	DefProfile(UPDATE, FRAME, "Update();");
+	DefProfile(UPDATEUNITS, UPDATE, "UpdateUnits();");
+	DefProfile(UPDUONCHECK, UPDATEUNITS, "Upd U On Ch");
+	DefProfile(UPDUNITAI, UPDATEUNITS, "Upd Unit AI");
+	DefProfile(MOVEUNIT, UPDATEUNITS, "Move Unit");
+	DefProfile(ANIMUNIT, UPDATEUNITS, "Anim Unit");
+	DefProfile(UPDATEBUILDINGS, UPDATE, "UpdateBuildings();");
+	DefProfile(DRAWBUILDINGS, DRAW, "DrawBuildings();");
+	DefProfile(DRAWUNITS, DRAW, "DrawUnits();");
+	DefProfile(DRAWRIM, DRAW, "DrawRim();");
+	DefProfile(DRAWWATER, DRAW, "DrawWater();");
+	DefProfile(DRAWCRPIPES, DRAW, "DrawCrPipes();");
+	DefProfile(DRAWPOWLS, DRAW, "DrawPowls();");
+	DefProfile(DRAWFOLIAGE, DRAW, "DrawFoliage();");
+	DefProfile(SORTPARTICLES, DRAW, "SortParticles();");
+	DefProfile(DRAWPARTICLES, DRAW, "DrawParticles();");
+	DefProfile(DRAWMAP, DRAW, "DrawMap();");
+	DefProfile(SHADOWS, DRAW, "Shadows");
+	DefProfile(DRAWSKY, DRAW, "DrawSky();");
+	DefProfile(DRAWPOWERLINES, DRAW, "DrawPowls();");
+	DefProfile(DRAWROADS, DRAW, "DrawRoads();");
+	DefProfile(DRAWMODEL1, DRAWBUILDINGS, "Draw model 1");
+	DefProfile(DRAWMODEL2, DRAWBUILDINGS, "Draw model 2");
+	DefProfile(DRAWMODEL3, DRAWBUILDINGS, "Draw model 3");
+}
 
 void CheckNum(const char* num)
 {

@@ -1,5 +1,5 @@
 
-#version 150
+#version 130
 
 in vec4 position;
 
@@ -33,6 +33,7 @@ uniform float maxelev;
 out float elevy;
 
 uniform vec3 sundirection;
+uniform mat4 normalMat;
 
 uniform float mind;
 uniform float maxd;
@@ -52,7 +53,7 @@ void main(void)
 	logz = log(gl_Position.w*C + 1)*FC;
 	gl_Position.z = (2*logz - 1)*gl_Position.w;
 
-	mat4 normalMat = transpose( inverse( model ) );
+	//mat4 normalMat = transpose( inverse( model ) );
 	//mat4 normalMat = invModelView;
 	vec3 normalEyeSpace = vec3( normalMat * vec4(normalIn, 0.0) );
 	normalOut = normalize(normalEyeSpace);
