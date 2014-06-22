@@ -77,7 +77,7 @@ void GetGLVersion(int* major, int* minor)
 void InitGLSL()
 {
 	//strstr("abab", "ba");
-
+	glewExperimental = GL_TRUE;
 	GLenum glewError = glewInit();
     if( glewError != GLEW_OK )
     {
