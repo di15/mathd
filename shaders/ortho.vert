@@ -1,5 +1,6 @@
 
-#version 150
+#version 130
+
 
 
 in vec4 position;

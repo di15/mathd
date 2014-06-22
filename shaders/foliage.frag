@@ -1,5 +1,6 @@
 
-#version 150
+#version 130
+
 
 uniform vec4 color;
 
@@ -49,18 +50,14 @@ void main (void)
 
 	alph = 1.0;
 
-	vec3 smcoord = lpos.xyz / lpos.w;
-	float shadow = max(0.6, float(smcoord.z <= texture(shadowmap, smcoord.xy).x));
-	//float shadow = 1;
-
 	//vec3 bump = normalize( texture(normalmap, texCoordOut0).xyz * 2.0 - 1.0);
 
 	vec3 lvec = normalize(light_vec);
-	//float diffuse = max(dot(-lvec, normalOut), 0.0) + 0.50;
+	float diffuse = max(dot(lvec, normalOut), 0.0) * 0.75 + 0.50;
 
 	//float distSqr = dot(light_vec, light_vec);
 	//vec3 lvec = light_vec * inversesqrt(distSqr);
-	float diffuse = max( dot(lvec, vec3(0,0,1)), 0.0 ) * 0.75 + 0.5;
+	//float diffuse = max( dot(lvec, vec3(0,0,1)), 0.0 ) * 0.75 + 0.5;
 	//float diffuse = max( dot(lvec, bump), 0.0 ) * 0.75 + 0.50;
 
 	//vec3 vvec = normalize(eyevec);
@@ -74,7 +71,8 @@ void main (void)
 	//gl_FragColor = vec4(color.xyz * stexel.xyz * shadow * diffuse + vspecular, alph);
 	//gl_FragColor = vec4(color.xyz * stexel.xyz * diffuse + vspecular, alph);
 	//gl_FragColor = vec4(color.xyz * diffuse, alph);
-	outfrag = vec4(color.xyz * stexel.xyz * shadow * diffuse, alph);
+	//outfrag = vec4(color.xyz * stexel.xyz * shadow * diffuse, alph);
+	outfrag = vec4(color.xyz * stexel.xyz * diffuse, alph);
 	//gl_FragColor = vec4(1,0,0,1);
 	//gl_FragColor = texel0;
 	//gl_FragColor = vec4(light_vec, color.w * texel0.w);	

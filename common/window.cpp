@@ -236,9 +236,10 @@ bool MakeWindow(const char* title)
 {
 	// Request compatibility because GLEW doesn't play well with core contexts.
 #if 1
-	SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_COMPATIBILITY);
+	//SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_COMPATIBILITY);
+	//SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_COMPATIBILITY);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3); 
-	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2); 
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0); 
 	SDL_GL_SetAttribute(SDL_GL_ACCELERATED_VISUAL, 1);
 	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
 	SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24); 
@@ -301,10 +302,12 @@ bool MakeWindow(const char* title)
         return false;
     }
 #endif
+	SDL_GL_SetSwapInterval(0);
 
 	g_glcontext = SDL_GL_CreateContext(g_window);
 	//SDL_GL_SetSwapInterval(1);
-
+	
+	SDL_GL_SetSwapInterval(0);
 	//SDL_Delay(7000);
 	//SDL_Delay(7000);
 

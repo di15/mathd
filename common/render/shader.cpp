@@ -95,10 +95,16 @@ void InitGLSL()
         ErrorMessage("Error", "OpenGL 2.1 not supported!\n" );
         return;
     }
-#else
+#elif 0
     if( !GLEW_VERSION_3_2 )
     {
         ErrorMessage("Error", "OpenGL 3.2 not supported!\n" );
+        return;
+    }
+#else
+    if( !GLEW_VERSION_3_0 )
+    {
+        ErrorMessage("Error", "OpenGL 3.0 not supported!\n" );
         return;
     }
 #endif
@@ -125,9 +131,9 @@ void InitGLSL()
 	int major, minor;
 	GetGLVersion(&major, &minor);
 
-	if(major < 3 || ( major == 3 && minor < 2 ))
+	if(major < 3 || ( major == 3 && minor < 0 ))
 	{
-		ErrorMessage("Error", "OpenGL 3.2 is not supported!");
+		ErrorMessage("Error", "OpenGL 3.0 is not supported!");
 	}
 	
 	LoadShader(SHADER_ORTHO, "shaders/ortho.vert", "shaders/ortho.frag");
@@ -279,7 +285,7 @@ void LoadShader(int shader, char* strVertex, char* strFragment)
     s->MapUniform(SSLOT_MODELMAT, "model");
     s->MapUniform(SSLOT_VIEWMAT, "view");
     s->MapUniform(SSLOT_MVPMAT, "mvpmat");
-	//s->MapUniform(SSLOT_NORMALMAT, "normalMat");
+	s->MapUniform(SSLOT_NORMALMAT, "normalMat");
 	//s->MapUniform(SSLOT_INVMODLVIEWMAT, "invModelView");
     s->MapUniform(SSLOT_COLOR, "color");
     s->MapUniform(SSLOT_OWNCOLOR, "owncolor");

@@ -371,7 +371,7 @@ void Click_NewGame()
 	CheckGLError(__FILE__, __LINE__);
 
 	gui->add(new WindowW(gui, "window", Resize_Window));
-	gui->open("window");
+	//gui->open("window");
 
 	WindowW* win = (WindowW*)gui->get("window");
 

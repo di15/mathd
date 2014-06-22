@@ -47,8 +47,8 @@ void DrawTransactions(Matrix projmodlview)
 		//DrawBoxShadText(MAINFONT8, x1, y1, py->width, py->height, &triter->rtext, color, 0, -1);
 		//DrawCenterShadText(MAINFONT8, x1, y1, &triter->rtext, color, -1);
 
-		triter->drawpos.y += TRANSACTION_RISE;
-		triter->life -= TRANSACTION_DECAY;
+		triter->drawpos.y += TRANSACTION_RISE * g_drawfrinterval;
+		triter->life -= TRANSACTION_DECAY * g_drawfrinterval;
 
 		if(triter->life <= 0.0f)
 		{

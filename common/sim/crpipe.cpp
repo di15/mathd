@@ -270,7 +270,7 @@ void DrawCrPipe(int x, int z, bool plan)
 
 void DrawCrPipes()
 {
-	//StartProfile(DRAWPOWERLINES);
+	//StartTimer(DRAWPOWERLINES);
     
 	//int type;
 	//CrPipeTile* p;
@@ -325,7 +325,7 @@ void DrawCrPipes()
 	//glColor4f(1,1,1,1);
 	glUniform4f(g_shader[g_curS].m_slot[SSLOT_COLOR], 1, 1, 1, 1);
 #endif
-	//EndProfile(DRAWPOWERLINES);
+	//StopTimer(DRAWPOWERLINES);
 }
 
 int GetCrPipeType(int x, int z, bool plan=false)

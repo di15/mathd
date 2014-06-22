@@ -1,5 +1,5 @@
 
-#version 150
+#version 130
 
 in vec4 position;
 
@@ -44,6 +44,7 @@ out float snowalpha;
 out float crackedrockalpha;
 
 uniform vec3 sundirection;
+uniform mat4 normalMat;
 
 uniform float mind;
 uniform float maxd;
@@ -171,7 +172,7 @@ void main(void)
 
 	//vec3 normalEyeSpace = vec3( normalMatrix * vec4(normalIn, 0.0) );
 	//vec3 normalEyeSpace = mat3(normalMatrix) * normalIn;
-	mat4 normalMat = transpose( inverse( model * view ) );
+	//mat4 normalMat = transpose( inverse( model * view ) );
 	//mat4 normalMat = invModelView;
 	vec3 normalEyeSpace = vec3( normalMat * vec4(normalIn, 0.0) );
 	normalOut = normalize(normalEyeSpace);

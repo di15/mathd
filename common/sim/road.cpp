@@ -421,7 +421,7 @@ void DrawRoadPlan(int x, int z)
 
 void DrawRoads()
 {
-	//StartProfile(DRAWROADS);
+	//StartTimer(DRAWROADS);
 
 	//int type;
 	//RoadTile* r;
@@ -467,7 +467,7 @@ void DrawRoads()
 			//glColor4f(1,1,1,1);
 			glUniform4f(g_shader[g_curS].m_slot[SSLOT_COLOR], 1, 1, 1, 1);
 
-			//EndProfile(DRAWROADS);
+			//StopTimer(DRAWROADS);
 }
 
 int GetRoadType(int x, int z, bool plan=false)

@@ -411,6 +411,9 @@ void DrawViewport(int which, int x, int y, int width, int height)
 	Player* py = &g_player[g_currP];
 	Camera* c = &py->camera;
 
+	
+	Matrix oldview = g_cameraViewMatrix;
+
 	if(which == VIEWPORT_ENTVIEW)
 	{
 		float aspect = fabsf((float)width / (float)height);
@@ -422,6 +425,8 @@ void DrawViewport(int which, int x, int y, int width, int height)
 		Vec3f upvec = py->bpcam.m_up;
 
 		Matrix viewmat = gluLookAt3(posvec.x, posvec.y, posvec.z, focusvec.x, focusvec.y, focusvec.z, upvec.x, upvec.y, upvec.z);
+		
+		g_cameraViewMatrix = viewmat;
 
 		Matrix modelview;
 		Matrix modelmat;
@@ -467,6 +472,8 @@ void DrawViewport(int which, int x, int y, int width, int height)
 		Vec3f upvec = c->m_up;
 
 		Matrix viewmat = gluLookAt3(posvec.x, posvec.y, posvec.z, focusvec.x, focusvec.y, focusvec.z, upvec.x, upvec.y, upvec.z);
+		
+		g_cameraViewMatrix = viewmat;
 
 		Matrix modelview;
 		Matrix modelmat;
@@ -501,6 +508,7 @@ void DrawViewport(int which, int x, int y, int width, int height)
 		}
 	}
 
+	g_cameraViewMatrix = oldview;
 
 #if 0
 	EndS();

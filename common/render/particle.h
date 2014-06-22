@@ -46,7 +46,7 @@ public:
 	EmitterCounter() { last = GetTickCount(); }
 	bool EmitNext(int delay) 
 	{ 
-		if(GetTickCount64()-last > delay) 
+		if(GetTickCount64()-last > (long long)delay) 
 		{
 			last = GetTickCount64();
 			return true;
@@ -70,7 +70,7 @@ public:
 	Particle() { on = false; }
 	Particle(Vec3f p, Vec3f v) { on = true; vel = v; }
 
-	void Update(Billboard* billb);
+	void update(Billboard* billb);
 };
 
 #define PARTICLES 512

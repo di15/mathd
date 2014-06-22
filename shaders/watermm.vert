@@ -1,5 +1,5 @@
 
-#version 150
+#version 130
 
 in vec4 position;
 
@@ -33,6 +33,7 @@ uniform float maxelev;
 out float elevy;
 
 uniform vec3 sundirection;
+uniform mat4 normalMat;
 
 uniform float mapminz;
 uniform float mapmaxz;
@@ -72,7 +73,7 @@ void main(void)
 
 	//vec3 normalEyeSpace = vec3( normalMatrix * vec4(normalIn, 0.0) );
 	//vec3 normalEyeSpace = mat3(normalMatrix) * normalIn;
-	mat4 normalMat = transpose( inverse( model * view ) );
+	//mat4 normalMat = transpose( inverse( model * view ) );
 	//mat4 normalMat = transpose( inverse( model ) );
 	//mat4 normalMat = invModelView;
 	vec3 normalEyeSpace = vec3( normalMat * vec4(normalIn, 0.0) );

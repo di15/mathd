@@ -47,7 +47,8 @@ public:
 #pragma pack(pop)
 
 //#define FOLIAGES	128
-#define FOLIAGES	6000
+#define FOLIAGES	2048
+//#define FOLIAGES	6000
 //#define FOLIAGES	30000
 //#define FOLIAGES	240000
 

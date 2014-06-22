@@ -78,7 +78,7 @@ public:
 	bool hidden() const;
 };
 
-#define UNITS	(4096)
+#define UNITS	(1024)
 
 extern Unit g_unit[UNITS];
 

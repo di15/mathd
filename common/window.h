@@ -14,7 +14,7 @@
 #define MIN_DISTANCE		1.0f
 //#define MAX_DISTANCE		(100 * 1000 * 10.0f) //10km
 //#define MAX_DISTANCE		(10 * 1000 * 10.0f) //10km
-#define MAX_DISTANCE		(5 * 1000 * 10.0f) //10km
+#define MAX_DISTANCE		(5.0f * 1000.0f * 10.0f) //10km
 #define FIELD_OF_VIEW		45.0f
 //#define PROJ_LEFT			(-16*4)
 #define PROJ_RIGHT			600 //(500)	//(30*12.5f)
@@ -22,8 +22,8 @@
 //#define PROJ_BOTTOM			(-16*4)
 //#define INI_ZOOM			0.025f
 //#define MIN_ZOOM		0.1f
-#define MIN_ZOOM		0.025f
-//#define MIN_ZOOM		0.005f
+//#define MIN_ZOOM		0.025f
+#define MIN_ZOOM		0.005f
 //#define MAX_ZOOM		0.7f 
 //#define MAX_ZOOM		0.7f
 #define MAX_ZOOM		0.1f
