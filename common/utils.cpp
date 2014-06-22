@@ -279,7 +279,6 @@ void Sleep(int ms)
 {
         SDL_Delay(ms);
 }
-
 #endif
 
 #ifdef PLATFORM_WIN
