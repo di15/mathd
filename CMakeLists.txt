@@ -64,6 +64,7 @@ ADD_EXECUTABLE(${PROJECT_NAME}
         common/gui/widgets/viewportw.cpp
         common/gui/widgets/vscrollbar.cpp
         common/gui/widgets/windoww.cpp
+        common/matchmaking/matchmaking.cpp
         common/math/3dmath.cpp
         common/math/barycentric.cpp
         common/math/brush.cpp
