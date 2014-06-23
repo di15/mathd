@@ -15,7 +15,7 @@
 #include "../sound/sound.h"
 #include "player.h"
 
-list<OrderMarker> g_order;
+std::list<OrderMarker> g_order;
 
 void DrawOrders(Matrix* projection, Matrix* modelmat, Matrix* viewmat)
 {
@@ -141,14 +141,14 @@ void Order(int mousex, int mousey, int viewwidth, int viewheight, Vec3f campos, 
 	InfoMessage("asd", "found surf");
 #endif
 
-	//vector<int> selection = py->sel;
+	//std::vector<int> selection = py->sel;
 	//int selecttype = g_selectType;
 
 	//py->sel.clear();
 
 	//SelectOne();
 
-	//vector<int> targets = py->sel;
+	//std::vector<int> targets = py->sel;
 	//int targettype = g_selectType;
 
 	//py->sel = selection;
@@ -222,7 +222,7 @@ void Order(int mousex, int mousey, int viewwidth, int viewheight, Vec3f campos, 
 		}
 
 		//center = center / (float)py->sel.size();
-		//Vec3f half = (min + max) / 2.0f;
+		//Vec3f half = (std::min + std::max) / 2.0f;
 
 #if 0
 		char msg[256];

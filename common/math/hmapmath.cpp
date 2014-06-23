@@ -53,7 +53,7 @@ bool GetMapIntersection2(Heightmap* hmap, Vec3f* vLine, Vec3f* vIntersection)
 
 	if(InterPoly(vQuad, vLine, 4, vIntersection))
 		return true;
-		
+
 	vQuad[0] = Vec3f(-10*hmap->m_widthx*TILE_SIZE, WATER_LEVEL*2.0f, -10*hmap->m_widthz*TILE_SIZE);
 	vQuad[1] = Vec3f(-10*hmap->m_widthx*TILE_SIZE, TILE_SIZE*500, -10*hmap->m_widthz*TILE_SIZE);
 	vQuad[2] = Vec3f(-10*hmap->m_widthx*TILE_SIZE, TILE_SIZE*500, 10*hmap->m_widthz*TILE_SIZE);
@@ -61,12 +61,12 @@ bool GetMapIntersection2(Heightmap* hmap, Vec3f* vLine, Vec3f* vIntersection)
 
 	if(InterPoly(vQuad, vLine, 4, vIntersection))
 		return true;
-	
+
 	vQuad[0] = Vec3f(10*hmap->m_widthx*TILE_SIZE, TILE_SIZE*500, -10*hmap->m_widthz*TILE_SIZE);
 	vQuad[1] = Vec3f(10*hmap->m_widthx*TILE_SIZE, WATER_LEVEL*2.0f, -10*hmap->m_widthz*TILE_SIZE);
 	vQuad[2] = Vec3f(10*hmap->m_widthx*TILE_SIZE, WATER_LEVEL*2.0f, 10*hmap->m_widthz*TILE_SIZE);
 	vQuad[3] = Vec3f(10*hmap->m_widthx*TILE_SIZE, TILE_SIZE*500, 10*hmap->m_widthz*TILE_SIZE);
-	
+
 	if(InterPoly(vQuad, vLine, 4, vIntersection))
 		return true;
 
@@ -77,12 +77,12 @@ bool GetMapIntersection2(Heightmap* hmap, Vec3f* vLine, Vec3f* vIntersection)
 
 	if(InterPoly(vQuad, vLine, 4, vIntersection))
 		return true;
-	
+
 	vQuad[0] = Vec3f(-10*hmap->m_widthx*TILE_SIZE, TILE_SIZE*500, 10*hmap->m_widthz*TILE_SIZE);
 	vQuad[1] = Vec3f(-10*hmap->m_widthx*TILE_SIZE, WATER_LEVEL*2.0f, 10*hmap->m_widthz*TILE_SIZE);
 	vQuad[2] = Vec3f(10*hmap->m_widthx*TILE_SIZE, WATER_LEVEL*2.0f, 10*hmap->m_widthz*TILE_SIZE);
 	vQuad[3] = Vec3f(10*hmap->m_widthx*TILE_SIZE, TILE_SIZE*500, 10*hmap->m_widthz*TILE_SIZE);
-	
+
 	if(InterPoly(vQuad, vLine, 4, vIntersection))
 		return true;
 
@@ -119,7 +119,7 @@ bool GetMapIntersection(Heightmap* hmap, Vec3f* vLine, Vec3f* vIntersection)
 			if(InterPoly(vTri, vLine, 3, vIntersection))
 				return true;
 				*/
-			
+
 			vTri[0] = v[ (z * wx + x) * 3 * 2 + 0 ];
 			vTri[1] = v[ (z * wx + x) * 3 * 2 + 1 ];
 			vTri[2] = v[ (z * wx + x) * 3 * 2 + 2 ];
@@ -157,7 +157,7 @@ bool GetMapIntersection(Heightmap* hmap, Vec3f* vLine, Vec3f* vIntersection)
 
 				intercepted = true;
 			}
-			
+
 
 			/*
 			vTri[0] = v[ (z * wx + x) * 3 * 2 + 2 ];
@@ -186,7 +186,7 @@ Returns success (true) or failure (false).
 bool MoveIntoMap(Vec3f& point, Vec3f ray, Heightmap* hmap)
 {
 	// Already within map?
-	if(point.x >= 1 
+	if(point.x >= 1
 		&& point.x < (hmap->m_widthx-1) * TILE_SIZE - 1
 		&& point.z >= 1
 		&& point.z < (hmap->m_widthz-1) * TILE_SIZE - 1)
@@ -204,7 +204,7 @@ bool MoveIntoMap(Vec3f& point, Vec3f ray, Heightmap* hmap)
 	// Ray is of unit length, so this gives us how much we travel along the ray to get  x to within the map border.
 	float x0moveratio = -xdif / ray.x;
 	point = point + ray * x0moveratio;
-	
+
 	// Get z distance off the map.
 
 	float zdif = 0;
@@ -213,15 +213,15 @@ bool MoveIntoMap(Vec3f& point, Vec3f ray, Heightmap* hmap)
 		zdif = point.z - 5;	// Add padding to make sure we're within the map
 	else if(point.z >= (hmap->m_widthz-1) * TILE_SIZE)	// If start z is in front of the map
 		zdif = (hmap->m_widthz-1) * TILE_SIZE - point.z + 5;	// Add padding to make sure we're within the map
-	
+
 	// Ray is of unit length, so this gives us how much we travel along the ray to get z to within the map border.
 	float z0moveratio = -zdif / ray.z;
 	point = point + ray * z0moveratio;
-	
-	// If we still couldn't get the point within the map 
+
+	// If we still couldn't get the point within the map
 	// (maybe the ray is outside the map, beside a corner)
 	// then return false.
-	if(point.x < 1 
+	if(point.x < 1
 		|| point.x >= (hmap->m_widthx-1) * TILE_SIZE - 1
 		|| point.z < 1
 		|| point.z >= (hmap->m_widthz-1) * TILE_SIZE - 1)
@@ -268,10 +268,10 @@ bool FastMapIntersectOld(Heightmap* hmap, Vec3f line[2], Vec3f* intersection)
 
 	if(line[0].z < 0 && line[1].z < 0)
 		return false;
-	
+
 	if(line[0].z >= hmap->m_widthz * TILE_SIZE && line[1].z >= hmap->m_widthz * TILE_SIZE)
 		return false;
-	
+
 	Vec3f ray = Normalize( line[1] - line[0] );
 	float lengthsqrd = Magnitude2( line[1] - line[0] );	//length squared
 
@@ -289,7 +289,7 @@ bool FastMapIntersectOld(Heightmap* hmap, Vec3f line[2], Vec3f* intersection)
 
 	int currtilex = currpoint.x / TILE_SIZE;
 	int currtilez = currpoint.z / TILE_SIZE;
-	
+
 	// The directions in which we will move to the next tile on the x and z axis
 	int tiledx = 0;
 	int tiledz = 0;
@@ -306,7 +306,7 @@ bool FastMapIntersectOld(Heightmap* hmap, Vec3f line[2], Vec3f* intersection)
 
 	if(tiledx == 0 && tiledz == 0)
 		return false;
-	
+
 	int nexttilex = currtilex + tiledx;
 	int nexttilez = currtilez + tiledz;
 
@@ -316,7 +316,7 @@ bool FastMapIntersectOld(Heightmap* hmap, Vec3f line[2], Vec3f* intersection)
 	{
 		float xdif = currtilex * TILE_SIZE - currpoint.x;
 		float zdif = currtilez * TILE_SIZE - currpoint.z;
-		
+
 		float xmoveratio = xdif / ray.x;
 		float zmoveratio = zdif / ray.z;
 
@@ -328,7 +328,7 @@ bool FastMapIntersectOld(Heightmap* hmap, Vec3f line[2], Vec3f* intersection)
 			xdif = currtilex * TILE_SIZE - currpoint.x;
 			xmoveratio = xdif / ray.x;
 		}
-		
+
 		// Advance to the next tile margin on the zaxis
 		while(zmoveratio < 0)
 		{
@@ -366,19 +366,19 @@ bool FastMapIntersectOld(Heightmap* hmap, Vec3f line[2], Vec3f* intersection)
 		int maxtilez = currtilez;
 
 		//Are we close to the previous tile on the x axis?
-		if( max(0.0f, currpoint.x/TILE_SIZE-0.1f) < mintilex)
+		if( std::max(0.0f, currpoint.x/TILE_SIZE-0.1f) < mintilex)
 			mintilex--;
 
 		//Are we close to the previous tile on the z axis?
-		if( max(0.0f, currpoint.z/TILE_SIZE-0.1f) < mintilez)
+		if( std::max(0.0f, currpoint.z/TILE_SIZE-0.1f) < mintilez)
 			mintilez--;
 
 		//Are we close to the next tile on the x axis?
-		if( min(hmap->m_widthx-1.0f, currpoint.x/TILE_SIZE+0.1f) > maxtilex)
+		if( std::min(hmap->m_widthx-1.0f, currpoint.x/TILE_SIZE+0.1f) > maxtilex)
 			maxtilex++;
 
 		//Are we close to the next tile on the z axis?
-		if( min(hmap->m_widthz-1.0f, currpoint.z/TILE_SIZE+0.1f) > maxtilez)
+		if( std::min(hmap->m_widthz-1.0f, currpoint.z/TILE_SIZE+0.1f) > maxtilez)
 			maxtilez++;
 
 		for(int itertilex = mintilex; itertilex <= maxtilex; itertilex ++)
@@ -391,7 +391,7 @@ bool FastMapIntersectOld(Heightmap* hmap, Vec3f line[2], Vec3f* intersection)
 					return true;
 			}
 
-		currpoint = currpoint + ray * moveratio; 
+		currpoint = currpoint + ray * moveratio;
 
 		lengthdone += moveratio;
 
@@ -444,7 +444,7 @@ bool FastMapIntersect(Heightmap* hmap, Vec3f* line, Vec3f* intersection)
 
 		if(tz >= hmap->m_widthz)
 			continue;
-		
+
 		if(TileIntersect(hmap, line, tx, tz, intersection))
 			return true;
 	}
@@ -499,10 +499,10 @@ bool TileUnclimablei(int tx, int tz)
 	float h1 = g_hmap.getheight(tx+1, tz);
 	float h2 = g_hmap.getheight(tx, tz+1);
 	float h3 = g_hmap.getheight(tx+1, tz+1);
-    
-	float minh = min(h0, min(h1, min(h2, h3)));
-	float maxh = max(h0, max(h1, max(h2, h3)));
-    
+
+	float minh = std::min(h0, std::min(h1, std::min(h2, h3)));
+	float maxh = std::max(h0, std::max(h1, std::max(h2, h3)));
+
 	if(fabs(maxh - minh) > MAX_CLIMB_INCLINE)
 	{
 #if 0
@@ -514,7 +514,7 @@ bool TileUnclimablei(int tx, int tz)
 #endif
 		return true;
 	}
-    
+
 	return false;
 }
 
@@ -522,7 +522,7 @@ bool TileUnclimable(float px, float pz)
 {
 	int tx = px / TILE_SIZE;
 	int tz = pz / TILE_SIZE;
-    
+
 	return TileUnclimablei(tx, tz);
 }
 
@@ -530,16 +530,16 @@ bool AnyWateri(int tx, int tz)
 {
 	if(g_hmap.getheight(tx, tz) <= WATER_LEVEL)
 		return true;
-    
+
 	if(g_hmap.getheight(tx+1, tz) <= WATER_LEVEL)
 		return true;
-    
+
 	if(g_hmap.getheight(tx, tz+1) <= WATER_LEVEL)
 		return true;
-    
+
 	if(g_hmap.getheight(tx+1, tz+1) <= WATER_LEVEL)
 		return true;
-    
+
 	return false;
 }
 
@@ -547,16 +547,16 @@ bool AnyLandi(int tx, int tz)
 {
 	if(g_hmap.getheight(tx, tz) > WATER_LEVEL)
 		return true;
-    
+
 	if(g_hmap.getheight(tx+1, tz) > WATER_LEVEL)
 		return true;
-    
+
 	if(g_hmap.getheight(tx, tz+1) > WATER_LEVEL)
 		return true;
-    
+
 	if(g_hmap.getheight(tx+1, tz+1) > WATER_LEVEL)
 		return true;
-    
+
 	return false;
 }
 
@@ -564,7 +564,7 @@ bool AnyWater(int cmx, int cmz)
 {
 	int tx = cmx / TILE_SIZE;
 	int tz = cmz / TILE_SIZE;
-    
+
 	return AnyWateri(tx, tz);
 }
 
@@ -575,7 +575,7 @@ bool AtWater(int cmx, int cmz)
 #else
 	const float h = g_hmap.accheight(cmx, cmz);
 #endif
-    
+
 	if(h <= WATER_LEVEL)
 	{
 #if 0
@@ -583,7 +583,7 @@ bool AtWater(int cmx, int cmz)
 #endif
 		return true;
 	}
-    
+
 	return false;
 }
 
@@ -594,7 +594,7 @@ bool AtLand(int cmx, int cmz)
 #else
 	const float h = g_hmap.accheight(cmx, cmz);
 #endif
-    
+
 	if(h > WATER_LEVEL)
 	{
 #if 0
@@ -602,6 +602,6 @@ bool AtLand(int cmx, int cmz)
 #endif
 		return true;
 	}
-    
+
 	return false;
 }

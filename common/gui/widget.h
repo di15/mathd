@@ -56,12 +56,12 @@ public:
 	unsigned int m_bgovertex;
 	bool m_over;
 	bool m_ldown;	//was the left mouse button pressed while over this (i.e. drag)?
-	string m_name;
+	std::string m_name;
 	RichText m_text;
 	int m_font;
 	unsigned int m_frametex, m_filledtex, m_uptex, m_downtex;
 	bool m_opened;
-	vector<RichText> m_options;
+	std::vector<RichText> m_options;
 	int m_selected;
 	float m_scroll[2];
 	bool m_mousescroll;
@@ -73,7 +73,7 @@ public:
 	bool m_passw;
 	int m_maxlen;
 	bool m_shadow;
-	list<Widget*> m_subwidg;
+	std::list<Widget*> m_subwidg;
 	int m_lines;
 	int m_alignment;
 	RichText m_label;

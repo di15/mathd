@@ -32,7 +32,7 @@ public:
 	Vec3f facing;
 	Vec2f rotation;
 
-	list<Vec2i> path;
+	std::list<Vec2i> path;
 	Vec2i goal;
 
 	int target;
@@ -52,7 +52,7 @@ public:
 	int targtype;
 	int home;
 	int car;
-	//vector<TransportJob> bids;
+	//std::vector<TransportJob> bids;
 
 	float frame[2];
 
@@ -61,10 +61,10 @@ public:
 	unsigned char mode;
 	int pathdelay;
 	long long lastpath;
-	
+
 	bool threadwait;
 
-	list<Demand*> demands;
+	std::list<Demand*> demands;
 
 	// used for debugging - don't save to file
 	bool collided;
@@ -78,7 +78,7 @@ public:
 	bool hidden() const;
 };
 
-#define UNITS	(1024)
+#define UNITS	(4096)
 
 extern Unit g_unit[UNITS];
 

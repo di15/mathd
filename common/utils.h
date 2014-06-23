@@ -9,12 +9,12 @@ using namespace std;
 
 extern ofstream g_log;
 
-const string DateTime();
-const string FileDateTime();
+const std::string DateTime();
+const std::string FileDateTime();
 void FullPath(const char* filename, char* full);
-string MakePathRelative(const char* full);
+std::string MakePathRelative(const char* full);
 void ExePath(char* exepath);
-string StripFile(string filepath);
+std::string StripFile(std::string filepath);
 void StripPathExtension(const char* n, char* o);
 void StripExtension(char* filepath);
 void StripPath(char* filepath);

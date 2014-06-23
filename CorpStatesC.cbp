@@ -12,8 +12,23 @@
 				<Option type="1" />
 				<Option compiler="gcc" />
 				<Compiler>
+					<Add option="-std=c++0x" />
 					<Add option="-g" />
 				</Compiler>
+				<Linker>
+					<Add library="GL" />
+					<Add library="GLU" />
+					<Add library="GLEW" />
+					<Add library="SDL2" />
+					<Add library="png" />
+					<Add library="jpeg" />
+					<Add library="z" />
+					<Add library="zip" />
+				</Linker>
+				<ExtraCommands>
+					<Add after='cmd /c yes | cp &quot;$(PROJECT_DIR)$(TARGET_OUTPUT_FILE)&quot; &quot;$(PROJECT_DIR)../testfolder/&quot;' />
+					<Mode after="always" />
+				</ExtraCommands>
 			</Target>
 			<Target title="Release">
 				<Option output="bin/Release/CorpStatesC" prefix_auto="1" extension_auto="1" />
@@ -22,14 +37,28 @@
 				<Option compiler="gcc" />
 				<Compiler>
 					<Add option="-O2" />
+					<Add option="-std=c++0x" />
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
+					<Add library="GL" />
+					<Add library="GLU" />
+					<Add library="GLEW" />
+					<Add library="SDL2" />
+					<Add library="png" />
+					<Add library="jpeg" />
+					<Add library="z" />
+					<Add library="zip" />
 				</Linker>
+				<ExtraCommands>
+					<Add after='cmd /c yes | cp &quot;$(PROJECT_DIR)$(TARGET_OUTPUT_FILE)&quot; &quot;$(PROJECT_DIR)../testfolder/&quot;' />
+					<Mode after="always" />
+				</ExtraCommands>
 			</Target>
 		</Build>
 		<Compiler>
 			<Add option="-Wall" />
+			<Add directory="libs/SDL2_net-2.0.0" />
 		</Compiler>
 		<Unit filename="common/ai/astarpath.cpp" />
 		<Unit filename="common/ai/astarpath.h" />
@@ -130,9 +159,8 @@
 		<Unit filename="common/math/3dmath.h" />
 		<Unit filename="common/math/barycentric.cpp" />
 		<Unit filename="common/math/barycentric.h" />
+		<Unit filename="common/math/brush.cpp" />
 		<Unit filename="common/math/brush.h" />
-		<Unit filename="common/math/brushside.cpp" />
-		<Unit filename="common/math/brushside.h" />
 		<Unit filename="common/math/camera.cpp" />
 		<Unit filename="common/math/camera.h" />
 		<Unit filename="common/math/edge.cpp" />
@@ -204,6 +232,8 @@
 		<Unit filename="common/render/water.h" />
 		<Unit filename="common/save/savemap.cpp" />
 		<Unit filename="common/save/savemap.h" />
+		<Unit filename="common/script/script.cpp" />
+		<Unit filename="common/script/script.h" />
 		<Unit filename="common/sim/build.cpp" />
 		<Unit filename="common/sim/build.h" />
 		<Unit filename="common/sim/building.cpp" />
@@ -263,6 +293,14 @@
 		<Unit filename="game/gui/playgui.h" />
 		<Unit filename="game/keymap.cpp" />
 		<Unit filename="game/keymap.h" />
+		<Unit filename="libs/objectscript/objectscript.cpp" />
+		<Unit filename="libs/objectscript/objectscript.h" />
+		<Unit filename="libs/objectscript/os-binder-arg-cc-functions.h" />
+		<Unit filename="libs/objectscript/os-binder-cc-functions.h" />
+		<Unit filename="libs/objectscript/os-binder-function.h" />
+		<Unit filename="libs/objectscript/os-binder.h" />
+		<Unit filename="libs/objectscript/os-heap.cpp" />
+		<Unit filename="libs/objectscript/os-heap.h" />
 		<Extensions>
 			<code_completion />
 			<debugger />

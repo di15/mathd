@@ -41,7 +41,7 @@ void DrawDeposits(const Matrix projection, const Matrix viewmat)
 
 	Matrix mvp;
 	mvp.set(projection.m_matrix);
-	mvp.postMultiply(viewmat);
+	mvp.postmult(viewmat);
 
 	Player* py = &g_player[g_currP];
 

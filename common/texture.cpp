@@ -6,7 +6,7 @@
 #include "debug.h"
 
 Texture g_texture[TEXTURES];
-vector<TextureToLoad> g_texLoad;
+std::vector<TextureToLoad> g_texLoad;
 
 int g_texwidth;
 int g_texheight;
@@ -44,7 +44,7 @@ LoadedTex *LoadBMP(const char *fullpath)
 	LoadedTex *pImage = new LoadedTex;
 	FILE *pFile = NULL;
 
-	if((pFile = fopen(fullpath, "rb")) == NULL) 
+	if((pFile = fopen(fullpath, "rb")) == NULL)
 	{
 		char msg[MAX_PATH+1];
 		sprintf(msg, "Unable to load BMP File: %s", fullpath);
@@ -60,7 +60,7 @@ LoadedTex *LoadBMP(const char *fullpath)
 	AUX_RGBImageRec *pBitbldg = NULL;
 
 	// Load the bitbldg using the aux function stored in glaux.lib
-	pBitbldg = auxDIBImageLoad(fullpath);				
+	pBitbldg = auxDIBImageLoad(fullpath);
 
 	pImage->channels = 3;
 	pImage->sizeX = pBitbldg->sizeX;
@@ -91,7 +91,7 @@ LoadedTex *LoadBMP(const char *fullpath)
 		// Store a pointer to the current line of pixels
 		unsigned char *pLine = &(pImage->data[stride * y]);
 		unsigned char *pLine2 = &(pImage->data[stride * y2]);
-			
+
 		// Go through all of the pixels and swap the B and R values since TGA
 		// files are stored as BGR instead of RGB (or use GL_BGR_EXT verses GL_RGB)
 		for(i = 0; i < stride; i += pImage->channels)
@@ -99,11 +99,11 @@ LoadedTex *LoadBMP(const char *fullpath)
 			temp = pLine[i];
 			pLine[i] = pLine2[i];
 			pLine2[i] = temp;
-			
+
 			temp = pLine[i+1];
 			pLine[i+1] = pLine2[i+1];
 			pLine2[i+1] = temp;
-			
+
 			temp = pLine[i+2];
 			pLine[i+2] = pLine2[i+2];
 			pLine2[i+2] = temp;
@@ -125,7 +125,7 @@ LoadedTex *LoadTGA(const char *fullpath)
 	int stride = 0;						// The stride (channels * width)
 	int i = 0;							// A counter
 
-	if((pFile = fopen(fullpath, "rb")) == NULL) 
+	if((pFile = fopen(fullpath, "rb")) == NULL)
 	{
 		char msg[MAX_PATH+1];
 		sprintf(msg, "Unable to load TGA File: %s", fullpath);
@@ -143,13 +143,13 @@ LoadedTex *LoadTGA(const char *fullpath)
 	fread(&length, sizeof(byte), 1, pFile);
 
 	// Jump over one byte
-	fseek(pFile,1,SEEK_CUR); 
+	fseek(pFile,1,SEEK_CUR);
 
 	// Read in the imageType (RLE, RGB, etc...)
 	fread(&imageType, sizeof(byte), 1, pFile);
 
 	// Skip past general information we don't care about
-	fseek(pFile, 9, SEEK_CUR); 
+	fseek(pFile, 9, SEEK_CUR);
 
 	// Read the width, height and bits per pixel (16, 24 or 32)
 	fread(&width,  sizeof(WORD), 1, pFile);
@@ -157,7 +157,7 @@ LoadedTex *LoadTGA(const char *fullpath)
 	fread(&bits,   sizeof(byte), 1, pFile);
 
 	// Now we move the file pointer to the pixel data
-	fseek(pFile, length + 1, SEEK_CUR); 
+	fseek(pFile, length + 1, SEEK_CUR);
 
 	// Check if the image is RLE compressed or not
 	if(imageType != TGA_RLE)
@@ -208,7 +208,7 @@ LoadedTex *LoadTGA(const char *fullpath)
 			channels = 3;
 			stride = channels * width;
 			pImageData->data = ((unsigned char*)malloc(sizeof(unsigned char)*stride*height));
-			
+
 			if(!pImageData->data)
 			{
 				OutOfMem(__FILE__, __LINE__);
@@ -233,7 +233,7 @@ LoadedTex *LoadTGA(const char *fullpath)
 				pImageData->data[i * 3 + 1] = g;
 				pImageData->data[i * 3 + 2] = b;
 			}
-		}	
+		}
 		// Else return a NULL for a bad or unsupported pixel format
 		else
 			return NULL;
@@ -265,7 +265,7 @@ LoadedTex *LoadTGA(const char *fullpath)
 			// Read in the current color count + 1
 			fread(&rleID, sizeof(byte), 1, pFile);
 
-			// Check if we don't have an encoded string of colors
+			// Check if we don't have an encoded std::string of colors
 			if(rleID < 128)
 			{
 				// Increase the count by 1
@@ -293,7 +293,7 @@ LoadedTex *LoadTGA(const char *fullpath)
 					colorsRead += channels;
 				}
 			}
-			// Else, let's read in a string of the same character
+			// Else, let's read in a std::string of the same character
 			else
 			{
 				// Minus the 128 ID + 1 (127) to get the color count that needs to be read
@@ -410,10 +410,10 @@ void DecodeJPG(jpeg_decompress_struct* cinfo, LoadedTex *pImageData)
 
 	// Now comes the juice of our work, here we extract all the pixel data
 	int rowsRead = 0;
-	while (cinfo->output_scanline < cinfo->output_height) 
+	while (cinfo->output_scanline < cinfo->output_height)
 	{
 		// Read in the current row of pixels and increase the rowsRead count
-		rowsRead += jpeg_read_scanlines(cinfo, 
+		rowsRead += jpeg_read_scanlines(cinfo,
 										&rowPtr[rowsRead], cinfo->output_height - rowsRead);
 	}
 
@@ -430,8 +430,8 @@ LoadedTex *LoadJPG(const char *fullpath)
 	LoadedTex *pImageData = NULL;
 	FILE *pFile;
 
-	// Open a file pointer to the jpeg file and check if it was found and opened 
-	if((pFile = fopen(fullpath, "rb")) == NULL) 
+	// Open a file pointer to the jpeg file and check if it was found and opened
+	if((pFile = fopen(fullpath, "rb")) == NULL)
 	{
 		// Display an error message saying the file was not found, then return NULL
 		char msg[MAX_PATH+1];
@@ -449,7 +449,7 @@ LoadedTex *LoadJPG(const char *fullpath)
 	// Initialize the decompression object
 	jpeg_create_decompress(&cinfo);
 
-	// Specify the data source (Our file pointer)	
+	// Specify the data source (Our file pointer)
 	jpeg_stdio_src(&cinfo, pFile);
 
 	// allocate the structure that will hold our eventual jpeg data (must free it!)
@@ -487,7 +487,7 @@ LoadedTex *LoadPNG(const char *fullpath)
 	png_byte header[8];
 	fread(header, sizeof(png_byte), 8, fp);
 	fclose(fp);
-	
+
 	g_log<<"PNG header "<<relative<<" "
 		<<(int)header[0]<<","<<(int)header[1]<<","<<(int)header[2]<<","<<(int)header[3]<<","
 		<<(int)header[4]<<","<<(int)header[5]<<","<<(int)header[6]<<","<<(int)header[7]<<endl;
@@ -510,7 +510,7 @@ LoadedTex *LoadPNG(const char *fullpath)
 
 	png_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
 
-	if (png_ptr == NULL) 
+	if (png_ptr == NULL)
 	{
         fclose(fp);
         return NULL;
@@ -519,7 +519,7 @@ LoadedTex *LoadPNG(const char *fullpath)
 	/* allocate/initialize the memory
      * for image information.  REQUIRED. */
     info_ptr = png_create_info_struct(png_ptr);
-    if (info_ptr == NULL) 
+    if (info_ptr == NULL)
 	{
         fclose(fp);
         png_destroy_read_struct(&png_ptr, png_infopp_NULL, png_infopp_NULL);
@@ -535,7 +535,7 @@ LoadedTex *LoadPNG(const char *fullpath)
      * the png_create_read_struct()
      * earlier.
      */
-    if (setjmp(png_jmpbuf(png_ptr))) 
+    if (setjmp(png_jmpbuf(png_ptr)))
 	{
         /* Free all of the memory associated
          * with the png_ptr and info_ptr */
@@ -582,7 +582,7 @@ LoadedTex *LoadPNG(const char *fullpath)
 
 	pImageData->sizeX = png_get_image_width(png_ptr, info_ptr); //info_ptr->width;
     pImageData->sizeY = png_get_image_height(png_ptr, info_ptr); //info_ptr->height;
-    //switch (info_ptr->color_type) 
+    //switch (info_ptr->color_type)
 	switch( png_get_color_type(png_ptr, info_ptr) )
 	{
         case PNG_COLOR_TYPE_RGBA:
@@ -612,7 +612,7 @@ LoadedTex *LoadPNG(const char *fullpath)
 
 	png_bytepp row_pointers = png_get_rows(png_ptr, info_ptr);
 
-	for (int i = 0; i < pImageData->sizeY; i++) 
+	for (int i = 0; i < pImageData->sizeY; i++)
 	{
         // note that png is ordered top to
         // bottom, but OpenGL expect it bottom to top
@@ -764,8 +764,8 @@ void FindTextureExtension(char *relative)
 {
 	char strJPGPath[MAX_PATH] = {0};
 	char strPNGPath[MAX_PATH] = {0};
-	char strTGAPath[MAX_PATH]    = {0}; 
-	char strBMPPath[MAX_PATH]    = {0}; 
+	char strTGAPath[MAX_PATH]    = {0};
+	char strBMPPath[MAX_PATH]    = {0};
 	FILE *fp = NULL;
 
 	//GetCurrentDirectory(MAX_PATH, strJPGPath);
@@ -777,7 +777,7 @@ void FindTextureExtension(char *relative)
 	strcpy(strTGAPath, strJPGPath);
 	strcpy(strBMPPath, strTGAPath);
 	strcpy(strPNGPath, strBMPPath);
-	
+
 	strcat(strJPGPath, ".jpg");
 	strcat(strTGAPath, ".tga");
 	strcat(strBMPPath, ".bmp");
@@ -789,7 +789,7 @@ void FindTextureExtension(char *relative)
 		strcat(relative, ".jpg");
 		return;
 	}
-	
+
 	if((fp = fopen(strPNGPath, "rb")) != NULL)
 	{
 		fclose(fp);
@@ -890,7 +890,7 @@ bool CreateTexture(unsigned int &texindex, const char* relative, bool clamp, boo
 {
 	CheckGLError(__FILE__, __LINE__);
 
-	if(!relative) 
+	if(!relative)
 		return false;
 
 	if(!reload)
@@ -906,11 +906,11 @@ bool CreateTexture(unsigned int &texindex, const char* relative, bool clamp, boo
 	pImage = LoadTexture(full);
 
 	// Make sure valid image data was given to pImage, otherwise return false
-	if(pImage == NULL)		
+	if(pImage == NULL)
 	{
 		g_log<<"Failed to load "<<relative<<endl;
 		g_log.flush();
-		
+
 		if(!reload)
 			texindex = 0;	// Give a harmless texture index
 
@@ -920,7 +920,7 @@ bool CreateTexture(unsigned int &texindex, const char* relative, bool clamp, boo
 	unsigned int texname;
 	// Generate a texture with the associative texture ID stored in the array
 	glGenTextures(1, &texname);
-	
+
 	CheckGLError(__FILE__, __LINE__);
 	// This sets the alignment requirements for the start of each pixel row in memory.
 	glPixelStorei (GL_UNPACK_ALIGNMENT, 1);
@@ -928,7 +928,7 @@ bool CreateTexture(unsigned int &texindex, const char* relative, bool clamp, boo
 
 	// Bind the texture to the texture arrays index and init the texture
 	glBindTexture(GL_TEXTURE_2D, texname);
-	
+
 	CheckGLError(__FILE__, __LINE__);
 	// Assume that the texture is a 24 bit RGB texture (We convert 16-bit ones to 24-bit)
 	int textureType = GL_RGB;
@@ -940,7 +940,7 @@ bool CreateTexture(unsigned int &texindex, const char* relative, bool clamp, boo
 		textureType = GL_RGBA;
 		transp = true;
 	}
-		
+
 
 	CheckGLError(__FILE__, __LINE__);
 
@@ -958,7 +958,7 @@ bool CreateTexture(unsigned int &texindex, const char* relative, bool clamp, boo
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 4);
-		
+
 		if(clamp)
 		{
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
@@ -980,7 +980,7 @@ bool CreateTexture(unsigned int &texindex, const char* relative, bool clamp, boo
 		// Option 2: without mipmaps
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-		
+
 		if(clamp)
 		{
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
@@ -1031,7 +1031,7 @@ void RequeueTextures()
 		if(g_texture[i].loaded)
 			RequeueTexture(i, g_texture[i].filepath, g_texture[i].clamp, g_texture[i].mipmaps);
 	}
-	
+
 	//LoadParticles();
 	//LoadProjectiles();
 	//LoadTerrainTextures();
@@ -1110,7 +1110,7 @@ void Blit(LoadedTex* src, LoadedTex* dest, Vec2i pos)
 
 			int srcpixel = x*src->channels + y*src->channels*src->sizeX;
 			int destpixel = (x+pos.x)*dest->channels + (y+pos.y)*dest->channels*dest->sizeX;
-			
+
 			dest->data[destpixel + 0] = src->data[srcpixel + 0];
 			dest->data[destpixel + 1] = src->data[srcpixel + 1];
 			dest->data[destpixel + 2] = src->data[srcpixel + 2];
@@ -1129,11 +1129,11 @@ void Blit(LoadedTex* src, LoadedTex* dest, Vec2i pos)
 void SaveJPEG(const char* fullpath, LoadedTex* image, float quality)
 {
 	FILE *outfile;
-    if ((outfile = fopen(fullpath, "wb")) == NULL) 
+    if ((outfile = fopen(fullpath, "wb")) == NULL)
 	{
 		return;
 	}
-	
+
 	struct jpeg_compress_struct cinfo;
     struct jpeg_error_mgr       jerr;
 
@@ -1227,7 +1227,7 @@ int SavePNG(const char* fullpath, LoadedTex* image)
    /* Set up the output control if you are using standard C streams */
    png_init_io(png_ptr, fp);
 
-   
+
    png_bytep* row_pointers = (png_bytep*) malloc(sizeof(png_bytep) * image->sizeY);
 
    if(!row_pointers)
@@ -1238,7 +1238,7 @@ int SavePNG(const char* fullpath, LoadedTex* image)
 
    for (int y=0; y<image->sizeY; y++)
 	   row_pointers[y] = (png_byte*)&image->data[y*image->sizeX*image->channels];
-   
+
    png_write_info(png_ptr, info_ptr);
    png_write_image(png_ptr, row_pointers);
    png_write_end(png_ptr, NULL);
@@ -1362,8 +1362,8 @@ int SaveBMP(const char* fullpath, LoadedTex* image)
 	}
 
 #if 0
-	for(int imageIdx = image->channels * (image->sizeX - 1); 
-		imageIdx < image->sizeX * image->sizeY * image->channels; 
+	for(int imageIdx = image->channels * (image->sizeX - 1);
+		imageIdx < image->sizeX * image->sizeY * image->channels;
 		imageIdx += image->channels * image->sizeX)
 	{
 		image->data[imageIdx] = image->data[imageIdx-3];

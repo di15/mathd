@@ -410,7 +410,7 @@ template <class F> struct FunctionData: public FunctionDataChain
 
 // =====================================================================
 
-// Denis modified
+// polyf modified
 #if 1
 #include "os-binder-arg-cc-functions.h"
 #endif

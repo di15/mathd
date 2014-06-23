@@ -10,7 +10,7 @@
 Frustum g_frustum;
 
 // This is the index in our selection buffer that has the closet object ID clicked
-#define FIRST_OBJECT_ID  3								
+#define FIRST_OBJECT_ID  3
 
 // We create an enum of the sides so we don't have to call each side 0 or 1.
 // This way it makes it more understandable and readable when dealing with frustum sides.
@@ -22,7 +22,7 @@ enum FrustumSide
 	TOP		= 3,		// The TOP side of the frustum
 	BACK	= 4,		// The BACK	side of the frustum
 	FRONT	= 5			// The FRONT side of the frustum
-}; 
+};
 
 // Like above, instead of saying a number for the ABC and D of the plane, we
 // want to be more descriptive.
@@ -36,14 +36,14 @@ enum PlaneData
 
 void NormalizePlane(float frustum[6][4], int side)
 {
-	float magnitude = (float)sqrtf( frustum[side][A] * frustum[side][A] + 
-								   frustum[side][B] * frustum[side][B] + 
+	float magnitude = (float)sqrtf( frustum[side][A] * frustum[side][A] +
+								   frustum[side][B] * frustum[side][B] +
 								   frustum[side][C] * frustum[side][C] );
 
 	frustum[side][A] /= magnitude;
 	frustum[side][B] /= magnitude;
 	frustum[side][C] /= magnitude;
-	frustum[side][D] /= magnitude; 
+	frustum[side][D] /= magnitude;
 }
 
 void Frustum::construct(const Plane3f left, const Plane3f right, const Plane3f top, const Plane3f bottom, const Plane3f front, const Plane3f back)
@@ -52,27 +52,27 @@ void Frustum::construct(const Plane3f left, const Plane3f right, const Plane3f t
 	m_Frustum[LEFT][B] = left.m_normal.y;
 	m_Frustum[LEFT][C] = left.m_normal.z;
 	m_Frustum[LEFT][D] = left.m_d;
-	
+
 	m_Frustum[RIGHT][A] = right.m_normal.x;
 	m_Frustum[RIGHT][B] = right.m_normal.y;
 	m_Frustum[RIGHT][C] = right.m_normal.z;
 	m_Frustum[RIGHT][D] = right.m_d;
-	
+
 	m_Frustum[TOP][A] = top.m_normal.x;
 	m_Frustum[TOP][B] = top.m_normal.y;
 	m_Frustum[TOP][C] = top.m_normal.z;
 	m_Frustum[TOP][D] = top.m_d;
-	
+
 	m_Frustum[BOTTOM][A] = bottom.m_normal.x;
 	m_Frustum[BOTTOM][B] = bottom.m_normal.y;
 	m_Frustum[BOTTOM][C] = bottom.m_normal.z;
 	m_Frustum[BOTTOM][D] = bottom.m_d;
-	
+
 	m_Frustum[FRONT][A] = front.m_normal.x;
 	m_Frustum[FRONT][B] = front.m_normal.y;
 	m_Frustum[FRONT][C] = front.m_normal.z;
 	m_Frustum[FRONT][D] = front.m_d;
-	
+
 	m_Frustum[BACK][A] = back.m_normal.x;
 	m_Frustum[BACK][B] = back.m_normal.y;
 	m_Frustum[BACK][C] = back.m_normal.z;
@@ -80,7 +80,7 @@ void Frustum::construct(const Plane3f left, const Plane3f right, const Plane3f t
 }
 
 void Frustum::construct(const float* proj, const float* modl)
-{    
+{
 	//float   proj[16];
 	//float   modl[16];
 	float   clip[16];	// clipping planes
@@ -110,7 +110,7 @@ void Frustum::construct(const float* proj, const float* modl)
 	clip[13] = modl[12] * proj[ 1] + modl[13] * proj[ 5] + modl[14] * proj[ 9] + modl[15] * proj[13];
 	clip[14] = modl[12] * proj[ 2] + modl[13] * proj[ 6] + modl[14] * proj[10] + modl[15] * proj[14];
 	clip[15] = modl[12] * proj[ 3] + modl[13] * proj[ 7] + modl[14] * proj[11] + modl[15] * proj[15];
-	
+
 	// Now we actually want to get the sides of the frustum.  To do this we take
 	// the clipping planes we received above and extract the sides from them.
 
@@ -190,7 +190,7 @@ bool Frustum::pointin( float x, float y, float z )
 
 bool Frustum::spherein( float x, float y, float z, float radius )
 {
-	for(int i = 0; i < 6; i++ )	
+	for(int i = 0; i < 6; i++ )
 	{
 		// If the center of the sphere is farther away from the plane than the radius
 		if( m_Frustum[i][A] * x + m_Frustum[i][B] * y + m_Frustum[i][C] * z + m_Frustum[i][D] <= -radius )
@@ -199,7 +199,7 @@ bool Frustum::spherein( float x, float y, float z, float radius )
 			return false;
 		}
 	}
-	
+
 	return true;
 }
 
@@ -244,7 +244,7 @@ bool Frustum::cubein( float x, float y, float z, float size )
 }
 
 
-// This determines if a BOX is in or around our frustum by it's min and max points
+// This determines if a BOX is in or around our frustum by it's std::min and std::max points
 bool Frustum::boxin( float x, float y, float z, float x2, float y2, float z2)
 {
 	// Go through all of the corners of the box and check then again each plane

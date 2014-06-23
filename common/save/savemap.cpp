@@ -84,7 +84,7 @@ void LoadJPGMap(const char* relative)
 	g_hmap2.destroy();
 	g_hmap4.destroy();
 	g_hmap8.destroy();
-	
+
 	CheckGLError(__FILE__, __LINE__);
 
 	LoadedTex *pImage = NULL;
@@ -97,14 +97,14 @@ void LoadJPGMap(const char* relative)
 	if(!pImage)
 		return;
 	CheckGLError(__FILE__, __LINE__);
-	
+
 	g_hmap.allocate((pImage->sizeX-1), (pImage->sizeY-1));
 #if 0
 	g_hmap2.allocate((pImage->sizeX-1)/2, (pImage->sizeY-1)/2);
 	g_hmap4.allocate((pImage->sizeX-1)/4, (pImage->sizeY-1)/4);
 	g_hmap8.allocate((pImage->sizeX-1)/8, (pImage->sizeY-1)/8);
 #endif
-	
+
 	CheckGLError(__FILE__, __LINE__);
 	for(int x=0; x<pImage->sizeX; x++)
 	{
@@ -131,11 +131,11 @@ void LoadJPGMap(const char* relative)
 #endif
 		}
 	}
-	
+
 	CheckGLError(__FILE__, __LINE__);
 	AllocWater(g_hmap.m_widthx, g_hmap.m_widthz);
 	CheckGLError(__FILE__, __LINE__);
-	
+
 	g_hmap.remesh(1);
 #if 0
 	g_hmap2.remesh(2);
@@ -149,7 +149,7 @@ void LoadJPGMap(const char* relative)
 	AllocGrid((pImage->sizeX-1), (pImage->sizeY-1));
 	FillColliderGrid();
 #endif
-	
+
 	CheckGLError(__FILE__, __LINE__);
 	FillForest();
 	PlaceUnits();
@@ -161,7 +161,7 @@ void LoadJPGMap(const char* relative)
 	Vec3f delta = center - c->m_view;
 	c->move(delta);
 	Vec3f viewvec = c->m_view - c->m_pos;
-	viewvec = Normalize(viewvec) * max(g_hmap.m_widthx, g_hmap.m_widthz) * TILE_SIZE;
+	viewvec = Normalize(viewvec) * std::max(g_hmap.m_widthx, g_hmap.m_widthz) * TILE_SIZE;
 	c->m_pos = c->m_view - viewvec;
 	py->zoom = INI_ZOOM;
 
@@ -173,12 +173,12 @@ void LoadJPGMap(const char* relative)
 		g_log<<relative<<"\n\r";
 		g_log.flush();
 	}
-	
+
 	c->position(
-		-1000.0f/3, 1000.0f/3 + 5000, -1000.0f/3, 
-		0, 5000, 0, 
+		-1000.0f/3, 1000.0f/3 + 5000, -1000.0f/3,
+		0, 5000, 0,
 		0, 1, 0);
-	
+
 	c->position(1000.0f/3, 1000.0f/3, 1000.0f/3, 0, 0, 0, 0, 1, 0);
 
 	c->move( Vec3f(g_hmap.m_widthx*TILE_SIZE/2, 1000, g_hmap.m_widthz*TILE_SIZE/2) );
@@ -202,7 +202,7 @@ void SaveHeightmap(FILE *fp)
 {
 	fwrite(&g_hmap.m_widthx, sizeof(int), 1, fp);
 	fwrite(&g_hmap.m_widthz, sizeof(int), 1, fp);
-	
+
 	fwrite(g_hmap.m_heightpoints, sizeof(float), (g_hmap.m_widthx+1)*(g_hmap.m_widthz+1), fp);
 	fwrite(g_hmap.m_countryowner, sizeof(int), g_hmap.m_widthx*g_hmap.m_widthz, fp);
 }
@@ -220,7 +220,7 @@ void ReadHeightmap(FILE *fp)
 	g_hmap4.allocate(widthx/4, widthz/4);
 	g_hmap8.allocate(widthx/8, widthz/8);
 #endif
-	
+
 	fread(g_hmap.m_heightpoints, sizeof(float), (g_hmap.m_widthx+1)*(g_hmap.m_widthz+1), fp);
 	fread(g_hmap.m_countryowner, sizeof(int), g_hmap.m_widthx*g_hmap.m_widthz, fp);
 
@@ -289,7 +289,7 @@ void ReadFoliage(FILE *fp)
 
 		fread(&f->type, sizeof(unsigned char), 1, fp);
 		fread(&f->pos, sizeof(Vec3f), 1, fp);
-	
+
 		f->reinstance();
 	}
 }
@@ -313,7 +313,7 @@ void SaveDeposits(FILE *fp)
 
 		if(!d->on)
 			continue;
-		
+
 		fwrite(&d->occupied, sizeof(bool), 1, fp);
 		fwrite(&d->restype, sizeof(int), 1, fp);
 		fwrite(&d->amount, sizeof(int), 1, fp);
@@ -332,7 +332,7 @@ void ReadDeposits(FILE *fp)
 
 		if(!d->on)
 			continue;
-		
+
 		fread(&d->occupied, sizeof(bool), 1, fp);
 		fread(&d->restype, sizeof(int), 1, fp);
 		fread(&d->amount, sizeof(int), 1, fp);
@@ -364,7 +364,7 @@ void SaveUnits(FILE *fp)
 	Vec3f facing;
 	Vec2f rotation;
 
-	list<Vec2i> path;
+	std::list<Vec2i> path;
 	Vec2i goal;
 #endif
 
@@ -394,7 +394,7 @@ void SaveUnits(FILE *fp)
 
 		for(auto pathiter = u->path.begin(); pathiter != u->path.end(); pathiter++)
 			fwrite(&*pathiter, sizeof(Vec2i), 1, fp);
-		
+
 		fwrite(&u->goal, sizeof(Vec2i), 1, fp);
 
 #if 0
@@ -415,13 +415,13 @@ void SaveUnits(FILE *fp)
 	int targtype;
 	int home;
 	int car;
-	//vector<TransportJob> bids;
+	//std::vector<TransportJob> bids;
 
 	float frame[2];
 
 	Vec2i subgoal;
 #endif
-	
+
 		fwrite(&u->target, sizeof(int), 1, fp);
 		fwrite(&u->target2, sizeof(int), 1, fp);
 		fwrite(&u->targetu, sizeof(bool), 1, fp);
@@ -446,11 +446,11 @@ void SaveUnits(FILE *fp)
 	unsigned char mode;
 	int pathdelay;
 	long long lastpath;
-	
+
 	bool threadwait;
 #endif
 
-		
+
 	}
 }
 
@@ -489,9 +489,9 @@ void ReadUnits(FILE *fp)
 			fread(&waypoint, sizeof(Vec2i), 1, fp);
 			u->path.push_back(waypoint);
 		}
-		
+
 		fread(&u->goal, sizeof(Vec2i), 1, fp);
-		
+
 		fread(&u->target, sizeof(int), 1, fp);
 		fread(&u->target2, sizeof(int), 1, fp);
 		fread(&u->targetu, sizeof(bool), 1, fp);
@@ -532,9 +532,9 @@ void SaveBuildings(FILE *fp)
 
 	int pownetw;
 	int crpipenetw;
-	list<int> roadnetw;
+	std::list<int> roadnetw;
 #endif
-		
+
 		Building *b = &g_building[i];
 
 		fwrite(&b->on, sizeof(bool), 1, fp);
@@ -567,7 +567,7 @@ void SaveBuildings(FILE *fp)
 
 void ReadBuildings(FILE *fp)
 {
-	
+
 	for(int i=0; i<BUILDINGS; i++)
 	{
 		Building *b = &g_building[i];
@@ -588,7 +588,7 @@ void ReadBuildings(FILE *fp)
 
 		fread(&b->tilepos, sizeof(Vec2i), 1, fp);
 		fread(&b->drawpos, sizeof(Vec3f), 1, fp);
-		
+
 		fread(&b->finished, sizeof(bool), 1, fp);
 
 		fread(&b->pownetw, sizeof(int), 1, fp);
@@ -622,7 +622,7 @@ void ReadZoomCam(FILE *fp)
 
 void SaveRoads(FILE* fp)
 {
-#if 0	
+#if 0
 	bool on;
 	int type;
 	bool finished;
@@ -672,7 +672,7 @@ void ReadRoads(FILE* fp)
 		fread(r->transporter, sizeof(int), RESOURCES, fp);
 		fread(&r->drawpos, sizeof(Vec3f), 1, fp);
 	}
-	
+
 	for(int x=0; x<g_hmap.m_widthx; x++)
 		for(int z=0; z<g_hmap.m_widthz; z++)
 		{
@@ -702,7 +702,7 @@ void SavePowls(FILE* fp)
 	int transporter[RESOURCES];
 	Vec3f drawpos;
 #endif
-	
+
 	for(int i=0; i<g_hmap.m_widthx*g_hmap.m_widthz; i++)
 	{
 		PowlTile* p = &g_powl[i];
@@ -741,7 +741,7 @@ void ReadPowls(FILE* fp)
 		fread(p->transporter, sizeof(int), RESOURCES, fp);
 		fread(&p->drawpos, sizeof(Vec3f), 1, fp);
 	}
-	
+
 	for(int x=0; x<g_hmap.m_widthx; x++)
 		for(int z=0; z<g_hmap.m_widthz; z++)
 		{
@@ -766,7 +766,7 @@ void SaveCrPipes(FILE* fp)
 	int transporter[RESOURCES];
 	Vec3f drawpos;
 #endif
-	
+
 	for(int i=0; i<g_hmap.m_widthx*g_hmap.m_widthz; i++)
 	{
 		CrPipeTile* p = &g_crpipe[i];
@@ -849,7 +849,7 @@ bool SaveMap(const char* fullpath)
 bool LoadMap(const char* fullpath)
 {
 	FreeMap();
-	
+
 	FILE *fp = NULL;
 
 	fp = fopen(fullpath, "rb");
@@ -860,7 +860,7 @@ bool LoadMap(const char* fullpath)
 	char realtag[] = MAP_TAG;
 	int version = MAP_VERSION;
 	char tag[ sizeof(realtag) ];
-	
+
 	fread(&tag, sizeof(tag), 1, fp);
 
 	if(memcmp(tag, realtag, sizeof(tag)) != 0)
@@ -892,7 +892,7 @@ bool LoadMap(const char* fullpath)
 	//CondenseForest(0, 0, g_hmap.m_widthx-1, g_hmap.m_widthz-1);
 
 	FillColliderGrid();
-	
+
 	fclose(fp);
 
 	return true;

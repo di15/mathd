@@ -12,22 +12,6 @@ Vec2i g_pathdim(0,0);
 PathNode* g_pathnode = NULL;
 Heap g_openlist;
 
-// Offsets for straights moves
-Vec2i straightoffsets[4] = {
-	Vec2i(1, 0), //W 
-	Vec2i(-1, 0), //E
-	Vec2i(0, 1), //S
-	Vec2i(0, -1) //N
-};
-
-// Offsets for diagonal moves
-Vec2i diagonaloffsets[4] = {
-	Vec2i(-1, -1), //NW 
-	Vec2i(1, -1), //NE
-	Vec2i(-1, 1), //SW 
-	Vec2i(1, 1) //SE
-};
-
 PathNode::PathNode(int startx, int startz, int endx, int endz, int nx, int nz, PathNode* prev, int totalD, int stepD)
 {
 	this->nx = nx;
@@ -118,46 +102,46 @@ bool AtGoal(PathJob* pj, PathNode* node)
 void SnapToNode(PathJob* pj)
 {
 	Vec2i npos = Vec2i( (pj->cmstartx+PATHNODE_SIZE/2) / PATHNODE_SIZE, (pj->cmstartz+PATHNODE_SIZE/2) / PATHNODE_SIZE );
-	
-	npos.x = min(g_pathdim.x-1, npos.x);
-	npos.y = min(g_pathdim.y-1, npos.y);
+
+	npos.x = std::min(g_pathdim.x-1, npos.x);
+	npos.y = std::min(g_pathdim.y-1, npos.y);
 
 	Vec2i npos_min = npos - Vec2i(1,1);
-	
-	npos_min.x = max(0, npos_min.x);
-	npos_min.y = max(0, npos_min.y);
 
-	Vec2i npos_max = npos_min + Vec2i(1,1); 
-	
+	npos_min.x = std::max(0, npos_min.x);
+	npos_min.y = std::max(0, npos_min.y);
+
+	Vec2i npos_max = npos_min + Vec2i(1,1);
+
 	Vec2i npos_nw = Vec2i( npos_min.x, npos_min.y );
 	Vec2i npos_ne = Vec2i( npos_max.x, npos_min.y );
 	Vec2i npos_sw = Vec2i( npos_min.x, npos_max.y );
 	Vec2i npos_se = Vec2i( npos_max.x, npos_max.y );
-	
+
 #if 1
 	PathNode* node_nw = PathNodeAt(npos_nw.x, npos_nw.y);
 	PathNode* node_ne = PathNodeAt(npos_ne.x, npos_ne.y);
 	PathNode* node_sw = PathNodeAt(npos_sw.x, npos_sw.y);
 	PathNode* node_se = PathNodeAt(npos_se.x, npos_se.y);
 #endif
-	
-	bool walkable_nw = Walkable(pj, npos_nw.x, npos_nw.y);
-	bool walkable_ne = Walkable(pj, npos_ne.x, npos_ne.y);
-	bool walkable_sw = Walkable(pj, npos_sw.x, npos_sw.y);
-	bool walkable_se = Walkable(pj, npos_se.x, npos_se.y);
+
+	bool walkable_nw = Standable(pj, npos_nw.x, npos_nw.y);
+	bool walkable_ne = Standable(pj, npos_ne.x, npos_ne.y);
+	bool walkable_sw = Standable(pj, npos_sw.x, npos_sw.y);
+	bool walkable_se = Standable(pj, npos_se.x, npos_se.y);
 
 	Vec2i cmpos_nw = Vec2i( npos_nw.x * PATHNODE_SIZE + PATHNODE_SIZE/2, npos_nw.y * PATHNODE_SIZE + PATHNODE_SIZE/2 );
 	Vec2i cmpos_ne = Vec2i( npos_ne.x * PATHNODE_SIZE + PATHNODE_SIZE/2, npos_ne.y * PATHNODE_SIZE + PATHNODE_SIZE/2 );
 	Vec2i cmpos_sw = Vec2i( npos_sw.x * PATHNODE_SIZE + PATHNODE_SIZE/2, npos_sw.y * PATHNODE_SIZE + PATHNODE_SIZE/2 );
 	Vec2i cmpos_se = Vec2i( npos_se.x * PATHNODE_SIZE + PATHNODE_SIZE/2, npos_se.y * PATHNODE_SIZE + PATHNODE_SIZE/2 );
-	
+
 	int dist_nw = Magnitude( Vec2i(pj->cmstartx, pj->cmstartz) - cmpos_nw );
 	int dist_ne = Magnitude( Vec2i(pj->cmstartx, pj->cmstartz) - cmpos_ne );
 	int dist_sw = Magnitude( Vec2i(pj->cmstartx, pj->cmstartz) - cmpos_sw );
 	int dist_se = Magnitude( Vec2i(pj->cmstartx, pj->cmstartz) - cmpos_se );
 
 	PathNode* startnode = NULL;
-	
+
 	int nearest = -1;
 
 	if( walkable_nw && walkable_ne && walkable_sw && (dist_nw < nearest || !startnode) )
@@ -204,7 +188,7 @@ void SnapToNode(PathJob* pj)
 
 			Vec2i scaleddir = dir * ut->cmspeed / Magnitude(dir);
 			Vec2i stepto = from + scaleddir;
-			
+
 			if(Walkable2(pj, stepto.x, stepto.y) && (dist_nw < nearest || !startnode) )
 			{
 				nearest = dist_nw;
@@ -227,7 +211,7 @@ void SnapToNode(PathJob* pj)
 
 			Vec2i scaleddir = dir * ut->cmspeed / Magnitude(dir);
 			Vec2i stepto = from + scaleddir;
-			
+
 			if(Walkable2(pj, stepto.x, stepto.y) && (dist_ne < nearest || !startnode) )
 			{
 				nearest = dist_ne;
@@ -250,7 +234,7 @@ void SnapToNode(PathJob* pj)
 
 			Vec2i scaleddir = dir * ut->cmspeed / Magnitude(dir);
 			Vec2i stepto = from + scaleddir;
-			
+
 			if(Walkable2(pj, stepto.x, stepto.y) && (dist_sw < nearest || !startnode) )
 			{
 				nearest = dist_sw;
@@ -273,7 +257,7 @@ void SnapToNode(PathJob* pj)
 
 			Vec2i scaleddir = dir * ut->cmspeed / Magnitude(dir);
 			Vec2i stepto = from + scaleddir;
-			
+
 			if(Walkable2(pj, stepto.x, stepto.y) && (dist_se < nearest || !startnode) )
 			{
 				nearest = dist_se;

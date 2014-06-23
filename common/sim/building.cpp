@@ -71,7 +71,7 @@ float CompletPct(int* cost, int* current)
 
 	for(int i=0; i<RESOURCES; i++)
 	{
-		totalhave += min(cost[i], current[i]);
+		totalhave += std::min(cost[i], current[i]);
 	}
 
 	return (float)totalhave/(float)totalreq;
@@ -107,7 +107,7 @@ bool PlaceBuilding(int type, Vec2i pos, bool finished, int owner)
 #if 1
 	if(t->widthx % 2 == 1)
 		b->drawpos.x += TILE_SIZE/2;
-	
+
 	if(t->widthz % 2 == 1)
 		b->drawpos.z += TILE_SIZE/2;
 
@@ -134,7 +134,7 @@ bool PlaceBuilding(int type, Vec2i pos, bool finished, int owner)
 #endif
 
 #endif
-	
+
 	b->remesh();
 
 	if(g_mode == APPMODE_PLAY)
@@ -170,27 +170,27 @@ void Building::allocres()
 {
 	BuildingT* t = &g_buildingT[type];
 	Player* py = &g_player[owner];
-    
+
 	int alloc;
-    
+
 	RichText transx;
-    
+
 	for(int i=0; i<RESOURCES; i++)
 	{
 		if(t->conmat[i] <= 0)
 			continue;
-        
+
 		if(i == RES_LABOUR)
 			continue;
-        
+
 		alloc = t->conmat[i] - conmat[i];
-        
+
 		if(py->global[i] < alloc)
 			alloc = py->global[i];
-        
+
 		conmat[i] += alloc;
 		py->global[i] -= alloc;
-        
+
 		if(alloc > 0)
 		{
 			char numpart[128];
@@ -201,14 +201,14 @@ void Building::allocres()
 			transx.m_part.push_back( RichTextP( "\n" ) );
 		}
 	}
-    
+
 	if(transx.m_part.size() > 0
 #ifdef LOCAL_TRANSX
        && owner == g_localP
 #endif
        )
 		NewTransx(drawpos, &transx);
-    
+
 	checkconstruction();
 }
 
@@ -281,7 +281,7 @@ void DrawBl()
 		{
 			continue;
 		}
-		
+
 		const BuildingT* t = &g_buildingT[b->type];
 		//const BuildingT* t = &g_buildingT[BUILDING_APARTMENT];
 		Model* m = &g_model[ t->model ];
@@ -297,17 +297,19 @@ void DrawBl()
 		float yaw = 0;
 		Matrix modelmat;
 		float radians[] = {static_cast<float>(DEGTORAD(pitch)), static_cast<float>(DEGTORAD(yaw)), 0};
-		modelmat.setTranslation((const float*)&b->drawpos);
+		modelmat.translation((const float*)&b->drawpos);
 		Matrix rotation;
-		rotation.setRotationRadians(radians);
-		modelmat.postMultiply(rotation);
+		rotation.rotrad(radians);
+		modelmat.postmult(rotation);
 		glUniformMatrix4fv(s->m_slot[SSLOT_MODELMAT], 1, 0, modelmat.m_matrix);
 
 		Matrix modelview;
 		modelview.set(modelmat.m_matrix);
-		modelview.postMultiply(g_cameraViewMatrix);
-		//modelview.set(g_cameraViewMatrix.m_matrix);
-		//modelview.postMultiply(modelmat);
+#ifdef SPECBUMPSHADOW
+		modelview.postmult(g_camview);
+#endif
+		//modelview.set(g_camview.m_matrix);
+		//modelview.postmult(modelmat);
 		Matrix modelviewinv;
 		Transpose(modelview, modelview);
 		Inverse2(modelview, modelviewinv);
@@ -317,7 +319,7 @@ void DrawBl()
 		VertexArray* va = &b->drawva;
 
 		m->usetex();
-    
+
 		glVertexAttribPointer(s->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, va->vertices);
 		glVertexAttribPointer(s->m_slot[SSLOT_TEXCOORD0], 2, GL_FLOAT, GL_FALSE, 0, va->texcoords);
 
@@ -346,7 +348,7 @@ void UpdateBuildings()
 		completion = 2.0f;
 #elif 1
 	HeightCopyVA(&g_building[0].drawva, &g_model[g_buildingT[g_building[0].type].model].m_va[0], completion);
-	
+
 	completion *= 0.95f;
 
 	if(completion < 0.001f)
@@ -381,7 +383,7 @@ void UpdateBuildings()
 		BuildingT* t = &g_buildingT[b->type];
 		EmitterPlace* ep;
 		ParticleT* pt;
-    
+
 		if(!b->finished)
 			continue;
 
@@ -391,14 +393,14 @@ void UpdateBuildings()
 
 			//if(completion < 1)
 			//	continue;
-        
+
 			ep = &t->emitterpl[j];
 
 			if(!ep->on)
 				continue;
 
 			pt = &g_particleT[ep->type];
-        
+
 			if(b->emitterco[j].EmitNext(pt->delay))
 				EmitParticle(ep->type, b->drawpos + ep->offset);
 		}
@@ -443,7 +445,7 @@ void StageCopyVA(VertexArray* to, VertexArray* from, float completion)
 		prevc[0] = to->texcoords[tri*3+0];
 		prevc[1] = to->texcoords[tri*3+1];
 		prevc[2] = to->texcoords[tri*3+2];
-		
+
 		for(int v=tri*3; v<tri*3+3; v++)
 		{
 			if(to->vertices[v].y > limity)
@@ -466,7 +468,7 @@ void StageCopyVA(VertexArray* to, VertexArray* from, float completion)
 					prevt[2].x, prevt[2].y, prevt[2].z,
 					to->vertices[v].x, to->vertices[v].y, to->vertices[v].z,
 					&ratio0, &ratio1, &ratio2);
-				
+
 				to->texcoords[v].x = ratio0 * prevc[0].x + ratio1 * prevc[1].x + ratio2 * prevc[2].x;
 				to->texcoords[v].y = ratio0 * prevc[0].y + ratio1 * prevc[1].y + ratio2 * prevc[2].y;
 #elif 0
@@ -523,7 +525,7 @@ void Explode(Building* b)
 	float hwx = t->widthx*TILE_SIZE/2.0f;
 	float hwz = t->widthz*TILE_SIZE/2.0f;
 	Vec3f p;
-    
+
 	for(int i=0; i<5; i++)
 	{
 		p.x = hwx * (float)(rand()%1000 - 500)/500.0f;
@@ -531,7 +533,7 @@ void Explode(Building* b)
 		p.z = hwz * (float)(rand()%1000 - 500)/500.0f;
 		EmitParticle(PARTICLE_FIREBALL, p + b->drawpos);
 	}
-    
+
 	for(int i=0; i<10; i++)
 	{
 		p.x = hwx * (float)(rand()%1000 - 500)/500.0f;
@@ -547,7 +549,7 @@ void Explode(Building* b)
      p.z = hwz * (float)(rand()%1000 - 500)/500.0f;
      EmitParticle(SMOKE, p + pos);
      }
-     
+
      for(int i=0; i<5; i++)
      {
      p.x = hwx * (float)(rand()%1000 - 500)/500.0f;

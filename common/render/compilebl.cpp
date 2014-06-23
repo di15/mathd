@@ -39,15 +39,15 @@ Vec2i TileTimes(Vec2f* tc)
 	Vec2f tc0 = tc[0];
 	Vec2f tc1 = tc[1];
 	Vec2f tc2 = tc[2];
-						
-	float minu = min(tc0.x, min(tc1.x, tc2.x));
-	float minv = min(tc0.y, min(tc1.y, tc2.y));
-	float maxu = max(tc0.x, max(tc1.x, tc2.x));
-	float maxv = max(tc0.y, max(tc1.y, tc2.y));
-	
+
+	float minu = std::min(tc0.x, std::min(tc1.x, tc2.x));
+	float minv = std::min(tc0.y, std::min(tc1.y, tc2.y));
+	float maxu = std::max(tc0.x, std::max(tc1.x, tc2.x));
+	float maxv = std::max(tc0.y, std::max(tc1.y, tc2.y));
+
 	float rangeu = maxu - minu;
 	float rangev = maxv - minv;
-						
+
 	float offu = minu - floor(minu);
 	float offv = minv - floor(minv);
 
@@ -57,7 +57,7 @@ Vec2i TileTimes(Vec2f* tc)
 	/*
 				float rangeu = maxu - minu;
 				float rangev = maxv - minv;
-				
+
 				float offu = minu - floor(minu);
 				float offv = minv - floor(minv);
 				*/
@@ -70,8 +70,8 @@ Vec2i TileTimes(Vec2f* tc)
 		g_log<<"--------------11 or 11 tile times---------------"<<endl;
 		g_log<<"ceilrange = "<<ceilrangeu<<","<<ceilrangev<<endl;
 		g_log<<"range = "<<rangeu<<","<<rangev<<endl;
-		g_log<<"min = "<<minu<<","<<minv<<endl;
-		g_log<<"max = "<<maxu<<","<<maxv<<endl;
+		g_log<<"std::min = "<<minu<<","<<minv<<endl;
+		g_log<<"std::max = "<<maxu<<","<<maxv<<endl;
 		g_log<<"[0] = "<<tc0.x<<","<<tc0.y<<endl;
 		g_log<<"[1] = "<<tc1.x<<","<<tc1.y<<endl;
 		g_log<<"[2] = "<<tc2.x<<","<<tc2.y<<endl;
@@ -91,7 +91,7 @@ Vec2i TileTimes(VertexArray* va)
 	for(int j=0; j<va->numverts; j+=3)
 	{
 		Vec2i tritile = TileTimes(&va->texcoords[j]);
-		
+
 		if(tritile.x > maxtile.x)
 			maxtile.x = tritile.x;
 		if(tritile.y > maxtile.y)
@@ -130,24 +130,24 @@ void Resample(LoadedTex* original, LoadedTex* empty, Vec2i newdim)
 
 		return;
 	}
-	
+
 #ifdef COMPILEB_DEBUG
 	g_log<<"resample "<<original->sizeX<<","<<original->sizeY<<" to "<<newdim.x<<","<<newdim.y<<endl;
 	g_log.flush();
 #endif
-	
+
 	AllocTex(empty, newdim.x, newdim.y, original->channels);
-	
+
 	double scaleW =  (double)newdim.x / (double)original->sizeX;
 	double scaleH = (double)newdim.y / (double)original->sizeY;
-	
+
 	for(int cy = 0; cy < newdim.y; cy++)
 	{
 		for(int cx = 0; cx < newdim.x; cx++)
 		{
 			int pixel = cy * (newdim.x * original->channels) + cx*original->channels;
 			int nearestMatch =  (int)(cy / scaleH) * original->sizeX * original->channels + (int)(cx / scaleW) * original->channels;
-			
+
 			empty->data[pixel    ] =  original->data[nearestMatch    ];
 			empty->data[pixel + 1] =  original->data[nearestMatch + 1];
 			empty->data[pixel + 2] =  original->data[nearestMatch + 2];
@@ -156,7 +156,7 @@ void Resample(LoadedTex* original, LoadedTex* empty, Vec2i newdim)
 				empty->data[pixel + 3] =  original->data[nearestMatch + 3];
 		}
 	}
-	
+
 #ifdef COMPILEB_DEBUG
 	g_log<<"\t done resample"<<endl;
 	g_log.flush();
@@ -176,23 +176,23 @@ void CompileBuilding(const char* fullfile, EdBuilding* bldg)
 	StripPath(basename);
 	StripExtension(basename);
 
-	string fullpath = StripFile(fullfile);	// + CORRECT_SLASH;
-	
+	std::string fullpath = StripFile(fullfile);	// + CORRECT_SLASH;
+
 #ifdef COMPILEB_DEBUG
 	g_log<<"FULLPATH STRIPPED "<<fullpath<<endl;
 	g_log.flush();
 #endif
 
-	string difffull = fullpath + string(basename) + ".jpg";
-	string difffullpng = fullpath + string(basename) + ".png";
-	string specfull = fullpath + string(basename) + ".spec.jpg";
-	string normfull = fullpath + string(basename) + ".norm.jpg";
-	string ownfull = fullpath + string(basename) + ".own.png";
-	
-	//string diffpath = string(basename) + ".jpg";
-	//string diffpathpng = string(basename) + ".png";
-	//string specpath = string(basename) + ".spec.jpg";
-	//string normpath = string(basename) + ".norm.jpg";
+	std::string difffull = fullpath + std::string(basename) + ".jpg";
+	std::string difffullpng = fullpath + std::string(basename) + ".png";
+	std::string specfull = fullpath + std::string(basename) + ".spec.jpg";
+	std::string normfull = fullpath + std::string(basename) + ".norm.jpg";
+	std::string ownfull = fullpath + std::string(basename) + ".own.png";
+
+	//std::string diffpath = std::string(basename) + ".jpg";
+	//std::string diffpathpng = std::string(basename) + ".png";
+	//std::string specpath = std::string(basename) + ".spec.jpg";
+	//std::string normpath = std::string(basename) + ".norm.jpg";
 
 	unsigned int notexindex;
 	CreateTexture(notexindex, "textures/notex.jpg", false);
@@ -201,13 +201,13 @@ void CompileBuilding(const char* fullfile, EdBuilding* bldg)
 
 	// STEP 1:
 	// i. count total triangles, excluding sides with default (notex.jpg) texture (they will not be added to the final building)
-	// ii. make a list of unique textures used in the brush sides and see if there are any transparent ones
-	// iii. calculate the max x,y tile extents of the texture coordinates for each triangles
+	// ii. make a std::list of unique textures used in the brush sides and see if there are any transparent ones
+	// iii. calculate the std::max x,y tile extents of the texture coordinates for each triangles
 
 	int ntris = 0;
-	list<unsigned int> uniquetexs;
+	std::list<unsigned int> uniquetexs;
 	TexFitInfo texfitinfo[TEXTURES];
-	
+
 #ifdef COMPILEB_DEBUG
 	g_log<<"compile 1"<<endl;
 	g_log.flush();
@@ -235,7 +235,7 @@ void CompileBuilding(const char* fullfile, EdBuilding* bldg)
 				if(*ut == s->m_diffusem)
 				{
 					Vec2i tiletimes = TileTimes(va);
-					
+
 					if(tiletimes.x > tfi->tiletimes.x)
 						tfi->tiletimes.x = tiletimes.x;
 					if(tiletimes.y > tfi->tiletimes.y)
@@ -249,7 +249,7 @@ void CompileBuilding(const char* fullfile, EdBuilding* bldg)
 			if(!found)
 			{
 				uniquetexs.push_back(s->m_diffusem);
-				
+
 				TexFitInfo* tfi = &texfitinfo[ s->m_diffusem ];
 				Vec2i tiletimes = TileTimes(va);
 				TexFitInfo newtfi;
@@ -262,7 +262,7 @@ void CompileBuilding(const char* fullfile, EdBuilding* bldg)
 		}
 	}
 
-	
+
 #ifdef COMPILEB_DEBUG
 	g_log<<"compile 2"<<endl;
 	g_log.flush();
@@ -282,7 +282,7 @@ void CompileBuilding(const char* fullfile, EdBuilding* bldg)
 		for(int i=0; i<br->m_nsides; i++)
 		{
 			EdBrushSide* s = &br->m_sides[i];
-			
+
 			if(s->m_diffusem == notexindex)
 				continue;
 
@@ -296,14 +296,14 @@ void CompileBuilding(const char* fullfile, EdBuilding* bldg)
 			}
 		}
 	}
-	
+
 #ifdef COMPILEB_DEBUG
 	g_log<<"compile 3"<<endl;
 	g_log.flush();
 #endif
 
 	// STEP 3.
-	// i. load all the diffuse, specular, and normal texture images (RGB data) from the compiled list of unique texture indices
+	// i. load all the diffuse, specular, and normal texture images (RGB data) from the compiled std::list of unique texture indices
 	// ii. save references to the texture images (RGB data) array based on the unique (diffuse) texture index
 
 	TexRef texref[TEXTURES];
@@ -367,16 +367,16 @@ void CompileBuilding(const char* fullfile, EdBuilding* bldg)
 	g_log.flush();
 #endif
 	}
-	
+
 #ifdef COMPILEB_DEBUG
 	g_log<<"compile 4"<<endl;
 	g_log.flush();
 #endif
 
 	// STEP 4.
-	// i. make a list of images sorted by height from tallest to shortest
+	// i. make a std::list of images sorted by height from tallest to shortest
 
-	list<unsigned int> heightsorted;
+	std::list<unsigned int> heightsorted;
 	int nextadd;
 	int lastheight = 0;
 
@@ -441,7 +441,7 @@ void CompileBuilding(const char* fullfile, EdBuilding* bldg)
 	// iv. calculate the scaled, translated texture coordinates for the final vertex array
 
 	Vec2i maxdim(0, 0);
-	list<TexFitRow> rows;
+	std::list<TexFitRow> rows;
 
 	for(auto hs=heightsorted.begin(); hs!=heightsorted.end(); hs++)
 	{
@@ -565,7 +565,7 @@ void CompileBuilding(const char* fullfile, EdBuilding* bldg)
 	g_log.flush();
 #endif
 	}
-	
+
 #ifdef COMPILEB_DEBUG
 	g_log<<"compile 6"<<endl;
 	g_log.flush();
@@ -582,7 +582,7 @@ void CompileBuilding(const char* fullfile, EdBuilding* bldg)
 	g_log<<"dimensions = ("<<maxdim.x<<","<<maxdim.y<<")->("<<finaldim.x<<","<<finaldim.y<<")"<<endl;
 	g_log.flush();
 #endif
-	
+
 	LoadedTex* resizedimages = new LoadedTex[ uniquetexs.size()*TEX_PER_BL ];
 
 	for(i=0; i<uniquetexs.size()*TEX_PER_BL; i++)
@@ -609,7 +609,7 @@ void CompileBuilding(const char* fullfile, EdBuilding* bldg)
 #endif
 
 			Vec2i newdim( ceil(tfi->newdim.x), ceil(tfi->newdim.y) );
-			
+
 			Resample(images[ tr->diffindex ], &resizedimages[ tr->diffindex ], newdim);
 
 #ifdef COMPILEB_DEBUG
@@ -630,11 +630,11 @@ void CompileBuilding(const char* fullfile, EdBuilding* bldg)
 			g_log<<"\t done compile 6 image norm"<<endl;
 			g_log.flush();
 #endif
-			
+
 			Resample(images[ tr->ownindex ], &resizedimages[ tr->ownindex ], newdim);
 		}
 	}
-	
+
 #ifdef COMPILEB_DEBUG
 	g_log<<"compile 7"<<endl;
 	g_log.flush();
@@ -647,7 +647,7 @@ void CompileBuilding(const char* fullfile, EdBuilding* bldg)
 	LoadedTex finalspec;
 	LoadedTex finalnorm;
 	LoadedTex finalown;
-	
+
 #ifdef COMPILEB_DEBUG
 	g_log<<"compile 7a"<<endl;
 	g_log.flush();
@@ -657,7 +657,7 @@ void CompileBuilding(const char* fullfile, EdBuilding* bldg)
 	AllocTex(&finalspec, finaldim.x, finaldim.y, 3);
 	AllocTex(&finalnorm, finaldim.x, finaldim.y, 3);
 	AllocTex(&finalown, finaldim.x, finaldim.y, 4);
-	
+
 #ifdef COMPILEB_DEBUG
 	g_log<<"compile 7b"<<endl;
 	g_log.flush();
@@ -669,7 +669,7 @@ void CompileBuilding(const char* fullfile, EdBuilding* bldg)
 		{
 			TexRef* tr = &texref[ f->texindex ];
 			TexFitInfo* tfi = &texfitinfo[ f->texindex ];
-			
+
 			tfi->bounds[0] = f->bounds[0];
 			tfi->bounds[1] = f->bounds[2];
 
@@ -689,7 +689,7 @@ void CompileBuilding(const char* fullfile, EdBuilding* bldg)
 			g_log<<"compile 7b2 to "<<newpos.x<<","<<newpos.y<<endl;
 			g_log.flush();
 #endif
-			
+
 					Blit( &resizedimages[ tr->diffindex ], &finaldiff, newpos );
 					Blit( &resizedimages[ tr->specindex ], &finalspec, newpos );
 					Blit( &resizedimages[ tr->normindex ], &finalnorm, newpos );
@@ -701,7 +701,7 @@ void CompileBuilding(const char* fullfile, EdBuilding* bldg)
 #endif
 		}
 	}
-	
+
 #ifdef COMPILEB_DEBUG
 	g_log<<"compile 7c"<<endl;
 	g_log.flush();
@@ -709,7 +709,7 @@ void CompileBuilding(const char* fullfile, EdBuilding* bldg)
 
 	for(i=0; i<uniquetexs.size()*TEX_PER_BL; i++)
 	{
-		
+
 #ifdef COMPILEB_DEBUG
 	g_log<<"compile 7c free image "<<i<<endl;
 	g_log.flush();
@@ -718,14 +718,14 @@ void CompileBuilding(const char* fullfile, EdBuilding* bldg)
 		if(resizedimages[i].data)
 			free(resizedimages[i].data);
 	}
-	
+
 #ifdef COMPILEB_DEBUG
 	g_log<<"compile 7d"<<endl;
 	g_log.flush();
 #endif
 
 	delete [] resizedimages;
-	
+
 #ifdef COMPILEB_DEBUG
 	g_log<<"compile 8"<<endl;
 	g_log.flush();
@@ -733,7 +733,7 @@ void CompileBuilding(const char* fullfile, EdBuilding* bldg)
 
 	// STEP 8.
 	// i. write the JPEG's/PNG's
-	
+
 	if(transparency)
 		SavePNG(difffullpng.c_str(), &finaldiff);
 	else
@@ -741,7 +741,7 @@ void CompileBuilding(const char* fullfile, EdBuilding* bldg)
 	SaveJPEG(specfull.c_str(), &finalspec, 0.5f);
 	SaveJPEG(normfull.c_str(), &finalnorm, 0.5f);
 	SavePNG(ownfull.c_str(), &finalown);
-	
+
 	//SavePNG(difffullpng.c_str(), &finaldiff);
 	//SavePNG(specfull.c_str(), &finalspec);
 	//SavePNG(normfull.c_str(), &finalnorm);
@@ -751,7 +751,7 @@ void CompileBuilding(const char* fullfile, EdBuilding* bldg)
 	// ii. write the vertex array
 
 	vindex = 0;
-	
+
 #ifdef COMPILEB_DEBUG
 	unsigned int window3index;
 	CreateTextureI(window3index, "textures/apartment/stuccowindow3.jpg", false);
@@ -762,7 +762,7 @@ void CompileBuilding(const char* fullfile, EdBuilding* bldg)
 		for(int i=0; i<br->m_nsides; i++)
 		{
 			EdBrushSide* s = &br->m_sides[i];
-			
+
 			if(s->m_diffusem == notexindex)
 				continue;
 
@@ -775,20 +775,20 @@ void CompileBuilding(const char* fullfile, EdBuilding* bldg)
 			{
 				//fullva.vertices[vindex] = va->vertices[j];
 				//fullva.normals[vindex] = va->normals[j];
-				
+
 				Vec2f tc[3];
 				tc[0] = va->texcoords[j + 0];
 				tc[1] = va->texcoords[j + 1];
 				tc[2] = va->texcoords[j + 2];
-				
-				float minu = min(tc[0].x, min(tc[1].x, tc[2].x));
-				float minv = min(tc[0].y, min(tc[1].y, tc[2].y));
-				float maxu = max(tc[0].x, max(tc[1].x, tc[2].x));
-				float maxv = max(tc[0].y, max(tc[1].y, tc[2].y));
-	
+
+				float minu = std::min(tc[0].x, std::min(tc[1].x, tc[2].x));
+				float minv = std::min(tc[0].y, std::min(tc[1].y, tc[2].y));
+				float maxu = std::max(tc[0].x, std::max(tc[1].x, tc[2].x));
+				float maxv = std::max(tc[0].y, std::max(tc[1].y, tc[2].y));
+
 				float rangeu = maxu - minu;
 				float rangev = maxv - minv;
-				
+
 				//float offu = minu - floor(minu+0.05f);
 				//float offv = minv - floor(minv+0.05f);
 				float offu = minu - floor(minu);
@@ -797,19 +797,19 @@ void CompileBuilding(const char* fullfile, EdBuilding* bldg)
 				/*
 				double pixelsrangeu = rangeu * tfi->newdim.x;
 				double pixelsrangev = rangev * tfi->newdim.y;
-				
+
 				int availablerangeu = tfi->newdim.x * tfi->tiletimes.x;
 				int availablerangev = tfi->newdim.y * tfi->tiletimes.y;
-				
+
 				//float scalerangeu = pixelsrangeu / (double)availablerangeu;
 				//float scalerangev = pixelsrangev / (double)availablerangev;
 
 				float scalerangeu = rangeu * (pixelsrangeu / (double)availablerangeu) * ((float)availablerangeu / (float)finaldim.x);
 				float scalerangev = rangev * (pixelsrangev / (double)availablerangev) * ((float)availablerangev / (float)finaldim.y);
-				
+
 				float tcleft = (float)tfi->bounds[0].x / (float)maxdim.x;
 				float tctop = (float)tfi->bounds[0].y / (float)maxdim.y;
-				
+
 				fullva.texcoords[vindex + 0] = Vec2f( tcleft + (offu + tc0.x - minu) * scalerangeu, tctop + (offv + tc0.y - minv) * scalerangev );
 				fullva.texcoords[vindex + 1] = Vec2f( tcleft + (offu + tc1.x - minu) * scalerangeu, tctop + (offv + tc1.y - minv) * scalerangev );
 				fullva.texcoords[vindex + 2] = Vec2f( tcleft + (offu + tc2.x - minu) * scalerangeu, tctop + (offv + tc2.y - minv) * scalerangev );
@@ -824,16 +824,16 @@ void CompileBuilding(const char* fullfile, EdBuilding* bldg)
 
 					uvpixel[0] = tc[k].x * (float)lt->sizeX;
 					uvpixel[1] = tc[k].y * (float)lt->sizeY;
-					
+
 					uvpixel[0] = uvpixel[0] - minu*(float)lt->sizeX + offu*(float)lt->sizeX;
 					uvpixel[1] = uvpixel[1] - minv*(float)lt->sizeY + offv*(float)lt->sizeY;
-					
+
 					uvpixel[0] += tfi->bounds[0].x;
 					uvpixel[1] += tfi->bounds[0].y;
-					
+
 					fullva.texcoords[vindex + k].x = uvpixel[0] / (float)maxdim.x;
 					fullva.texcoords[vindex + k].y = uvpixel[1] / (float)maxdim.y;
-					
+
 #ifdef COMPILEB_DEBUG
 					if(s->m_diffusem == window3index)
 					{

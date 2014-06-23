@@ -103,7 +103,7 @@ void NextLineBreak()
 		{
 			if(lastspace < 0)
 			{
-				nextlb = max(j, i+1);
+				nextlb = std::max(j, i+1);
 
 				//if(w <= g2->w)
 				//	nextlb++;
@@ -341,7 +341,7 @@ void FSub(const char* substr)
 {
 	int subsize = strlen(substr);
 
-	string subsubstr[9];
+	std::string subsubstr[9];
 
 	int k = 0;
 	for(j=0; j<9; j++)
@@ -392,7 +392,7 @@ void LoadFont(int id, const char* fontfile)
 	f->height = g_texheight;
 
 	char fullfontpath[MAX_PATH+1];
-	string fontfileext = string(fontfile) + ".fnt";
+	std::string fontfileext = std::string(fontfile) + ".fnt";
 	sprintf(fullfontpath, "%s.fnt", fontfile);
 	FullPath(fontfileext.c_str(), fullfontpath);
 	FILE* fp = fopen(fullfontpath, "rb");
@@ -413,7 +413,7 @@ void LoadFont(int id, const char* fontfile)
 
 	//NSLog(@"%s", file);
 
-	string substr;
+	std::string substr;
 	//g_str = file;
 
 	g_currfont = id;

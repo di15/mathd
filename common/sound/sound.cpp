@@ -3,7 +3,7 @@
 #include "sound.h"
 #include "../utils.h"
 
-vector<Sound> g_ordersnd;
+std::vector<Sound> g_ordersnd;
 
 void SoundPath(const char* from, char* to)
 {

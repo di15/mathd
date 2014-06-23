@@ -8,7 +8,7 @@
 #include "../utils.h"
 #include "../sim/player.h"
 
-list<Transaction> g_transx;
+std::list<Transaction> g_transx;
 
 void DrawTransactions(Matrix projmodlview)
 {
@@ -42,7 +42,7 @@ void DrawTransactions(Matrix projmodlview)
 		int x1 = screenpos.x - triter->halfwidth;
 		int y1 = screenpos.y;
 		color[3] = triter->life * 0.9f;
-		
+
 		DrawShadowedText(MAINFONT8, x1, y1, &triter->rtext, color);
 		//DrawBoxShadText(MAINFONT8, x1, y1, py->width, py->height, &triter->rtext, color, 0, -1);
 		//DrawCenterShadText(MAINFONT8, x1, y1, &triter->rtext, color, -1);

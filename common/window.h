@@ -24,7 +24,7 @@
 //#define MIN_ZOOM		0.1f
 //#define MIN_ZOOM		0.025f
 #define MIN_ZOOM		0.005f
-//#define MAX_ZOOM		0.7f 
+//#define MAX_ZOOM		0.7f
 //#define MAX_ZOOM		0.7f
 #define MAX_ZOOM		0.1f
 #define INI_ZOOM			MIN_ZOOM
@@ -47,11 +47,11 @@ struct Resolution
 };
 
 extern Resolution g_selectedRes;
-extern vector<Resolution> g_resolution;
-extern vector<int> g_bpps;
+extern std::vector<Resolution> g_resolution;
+extern std::vector<int> g_bpps;
 
 void AddRes(int w, int h);
-void CalcDrawFrameRate();
+void CalcDrawRate();
 bool DrawNextFrame(int desiredFrameRate);
 void EnumerateDisplay();
 void Resize(int width, int height);

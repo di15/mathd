@@ -27,7 +27,7 @@
 
 // Calculates a path.
 void JPSPath(int utype, int umode, int cmstartx, int cmstartz, int target, int target2, int targtype,
-			 list<Vec2i> *path, Vec2i *subgoal, Unit* thisu, Unit* ignoreu, Building* ignoreb, 
+			 std::list<Vec2i> *path, Vec2i *subgoal, Unit* thisu, Unit* ignoreu, Building* ignoreb,
 			 int cmgoalx, int cmgoalz, int cmgoalminx, int cmgoalminz, int cmgoalmaxx, int cmgoalmaxz)
 {
 	UnitT* ut = &g_unitT[utype];
@@ -77,7 +77,7 @@ void JPSPath(int utype, int umode, int cmstartx, int cmstartz, int target, int t
 	pj->airborne = ut->airborne;
 	pj->callback = Callback_UnitPath;
 	pj->pjtype = PATHJOB_JPS;
-	
+
 	// Returns the path from location `<startX, startY>` to location `<endX, endY>`.
 	//return function(finder, startNode, endNode, clearance, toClear)
 

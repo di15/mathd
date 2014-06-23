@@ -378,12 +378,12 @@ void Heightmap::remesh(float tilescale)
 	We need pointers for this because we construct the normals as we go along,
 	and only blend them in the end.
 	*/
-	vector<Vec3f**> *addedvertnormals = new vector<Vec3f**>[ m_widthx * m_widthz * 6 ];
+	std::vector<Vec3f**> *addedvertnormals = new std::vector<Vec3f**>[ m_widthx * m_widthz * 6 ];
 
 	if(!addedvertnormals) OutOfMem(__FILE__, __LINE__);
 
 	/*
-	Because triangles will alternate, we need to keep an ordered list
+	Because triangles will alternate, we need to keep an ordered std::list
 	for the tile corner vertex normals for each tile, for
 	figuring out the corner vertex normals of neighbouring tiles.
 	*/
@@ -1138,7 +1138,7 @@ void Heightmap::remesh(float tilescale)
 			{
 				int tileindex6v = (z * m_widthx + x) * 3 * 2 + trivert;
 				int tileindex = (z * m_widthx + x);
-				vector<Vec3f**> vertexnormals = addedvertnormals[ tileindex6v ];
+				std::vector<Vec3f**> vertexnormals = addedvertnormals[ tileindex6v ];
 
 				// Before we add up the added normals, we make sure we don't repeat
 				// any normals, since for diagonals we add the two normals for
@@ -1152,7 +1152,7 @@ void Heightmap::remesh(float tilescale)
 					auto normiter2 = normiter+1;
 					while(normiter2 != vertexnormals.end())
 					{
-						// If both pointers are pointing to the same normal vector, remove the second copy.
+						// If both pointers are pointing to the same normal std::vector, remove the second copy.
 						if(**normiter2 == **normiter)
 						{
 							normiter2 = vertexnormals.erase( normiter2 );
@@ -1355,9 +1355,11 @@ void Heightmap::draw()
 	Matrix modelmat;
     Matrix modelview;
     modelview.set(modelmat.m_matrix);
-    modelview.postMultiply(g_cameraViewMatrix);
-    //modelview.set(g_cameraViewMatrix.m_matrix);
-    //modelview.postMultiply(modelmat);
+#ifdef SPECBUMPSHADOW
+    modelview.postmult(g_camview);
+#endif
+    //modelview.set(g_camview.m_matrix);
+    //modelview.postmult(modelmat);
 	Matrix modelviewinv;
 	Transpose(modelview, modelview);
 	Inverse2(modelview, modelviewinv);
@@ -1467,9 +1469,11 @@ void Heightmap::draw2()
 	Matrix modelmat;
     Matrix modelview;
     modelview.set(modelmat.m_matrix);
-    modelview.postMultiply(g_cameraViewMatrix);
-    //modelview.set(g_cameraViewMatrix.m_matrix);
-    //modelview.postMultiply(modelmat);
+#ifdef SPECBUMPSHADOW
+    modelview.postmult(g_camview);
+#endif
+    //modelview.set(g_camview.m_matrix);
+    //modelview.postmult(modelmat);
 	Matrix modelviewinv;
 	Transpose(modelview, modelview);
 	Inverse2(modelview, modelviewinv);
@@ -1564,9 +1568,11 @@ void Heightmap::drawrim()
 	Matrix modelmat;
     Matrix modelview;
     modelview.set(modelmat.m_matrix);
-    modelview.postMultiply(g_cameraViewMatrix);
-    //modelview.set(g_cameraViewMatrix.m_matrix);
-    //modelview.postMultiply(modelmat);
+#ifdef SPECBUMPSHADOW
+    modelview.postmult(g_camview);
+#endif
+    //modelview.set(g_camview.m_matrix);
+    //modelview.postmult(modelmat);
 	Matrix modelviewinv;
 	Transpose(modelview, modelview);
 	Inverse2(modelview, modelviewinv);

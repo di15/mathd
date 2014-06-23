@@ -15,7 +15,7 @@ public:
 	void play();
 };
 
-extern vector<Sound> g_ordersnd;
+extern std::vector<Sound> g_ordersnd;
 
 void SoundPath(const char* from, char* to);
 

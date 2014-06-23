@@ -39,6 +39,7 @@
 #include "../common/gui/widgets/spez/bottompanel.h"
 #include "../common/texture.h"
 #include "../common/render/skybox.h"
+#include "../common/script/script.h"
 
 int g_mode = APPMODE_LOADING;
 
@@ -112,7 +113,7 @@ void UpdateReloading()
 	}
 }
 
-void CalcUpdFrameRate()
+void CalcUpdRate()
 {
 	static unsigned int frametime = 0;				// This stores the last frame's time
 	static int framecounter = 0;
@@ -222,7 +223,7 @@ void Update()
 		UpdateEditor();
 }
 
-void DrawScene(Matrix projection, Matrix viewmat, Matrix modelmat, Matrix modelviewinv, float mvLightPos[3], float lightDir[3])
+void DrawScene(Matrix projection, Matrix viewmat, Matrix modelmat, Matrix modelviewinv, float lightpos[3], float lightdir[3])
 {
 	Player* py = &g_player[g_currP];
 	Camera* c = &py->camera;
@@ -230,11 +231,11 @@ void DrawScene(Matrix projection, Matrix viewmat, Matrix modelmat, Matrix modelv
 #if 1
 	Matrix mvpmat;
 	mvpmat.set(projection.m_matrix);
-	mvpmat.postMultiply(viewmat);
+	mvpmat.postmult(viewmat);
 
 	g_frustum.construct(projection.m_matrix, viewmat.m_matrix);
 
-	UseShadow(SHADER_SKYBOX, projection, viewmat, modelmat, modelviewinv, mvLightPos, lightDir);
+	UseShadow(SHADER_SKYBOX, projection, viewmat, modelmat, modelviewinv, lightpos, lightdir);
 	DrawSkyBox(c->zoompos());
 	//DrawSkyBox(Vec3f(0,0,0));
 	EndS();
@@ -242,7 +243,7 @@ void DrawScene(Matrix projection, Matrix viewmat, Matrix modelmat, Matrix modelv
 
 	StartTimer(DRAWMAP);
 #if 1
-	UseShadow(SHADER_MAPTILES, projection, viewmat, modelmat, modelviewinv, mvLightPos, lightDir);
+	UseShadow(SHADER_MAPTILES, projection, viewmat, modelmat, modelviewinv, lightpos, lightdir);
 	glActiveTexture(GL_TEXTURE8);
 	glBindTexture(GL_TEXTURE_2D, g_depth);
 	glUniform1i(g_shader[g_curS].m_slot[SSLOT_SHADOWMAP], 8);
@@ -255,7 +256,7 @@ void DrawScene(Matrix projection, Matrix viewmat, Matrix modelmat, Matrix modelv
 
 	StartTimer(DRAWRIM);
 #if 1
-	UseShadow(SHADER_RIM, projection, viewmat, modelmat, modelviewinv, mvLightPos, lightDir);
+	UseShadow(SHADER_RIM, projection, viewmat, modelmat, modelviewinv, lightpos, lightdir);
 	CheckGLError(__FILE__, __LINE__);
 	glActiveTexture(GL_TEXTURE8);
 	glBindTexture(GL_TEXTURE_2D, g_depth);
@@ -270,7 +271,7 @@ void DrawScene(Matrix projection, Matrix viewmat, Matrix modelmat, Matrix modelv
 
 	StartTimer(DRAWWATER);
 #if 1
-	UseShadow(SHADER_WATER, projection, viewmat, modelmat, modelviewinv, mvLightPos, lightDir);
+	UseShadow(SHADER_WATER, projection, viewmat, modelmat, modelviewinv, lightpos, lightdir);
 	glActiveTexture(GL_TEXTURE4);
 	glBindTexture(GL_TEXTURE_2D, g_depth);
 	glUniform1i(g_shader[g_curS].m_slot[SSLOT_SHADOWMAP], 4);
@@ -282,8 +283,8 @@ void DrawScene(Matrix projection, Matrix viewmat, Matrix modelmat, Matrix modelv
 	CheckGLError(__FILE__, __LINE__);
 
 #if 1
-	UseShadow(SHADER_OWNED, projection, viewmat, modelmat, modelviewinv, mvLightPos, lightDir);
-	//UseShadow(SHADER_UNIT, projection, viewmat, modelmat, modelviewinv, mvLightPos, lightDir);
+	UseShadow(SHADER_OWNED, projection, viewmat, modelmat, modelviewinv, lightpos, lightdir);
+	//UseShadow(SHADER_UNIT, projection, viewmat, modelmat, modelviewinv, lightpos, lightdir);
 	glActiveTexture(GL_TEXTURE5);
 	glBindTexture(GL_TEXTURE_2D, g_depth);
 	glUniform1i(g_shader[g_curS].m_slot[SSLOT_SHADOWMAP], 5);
@@ -309,7 +310,7 @@ void DrawScene(Matrix projection, Matrix viewmat, Matrix modelmat, Matrix modelv
 
 	StartTimer(DRAWUNITS);
 #if 1
-	UseShadow(SHADER_UNIT, projection, viewmat, modelmat, modelviewinv, mvLightPos, lightDir);
+	UseShadow(SHADER_UNIT, projection, viewmat, modelmat, modelviewinv, lightpos, lightdir);
 	glActiveTexture(GL_TEXTURE5);
 	glBindTexture(GL_TEXTURE_2D, g_depth);
 	glUniform1i(g_shader[g_curS].m_slot[SSLOT_SHADOWMAP], 5);
@@ -323,7 +324,7 @@ void DrawScene(Matrix projection, Matrix viewmat, Matrix modelmat, Matrix modelv
 
 #if 1
 	StartTimer(DRAWFOLIAGE);
-	UseShadow(SHADER_FOLIAGE, projection, viewmat, modelmat, modelviewinv, mvLightPos, lightDir);
+	UseShadow(SHADER_FOLIAGE, projection, viewmat, modelmat, modelviewinv, lightpos, lightdir);
 	glActiveTexture(GL_TEXTURE5);
 	glBindTexture(GL_TEXTURE_2D, g_depth);
 	glUniform1i(g_shader[g_curS].m_slot[SSLOT_SHADOWMAP], 5);
@@ -334,20 +335,9 @@ void DrawScene(Matrix projection, Matrix viewmat, Matrix modelmat, Matrix modelv
 #endif
 
 	CheckGLError(__FILE__, __LINE__);
-#if 0
-	UseShadow(SHADER_BILLBOARD, projection, viewmat, modelmat, modelviewinv, mvLightPos, lightDir);
-	glActiveTexture(GL_TEXTURE4);
-	glBindTexture(GL_TEXTURE_2D, g_depth);
-	glUniform1i(g_shader[g_curS].m_slot[SSLOT_SHADOWMAP], 4);
-#if 0
-	DrawUnits();
-#endif
-	//DrawFoliage();
-	EndS();
-#endif
 
 #if 0
-	UseShadow(SHADER_BORDERS, projection, viewmat, modelmat, modelviewinv, mvLightPos, lightDir);
+	UseShadow(SHADER_BORDERS, projection, viewmat, modelmat, modelviewinv, lightpos, lightdir);
 	//glActiveTexture(GL_TEXTURE8);
 	//glBindTexture(GL_TEXTURE_2D, g_depth);
 	//glUniform1i(g_shader[g_curS].m_slot[SSLOT_SHADOWMAP], 8);
@@ -356,7 +346,7 @@ void DrawScene(Matrix projection, Matrix viewmat, Matrix modelmat, Matrix modelv
 #endif
 
 #if 0
-	UseShadow(SHADER_COLOR3D, projection, viewmat, modelmat, modelviewinv, mvLightPos, lightDir);
+	UseShadow(SHADER_COLOR3D, projection, viewmat, modelmat, modelviewinv, lightpos, lightdir);
 	DrawGrid();
 	DrawUnitSquares();
 	DrawPaths();
@@ -371,7 +361,7 @@ void DrawScene(Matrix projection, Matrix viewmat, Matrix modelmat, Matrix modelv
 	CheckGLError(__FILE__, __LINE__);
 
 #if 1
-	//UseShadow(SHADER_BILLBOARD, projection, viewmat, modelmat, modelviewinv, mvLightPos, lightDir);
+	//UseShadow(SHADER_BILLBOARD, projection, viewmat, modelmat, modelviewinv, lightpos, lightdir);
 	//glActiveTexture(GL_TEXTURE4);
 	//glBindTexture(GL_TEXTURE_2D, g_depth);
 	//glUniform1i(g_shader[g_curS].m_slot[SSLOT_SHADOWMAP], 4);
@@ -450,7 +440,7 @@ void DrawSceneDepth()
 	DrawPy();
 	CheckGLError(__FILE__, __LINE__);
 #if 1
-	DrawFoliage(g_lightPos, Vec3f(0,1,0), Cross(Vec3f(0,1,0), Normalize(g_lightEye - g_lightPos)));
+	DrawFoliage(g_lightpos, Vec3f(0,1,0), Cross(Vec3f(0,1,0), Normalize(g_lighteye - g_lightpos)));
 	CheckGLError(__FILE__, __LINE__);
 #endif
 #endif
@@ -471,8 +461,8 @@ void Draw()
 	{
 
 		float aspect = fabsf((float)py->width / (float)py->height);
-		Matrix projection = BuildPerspProjMat(FIELD_OF_VIEW, aspect, MIN_DISTANCE, MAX_DISTANCE/py->zoom);
-		//Matrix projection = setorthographicmat(-PROJ_RIGHT*aspect/py->zoom, PROJ_RIGHT*aspect/py->zoom, PROJ_RIGHT/py->zoom, -PROJ_RIGHT/py->zoom, MIN_DISTANCE, MAX_DISTANCE);
+		Matrix projection = PerspProj(FIELD_OF_VIEW, aspect, MIN_DISTANCE, MAX_DISTANCE/py->zoom);
+		//Matrix projection = OrthoProj(-PROJ_RIGHT*aspect/py->zoom, PROJ_RIGHT*aspect/py->zoom, PROJ_RIGHT/py->zoom, -PROJ_RIGHT/py->zoom, MIN_DISTANCE, MAX_DISTANCE);
 
 		Vec3f focusvec = c->m_view;
 		Vec3f posvec = c->zoompos();
@@ -480,19 +470,19 @@ void Draw()
 
 		Matrix viewmat = gluLookAt3(posvec.x, posvec.y, posvec.z, focusvec.x, focusvec.y, focusvec.z, upvec.x, upvec.y, upvec.z);
 
-        g_cameraViewMatrix = viewmat;
+        g_camview = viewmat;
 
 		Matrix modelview;
 		Matrix modelmat;
 		float translation[] = {0, 0, 0};
-		modelview.setTranslation(translation);
-		//modelmat.setTranslation(translation);
-		modelmat.loadIdentity();
-		modelview.postMultiply(viewmat);
+		modelview.translation(translation);
+		//modelmat.translation(translation);
+		modelmat.reset();
+		modelview.postmult(viewmat);
 
 		Matrix mvpmat;
 		mvpmat.set(projection.m_matrix);
-		mvpmat.postMultiply(viewmat);
+		mvpmat.postmult(viewmat);
 
 		//if(v->m_type == VIEWPORT_MAIN3D)
 		{
@@ -512,7 +502,7 @@ void Draw()
 						//GetMapIntersection(&g_hmap, vLine, &focus);
 			focus = c->m_view;
 			CheckGLError(__FILE__, __LINE__);
-			RenderToShadowMap(projection, viewmat, modelmat, focus, focus + g_lightOff / py->zoom, DrawSceneDepth);
+			RenderToShadowMap(projection, viewmat, modelmat, focus, focus + g_lightoff / py->zoom, DrawSceneDepth);
 			CheckGLError(__FILE__, __LINE__);
 			RenderShadowedScene(projection, viewmat, modelmat, modelview, DrawScene);
 			CheckGLError(__FILE__, __LINE__);
@@ -734,7 +724,7 @@ void LoadConfig()
 	if(!f)
         return;
 
-	string line;
+	std::string line;
 	char keystr[128];
 	char actstr[128];
 
@@ -763,6 +753,12 @@ void LoadConfig()
 	}
 }
 
+int testfunc(ObjectScript::OS* os, int nparams, int closure_values, int need_ret_values, void * param)
+{
+    InfoMessage("os", "test");
+    return 1;
+}
+
 void Init()
 {
 	SDL_Init(SDL_INIT_VIDEO);
@@ -772,6 +768,17 @@ void Init()
 	srand(GetTickCount64());
 
 	LoadConfig();
+
+    g_os = ObjectScript::OS::create();
+    g_os->pushCFunction(testfunc);
+    g_os->setGlobal("testfunc");
+    //os->eval("testfunc();");
+    //os->eval("function require(){ /* if(relative == \"called.os\") */ { testfunc(); } }");
+    char autoexecpath[MAX_PATH+1];
+    FullPath("scripts/autoexec.os", autoexecpath);
+    //g_os->require(autoexecpath);
+    g_os->release();
+
 	//EnumerateMaps();
 	//EnumerateDisplay();
 	MapKeys();
@@ -1045,7 +1052,7 @@ void EventLoop()
 		{
 			StartTimer(DRAW);
 
-			CalcDrawFrameRate();
+			CalcDrawRate();
 			CheckGLError(__FILE__, __LINE__);
 			Draw();
 			CheckGLError(__FILE__, __LINE__);
@@ -1059,11 +1066,11 @@ void EventLoop()
 			StopTimer(DRAW);
 		}
 
-		if((g_mode == APPMODE_LOADING || g_mode == APPMODE_RELOADING) || true /* UpdNextFrame(SIM_FRAME_RATE) */ )
+		if((g_mode == APPMODE_LOADING || g_mode == APPMODE_RELOADING) || UpdNextFrame(SIM_FRAME_RATE) )
 		{
 			StartTimer(UPDATE);
 
-			CalcUpdFrameRate();
+			CalcUpdRate();
 			Update();
 
 			StopTimer(UPDATE);

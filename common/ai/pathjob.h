@@ -31,7 +31,7 @@ public:
 	int target;
 	int target2;
 	int targtype;
-	list<Vec2i> *path;
+	std::list<Vec2i> *path;
 	Vec2i *subgoal;
 	short thisu;
 	short ignoreu;
@@ -64,7 +64,7 @@ public:
 };
 #pragma pack(pop)
 
-extern list<PathNode*> g_toclear;
+extern std::list<PathNode*> g_toclear;
 
 void Callback_UnitPath(bool result, PathJob* pj);
 

@@ -22,7 +22,7 @@ UString::~UString()
 		g_log<<(char)m_data[i];
 		g_log.flush();
 	}
-	
+
 	g_log<<endl;
 	g_log.flush();
 
@@ -163,9 +163,9 @@ int UString::firstof(UString find) const
 	return -1;
 }
 
-string UString::rawstr() const
+std::string UString::rawstr() const
 {
-	string finstr;
+	std::string finstr;
 
 //#ifdef USTR_DEBUG
 #if 0

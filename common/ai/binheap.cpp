@@ -84,17 +84,17 @@ bool Heap::hasmore()
 PathNode* Heap::deletemin()
 {
 #if 0
-	PathNode* min = heap[0];
+	PathNode* pmin = heap[0];
 	heap[0] = heap[nelements - 1];
 	nelements--;
 	heapifydown(0);
-	return min;
+	return pmin;
 #else
-	PathNode* min = heap.front();
+	PathNode* pmin = heap.front();
 	heap[0] = heap.at(heap.size() - 1);
 	heap.pop_back();
 	heapifydown(0);
-	return min;
+	return pmin;
 #endif
 }
 
@@ -134,7 +134,7 @@ void Heap::heapify(PathNode* element)
 #if 0
 void Heap::print()
 {
-	vector<int>::iterator pos = heap.begin();
+	std::vector<int>::iterator pos = heap.begin();
 	cout << "Heap = ";
 	while ( pos != heap.end() ) {
 		cout << *pos << " ";
@@ -145,7 +145,7 @@ void Heap::print()
 #endif
 
 void Heap::heapifyup(int index)
-{    
+{
 	//cout << "index=" << index << endl;
 	//cout << "parent(index)=" << parent(index) << endl;
 	//cout << "heap[parent(index)]=" << heap[parent(index)] << endl;
@@ -161,7 +161,7 @@ void Heap::heapifyup(int index)
 }
 
 void Heap::heapifydown(int index)
-{     
+{
 	//cout << "index=" << index << endl;
 	//cout << "left(index)=" << left(index) << endl;
 	//cout << "right(index)=" << right(index) << endl;
@@ -239,7 +239,7 @@ int main()
 	// Get priority element from the heap
 	int heapSize = myheap->size();
 	for ( int i = 0; i < heapSize; i++ )
-		cout << "Get min element = " << myheap->deletemin() << endl;
+		cout << "Get std::min element = " << myheap->deletemin() << endl;
 
 	// Cleanup
 	delete myheap;

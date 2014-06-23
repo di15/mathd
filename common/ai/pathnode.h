@@ -9,8 +9,53 @@
 #define PATHNODE_SIZE	(TILE_SIZE/8)
 #define PATHNODE_DIAG	(sqrt(PATHNODE_SIZE*PATHNODE_SIZE*2))
 
-extern Vec2i straightoffsets[4];
-extern Vec2i diagonaloffsets[4];
+// Offsets for straights moves
+const Vec2i straightoffsets[4] = {
+	Vec2i(1, 0), //E
+	Vec2i(-1, 0), //W
+	Vec2i(0, 1), //S
+	Vec2i(0, -1) //N
+};
+
+// Offsets for diagonal moves
+const Vec2i diagonaloffsets[4] = {
+	Vec2i(-1, -1), //NW
+	Vec2i(1, -1), //NE
+	Vec2i(-1, 1), //SW
+	Vec2i(1, 1) //SE
+};
+
+#define DIR_NW      0
+#define DIR_N       1
+#define DIR_NE      2
+#define DIR_E       3
+#define DIR_SE      4
+#define DIR_S       5
+#define DIR_SW      6
+#define DIR_W       7
+#define DIRS        8
+
+const Vec2i offsets[DIRS] = {
+	Vec2i(-1, -1), //NW
+	Vec2i(0, -1), //N
+	Vec2i(1, -1), //NE
+	Vec2i(1, 0), //E
+	Vec2i(1, 1), //SE
+	Vec2i(0, 1), //S
+	Vec2i(-1, 1), //SW
+	Vec2i(-1, 0) //W
+};
+
+const int stepdist[DIRS] = {
+	PATHNODE_DIAG, //NW
+	PATHNODE_SIZE, //N
+	PATHNODE_DIAG, //NE
+	PATHNODE_SIZE, //E
+	PATHNODE_DIAG, //SE
+	PATHNODE_SIZE, //S
+	PATHNODE_DIAG, //SW
+	PATHNODE_SIZE //W
+};
 
 // byte-align structures
 #pragma pack(push, 1)

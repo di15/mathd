@@ -19,7 +19,7 @@ public:
 #define TRANSACTION_RISE		(15.0f*30.0f)
 #define TRANSACTION_DECAY		(0.015f*30.0f)
 
-extern list<Transaction> g_transx;
+extern std::list<Transaction> g_transx;
 
 class Matrix;
 

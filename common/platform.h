@@ -75,18 +75,21 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_opengl.h>
 #include <GL/glut.h>
+#include <SDL/SDL_net.h>
 #endif
 
 #ifdef PLATFORM_MAC
 #include <GL/xglew.h>
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_opengl.h>
+#include <SDL2/SDL_net.h>
 #endif
 
 #ifdef PLATFORM_WIN
 #include <GL/wglew.h>
 #include <SDL.h>
 #include <SDL_opengl.h>
+#include <SDL_net.h>
 #endif
 #endif
 
@@ -110,8 +113,6 @@
 #pragma comment(lib, "zlibstatic.lib")
 #pragma comment(lib, "zipstatic.lib")
 #endif
-
-using namespace std;
 
 #ifndef MAX_PATH
 #define MAX_PATH 260
@@ -147,5 +148,18 @@ extern HINSTANCE g_hInstance;
 extern SDL_Window *g_window;
 extern SDL_Renderer* g_renderer;
 extern SDL_GLContext g_glcontext;
+
+#include "../libs/objectscript/objectscript.h"
+
+#if 0   //are these meant to be included by OS itself?
+#include "../libs/objectscript/os-binder.h"
+#include "../libs/objectscript/os-binder-arg-cc-functions.h"
+#include "../libs/objectscript/os-heap.h"
+#include "../libs/objectscript/os-binder-cc-functions.h"
+#include "../libs/objectscript/os-binder-function.h"
+#endif
+
+#define SPECBUMPSHADOW
+//#define GLDEBUG
 
 #endif // #define LIBRARY_H

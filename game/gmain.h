@@ -34,7 +34,7 @@ extern double g_instantupdfps;
 extern double g_updfrinterval;
 
 void WriteConfig();
-void DrawScene(Matrix projection, Matrix viewmat, Matrix modelmat, Matrix modelviewinv, float mvLightPos[3], float lightDir[3]);
+void DrawScene(Matrix projection, Matrix viewmat, Matrix modelmat, Matrix modelviewinv, float lightpos[3], float lightdir[3]);
 void DrawSceneDepth();
 
 #endif

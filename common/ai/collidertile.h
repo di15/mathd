@@ -11,7 +11,7 @@
 #define FLAG_ABRUPT		4
 
 #define LARGEST_UNIT_NODES		4
-#define MAX_COLLIDER_UNITS		9
+#define MAX_COLLIDER_UNITS		4
 
 // byte-align structures
 #pragma pack(push, 1)
@@ -25,7 +25,7 @@ public:
 	unsigned char flags;
 	short building;
 	short units[MAX_COLLIDER_UNITS];
-	list<int> foliage;
+	std::list<int> foliage;
 
 	ColliderTile();
 };
@@ -42,7 +42,7 @@ Vec2i PathNodePos(int cmposx, int cmposz);
 void FreePathGrid();
 void AllocPathGrid(int cmwx, int cmwz);
 void FillColliderGrid();
-bool Walkable(const PathJob* pj, const int nx, const int nz);
+bool Standable(const PathJob* pj, const int nx, const int nz);
 bool Walkable2(PathJob* pj, int cmposx, int cmposz);
 
 #endif

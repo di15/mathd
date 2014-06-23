@@ -28,9 +28,9 @@
 #include "partialpath.h"
 
 long long g_lastpath = 0;
-list<PathNode*> g_toclear;
+std::list<PathNode*> g_toclear;
 
-void ClearNodes(list<PathNode*> &toclear)
+void ClearNodes(std::list<PathNode*> &toclear)
 {
 	for(auto niter = toclear.begin(); niter != toclear.end(); niter++)
 	{
@@ -64,14 +64,14 @@ bool PathJob::process()
 	closest = 0;
 	closestnode = NULL;
 
-	while( g_openlist.hasmore() ) 
+	while( g_openlist.hasmore() )
 	{
 		searchdepth ++;
 
 		if((pjtype == PATHJOB_QUICKPARTIAL || pjtype == PATHJOB_JPSPART) && searchdepth > maxsearch)
 			break;
 
-		// Pops the lowest F-cost node, moves it in the closed list
+		// Pops the lowest F-cost node, moves it in the closed std::list
 		node = g_openlist.deletemin();
 		int i = node - g_pathnode;
 
@@ -80,7 +80,7 @@ bool PathJob::process()
 		node->closed = true;
 
 		// If the popped node is the endNode, return it
-		if( AtGoal(this, node) ) 
+		if( AtGoal(this, node) )
 		{
 			ReconstructPath(this, node);
 			ClearNodes(g_toclear);
@@ -98,19 +98,18 @@ bool PathJob::process()
 			IdentifySuccessors_QP(this, node);
 	}
 
+	bool pathfound = false;
+
 	if((pjtype == PATHJOB_QUICKPARTIAL || pjtype == PATHJOB_JPSPART) && closestnode)
 	{
+        pathfound = true;
 		ReconstructPath(this, closestnode);
-		
-		if(callback)
-			callback(true, this);
 	}
 
 	ClearNodes(g_toclear);
 
-	// No path found
-	if(callback)
-		callback(false, this);
+    if(callback)
+        callback(pathfound, this);
 
 	return true;
 }

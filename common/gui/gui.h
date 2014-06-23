@@ -27,7 +27,7 @@
 class GUI : public Widget
 {
 public:
-	list<ViewLayer> view;
+	std::list<ViewLayer> view;
 	void (*keyupfunc[SDL_NUM_SCANCODES])();
 	void (*keydownfunc[SDL_NUM_SCANCODES])();
 	void (*anykeyupfunc)(int k);

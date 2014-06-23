@@ -18,7 +18,7 @@ public:
 	UString m_text;
 	int texlen() const;	//each icon counts as 1
 	int rawlen() const;	//icon tags are counted
-	string texval() const;
+	std::string texval() const;
 	RichTextP substr(int start, int length) const;
 	RichTextP();
 	RichTextP(const RichTextP& original);
@@ -31,11 +31,11 @@ public:
 class RichText
 {
 public:
-	list<RichTextP> m_part;
-	string rawstr() const;
+	std::list<RichTextP> m_part;
+	std::string rawstr() const;
 	int texlen() const;	//each icon counts as 1
 	int rawlen() const;	//icon tags are counted
-	RichText pwver() const;	//asterisk-mask password string
+	RichText pwver() const;	//asterisk-mask password std::string
 	RichText();
 	RichText(const RichTextP& part);
 	RichText(const RichText& original);

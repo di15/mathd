@@ -34,12 +34,12 @@ void Foliage::reinstance()
 	if(on)
 	{
 		float pitch = 0;
-		m->loadIdentity();
+		m->reset();
 		float radians[] = {static_cast<float>(DEGTORAD(pitch)), static_cast<float>(DEGTORAD(yaw)), 0};
-		m->setTranslation((const float*)&pos);
+		m->translation((const float*)&pos);
 		Matrix rotation;
-		rotation.setRotationRadians(radians);
-		m->postMultiply(rotation);
+		rotation.rotrad(radians);
+		m->postmult(rotation);
 	}
 	else
 	{
@@ -199,9 +199,11 @@ void DrawFoliage(Vec3f zoompos, Vec3f vertical, Vec3f horizontal)
 
 		Matrix modelview;
 		modelview.set(g_folmodmat[i].m_matrix);
-		modelview.postMultiply(g_cameraViewMatrix);
-		//modelview.set(g_cameraViewMatrix.m_matrix);
-		//modelview.postMultiply(modelmat);
+#ifdef SPECBUMPSHADOW
+		modelview.postmult(g_camview);
+#endif
+		//modelview.set(g_camview.m_matrix);
+		//modelview.postmult(modelmat);
 		Matrix modelviewinv;
 		Transpose(modelview, modelview);
 		Inverse2(modelview, modelviewinv);
@@ -274,7 +276,7 @@ void FillForest()
 	{
 
 		int maxfoliage = FOLIAGES*g_hmap.m_widthx*g_hmap.m_widthz/MAX_MAP/MAX_MAP;
-		maxfoliage = min(FOLIAGES, maxfoliage);
+		maxfoliage = std::min(FOLIAGES, maxfoliage);
 
 		for(int i=0; i<maxfoliage; i++)
 		{

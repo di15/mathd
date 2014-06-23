@@ -28,23 +28,23 @@ unsigned int g_fbDepth;
 //#define LIGHT_MAX_D		(1000.0f * 100.0f)
 //#define LIGHT_MIN_D		1.0f
 
-Vec3f g_lightOff(-MAX_DISTANCE/4, MAX_DISTANCE/4, MAX_DISTANCE/4);
-//Vec3f g_lightOff(-LIGHT_MAX_D/5, LIGHT_MAX_D/3, LIGHT_MAX_D/4);
-Vec3f g_lightPos;	//(-MAX_DISTANCE/2, MAX_DISTANCE/5, MAX_DISTANCE/3);
-Vec3f g_lightEye;	//(-MAX_DISTANCE/2+1.0f/2.0f, MAX_DISTANCE/3-1.0f/3.0f, MAX_DISTANCE/3-1.0f/3.0f);
-Vec3f g_lightUp(0,1,0);
+Vec3f g_lightoff(-MAX_DISTANCE/4, MAX_DISTANCE/4, MAX_DISTANCE/4);
+//Vec3f g_lightoff(-LIGHT_MAX_D/5, LIGHT_MAX_D/3, LIGHT_MAX_D/4);
+Vec3f g_lightpos;	//(-MAX_DISTANCE/2, MAX_DISTANCE/5, MAX_DISTANCE/3);
+Vec3f g_lighteye;	//(-MAX_DISTANCE/2+1.0f/2.0f, MAX_DISTANCE/3-1.0f/3.0f, MAX_DISTANCE/3-1.0f/3.0f);
+Vec3f g_lightup(0,1,0);
 
-Matrix g_lightProjectionMatrix;
-Matrix g_lightModelViewMatrix;
-Matrix g_cameraInverseModelViewMatrix;
-Matrix g_lightMatrix;
-Matrix g_cameraModelViewMatrix;
-Matrix g_cameraProjectionMatrix;
-Matrix g_cameraViewMatrix;
+Matrix g_lightproj;
+Matrix g_lightmodelview;
+Matrix g_caminvmv;  //camera inverse modelview
+Matrix g_lightmat;
+Matrix g_cammodelview;
+Matrix g_camproj;
+Matrix g_camview;
 
 #if 0
 void (*DrawSceneDepthFunc)() = NULL;
-void (*DrawSceneFunc)(Matrix projection, Matrix viewmat, Matrix modelmat, Matrix modelviewinv, float mvLightPos[3], float lightDir[3]) = NULL;
+void (*DrawSceneFunc)(Matrix projection, Matrix viewmat, Matrix modelmat, Matrix modelviewinv, float lightpos[3], float lightdir[3]) = NULL;
 #endif
 
 Vec3f g_viewInter;
@@ -290,26 +290,26 @@ void RenderToShadowMap(Matrix projection, Matrix viewmat, Matrix modelmat, Vec3f
 
 	CheckGLError(__FILE__, __LINE__);
 
-	g_lightPos = lightpos;
-	g_lightEye = focus;
+	g_lightpos = lightpos;
+	g_lighteye = focus;
 
 	//return;
 
 #if 0
-	g_log<<"lposd "<<g_lightPos.x<<","<<g_lightPos.y<<","<<g_lightPos.z<<endl;
-	g_log<<"leyed "<<g_lightEye.x<<","<<g_lightEye.y<<","<<g_lightEye.z<<endl;
+	g_log<<"lposd "<<g_lightpos.x<<","<<g_lightpos.y<<","<<g_lightpos.z<<endl;
+	g_log<<"leyed "<<g_lighteye.x<<","<<g_lighteye.y<<","<<g_lighteye.z<<endl;
 #endif
 
-	//g_lightEye = Vec3f(0,0,0);
-	//g_lightPos = g_lightEye + g_lightOff;
+	//g_lighteye = Vec3f(0,0,0);
+	//g_lightpos = g_lighteye + g_lightoff;
 
-	float zoom = Magnitude(g_lightOff) / Magnitude(g_lightEye - g_lightPos);
+	float zoom = Magnitude(g_lightoff) / Magnitude(g_lighteye - g_lightpos);
 
 #define LIGHT_SCALE		3
 //#define LIGHT_SCALE		1
 
-	//g_lightProjectionMatrix = BuildPerspProjMat(90.0, 1.0, 30.0, 10000.0);
-	g_lightProjectionMatrix = setorthographicmat(
+	//g_lightproj = PerspProj(90.0, 1.0, 30.0, 10000.0);
+	g_lightproj = OrthoProj(
 		-PROJ_RIGHT*LIGHT_SCALE/zoom,
 		PROJ_RIGHT*LIGHT_SCALE/zoom,
 		PROJ_RIGHT*LIGHT_SCALE/zoom,
@@ -317,19 +317,19 @@ void RenderToShadowMap(Matrix projection, Matrix viewmat, Matrix modelmat, Vec3f
 		MIN_DISTANCE,
 		MAX_DISTANCE/zoom);
 
-	//g_lightPos = RotateAround(g_lightPos, g_lightEye, DEGTORAD((g_simframe%360)), 0, 0, 1);
+	//g_lightpos = RotateAround(g_lightpos, g_lighteye, DEGTORAD((g_simframe%360)), 0, 0, 1);
 
-	g_lightModelViewMatrix = gluLookAt2(
-		g_lightPos.x, g_lightPos.y, g_lightPos.z,
+	g_lightmodelview = gluLookAt2(
+		g_lightpos.x, g_lightpos.y, g_lightpos.z,
 		//timelightpos.x, timelightpos.y, timelightpos.z,
-		g_lightEye.x, g_lightEye.y, g_lightEye.z,
-		g_lightUp.x, g_lightUp.y, g_lightUp.z);
+		g_lighteye.x, g_lighteye.y, g_lighteye.z,
+		g_lightup.x, g_lightup.y, g_lightup.z);
 	CheckGLError(__FILE__, __LINE__);
 
 	UseS(SHADER_DEPTH);
-	glUniformMatrix4fv(g_shader[SHADER_DEPTH].m_slot[SSLOT_PROJECTION], 1, 0, g_lightProjectionMatrix.m_matrix);
+	glUniformMatrix4fv(g_shader[SHADER_DEPTH].m_slot[SSLOT_PROJECTION], 1, 0, g_lightproj.m_matrix);
 	glUniformMatrix4fv(g_shader[SHADER_DEPTH].m_slot[SSLOT_MODELMAT], 1, 0, modelmat.m_matrix);
-	glUniformMatrix4fv(g_shader[SHADER_DEPTH].m_slot[SSLOT_VIEWMAT], 1, 0, g_lightModelViewMatrix.m_matrix);
+	glUniformMatrix4fv(g_shader[SHADER_DEPTH].m_slot[SSLOT_VIEWMAT], 1, 0, g_lightmodelview.m_matrix);
 	glUniform4f(g_shader[SHADER_DEPTH].m_slot[SSLOT_COLOR], 1, 1, 1, 1);
 	//glEnableVertexAttribArray(g_shader[SHADER_DEPTH].m_slot[SSLOT_POSITION]);
 	//glEnableVertexAttribArray(g_shader[SHADER_DEPTH].m_slot[SSLOT_TEXCOORD0]);
@@ -357,7 +357,7 @@ void RenderToShadowMap(Matrix projection, Matrix viewmat, Matrix modelmat, Vec3f
 	CheckGLError(__FILE__, __LINE__);
 }
 
-void UseShadow(int shader, Matrix projection, Matrix viewmat, Matrix modelmat, Matrix modelviewinv, float mvLightPos[3], float lightDir[3])
+void UseShadow(int shader, Matrix projection, Matrix viewmat, Matrix modelmat, Matrix modelviewinv, float lightpos[3], float lightdir[3])
 {
 	UseS(shader);
 	Shader* s = &g_shader[g_curS];
@@ -372,19 +372,19 @@ void UseShadow(int shader, Matrix projection, Matrix viewmat, Matrix modelmat, M
 	//glEnableVertexAttribArray(s->m_slot[SSLOT_TEXCOORD1]);
 	//if(s->m_slot[SSLOT_NORMAL] != -1)   glEnableVertexAttribArray(s->m_slot[SSLOT_NORMAL]);
 
-	//glUniformMatrix4fv(s->m_slot[SSLOT_LIGHTMATRIX], 1, false, g_lightMatrix);
-	glUniformMatrix4fv(s->m_slot[SSLOT_LIGHTMATRIX], 1, false, g_lightMatrix.m_matrix);
+	//glUniformMatrix4fv(s->m_slot[SSLOT_LIGHTMATRIX], 1, false, g_lightmat);
+	glUniformMatrix4fv(s->m_slot[SSLOT_LIGHTMATRIX], 1, false, g_lightmat.m_matrix);
 
-	glUniform3f(s->m_slot[SSLOT_LIGHTPOS], mvLightPos[0], mvLightPos[1], mvLightPos[2]);
-	glUniform3f(s->m_slot[SSLOT_SUNDIRECTION], lightDir[0], lightDir[1], lightDir[2]);
+	glUniform3f(s->m_slot[SSLOT_LIGHTPOS], lightpos[0], lightpos[1], lightpos[2]);
+	glUniform3f(s->m_slot[SSLOT_SUNDIRECTION], lightdir[0], lightdir[1], lightdir[2]);
 	//glUniform1f(s->m_slot[SSLOT_MAXELEV], g_maxelev);
 
 #if 0
-	g_log<<"sun "<<lightDir[0]<<","<<lightDir[1]<<","<<lightDir[2]<<endl;
+	g_log<<"sun "<<lightdir[0]<<","<<lightdir[1]<<","<<lightdir[2]<<endl;
 #endif
 }
 
-void RenderShadowedScene(Matrix projection, Matrix viewmat, Matrix modelmat, Matrix modelview, void (*drawscenefunc)(Matrix projection, Matrix viewmat, Matrix modelmat, Matrix modelviewinv, float mvLightPos[3], float lightDir[3]))
+void RenderShadowedScene(Matrix projection, Matrix viewmat, Matrix modelmat, Matrix modelview, void (*drawscenefunc)(Matrix projection, Matrix viewmat, Matrix modelmat, Matrix modelviewinv, float lightpos[3], float lightdir[3]))
 {
 	//glViewport(0, 0, py->width, py->height);
 	glClearColor(0.0, 0.0, 0.0, 1.0);
@@ -393,65 +393,66 @@ void RenderShadowedScene(Matrix projection, Matrix viewmat, Matrix modelmat, Mat
 	//glMatrixMode(GL_PROJECTION);
 	//glLoadIdentity();
 	//gluPerspective(FIELD_OF_VIEW, double(py->width) / double(py->height), MIN_DISTANCE, MAX_DISTANCE);
-	//g_cameraProjectionMatrix = BuildPerspProjMat(FIELD_OF_VIEW, double(py->width) / double(py->height), MIN_DISTANCE, MAX_DISTANCE);
+	//g_camproj = PerspProj(FIELD_OF_VIEW, double(py->width) / double(py->height), MIN_DISTANCE, MAX_DISTANCE);
 	//glMatrixMode(GL_MODELVIEW);
 	//glLoadIdentity();
 	//c->Look();
 
-	//glGetFloatv(GL_PROJECTION_MATRIX, g_cameraProjectionMatrix);
-	g_cameraProjectionMatrix = projection;
-	//glGetFloatv(GL_MODELVIEW_MATRIX, g_cameraModelViewMatrix);
-	g_cameraModelViewMatrix = modelview;
+	//glGetFloatv(GL_PROJECTION_MATRIX, g_camproj);
+	g_camproj = projection;
+	//glGetFloatv(GL_MODELVIEW_MATRIX, g_cammodelview);
+	g_cammodelview = modelview;
 
 	// Do non-shadowed drawing here
 	//DrawSkyBox(c->LookPos());
 
-	Inverse(&g_cameraInverseModelViewMatrix, modelview);
+	Inverse(&g_caminvmv, modelview);
 
 	// We need to change the clip-space coordinates from range [-1,1] to [0,1] for texture mapping
-	g_lightMatrix.loadIdentity();
+	g_lightmat.reset();
 #if 1
 	float trans[] = { 0.5f, 0.5f, 0.5f };
-	g_lightMatrix.setTranslation(trans);
+	g_lightmat.translation(trans);
 	float scalef[] = { 0.5f, 0.5f, 0.5f };
 	Matrix scalem;
-	scalem.setScale(scalef);
-	g_lightMatrix.postMultiply2(scalem);
+	scalem.scale(scalef);
+	g_lightmat.postmult2(scalem);
 #endif
-	g_lightMatrix.postMultiply2(g_lightProjectionMatrix);
-	g_lightMatrix.postMultiply2(g_lightModelViewMatrix);
-	//g_lightMatrix.postMultiply(g_cameraInverseModelViewMatrix);
+	g_lightmat.postmult2(g_lightproj);
+	g_lightmat.postmult2(g_lightmodelview);
+	//g_lightmat.postmult(g_caminvmv);
 
 	Matrix modelviewinv;
 	Inverse2(modelview, modelviewinv);
 	Transpose(modelviewinv, modelviewinv);
 
-	const float* mv = g_cameraModelViewMatrix.m_matrix;
-	float mvLightPos[3];
-	mvLightPos[0] = mv[0] * g_lightPos.x + mv[4] * g_lightPos.y + mv[8] * g_lightPos.z + mv[12];
-	mvLightPos[1] = mv[1] * g_lightPos.x + mv[5] * g_lightPos.y + mv[9] * g_lightPos.z + mv[13];
-	mvLightPos[2] = mv[2] * g_lightPos.x + mv[6] * g_lightPos.y + mv[10] * g_lightPos.z + mv[14];
+	const float* mv = g_cammodelview.m_matrix;
+	float lightpos[3];
+	lightpos[0] = mv[0] * g_lightpos.x + mv[4] * g_lightpos.y + mv[8] * g_lightpos.z + mv[12];
+	lightpos[1] = mv[1] * g_lightpos.x + mv[5] * g_lightpos.y + mv[9] * g_lightpos.z + mv[13];
+	lightpos[2] = mv[2] * g_lightpos.x + mv[6] * g_lightpos.y + mv[10] * g_lightpos.z + mv[14];
 
-	Vec3f lightDir;
-	//lightDir[0] = g_lightEye.x - g_lightPos.x;
-	//lightDir[1] = g_lightEye.y - g_lightPos.y;
-	//lightDir[2] = g_lightEye.z - g_lightPos.z;
+	//Vec3f lightdir;
+	//lightdir[0] = g_lighteye.x - g_lightpos.x;
+	//lightdir[1] = g_lighteye.y - g_lightpos.y;
+	//lightdir[2] = g_lighteye.z - g_lightpos.z;
 #if 0
-	g_log<<"lpos "<<g_lightPos.x<<","<<g_lightPos.y<<","<<g_lightPos.z<<endl;
-	g_log<<"leye "<<g_lightEye.x<<","<<g_lightEye.y<<","<<g_lightEye.z<<endl;
+	g_log<<"lpos "<<g_lightpos.x<<","<<g_lightpos.y<<","<<g_lightpos.z<<endl;
+	g_log<<"leye "<<g_lighteye.x<<","<<g_lighteye.y<<","<<g_lighteye.z<<endl;
 #endif
-	lightDir = g_lightPos - g_lightEye;
+	//lightdir = g_lightpos - g_lighteye;
 #if 0
-	g_log<<"sun pres "<<lightDir.x<<","<<lightDir.y<<","<<lightDir.z<<endl;
+	g_log<<"sun pres "<<lightdir.x<<","<<lightdir.y<<","<<lightdir.z<<endl;
 #endif
-	lightDir = Normalize(lightDir);
+	//lightdir = Normalize(lightdir);
 #if 0
-	g_log<<"sun norm "<<lightDir.x<<","<<lightDir.y<<","<<lightDir.z<<endl;
+	g_log<<"sun norm "<<lightdir.x<<","<<lightdir.y<<","<<lightdir.z<<endl;
 #endif
 
 	if(drawscenefunc != NULL)
-		drawscenefunc(projection, viewmat, modelmat, modelviewinv, mvLightPos, (float*)&lightDir);
-		//DrawSceneFunc(projection, viewmat, modelmat, modelviewinv, (float*)&g_lightPos, lightDir);
+		//drawscenefunc(projection, viewmat, modelmat, modelviewinv, lightpos, (float*)&lightdir);
+		drawscenefunc(projection, viewmat, modelmat, modelviewinv, lightpos, lightdir);
+		//DrawSceneFunc(projection, viewmat, modelmat, modelviewinv, (float*)&g_lightpos, lightdir);
 
 	TurnOffShader();
 	glBindTexture(GL_TEXTURE_2D, 0);

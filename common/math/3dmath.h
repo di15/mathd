@@ -59,8 +59,8 @@ Matrix gluLookAt2(float eyex, float eyey, float eyez,
 Matrix gluLookAt3(float eyex, float eyey, float eyez,
                float centerx, float centery, float centerz,
                float upx, float upy, float upz);
-Matrix BuildPerspProjMat(float fov, float aspect, float znear, float zfar);
-Matrix setorthographicmat(float l, float r, float t, float b, float n, float f);
+Matrix PerspProj(float fov, float aspect, float znear, float zfar);
+Matrix OrthoProj(float l, float r, float t, float b, float n, float f);
 Vec4f ScreenPos(Matrix* mvp, Vec3f vec, float width, float height, bool persp);
 float Snap(float base, float value);
 float SnapNearest(float base, float value);

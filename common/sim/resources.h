@@ -13,9 +13,9 @@ public:
 	bool physical;
 	bool capacity;
 	bool global;
-	string name;
+	std::string name;
 	float rgba[4];
-	string depositn;
+	std::string depositn;
 };
 
 #define RES_NONE			-1

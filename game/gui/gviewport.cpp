@@ -226,17 +226,17 @@ void DrawMMFrust()
 	glDrawArrays(GL_LINE_STRIP, 0, 5);
 }
 
-void DrawMinimap(Matrix projection, Matrix viewmat, Matrix modelmat, Matrix modelviewinv, float mvLightPos[3], float lightDir[3])
+void DrawMinimap(Matrix projection, Matrix viewmat, Matrix modelmat, Matrix modelviewinv, float lightpos[3], float lightdir[3])
 {
 	Matrix mvpmat;
 	mvpmat.set(projection.m_matrix);
-	mvpmat.postMultiply(viewmat);
+	mvpmat.postmult(viewmat);
 
 	//g_frustum.construct(projection.m_matrix, viewmat.m_matrix);
 
 	CheckGLError(__FILE__, __LINE__);
 #if 1
-	UseShadow(SHADER_MAPTILESMM, projection, viewmat, modelmat, modelviewinv, mvLightPos, lightDir);
+	UseShadow(SHADER_MAPTILESMM, projection, viewmat, modelmat, modelviewinv, lightpos, lightdir);
 	glActiveTexture(GL_TEXTURE8);
 	glBindTexture(GL_TEXTURE_2D, g_depth);
 	glUniform1i(g_shader[g_curS].m_slot[SSLOT_SHADOWMAP], 8);
@@ -246,7 +246,7 @@ void DrawMinimap(Matrix projection, Matrix viewmat, Matrix modelmat, Matrix mode
 	CheckGLError(__FILE__, __LINE__);
 
 #if 1
-	UseShadow(SHADER_WATERMM, projection, viewmat, modelmat, modelviewinv, mvLightPos, lightDir);
+	UseShadow(SHADER_WATERMM, projection, viewmat, modelmat, modelviewinv, lightpos, lightdir);
 	CheckGLError(__FILE__, __LINE__);
 	glActiveTexture(GL_TEXTURE8);
 	glBindTexture(GL_TEXTURE_2D, g_depth);
@@ -259,7 +259,7 @@ void DrawMinimap(Matrix projection, Matrix viewmat, Matrix modelmat, Matrix mode
 
 	CheckGLError(__FILE__, __LINE__);
 #if 0
-	UseShadow(SHADER_BORDERSMM, projection, viewmat, modelmat, modelviewinv, mvLightPos, lightDir);
+	UseShadow(SHADER_BORDERSMM, projection, viewmat, modelmat, modelviewinv, lightpos, lightdir);
 	//glActiveTexture(GL_TEXTURE8);
 	//glBindTexture(GL_TEXTURE_2D, g_depth);
 	//glUniform1i(g_shader[g_curS].m_slot[SSLOT_SHADOWMAP], 8);
@@ -292,14 +292,14 @@ void DrawMinimapDepth()
 	g_hmap.draw2();
 }
 
-void DrawPreview(Matrix projection, Matrix viewmat, Matrix modelmat, Matrix modelviewinv, float mvLightPos[3], float lightDir[3])
+void DrawPreview(Matrix projection, Matrix viewmat, Matrix modelmat, Matrix modelviewinv, float lightpos[3], float lightdir[3])
 {
 	Matrix mvpmat;
 	mvpmat.set(projection.m_matrix);
-	mvpmat.postMultiply(viewmat);
+	mvpmat.postmult(viewmat);
 
-	UseShadow(SHADER_OWNED, projection, viewmat, modelmat, modelviewinv, mvLightPos, lightDir);
-	//UseShadow(SHADER_UNIT, projection, viewmat, modelmat, modelviewinv, mvLightPos, lightDir);
+	UseShadow(SHADER_OWNED, projection, viewmat, modelmat, modelviewinv, lightpos, lightdir);
+	//UseShadow(SHADER_UNIT, projection, viewmat, modelmat, modelviewinv, lightpos, lightdir);
 	glActiveTexture(GL_TEXTURE8);
 	glBindTexture(GL_TEXTURE_2D, g_depth);
 	glUniform1i(g_shader[g_curS].m_slot[SSLOT_SHADOWMAP], 8);
@@ -338,10 +338,10 @@ void DrawPreview(Matrix projection, Matrix viewmat, Matrix modelmat, Matrix mode
 	Vec3f pos(0,0,0);
 	Matrix modelmat2;
 	float radians[] = {static_cast<float>(DEGTORAD(pitch)), static_cast<float>(DEGTORAD(yaw)), 0};
-	modelmat2.setTranslation((const float*)&pos);
+	modelmat2.translation((const float*)&pos);
 	Matrix rotation;
-	rotation.setRotationRadians(radians);
-	modelmat2.postMultiply(rotation);
+	rotation.rotrad(radians);
+	modelmat2.postmult(rotation);
 	glUniformMatrix4fv(s->m_slot[SSLOT_MODELMAT], 1, 0, modelmat2.m_matrix);
 
 	VertexArray* va = &m->m_va[frame];
@@ -393,10 +393,10 @@ void DrawPreviewDepth()
 	Vec3f pos(0,0,0);
 	Matrix modelmat;
 	float radians[] = {static_cast<float>(DEGTORAD(pitch)), static_cast<float>(DEGTORAD(yaw)), 0};
-	modelmat.setTranslation((const float*)&pos);
+	modelmat.translation((const float*)&pos);
 	Matrix rotation;
-	rotation.setRotationRadians(radians);
-	modelmat.postMultiply(rotation);
+	rotation.rotrad(radians);
+	modelmat.postmult(rotation);
 	glUniformMatrix4fv(s->m_slot[SSLOT_MODELMAT], 1, 0, modelmat.m_matrix);
 
 	VertexArray* va = &m->m_va[frame];
@@ -421,13 +421,13 @@ void DrawViewport(int which, int x, int y, int width, int height)
 	Camera* c = &py->camera;
 
 
-	Matrix oldview = g_cameraViewMatrix;
+	Matrix oldview = g_camview;
 
 	if(which == VIEWPORT_ENTVIEW)
 	{
 		float aspect = fabsf((float)width / (float)height);
-		Matrix projection = BuildPerspProjMat(FIELD_OF_VIEW, aspect, MIN_DISTANCE, MAX_DISTANCE);
-		//Matrix projection = setorthographicmat(-PROJ_RIGHT*aspect/py->zoom, PROJ_RIGHT*aspect/py->zoom, PROJ_RIGHT/py->zoom, -PROJ_RIGHT/py->zoom, MIN_DISTANCE, MAX_DISTANCE);
+		Matrix projection = PerspProj(FIELD_OF_VIEW, aspect, MIN_DISTANCE, MAX_DISTANCE);
+		//Matrix projection = OrthoProj(-PROJ_RIGHT*aspect/py->zoom, PROJ_RIGHT*aspect/py->zoom, PROJ_RIGHT/py->zoom, -PROJ_RIGHT/py->zoom, MIN_DISTANCE, MAX_DISTANCE);
 
 		Vec3f focusvec = py->bpcam.m_view;
 		Vec3f posvec = py->bpcam.m_pos;
@@ -435,18 +435,18 @@ void DrawViewport(int which, int x, int y, int width, int height)
 
 		Matrix viewmat = gluLookAt3(posvec.x, posvec.y, posvec.z, focusvec.x, focusvec.y, focusvec.z, upvec.x, upvec.y, upvec.z);
 
-		g_cameraViewMatrix = viewmat;
+		g_camview = viewmat;
 
 		Matrix modelview;
 		Matrix modelmat;
 		float translation[] = {0, 0, 0};
-		modelview.setTranslation(translation);
-		modelmat.setTranslation(translation);
-		modelview.postMultiply(viewmat);
+		modelview.translation(translation);
+		modelmat.translation(translation);
+		modelview.postmult(viewmat);
 
 		Matrix mvpmat;
 		mvpmat.set(projection.m_matrix);
-		mvpmat.postMultiply(viewmat);
+		mvpmat.postmult(viewmat);
 
 		//if(v->m_type == VIEWPORT_MAIN3D)
 		{
@@ -465,7 +465,7 @@ void DrawViewport(int which, int x, int y, int width, int height)
 					GetMapIntersection2(&g_hmap, vLine, &focus);
 #endif
 			CheckGLError(__FILE__, __LINE__);
-			RenderToShadowMap(projection, viewmat, modelmat, focus, focus + g_lightOff, DrawPreviewDepth);
+			RenderToShadowMap(projection, viewmat, modelmat, focus, focus + g_lightoff, DrawPreviewDepth);
             CheckGLError(__FILE__, __LINE__);
 			RenderShadowedScene(projection, viewmat, modelmat, modelview, DrawPreview);
             CheckGLError(__FILE__, __LINE__);
@@ -475,8 +475,8 @@ void DrawViewport(int which, int x, int y, int width, int height)
 	if(which == VIEWPORT_MINIMAP)
 	{
 		float aspect = fabsf((float)width / (float)height);
-		Matrix projection = BuildPerspProjMat(FIELD_OF_VIEW, aspect, MIN_DISTANCE, MAX_DISTANCE/py->zoom);
-		//Matrix projection = setorthographicmat(-PROJ_RIGHT*aspect/py->zoom, PROJ_RIGHT*aspect/py->zoom, PROJ_RIGHT/py->zoom, -PROJ_RIGHT/py->zoom, MIN_DISTANCE, MAX_DISTANCE);
+		Matrix projection = PerspProj(FIELD_OF_VIEW, aspect, MIN_DISTANCE, MAX_DISTANCE/py->zoom);
+		//Matrix projection = OrthoProj(-PROJ_RIGHT*aspect/py->zoom, PROJ_RIGHT*aspect/py->zoom, PROJ_RIGHT/py->zoom, -PROJ_RIGHT/py->zoom, MIN_DISTANCE, MAX_DISTANCE);
 
 		Vec3f focusvec = c->m_view;
 		Vec3f posvec = c->zoompos();
@@ -484,18 +484,18 @@ void DrawViewport(int which, int x, int y, int width, int height)
 
 		Matrix viewmat = gluLookAt3(posvec.x, posvec.y, posvec.z, focusvec.x, focusvec.y, focusvec.z, upvec.x, upvec.y, upvec.z);
 
-		g_cameraViewMatrix = viewmat;
+		g_camview = viewmat;
 
 		Matrix modelview;
 		Matrix modelmat;
 		float translation[] = {0, 0, 0};
-		modelview.setTranslation(translation);
-		modelmat.setTranslation(translation);
-		modelview.postMultiply(viewmat);
+		modelview.translation(translation);
+		modelmat.translation(translation);
+		modelview.postmult(viewmat);
 
 		Matrix mvpmat;
 		mvpmat.set(projection.m_matrix);
-		mvpmat.postMultiply(viewmat);
+		mvpmat.postmult(viewmat);
 
 		//if(v->m_type == VIEWPORT_MAIN3D)
 		{
@@ -514,14 +514,14 @@ void DrawViewport(int which, int x, int y, int width, int height)
 					GetMapIntersection2(&g_hmap, vLine, &focus);
 #endif
 			CheckGLError(__FILE__, __LINE__);
-			RenderToShadowMap(projection, viewmat, modelmat, focus, focus + g_lightOff / MIN_ZOOM, DrawMinimapDepth);
+			RenderToShadowMap(projection, viewmat, modelmat, focus, focus + g_lightoff / MIN_ZOOM, DrawMinimapDepth);
             CheckGLError(__FILE__, __LINE__);
 			RenderShadowedScene(projection, viewmat, modelmat, modelview, DrawMinimap);
             CheckGLError(__FILE__, __LINE__);
 		}
 	}
 
-	g_cameraViewMatrix = oldview;
+	g_camview = oldview;
 
 #if 0
 	EndS();
@@ -564,12 +564,12 @@ bool ViewportLDown(int which, int relx, int rely, int width, int height)
 #if 0
 	if(v->!t->m_axial && g_projtype == PROJ_PERSP)
 	{
-		projection = BuildPerspProjMat(FIELD_OF_VIEW, aspect, MIN_DISTANCE, MAX_DISTANCE);
+		projection = PerspProj(FIELD_OF_VIEW, aspect, MIN_DISTANCE, MAX_DISTANCE);
 		persp = true;
 	}
 	else
 	{
-		projection = setorthographicmat(-PROJ_RIGHT*aspect/py->zoom, PROJ_RIGHT*aspect/py->zoom, PROJ_RIGHT/py->zoom, -PROJ_RIGHT/py->zoom, MIN_DISTANCE, MAX_DISTANCE);
+		projection = OrthoProj(-PROJ_RIGHT*aspect/py->zoom, PROJ_RIGHT*aspect/py->zoom, PROJ_RIGHT/py->zoom, -PROJ_RIGHT/py->zoom, MIN_DISTANCE, MAX_DISTANCE);
 	}
 #endif
 
@@ -598,7 +598,7 @@ bool ViewportLDown(int which, int relx, int rely, int width, int height)
 	Matrix viewmat = gluLookAt3(posvec.x, posvec.y, posvec.z, focusvec.x, focusvec.y, focusvec.z, upvec.x, upvec.y, upvec.z);
 	Matrix mvpmat;
 	mvpmat.set(projection.m_matrix);
-	mvpmat.postMultiply(viewmat);
+	mvpmat.postmult(viewmat);
 
 	return true;
 }

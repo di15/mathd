@@ -31,7 +31,7 @@
 #define MAX3(a,b,c) ((((a)>(b))&&((a)>(c))) ? (a) : (((b)>(c)) ? (b) : (c)))
 #define INSIDE 0
 #define OUTSIDE 1
-  
+
 /*___________________________________________________________________________*/
 /* Which of the six face-plane(s) is point P outside of? */
 long face_plane(Vec3f p)
@@ -124,14 +124,14 @@ Vec3f vect12,vect23,vect31,vect1h,vect2h,vect3h;
 Vec3f cross12_1p,cross23_2p,cross31_3p;
 /* First, a quick bounding-box test:							   */
 /* If P is outside triangle bbox, there cannot be an intersection. */
-   if (p.x > MAX3(t.m_vertex[0].x, t.m_vertex[1].x, t.m_vertex[2].x)) return(OUTSIDE); 
+   if (p.x > MAX3(t.m_vertex[0].x, t.m_vertex[1].x, t.m_vertex[2].x)) return(OUTSIDE);
    if (p.y > MAX3(t.m_vertex[0].y, t.m_vertex[1].y, t.m_vertex[2].y)) return(OUTSIDE);
    if (p.z > MAX3(t.m_vertex[0].z, t.m_vertex[1].z, t.m_vertex[2].z)) return(OUTSIDE);
    if (p.x < MIN3(t.m_vertex[0].x, t.m_vertex[1].x, t.m_vertex[2].x)) return(OUTSIDE);
    if (p.y < MIN3(t.m_vertex[0].y, t.m_vertex[1].y, t.m_vertex[2].y)) return(OUTSIDE);
    if (p.z < MIN3(t.m_vertex[0].z, t.m_vertex[1].z, t.m_vertex[2].z)) return(OUTSIDE);
-/* For each triangle side, make a vector out of it by subtracting vertexes; */
-/* make another vector from one vertex to point P.						  */
+/* For each triangle side, make a std::vector out of it by subtracting vertexes; */
+/* make another std::vector from one vertex to point P.						  */
 /* The crossproduct of these two vectors is orthogonal to both and the	  */
 /* signs of its X,Y,Z components indicate whether P was to the inside or    */
 /* to the outside of this triangle side.								    */
@@ -187,12 +187,12 @@ Vec3f hitpp,hitpn,hitnp,hitnn;
    v1_test |= bevel_2d(t.m_vertex[0]) << 8;
    v2_test |= bevel_2d(t.m_vertex[1]) << 8;
    v3_test |= bevel_2d(t.m_vertex[2]) << 8;
-   if ((v1_test & v2_test & v3_test) != 0) return(OUTSIDE); 
+   if ((v1_test & v2_test & v3_test) != 0) return(OUTSIDE);
 /* Now do the same trivial rejection test for the 8 corner planes */
    v1_test |= bevel_3d(t.m_vertex[0]) << 24;
    v2_test |= bevel_3d(t.m_vertex[1]) << 24;
    v3_test |= bevel_3d(t.m_vertex[2]) << 24;
-   if ((v1_test & v2_test & v3_test) != 0) return(OUTSIDE);  
+   if ((v1_test & v2_test & v3_test) != 0) return(OUTSIDE);
 /* If vertex 1 and 2, as a pair, cannot be trivially rejected */
 /* by the above tests, then see if the v1-->v2 triangle edge  */
 /* intersects the cube.  Do the same for v1-->v3 and v2-->v3. */
@@ -214,12 +214,12 @@ Vec3f hitpp,hitpn,hitnp,hitnn;
 /* then if that intersection is inside the cube, pursuing	    */
 /* whether the intersection point is inside the triangle itself. */
 /* To find plane of the triangle, first perform crossproduct on  */
-/* two triangle side vectors to compute the normal vector.	   */ 
-							   
+/* two triangle side vectors to compute the normal std::vector.	   */
+
    SUB(t.m_vertex[0],t.m_vertex[1],vect12);
    SUB(t.m_vertex[0],t.m_vertex[2],vect13);
    CROSS(vect12,vect13,norm)
-/* The normal vector "norm" X,Y,Z components are the coefficients */
+/* The normal std::vector "norm" X,Y,Z components are the coefficients */
 /* of the triangles AX + BY + CZ + D = 0 plane equation.  If we   */
 /* solve the plane equation for X=Y=Z (a diagonal), we get	    */
 /* -D/(A+B+C) as a metric of the distance from cube center to the */
@@ -241,9 +241,9 @@ Vec3f hitpp,hitpn,hitnp,hitnn;
 	  hitpn.z = -(hitpn.x = hitpn.y = d / denom);
 	  if (fabs(hitpn.x) <= 0.5)
 		 if (point_triangle_intersection(hitpn,t) == INSIDE) return(INSIDE);
-   }	  
+   }
    if(fabs(denom=(norm.x - norm.y + norm.z))>EPS)
-   {	  
+   {
 	  hitnp.y = -(hitnp.x = hitnp.z = d / denom);
 	  if (fabs(hitnp.x) <= 0.5)
 		 if (point_triangle_intersection(hitnp,t) == INSIDE) return(INSIDE);
@@ -254,7 +254,7 @@ Vec3f hitpp,hitpn,hitnp,hitnn;
 	  if (fabs(hitnn.x) <= 0.5)
 		 if (point_triangle_intersection(hitnn,t) == INSIDE) return(INSIDE);
    }
-  
+
 /* No edge touched the cube; no cube diagonal touched the triangle. */
 /* We're done...there was no intersection.						  */
    return(OUTSIDE);

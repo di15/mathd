@@ -23,7 +23,7 @@ public:
 	UString operator+(const UString &other);
 	UString substr(int start, int len) const;
 	int firstof(UString find) const;
-	string rawstr() const;
+	std::string rawstr() const;
 };
 
 #endif

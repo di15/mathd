@@ -8,13 +8,14 @@
 #include "../gui/gui.h"
 #include "../math/camera.h"
 #include "selection.h"
+#include "../../libs/objectscript/objectscript.h"
 
 class Player
 {
 public:
 	bool on;
 	bool ai;
-	
+
 	int local[RESOURCES];	// used just for counting; cannot be used
 	int global[RESOURCES];
 
@@ -56,6 +57,7 @@ public:
 	//bool py->mouseoveraction = false;
 
 	Player();
+	~Player();
 };
 
 #define PLAYERS 32

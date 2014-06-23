@@ -33,7 +33,7 @@ public:
 class TexFitRow
 {
 public:
-	list<TexFit> fits;
+	std::list<TexFit> fits;
 	Vec2i bounds[2];
 
 	TexFitRow();

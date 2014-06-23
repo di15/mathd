@@ -59,7 +59,7 @@ void DrawSkyBox(Vec3f pos)
     //g_log<<"mm"<<s->m_slot[SSLOT_MODELMAT]<<endl;
 #if 1
     Matrix modelmat;
-    modelmat.setTranslation((const float*)&pos);
+    modelmat.translation((const float*)&pos);
     glUniformMatrix4fv(s->m_slot[SSLOT_MODELMAT], 1, 0, modelmat.m_matrix);
 #endif
 

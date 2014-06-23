@@ -163,7 +163,7 @@ void InitGLSL()
 	LoadShader(SHADER_UNIT, "shaders/unit.vert", "shaders/unit.frag");
 }
 
-string LoadTextFile(char* strFile)
+std::string LoadTextFile(char* strFile)
 {
 	ifstream fin(strFile);
 
@@ -173,8 +173,8 @@ string LoadTextFile(char* strFile)
 		return "";
 	}
 
-	string strLine = "";
-	string strText = "";
+	std::string strLine = "";
+	std::string strText = "";
 
 	while(getline(fin, strLine))
 		strText = strText + "\n" + strLine;
@@ -187,7 +187,7 @@ string LoadTextFile(char* strFile)
 void LoadShader(int shader, char* strVertex, char* strFragment)
 {
 	Shader* s = &g_shader[shader];
-	string strVShader, strFShader;
+	std::string strVShader, strFShader;
 
 	if(s->m_vertshader || s->m_fragshader || s->m_program)
 		s->release();
@@ -281,17 +281,15 @@ void LoadShader(int shader, char* strVertex, char* strFragment)
 	s->mapuniform(SSLOT_SHADOWMAP, "shadowmap");
 	s->mapuniform(SSLOT_LIGHTMATRIX, "lightMatrix");
 	s->mapuniform(SSLOT_LIGHTPOS, "lightPos");
-	//s->mapuniform(SSLOT_LIGHTDIR, "lightDir");
+	//s->mapuniform(SSLOT_LIGHTDIR, "lightdir");
 	s->mapuniform(SSLOT_TEXTURE0, "texture0");
-	s->mapuniform(SSLOT_TEXTURE1, "texture1");
-	s->mapuniform(SSLOT_TEXTURE2, "texture2");
-	s->mapuniform(SSLOT_TEXTURE3, "texture3");
 	s->mapuniform(SSLOT_NORMALMAP, "normalmap");
 	s->mapuniform(SSLOT_SPECULARMAP, "specularmap");
     s->mapuniform(SSLOT_PROJECTION, "projection");
     s->mapuniform(SSLOT_MODELMAT, "model");
     s->mapuniform(SSLOT_VIEWMAT, "view");
-    s->mapuniform(SSLOT_MVPMAT, "mvpmat");
+    s->mapuniform(SSLOT_MVP, "mvp");
+    s->mapuniform(SSLOT_MODELVIEW, "modelview");
 	s->mapuniform(SSLOT_NORMALMAT, "normalMat");
 	//s->mapuniform(SSLOT_INVMODLVIEWMAT, "invModelView");
     s->mapuniform(SSLOT_COLOR, "color");

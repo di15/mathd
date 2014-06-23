@@ -23,8 +23,8 @@
 #include "reconstructpath.h"
 #include "pathdebug.h"
 
-void PartialPath(int utype, int umode, int cmstartx, int cmstartz, int target, int target2, int targtype, 
-			  list<Vec2i> *path, Vec2i *subgoal, Unit* thisu, Unit* ignoreu, Building* ignoreb, 
+void PartialPath(int utype, int umode, int cmstartx, int cmstartz, int target, int target2, int targtype,
+			  std::list<Vec2i> *path, Vec2i *subgoal, Unit* thisu, Unit* ignoreu, Building* ignoreb,
 			  int cmgoalx, int cmgoalz, int cmgoalminx, int cmgoalminz, int cmgoalmaxx, int cmgoalmaxz,
 			  int maxsearch)
 {
@@ -79,7 +79,7 @@ void PartialPath(int utype, int umode, int cmstartx, int cmstartz, int target, i
 
 	// Returns the path from location `<startX, startY>` to location `<endX, endY>`.
 	//return function(finder, startNode, endNode, clearance, toClear)
-	
+
 	pj->process();
 	delete pj;
 }
@@ -100,23 +100,33 @@ void IdentifySuccessors_QP(PathJob* pj, PathNode* node)
 
 	if(node->previous)
 		runningD = node->previous->totalD;
-	
-	bool walkable_nw = Walkable(pj, npos.x - 1, npos.y - 1);
-	bool walkable_n = Walkable(pj, npos.x, npos.y - 1);
-	bool walkable_ne = Walkable(pj, npos.x + 1, npos.y - 1);
-	bool walkable_e = Walkable(pj, npos.x + 1, npos.y);
-	bool walkable_se = Walkable(pj, npos.x + 1, npos.y + 1);
-	bool walkable_s = Walkable(pj, npos.x, npos.y + 1);
-	bool walkable_sw = Walkable(pj, npos.x - 1, npos.y + 1);
-	bool walkable_w = Walkable(pj, npos.x - 1, npos.y);
-	
-	int newD = runningD + PATHNODE_SIZE;
 
-	if(walkable_w)
-	{
-		Vec2i nextnpos(npos.x - 1, npos.y);
+    bool standable[DIRS];
+
+    for(int i=0; i<DIRS; i++)
+        standable[i] = Standable(pj, npos.x + offsets[i].x, npos.y + offsets[i].y);
+
+    bool passable[DIRS];
+
+    passable[DIR_NW] = standable[DIR_NW] && standable[DIR_N] && standable[DIR_W];
+    passable[DIR_N] = standable[DIR_N];
+    passable[DIR_NE] = standable[DIR_NE] && standable[DIR_N] && standable[DIR_E];
+    passable[DIR_E] = standable[DIR_E];
+    passable[DIR_SE] = standable[DIR_SE] && standable[DIR_S] && standable[DIR_E];
+    passable[DIR_S] = standable[DIR_S];
+    passable[DIR_SW] = standable[DIR_SW] && standable[DIR_S] && standable[DIR_W];
+    passable[DIR_W] = standable[DIR_W];
+
+    for(int i=0; i<DIRS; i++)
+    {
+        if(!passable[i])
+            continue;
+
+        int newD = runningD + stepdist[i];
+
+		Vec2i nextnpos(npos.x + offsets[i].x, npos.y + offsets[i].y);
 		PathNode* nextn = PathNodeAt(nextnpos.x, nextnpos.y);
-		
+
 		if(!nextn->closed && (!nextn->opened || newD < nextn->totalD))
 		{
 			g_toclear.push_back(nextn); // Records this node to reset its properties later.
@@ -125,7 +135,7 @@ void IdentifySuccessors_QP(PathJob* pj, PathNode* node)
 			nextn->F = nextn->totalD + H;
 			nextn->previous = node;
 
-			if( !nextn->opened ) 
+			if( !nextn->opened )
 			{
 				g_openlist.insert(nextn);
 				nextn->opened = true;
@@ -135,179 +145,5 @@ void IdentifySuccessors_QP(PathJob* pj, PathNode* node)
 				g_openlist.heapify(nextn);
 			}
 		}
-	}
-	if(walkable_e)
-	{
-		Vec2i nextnpos(npos.x + 1, npos.y);
-		PathNode* nextn = PathNodeAt(nextnpos.x, nextnpos.y);
-		
-		if(!nextn->closed && (!nextn->opened || newD < nextn->totalD))
-		{
-			g_toclear.push_back(nextn); // Records this node to reset its properties later.
-			nextn->totalD = newD;
-			int H = Manhattan( nextnpos - Vec2i(pj->ngoalx, pj->ngoalz) );
-			nextn->F = nextn->totalD + H;
-			nextn->previous = node;
-
-			if( !nextn->opened ) 
-			{
-				g_openlist.insert(nextn);
-				nextn->opened = true;
-			}
-			else
-			{
-				g_openlist.heapify(nextn);
-			}
-		}
-	}
-	if(walkable_n)
-	{
-		Vec2i nextnpos(npos.x, npos.y - 1);
-		PathNode* nextn = PathNodeAt(nextnpos.x, nextnpos.y);
-		
-		if(!nextn->closed && (!nextn->opened || newD < nextn->totalD))
-		{
-			g_toclear.push_back(nextn); // Records this node to reset its properties later.
-			nextn->totalD = newD;
-			int H = Manhattan( nextnpos - Vec2i(pj->ngoalx, pj->ngoalz) );
-			nextn->F = nextn->totalD + H;
-			nextn->previous = node;
-
-			if( !nextn->opened ) 
-			{
-				g_openlist.insert(nextn);
-				nextn->opened = true;
-			}
-			else
-			{
-				g_openlist.heapify(nextn);
-			}
-		}
-	}
-	if(walkable_s)
-	{
-		Vec2i nextnpos(npos.x, npos.y + 1);
-		PathNode* nextn = PathNodeAt(nextnpos.x, nextnpos.y);
-		
-		if(!nextn->closed && (!nextn->opened || newD < nextn->totalD))
-		{
-			g_toclear.push_back(nextn); // Records this node to reset its properties later.
-			nextn->totalD = newD;
-			int H = Manhattan( nextnpos - Vec2i(pj->ngoalx, pj->ngoalz) );
-			nextn->F = nextn->totalD + H;
-			nextn->previous = node;
-
-			if( !nextn->opened ) 
-			{
-				g_openlist.insert(nextn);
-				nextn->opened = true;
-			}
-			else
-			{
-				g_openlist.heapify(nextn);
-			}
-		}
-	}
-
-	newD = runningD + PATHNODE_DIAG;
-
-	if(walkable_nw && walkable_n && walkable_w)
-	{
-		Vec2i nextnpos(npos.x - 1, npos.y - 1);
-		PathNode* nextn = PathNodeAt(nextnpos.x, nextnpos.y);
-		
-		if(!nextn->closed && (!nextn->opened || newD < nextn->totalD))
-		{
-			g_toclear.push_back(nextn); // Records this node to reset its properties later.
-			nextn->totalD = newD;
-			int H = Manhattan( nextnpos - Vec2i(pj->ngoalx, pj->ngoalz) );
-			nextn->F = nextn->totalD + H;
-			nextn->previous = node;
-
-			if( !nextn->opened ) 
-			{
-				g_openlist.insert(nextn);
-				nextn->opened = true;
-			}
-			else
-			{
-				g_openlist.heapify(nextn);
-			}
-		}
-	}
-
-	if(walkable_ne && walkable_n && walkable_e)
-	{
-		Vec2i nextnpos(npos.x + 1, npos.y);
-		PathNode* nextn = PathNodeAt(nextnpos.x, nextnpos.y);
-		
-		if(!nextn->closed && (!nextn->opened || newD < nextn->totalD))
-		{
-			g_toclear.push_back(nextn); // Records this node to reset its properties later.
-			nextn->totalD = newD;
-			int H = Manhattan( nextnpos - Vec2i(pj->ngoalx, pj->ngoalz) );
-			nextn->F = nextn->totalD + H;
-			nextn->previous = node;
-
-			if( !nextn->opened ) 
-			{
-				g_openlist.insert(nextn);
-				nextn->opened = true;
-			}
-			else
-			{
-				g_openlist.heapify(nextn);
-			}
-		}
-	}
-
-	if(walkable_sw && walkable_s && walkable_w)
-	{
-		Vec2i nextnpos(npos.x - 1, npos.y + 1);
-		PathNode* nextn = PathNodeAt(nextnpos.x, nextnpos.y);
-		
-		if(!nextn->closed && (!nextn->opened || newD < nextn->totalD))
-		{
-			g_toclear.push_back(nextn); // Records this node to reset its properties later.
-			nextn->totalD = newD;
-			int H = Manhattan( nextnpos - Vec2i(pj->ngoalx, pj->ngoalz) );
-			nextn->F = nextn->totalD + H;
-			nextn->previous = node;
-
-			if( !nextn->opened ) 
-			{
-				g_openlist.insert(nextn);
-				nextn->opened = true;
-			}
-			else
-			{
-				g_openlist.heapify(nextn);
-			}
-		}
-	}
-
-	if(walkable_se && walkable_s && walkable_e)
-	{
-		Vec2i nextnpos(npos.x + 1, npos.y + 1);
-		PathNode* nextn = PathNodeAt(nextnpos.x, nextnpos.y);
-		
-		if(!nextn->closed && (!nextn->opened || newD < nextn->totalD))
-		{
-			g_toclear.push_back(nextn); // Records this node to reset its properties later.
-			nextn->totalD = newD;
-			int H = Manhattan( nextnpos - Vec2i(pj->ngoalx, pj->ngoalz) );
-			nextn->F = nextn->totalD + H;
-			nextn->previous = node;
-
-			if( !nextn->opened ) 
-			{
-				g_openlist.insert(nextn);
-				nextn->opened = true;
-			}
-			else
-			{
-				g_openlist.heapify(nextn);
-			}
-		}
-	}
+    }
 }

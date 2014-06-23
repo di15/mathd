@@ -29,7 +29,7 @@ void SaveScreenshot()
 	FlipImage(&screenshot);
 
 	char relative[256];
-	string datetime = FileDateTime();
+	std::string datetime = FileDateTime();
 	sprintf(relative, "screenshots/%s.jpg", datetime.c_str());
 	char fullpath[MAX_PATH+1];
 	FullPath(relative, fullpath);

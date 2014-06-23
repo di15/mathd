@@ -124,13 +124,13 @@ bool MS3DModel::load(const char *relative, unsigned int& diffm, unsigned int& sp
 	FullPath(relative, full);
 
 	ifstream inputFile( full, ios::in | ios::binary );
-	if ( inputFile.fail()) 
+	if ( inputFile.fail())
 	{
 		g_log << "Couldn't open the model file "<< relative << endl;
 		return false;
 	}
 
-	string reltemp = StripFile(relative);
+	std::string reltemp = StripFile(relative);
 
 	//if(strlen(reltemp.c_str()) == 0)
 	//	reltemp += CORRECT_SLASH;
@@ -140,19 +140,19 @@ bool MS3DModel::load(const char *relative, unsigned int& diffm, unsigned int& sp
 	/*
 	char pathTemp[MAX_PATH+1];
 	int pathLength;
-	for ( pathLength = strlen( filename ); --pathLength; ) 
+	for ( pathLength = strlen( filename ); --pathLength; )
 	{
-		if ( filename[pathLength] == '/' || filename[pathLength] == '\\' ) 
+		if ( filename[pathLength] == '/' || filename[pathLength] == '\\' )
 			break;
 	}
 	strncpy( pathTemp, filename, pathLength );
-	
+
 	int i;
-	if ( pathLength > 0 ) 
+	if ( pathLength > 0 )
 	{
 		pathTemp[pathLength++] = '/';
 	}
-	
+
 	strncpy( m_filepath, filename, pathLength );
 	*/
 
@@ -168,19 +168,19 @@ bool MS3DModel::load(const char *relative, unsigned int& diffm, unsigned int& sp
 	MS3DHeader *pHeader = ( MS3DHeader* )pPtr;
 	pPtr += sizeof( MS3DHeader );
 
-	if ( strncmp( pHeader->m_ID, "MS3D000000", 10 ) != 0 ) 
+	if ( strncmp( pHeader->m_ID, "MS3D000000", 10 ) != 0 )
 	{
 		g_log << "Not an MS3D file "<< relative << endl;
 		return false;
     }
 
-	if ( pHeader->m_version < 3 ) 
+	if ( pHeader->m_version < 3 )
 	{
 		g_log << "I know nothing about MS3D v1.2, " <<relative<< endl;
 		return false;
 	}
 
-	int nVertices = *( word* )pPtr; 
+	int nVertices = *( word* )pPtr;
 	m_numVertices = nVertices;
 	m_pVertices = new Vertex[nVertices];
 	pPtr += sizeof( word );
@@ -386,9 +386,9 @@ void MS3DModel::genva(VertexArray** vertexArrays, Vec3f scale, Vec3f translate, 
 
 	restart();
 
-	vector<Vec3f>* normalweights;
+	std::vector<Vec3f>* normalweights;
 
-	normalweights = new vector<Vec3f>[numverts];
+	normalweights = new std::vector<Vec3f>[numverts];
 
 	for(int f = 0; f < m_totalFrames; f++)
 	{
@@ -404,7 +404,7 @@ void MS3DModel::genva(VertexArray** vertexArrays, Vec3f scale, Vec3f translate, 
 		vertices = (*vertexArrays)[f].vertices;
 		texcoords = (*vertexArrays)[f].texcoords;
 		normals = (*vertexArrays)[f].normals;
-  
+
 		for(int i = 0; i < m_numMeshes; i++)
 		{
 			for(int j = 0; j < m_pMeshes[i].m_numTriangles; j++)
@@ -562,12 +562,12 @@ void MS3DModel::setupjoints()
 	{
 		Joint& joint = m_pJoints[i];
 
-		joint.m_relative.setRotationRadians( joint.m_localRotation );
-		joint.m_relative.setTranslation( joint.m_localTranslation );
+		joint.m_relative.rotrad( joint.m_localRotation );
+		joint.m_relative.translation( joint.m_localTranslation );
 		if ( joint.m_parent != -1 )
 		{
 			joint.m_absolute.set( m_pJoints[joint.m_parent].m_absolute.m_matrix);
-			joint.m_absolute.postMultiply( joint.m_relative );
+			joint.m_absolute.postmult( joint.m_relative );
 		}
 		else
 			joint.m_absolute.set( joint.m_relative.m_matrix);
@@ -641,7 +641,7 @@ void MS3DModel::advanceanim()
 			else
 			{
 				pJoint->m_final.set( m_pJoints[pJoint->m_parent].m_final.m_matrix );
-				pJoint->m_final.postMultiply( relativeFinal );
+				pJoint->m_final.postmult( relativeFinal );
 			}
 #endif
 
@@ -671,7 +671,7 @@ void MS3DModel::advanceanim()
 
 			transVec[0] = prevFrame.m_parameter[0]+( curFrame.m_parameter[0]-prevFrame.m_parameter[0] )*interpValue;
 			transVec[1] = prevFrame.m_parameter[1]+( curFrame.m_parameter[1]-prevFrame.m_parameter[1] )*interpValue;
-			transVec[2] = prevFrame.m_parameter[2]+( curFrame.m_parameter[2]-prevFrame.m_parameter[2] )*interpValue; 
+			transVec[2] = prevFrame.m_parameter[2]+( curFrame.m_parameter[2]-prevFrame.m_parameter[2] )*interpValue;
 		}
 
 		frame = pJoint->m_currentRotationKeyframe;
@@ -682,9 +682,9 @@ void MS3DModel::advanceanim()
 		pJoint->m_currentRotationKeyframe = frame;
 
 		if(frame == 0)
-			transform.setRotationRadians( pJoint->m_pRotationKeyframes[0].m_parameter );
+			transform.rotrad( pJoint->m_pRotationKeyframes[0].m_parameter );
 		else if(frame == pJoint->m_numRotationKeyframes)
-			transform.setRotationRadians( pJoint->m_pRotationKeyframes[frame-1].m_parameter );
+			transform.rotrad( pJoint->m_pRotationKeyframes[frame-1].m_parameter );
 		else
 		{
 			const MS3DModel::Keyframe& curFrame = pJoint->m_pRotationKeyframes[frame];
@@ -697,7 +697,7 @@ void MS3DModel::advanceanim()
 			Quaternion qPrev( prevFrame.m_parameter );
 			Quaternion qCur( curFrame.m_parameter );
 			Quaternion qFinal( qPrev, qCur, interpValue );
-			transform.setRotationQuaternion( qFinal );
+			transform.rotquat( qFinal );
 #else
 			float rotVec[3];
 
@@ -705,20 +705,20 @@ void MS3DModel::advanceanim()
 			rotVec[1] = prevFrame.m_parameter[1]+( curFrame.m_parameter[1]-prevFrame.m_parameter[1] )*interpValue;
 			rotVec[2] = prevFrame.m_parameter[2]+( curFrame.m_parameter[2]-prevFrame.m_parameter[2] )*interpValue;
 
-			transform.setRotationRadians( rotVec );
+			transform.rotrad( rotVec );
 #endif
 		}
 
-		transform.setTranslation( transVec );
+		transform.translation( transVec );
 		Matrix relativeFinal( pJoint->m_relative );
-		relativeFinal.postMultiply( transform );
+		relativeFinal.postmult( transform );
 
 		if ( pJoint->m_parent == -1 )
 			pJoint->m_final.set( relativeFinal.m_matrix );
 		else
 		{
 			pJoint->m_final.set( m_pJoints[pJoint->m_parent].m_final.m_matrix );
-			pJoint->m_final.postMultiply( relativeFinal );
+			pJoint->m_final.postmult( relativeFinal );
 		}
 	}
 }

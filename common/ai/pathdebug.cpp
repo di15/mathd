@@ -25,7 +25,7 @@
 #include "../render/shader.h"
 #include "../sim/player.h"
 
-static vector<Vec3f> gridvecs;
+static std::vector<Vec3f> gridvecs;
 Unit* g_pathunit = NULL;
 
 void DrawSteps()
@@ -39,15 +39,15 @@ void DrawSteps()
 	int ui = *py->sel.units.begin();
 	Unit* u = &g_unit[ui];
 
-	vector<Vec3f> lines;
+	std::vector<Vec3f> lines;
 
 #if 1
 
 	Vec2i npos = Vec2i( u->cmpos.x / PATHNODE_SIZE, u->cmpos.y / PATHNODE_SIZE );
-	int nminx = max(0, npos.x-50);
-	int nminz = max(0, npos.y-50);
-	int nmaxx = min(g_pathdim.x-1, npos.x+50);
-	int nmaxz = min(g_pathdim.y-1, npos.y+50);
+	int nminx = std::max(0, npos.x-50);
+	int nminz = std::max(0, npos.y-50);
+	int nmaxx = std::min(g_pathdim.x-1, npos.x+50);
+	int nmaxz = std::min(g_pathdim.y-1, npos.y+50);
 
 	for(int x = nminx; x <= nmaxx; x ++)
 		for(int z = nminz; z <= nmaxz; z++)
@@ -148,8 +148,8 @@ void DrawGrid()
 		int ux = u->cmpos.x / PATHNODE_SIZE;
 		int uz = u->cmpos.y / PATHNODE_SIZE;
 
-		for(int x=max(0, ux-50); x<min(ux+50, g_pathdim.x); x++)
-			for(int z=max(0, uz-50); z<min(uz+50, g_pathdim.y); z++)
+		for(int x=std::max(0, ux-50); x<std::min(ux+50, g_pathdim.x); x++)
+			for(int z=std::max(0, uz-50); z<std::min(uz+50, g_pathdim.y); z++)
 			{
 				ColliderTile* cell = ColliderTileAt(x, z);
 
@@ -179,7 +179,7 @@ void DrawGrid()
 				if(!foundother && !blocked)
 					continue;
 
-				vector<Vec3f> vecs;
+				std::vector<Vec3f> vecs;
 				vecs.push_back(Vec3f(x*PATHNODE_SIZE, 1, z*PATHNODE_SIZE));
 				vecs.push_back(Vec3f((x+1)*PATHNODE_SIZE, 1, (z+1)*PATHNODE_SIZE));
 				vecs.push_back(Vec3f((x+1)*PATHNODE_SIZE, 1, z*PATHNODE_SIZE));
@@ -268,7 +268,7 @@ void DrawUnitSquares()
 
 		Vec3i vmin(u->cmpos.x - t->size.x/2, 0, u->cmpos.y - t->size.z/2);
 
-		vector<Vec3f> vecs;
+		std::vector<Vec3f> vecs;
 		vecs.push_back(Vec3f(vmin.x, 0 + 1, vmin.z));
 		vecs.push_back(Vec3f(vmin.x, 0 + 1, vmin.z + t->size.z));
 		vecs.push_back(Vec3f(vmin.x + t->size.x, 0 + 1, vmin.z + t->size.z));
@@ -312,7 +312,7 @@ void DrawPaths()
 			continue;
 #endif
 
-		vector<Vec3f> vecs;
+		std::vector<Vec3f> vecs;
 
 		Vec3f p;
 		p.x = u->cmpos.x;
@@ -374,7 +374,7 @@ void DrawVelocities()
 
 		t = &g_unitT[u->type];
 
-		vector<Vec3f> vecs;
+		std::vector<Vec3f> vecs;
 
         vecs.push_back(u->drawpos + Vec3f(0, TILE_SIZE/20, 0));
 		Vec3f prevpos = Vec3f(u->prevpos.x, g_hmap.accheight(u->prevpos.x, u->prevpos.y), u->prevpos.y);

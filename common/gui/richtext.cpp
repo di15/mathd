@@ -17,7 +17,7 @@ RichTextP::RichTextP()
 
 RichTextP::RichTextP(const RichTextP& original)
 {
-	
+
 #ifdef USTR_DEBUG
 	g_log<<"RichTextP::RichTextP(const RichTextP& original)"<<endl;
 	g_log.flush();
@@ -91,7 +91,7 @@ int RichTextP::rawlen() const	// icon tag length is counted
 	return 0;
 }
 
-string RichTextP::texval() const
+std::string RichTextP::texval() const
 {
 	if(m_type == RICHTEXT_TEXT)
 	{
@@ -102,7 +102,7 @@ string RichTextP::texval() const
 #endif
 
 		return m_text.rawstr();
-		
+
 #if 0
 //#ifdef USTR_DEBUG
 		g_log<<"\tstring RichTextP::texval() const = "<<m_text.rawstr()<<endl;
@@ -179,7 +179,7 @@ RichText RichText::operator+(const RichText &other)
 {
 	RichTextP twopart;
 	bool havecombomid = false;
-	
+
 	RichTextP* last1 = NULL;
 	RichTextP* first2 = NULL;
 
@@ -233,7 +233,7 @@ RichText RichText::operator+(const RichText &other)
 
 	if(twopart.texlen() > 0 && havecombomid)
 		combined.m_part.push_back(twopart);
-	
+
 		//g_log<<"combined2 rawstr = "<<combined.rawstr()<<endl;
 
 	for(auto i=other.m_part.begin(); i!=other.m_part.end(); i++)
@@ -245,7 +245,7 @@ RichText RichText::operator+(const RichText &other)
 			continue;
 
 		combined.m_part.push_back(*i);
-		
+
 		//g_log<<"combined3 rawstr = "<<combined.rawstr()<<endl;
 	}
 
@@ -295,20 +295,20 @@ RichText RichText::substr(int start, int length) const
 	return retval;
 }
 
-string RichText::rawstr() const
+std::string RichText::rawstr() const
 {
-	string raws;
-	
+	std::string raws;
+
 #ifdef USTR_DEBUG
 	//int parti = 0;
-	//g_log<<"string RichText::rawstr() const before loop..."<<parti<<endl;
+	//g_log<<"std::string RichText::rawstr() const before loop..."<<parti<<endl;
 	//g_log.flush();
 #endif
 
 	for(auto i=m_part.begin(); i!=m_part.end(); i++)
 	{
 #ifdef USTR_DEBUG
-		//g_log<<"string RichText::rawstr() const parti="<<parti<<endl;
+		//g_log<<"std::string RichText::rawstr() const parti="<<parti<<endl;
 		//g_log.flush();
 		//g_log<<"\tstring RichText::rawstr() const = "<<i->texval()<<endl;
 		//g_log.flush();
@@ -345,7 +345,7 @@ RichText::RichText()
 {
 }
 
-RichText RichText::pwver() const	//asterisk-mask password string
+RichText RichText::pwver() const	//asterisk-mask password std::string
 {
 	int len = 0;
 
@@ -358,7 +358,7 @@ RichText RichText::pwver() const	//asterisk-mask password string
 		pwcstr[i] = '*';
 
 	pwcstr[len] = '\0';
-	
+
 	RichTextP pwstrp(pwcstr);
 	delete pwcstr;
 
@@ -378,7 +378,7 @@ RichText ParseTags(RichText original, int* caret)
 	int currplace = 0;
 
 	bool changed = false;
-	
+
 #ifdef USTR_DEBUG
 	parsedepth ++;
 
@@ -418,7 +418,7 @@ RichText ParseTags(RichText original, int* caret)
 #endif
 
 					parsed = parsed + RichText(before);
-					
+
 #ifdef USTR_DEBUG
 					g_log<<"\tparsed now = \""<<parsed.rawstr()<<"\""<<endl;
 					g_log.flush();

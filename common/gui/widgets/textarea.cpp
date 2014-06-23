@@ -50,7 +50,7 @@ void TextArea::draw()
 	glUniform4f(g_shader[SHADER_ORTHO].m_slot[SSLOT_COLOR], 1, 1, 1, 1);
 
 	DrawImage(m_frametex, m_pos[0], m_pos[1], m_pos[2], m_pos[3]);
-	
+
 	DrawImage(g_texture[m_frametex].texname, m_pos[2]-square(), m_pos[1], m_pos[2], m_pos[3]);
 	DrawImage(g_texture[m_uptex].texname, m_pos[2]-square(), m_pos[1], m_pos[2], m_pos[1]+square());
 	DrawImage(g_texture[m_downtex].texname, m_pos[2]-square(), m_pos[3]-square(), m_pos[2], m_pos[3]);
@@ -58,7 +58,7 @@ void TextArea::draw()
 
     float width = m_pos[2] - m_pos[0] - square();
     float height = m_pos[3] - m_pos[1];
-    
+
     //DrawBoxShadText(m_font, m_pos[0], m_pos[1], width, height, m_value.c_str(), m_rgba, m_scroll[1], m_opened ? m_caret : -1);
 
 	DrawShadowedTextF(m_font, m_pos[0]+m_scroll[0], m_pos[1], m_pos[0], m_pos[1], m_pos[2], m_pos[3], &m_value, NULL, m_opened ? m_caret : -1);
@@ -92,7 +92,7 @@ void TextArea::inev(InEv* ev)
 		if(m_ldown)
 		{
 			int newcaret = MatchGlyphF(&m_value, m_font, py->mouse.x, m_pos[0]+m_scroll[0], m_pos[1], m_pos[0], m_pos[1], m_pos[2], m_pos[3]);
-		
+
 			if(newcaret > m_caret)
 			{
 				m_highl[0] = m_caret;
@@ -115,7 +115,7 @@ void TextArea::inev(InEv* ev)
 		if(py->mouse.x >= m_pos[0] && py->mouse.x <= m_pos[2] && py->mouse.y >= m_pos[1] && py->mouse.y <= m_pos[3])
 		{
 			m_over = true;
-			
+
 			ev->intercepted = true;
 			return;
 		}
@@ -281,7 +281,7 @@ void TextArea::inev(InEv* ev)
 		//else if(k >= 'A' && k <= 'Z' || k >= 'a' && k <= 'z')
 		//else if(k == 190 || k == 188)
 		//else if((k >= '!' && k <= '@') || (k >= '[' && k <= '`') || (k >= '{' && k <= '~') || (k >= '0' || k <= '9'))
-		else 
+		else
 		{
 
 #ifdef PASTE_DEBUG
@@ -343,7 +343,7 @@ void TextArea::placestr(const char* str)
 
 	if(!addstr)
 		OutOfMem(__FILE__, __LINE__);
-	
+
 	if(addlen > 0)
 	{
 		for(int i=0; i<addlen; i++)
@@ -378,7 +378,7 @@ void TextArea::placestr(const char* str)
 		m_value = before + addstr + after;
 		m_caret += addlen;
 	}
-	
+
 	//RichText val = drawvalue();
 	int endx = EndX(&m_value, m_caret, m_font, m_pos[0]+m_scroll[0], m_pos[1]);
 
@@ -391,7 +391,7 @@ void TextArea::placestr(const char* str)
 bool TextArea::delnext()
 {
 	int len = m_value.texlen();
-		
+
 	if(m_highl[1] > 0 && m_highl[0] != m_highl[1])
 	{
 		RichText before = m_value.substr(0, m_highl[0]);
@@ -409,7 +409,7 @@ bool TextArea::delnext()
 		RichText after = m_value.substr(m_caret+1, len-m_caret);
 		m_value = before + after;
 	}
-		
+
 	//RichText val = drawvalue();
 	int endx = EndX(&m_value, m_caret, m_font, m_pos[0]+m_scroll[0], m_pos[1]);
 
@@ -444,7 +444,7 @@ bool TextArea::delprev()
 
 		m_caret--;
 	}
-		
+
 	//RichText val = drawvalue();
 	int endx = EndX(&m_value, m_caret, m_font, m_pos[0]+m_scroll[0], m_pos[1]);
 
@@ -469,7 +469,7 @@ void TextArea::copyval()
 	if(m_highl[1] > 0 && m_highl[0] != m_highl[1])
 	{
 		RichText highl = m_value.substr(m_highl[0], m_highl[1]-m_highl[0]);
-		string rawhighl = highl.rawstr();
+		std::string rawhighl = highl.rawstr();
 		const size_t len = strlen(rawhighl.c_str())+1;
 		HGLOBAL hMem = GlobalAlloc(GMEM_MOVEABLE, len);
 		memcpy(GlobalLock(hMem), rawhighl.c_str(), len);
@@ -503,12 +503,12 @@ void TextArea::pasteval()
 	g_log<<"paste"<<endl;
 #endif
 	OpenClipboard(NULL);
-			
+
 #ifdef PASTE_DEBUG
 	g_log<<"paste1"<<endl;
 #endif
 	HANDLE clip0 = GetClipboardData(CF_TEXT);
-			
+
 #ifdef PASTE_DEBUG
 	g_log<<"paste2"<<endl;
 #endif
@@ -548,8 +548,8 @@ void TextArea::placechar(unsigned int k)
 
 	//char addchar = k;
 
-	//string before = m_value.substr(0, m_caret);
-	//string after = m_value.substr(m_caret, len-m_caret);
+	//std::string before = m_value.substr(0, m_caret);
+	//std::string after = m_value.substr(m_caret, len-m_caret);
 	//m_value = before + addchar + after;
 
 	RichText newval;
@@ -592,7 +592,7 @@ void TextArea::placechar(unsigned int k)
 			else if(i->m_type == RICHTEXT_ICON)
 			{
 				Icon* icon = &g_icon[i->m_icon];
-				
+
 				int subplace = m_caret - currplace;
 
 				if(subplace <= 0)
@@ -625,7 +625,7 @@ void TextArea::selectall()
 	m_highl[0] = 0;
 	m_highl[1] = m_value.texlen()+1;
 	m_caret = -1;
-			
+
 	//RichText val = drawvalue();
 	int endx = EndX(&m_value, m_value.texlen(), m_font, m_pos[0]+m_scroll[0], m_pos[1]);
 

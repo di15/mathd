@@ -40,70 +40,6 @@ void Unit::resetpath()
 	pathblocked = false;
 }
 
-#if 0
-void DrawUnits()
-{
-	Vec3f vertical = c->up2();
-	Vec3f horizontal = c->m_strafe;
-	Vec3f a, b, c, d;
-	Vec3f vert, horiz;
-
-	Shader* s = &g_shader[g_curS];
-
-	glActiveTexture(GL_TEXTURE0);
-	glUniform1i(s->m_slot[SSLOT_TEXTURE0], 0);
-
-	//glDisable(GL_CULL_FACE);
-
-	for(int i=0; i<UNITS; i++)
-	{
-		Unit* u = &g_unit[i];
-
-		if(!u->on)
-			continue;
-
-		UnitT* t = &g_unitT[u->type];
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, g_texture[t->texindex].texname);
-		glUniform1i(s->m_slot[SSLOT_TEXTURE0], 0);
-
-		Vec2i* size = &t->bilbsize;
-
-		vert = vertical*size->y;
-		horiz = horizontal*(size->x/2);
-
-		a = u->drawpos + horiz + vert;
-		b = u->drawpos + horiz;
-		c = u->drawpos - horiz;
-		d = u->drawpos - horiz + vert;
-
-		float vertices[] =
-		{
-			//posx, posy posz   texx, texy
-			a.x, a.y, a.z,          1, 0,
-			b.x, b.y, b.z,          1, 1,
-			c.x, c.y, c.z,          0, 1,
-
-			c.x, c.y, c.z,          0, 1,
-			d.x, d.y, d.z,          0, 0,
-			a.x, a.y, a.z,          1, 0
-		};
-
-		//glVertexPointer(3, GL_FLOAT, sizeof(float)*5, &vertices[0]);
-		//glTexCoordPointer(2, GL_FLOAT, sizeof(float)*5, &vertices[3]);
-
-		glVertexAttribPointer(s->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, sizeof(float) * 5, &vertices[0]);
-		glVertexAttribPointer(s->m_slot[SSLOT_TEXCOORD0], 2, GL_FLOAT, GL_FALSE, sizeof(float) * 5, &vertices[3]);
-		//glVertexAttribPointer(s->m_slot[SSLOT_NORMAL], 3, GL_FLOAT, GL_FALSE, sizeof(float) * 5, va->normals);
-
-		glDrawArrays(GL_TRIANGLES, 0, 6);
-	}
-
-
-	//glEnable(GL_CULL_FACE);
-}
-#endif
-
 void DrawUnits()
 {
 	for(int i=0; i<UNITS; i++)
@@ -111,9 +47,7 @@ void DrawUnits()
 		Unit* u = &g_unit[i];
 
 		if(!u->on)
-		{
 			continue;
-		}
 
 		UnitT* t = &g_unitT[u->type];
 
@@ -197,7 +131,7 @@ bool PlaceUnit(int type, Vec3i cmpos, int owner)
 	int targtype;
 	int home;
 	int car;
-	//vector<TransportJob> bids;
+	//std::vector<TransportJob> bids;
 
 	float frame[2];
 #endif

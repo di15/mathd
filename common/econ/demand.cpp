@@ -2,5 +2,5 @@
 
 #include "demand.h"
 
-list<Demand> g_demand;
+std::list<Demand> g_demand;
 

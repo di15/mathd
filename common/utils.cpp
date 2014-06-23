@@ -4,7 +4,7 @@
 
 ofstream g_log;
 
-const string DateTime() 
+const std::string DateTime()
 {
     time_t     now = time(0);
     struct tm  tstruct;
@@ -17,7 +17,7 @@ const string DateTime()
     return buf;
 }
 
-const string FileDateTime() 
+const std::string FileDateTime()
 {
     time_t     now = time(0);
     struct tm  tstruct;
@@ -45,12 +45,12 @@ void OpenLog(const char* filename, int version)
 	g_log.flush();
 }
 
-string MakePathRelative(const char* full)
+std::string MakePathRelative(const char* full)
 {
 	char full2c[MAX_PATH+1];
 	strcpy(full2c, full);
 	CorrectSlashes(full2c);
-	string full2(full2c);
+	std::string full2(full2c);
 	char exepath[MAX_PATH+1];
 	ExePath(exepath);
 	CorrectSlashes(exepath);
@@ -58,23 +58,23 @@ string MakePathRelative(const char* full)
 	//g_log<<"exepath: "<<exepath<<endl;
 	//g_log<<"fulpath: "<<full<<endl;
 
-	string::size_type pos = full2.find(exepath, 0);
+	std::string::size_type pos = full2.find(exepath, 0);
 
-	if(pos == string::npos)
+	if(pos == std::string::npos)
 	{
 		return full2;
 	}
 
 	//g_log<<"posposp: "<<pos<<endl;
 
-	string sub = string( full2 ).substr(strlen(exepath)+1, strlen(full)-strlen(exepath)-1);
+	std::string sub = std::string( full2 ).substr(strlen(exepath)+1, strlen(full)-strlen(exepath)-1);
 
 	//g_log<<"subpath: "<<sub<<endl;
 
     return sub;
 }
 
-string StripFile(string filepath)
+std::string StripFile(std::string filepath)
 {
 	int lastof = filepath.find_last_of("/\\");
 	if(lastof < 0)
@@ -82,15 +82,15 @@ string StripFile(string filepath)
 	else
 		lastof += 1;
 
-	string stripped = filepath.substr(0, lastof);
+	std::string stripped = filepath.substr(0, lastof);
 	return stripped;
 }
 
 void StripPath(char* filepath)
 {
-	string s0(filepath);
+	std::string s0(filepath);
 	size_t sep = s0.find_last_of("\\/");
-	string s1;
+	std::string s1;
 
     if (sep != std::string::npos)
         s1 = s0.substr(sep + 1, s0.size() - sep - 1);
@@ -102,10 +102,10 @@ void StripPath(char* filepath)
 
 void StripExtension(char* filepath)
 {
-	string s1(filepath);
+	std::string s1(filepath);
 
 	size_t dot = s1.find_last_of(".");
-	string s2;
+	std::string s2;
 
 	if (dot != std::string::npos)
 		s2 = s1.substr(0, dot);
@@ -117,9 +117,9 @@ void StripExtension(char* filepath)
 
 void StripPathExtension(const char* n, char* o)
 {
-	string s0(n);
+	std::string s0(n);
 	size_t sep = s0.find_last_of("\\/");
-	string s1;
+	std::string s1;
 
     if (sep != std::string::npos)
         s1 = s0.substr(sep + 1, s0.size() - sep - 1);
@@ -127,7 +127,7 @@ void StripPathExtension(const char* n, char* o)
 		s1 = s0;
 
 	size_t dot = s1.find_last_of(".");
-	string s2;
+	std::string s2;
 
 	if (dot != std::string::npos)
 		s2 = s1.substr(0, dot);
@@ -138,13 +138,13 @@ void StripPathExtension(const char* n, char* o)
 }
 
 #ifndef PLATFORM_IOS
-void ExePath(char* exepath) 
+void ExePath(char* exepath)
 {
 #ifdef PLATFORM_WIN
     //char buffer[MAX_PATH+1];
     GetModuleFileName(NULL, exepath, MAX_PATH+1);
-    //string::size_type pos = string( buffer ).find_last_of( "\\/" );
-    //string strexepath = string( buffer ).substr( 0, pos);
+    //std::string::size_type pos = std::string( buffer ).find_last_of( "\\/" );
+    //std::string strexepath = std::string( buffer ).substr( 0, pos);
 	//strcpy(exepath, strexepath.c_str());
 #else
 	char szTmp[32];
@@ -153,7 +153,7 @@ void ExePath(char* exepath)
 	int bytes = std::min((int)readlink(szTmp, exepath, MAX_PATH+1), MAX_PATH);
 	if(bytes >= 0)
 		exepath[bytes] = '\0';
-	//string strexepath = StripFile(string(buffer));
+	//std::string strexepath = StripFile(std::string(buffer));
 	//strcpy(exepath, strexepath.c_str());
 #endif
 }
@@ -163,7 +163,7 @@ void FullPath(const char* filename, char* full)
 {
 	char exepath[MAX_PATH+1];
 	ExePath(exepath);
-	string path = StripFile(exepath);
+	std::string path = StripFile(exepath);
 
 	//char full[MAX_PATH+1];
 	sprintf(full, "%s", path.c_str());
@@ -185,7 +185,7 @@ float StrToFloat(const char *s)
     float x;
     istringstream iss(s);
     iss >> x;
-	
+
 	if(_isnan(x))
 		x = 1.0f;
 

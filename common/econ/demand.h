@@ -26,6 +26,6 @@ public:
 #define HOUSING_PRIVATE				1
 #define HOUSING_FORRENT				2
 
-extern list<Demand> g_demand;
+extern std::list<Demand> g_demand;
 
 #endif

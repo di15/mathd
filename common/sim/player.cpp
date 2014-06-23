@@ -17,7 +17,7 @@ Player::Player()
 {
 	Zero(local);
 	Zero(global);
-	
+
 	global[RES_MINERALS] = 10000;
 	//global[RES_LABOUR] = 10000;
 
@@ -37,6 +37,10 @@ Player::Player()
 	mouseoveraction = false;
 	curst = CU_DEFAULT;
 	kbfocus = 0;
+}
+
+Player::~Player()
+{
 }
 
 void DefP(int ID, float red, float green, float blue, float alpha, RichText name)

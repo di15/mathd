@@ -20,13 +20,13 @@ public:
 
 	Image left_outer_topleftcorner;
 	Image left_outer;
-	
+
 	Image right_outer_toprightcorner;
 	Image right_outer;
-	
+
 	Image middle_outer_top;
 	Image middle_outer_bottom;
-	
+
 	ViewportW viewport;
 
 	Image white_bg;
@@ -52,7 +52,7 @@ public:
 		Text perunittext;
 	};
 
-	list<ReqRow> reqrows;
+	std::list<ReqRow> reqrows;
 
 	Button move_button;
 	Button cancel_button;

@@ -41,18 +41,18 @@ ConstructionView::ConstructionView(Widget* parent, const char* n, void (*reframe
 #if 0
 	Image left_outer_topleftcorner;
 	Image left_outer;
-	
+
 	Image right_outer_toprightcorner;
 	Image right_outer;
-	
+
 	Image middle_outer_top;
 	Image middle_outer_bottom;
-	
+
 	ViewportW viewport;
 
 	Image white_bg;
 #endif
-	
+
 #if 0
 	restext = Text(this, "res ticker", RichText("asdadasdasads"), MAINFONT16, NULL, true, 1, 1, 1, 1);
 	leftinnerdiagblur = Image(this, "gui/frames/innerdiagblur32x24halfwht.png", NULL, 1, 1, 1, 1,		0, 0, 1, 1);
@@ -62,9 +62,9 @@ ConstructionView::ConstructionView(Widget* parent, const char* n, void (*reframe
 	righthlineblur = Image(this, "gui/frames/innerhlineblur30x3.png", NULL, 1, 1, 1, 1,		1, 0, 0, 1);
 	whitebg = Image(this, "gui/backg/white.jpg", NULL, 1, 1, 1, 1,		0, 0, 1, 1);
 #endif
-	
+
 	viewport = ViewportW(this, "viewport", NULL, &DrawViewport, &ViewportLDown, &ViewportLUp, &ViewportMousemove, &ViewportRDown, &ViewportRUp, ViewportMousewheel, VIEWPORT_ENTVIEW);
-	
+
 	left_outer_topleftcorner = Image(this, "gui/frames/outertopleft64x64.png", true, NULL, 1, 1, 1, 1,		1, 0, 0, 1);
 	right_outer_toprightcorner = Image(this, "gui/frames/outertopleft64x64.png", true, NULL, 1, 1, 1, 1,		0, 0, 1, 1);
 	middle_outer_top = Image(this, "gui/frames/outertop2x64.png", true, NULL, 1, 1, 1, 1,		0, 0, 1, 1);
@@ -84,7 +84,7 @@ ConstructionView::ConstructionView(Widget* parent, const char* n, void (*reframe
 	Button cancel_button;
 	Button proceed_button;
 #endif
-	
+
 	move_button = Button(this, "", "gui/move.png", RichText("Choose another spot"), RichText(""), MAINFONT16, BUTTON_LEFTIMAGE, NULL, movefunc, NULL, NULL, NULL, NULL, -1);
 	cancel_button = Button(this, "", "gui/cancel.png", RichText("Cancel construction"), RichText(""), MAINFONT16, BUTTON_LEFTIMAGE, NULL, cancelfunc, NULL, NULL, NULL, NULL, -1);
 	proceed_button = Button(this, "", "gui/accept.png", RichText("Proceed with plan"), RichText(""), MAINFONT16, BUTTON_LEFTIMAGE, NULL, proceedfunc, NULL, NULL, NULL, NULL, -1);
@@ -190,11 +190,11 @@ void ConstructionView::regen(Selection* sel)
 			RichText textline2rt;
 			textline2rt.m_part.push_back( RichTextP("Max. est. cost:") );
 			reqrow.textline2 = Text(this, "textline2", textline2rt, font, NULL, false, color[0], color[1], color[2], color[3]);
-			
+
 			RichText dollarsignrt;
 			dollarsignrt.m_part.push_back( RichTextP(RICHTEXT_ICON, g_resource[RES_FUNDS].icon) );
 			reqrow.dollarsign = Text(this, "dollarsign", dollarsignrt, font, NULL, false, color[0], color[1], color[2], color[3]);
-			
+
 			char edittext[256];
 			if(maxcost)
 			{
@@ -254,11 +254,11 @@ void ConstructionView::regen(Selection* sel)
 			RichText textline2rt;
 			textline2rt.m_part.push_back( RichTextP("Construction wage:") );
 			reqrow.textline2 = Text(this, "textline2", textline2rt, font, NULL, false, color[0], color[1], color[2], color[3]);
-			
+
 			RichText dollarsignrt;
 			dollarsignrt.m_part.push_back( RichTextP(RICHTEXT_ICON, g_resource[RES_FUNDS].icon) );
 			reqrow.dollarsign = Text(this, "dollarsign", dollarsignrt, font, NULL, false, color[0], color[1], color[2], color[3]);
-			
+
 			char edittext[256];
 			if(maxcost)
 			{
@@ -300,7 +300,7 @@ void ConstructionView::reframe()	//resized or moved
 	viewport.m_pos[1] = m_pos[1] + 10;
 	viewport.m_pos[2] = (m_pos[0]+m_pos[2])/2;
 	viewport.m_pos[3] = (m_pos[1]+m_pos[3])/2;
-	
+
 	white_bg.m_pos[0] = m_pos[0];
 	white_bg.m_pos[1] = m_pos[1];
 	white_bg.m_pos[2] = m_pos[2];
@@ -328,7 +328,7 @@ void ConstructionView::reframe()	//resized or moved
 		Text perunittext;
 	};
 
-	list<ReqRow> reqrows;
+	std::list<ReqRow> reqrows;
 #endif
 
 	int rowi = 0;
@@ -365,7 +365,7 @@ void ConstructionView::reframe()	//resized or moved
 		editbox->m_pos[3] = line2y + gheight;
 
 		endx += 2 + 64;
-		
+
 		Text* perunittext = &i->perunittext;
 		perunittext->m_pos[0] = endx + 2;
 		perunittext->m_pos[1] = line2y;
@@ -390,17 +390,17 @@ void ConstructionView::reframe()	//resized or moved
 	move_button.m_pos[1] = m_pos[1] + 50 + button_height*0 + button_space*0;
 	move_button.m_pos[2] = midx + 5 + 180;
 	move_button.m_pos[3] = m_pos[1] + 50 + button_height*1 + button_space*0;
-	
+
 	cancel_button.m_pos[0] = midx + 5;
 	cancel_button.m_pos[1] = m_pos[1] + 50 + button_height*1 + button_space*1;
 	cancel_button.m_pos[2] = midx + 5 + 180;
 	cancel_button.m_pos[3] = m_pos[1] + 50 + button_height*2 + button_space*1;
-	
+
 	proceed_button.m_pos[0] = midx + 5;
 	proceed_button.m_pos[1] = m_pos[1] + 50 + button_height*2 + button_space*2;
 	proceed_button.m_pos[2] = midx + 5 + 180;
 	proceed_button.m_pos[3] = m_pos[1] + 50 + button_height*3 + button_space*2;
-	
+
 	estimate_button.m_pos[0] = midx + 5;
 	estimate_button.m_pos[1] = m_pos[1] + 50 + button_height*3 + button_space*3;
 	estimate_button.m_pos[2] = midx + 5 + 180;
@@ -441,7 +441,7 @@ void ConstructionView::draw()
 
 	//RichText rt = RichText(")A)JJF)@J)(J)(F$KJ(0jfjfjoi3jfwkjlekf");
 	//DrawShadowedTextF(MAINFONT16, m_pos[0]+32, m_pos[1]+4, 0, 0, 50, 50, &rt);
-	
+
 	leftinnerdiagblur.draw();
 	rightinnerdiagblur.draw();
 	lefthlineblur.draw();
@@ -451,7 +451,7 @@ void ConstructionView::draw()
 }
 
 void ConstructionView::drawover()
-{	
+{
 	for(auto i=reqrows.begin(); i!=reqrows.end(); i++)
 	{
 		i->textline.drawover();
@@ -469,7 +469,7 @@ void ConstructionView::inev(InEv* ev)
 {
 	for(auto i=reqrows.begin(); i!=reqrows.end(); i++)
 		i->editbox.inev(ev);
-	
+
 	move_button.inev(ev);
 	cancel_button.inev(ev);
 	proceed_button.inev(ev);

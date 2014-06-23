@@ -31,7 +31,7 @@ void MouseMidButtonUp()
 }
 
 void MouseWheel(int delta)
-{        
+{
 	if(g_mode == APPMODE_PLAY || g_mode == APPMODE_EDITOR)
 	{
 		Player* py = &g_player[g_currP];
@@ -79,13 +79,13 @@ void ZoomOut()
 }
 
 void MapKeys()
-{	
+{
 #if 0
 	AssignKey(SDLK_ESCAPE, &Escape, NULL);
 	AssignLButton(&MouseLeftButtonDown, &MouseLeftButtonUp);
 	AssignRButton(NULL, &MouseRightButtonUp);
 #endif
-	
+
 	for(int i=0; i<PLAYERS; i++)
 	{
 		Player* py = &g_player[i];
@@ -101,7 +101,7 @@ void MapKeys()
 	void (*down)();
 	void (*up)();
 	ifstream f("keymap.ini");
-	string line;
+	std::string line;
 	char keystr[32];
 	char actstr[32];
 
@@ -175,7 +175,7 @@ void MapKeys()
 			g_log<<"Unknown input: "<<keystr<<endl;
 			continue;
 		}
-		
+
 		if(stricmp(actstr, "Escape();") == 0)				{	down = &Escape;			up = NULL;			}
 		else if(stricmp(actstr, "Forward();") == 0)			{	down = &Forward;		up = NULL;			}
 		else if(stricmp(actstr, "Left();") == 0)			{	down = &Left;			up = NULL;			}

@@ -132,9 +132,11 @@ void DrawWater3()
 	Matrix modelmat;
     Matrix modelview;
     modelview.set(modelmat.m_matrix);
-    modelview.postMultiply(g_cameraViewMatrix);
-    //modelview.set(g_cameraViewMatrix.m_matrix);
-    //modelview.postMultiply(modelmat);
+#ifdef SPECBUMPSHADOW
+    modelview.postmult(g_camview);
+#endif
+    //modelview.set(g_camview.m_matrix);
+    //modelview.postmult(modelmat);
 	Matrix modelviewinv;
 	Transpose(modelview, modelview);
 	Inverse2(modelview, modelviewinv);
@@ -193,9 +195,11 @@ void DrawWater()
 	Matrix modelmat;
     Matrix modelview;
     modelview.set(modelmat.m_matrix);
-    modelview.postMultiply(g_cameraViewMatrix);
-    //modelview.set(g_cameraViewMatrix.m_matrix);
-    //modelview.postMultiply(modelmat);
+#ifdef SPECBUMPSHADOW
+    modelview.postmult(g_camview);
+#endif
+    //modelview.set(g_camview.m_matrix);
+    //modelview.postmult(modelmat);
 	Matrix modelviewinv;
 	Transpose(modelview, modelview);
 	Inverse2(modelview, modelviewinv);
@@ -316,9 +320,11 @@ void DrawWater2()
 	Matrix modelmat;
     Matrix modelview;
     modelview.set(modelmat.m_matrix);
-    modelview.postMultiply(g_cameraViewMatrix);
-    //modelview.set(g_cameraViewMatrix.m_matrix);
-    //modelview.postMultiply(modelmat);
+#ifdef SPECBUMPSHADOW
+    modelview.postmult(g_camview);
+#endif
+    //modelview.set(g_camview.m_matrix);
+    //modelview.postmult(modelmat);
 	Matrix modelviewinv;
 	Transpose(modelview, modelview);
 	Inverse2(modelview, modelviewinv);

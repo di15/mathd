@@ -15,7 +15,7 @@ MemPool::MemPool()
 /*==============================================================================
 MemPool:
 Constructor of this class. It allocate memory block from system and create
-a static double linked list to manage all memory unit.
+a static double linked std::list to manage all memory unit.
 
 Parameters:
 [in]ulUnitNum
@@ -37,7 +37,7 @@ void MemPool::allocsys(int nunits, int unitsz)
 	if(!m_pMemBlock)
 		OutOfMem(__FILE__, __LINE__);
 
-	resetunits();	
+	resetunits();
 }
 
 /*==============================================================================
@@ -66,7 +66,7 @@ Whether use memory pool.
 Return Values:
 Return a pointer to a memory unit.
 //=============================================================================
-*/	
+*/
 void* MemPool::alloc()
 {
 	if( m_pMemBlock == NULL || m_pFreeMemBlock == NULL)
@@ -91,7 +91,7 @@ void* MemPool::alloc()
 
 	if(NULL != m_pAllocatedMemBlock)
 	{
-		m_pAllocatedMemBlock->pPrev = pCurUnit; 
+		m_pAllocatedMemBlock->pPrev = pCurUnit;
 	}
 	m_pAllocatedMemBlock = pCurUnit;
 
@@ -102,7 +102,7 @@ void* MemPool::alloc()
 /*==============================================================================
 Free:
 To free a memory unit. If the pointer of parameter point to a memory unit,
-then insert it to "Free linked list". Otherwise, call system function "free".
+then insert it to "Free linked std::list". Otherwise, call system function "free".
 
 Parameters:
 [in]p

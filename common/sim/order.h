@@ -18,7 +18,7 @@ public:
 	}
 };
 
-extern list<OrderMarker> g_order;
+extern std::list<OrderMarker> g_order;
 
 #define ORDER_EXPIRE		2000
 

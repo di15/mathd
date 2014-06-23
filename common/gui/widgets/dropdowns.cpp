@@ -52,7 +52,7 @@ void DropDownS::erase(int which)
 int DropDownS::rowsshown()
 {
 	int rows = MAX_OPTIONS_SHOWN;
-		
+
 	if(rows > m_options.size())
 		rows = m_options.size();
 
@@ -172,7 +172,7 @@ void DropDownS::inev(InEv* ev)
 		{
 			for(int i=(int)m_scroll[1]; i<(int)m_scroll[1]+rowsshown(); i++)
 			{
-				// list item?
+				// std::list item?
 				if(py->mouse.x >= m_pos[0] && py->mouse.x <= m_pos[2]-square() && py->mouse.y >= m_pos[3]+g_font[m_font].gheight*(i-(int)m_scroll[1])
 					&& py->mouse.y <= m_pos[3]+g_font[m_font].gheight*(i-(int)m_scroll[1]+1))
 				{
@@ -183,7 +183,7 @@ void DropDownS::inev(InEv* ev)
 			}
 
 			// scroll bar?
-			if(py->mouse.x >= m_pos[2]-square() && py->mouse.y >= m_pos[3]+scrollspace()*topratio() && py->mouse.x <= m_pos[2] && 
+			if(py->mouse.x >= m_pos[2]-square() && py->mouse.y >= m_pos[3]+scrollspace()*topratio() && py->mouse.x <= m_pos[2] &&
 					py->mouse.y <= m_pos[3]+scrollspace()*bottomratio())
 			{
 				m_ldown = true;
@@ -231,7 +231,7 @@ void DropDownS::inev(InEv* ev)
 				m_opened = false;
 				return;
 			}
-	
+
 			m_ldown = false;
 
 			if(m_mousescroll)
@@ -245,7 +245,7 @@ void DropDownS::inev(InEv* ev)
 
 			for(int i=(int)m_scroll[1]; i<(int)m_scroll[1]+rowsshown(); i++)
 			{
-				// list item?
+				// std::list item?
 				if(py->mouse.x >= m_pos[0] && py->mouse.x <= m_pos[2]-square() && py->mouse.y >= m_pos[3]+g_font[m_font].gheight*(i-(int)m_scroll[1])
 					&& py->mouse.y <= m_pos[3]+g_font[m_font].gheight*(i-(int)m_scroll[1]+1))
 				{
@@ -276,11 +276,11 @@ void DropDownS::inev(InEv* ev)
 				m_scroll[1]++;
 				if(m_scroll[1]+rowsshown() > m_options.size())
 					m_scroll[1] = m_options.size() - rowsshown();
-				
+
 				ev->intercepted = true;
 				return;
 			}
-	
+
 			m_opened = false;
 
 			ev->intercepted = true;	// intercept mouse event

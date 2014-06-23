@@ -64,7 +64,7 @@ EditBox::EditBox(Widget* parent, const char* n, const RichText t, int f, void (*
 RichText EditBox::drawvalue()
 {
 	/*
-	string val = m_value;
+	std::string val = m_value;
 
 	if(m_passw)
 	{
@@ -134,7 +134,7 @@ void EditBox::frameupd()
 
 			RichText val = drawvalue();
 			int vallen = val.texlen();
-			
+
 			int endx = EndX(&val, vallen, m_font, m_pos[0]+m_scroll[0], m_pos[1]);
 
 			if(endx < m_pos[2])
@@ -191,7 +191,7 @@ void EditBox::inev(InEv* ev)
 			{
 				RichText val = drawvalue();
 				int newcaret = MatchGlyphF(&val, m_font, py->mouse.x, m_pos[0]+m_scroll[0], m_pos[1], m_pos[0], m_pos[1], m_pos[2], m_pos[3]);
-		
+
 				if(newcaret > m_caret)
 				{
 					m_highl[0] = m_caret;
@@ -216,14 +216,14 @@ void EditBox::inev(InEv* ev)
 				m_over = true;
 
 				py->mouseoveraction = true;
-			
+
 				ev->intercepted = true;
 				return;
 			}
 			else
 			{
 				m_over = false;
-			
+
 				return;
 			}
 		}
@@ -235,7 +235,7 @@ void EditBox::inev(InEv* ev)
 			m_opened = false;
 			m_highl[0] = m_highl[1] = 0;
 		}
-		
+
 		if(!ev->intercepted)
 		{
 			if(m_over)
@@ -287,7 +287,7 @@ void EditBox::inev(InEv* ev)
 	{
 		if(!m_opened)
 			return;
-	
+
 		int len = m_value.texlen();
 
 		if(m_caret > len)
@@ -297,7 +297,7 @@ void EditBox::inev(InEv* ev)
 			return;
 
 		if(ev->key == SDLK_LEFT)
-		{	
+		{
 			if(m_highl[0] > 0 && m_highl[0] != m_highl[1])
 			{
 				m_caret = m_highl[0];
@@ -310,7 +310,7 @@ void EditBox::inev(InEv* ev)
 			}
 			else
 				m_caret --;
-		
+
 			RichText val = drawvalue();
 			int endx = EndX(&val, m_caret, m_font, m_pos[0]+m_scroll[0], m_pos[1]);
 
@@ -336,7 +336,7 @@ void EditBox::inev(InEv* ev)
 			}
 			else
 				m_caret ++;
-		
+
 			RichText val = drawvalue();
 			int endx = EndX(&val, m_caret, m_font, m_pos[0]+m_scroll[0], m_pos[1]);
 
@@ -349,7 +349,7 @@ void EditBox::inev(InEv* ev)
 
 			//g_log<<"vk del"<<endl;
 			//g_log.flush();
-		
+
 			if((m_highl[1] <= 0 || m_highl[0] == m_highl[1]) && m_caret >= len || len <= 0)
 			{
 				ev->intercepted = true;
@@ -415,11 +415,11 @@ void EditBox::inev(InEv* ev)
 
 		if(changefunc2 != NULL)
 			changefunc2(m_param);
-		
+
 		ev->intercepted = true;
 	}
 	else if(ev->type == INEV_KEYUP && !ev->intercepted)
-	{	
+	{
 		if(!m_opened)
 			return;
 
@@ -442,13 +442,13 @@ void EditBox::inev(InEv* ev)
 		//g_log<<"vk "<<ev->key<<endl;
 		//g_log.flush();
 
-		
+
 #if 0
 		if(ev->key == SDLK_SPACE)
 		{
 			placechar(' ');
 		}
-		else 
+		else
 #endif
 		{
 
@@ -531,7 +531,7 @@ void EditBox::placestr(const RichText* str)
 
 		LogRich(&m_value);
 	}
-	
+
 	RichText val = drawvalue();
 	int endx = EndX(&val, m_caret, m_font, m_pos[0]+m_scroll[0], m_pos[1]);
 
@@ -551,7 +551,7 @@ void EditBox::changevalue(const char* str)
 		setlen = m_maxlen;
 
 	char* setstr = new char[setlen+1];
-	
+
 	if(!setstr)
 		OutOfMem(__FILE__, __LINE__);
 
@@ -569,7 +569,7 @@ void EditBox::changevalue(const char* str)
 bool EditBox::delnext()
 {
 	int len = m_value.texlen();
-		
+
 	if(m_highl[1] > 0 && m_highl[0] != m_highl[1])
 	{
 		RichText before = m_value.substr(0, m_highl[0]);
@@ -587,7 +587,7 @@ bool EditBox::delnext()
 		RichText after = m_value.substr(m_caret+1, len-m_caret);
 		m_value = before + after;
 	}
-		
+
 	RichText val = drawvalue();
 	int endx = EndX(&val, m_caret, m_font, m_pos[0]+m_scroll[0], m_pos[1]);
 
@@ -619,7 +619,7 @@ bool EditBox::delprev()
 		RichText before = m_value.substr(0, m_caret-1);
 		RichText after = m_value.substr(m_caret, len-m_caret);
 		m_value = before + after;
-		
+
 		//g_log<<"before newval="<<before.rawstr()<<" texlen="<<before.texlen()<<endl;
 		//g_log<<"after="<<after.rawstr()<<" texlen="<<after.texlen()<<endl;
 		//g_log<<"ba newval="<<m_value.rawstr()<<" texlen="<<(before + after).texlen()<<endl;
@@ -627,7 +627,7 @@ bool EditBox::delprev()
 
 		m_caret--;
 	}
-		
+
 	RichText val = drawvalue();
 	int endx = EndX(&val, m_caret, m_font, m_pos[0]+m_scroll[0], m_pos[1]);
 
@@ -652,7 +652,7 @@ void EditBox::copyval()
 	if(m_highl[1] > 0 && m_highl[0] != m_highl[1])
 	{
 		RichText highl = m_value.substr(m_highl[0], m_highl[1]-m_highl[0]);
-		string rawhighl = highl.rawstr();
+		std::string rawhighl = highl.rawstr();
 		const size_t len = strlen(rawhighl.c_str())+1;
 		HGLOBAL hMem = GlobalAlloc(GMEM_MOVEABLE, len);
 		memcpy(GlobalLock(hMem), rawhighl.c_str(), len);
@@ -686,12 +686,12 @@ void EditBox::pasteval()
 	g_log<<"paste"<<endl;
 #endif
 	OpenClipboard(NULL);
-			
+
 #ifdef PASTE_DEBUG
 	g_log<<"paste1"<<endl;
 #endif
 	HANDLE clip0 = GetClipboardData(CF_TEXT);
-			
+
 #ifdef PASTE_DEBUG
 	g_log<<"paste2"<<endl;
 #endif
@@ -727,7 +727,7 @@ void EditBox::selectall()
 	m_highl[0] = 0;
 	m_highl[1] = m_value.texlen()+1;
 	m_caret = -1;
-			
+
 	RichText val = drawvalue();
 	int endx = EndX(&val, m_value.texlen(), m_font, m_pos[0]+m_scroll[0], m_pos[1]);
 

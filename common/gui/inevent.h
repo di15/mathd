@@ -29,7 +29,7 @@ public:
 	int scancode;
 	int amount;
 	bool intercepted;
-	string text;	//UTF8
+	std::string text;	//UTF8
 	int cursor;	//cursor pos in composition
 	int sellen;	//selection length
 

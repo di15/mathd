@@ -18,7 +18,7 @@ public:
 	bool on;
 	int type;
 	int owner;
-	
+
 	Vec2i tilepos;	//position in tiles
 	Vec3f drawpos;	//drawing position in centimeters
 
@@ -26,11 +26,11 @@ public:
 
 	int pownetw;
 	int crpipenetw;
-	list<int> roadnetw;
+	std::list<int> roadnetw;
 
 	int stocked[RESOURCES];
 	int inuse[RESOURCES];
-	
+
 	EmitterCounter emitterco[MAX_B_EMITTERS];
 
 	VertexArray drawva;

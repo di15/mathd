@@ -24,7 +24,7 @@
 
 #define EPSILON_I		1
 
-bool PassUnits(Vec2i vstart, Vec2i vend, 
+bool PassUnits(Vec2i vstart, Vec2i vend,
 			int cmminx, int cmminz, int cmmaxx, int cmmaxz,
 			Unit* u2)
 {
@@ -33,7 +33,7 @@ bool PassUnits(Vec2i vstart, Vec2i vend,
 	bool startsout = false;
 
 	UnitT* u2t = &g_unitT[u2->type];
-	
+
 	int cmminx2 = u2->cmpos.x - u2t->size.x/2;
 	int cmminz2 = u2->cmpos.y - u2t->size.z/2;
 	int cmmaxx2 = cmminx2 + u2t->size.x;
@@ -50,11 +50,11 @@ bool PassUnits(Vec2i vstart, Vec2i vend,
 		Plane2i* p = &planes[i];
 
 		float offset = 0;
-		
+
 #if 0
 		if(tj->type == TRACE_SPHERE)
 			offset = tj->radius;
-		
+
 		float startdistance = Dot(tj->absstart, p->m_normal) + (p->m_d + offset);
 		float enddistance = Dot(tj->absend, p->m_normal) + (p->m_d + offset);
 #endif
@@ -72,7 +72,7 @@ bool PassUnits(Vec2i vstart, Vec2i vend,
 #if 0
 			voffset.z = (p->m_normal.z < 0) ? tj->vmax.z : tj->vmin.z;
 #endif
-			
+
 			startdistance = Dot(vstart + voffset, p->m_normal) + p->m_d;
 			enddistance = Dot(vend + voffset, p->m_normal) + p->m_d;
 		}
@@ -95,7 +95,7 @@ bool PassUnits(Vec2i vstart, Vec2i vend,
 #if 0
 
 				tw->collisionnormal = p->m_normal;
-				
+
 				if((tj->start.x != tj->end.x || tj->start.z != tj->end.z) && p->m_normal.y != 1 && p->m_normal.y >= 0.0f)
 				//if((tj->start.x != tj->end.x || tj->start.z != tj->end.z))
 				{
@@ -156,19 +156,19 @@ bool PassUnits(Vec2i vstart, Vec2i vend,
 	return true;
 }
 
-int Trace(int utype, int umode, 
+int Trace(int utype, int umode,
 			Vec2i vstart, Vec2i vend,
 			Unit* thisu, Unit* ignoreu, Building* ignoreb)
 {
 	UnitT* ut = &g_unitT[utype];
-	
+
 	int cmminx = -ut->size.x/2;
 	int cmminz = -ut->size.z/2;
 	int cmmaxx = cmminx + ut->size.x;
 	int cmmaxz = cmminx + ut->size.z;
-	
-	Vec2i absmin( min(vstart.x + cmmaxx, vend.x + cmmaxx), min(vstart.y + cmmaxz, vend.y + cmmaxz) );
-	Vec2i absmax( max(vstart.x + cmmaxx, vend.x + cmmaxx), max(vstart.y + cmmaxz, vend.y + cmmaxz) );
+
+	Vec2i absmin( std::min(vstart.x + cmmaxx, vend.x + cmmaxx), std::min(vstart.y + cmmaxz, vend.y + cmmaxz) );
+	Vec2i absmax( std::max(vstart.x + cmmaxx, vend.x + cmmaxx), std::max(vstart.y + cmmaxz, vend.y + cmmaxz) );
 
 	int cminx = absmin.x / PATHNODE_SIZE;
 	int cminz = absmin.y / PATHNODE_SIZE;

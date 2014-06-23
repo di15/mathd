@@ -10,7 +10,7 @@ class PathNode;
 
 // http://www.sourcetricks.com/2011/06/c-heaps.html
 
-class Heap 
+class Heap
 {
 public:
     Heap();
@@ -37,7 +37,7 @@ private:
 	int nelements;
 	int allocsz;
 #else
-	vector<PathNode*> heap;
+	std::vector<PathNode*> heap;
 #endif
 };
 

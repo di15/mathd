@@ -2,7 +2,7 @@
 //  powerline.m
 //  corpstates
 //
-//  Created by Denis Ivanov on 2013-05-30.
+//  Created by polyf Ivanov on 2013-05-30.
 //  Copyright (c) 2013 DMD 'Ware. All rights reserved.
 //
 
@@ -731,8 +731,8 @@ void ClearPowls()
 
 void MergePow(int A, int B)
 {
-	int mini = min(A, B);
-	int maxi = max(A, B);
+	int mini = std::min(A, B);
+	int maxi = std::max(A, B);
 
 	Building* b;
 

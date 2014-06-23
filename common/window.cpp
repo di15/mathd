@@ -13,8 +13,8 @@ bool g_quit = false;
 double g_drawfrinterval = 0.0f;
 bool g_fullscreen = false;
 Resolution g_selectedRes;
-vector<Resolution> g_resolution;
-vector<int> g_bpps;
+std::vector<Resolution> g_resolution;
+std::vector<int> g_bpps;
 #if 0
 double g_currentTime;
 double g_lastTime = 0.0f;		// This will hold the time from the last frame
@@ -97,7 +97,7 @@ void Resize(int width, int height)
 	}
 }
 
-void CalcDrawFrameRate()
+void CalcDrawRate()
 {
 	static unsigned int frametime = 0.0f;				// This stores the last frame's time
 	static int framecounter = 0;

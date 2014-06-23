@@ -54,7 +54,7 @@ void ListBox::erase(int which)
 int ListBox::rowsshown()
 {
 	int rows = (m_pos[3]-m_pos[1])/g_font[m_font].gheight;
-		
+
 	if(rows > m_options.size())
 		rows = m_options.size();
 
@@ -91,7 +91,7 @@ void ListBox::draw()
 		DrawImage(g_texture[m_filledtex].texname, m_pos[0], m_pos[1]+(m_selected-(int)m_scroll[1])*f->gheight, m_pos[2]-square(), m_pos[1]+(m_selected-(int)m_scroll[1]+1)*f->gheight);
 		glUniform4f(g_shader[SHADER_ORTHO].m_slot[SSLOT_COLOR], 1, 1, 1, 1);
 	}
-	
+
 	for(int i=(int)m_scroll[1]; i<(int)m_scroll[1]+rowsshown(); i++)
 		DrawShadowedText(m_font, m_pos[0]+3, m_pos[1]+g_font[m_font].gheight*(i-(int)m_scroll[1]), &m_options[i]);
 }
@@ -142,7 +142,7 @@ void ListBox::inev(InEv* ev)
 		for(int i=(int)m_scroll[1]; i<(int)m_scroll[1]+rowsshown(); i++)
 		{
 			int row = i-(int)m_scroll[1];
-			// list item?
+			// std::list item?
 			if(py->mouse.x >= m_pos[0] && py->mouse.x <= m_pos[2]-square() && py->mouse.y >= m_pos[1]+f->gheight*row
 				&& py->mouse.y <= m_pos[1]+f->gheight*(row+1))
 			{
@@ -153,7 +153,7 @@ void ListBox::inev(InEv* ev)
 		}
 
 		// scroll bar?
-		if(py->mouse.x >= m_pos[2]-square() && py->mouse.y >= m_pos[1]+square()+scrollspace()*topratio() && py->mouse.x <= m_pos[2] && 
+		if(py->mouse.x >= m_pos[2]-square() && py->mouse.y >= m_pos[1]+square()+scrollspace()*topratio() && py->mouse.x <= m_pos[2] &&
 				py->mouse.y <= m_pos[1]+square()+scrollspace()*bottomratio())
 		{
 			m_ldown = true;
@@ -183,7 +183,7 @@ void ListBox::inev(InEv* ev)
 	{
 		if(!m_ldown)
 			return;
-	
+
 		m_ldown = false;
 
 		if(m_mousescroll)
@@ -192,14 +192,14 @@ void ListBox::inev(InEv* ev)
 			ev->intercepted = true;
 			return;	// intercept mouse event
 		}
-	
+
 		Font* f = &g_font[m_font];
 
 		for(int i=(int)m_scroll[1]; i<(int)m_scroll[1]+rowsshown(); i++)
 		{
 			int row = i-(int)m_scroll[1];
 
-			// list item?
+			// std::list item?
 			if(py->mouse.x >= m_pos[0] && py->mouse.x <= m_pos[2]-square() && py->mouse.y >= m_pos[1]+f->gheight*row
 				&& py->mouse.y <= m_pos[1]+f->gheight*(row+1))
 			{

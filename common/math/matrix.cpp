@@ -7,7 +7,7 @@
 
 Matrix::Matrix()
 {
-	loadIdentity();
+	reset();
 }
 
 Matrix::Matrix(Vec4f a, Vec4f b, Vec4f c, Vec4f d)
@@ -39,7 +39,7 @@ void Matrix::inverseTranslateVect( float *pVect )
 	pVect[2] = pVect[2]-m_matrix[14];
 }
 
-void Matrix::postMultiply( const Matrix& matrix )
+void Matrix::postmult( const Matrix& matrix )
 {
 	float newMatrix[16];
 
@@ -96,7 +96,7 @@ void Matrix::postMultiply( const Matrix& matrix )
 	set( newMatrix );
 }
 
-void Matrix::postMultiply2( const Matrix& matrix )
+void Matrix::postmult2( const Matrix& matrix )
 {
 	float newMatrix[16];
 
@@ -153,7 +153,7 @@ void Matrix::postMultiply2( const Matrix& matrix )
 	set( newMatrix );
 }
 
-void Matrix::setTranslation( const float *translation )
+void Matrix::translation( const float *translation )
 {
 #if 0
 	m_matrix[0] = m_matrix[5] =  m_matrix[10] = m_matrix[15] = 1.0;
@@ -199,16 +199,16 @@ void Matrix::setTranslation( const float *translation )
 #endif
 }
 
-void Matrix::setInverseTranslation( const float *translation )
+void Matrix::invtrans( const float *translation )
 {
 	m_matrix[12] = -translation[0];
 	m_matrix[13] = -translation[1];
 	m_matrix[14] = -translation[2];
 }
 
-void Matrix::setScale( const float *scale )
+void Matrix::scale( const float *scale )
 {
-	loadIdentity();
+	reset();
 
 	m_matrix[0] = scale[0];
 	m_matrix[5] = scale[1];
@@ -216,25 +216,25 @@ void Matrix::setScale( const float *scale )
 	m_matrix[15] = 1;
 }
 
-void Matrix::setRotationDegrees( const float *angles )
+void Matrix::rotdeg( const float *angles )
 {
 	float vec[3];
 	vec[0] = ( float )( angles[0]*180.0/M_PI );
 	vec[1] = ( float )( angles[1]*180.0/M_PI );
 	vec[2] = ( float )( angles[2]*180.0/M_PI );
-	setRotationRadians( vec );
+	rotrad( vec );
 }
 
-void Matrix::setInverseRotationDegrees( const float *angles )
+void Matrix::invrotdeg( const float *angles )
 {
 	float vec[3];
 	vec[0] = ( float )( angles[0]*180.0/M_PI );
 	vec[1] = ( float )( angles[1]*180.0/M_PI );
 	vec[2] = ( float )( angles[2]*180.0/M_PI );
-	setInverseRotationRadians( vec );
+	invrotrad( vec );
 }
 
-void Matrix::setRotationRadians( const float *angles )
+void Matrix::rotrad( const float *angles )
 {
 	double cr = cos( angles[0] );
 	double sr = sin( angles[0] );
@@ -259,7 +259,7 @@ void Matrix::setRotationRadians( const float *angles )
 	m_matrix[10] = ( float )( cr*cp );
 }
 
-void Matrix::setInverseRotationRadians( const float *angles )
+void Matrix::invrotrad( const float *angles )
 {
 	double cr = cos( angles[0] );
 	double sr = sin( angles[0] );
@@ -284,7 +284,7 @@ void Matrix::setInverseRotationRadians( const float *angles )
 	m_matrix[10] = ( float )( cr*cp );
 }
 
-void Matrix::setRotationQuaternion( const Quaternion& quat )
+void Matrix::rotquat( const Quaternion& quat )
 {
 	m_matrix[0] = ( float )( 1.0 - 2.0*quat[1]*quat[1] - 2.0*quat[2]*quat[2] );
 	m_matrix[1] = ( float )( 2.0*quat[0]*quat[1] + 2.0*quat[3]*quat[2] );

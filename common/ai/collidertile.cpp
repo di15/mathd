@@ -33,8 +33,8 @@ ColliderTile::ColliderTile()
 	bool hasland;
 	bool haswater;
 	bool abrupt;	//abrupt incline?
-	list<int> units;
-	list<int> foliage;
+	std::list<int> units;
+	std::list<int> foliage;
 	int building;
 #endif
 
@@ -98,7 +98,7 @@ void AllocPathGrid(int cmwx, int cmwz)
 			n->opened = false;
 			n->closed = false;
 		}
-		
+
 	//g_lastpath = g_simframe;
 }
 
@@ -120,7 +120,7 @@ void FillColliderGrid()
 			int cmx = x*PATHNODE_SIZE + PATHNODE_SIZE/2;
 			int cmz = z*PATHNODE_SIZE + PATHNODE_SIZE/2;
 			ColliderTile* cell = ColliderTileAt(x, z);
-            
+
 			//g_log<<"cell "<<x<<","<<z<<" cmpos="<<cmx<<","<<cmz<<" y="<<g_hmap.accheight(cmx, cmz)<<endl;
 
 			if(AtLand(cmx, cmz))
@@ -142,7 +142,7 @@ void FillColliderGrid()
 			else
 				cell->haswater = false;
 #endif
-            
+
 			if(TileUnclimable(cmx, cmz) && (cell->flags & FLAG_HASLAND))
 			{
 				//cell->abrupt = true;
@@ -153,12 +153,12 @@ void FillColliderGrid()
 				//cell->abrupt = false;
 				cell->flags &= ~FLAG_ABRUPT;
 			}
-            
+
 			int tx = cmx/TILE_SIZE;
 			int tz = cmz/TILE_SIZE;
 
 			RoadTile* r = RoadAt(tx, tz);
-			
+
 			//if(r->on /* && r->finished */ )
 			if(r->on && r->finished )
 			{
@@ -172,28 +172,28 @@ void FillColliderGrid()
 			}
 		}
 
-		
+
 	for(int x=0; x<LARGEST_UNIT_NODES; x++)
 		for(int z=0; z<cwz; z++)
 		{
 			ColliderTile* cell = ColliderTileAt(x, z);
 			cell->flags |= FLAG_ABRUPT;
 		}
-		
+
 	for(int x=cwx-LARGEST_UNIT_NODES-1; x<cwx; x++)
 		for(int z=0; z<cwz; z++)
 		{
 			ColliderTile* cell = ColliderTileAt(x, z);
 			cell->flags |= FLAG_ABRUPT;
 		}
-		
+
 	for(int x=0; x<cwx; x++)
 		for(int z=0; z<LARGEST_UNIT_NODES; z++)
 		{
 			ColliderTile* cell = ColliderTileAt(x, z);
 			cell->flags |= FLAG_ABRUPT;
 		}
-		
+
 	for(int x=0; x<cwx; x++)
 		for(int z=cwz-LARGEST_UNIT_NODES-1; z<cwz; z++)
 		{
@@ -204,7 +204,7 @@ void FillColliderGrid()
 	for(int i=0; i<UNITS; i++)
 	{
 		Unit* u = &g_unit[i];
-	
+
 		if(!u->on)
 			continue;
 
@@ -228,7 +228,7 @@ void Unit::fillcollider()
 {
 	UnitT* t = &g_unitT[type];
 	int ui = this - g_unit;
-	
+
 	//cm = centimeter position
 	int cmminx = cmpos.x - t->size.x/2;
 	int cmminz = cmpos.y - t->size.z/2;
@@ -240,7 +240,7 @@ void Unit::fillcollider()
 	int cminz = cmminz / PATHNODE_SIZE;
 	int cmaxx = cmmaxx / PATHNODE_SIZE;
 	int cmaxz = cmmaxz / PATHNODE_SIZE;
-	
+
 	for(int nz = cminz; nz <= cmaxz; nz++)
 		for(int nx = cminx; nx <= cmaxx; nx++)
 		{
@@ -279,7 +279,7 @@ void Building::fillcollider()
 	int cminz = cmminz / PATHNODE_SIZE;
 	int cmaxx = cmmaxx / PATHNODE_SIZE;
 	int cmaxz = cmmaxz / PATHNODE_SIZE;
-	
+
 	for(int nz = cminz; nz <= cmaxz; nz++)
 		for(int nx = cminx; nx <= cmaxx; nx++)
 		{
@@ -304,7 +304,7 @@ void Unit::freecollider()
 	int cminz = cmminz / PATHNODE_SIZE;
 	int cmaxx = cmmaxx / PATHNODE_SIZE;
 	int cmaxz = cmmaxz / PATHNODE_SIZE;
-	
+
 	for(int nz = cminz; nz <= cmaxz; nz++)
 		for(int nx = cminx; nx <= cmaxx; nx++)
 		{
@@ -340,7 +340,7 @@ void Building::freecollider()
 	int cminz = cmminz / PATHNODE_SIZE;
 	int cmaxx = cmmaxx / PATHNODE_SIZE;
 	int cmaxz = cmmaxz / PATHNODE_SIZE;
-	
+
 	for(int nz = cminz; nz <= cmaxz; nz++)
 		for(int nx = cminx; nx <= cmaxx; nx++)
 		{
@@ -424,12 +424,12 @@ bool Walkable2(PathJob* pj, int cmposx, int cmposz)
 				int tminz = b->tilepos.y - t2->widthz/2;
 				int tmaxx = tminx + t2->widthx;
 				int tmaxz = tminz + t2->widthz;
-				
+
 				int minx2 = tminx*TILE_SIZE;
 				int minz2 = tminz*TILE_SIZE;
 				int maxx2 = tmaxx*TILE_SIZE - 1;
 				int maxz2 = tmaxz*TILE_SIZE - 1;
-				
+
 				if(cmminx <= maxx2 && cmminz <= maxz2 && cmmaxx >= minx2 && cmmaxz >= minz2)
 				{
 					//g_log<<"bld"<<endl;
@@ -450,7 +450,7 @@ bool Walkable2(PathJob* pj, int cmposx, int cmposz)
 				{
 #if 1
 					UnitT* t = &g_unitT[u->type];
-					
+
 					int cmminx2 = u->cmpos.x - t->size.x/2;
 					int cmminz2 = u->cmpos.y - t->size.z/2;
 					int cmmaxx2 = cmminx2 + t->size.x - 1;
@@ -471,13 +471,13 @@ bool Walkable2(PathJob* pj, int cmposx, int cmposz)
 	return true;
 }
 
-bool Walkable(const PathJob* pj, const int nx, const int nz)
+bool Standable(const PathJob* pj, const int nx, const int nz)
 {
 #if 0
 	if(nx < 0 || nz < 0 || nx >= g_pathdim.x || nz >= g_pathdim.y)
 		return false;
 #endif
-	
+
 	ColliderTile* cell = ColliderTileAt( nx, nz );
 
 #if 1
@@ -537,19 +537,19 @@ bool Walkable(const PathJob* pj, const int nx, const int nz)
 				int tminz = b->tilepos.y - t2->widthz/2;
 				int tmaxx = tminx + t2->widthx;
 				int tmaxz = tminz + t2->widthz;
-				
+
 				int minx2 = tminx*TILE_SIZE;
 				int minz2 = tminz*TILE_SIZE;
 				int maxx2 = tmaxx*TILE_SIZE - 1;
 				int maxz2 = tmaxz*TILE_SIZE - 1;
-				
+
 				if(cmminx <= maxx2 && cmminz <= maxz2 && cmmaxx >= minx2 && cmmaxz >= minz2)
 					return false;
 #else
 				return false;
 #endif
 			}
-			
+
 			for(short uiter = 0; uiter < MAX_COLLIDER_UNITS; uiter++)
 			{
 				short uindex = cell->units[uiter];
@@ -563,7 +563,7 @@ bool Walkable(const PathJob* pj, const int nx, const int nz)
 				{
 #if 0
 					UnitT* t = &g_unitT[u->type];
-					
+
 					int cmminx2 = u->cmpos.x - t->size.x/2;
 					int cmminz2 = u->cmpos.y - t->size.z/2;
 					int cmmaxx2 = cmminx2 + t->size.x - 1;

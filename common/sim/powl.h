@@ -2,7 +2,7 @@
 //  powl.h
 //  corpstates
 //
-//  Created by Denis Ivanov on 2013-05-30.
+//  Created by polyf Ivanov on 2013-05-30.
 //  Copyright (c) 2013 DMD 'Ware. All rights reserved.
 //
 
@@ -23,7 +23,7 @@ class PowlTileType
 public:
 	void draw(int x, int z);
 	void Define(const char* modelfile);
-    
+
 	int model;
 };
 
@@ -43,10 +43,10 @@ public:
 	int transporter[RESOURCES];
 	Vec3f drawpos;
 	int maxcost[RESOURCES];
-    
+
 	PowlTile();
 	~PowlTile();
-    
+
 	int netreq(int res);
 	void destroy();
 	void allocate();

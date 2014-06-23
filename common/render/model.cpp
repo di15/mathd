@@ -12,7 +12,7 @@
 #include "shadow.h"
 
 Model g_model[MODELS];
-vector<ModelToLoad> g_modelsToLoad;
+std::vector<ModelToLoad> g_modelsToLoad;
 
 Model::~Model()
 {
@@ -83,14 +83,16 @@ void DrawVA(VertexArray* va, Vec3f pos)
 	Shader* s = &g_shader[g_curS];
 
 	Matrix modelmat;
-	modelmat.setTranslation((const float*)&pos);
+	modelmat.translation((const float*)&pos);
 	glUniformMatrix4fv(s->m_slot[SSLOT_MODELMAT], 1, 0, modelmat.m_matrix);
 
     Matrix modelview;
     modelview.set(modelmat.m_matrix);
-    modelview.postMultiply(g_cameraViewMatrix);
-    //modelview.set(g_cameraViewMatrix.m_matrix);
-    //modelview.postMultiply(modelmat);
+#ifdef SPECBUMPSHADOW
+    modelview.postmult(g_camview);
+#endif
+    //modelview.set(g_camview.m_matrix);
+    //modelview.postmult(modelmat);
 	Matrix modelviewinv;
 	Transpose(modelview, modelview);
 	Inverse2(modelview, modelviewinv);
@@ -118,14 +120,14 @@ void Model::usetex()
 	glBindTexture(GL_TEXTURE_2D, g_texture[ m_specularm ].texname);
 	glUniform1i(s->m_slot[SSLOT_SPECULARMAP], 1);
 
-	if(s->m_slot[SSLOT_NORMAL] != -1)
+	//if(s->m_slot[SSLOT_NORMAL] != -1)
 	{
 		glActiveTexture(GL_TEXTURE2);
 		glBindTexture(GL_TEXTURE_2D, g_texture[ m_normalm ].texname);
 		glUniform1i(s->m_slot[SSLOT_NORMALMAP], 2);
 	}
 
-	if(s->m_slot[SSLOT_OWNERMAP] != -1)
+	//if(s->m_slot[SSLOT_OWNERMAP] != -1)
 	{
 		glActiveTexture(GL_TEXTURE3);
 		glBindTexture(GL_TEXTURE_2D, g_texture[ m_ownerm ].texname);
@@ -140,17 +142,19 @@ void Model::draw(int frame, Vec3f pos, float yaw)
 	float pitch = 0;
 	Matrix modelmat;
 	float radians[] = {static_cast<float>(DEGTORAD(pitch)), static_cast<float>(DEGTORAD(yaw)), 0};
-	modelmat.setTranslation((const float*)&pos);
+	modelmat.translation((const float*)&pos);
 	Matrix rotation;
-	rotation.setRotationRadians(radians);
-	modelmat.postMultiply(rotation);
+	rotation.rotrad(radians);
+	modelmat.postmult(rotation);
 	glUniformMatrix4fv(s->m_slot[SSLOT_MODELMAT], 1, 0, modelmat.m_matrix);
 
     Matrix modelview;
     modelview.set(modelmat.m_matrix);
-    modelview.postMultiply(g_cameraViewMatrix);
-    //modelview.set(g_cameraViewMatrix.m_matrix);
-    //modelview.postMultiply(modelmat);
+#ifdef SPECBUMPSHADOW
+    modelview.postmult(g_camview);
+#endif
+    //modelview.set(g_camview.m_matrix);
+    //modelview.postmult(modelmat);
 	Matrix modelviewinv;
 	Transpose(modelview, modelview);
 	Inverse2(modelview, modelviewinv);

@@ -10,11 +10,11 @@
 class Selection
 {
 public:
-	list<int> units;
-	list<int> buildings;
-	list<Vec2i> roads;
-	list<Vec2i> powls;
-	list<Vec2i> crpipes;
+	std::list<int> units;
+	std::list<int> buildings;
+	std::list<Vec2i> roads;
+	std::list<Vec2i> powls;
+	std::list<Vec2i> crpipes;
 
 	void clear();
 };

@@ -131,8 +131,8 @@ void Camera::rotatebymouse(int dx, int dy)
 		if(lastRotX != 1.0f)
 		{
 			// To find the axis we need to rotate around for up and down
-			// movements, we need to get a perpendicular vector from the
-			// camera's view vector and up vector.  This will be the axis.
+			// movements, we need to get a perpendicular std::vector from the
+			// camera's view std::vector and up std::vector.  This will be the axis.
 			// Before using the axis, it's a good idea to normalize it first.
 			Vec3f vAxis = Cross(m_view - m_pos, m_up);
 			vAxis = Normalize(vAxis);
@@ -150,8 +150,8 @@ void Camera::rotatebymouse(int dx, int dy)
 		if(lastRotX != -1.0f)
 		{
 			// To find the axis we need to rotate around for up and down
-			// movements, we need to get a perpendicular vector from the
-			// camera's view vector and up vector.  This will be the axis.
+			// movements, we need to get a perpendicular std::vector from the
+			// camera's view std::vector and up std::vector.  This will be the axis.
 			// Before using the axis, it's a good idea to normalize it first.
 			Vec3f vAxis = Cross(m_view - m_pos, m_up);
 			vAxis = Normalize(vAxis);
@@ -164,8 +164,8 @@ void Camera::rotatebymouse(int dx, int dy)
 	else
 	{
 		// To find the axis we need to rotate around for up and down
-		// movements, we need to get a perpendicular vector from the
-		// camera's view vector and up vector.  This will be the axis.
+		// movements, we need to get a perpendicular std::vector from the
+		// camera's view std::vector and up std::vector.  This will be the axis.
 		// Before using the axis, it's a good idea to normalize it first.
 		Vec3f vAxis = Cross(m_view - m_pos, m_up);
 		vAxis = Normalize(vAxis);
