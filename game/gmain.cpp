@@ -928,25 +928,21 @@ void EventLoop()
 
 	while (!g_quit)
 	{
-
 		StartTimer(TIMER_FRAME);
+		StartTimer(TIMER_EVENT);
 
 		SDL_Event e;
 
-		StartTimer(TIMER_EVENT);
-
 		while (SDL_PollEvent(&e))
-		{
+                {
 			InEv ev;
 			ev.intercepted = false;
 
-			if (e.type == SDL_QUIT)
-			{
+                        switch(e.type)
+			case SDL_QUIT:
 				g_quit = true;
 				break;
-			}
-			else if(e.type == SDL_KEYDOWN)
-			{
+			case SDL_KEYDOWN:
 				ev.type = INEV_KEYDOWN;
 				ev.key = e.key.keysym.sym;
 				ev.scancode = e.key.keysym.scancode;
@@ -957,9 +953,8 @@ void EventLoop()
 					py->keys[e.key.keysym.scancode] = true;
 
 				py->keyintercepted = ev.intercepted;
-			}
-			else if(e.type == SDL_KEYUP)
-			{
+                                break;
+			case SDL_KEYUP:
 				ev.type = INEV_KEYUP;
 				ev.key = e.key.keysym.sym;
 				ev.scancode = e.key.keysym.scancode;
@@ -970,9 +965,8 @@ void EventLoop()
 					py->keys[e.key.keysym.scancode] = false;
 
 				py->keyintercepted = ev.intercepted;
-			}
-			else if(e.type == SDL_TEXTINPUT)
-			{
+                                break;
+			case SDL_TEXTINPUT:
 				//g_GUI.charin(e.text.text);	//UTF8
 				ev.type = INEV_TEXTIN;
 				ev.text = e.text.text;
@@ -986,9 +980,8 @@ void EventLoop()
 				g_log.flush();
 
 				gui->inev(&ev);
-			}
-			else if(e.type == SDL_TEXTEDITING)
-			{
+                                break;
+			case SDL_TEXTEDITING:
 				//g_GUI.charin(e.text.text);	//UTF8
 				ev.type = INEV_TEXTED;
 				ev.text = e.text.text;
@@ -1007,7 +1000,6 @@ void EventLoop()
 				g_log.flush();
 
 				gui->inev(&ev);
-
 #if 0
 				ev.intercepted = false;
 				ev.type = INEV_TEXTIN;
@@ -1015,7 +1007,7 @@ void EventLoop()
 
 				gui->inev(&ev);
 #endif
-			}
+                                break;
 #if 0
 		case SDL_TEXTINPUT:
 			/* Add new text onto the end of our text */
@@ -1042,15 +1034,12 @@ void EventLoop()
 			//else if(e.type == SDL_BUTTONDOWN)
 			//{
 			//}
-			else if(e.type == SDL_MOUSEWHEEL)
-			{
+			case SDL_MOUSEWHEEL:
 				ev.type = INEV_MOUSEWHEEL;
 				ev.amount = e.wheel.y;
 
 				gui->inev(&ev);
-			}
-			else if (e.type == SDL_MOUSEBUTTONDOWN)
-			{
+			case SDL_MOUSEBUTTONDOWN:
 				if (e.button.button == SDL_BUTTON_LEFT)
 				{
 					py->mousekeys[MOUSE_LEFT] = true;
@@ -1090,58 +1079,53 @@ void EventLoop()
 
 					gui->inev(&ev);
 				}
-			}
-			else if (e.type == SDL_MOUSEBUTTONUP)
-			{
-				if (e.button.button == SDL_BUTTON_LEFT)
-				{
-					py->mousekeys[MOUSE_LEFT] = false;
+                                break;
+			case SDL_MOUSEBUTTONUP:
+                                switch (e.button.button) {
+                                        case SDL_BUTTON_LEFT:
+                                                py->mousekeys[MOUSE_LEFT] = false;
 
-					ev.type = INEV_MOUSEUP;
-					ev.key = MOUSE_LEFT;
-					ev.amount = 1;
-					ev.x = py->mouse.x;
-					ev.y = py->mouse.y;
+                                                ev.type = INEV_MOUSEUP;
+                                                ev.key = MOUSE_LEFT;
+                                                ev.amount = 1;
+                                                ev.x = py->mouse.x;
+                                                ev.y = py->mouse.y;
 
-					gui->inev(&ev);
-				}
-				else if (e.button.button == SDL_BUTTON_RIGHT)
-				{
-					py->mousekeys[MOUSE_RIGHT] = false;
+                                                gui->inev(&ev);
+                                                break;
+                                        case SDL_BUTTON_RIGHT:
+                                                py->mousekeys[MOUSE_RIGHT] = false;
 
-					ev.type = INEV_MOUSEUP;
-					ev.key = MOUSE_RIGHT;
-					ev.amount = 1;
-					ev.x = py->mouse.x;
-					ev.y = py->mouse.y;
+                                                ev.type = INEV_MOUSEUP;
+                                                ev.key = MOUSE_RIGHT;
+                                                ev.amount = 1;
+                                                ev.x = py->mouse.x;
+                                                ev.y = py->mouse.y;
 
-					gui->inev(&ev);
-				}
-				else if (e.button.button == SDL_BUTTON_MIDDLE)
-				{
-					py->mousekeys[MOUSE_MIDDLE] = false;
+                                                gui->inev(&ev);
+                                                break;
+                                        case SDL_BUTTON_MIDDLE:
+                                                py->mousekeys[MOUSE_MIDDLE] = false;
 
-					ev.type = INEV_MOUSEUP;
-					ev.key = MOUSE_MIDDLE;
-					ev.amount = 1;
-					ev.x = py->mouse.x;
-					ev.y = py->mouse.y;
+                                                ev.type = INEV_MOUSEUP;
+                                                ev.key = MOUSE_MIDDLE;
+                                                ev.amount = 1;
+                                                ev.x = py->mouse.x;
+                                                ev.y = py->mouse.y;
 
-					gui->inev(&ev);
-				}
-			}
-			else if (e.type == SDL_MOUSEMOTION)
-			{
+                                                gui->inev(&ev);
+                                                break;
+                                }
+                                break;
+			case SDL_MOUSEMOTION:
 				//py->mouse.x = e.motion.x;
 				//py->mouse.y = e.motion.y;
 
-				if(py->mouseout)
-				{
+				if(py->mouseout) {
 					//TrackMouse();
 					py->mouseout = false;
 				}
-				if(MousePosition())
-				{
+				if(MousePosition()) {
 					py->moved = true;
 
 					ev.type = INEV_MOUSEMOVE;
@@ -1150,7 +1134,7 @@ void EventLoop()
 
 					gui->inev(&ev);
 				}
-			}
+                        break;
 		}
 
 		StopTimer(TIMER_EVENT);
