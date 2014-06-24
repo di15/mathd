@@ -39,6 +39,7 @@
 /* POSIX! getpid(), readlink() */
 #include <sys/types.h>
 #include <unistd.h>
+#include <signal.h>
 #endif
 
 
@@ -138,11 +139,6 @@ int _isnan(double x) { return x != x; }
 
 #ifdef PLATFORM_WIN
 extern HINSTANCE g_hInstance;
-#endif
-
-#ifdef PLATFORM_LINUX
-//extern Display *g_display;
-//extern Window g_window;
 #endif
 
 extern SDL_Window *g_window;

@@ -852,8 +852,22 @@ int testfunc(ObjectScript::OS* os, int nparams, int closure_values, int need_ret
 	return 1;
 }
 
+// Define the function to be called when ctrl-c (SIGINT) signal is sent to process
+void SignalCallback(int signum)
+{
+    //printf("Caught signal %d\n",signum);
+    // Cleanup and close up stuff here
+
+    // Terminate program
+    g_quit = true;
+}
+
 void Init()
 {
+#ifdef PLATFORM_LINUX
+	signal(SIGINT, SignalCallback);
+#endif
+
 	SDL_Init(SDL_INIT_VIDEO);
 
 	OpenLog("log.txt", VERSION);

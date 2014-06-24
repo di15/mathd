@@ -28,7 +28,7 @@
 	"../math/vec2i.h"
 	"../render/heightmap.h"
 
-1403550579 /home/polyfrag/Desktop/Projects/CorpStatesC/aaa004/common/platform.h
+1403579748 /home/polyfrag/Desktop/Projects/CorpStatesC/aaa004/common/platform.h
 	"TargetConditionals.h"
 	<winsock2.h>
 	<windows.h>
@@ -36,6 +36,7 @@
 	<commdlg.h>
 	<sys/types.h>
 	<unistd.h>
+	<signal.h>
 	<string>
 	<sstream>
 	<stdio.h>
