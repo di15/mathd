@@ -349,7 +349,7 @@ void DrawPreview(Matrix projection, Matrix viewmat, Matrix modelmat, Matrix mode
 	float yaw = py->bpyaw;
 	int frame = 0;
 	Vec3f pos(0,0,0);
-	float radians[] = {static_cast<float>(DEGTORAD(pitch)), static_cast<float>(DEGTORAD(yaw)), 0};
+	float radians[] = {(float)DEGTORAD(pitch), (float)DEGTORAD(yaw), 0};
 	modelmat.reset();
 	modelmat.translation((const float*)&pos);
 	Matrix rotation;
@@ -431,7 +431,7 @@ void DrawPreviewDepth()
 	int frame = 0;
 	Vec3f pos(0,0,0);
 	Matrix modelmat;
-	float radians[] = {static_cast<float>(DEGTORAD(pitch)), static_cast<float>(DEGTORAD(yaw)), 0};
+	float radians[] = {(float)DEGTORAD(pitch), (float)DEGTORAD(yaw), 0};
 	modelmat.translation((const float*)&pos);
 	Matrix rotation;
 	rotation.rotrad(radians);

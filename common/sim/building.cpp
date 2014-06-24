@@ -295,7 +295,7 @@ void DrawBl()
 		float pitch = 0;
 		float yaw = 0;
 		Matrix modelmat;
-		float radians[] = {static_cast<float>(DEGTORAD(pitch)), static_cast<float>(DEGTORAD(yaw)), 0};
+		float radians[] = {(float)DEGTORAD(pitch), (float)DEGTORAD(yaw), 0};
 		modelmat.translation((const float*)&b->drawpos);
 		Matrix rotation;
 		rotation.rotrad(radians);
