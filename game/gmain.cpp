@@ -876,15 +876,15 @@ void Init()
 
 	LoadConfig();
 
-	g_os = ObjectScript::OS::create();
-	g_os->pushCFunction(testfunc);
-	g_os->setGlobal("testfunc");
+	//g_os = ObjectScript::OS::create();
+	//g_os->pushCFunction(testfunc);
+	//g_os->setGlobal("testfunc");
 	//os->eval("testfunc();");
 	//os->eval("function require(){ /* if(relative == \"called.os\") */ { testfunc(); } }");
 	char autoexecpath[MAX_PATH+1];
 	FullPath("scripts/autoexec.os", autoexecpath);
 	//g_os->require(autoexecpath);
-	g_os->release();
+	//g_os->release();
 
 	//EnumerateMaps();
 	//EnumerateDisplay();
