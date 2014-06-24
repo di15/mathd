@@ -40,6 +40,10 @@
 #include "../common/render/skybox.h"
 #include "../common/script/script.h"
 
+#ifndef GLDEBUG
+#define CheckGLError(a) (void)0
+#endif
+
 int g_mode = APPMODE_LOADING;
 
 double g_instantupdfps = 0;
@@ -241,9 +245,7 @@ void DrawScene(Matrix projection, Matrix viewmat, Matrix modelmat, Matrix modelv
 	DrawSkyBox(c->zoompos());
 	//DrawSkyBox(Vec3f(0,0,0));
 	EndS();
-#ifdef GLDEBUG
 	CheckGLError(__FILE__, __LINE__);
-#endif
 
 	StartTimer(TIMER_DRAWMAP);
 #if 1
@@ -256,32 +258,22 @@ void DrawScene(Matrix projection, Matrix viewmat, Matrix modelmat, Matrix modelv
 	EndS();
 #endif
 	StopTimer(TIMER_DRAWMAP);
-#ifdef GLDEBUG
 	CheckGLError(__FILE__, __LINE__);
-#endif
 
 	StartTimer(TIMER_DRAWRIM);
 #if 1
 	UseShadow(SHADER_RIM, projection, viewmat, modelmat, modelviewinv, lightpos, lightdir);
-#ifdef GLDEBUG
 	CheckGLError(__FILE__, __LINE__);
-#endif
 	glActiveTexture(GL_TEXTURE8);
 	glBindTexture(GL_TEXTURE_2D, g_depth);
 	glUniform1i(g_shader[g_curS].m_slot[SSLOT_SHADOWMAP], 8);
-#ifdef GLDEBUG
 	CheckGLError(__FILE__, __LINE__);
-#endif
 	g_hmap.drawrim();
-#ifdef GLDEBUG
 	CheckGLError(__FILE__, __LINE__);
-#endif
 	EndS();
 #endif
 	StopTimer(TIMER_DRAWRIM);
-#ifdef GLDEBUG
 	CheckGLError(__FILE__, __LINE__);
-#endif
 
 	StartTimer(TIMER_DRAWWATER);
 #if 1
@@ -294,9 +286,7 @@ void DrawScene(Matrix projection, Matrix viewmat, Matrix modelmat, Matrix modelv
 	EndS();
 #endif
 	StopTimer(TIMER_DRAWWATER);
-#ifdef GLDEBUG
 	CheckGLError(__FILE__, __LINE__);
-#endif
 
 #if 1
 	UseShadow(SHADER_OWNED, projection, viewmat, modelmat, modelviewinv, lightpos, lightdir);
@@ -321,9 +311,7 @@ void DrawScene(Matrix projection, Matrix viewmat, Matrix modelmat, Matrix modelv
 	StopTimer(TIMER_DRAWPOWLS);
 	DrawSBuild();
 	EndS();
-#ifdef GLDEBUG
 	CheckGLError(__FILE__, __LINE__);
-#endif
 #endif
 
 	StartTimer(TIMER_DRAWUNITS);
@@ -338,9 +326,7 @@ void DrawScene(Matrix projection, Matrix viewmat, Matrix modelmat, Matrix modelv
 	EndS();
 #endif
 	StopTimer(TIMER_DRAWUNITS);
-#ifdef GLDEBUG
 	CheckGLError(__FILE__, __LINE__);
-#endif
 
 #if 1
 	StartTimer(TIMER_DRAWFOLIAGE);
@@ -354,9 +340,7 @@ void DrawScene(Matrix projection, Matrix viewmat, Matrix modelmat, Matrix modelv
 	StopTimer(TIMER_DRAWFOLIAGE);
 #endif
 
-#ifdef GLDEBUG
 	CheckGLError(__FILE__, __LINE__);
-#endif
 
 #if 0
 	UseShadow(SHADER_BORDERS, projection, viewmat, modelmat, modelviewinv, lightpos, lightdir);
@@ -378,13 +362,9 @@ void DrawScene(Matrix projection, Matrix viewmat, Matrix modelmat, Matrix modelv
 #endif
 
 	DrawSel(&projection, &modelmat, &viewmat);
-#ifdef GLDEBUG
 	CheckGLError(__FILE__, __LINE__);
-#endif
 	DrawOrders(&projection, &modelmat, &viewmat);
-#ifdef GLDEBUG
 	CheckGLError(__FILE__, __LINE__);
-#endif
 
 #if 1
 	//UseShadow(SHADER_BILLBOARD, projection, viewmat, modelmat, modelviewinv, lightpos, lightdir);
@@ -400,9 +380,7 @@ void DrawScene(Matrix projection, Matrix viewmat, Matrix modelmat, Matrix modelv
 	//glUniformMatrix4fv(s->m_slot[SSLOT_NORMALMAT], 1, 0, modelviewinv.m_matrix);
 	//glUniformMatrix4fv(s->m_slot[SSLOT_INVMODLVIEWMAT], 1, 0, modelviewinv.m_matrix);
 	glUniform4f(s->m_slot[SSLOT_COLOR], 1, 1, 1, 1);
-#ifdef GLDEBUG
 	CheckGLError(__FILE__, __LINE__);
-#endif
 	UpdateParticles();
 	StartTimer(TIMER_SORTPARTICLES);
 	SortBillboards();
@@ -413,9 +391,7 @@ void DrawScene(Matrix projection, Matrix viewmat, Matrix modelmat, Matrix modelv
 
 #if 1
 	StartTimer(TIMER_DRAWGUI);
-#ifdef GLDEBUG
 	CheckGLError(__FILE__, __LINE__);
-#endif
 	Ortho(py->width, py->height, 1, 1, 1, 1);
 	glDisable(GL_DEPTH_TEST);
 	//DrawDeposits(projection, viewmat);
@@ -428,9 +404,7 @@ void DrawScene(Matrix projection, Matrix viewmat, Matrix modelmat, Matrix modelv
 #endif
 
 #if 0
-#ifdef GLDEBUG
 	CheckGLError(__FILE__, __LINE__);
-#endif
 	Ortho(py->width, py->height, 1, 1, 1, 1);
 	glDisable(GL_DEPTH_TEST);
 	FoliageT* t = &g_foliageT[FOLIAGE_TREE1];
@@ -457,52 +431,32 @@ void DrawSceneDepth()
 #if 1
 	Player* py = &g_player[g_curP];
 
-#ifdef GLDEBUG
 	CheckGLError(__FILE__, __LINE__);
-#endif
 	//if(rand()%2 == 1)
 	StartTimer(TIMER_DRAWMAPDEPTH);
 	g_hmap.draw2();
 	StopTimer(TIMER_DRAWMAPDEPTH);
-#ifdef GLDEBUG
 	CheckGLError(__FILE__, __LINE__);
-#endif
 	g_hmap.drawrim();
-#ifdef GLDEBUG
 	CheckGLError(__FILE__, __LINE__);
-#endif
 	//g_hmap.draw2();
 	DrawBl();
-#ifdef GLDEBUG
 	CheckGLError(__FILE__, __LINE__);
-#endif
 	DrawRoads();
-#ifdef GLDEBUG
 	CheckGLError(__FILE__, __LINE__);
-#endif
 	DrawCrPipes();
-#ifdef GLDEBUG
 	CheckGLError(__FILE__, __LINE__);
-#endif
 	DrawPowls();
-#ifdef GLDEBUG
 	CheckGLError(__FILE__, __LINE__);
-#endif
 	StartTimer(TIMER_DRAWUNITSDEPTH);
 	DrawUnits();
 	StopTimer(TIMER_DRAWUNITSDEPTH);
-#ifdef GLDEBUG
 	CheckGLError(__FILE__, __LINE__);
-#endif
 	DrawPy();
-#ifdef GLDEBUG
 	CheckGLError(__FILE__, __LINE__);
-#endif
 #if 1
 	DrawFoliage(g_lightpos, Vec3f(0,1,0), Cross(Vec3f(0,1,0), Normalize(g_lighteye - g_lightpos)));
-#ifdef GLDEBUG
 	CheckGLError(__FILE__, __LINE__);
-#endif
 #endif
 #endif
 
@@ -513,13 +467,9 @@ void Draw()
 {
 	StartTimer(TIMER_DRAWSETUP);
 
-#ifdef GLDEBUG
 	CheckGLError(__FILE__, __LINE__);
-#endif
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-#ifdef GLDEBUG
 	CheckGLError(__FILE__, __LINE__);
-#endif
 
 	Player* py = &g_player[g_curP];
 	GUI* gui = &py->gui;
@@ -573,24 +523,16 @@ void Draw()
         //if(!GetMapIntersection2(&g_hmap, vLine, &focus))
         //GetMapIntersection(&g_hmap, vLine, &focus);
         focus = c->m_view;
-#ifdef GLDEBUG
         CheckGLError(__FILE__, __LINE__);
-#endif
 
         StopTimer(TIMER_DRAWSETUP);
 
         RenderToShadowMap(projection, viewmat, modelmat, focus, focus + g_lightoff / py->zoom, DrawSceneDepth);
-#ifdef GLDEBUG
         CheckGLError(__FILE__, __LINE__);
-#endif
         RenderShadowedScene(projection, viewmat, modelmat, modelview, DrawScene);
-#ifdef GLDEBUG
         CheckGLError(__FILE__, __LINE__);
-#endif
 	}
-#ifdef GLDEBUG
 	CheckGLError(__FILE__, __LINE__);
-#endif
 #endif
 
 #if 0
@@ -605,9 +547,7 @@ void Draw()
 	g_log<<("before gui dr")<<endl;
 	g_log.flush();
 #endif
-#ifdef GLDEBUG
 	CheckGLError(__FILE__, __LINE__);
-#endif
 	gui->draw();
 	StopTimer(TIMER_DRAWGUI);
 
@@ -623,17 +563,11 @@ void Draw()
 	glDrawPixels(blitscreen.sizeX, blitscreen.sizeY, GL_RGB, GL_BYTE, blitscreen.data);
 #endif
 
-#ifdef GLDEBUG
 	CheckGLError(__FILE__, __LINE__);
-#endif
 	Ortho(py->width, py->height, 1, 1, 1, 1);
-#ifdef GLDEBUG
 	CheckGLError(__FILE__, __LINE__);
-#endif
 	glDisable(GL_DEPTH_TEST);
-#ifdef GLDEBUG
 	CheckGLError(__FILE__, __LINE__);
-#endif
 
 #if 0
 	RichText uni;
@@ -656,9 +590,7 @@ void Draw()
 	CheckGLError(__FILE__, __LINE__);
 	glEnable(GL_DEPTH_TEST);
 	EndS();
-#ifdef GLDEBUG
 	CheckGLError(__FILE__, __LINE__);
-#endif
 #endif
 
 #if 0
@@ -1143,13 +1075,9 @@ void EventLoop()
 			StartTimer(TIMER_DRAW);
 
 			CalcDrawRate();
-#ifdef GLDEBUG
 			CheckGLError(__FILE__, __LINE__);
-#endif
 			Draw();
-#ifdef GLDEBUG
 			CheckGLError(__FILE__, __LINE__);
-#endif
 
 			if(g_mode == APPMODE_PLAY || g_mode == APPMODE_EDITOR)
 			{
