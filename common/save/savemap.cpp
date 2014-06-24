@@ -1,4 +1,5 @@
 #include "../render/heightmap.h"
+#include "../texture.h"
 #include "../utils.h"
 #include "../math/vec3f.h"
 #include "../window.h"

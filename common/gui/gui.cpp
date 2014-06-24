@@ -1,3 +1,4 @@
+#include "gui.h"
 #include "../render/shader.h"
 #include "../texture.h"
 #include "font.h"
