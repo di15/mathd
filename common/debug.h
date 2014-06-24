@@ -73,7 +73,14 @@ extern Timer g_profile[TIMERS];
 
 void StartTimer(int id);
 void StopTimer(int id);
+void DefTimer(int id, int inside, char* name);
+
 void WriteProfiles(int in, int layer);
 void InitProfiles();
+
+void CheckNum(const char* num);
+void LastNum(const char* l);
+
+void CheckGLError(const char* file, int line);
 
 #endif	//DEBUG_H
