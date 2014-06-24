@@ -1429,57 +1429,43 @@ void Heightmap::draw2()
 	glBindTexture(GL_TEXTURE_2D, g_texture[ g_tiletexs[TILE_SAND] ].texname);
 	glUniform1i(s->m_slot[SSLOT_SANDTEX], 0);
 
-#ifdef GLDEBUG
 	CheckGLError(__FILE__, __LINE__);
-#endif
 
 	glActiveTexture(GL_TEXTURE1);
 	glBindTexture(GL_TEXTURE_2D, g_texture[ g_tiletexs[TILE_GRASS] ].texname);
 	glUniform1i(s->m_slot[SSLOT_GRASSTEX], 1);
 
-#ifdef GLDEBUG
 	CheckGLError(__FILE__, __LINE__);
-#endif
 
 	//glActiveTexture(GL_TEXTURE2);
 	//glBindTexture(GL_TEXTURE_2D, g_texture[ g_tiletexs[TILE_SNOW] ].texname);
 	//glUniform1i(s->m_slot[SSLOT_SNOWTEX], 2);
 
-#ifdef GLDEBUG
 	CheckGLError(__FILE__, __LINE__);
-#endif
 
 	glActiveTexture(GL_TEXTURE3);
 	glBindTexture(GL_TEXTURE_2D, g_texture[ g_tiletexs[TILE_ROCK] ].texname);
 	glUniform1i(s->m_slot[SSLOT_ROCKTEX], 3);
 
-#ifdef GLDEBUG
 	CheckGLError(__FILE__, __LINE__);
-#endif
 
 	glActiveTexture(GL_TEXTURE4);
 	glBindTexture(GL_TEXTURE_2D, g_texture[ g_tiletexs[TILE_CRACKEDROCK] ].texname);
 	glUniform1i(s->m_slot[SSLOT_CRACKEDROCKTEX], 4);
 
-#ifdef GLDEBUG
 	CheckGLError(__FILE__, __LINE__);
-#endif
 
 	glActiveTexture(GL_TEXTURE5);
 	glBindTexture(GL_TEXTURE_2D, g_texture[ g_tiletexs[TILE_CRACKEDROCK_NORM] ].texname);
 	glUniform1i(s->m_slot[SSLOT_CRACKEDROCKNORMTEX], 5);
 
-#ifdef GLDEBUG
 	CheckGLError(__FILE__, __LINE__);
-#endif
 
 	glActiveTexture(GL_TEXTURE6);
 	glBindTexture(GL_TEXTURE_2D, g_texture[ g_tiletexs[TILE_ROCK_NORM] ].texname);
 	glUniform1i(s->m_slot[SSLOT_ROCKNORMTEX], 6);
 
-#ifdef GLDEBUG
 	CheckGLError(__FILE__, __LINE__);
-#endif
 
 	//float yscale = TILE_Y_SCALE / 2000.0f;
 	glUniform1f(s->m_slot[SSLOT_SANDONLYMAXY], ELEV_SANDONLYMAXY);
@@ -1522,9 +1508,7 @@ void Heightmap::draw2()
 	//Transpose(modelviewinv, modelviewinv);
 	glUniformMatrix4fv(s->m_slot[SSLOT_NORMALMAT], 1, 0, modelviewinv.m_matrix);
 
-#ifdef GLDEBUG
 	CheckGLError(__FILE__, __LINE__);
-#endif
 
 
 	/*
@@ -1543,28 +1527,20 @@ void Heightmap::draw2()
 	// Draw all tiles
 	glVertexAttribPointer(s->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, m_collverts);
 
-#ifdef GLDEBUG
 	CheckGLError(__FILE__, __LINE__);
-#endif
 
 	glVertexAttribPointer(s->m_slot[SSLOT_TEXCOORD0], 2, GL_FLOAT, GL_FALSE, 0, m_texcoords0);
 
-#ifdef GLDEBUG
 	CheckGLError(__FILE__, __LINE__);
-#endif
 
 	if(s->m_slot[SSLOT_NORMAL] != -1)
 		glVertexAttribPointer(s->m_slot[SSLOT_NORMAL], 3, GL_FLOAT, GL_FALSE, 0, m_normals);
 
-#ifdef GLDEBUG
 	CheckGLError(__FILE__, __LINE__);
-#endif
 
 	glDrawArrays(GL_TRIANGLES, 0, (m_widthx) * (m_widthz) * 3 * 2);
 
-#ifdef GLDEBUG
 	CheckGLError(__FILE__, __LINE__);
-#endif
 
 
 #else

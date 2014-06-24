@@ -80,25 +80,19 @@ void ViewportW::draw()
 
 	EndS();
 
-#ifdef GLDEBUG
 	CheckGLError(__FILE__, __LINE__);
-#endif
 
 	if(drawfunc != NULL)
 		drawfunc(m_param, m_pos[0], m_pos[1], w, h);
 
-#ifdef GLDEBUG
 	CheckGLError(__FILE__, __LINE__);
-#endif
 
 	//glViewport(0, 0, py->width, py->height);
 	glViewport(viewport[0], viewport[1], viewport[2], viewport[3]);
 	//glUniform1f(g_shader[SHADER_ORTHO].m_slot[SSLOT_WIDTH], (float)py->width);
 	//glUniform1f(g_shader[SHADER_ORTHO].m_slot[SSLOT_HEIGHT], (float)py->height);
 
-#ifdef GLDEBUG
 	CheckGLError(__FILE__, __LINE__);
-#endif
 	Ortho(py->width, py->height, 1, 1, 1, 1);
 }
 

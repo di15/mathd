@@ -1,7 +1,5 @@
 
 
-
-
 #include "../platform.h"
 #include "font.h"
 #include "../texture.h"
@@ -386,9 +384,7 @@ void LoadFont(int id, const char* fontfile)
 	strcpy(texfile, fontfile);
 	FindTextureExtension(texfile);
 
-#ifdef GLDEBUG
 	CheckGLError(__FILE__, __LINE__);
-#endif
 
 	CreateTexture(f->texindex, texfile, true, false);
 	f->width = g_texwidth;
@@ -841,9 +837,7 @@ void HighlightF(int fnt, float startx, float starty, float framex1, float framey
 	}
 
 	EndS();
-#ifdef GLDEBUG
 	CheckGLError(__FILE__, __LINE__);
-#endif
 	Ortho(py->currw, py->currh, 1, 1, 1, 1);
 }
 

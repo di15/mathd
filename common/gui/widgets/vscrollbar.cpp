@@ -107,9 +107,7 @@ void VScroll::draw()
 	DrawLine(darkcolor[0], darkcolor[1], darkcolor[2], darkcolor[3], m_barpos[2], m_barpos[1]+1, m_barpos[2], m_barpos[3]);
 
 	EndS();
-#ifdef GLDEBUG
 	CheckGLError(__FILE__, __LINE__);
-#endif
 	Ortho(py->currw, py->currh, 1, 1, 1, 1);
 
 	for(auto w=m_subwidg.begin(); w!=m_subwidg.end(); w++)

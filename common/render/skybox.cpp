@@ -77,18 +77,14 @@ void DrawSkyBox(Vec3f pos)
 #endif
 	glUniformMatrix4fv(s->m_slot[SSLOT_MVP], 1, 0, mvp.m_matrix);
 
-#ifdef GLDEBUG
 	CheckGLError(__FILE__, __LINE__);
-#endif
 
 	// right
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, g_texture[ g_right ].texname);
 	glUniform1i(s->m_slot[SSLOT_TEXTURE0], 0);
 
-#ifdef GLDEBUG
 	CheckGLError(__FILE__, __LINE__);
-#endif
 
 
 	/*
@@ -113,23 +109,17 @@ void DrawSkyBox(Vec3f pos)
 
 	glVertexAttribPointer(s->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, sizeof(float)*5, &vright[2]);
 
-#ifdef GLDEBUG
 	CheckGLError(__FILE__, __LINE__);
-#endif
 
 	glVertexAttribPointer(s->m_slot[SSLOT_TEXCOORD0], 2, GL_FLOAT, GL_FALSE, sizeof(float)*5, &vright[0]);
 
 	//g_log<<"tci"<<s->m_slot[SSLOT_TEXCOORD0]<<endl;
 
-#ifdef GLDEBUG
 	CheckGLError(__FILE__, __LINE__);
-#endif
 
 	glDrawArrays(GL_TRIANGLES, 0, 6);
 
-#ifdef GLDEBUG
 	CheckGLError(__FILE__, __LINE__);
-#endif
 
 #if 1
 	// left
@@ -151,9 +141,7 @@ void DrawSkyBox(Vec3f pos)
 	glVertexAttribPointer(s->m_slot[SSLOT_TEXCOORD0], 2, GL_FLOAT, GL_FALSE, sizeof(float)*5, &vleft[0]);
 	glDrawArrays(GL_TRIANGLES, 0, 6);
 
-#ifdef GLDEBUG
 	CheckGLError(__FILE__, __LINE__);
-#endif
 
 
 	// front

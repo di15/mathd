@@ -1,6 +1,4 @@
-
 #include "../render/heightmap.h"
-#include "../texture.h"
 #include "../utils.h"
 #include "../math/vec3f.h"
 #include "../window.h"
@@ -84,9 +82,7 @@ void LoadJPGMap(const char* relative)
 	g_hmap4.destroy();
 	g_hmap8.destroy();
 
-#ifdef GLDEBUG
 	CheckGLError(__FILE__, __LINE__);
-#endif
 
 	LoadedTex *pImage = NULL;
 
@@ -98,9 +94,7 @@ void LoadJPGMap(const char* relative)
 	if(!pImage)
 		return;
 
-#ifdef GLDEBUG
 	CheckGLError(__FILE__, __LINE__);
-#endif
 
 	g_hmap.allocate((pImage->sizeX-1), (pImage->sizeY-1));
 #if 0
@@ -109,9 +103,7 @@ void LoadJPGMap(const char* relative)
 	g_hmap8.allocate((pImage->sizeX-1)/8, (pImage->sizeY-1)/8);
 #endif
 
-#ifdef GLDEBUG
 	CheckGLError(__FILE__, __LINE__);
-#endif
 	for(int x=0; x<pImage->sizeX; x++)
 	{
 		for(int z=0; z<pImage->sizeY; z++)
@@ -138,13 +130,9 @@ void LoadJPGMap(const char* relative)
 		}
 	}
 
-#ifdef GLDEBUG
 	CheckGLError(__FILE__, __LINE__);
-#endif
 	AllocWater(g_hmap.m_widthx, g_hmap.m_widthz);
-#ifdef GLDEBUG
 	CheckGLError(__FILE__, __LINE__);
-#endif
 
 	g_hmap.remesh(1);
 #if 0
@@ -152,9 +140,7 @@ void LoadJPGMap(const char* relative)
 	g_hmap4.remesh(4);
 	g_hmap8.remesh(8);
 #endif
-#ifdef GLDEBUG
 	CheckGLError(__FILE__, __LINE__);
-#endif
 
 #if 1
 	AllocPathGrid(g_hmap.m_widthx*TILE_SIZE, g_hmap.m_widthz*TILE_SIZE);
@@ -162,9 +148,7 @@ void LoadJPGMap(const char* relative)
 	FillColliderGrid();
 #endif
 
-#ifdef GLDEBUG
 	CheckGLError(__FILE__, __LINE__);
-#endif
 	FillForest();
 	PlaceUnits();
 

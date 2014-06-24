@@ -233,9 +233,7 @@ void DrawMinimap(Matrix projection, Matrix viewmat, Matrix modelmat, Matrix mode
 
 	//g_frustum.construct(projection.m_matrix, viewmat.m_matrix);
 
-#ifdef GLDEBUG
 	CheckGLError(__FILE__, __LINE__);
-#endif
 #if 1
 	UseShadow(SHADER_MAPTILESMM, projection, viewmat, modelmat, modelviewinv, lightpos, lightdir);
 	glActiveTexture(GL_TEXTURE8);
@@ -244,31 +242,21 @@ void DrawMinimap(Matrix projection, Matrix viewmat, Matrix modelmat, Matrix mode
 	g_hmap.draw2();
 	EndS();
 #endif
-#ifdef GLDEBUG
 	CheckGLError(__FILE__, __LINE__);
-#endif
 
 #if 1
 	UseShadow(SHADER_WATERMM, projection, viewmat, modelmat, modelviewinv, lightpos, lightdir);
-#ifdef GLDEBUG
 	CheckGLError(__FILE__, __LINE__);
-#endif
 	glActiveTexture(GL_TEXTURE8);
 	glBindTexture(GL_TEXTURE_2D, g_depth);
 	glUniform1i(g_shader[g_curS].m_slot[SSLOT_SHADOWMAP], 8);
-#ifdef GLDEBUG
 	CheckGLError(__FILE__, __LINE__);
-#endif
 	DrawWater2();
-#ifdef GLDEBUG
 	CheckGLError(__FILE__, __LINE__);
-#endif
 	EndS();
 #endif
 
-#ifdef GLDEBUG
 	CheckGLError(__FILE__, __LINE__);
-#endif
 #if 0
 	UseShadow(SHADER_BORDERSMM, projection, viewmat, modelmat, modelviewinv, lightpos, lightdir);
 	//glActiveTexture(GL_TEXTURE8);
@@ -294,9 +282,7 @@ void DrawMinimap(Matrix projection, Matrix viewmat, Matrix modelmat, Matrix mode
 	glUniform4f(g_shader[SHADER_COLOR2D].m_slot[SSLOT_COLOR], 1, 1, 1, 0.5f);
 	DrawMMFrust();
 	EndS();
-#ifdef GLDEBUG
 	CheckGLError(__FILE__, __LINE__);
-#endif
 }
 
 void DrawMinimapDepth()
@@ -521,17 +507,11 @@ void DrawViewport(int which, int x, int y, int width, int height)
             //if(!GetMapIntersection(&g_hmap, vLine, &focus))
             GetMapIntersection2(&g_hmap, vLine, &focus);
 #endif
-#ifdef GLDEBUG
         CheckGLError(__FILE__, __LINE__);
-#endif
         RenderToShadowMap(projection, viewmat, modelmat, focus, focus + g_lightoff, DrawPreviewDepth);
-#ifdef GLDEBUG
         CheckGLError(__FILE__, __LINE__);
-#endif
         RenderShadowedScene(projection, viewmat, modelmat, modelview, DrawPreview);
-#ifdef GLDEBUG
         CheckGLError(__FILE__, __LINE__);
-#endif
 	}
 
 	if(which == VIEWPORT_MINIMAP)
@@ -577,17 +557,11 @@ void DrawViewport(int which, int x, int y, int width, int height)
 				//if(!GetMapIntersection(&g_hmap, vLine, &focus))
 				GetMapIntersection2(&g_hmap, vLine, &focus);
 #endif
-#ifdef GLDEBUG
 			CheckGLError(__FILE__, __LINE__);
-#endif
 			RenderToShadowMap(projection, viewmat, modelmat, focus, focus + g_lightoff / MIN_ZOOM, DrawMinimapDepth);
-#ifdef GLDEBUG
 			CheckGLError(__FILE__, __LINE__);
-#endif
 			RenderShadowedScene(projection, viewmat, modelmat, modelview, DrawMinimap);
-#ifdef GLDEBUG
 			CheckGLError(__FILE__, __LINE__);
-#endif
 		}
 
 		StopTimer(TIMER_DRAWMINIMAP);
@@ -597,9 +571,7 @@ void DrawViewport(int which, int x, int y, int width, int height)
 
 #if 0
 	EndS();
-#ifdef GLDEBUG
 	CheckGLError(__FILE__, __LINE__);
-#endif
 	Ortho(width, height, 1, 0, 0, 1);
 	glDisable(GL_DEPTH_TEST);
 	RichText rt = RichText(t->m_label);
@@ -612,9 +584,7 @@ void DrawViewport(int which, int x, int y, int width, int height)
 
 	glDisable(GL_DEPTH_TEST);
 	glFlush();
-#ifdef GLDEBUG
 	CheckGLError(__FILE__, __LINE__);
-#endif
 }
 
 bool ViewportLDown(int which, int relx, int rely, int width, int height)

@@ -280,9 +280,7 @@ void RenderToShadowMap(Matrix projection, Matrix viewmat, Matrix modelmat, Vec3f
     Matrix oldview = g_camview;
     Matrix oldmvp = g_cammvp;
 
-#ifdef GLDEBUG
     CheckGLError(__FILE__, __LINE__);
-#endif
 
     glDisable(GL_CULL_FACE);
 
@@ -300,9 +298,7 @@ void RenderToShadowMap(Matrix projection, Matrix viewmat, Matrix modelmat, Vec3f
     //glPolygonOffset(10.0, 2500.0);
     glPolygonOffset(1.0, 250.0);
 
-#ifdef GLDEBUG
     CheckGLError(__FILE__, __LINE__);
-#endif
 
     g_lightpos = lightpos;
     g_lighteye = focus;
@@ -346,9 +342,7 @@ void RenderToShadowMap(Matrix projection, Matrix viewmat, Matrix modelmat, Vec3f
                            g_lightup.x, g_lightup.y, g_lightup.z);
 #endif
 
-#ifdef GLDEBUG
     CheckGLError(__FILE__, __LINE__);
-#endif
 
     UseS(SHADER_DEPTH);
     glUniformMatrix4fv(g_shader[SHADER_DEPTH].m_slot[SSLOT_PROJECTION], 1, 0, g_lightproj.m_matrix);
@@ -363,25 +357,17 @@ void RenderToShadowMap(Matrix projection, Matrix viewmat, Matrix modelmat, Vec3f
 	mvp.set(g_lightproj.m_matrix);
 	mvp.postmult2(g_lightview);
 
-	g_cammvp = mvp;
 
-
-#ifdef GLDEBUG
     CheckGLError(__FILE__, __LINE__);
-#endif
 
     if(drawscenedepthfunc != NULL)
         drawscenedepthfunc();
 
-#ifdef GLDEBUG
     CheckGLError(__FILE__, __LINE__);
-#endif
 
     EndS();
 
-#ifdef GLDEBUG
     CheckGLError(__FILE__, __LINE__);
-#endif
 
     glDisable(GL_POLYGON_OFFSET_FILL);
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -394,9 +380,7 @@ void RenderToShadowMap(Matrix projection, Matrix viewmat, Matrix modelmat, Vec3f
 	g_camview = oldview;
 	g_cammvp = oldmvp;
 
-#ifdef GLDEBUG
     CheckGLError(__FILE__, __LINE__);
-#endif
 }
 
 void UseShadow(int shader, Matrix projection, Matrix viewmat, Matrix modelmat, Matrix modelviewinv, float lightpos[3], float lightdir[3])

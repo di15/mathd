@@ -206,9 +206,7 @@ void Button::draw()
 		DrawLine(darkcolor[0], darkcolor[1], darkcolor[2], darkcolor[3], m_pos[2], m_pos[1]+1, m_pos[2], m_pos[3]);
 
 		EndS();
-#ifdef GLDEBUG
 		CheckGLError(__FILE__, __LINE__);
-#endif
 		Ortho(py->currw, py->currh, 1, 1, 1, 1);
 
 		float w = m_pos[2]-m_pos[0]-2;

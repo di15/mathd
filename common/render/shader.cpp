@@ -329,36 +329,24 @@ void LoadShader(int shader, char* strVertex, char* strFragment)
 
 void UseS(int shader)
 {
-#ifdef GLDEBUG
 	CheckGLError(__FILE__, __LINE__);
-#endif
 	g_curS = shader;
 
 	Shader* s = &g_shader[g_curS];
 
 	//glUseProgramObject(g_shader[shader].m_program);
 	glUseProgram(s->m_program);
-#ifdef GLDEBUG
 	CheckGLError(__FILE__, __LINE__);
-#endif
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
-#ifdef GLDEBUG
 	CheckGLError(__FILE__, __LINE__);
-#endif
 	if(s->m_slot[SSLOT_POSITION] != -1)	glEnableVertexAttribArray(s->m_slot[SSLOT_POSITION]);
-#ifdef GLDEBUG
 	CheckGLError(__FILE__, __LINE__);
-#endif
 	if(s->m_slot[SSLOT_TEXCOORD0] != -1) glEnableVertexAttribArray(s->m_slot[SSLOT_TEXCOORD0]);
-#ifdef GLDEBUG
 	CheckGLError(__FILE__, __LINE__);
-#endif
 	if(s->m_slot[SSLOT_NORMAL] != -1)	glEnableVertexAttribArray(s->m_slot[SSLOT_NORMAL]);
-#ifdef GLDEBUG
 	CheckGLError(__FILE__, __LINE__);
-#endif
 
 	Player* py = &g_player[g_curP];
 
@@ -368,30 +356,20 @@ void UseS(int shader)
 
 void EndS()
 {
-#ifdef GLDEBUG
 	CheckGLError(__FILE__, __LINE__);
-#endif
 
 	if(g_curS < 0)
 		return;
 
 	Shader* s = &g_shader[g_curS];
 
-#ifdef GLDEBUG
 	CheckGLError(__FILE__, __LINE__);
-#endif
 	if(s->m_slot[SSLOT_POSITION] != -1)	glDisableVertexAttribArray(s->m_slot[SSLOT_POSITION]);
-#ifdef GLDEBUG
 	CheckGLError(__FILE__, __LINE__);
-#endif
 	if(s->m_slot[SSLOT_TEXCOORD0] != -1) glDisableVertexAttribArray(s->m_slot[SSLOT_TEXCOORD0]);
-#ifdef GLDEBUG
 	CheckGLError(__FILE__, __LINE__);
-#endif
 	if(s->m_slot[SSLOT_NORMAL] != -1)	glDisableVertexAttribArray(s->m_slot[SSLOT_NORMAL]);
-#ifdef GLDEBUG
 	CheckGLError(__FILE__, __LINE__);
-#endif
 
 	glUseProgram(0);
 

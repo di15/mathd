@@ -281,9 +281,7 @@ void Resize_WinText(Widget* thisw)
 
 void Click_NewGame()
 {
-#ifdef GLDEBUG
 	CheckGLError(__FILE__, __LINE__);
-#endif
 #if 1
 	//LoadJPGMap("heightmaps/heightmap0e2s.jpg");
 	LoadJPGMap("heightmaps/heightmap0e2.jpg");
@@ -310,9 +308,7 @@ void Click_NewGame()
 			//PlaceUnit(UNIT_LABOURER, cmpos, 0);
 		}
 
-#ifdef GLDEBUG
 	CheckGLError(__FILE__, __LINE__);
-#endif
 
 	PlaceBuilding(BUILDING_HOUR, Vec2i(g_hmap.m_widthx/2-1, g_hmap.m_widthz/2-3), true, 0);
 	PlaceBuilding(BUILDING_APARTMENT, Vec2i(g_hmap.m_widthx/2+2, g_hmap.m_widthz/2-2), true, 0);
@@ -361,9 +357,7 @@ void Click_NewGame()
 	CheckGLError(__FILE__, __LINE__);
 	PlaceBuilding(BUILDING_GASSTATION, Vec2i(g_hmap.m_widthx/2+14, g_hmap.m_widthz/2-1), true, 0);
 
-#ifdef GLDEBUG
 	CheckGLError(__FILE__, __LINE__);
-#endif
 
 	g_mode = APPMODE_PLAY;
 
@@ -374,9 +368,7 @@ void Click_NewGame()
 	gui->open("play gui");
 	gui->open("play right opener");
 
-#ifdef GLDEBUG
 	CheckGLError(__FILE__, __LINE__);
-#endif
 
 	gui->add(new WindowW(gui, "window", Resize_Window));
 	//gui->open("window");
@@ -400,13 +392,9 @@ void Click_NewGame()
 
 void Click_OpenEditor()
 {
-#ifdef GLDEBUG
 	CheckGLError(__FILE__, __LINE__);
-#endif
 	LoadJPGMap("heightmaps/heightmap0e2.jpg");
-#ifdef GLDEBUG
 	CheckGLError(__FILE__, __LINE__);
-#endif
 
 	g_mode = APPMODE_EDITOR;
 

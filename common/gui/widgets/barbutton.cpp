@@ -54,9 +54,7 @@ void BarButton::draw()
 	DrawSquare(0, 1, 0, 1, m_pos[0], m_pos[3]-5, m_pos[0]+bar, m_pos[3]);
 
 	EndS();
-#ifdef GLDEBUG
 	CheckGLError(__FILE__, __LINE__);
-#endif
 	Ortho(py->currw, py->currh, 1, 1, 1, 1);
 }
 
