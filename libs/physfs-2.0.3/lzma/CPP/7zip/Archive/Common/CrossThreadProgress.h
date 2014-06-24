@@ -20,13 +20,13 @@ public:
 
   HRes Create()
   {
-    RINOK(ProgressEvent.CreateIfNotCreated());
-    return WaitEvent.CreateIfNotCreated();
+	RINOK(ProgressEvent.CreateIfNotCreated());
+	return WaitEvent.CreateIfNotCreated();
   }
   void Init()
   {
-    ProgressEvent.Reset();
-    WaitEvent.Reset();
+	ProgressEvent.Reset();
+	WaitEvent.Reset();
   }
 
   MY_UNKNOWN_IMP

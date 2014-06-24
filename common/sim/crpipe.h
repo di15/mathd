@@ -2,7 +2,7 @@
 //  pipeline.h
 //  corpstates
 //
-//  Created by polyf Ivanov on 2013-05-30.
+//  Created by polyf  on 2013-05-30.
 //  Copyright (c) 2013 DMD 'Ware. All rights reserved.
 //
 

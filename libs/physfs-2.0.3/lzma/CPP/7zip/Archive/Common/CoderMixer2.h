@@ -31,96 +31,96 @@ struct CBindInfo
 
   void Clear()
   {
-    Coders.Clear();
-    BindPairs.Clear();
-    InStreams.Clear();
-    OutStreams.Clear();
+	Coders.Clear();
+	BindPairs.Clear();
+	InStreams.Clear();
+	OutStreams.Clear();
   }
 
   /*
   UInt32 GetCoderStartOutStream(UInt32 coderIndex) const
   {
-    UInt32 numOutStreams = 0;
-    for (UInt32 i = 0; i < coderIndex; i++)
-      numOutStreams += Coders[i].NumOutStreams;
-    return numOutStreams;
+	UInt32 numOutStreams = 0;
+	for (UInt32 i = 0; i < coderIndex; i++)
+	  numOutStreams += Coders[i].NumOutStreams;
+	return numOutStreams;
   }
   */
 
 
   void GetNumStreams(UInt32 &numInStreams, UInt32 &numOutStreams) const
   {
-    numInStreams = 0;
-    numOutStreams = 0;
-    for (int i = 0; i < Coders.Size(); i++)
-    {
-      const CCoderStreamsInfo &coderStreamsInfo = Coders[i];
-      numInStreams += coderStreamsInfo.NumInStreams;
-      numOutStreams += coderStreamsInfo.NumOutStreams;
-    }
+	numInStreams = 0;
+	numOutStreams = 0;
+	for (int i = 0; i < Coders.Size(); i++)
+	{
+	  const CCoderStreamsInfo &coderStreamsInfo = Coders[i];
+	  numInStreams += coderStreamsInfo.NumInStreams;
+	  numOutStreams += coderStreamsInfo.NumOutStreams;
+	}
   }
 
   int FindBinderForInStream(UInt32 inStream) const
   {
-    for (int i = 0; i < BindPairs.Size(); i++)
-      if (BindPairs[i].InIndex == inStream)
-        return i;
-    return -1;
+	for (int i = 0; i < BindPairs.Size(); i++)
+	  if (BindPairs[i].InIndex == inStream)
+		return i;
+	return -1;
   }
   int FindBinderForOutStream(UInt32 outStream) const
   {
-    for (int i = 0; i < BindPairs.Size(); i++)
-      if (BindPairs[i].OutIndex == outStream)
-        return i;
-    return -1;
+	for (int i = 0; i < BindPairs.Size(); i++)
+	  if (BindPairs[i].OutIndex == outStream)
+		return i;
+	return -1;
   }
 
   UInt32 GetCoderInStreamIndex(UInt32 coderIndex) const
   {
-    UInt32 streamIndex = 0;
-    for (UInt32 i = 0; i < coderIndex; i++)
-      streamIndex += Coders[i].NumInStreams;
-    return streamIndex;
+	UInt32 streamIndex = 0;
+	for (UInt32 i = 0; i < coderIndex; i++)
+	  streamIndex += Coders[i].NumInStreams;
+	return streamIndex;
   }
 
   UInt32 GetCoderOutStreamIndex(UInt32 coderIndex) const
   {
-    UInt32 streamIndex = 0;
-    for (UInt32 i = 0; i < coderIndex; i++)
-      streamIndex += Coders[i].NumOutStreams;
-    return streamIndex;
+	UInt32 streamIndex = 0;
+	for (UInt32 i = 0; i < coderIndex; i++)
+	  streamIndex += Coders[i].NumOutStreams;
+	return streamIndex;
   }
 
 
   void FindInStream(UInt32 streamIndex, UInt32 &coderIndex, 
-      UInt32 &coderStreamIndex) const
+	  UInt32 &coderStreamIndex) const
   {
-    for (coderIndex = 0; coderIndex < (UInt32)Coders.Size(); coderIndex++)
-    {
-      UInt32 curSize = Coders[coderIndex].NumInStreams;
-      if (streamIndex < curSize)
-      {
-        coderStreamIndex = streamIndex;
-        return;
-      }
-      streamIndex -= curSize;
-    }
-    throw 1;
+	for (coderIndex = 0; coderIndex < (UInt32)Coders.Size(); coderIndex++)
+	{
+	  UInt32 curSize = Coders[coderIndex].NumInStreams;
+	  if (streamIndex < curSize)
+	  {
+		coderStreamIndex = streamIndex;
+		return;
+	  }
+	  streamIndex -= curSize;
+	}
+	throw 1;
   }
   void FindOutStream(UInt32 streamIndex, UInt32 &coderIndex, 
-      UInt32 &coderStreamIndex) const
+	  UInt32 &coderStreamIndex) const
   {
-    for (coderIndex = 0; coderIndex < (UInt32)Coders.Size(); coderIndex++)
-    {
-      UInt32 curSize = Coders[coderIndex].NumOutStreams;
-      if (streamIndex < curSize)
-      {
-        coderStreamIndex = streamIndex;
-        return;
-      }
-      streamIndex -= curSize;
-    }
-    throw 1;
+	for (coderIndex = 0; coderIndex < (UInt32)Coders.Size(); coderIndex++)
+	{
+	  UInt32 curSize = Coders[coderIndex].NumOutStreams;
+	  if (streamIndex < curSize)
+	  {
+		coderStreamIndex = streamIndex;
+		return;
+	  }
+	  streamIndex -= curSize;
+	}
+	throw 1;
   }
 };
 
@@ -156,8 +156,8 @@ struct CCoderInfo2
 
   HRESULT QueryInterface(REFGUID iid, void** pp) const
   {
-    IUnknown *p = Coder ? (IUnknown *)Coder : (IUnknown *)Coder2;
-    return p->QueryInterface(iid, pp);
+	IUnknown *p = Coder ? (IUnknown *)Coder : (IUnknown *)Coder2;
+	return p->QueryInterface(iid, pp);
   }
 };
 

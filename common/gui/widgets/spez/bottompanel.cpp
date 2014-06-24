@@ -1,5 +1,4 @@
 
-
 #include "../../widget.h"
 #include "../barbutton.h"
 #include "../button.h"
@@ -28,14 +27,14 @@ BottomPanel::BottomPanel(Widget* parent, const char* n, void (*reframef)(Widget*
 	m_name = n;
 	reframefunc = reframef;
 	m_ldown = false;
-	
+
 	left_outer_toprightcorner = Image(this, "gui/frames/outertopleft64x64.png", true, NULL, 1, 1, 1, 1,		1, 0, 0, 1);
 	left_outer_top = Image(this, "gui/frames/outertop2x64.png", true, NULL, 1, 1, 1, 1,		0, 0, 1, 1);
 	left_minimap = ViewportW(this, "minimap viewport", NULL, &DrawViewport, &ViewportLDown, &ViewportLUp, &ViewportMousemove, &ViewportRDown, &ViewportRUp, ViewportMousewheel, VIEWPORT_MINIMAP);
-	
+
 	right_outer_topleftcorner = Image(this, "gui/frames/outertopleft64x64.png", true, NULL, 1, 1, 1, 1,		0, 0, 1, 1);
 	right_outer_top = Image(this, "gui/frames/outertop2x64.png", true, NULL, 1, 1, 1, 1,		0, 0, 1, 1);
-	
+
 	middle_outer_top = Image(this, "gui/frames/outertop2x12.png", true, NULL, 1, 1, 1, 1,		0, 0, 1, 1);
 
 	white_bg = Image(this, "gui/backg/white.jpg", true, NULL, 1, 1, 1, 1,		0, 0, 1, 1);
@@ -69,14 +68,14 @@ void BottomPanel::reframe()	//resized or moved
 	left_outer_top.m_pos[1] = m_pos[1];
 	left_outer_top.m_pos[2] = m_pos[0] + MINIMAP_SIZE - 32;
 	left_outer_top.m_pos[3] = m_pos[1] + 64;
-	
+
 	left_outer_top.m_texc[2] = (left_outer_toprightcorner.m_pos[2]-left_outer_toprightcorner.m_pos[0])/2.0f;
 
 	left_minimap.m_pos[0] = m_pos[0] + MINIMAP_OFF;
 	left_minimap.m_pos[1] = m_pos[1] + 32 - MINIMAP_OFF;
 	left_minimap.m_pos[2] = m_pos[0] + MINIMAP_SIZE + MINIMAP_OFF;
 	left_minimap.m_pos[3] = m_pos[1] + 32 + MINIMAP_SIZE - MINIMAP_OFF;
-	
+
 #if 0
 	Image right_outer_topleftcorner;
 	Image right_outer_top;
@@ -92,7 +91,7 @@ void BottomPanel::reframe()	//resized or moved
 	right_outer_top.m_pos[1] = m_pos[1];
 	right_outer_top.m_pos[2] = m_pos[2];
 	right_outer_top.m_pos[3] = m_pos[1] + 64;
-	
+
 	middle_outer_top.m_pos[0] = m_pos[0] + MINIMAP_SIZE + 32 - 15;
 	middle_outer_top.m_pos[1] = m_pos[1] + 64 - 12;
 	middle_outer_top.m_pos[2] = m_pos[2] - MINIMAP_SIZE - 32 + 15;
@@ -102,7 +101,7 @@ void BottomPanel::reframe()	//resized or moved
 	white_bg.m_pos[1] = m_pos[1] + 64;
 	white_bg.m_pos[2] = m_pos[2];
 	white_bg.m_pos[3] = m_pos[3];
-	
+
 	float bottomright_left = m_pos[2] - MINIMAP_SIZE - MINIMAP_OFF;
 	float bottomright_top = m_pos[1] + 32 - MINIMAP_OFF;
 
@@ -113,7 +112,7 @@ void BottomPanel::reframe()	//resized or moved
 			int i = y*3 + x;
 
 			Button* b = &bottomright_button[i];
-			
+
 			b->m_pos[0] = bottomright_left + MINIMAP_SIZE/3 * x;
 			b->m_pos[1] = bottomright_top + MINIMAP_SIZE/3 * y;
 			b->m_pos[2] = bottomright_left + MINIMAP_SIZE/3 * (x+1);
@@ -128,7 +127,7 @@ void BottomPanel::reframe()	//resized or moved
 	leftinnerdiagblur.m_pos[1] = m_pos[1];
 	leftinnerdiagblur.m_pos[2] = m_pos[0]+32;
 	leftinnerdiagblur.m_pos[3] = m_pos[1]+24;
-	
+
 	rightinnerdiagblur.m_pos[0] = m_pos[2]-32;
 	rightinnerdiagblur.m_pos[1] = m_pos[1];
 	rightinnerdiagblur.m_pos[2] = m_pos[2];
@@ -162,7 +161,7 @@ void BottomPanel::reframe()	//resized or moved
 	lefthlineblur.m_pos[1] = m_pos[1]+24-3;
 	lefthlineblur.m_pos[2] = centerw;
 	lefthlineblur.m_pos[3] = m_pos[1]+24;
-	
+
 	righthlineblur.m_pos[0] = centerw;
 	righthlineblur.m_pos[1] = m_pos[1]+24-3;
 	righthlineblur.m_pos[2] = m_pos[2]-32;
@@ -190,7 +189,7 @@ void BottomPanel::draw()
 
 	left_outer_toprightcorner.draw();
 	left_outer_top.draw();
-	
+
 	right_outer_topleftcorner.draw();
 	right_outer_top.draw();
 
@@ -199,7 +198,7 @@ void BottomPanel::draw()
 	white_bg.draw();
 	left_minimap.draw();
 
-	
+
 	for(int y=0; y<3; y++)
 	{
 		for(int x=0; x<3; x++)
@@ -223,7 +222,7 @@ void BottomPanel::draw()
 
 	//RichText rt = RichText(")A)JJF)@J)(J)(F$KJ(0jfjfjoi3jfwkjlekf");
 	//DrawShadowedTextF(MAINFONT16, m_pos[0]+32, m_pos[1]+4, 0, 0, 50, 50, &rt);
-	
+
 	leftinnerdiagblur.draw();
 	rightinnerdiagblur.draw();
 	lefthlineblur.draw();

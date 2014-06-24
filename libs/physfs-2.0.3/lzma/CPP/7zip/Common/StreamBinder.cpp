@@ -68,16 +68,16 @@ void CStreamBinder::ReInit()
 
   
 void CStreamBinder::CreateStreams(ISequentialInStream **inStream, 
-      ISequentialOutStream **outStream)
+	  ISequentialOutStream **outStream)
 {
   CSequentialInStreamForBinder *inStreamSpec = new 
-      CSequentialInStreamForBinder;
+	  CSequentialInStreamForBinder;
   CMyComPtr<ISequentialInStream> inStreamLoc(inStreamSpec);
   inStreamSpec->SetBinder(this);
   *inStream = inStreamLoc.Detach();
 
   CSequentialOutStreamForBinder *outStreamSpec = new 
-      CSequentialOutStreamForBinder;
+	  CSequentialOutStreamForBinder;
   CMyComPtr<ISequentialOutStream> outStreamLoc(outStreamSpec);
   outStreamSpec->SetBinder(this);
   *outStream = outStreamLoc.Detach();
@@ -92,22 +92,22 @@ HRESULT CStreamBinder::Read(void *data, UInt32 size, UInt32 *processedSize)
   UInt32 sizeToRead = size;
   if (size > 0)
   {
-    RINOK(_thereAreBytesToReadEvent.Lock());
-    sizeToRead = MyMin(_bufferSize, size);
-    if (_bufferSize > 0)
-    {
-      MoveMemory(data, _buffer, sizeToRead);
-      _buffer = ((const Byte *)_buffer) + sizeToRead;
-      _bufferSize -= sizeToRead;
-      if (_bufferSize == 0)
-      {
-        _thereAreBytesToReadEvent.Reset();
-        _allBytesAreWritenEvent.Set();
-      }
-    }
+	RINOK(_thereAreBytesToReadEvent.Lock());
+	sizeToRead = MyMin(_bufferSize, size);
+	if (_bufferSize > 0)
+	{
+	  MoveMemory(data, _buffer, sizeToRead);
+	  _buffer = ((const Byte *)_buffer) + sizeToRead;
+	  _bufferSize -= sizeToRead;
+	  if (_bufferSize == 0)
+	  {
+		_thereAreBytesToReadEvent.Reset();
+		_allBytesAreWritenEvent.Set();
+	  }
+	}
   }
   if (processedSize != NULL)
-    *processedSize = sizeToRead;
+	*processedSize = sizeToRead;
   ProcessedSize += sizeToRead;
   return S_OK;
 }
@@ -121,25 +121,25 @@ HRESULT CStreamBinder::Write(const void *data, UInt32 size, UInt32 *processedSiz
 {
   if (size > 0)
   {
-    _buffer = data;
-    _bufferSize = size;
-    _allBytesAreWritenEvent.Reset();
-    _thereAreBytesToReadEvent.Set();
+	_buffer = data;
+	_bufferSize = size;
+	_allBytesAreWritenEvent.Reset();
+	_thereAreBytesToReadEvent.Set();
 
-    HANDLE events[2]; 
-    events[0] = _allBytesAreWritenEvent;
-    events[1] = _readStreamIsClosedEvent; 
-    DWORD waitResult = ::WaitForMultipleObjects(2, events, FALSE, INFINITE);
-    if (waitResult != WAIT_OBJECT_0 + 0)
-    {
-      // ReadingWasClosed = true;
-      return S_FALSE;
-    }
-    // if(!_allBytesAreWritenEvent.Lock())
-    //   return E_FAIL;
+	HANDLE events[2]; 
+	events[0] = _allBytesAreWritenEvent;
+	events[1] = _readStreamIsClosedEvent; 
+	DWORD waitResult = ::WaitForMultipleObjects(2, events, FALSE, INFINITE);
+	if (waitResult != WAIT_OBJECT_0 + 0)
+	{
+	  // ReadingWasClosed = true;
+	  return S_FALSE;
+	}
+	// if(!_allBytesAreWritenEvent.Lock())
+	//   return E_FAIL;
   }
   if (processedSize != NULL)
-    *processedSize = size;
+	*processedSize = size;
   return S_OK;
 }
 

@@ -11,11 +11,11 @@
   freely, subject to the following restrictions:
 
   1. The origin of this software must not be misrepresented; you must not
-     claim that you wrote the original software. If you use this software
-     in a product, an acknowledgment in the product documentation would be
-     appreciated but is not required.
+	 claim that you wrote the original software. If you use this software
+	 in a product, an acknowledgment in the product documentation would be
+	 appreciated but is not required.
   2. Altered source versions must be plainly marked as such, and must not be
-     misrepresented as being the original software.
+	 misrepresented as being the original software.
   3. This notice may not be removed or altered from any source distribution.
 */
 #include "SDL_config.h"
@@ -58,41 +58,41 @@
 /* typedef's for XInput structs we use */
 typedef struct
 {
-    WORD wButtons;
-    BYTE bLeftTrigger;
-    BYTE bRightTrigger;
-    SHORT sThumbLX;
-    SHORT sThumbLY;
-    SHORT sThumbRX;
-    SHORT sThumbRY;
-    DWORD dwPaddingReserved;
+	WORD wButtons;
+	BYTE bLeftTrigger;
+	BYTE bRightTrigger;
+	SHORT sThumbLX;
+	SHORT sThumbLY;
+	SHORT sThumbRX;
+	SHORT sThumbRY;
+	DWORD dwPaddingReserved;
 } XINPUT_GAMEPAD_EX;
 
 typedef struct
 {
-    DWORD dwPacketNumber;
-    XINPUT_GAMEPAD_EX Gamepad;
+	DWORD dwPacketNumber;
+	XINPUT_GAMEPAD_EX Gamepad;
 } XINPUT_STATE_EX;
 
 /* Forward decl's for XInput API's we load dynamically and use if available */
 typedef DWORD (WINAPI *XInputGetState_t)
-    (
-    DWORD         dwUserIndex,  /* [in] Index of the gamer associated with the device */
-    XINPUT_STATE_EX* pState     /* [out] Receives the current state */
-    );
+	(
+	DWORD         dwUserIndex,  /* [in] Index of the gamer associated with the device */
+	XINPUT_STATE_EX* pState     /* [out] Receives the current state */
+	);
 
 typedef DWORD (WINAPI *XInputSetState_t)
-    (
-    DWORD             dwUserIndex,  /* [in] Index of the gamer associated with the device */
-    XINPUT_VIBRATION* pVibration    /* [in, out] The vibration information to send to the controller */
-    );
+	(
+	DWORD             dwUserIndex,  /* [in] Index of the gamer associated with the device */
+	XINPUT_VIBRATION* pVibration    /* [in, out] The vibration information to send to the controller */
+	);
 
 typedef DWORD (WINAPI *XInputGetCapabilities_t)
-    (
-    DWORD                dwUserIndex,   /* [in] Index of the gamer associated with the device */
-    DWORD                dwFlags,       /* [in] Input flags that identify the device type */
-    XINPUT_CAPABILITIES* pCapabilities  /* [out] Receives the capabilities */
-    );
+	(
+	DWORD                dwUserIndex,   /* [in] Index of the gamer associated with the device */
+	DWORD                dwFlags,       /* [in] Input flags that identify the device type */
+	XINPUT_CAPABILITIES* pCapabilities  /* [out] Receives the capabilities */
+	);
 
 extern int WIN_LoadXInputDLL(void);
 extern void WIN_UnloadXInputDLL(void);
@@ -117,34 +117,34 @@ typedef enum Type
 
 typedef struct input_t
 {
-    /* DirectInput offset for this input type: */
-    DWORD ofs;
+	/* DirectInput offset for this input type: */
+	DWORD ofs;
 
-    /* Button, axis or hat: */
-    Type type;
+	/* Button, axis or hat: */
+	Type type;
 
-    /* SDL input offset: */
-    Uint8 num;
+	/* SDL input offset: */
+	Uint8 num;
 } input_t;
 
 /* The private structure used to keep track of a joystick */
 struct joystick_hwdata
 {
-    LPDIRECTINPUTDEVICE8 InputDevice;
-    DIDEVCAPS Capabilities;
-    int buffered;
-    SDL_JoystickGUID guid;
+	LPDIRECTINPUTDEVICE8 InputDevice;
+	DIDEVCAPS Capabilities;
+	int buffered;
+	SDL_JoystickGUID guid;
 
-    input_t Inputs[MAX_INPUTS];
-    int NumInputs;
-    int NumSliders;
-    Uint8 removed;
-    Uint8 send_remove_event;
-    Uint8 bXInputDevice; /* 1 if this device supports using the xinput API rather than DirectInput */
-    Uint8 bXInputHaptic; /* Supports force feedback via XInput. */
-    Uint8 userid; /* XInput userid index for this joystick */
-    Uint8 currentXInputSlot; /* the current position to write to in XInputState below, used so we can compare old and new values */
-    XINPUT_STATE_EX XInputState[2];
+	input_t Inputs[MAX_INPUTS];
+	int NumInputs;
+	int NumSliders;
+	Uint8 removed;
+	Uint8 send_remove_event;
+	Uint8 bXInputDevice; /* 1 if this device supports using the xinput API rather than DirectInput */
+	Uint8 bXInputHaptic; /* Supports force feedback via XInput. */
+	Uint8 userid; /* XInput userid index for this joystick */
+	Uint8 currentXInputSlot; /* the current position to write to in XInputState below, used so we can compare old and new values */
+	XINPUT_STATE_EX XInputState[2];
 };
 
 #endif /* SDL_JOYSTICK_DINPUT_H */

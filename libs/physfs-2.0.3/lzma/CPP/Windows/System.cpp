@@ -43,20 +43,20 @@ UInt64 GetRamSize()
   stat.dwLength = sizeof(stat);
   #ifdef _WIN64
   if (!::GlobalMemoryStatusEx(&stat))
-    return 0;
+	return 0;
   return stat.ullTotalPhys;
   #else
   GlobalMemoryStatusExP globalMemoryStatusEx = (GlobalMemoryStatusExP)
-        ::GetProcAddress(::GetModuleHandle(TEXT("kernel32.dll")),
-        "GlobalMemoryStatusEx");
+		::GetProcAddress(::GetModuleHandle(TEXT("kernel32.dll")),
+		"GlobalMemoryStatusEx");
   if (globalMemoryStatusEx != 0)
-    if (globalMemoryStatusEx(&stat))
-      return stat.ullTotalPhys;
+	if (globalMemoryStatusEx(&stat))
+	  return stat.ullTotalPhys;
   {
-    MEMORYSTATUS stat;
-    stat.dwLength = sizeof(stat);
-    GlobalMemoryStatus(&stat);
-    return stat.dwTotalPhys;
+	MEMORYSTATUS stat;
+	stat.dwLength = sizeof(stat);
+	GlobalMemoryStatus(&stat);
+	return stat.dwTotalPhys;
   }
   #endif
 }

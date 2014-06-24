@@ -1,6 +1,5 @@
 
 
-
 #define EPSILON			0.03125f //0.1f	//1.2f
 #define	CLOSE_EPSILON	0.1f
 #define FRICTION		1.5f

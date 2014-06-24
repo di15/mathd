@@ -9,19 +9,19 @@
 #include "Windows/FileFind.h"
 
 void AddDirFileInfo(
-    const UString &prefix, 
-    const UString &fullPathName,
-    const NWindows::NFile::NFind::CFileInfoW &fileInfo, 
-    CObjectVector<CDirItem> &dirItems);
+	const UString &prefix, 
+	const UString &fullPathName,
+	const NWindows::NFile::NFind::CFileInfoW &fileInfo, 
+	CObjectVector<CDirItem> &dirItems);
 
 
 void EnumerateDirItems(
-    const UString &baseFolderPrefix,
-    const UStringVector &fileNames,
-    const UString &archiveNamePrefix, 
-    CObjectVector<CDirItem> &dirItems, 
-    UStringVector &errorPaths,
-    CRecordVector<DWORD> &errorCodes);
+	const UString &baseFolderPrefix,
+	const UStringVector &fileNames,
+	const UString &archiveNamePrefix, 
+	CObjectVector<CDirItem> &dirItems, 
+	UStringVector &errorPaths,
+	CRecordVector<DWORD> &errorCodes);
 
 struct IEnumDirItemCallback
 {
@@ -30,10 +30,10 @@ struct IEnumDirItemCallback
 
 
 HRESULT EnumerateItems(
-    const NWildcard::CCensor &censor, 
-    CObjectVector<CDirItem> &dirItems, 
-    IEnumDirItemCallback *callback, 
-    UStringVector &errorPaths,
-    CRecordVector<DWORD> &errorCodes);
+	const NWildcard::CCensor &censor, 
+	CObjectVector<CDirItem> &dirItems, 
+	IEnumDirItemCallback *callback, 
+	UStringVector &errorPaths,
+	CRecordVector<DWORD> &errorCodes);
 
 #endif

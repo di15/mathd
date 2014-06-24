@@ -1,5 +1,4 @@
 
-
 #include "order.h"
 #include "../render/shader.h"
 #include "selection.h"
@@ -14,6 +13,7 @@
 #include "../math/hmapmath.h"
 #include "../sound/sound.h"
 #include "player.h"
+#include "../render/shadow.h"
 
 std::list<OrderMarker> g_order;
 
@@ -32,6 +32,7 @@ void DrawOrders(Matrix* projection, Matrix* modelmat, Matrix* viewmat)
 	glUniformMatrix4fv(s->m_slot[SSLOT_PROJECTION], 1, 0, projection->m_matrix);
 	glUniformMatrix4fv(s->m_slot[SSLOT_MODELMAT], 1, 0, modelmat->m_matrix);
 	glUniformMatrix4fv(s->m_slot[SSLOT_VIEWMAT], 1, 0, viewmat->m_matrix);
+	glUniformMatrix4fv(s->m_slot[SSLOT_MVP], 1, 0, g_cammvp.m_matrix);
 	glUniform4f(s->m_slot[SSLOT_COLOR], 0, 1, 0, 1);
 	//glEnableVertexAttribArray(s->m_slot[SSLOT_POSITION]);
 	//glEnableVertexAttribArray(s->m_slot[SSLOT_TEXCOORD0]);
@@ -168,7 +169,7 @@ void Order(int mousex, int mousey, int viewwidth, int viewheight, Vec3f campos, 
 	InfoMessage("asd", msg);
 #endif
 
-	Player* py = &g_player[g_currP];
+	Player* py = &g_player[g_curP];
 
 	//if(targets.size() <= 0 || (targettype != SELECT_UNIT && targettype != SELECT_BUILDING))
 	{

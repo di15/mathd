@@ -1,5 +1,4 @@
 
-
 #include "vec3f.h"
 #include "plane3f.h"
 #include "physics.h"
@@ -67,22 +66,22 @@ Vec3f PointOnPlane(Plane3f p)
 	}
 
 	if(fabs(p.m_normal.x) > EPSILON)
-	//if(greatest == 0)
+		//if(greatest == 0)
 		return Vec3f(- p.m_d / p.m_normal.x, 0, 0);
 
 	if(fabs(p.m_normal.y) > EPSILON)
-	//if(greatest == 1)
+		//if(greatest == 1)
 		return Vec3f(0, - p.m_d / p.m_normal.y, 0);
 
 	if(fabs(p.m_normal.z) > EPSILON)
-	//if(greatest == 2)
+		//if(greatest == 2)
 		return Vec3f(0, 0, - p.m_d / p.m_normal.z);
-	
+
 	return Vec3f(0, 0, 0);
 }
 
 float PlaneDistance(Vec3f normal, Vec3f point)
-{	
+{
 	float distance = 0; // This variable holds the distance from the plane to the origin
 
 	// Use the plane equation to find the distance (Ax + By + Cz + D = 0)  We want to find D.
@@ -156,13 +155,13 @@ bool LineInterPlane(const Vec3f* line, const Vec3f norm, const float d, Vec3f* i
 
 	if(fabs(denom) <= EPSILON)
 		return false;
-		
+
 	float SegScalar = (d - Dot(norm, line[0])) / denom;
-		
+
 	//TODO: Check if SegScalar is [0.0, 1.0]?
 	if(SegScalar < 0.0f)
 		return false;
-		
+
 	*inter = change * SegScalar + line[0];
 
 	return true;

@@ -2,7 +2,7 @@
 //  powerline.m
 //  corpstates
 //
-//  Created by polyf Ivanov on 2013-05-30.
+//  Created by polyf  on 2013-05-30.
 //  Copyright (c) 2013 DMD 'Ware. All rights reserved.
 //
 
@@ -143,9 +143,9 @@ void PowlTile::allocate()
 
 	if(transx[0] != '\0'
 #ifdef LOCAL_TRANSX
-       && owner == g_localP
+			&& owner == g_localP
 #endif
-       )
+	  )
 	{
 		int x, z;
 		PowlXZ(this, x, z);
@@ -272,25 +272,25 @@ void DrawPowls()
 		for(int z=0; z<g_hmap.m_widthz; z++)
 		{
 			/*
-             p = PowlAt(x, z);
+			 p = PowlAt(x, z);
 
-             if(!p->on)
-             continue;
+			 if(!p->on)
+			 continue;
 
-             const float* owncol = facowncolor[p->owner];
-             glUniform4f(g_shader[g_curS].m_slot[SSLOT_OWNCOLOR], owncol[0], owncol[1], owncol[2], owncol[3]);
+			 const float* owncol = facowncolor[p->owner];
+			 glUniform4f(g_shader[g_curS].m_slot[SSLOT_OWNCOLOR], owncol[0], owncol[1], owncol[2], owncol[3]);
 
-             //type = p->type;
-             DrawVA(&p->drawva, PowlPosition(x, z));
+			 //type = p->type;
+			 DrawVA(&p->drawva, PowlPosition(x, z));
 
-             //if(p->finished)
-             //	g_powlT[type][FINISHED].draw(x, z);
-             //else
-             //	g_powlT[type][CONSTRUCTION].draw(x, z);*/
+			 //if(p->finished)
+			 //	g_powlT[type][FINISHED].draw(x, z);
+			 //else
+			 //	g_powlT[type][CONSTRUCTION].draw(x, z);*/
 			DrawPowl(x, z, false);
 		}
 #if 1
-	Player* py = &g_player[g_currP];
+	Player* py = &g_player[g_curP];
 
 	if(py->build != BUILDING_POWL)
 		return;
@@ -302,16 +302,16 @@ void DrawPowls()
 		for(int z=0; z<g_hmap.m_widthz; z++)
 		{
 			/*
-             p = PowlPlanAt(x, z);
-             if(!p->on)
-             continue;
+			 p = PowlPlanAt(x, z);
+			 if(!p->on)
+			 continue;
 
-             const float* owncol = facowncolor[p->owner];
-             glUniform4f(g_shader[g_curS].m_slot[SSLOT_OWNCOLOR], owncol[0], owncol[1], owncol[2], owncol[3]);
+			 const float* owncol = facowncolor[p->owner];
+			 glUniform4f(g_shader[g_curS].m_slot[SSLOT_OWNCOLOR], owncol[0], owncol[1], owncol[2], owncol[3]);
 
-             //type = p->type;
-             DrawVA(&p->drawva, PowlPosition(x, z));
-             //g_powlT[type][FINISHED].draw(x, z);*/
+			 //type = p->type;
+			 DrawVA(&p->drawva, PowlPosition(x, z));
+			 //g_powlT[type][FINISHED].draw(x, z);*/
 			DrawPowl(x, z, true);
 		}
 
@@ -442,12 +442,12 @@ void MeshPowl(int x, int z, bool plan)
 		//Chat(msg);
 	}
 
-    for(int i=0; i<pva->numverts; i+=3)
-    {
-        pva->normals[i+0] = Normal(&pva->vertices[i]);
-        pva->normals[i+1] = Normal(&pva->vertices[i]);
-        pva->normals[i+2] = Normal(&pva->vertices[i]);
-    }
+	for(int i=0; i<pva->numverts; i+=3)
+	{
+		pva->normals[i+0] = Normal(&pva->vertices[i]);
+		pva->normals[i+1] = Normal(&pva->vertices[i]);
+		pva->normals[i+2] = Normal(&pva->vertices[i]);
+	}
 
 	//g_log<<"done meshpowl"<<endl;
 	//g_log.flush();
@@ -586,7 +586,7 @@ void PlacePowl(int x, int z, int stateowner, bool plan)
 	if(g_mode == APPMODE_PLAY)
 		p->finished = false;
 	//if(plan || g_mode == APPMODE_EDITOR)
-    if(plan)
+	if(plan)
 		p->finished = true;
 
 
@@ -618,7 +618,7 @@ void ClearPowlPlans()
 
 void PlacePowl()
 {
-	Player* py = &g_player[g_currP];
+	Player* py = &g_player[g_curP];
 
 	if(g_mode == APPMODE_PLAY)
 	{
@@ -655,7 +655,7 @@ void PlacePowl()
 
 	if(g_mode == APPMODE_PLAY)
 	{
-		Player* py = &g_player[g_currP];
+		Player* py = &g_player[g_curP];
 		GUI* gui = &py->gui;
 
 		if(py->sel.powls.size() > 0)
@@ -973,7 +973,8 @@ void RePow()
 
 		if(RePowPow())
 			change = true;
-	}while(change);
+	}
+	while(change);
 }
 
 bool PowlIntersect(int x, int z, Vec3f line[])

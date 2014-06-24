@@ -1,5 +1,4 @@
 
-
 #include "../ai/collidertile.h"
 #include "../math/vec2i.h"
 #include "../math/3dmath.h"
@@ -25,8 +24,8 @@
 #define EPSILON_I		1
 
 bool PassUnits(Vec2i vstart, Vec2i vend,
-			int cmminx, int cmminz, int cmmaxx, int cmmaxz,
-			Unit* u2)
+			   int cmminx, int cmminz, int cmmaxx, int cmmaxz,
+			   Unit* u2)
 {
 	float startratio = -1.0f;
 	float endratio = 1.0f;
@@ -97,7 +96,7 @@ bool PassUnits(Vec2i vstart, Vec2i vend,
 				tw->collisionnormal = p->m_normal;
 
 				if((tj->start.x != tj->end.x || tj->start.z != tj->end.z) && p->m_normal.y != 1 && p->m_normal.y >= 0.0f)
-				//if((tj->start.x != tj->end.x || tj->start.z != tj->end.z))
+					//if((tj->start.x != tj->end.x || tj->start.z != tj->end.z))
 				{
 					tw->trytostep = true;
 
@@ -157,8 +156,8 @@ bool PassUnits(Vec2i vstart, Vec2i vend,
 }
 
 int Trace(int utype, int umode,
-			Vec2i vstart, Vec2i vend,
-			Unit* thisu, Unit* ignoreu, Building* ignoreb)
+		  Vec2i vstart, Vec2i vend,
+		  Unit* thisu, Unit* ignoreu, Building* ignoreb)
 {
 	UnitT* ut = &g_unitT[utype];
 

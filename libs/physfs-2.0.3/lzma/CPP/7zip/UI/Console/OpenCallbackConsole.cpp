@@ -10,7 +10,7 @@
 HRESULT COpenCallbackConsole::CheckBreak()
 {
   if (NConsoleClose::TestBreakSignal())
-    return E_ABORT;
+	return E_ABORT;
   return S_OK;
 }
 
@@ -30,8 +30,8 @@ HRESULT COpenCallbackConsole::CryptoGetTextPassword(BSTR *password)
   RINOK(CheckBreak());
   if (!PasswordIsDefined)
   {
-    Password = GetPassword(OutStream); 
-    PasswordIsDefined = true;
+	Password = GetPassword(OutStream); 
+	PasswordIsDefined = true;
   }
   CMyComBSTR temp(Password);
   *password = temp.Detach();
@@ -41,7 +41,7 @@ HRESULT COpenCallbackConsole::CryptoGetTextPassword(BSTR *password)
 HRESULT COpenCallbackConsole::GetPasswordIfAny(UString &password)
 {
   if (PasswordIsDefined)
-    password = Password;
+	password = Password;
   return S_OK;
 }
 

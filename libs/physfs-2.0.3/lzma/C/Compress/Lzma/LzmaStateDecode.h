@@ -75,10 +75,10 @@ typedef struct _CLzmaDecoderState
   UInt32 Reps[4];
   int State;
   int RemainLen;  /* -2: decoder needs internal initialization
-                     -1: stream was finished, 
-                      0: ok
-                    > 0: need to write RemainLen bytes as match Reps[0],
-                  */
+					 -1: stream was finished, 
+					  0: ok
+					> 0: need to write RemainLen bytes as match Reps[0],
+				  */
   unsigned char TempDictionary[4];  /* it's required when DictionarySize = 0 */
 } CLzmaDecoderState;
 
@@ -89,8 +89,8 @@ typedef struct _CLzmaDecoderState
   after inStream[inSize - 1]. */
 
 int LzmaDecode(CLzmaDecoderState *vs,
-    const unsigned char *inStream, SizeT inSize,  SizeT *inSizeProcessed,
-    unsigned char *outStream, SizeT outSize, SizeT *outSizeProcessed,
-    int finishDecoding);
+	const unsigned char *inStream, SizeT inSize,  SizeT *inSizeProcessed,
+	unsigned char *outStream, SizeT outSize, SizeT *outSizeProcessed,
+	int finishDecoding);
 
 #endif

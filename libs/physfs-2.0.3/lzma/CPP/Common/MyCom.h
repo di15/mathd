@@ -19,8 +19,8 @@ public:
   CMyComPtr(T* p) {if ((_p = p) != NULL) p->AddRef(); }
   CMyComPtr(const CMyComPtr<T>& lp)
   {
-    if ((_p = lp._p) != NULL)
-      _p->AddRef();
+	if ((_p = lp._p) != NULL)
+	  _p->AddRef();
   }
   ~CMyComPtr() { if (_p) _p->Release(); }
   void Release() { if (_p) { _p->Release(); _p = NULL; } }
@@ -30,12 +30,12 @@ public:
   T* operator->() const { return _p; }
   T* operator=(T* p) 
   { 
-    if (p != 0)
-      p->AddRef();
-    if (_p) 
-      _p->Release();
-    _p = p;
-    return p;
+	if (p != 0)
+	  p->AddRef();
+	if (_p) 
+	  _p->Release();
+	_p = p;
+	return p;
   }
   T* operator=(const CMyComPtr<T>& lp) { return (*this = lp._p); }
   bool operator!() const { return (_p == NULL); }
@@ -43,36 +43,36 @@ public:
   // Compare two objects for equivalence
   void Attach(T* p2)
   {
-    Release();
-    _p = p2;
+	Release();
+	_p = p2;
   }
   T* Detach()
   {
-    T* pt = _p;
-    _p = NULL;
-    return pt;
+	T* pt = _p;
+	_p = NULL;
+	return pt;
   }
   #ifdef _WIN32
   HRESULT CoCreateInstance(REFCLSID rclsid, REFIID iid, LPUNKNOWN pUnkOuter = NULL, DWORD dwClsContext = CLSCTX_ALL)
   {
-    return ::CoCreateInstance(rclsid, pUnkOuter, dwClsContext, iid, (void**)&_p);
+	return ::CoCreateInstance(rclsid, pUnkOuter, dwClsContext, iid, (void**)&_p);
   }
   #endif
   /*
   HRESULT CoCreateInstance(LPCOLESTR szProgID, LPUNKNOWN pUnkOuter = NULL, DWORD dwClsContext = CLSCTX_ALL)
   {
-    CLSID clsid;
-    HRESULT hr = CLSIDFromProgID(szProgID, &clsid);
-    ATLASSERT(_p == NULL);
-    if (SUCCEEDED(hr))
-      hr = ::CoCreateInstance(clsid, pUnkOuter, dwClsContext, __uuidof(T), (void**)&_p);
-    return hr;
+	CLSID clsid;
+	HRESULT hr = CLSIDFromProgID(szProgID, &clsid);
+	ATLASSERT(_p == NULL);
+	if (SUCCEEDED(hr))
+	  hr = ::CoCreateInstance(clsid, pUnkOuter, dwClsContext, __uuidof(T), (void**)&_p);
+	return hr;
   }
   */
   template <class Q>
   HRESULT QueryInterface(REFGUID iid, Q** pp) const
   {
-    return _p->QueryInterface(iid, (void**)pp);
+	return _p->QueryInterface(iid, (void**)pp);
   }
 };
 
@@ -90,50 +90,50 @@ public:
   /*
   CMyComBSTR(REFGUID src)
   {
-    LPOLESTR szGuid;
-    StringFromCLSID(src, &szGuid);
-    m_str = ::SysAllocString(szGuid);
-    CoTaskMemFree(szGuid);
+	LPOLESTR szGuid;
+	StringFromCLSID(src, &szGuid);
+	m_str = ::SysAllocString(szGuid);
+	CoTaskMemFree(szGuid);
   }
   */
   ~CMyComBSTR() { ::SysFreeString(m_str); }
   CMyComBSTR& operator=(const CMyComBSTR& src)
   {
-    if (m_str != src.m_str)
-    {
-      if (m_str)
-        ::SysFreeString(m_str);
-      m_str = src.MyCopy();
-    }
-    return *this;
+	if (m_str != src.m_str)
+	{
+	  if (m_str)
+		::SysFreeString(m_str);
+	  m_str = src.MyCopy();
+	}
+	return *this;
   }
   CMyComBSTR& operator=(LPCOLESTR pSrc)
   {
-    ::SysFreeString(m_str);
-    m_str = ::SysAllocString(pSrc);
-    return *this;
+	::SysFreeString(m_str);
+	m_str = ::SysAllocString(pSrc);
+	return *this;
   }
   unsigned int Length() const { return ::SysStringLen(m_str); }
   operator BSTR() const { return m_str; }
   BSTR* operator&() { return &m_str; }
   BSTR MyCopy() const 
   { 
-    int byteLen = ::SysStringByteLen(m_str);
-    BSTR res = ::SysAllocStringByteLen(NULL, byteLen);
-    memmove(res, m_str, byteLen);
-    return res;
+	int byteLen = ::SysStringByteLen(m_str);
+	BSTR res = ::SysAllocStringByteLen(NULL, byteLen);
+	memmove(res, m_str, byteLen);
+	return res;
   }
   void Attach(BSTR src) {  m_str = src; }
   BSTR Detach()
   {
-    BSTR s = m_str;
-    m_str = NULL;
-    return s;
+	BSTR s = m_str;
+	m_str = NULL;
+	return s;
   }
   void Empty()
   {
-    ::SysFreeString(m_str);
-    m_str = NULL;
+	::SysFreeString(m_str);
+	m_str = NULL;
   }
   bool operator!() const {  return (m_str == NULL); }
 };
@@ -149,17 +149,17 @@ public:
 };
 
 #define MY_QUERYINTERFACE_BEGIN STDMETHOD(QueryInterface) \
-    (REFGUID iid, void **outObject) { 
+	(REFGUID iid, void **outObject) { 
 
 #define MY_QUERYINTERFACE_ENTRY(i) if (iid == IID_ ## i) \
-    { *outObject = (void *)(i *)this; AddRef(); return S_OK; }
+	{ *outObject = (void *)(i *)this; AddRef(); return S_OK; }
 
 #define MY_QUERYINTERFACE_ENTRY_UNKNOWN(i) if (iid == IID_IUnknown) \
-    { *outObject = (void *)(IUnknown *)(i *)this; AddRef(); return S_OK; }
+	{ *outObject = (void *)(IUnknown *)(i *)this; AddRef(); return S_OK; }
 
 #define MY_QUERYINTERFACE_BEGIN2(i) MY_QUERYINTERFACE_BEGIN \
-    MY_QUERYINTERFACE_ENTRY_UNKNOWN(i) \
-    MY_QUERYINTERFACE_ENTRY(i)
+	MY_QUERYINTERFACE_ENTRY_UNKNOWN(i) \
+	MY_QUERYINTERFACE_ENTRY(i)
 
 #define MY_QUERYINTERFACE_END return E_NOINTERFACE; }
 

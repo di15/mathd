@@ -1,6 +1,5 @@
 
 
-
 #include "../texture.h"
 #include "foliage.h"
 #include "water.h"
@@ -176,7 +175,7 @@ void DrawFoliage(Vec3f zoompos, Vec3f vertical, Vec3f horizontal)
 	m->usetex();
 	Matrix im;
 
-	Player* py = &g_player[g_currP];
+	Player* py = &g_player[g_curP];
 	Camera* cam = &py->camera;
 
 	Vec3f viewdir = Normalize(cam->m_view - zoompos);
@@ -198,12 +197,26 @@ void DrawFoliage(Vec3f zoompos, Vec3f vertical, Vec3f horizontal)
 		glUniformMatrix4fv(s->m_slot[SSLOT_MODELMAT], 1, 0, g_folmodmat[i].m_matrix);
 
 		Matrix modelview;
-		modelview.set(g_folmodmat[i].m_matrix);
 #ifdef SPECBUMPSHADOW
-		modelview.postmult(g_camview);
+   		 modelview.set(g_camview.m_matrix);
 #endif
-		//modelview.set(g_camview.m_matrix);
-		//modelview.postmult(modelmat);
+    	modelview.postmult(g_folmodmat[i]);
+		glUniformMatrix4fv(s->m_slot[SSLOT_MODELVIEW], 1, 0, modelview.m_matrix);
+
+		Matrix mvp;
+#if 0
+		mvp.set(modelview.m_matrix);
+		mvp.postmult(g_camproj);
+#elif 0
+		mvp.set(g_camproj.m_matrix);
+		mvp.postmult(modelview);
+#else
+		mvp.set(g_camproj.m_matrix);
+		mvp.postmult(g_camview);
+		mvp.postmult(g_folmodmat[i]);
+#endif
+		glUniformMatrix4fv(s->m_slot[SSLOT_MVP], 1, 0, mvp.m_matrix);
+
 		Matrix modelviewinv;
 		Transpose(modelview, modelview);
 		Inverse2(modelview, modelviewinv);
@@ -257,19 +270,19 @@ void FillForest()
 	for(int tx = 0; tx < g_hmap.m_widthx; tx++)
 		for(int tz = 0; tz < g_hmap.m_widthz; tz++)
 		{
-				int x = tz*TILE_SIZE + TILE_SIZE/2;
-				int z = tz*TILE_SIZE + TILE_SIZE/2;
+			int x = tz*TILE_SIZE + TILE_SIZE/2;
+			int z = tz*TILE_SIZE + TILE_SIZE/2;
 
-				Vec3f norm = g_hmap.getnormal(tx, tz);
+			Vec3f norm = g_hmap.getnormal(tx, tz);
 
-				float y = g_hmap.accheight2(x, z);
+			float y = g_hmap.accheight2(x, z);
 
-				if(y >= ELEV_SANDONLYMAXY && y <= ELEV_GRASSONLYMAXY && 1.0f - norm.y <= 0.3f)
-				{
-					Forest* f = ForestAt(tx, tz);
-					f->on = true;
-					f->remesh();
-				}
+			if(y >= ELEV_SANDONLYMAXY && y <= ELEV_GRASSONLYMAXY && 1.0f - norm.y <= 0.3f)
+			{
+				Forest* f = ForestAt(tx, tz);
+				f->on = true;
+				f->remesh();
+			}
 		}
 #endif
 	//for(int condensation = 0; condensation < sqrt(g_hmap.m_widthx * g_hmap.m_widthz); condensation++)
@@ -298,7 +311,7 @@ void FillForest()
 				if(y >= ELEV_SANDONLYMAXY && y <= ELEV_GRASSONLYMAXY && 1.0f - norm.y <= 0.3f)
 				{
 					//int type = rand()%10 == 1 ? UNIT_MECH : UNIT_LABOURER;
-	#if 0
+#if 0
 					int type = UNIT_LABOURER;
 
 					if(rand()%10 == 1)
@@ -307,13 +320,13 @@ void FillForest()
 						type = UNIT_GEPARDAA;
 
 					PlaceUnit(type, Vec3i(x, y, z), -1, -1);
-	#endif
-	#if 1
+#endif
+#if 1
 
 					int type = FOLIAGE_TREE1;
 
 					PlaceFoliage(type, Vec3i(x, y, z));
-	#endif
+#endif
 					break;
 				}
 			}

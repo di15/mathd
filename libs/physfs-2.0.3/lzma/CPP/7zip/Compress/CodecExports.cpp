@@ -18,7 +18,7 @@ DEFINE_GUID(CLSID_CCodec,
 static inline HRESULT SetPropString(const char *s, unsigned int size, PROPVARIANT *value)
 {
   if ((value->bstrVal = ::SysAllocStringByteLen(s, size)) != 0)
-    value->vt = VT_BSTR;
+	value->vt = VT_BSTR;
   return S_OK;
 }
 
@@ -31,9 +31,9 @@ static HRESULT SetClassID(CMethodId id, bool encode, PROPVARIANT *value)
 {
   GUID clsId = CLSID_CCodec;
   for (int i = 0; i < sizeof(id); i++, id >>= 8)
-    clsId.Data4[i] = (Byte)(id & 0xFF);
+	clsId.Data4[i] = (Byte)(id & 0xFF);
   if (encode)
-    clsId.Data3++;
+	clsId.Data3++;
   return SetPropGUID(clsId, value);
 }
 
@@ -41,23 +41,23 @@ static HRESULT FindCodecClassId(const GUID *clsID, UInt32 isCoder2, bool isFilte
 {
   index = -1;
   if (clsID->Data1 != CLSID_CCodec.Data1 || 
-      clsID->Data2 != CLSID_CCodec.Data2 ||
-      (clsID->Data3 & ~1) != kDecodeId)
-    return S_OK;
+	  clsID->Data2 != CLSID_CCodec.Data2 ||
+	  (clsID->Data3 & ~1) != kDecodeId)
+	return S_OK;
   encode = (clsID->Data3 != kDecodeId);
   UInt64 id = 0;
   for (int j = 0; j < 8; j++)
-    id |= ((UInt64)clsID->Data4[j]) << (8 * j);
+	id |= ((UInt64)clsID->Data4[j]) << (8 * j);
   for (UInt32 i = 0; i < g_NumCodecs; i++)
   {
-    const CCodecInfo &codec = *g_Codecs[i];
-    if (id != codec.Id || encode && !codec.CreateEncoder || !encode && !codec.CreateDecoder)
-      continue;
-    if (!isFilter && codec.IsFilter || isFilter && !codec.IsFilter ||
-        codec.NumInStreams != 1 && !isCoder2 || codec.NumInStreams == 1 && isCoder2)
-      return E_NOINTERFACE;
-    index = i;
-    return S_OK;
+	const CCodecInfo &codec = *g_Codecs[i];
+	if (id != codec.Id || encode && !codec.CreateEncoder || !encode && !codec.CreateDecoder)
+	  continue;
+	if (!isFilter && codec.IsFilter || isFilter && !codec.IsFilter ||
+		codec.NumInStreams != 1 && !isCoder2 || codec.NumInStreams == 1 && isCoder2)
+	  return E_NOINTERFACE;
+	index = i;
+	return S_OK;
   }
   return S_OK;
 }
@@ -71,26 +71,26 @@ STDAPI CreateCoder2(bool encode, UInt32 index, const GUID *iid, void **outObject
   bool isFilter = (*iid == IID_ICompressFilter) != 0;
   const CCodecInfo &codec = *g_Codecs[index];
   if (!isFilter && codec.IsFilter || isFilter && !codec.IsFilter ||
-      codec.NumInStreams != 1 && !isCoder2 || codec.NumInStreams == 1 && isCoder2)
-    return E_NOINTERFACE;
+	  codec.NumInStreams != 1 && !isCoder2 || codec.NumInStreams == 1 && isCoder2)
+	return E_NOINTERFACE;
   if (encode)
   {
-    if (!codec.CreateEncoder)
-      return CLASS_E_CLASSNOTAVAILABLE;
-    *outObject = codec.CreateEncoder();
+	if (!codec.CreateEncoder)
+	  return CLASS_E_CLASSNOTAVAILABLE;
+	*outObject = codec.CreateEncoder();
   }
   else
   {
-    if (!codec.CreateDecoder)
-      return CLASS_E_CLASSNOTAVAILABLE;
-    *outObject = codec.CreateDecoder();
+	if (!codec.CreateDecoder)
+	  return CLASS_E_CLASSNOTAVAILABLE;
+	*outObject = codec.CreateDecoder();
   }
   if (isCoder)
-    ((ICompressCoder *)*outObject)->AddRef();
+	((ICompressCoder *)*outObject)->AddRef();
   else if (isCoder2)
-    ((ICompressCoder2 *)*outObject)->AddRef();
+	((ICompressCoder2 *)*outObject)->AddRef();
   else
-    ((ICompressFilter *)*outObject)->AddRef();
+	((ICompressFilter *)*outObject)->AddRef();
   return S_OK;
   COM_TRY_END
 }
@@ -102,14 +102,14 @@ STDAPI CreateCoder(const GUID *clsid, const GUID *iid, void **outObject)
   bool isCoder2 = (*iid == IID_ICompressCoder2) != 0;
   bool isFilter = (*iid == IID_ICompressFilter) != 0;
   if (!isCoder && !isCoder2 && !isFilter)
-    return E_NOINTERFACE;
+	return E_NOINTERFACE;
   bool encode;
   int codecIndex;
   HRESULT res = FindCodecClassId(clsid, isCoder2, isFilter, encode, codecIndex);
   if (res != S_OK)
-    return res;
+	return res;
   if (codecIndex < 0)
-    return CLASS_E_CLASSNOTAVAILABLE;
+	return CLASS_E_CLASSNOTAVAILABLE;
   return CreateCoder2(encode, codecIndex, iid, outObject);
 }
 
@@ -119,33 +119,33 @@ STDAPI GetMethodProperty(UInt32 codecIndex, PROPID propID, PROPVARIANT *value)
   const CCodecInfo &codec = *g_Codecs[codecIndex];
   switch(propID)
   {
-    case NMethodPropID::kID:
-    {
-      value->uhVal.QuadPart = (UInt64)codec.Id;
-      value->vt = VT_UI8;
-      break;
-    }
-    case NMethodPropID::kName:
-      if ((value->bstrVal = ::SysAllocString(codec.Name)) != 0)
-        value->vt = VT_BSTR;
-      break;
-    case NMethodPropID::kDecoder:
-      if (codec.CreateDecoder)
-        return SetClassID(codec.Id, false, value);
-      break;
-    case NMethodPropID::kEncoder:
-      if (codec.CreateEncoder)
-        return SetClassID(codec.Id, true, value);
-      break;
-    case NMethodPropID::kInStreams:
-    {
-      if (codec.NumInStreams != 1)
-      {
-        value->vt = VT_UI4;
-        value->ulVal = codec.NumInStreams;
-      }
-      break;
-    }
+	case NMethodPropID::kID:
+	{
+	  value->uhVal.QuadPart = (UInt64)codec.Id;
+	  value->vt = VT_UI8;
+	  break;
+	}
+	case NMethodPropID::kName:
+	  if ((value->bstrVal = ::SysAllocString(codec.Name)) != 0)
+		value->vt = VT_BSTR;
+	  break;
+	case NMethodPropID::kDecoder:
+	  if (codec.CreateDecoder)
+		return SetClassID(codec.Id, false, value);
+	  break;
+	case NMethodPropID::kEncoder:
+	  if (codec.CreateEncoder)
+		return SetClassID(codec.Id, true, value);
+	  break;
+	case NMethodPropID::kInStreams:
+	{
+	  if (codec.NumInStreams != 1)
+	  {
+		value->vt = VT_UI4;
+		value->ulVal = codec.NumInStreams;
+	  }
+	  break;
+	}
   }
   return S_OK;
 }

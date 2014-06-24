@@ -1,4 +1,3 @@
-
 #ifndef VIEWLAYER_H
 #define VIEWLAYER_H
 
@@ -23,7 +22,7 @@ public:
 		m_type = WIDGET_VIEWLAYER;
 		m_parent = parent;
 	}
-	
+
 	void draw();
 	void drawover();
 	void inev(InEv* ev);

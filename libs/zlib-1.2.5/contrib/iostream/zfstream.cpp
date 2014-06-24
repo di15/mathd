@@ -11,45 +11,45 @@ gzfilebuf::~gzfilebuf() {
 
   sync();
   if ( own_file_descriptor )
-    close();
+	close();
 
 }
 
 gzfilebuf *gzfilebuf::open( const char *name,
-                            int io_mode ) {
+							int io_mode ) {
 
   if ( is_open() )
-    return NULL;
+	return NULL;
 
   char char_mode[10];
   char *p = char_mode;
 
   if ( io_mode & ios::in ) {
-    mode = ios::in;
-    *p++ = 'r';
+	mode = ios::in;
+	*p++ = 'r';
   } else if ( io_mode & ios::app ) {
-    mode = ios::app;
-    *p++ = 'a';
+	mode = ios::app;
+	*p++ = 'a';
   } else {
-    mode = ios::out;
-    *p++ = 'w';
+	mode = ios::out;
+	*p++ = 'w';
   }
 
   if ( io_mode & ios::binary ) {
-    mode |= ios::binary;
-    *p++ = 'b';
+	mode |= ios::binary;
+	*p++ = 'b';
   }
 
   // Hard code the compression level
   if ( io_mode & (ios::out|ios::app )) {
-    *p++ = '9';
+	*p++ = '9';
   }
 
   // Put the end-of-string indicator
   *p = '\0';
 
   if ( (file = gzopen(name, char_mode)) == NULL )
-    return NULL;
+	return NULL;
 
   own_file_descriptor = 1;
 
@@ -58,40 +58,40 @@ gzfilebuf *gzfilebuf::open( const char *name,
 }
 
 gzfilebuf *gzfilebuf::attach( int file_descriptor,
-                              int io_mode ) {
+							  int io_mode ) {
 
   if ( is_open() )
-    return NULL;
+	return NULL;
 
   char char_mode[10];
   char *p = char_mode;
 
   if ( io_mode & ios::in ) {
-    mode = ios::in;
-    *p++ = 'r';
+	mode = ios::in;
+	*p++ = 'r';
   } else if ( io_mode & ios::app ) {
-    mode = ios::app;
-    *p++ = 'a';
+	mode = ios::app;
+	*p++ = 'a';
   } else {
-    mode = ios::out;
-    *p++ = 'w';
+	mode = ios::out;
+	*p++ = 'w';
   }
 
   if ( io_mode & ios::binary ) {
-    mode |= ios::binary;
-    *p++ = 'b';
+	mode |= ios::binary;
+	*p++ = 'b';
   }
 
   // Hard code the compression level
   if ( io_mode & (ios::out|ios::app )) {
-    *p++ = '9';
+	*p++ = '9';
   }
 
   // Put the end-of-string indicator
   *p = '\0';
 
   if ( (file = gzdopen(file_descriptor, char_mode)) == NULL )
-    return NULL;
+	return NULL;
 
   own_file_descriptor = 0;
 
@@ -103,9 +103,9 @@ gzfilebuf *gzfilebuf::close() {
 
   if ( is_open() ) {
 
-    sync();
-    gzclose( file );
-    file = NULL;
+	sync();
+	gzclose( file );
+	file = NULL;
 
   }
 
@@ -136,24 +136,24 @@ int gzfilebuf::underflow() {
 
   // If the file hasn't been opened for reading, error.
   if ( !is_open() || !(mode & ios::in) )
-    return EOF;
+	return EOF;
 
   // if a buffer doesn't exists, allocate one.
   if ( !base() ) {
 
-    if ( (allocate()) == EOF )
-      return EOF;
-    setp(0,0);
+	if ( (allocate()) == EOF )
+	  return EOF;
+	setp(0,0);
 
   } else {
 
-    if ( in_avail() )
-      return (unsigned char) *gptr();
+	if ( in_avail() )
+	  return (unsigned char) *gptr();
 
-    if ( out_waiting() ) {
-      if ( flushbuf() == EOF )
-        return EOF;
-    }
+	if ( out_waiting() ) {
+	  if ( flushbuf() == EOF )
+		return EOF;
+	}
 
   }
 
@@ -161,9 +161,9 @@ int gzfilebuf::underflow() {
 
   int result = fillbuf();
   if ( result == EOF ) {
-    // disable get area
-    setg(0,0,0);
-    return EOF;
+	// disable get area
+	setg(0,0,0);
+	return EOF;
   }
 
   return (unsigned char) *gptr();
@@ -173,20 +173,20 @@ int gzfilebuf::underflow() {
 int gzfilebuf::overflow( int c ) {
 
   if ( !is_open() || !(mode & ios::out) )
-    return EOF;
+	return EOF;
 
   if ( !base() ) {
-    if ( allocate() == EOF )
-      return EOF;
-    setg(0,0,0);
+	if ( allocate() == EOF )
+	  return EOF;
+	setg(0,0,0);
   } else {
-    if (in_avail()) {
-        return EOF;
-    }
-    if (out_waiting()) {
-      if (flushbuf() == EOF)
-        return EOF;
-    }
+	if (in_avail()) {
+		return EOF;
+	}
+	if (out_waiting()) {
+	  if (flushbuf() == EOF)
+		return EOF;
+	}
   }
 
   int bl = blen();
@@ -194,8 +194,8 @@ int gzfilebuf::overflow( int c ) {
 
   if ( c != EOF ) {
 
-    *pptr() = c;
-    pbump(1);
+	*pptr() = c;
+	pbump(1);
 
   }
 
@@ -206,10 +206,10 @@ int gzfilebuf::overflow( int c ) {
 int gzfilebuf::sync() {
 
   if ( !is_open() )
-    return EOF;
+	return EOF;
 
   if ( out_waiting() )
-    return flushbuf();
+	return flushbuf();
 
   return 0;
 
@@ -224,7 +224,7 @@ int gzfilebuf::flushbuf() {
   n = pptr() - q;
 
   if ( gzwrite( file, q, n) < n )
-    return EOF;
+	return EOF;
 
   setp(0,0);
 
@@ -261,25 +261,25 @@ gzfilestream_common::~gzfilestream_common()
 void gzfilestream_common::attach( int fd, int io_mode ) {
 
   if ( !buffer.attach( fd, io_mode) )
-    clear( ios::failbit | ios::badbit );
+	clear( ios::failbit | ios::badbit );
   else
-    clear();
+	clear();
 
 }
 
 void gzfilestream_common::open( const char *name, int io_mode ) {
 
   if ( !buffer.open( name, io_mode ) )
-    clear( ios::failbit | ios::badbit );
+	clear( ios::failbit | ios::badbit );
   else
-    clear();
+	clear();
 
 }
 
 void gzfilestream_common::close() {
 
   if ( !buffer.close() )
-    clear( ios::failbit | ios::badbit );
+	clear( ios::failbit | ios::badbit );
 
 }
 

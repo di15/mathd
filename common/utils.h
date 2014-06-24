@@ -1,4 +1,3 @@
-
 #include "platform.h"
 
 using namespace std;

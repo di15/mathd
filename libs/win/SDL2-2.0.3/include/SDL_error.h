@@ -11,11 +11,11 @@
   freely, subject to the following restrictions:
 
   1. The origin of this software must not be misrepresented; you must not
-     claim that you wrote the original software. If you use this software
-     in a product, an acknowledgment in the product documentation would be
-     appreciated but is not required.
+	 claim that you wrote the original software. If you use this software
+	 in a product, an acknowledgment in the product documentation would be
+	 appreciated but is not required.
   2. Altered source versions must be plainly marked as such, and must not be
-     misrepresented as being the original software.
+	 misrepresented as being the original software.
   3. This notice may not be removed or altered from any source distribution.
 */
 
@@ -54,12 +54,12 @@ extern DECLSPEC void SDLCALL SDL_ClearError(void);
 #define SDL_InvalidParamError(param)    SDL_SetError("Parameter '%s' is invalid", (param))
 typedef enum
 {
-    SDL_ENOMEM,
-    SDL_EFREAD,
-    SDL_EFWRITE,
-    SDL_EFSEEK,
-    SDL_UNSUPPORTED,
-    SDL_LASTERROR
+	SDL_ENOMEM,
+	SDL_EFREAD,
+	SDL_EFWRITE,
+	SDL_EFSEEK,
+	SDL_UNSUPPORTED,
+	SDL_LASTERROR
 } SDL_errorcode;
 /* SDL_Error() unconditionally returns -1. */
 extern DECLSPEC int SDLCALL SDL_Error(SDL_errorcode code);

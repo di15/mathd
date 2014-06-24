@@ -48,16 +48,16 @@ private:
   void AddDigest();
 public:
   void Init(IArchiveUpdateCallback *updateCallback, 
-      const UInt32 *fileIndices, UInt32 numFiles);
+	  const UInt32 *fileIndices, UInt32 numFiles);
   CRecordVector<bool> Processed;
   CRecordVector<UInt32> CRCs;
   CRecordVector<UInt64> Sizes;
   UInt64 GetFullSize() const
   {
-    UInt64 size = 0;
-    for (int i = 0; i < Sizes.Size(); i++)      
-      size += Sizes[i];
-    return size;
+	UInt64 size = 0;
+	for (int i = 0; i < Sizes.Size(); i++)      
+	  size += Sizes[i];
+	return size;
   }
 };
 

@@ -11,11 +11,11 @@
   freely, subject to the following restrictions:
 
   1. The origin of this software must not be misrepresented; you must not
-     claim that you wrote the original software. If you use this software
-     in a product, an acknowledgment in the product documentation would be
-     appreciated but is not required.
+	 claim that you wrote the original software. If you use this software
+	 in a product, an acknowledgment in the product documentation would be
+	 appreciated but is not required.
   2. Altered source versions must be plainly marked as such, and must not be
-     misrepresented as being the original software.
+	 misrepresented as being the original software.
   3. This notice may not be removed or altered from any source distribution.
 */
 #include "SDL_config.h"
@@ -36,35 +36,35 @@
 
 typedef enum
 {
-    PENDING_FOCUS_NONE,
-    PENDING_FOCUS_IN,
-    PENDING_FOCUS_OUT
+	PENDING_FOCUS_NONE,
+	PENDING_FOCUS_IN,
+	PENDING_FOCUS_OUT
 } PendingFocusEnum;
 
 typedef struct
 {
-    SDL_Window *window;
-    Window xwindow;
-    Window fswindow;  /* used if we can't have the WM handle fullscreen. */
-    Visual *visual;
-    Colormap colormap;
+	SDL_Window *window;
+	Window xwindow;
+	Window fswindow;  /* used if we can't have the WM handle fullscreen. */
+	Visual *visual;
+	Colormap colormap;
 #ifndef NO_SHARED_MEMORY
-    /* MIT shared memory extension information */
-    SDL_bool use_mitshm;
-    XShmSegmentInfo shminfo;
+	/* MIT shared memory extension information */
+	SDL_bool use_mitshm;
+	XShmSegmentInfo shminfo;
 #endif
-    XImage *ximage;
-    GC gc;
-    XIC ic;
-    SDL_bool created;
-    PendingFocusEnum pending_focus;
-    Uint32 pending_focus_time;
-    XConfigureEvent last_xconfigure;
-    struct SDL_VideoData *videodata;
-    Atom xdnd_req;
-    Window xdnd_source;
+	XImage *ximage;
+	GC gc;
+	XIC ic;
+	SDL_bool created;
+	PendingFocusEnum pending_focus;
+	Uint32 pending_focus_time;
+	XConfigureEvent last_xconfigure;
+	struct SDL_VideoData *videodata;
+	Atom xdnd_req;
+	Window xdnd_source;
 #if SDL_VIDEO_OPENGL_EGL  
-    EGLSurface egl_surface;
+	EGLSurface egl_surface;
 #endif
 } SDL_WindowData;
 
@@ -92,7 +92,7 @@ extern int X11_SetWindowGammaRamp(_THIS, SDL_Window * window, const Uint16 * ram
 extern void X11_SetWindowGrab(_THIS, SDL_Window * window, SDL_bool grabbed);
 extern void X11_DestroyWindow(_THIS, SDL_Window * window);
 extern SDL_bool X11_GetWindowWMInfo(_THIS, SDL_Window * window,
-                                    struct SDL_SysWMinfo *info);
+									struct SDL_SysWMinfo *info);
 
 #endif /* _SDL_x11window_h */
 

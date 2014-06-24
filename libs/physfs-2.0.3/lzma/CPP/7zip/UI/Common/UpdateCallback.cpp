@@ -66,31 +66,31 @@ STDMETHODIMP CArchiveUpdateCallback::EnumProperties(IEnumSTATPROPSTG **)
   return E_NOTIMPL;
   /*
   return CStatPropEnumerator::CreateEnumerator(kProperties, 
-      sizeof(kProperties) / sizeof(kProperties[0]), enumerator);
+	  sizeof(kProperties) / sizeof(kProperties[0]), enumerator);
   */
 }
 
 STDMETHODIMP CArchiveUpdateCallback::GetUpdateItemInfo(UInt32 index, 
-      Int32 *newData, Int32 *newProperties, UInt32 *indexInArchive)
+	  Int32 *newData, Int32 *newProperties, UInt32 *indexInArchive)
 {
   COM_TRY_BEGIN
   RINOK(Callback->CheckBreak());
   const CUpdatePair2 &updatePair = (*UpdatePairs)[index];
   if(newData != NULL)
-    *newData = BoolToInt(updatePair.NewData);
+	*newData = BoolToInt(updatePair.NewData);
   if(newProperties != NULL)
-    *newProperties = BoolToInt(updatePair.NewProperties);
+	*newProperties = BoolToInt(updatePair.NewProperties);
   if(indexInArchive != NULL)
   {
-    if (updatePair.ExistInArchive)
-    {
-      if (ArchiveItems == 0)
-        *indexInArchive = updatePair.ArchiveItemIndex;
-      else
-        *indexInArchive = (*ArchiveItems)[updatePair.ArchiveItemIndex].IndexInServer;
-    }
-    else
-      *indexInArchive = UInt32(-1);
+	if (updatePair.ExistInArchive)
+	{
+	  if (ArchiveItems == 0)
+		*indexInArchive = updatePair.ArchiveItemIndex;
+	  else
+		*indexInArchive = (*ArchiveItems)[updatePair.ArchiveItemIndex].IndexInServer;
+	}
+	else
+	  *indexInArchive = UInt32(-1);
   }
   return S_OK;
   COM_TRY_END
@@ -104,76 +104,76 @@ STDMETHODIMP CArchiveUpdateCallback::GetProperty(UInt32 index, PROPID propID, PR
   
   if (propID == kpidIsAnti)
   {
-    propVariant = updatePair.IsAnti;
-    propVariant.Detach(value);
-    return S_OK;
+	propVariant = updatePair.IsAnti;
+	propVariant.Detach(value);
+	return S_OK;
   }
 
   if (updatePair.IsAnti)
   {
-    switch(propID)
-    {
-      case kpidIsFolder:
-      case kpidPath:
-        break;
-      case kpidSize:
-        propVariant = (UInt64)0;
-        propVariant.Detach(value);
-        return S_OK;
-      default:
-        propVariant.Detach(value);
-        return S_OK;
-    }
+	switch(propID)
+	{
+	  case kpidIsFolder:
+	  case kpidPath:
+		break;
+	  case kpidSize:
+		propVariant = (UInt64)0;
+		propVariant.Detach(value);
+		return S_OK;
+	  default:
+		propVariant.Detach(value);
+		return S_OK;
+	}
   }
   
   if(updatePair.ExistOnDisk)
   {
-    const CDirItem &dirItem = (*DirItems)[updatePair.DirItemIndex];
-    switch(propID)
-    {
-      case kpidPath:
-        propVariant = dirItem.Name;
-        break;
-      case kpidIsFolder:
-        propVariant = dirItem.IsDirectory();
-        break;
-      case kpidSize:
-        propVariant = dirItem.Size;
-        break;
-      case kpidAttributes:
-        propVariant = dirItem.Attributes;
-        break;
-      case kpidLastAccessTime:
-        propVariant = dirItem.LastAccessTime;
-        break;
-      case kpidCreationTime:
-        propVariant = dirItem.CreationTime;
-        break;
-      case kpidLastWriteTime:
-        propVariant = dirItem.LastWriteTime;
-        break;
-    }
+	const CDirItem &dirItem = (*DirItems)[updatePair.DirItemIndex];
+	switch(propID)
+	{
+	  case kpidPath:
+		propVariant = dirItem.Name;
+		break;
+	  case kpidIsFolder:
+		propVariant = dirItem.IsDirectory();
+		break;
+	  case kpidSize:
+		propVariant = dirItem.Size;
+		break;
+	  case kpidAttributes:
+		propVariant = dirItem.Attributes;
+		break;
+	  case kpidLastAccessTime:
+		propVariant = dirItem.LastAccessTime;
+		break;
+	  case kpidCreationTime:
+		propVariant = dirItem.CreationTime;
+		break;
+	  case kpidLastWriteTime:
+		propVariant = dirItem.LastWriteTime;
+		break;
+	}
   }
   else
   {
-    if (propID == kpidPath)
-    {
-      if (updatePair.NewNameIsDefined)
-      {
-        propVariant = updatePair.NewName;
-        propVariant.Detach(value);
-        return S_OK;
-      }
-    }
-    if (updatePair.ExistInArchive && Archive)
-    {
-      UInt32 indexInArchive;
-      if (ArchiveItems == 0)
-        indexInArchive = updatePair.ArchiveItemIndex;
-      else
-        indexInArchive = (*ArchiveItems)[updatePair.ArchiveItemIndex].IndexInServer;
-      return Archive->GetProperty(indexInArchive, propID, value);
-    }
+	if (propID == kpidPath)
+	{
+	  if (updatePair.NewNameIsDefined)
+	  {
+		propVariant = updatePair.NewName;
+		propVariant.Detach(value);
+		return S_OK;
+	  }
+	}
+	if (updatePair.ExistInArchive && Archive)
+	{
+	  UInt32 indexInArchive;
+	  if (ArchiveItems == 0)
+		indexInArchive = updatePair.ArchiveItemIndex;
+	  else
+		indexInArchive = (*ArchiveItems)[updatePair.ArchiveItemIndex].IndexInServer;
+	  return Archive->GetProperty(indexInArchive, propID, value);
+	}
   }
   propVariant.Detach(value);
   return S_OK;
@@ -185,37 +185,37 @@ STDMETHODIMP CArchiveUpdateCallback::GetStream(UInt32 index, ISequentialInStream
   COM_TRY_BEGIN
   const CUpdatePair2 &updatePair = (*UpdatePairs)[index];
   if(!updatePair.NewData)
-    return E_FAIL;
+	return E_FAIL;
   
   RINOK(Callback->CheckBreak());
   RINOK(Callback->Finilize());
 
   if(updatePair.IsAnti)
   {
-    return Callback->GetStream((*ArchiveItems)[updatePair.ArchiveItemIndex].Name, true);
+	return Callback->GetStream((*ArchiveItems)[updatePair.ArchiveItemIndex].Name, true);
   }
   const CDirItem &dirItem = (*DirItems)[updatePair.DirItemIndex];
   RINOK(Callback->GetStream(dirItem.Name, false));
  
   if(dirItem.IsDirectory())
-    return S_OK;
+	return S_OK;
 
   if (StdInMode)
   {
-    CStdInFileStream *inStreamSpec = new CStdInFileStream;
-    CMyComPtr<ISequentialInStream> inStreamLoc(inStreamSpec);
-    *inStream = inStreamLoc.Detach();
+	CStdInFileStream *inStreamSpec = new CStdInFileStream;
+	CMyComPtr<ISequentialInStream> inStreamLoc(inStreamSpec);
+	*inStream = inStreamLoc.Detach();
   }
   else
   {
-    CInFileStream *inStreamSpec = new CInFileStream;
-    CMyComPtr<ISequentialInStream> inStreamLoc(inStreamSpec);
-    UString path = DirPrefix + dirItem.FullPath;
-    if(!inStreamSpec->OpenShared(path, ShareForWrite))
-    {
-      return Callback->OpenFileError(path, ::GetLastError());
-    }
-    *inStream = inStreamLoc.Detach();
+	CInFileStream *inStreamSpec = new CInFileStream;
+	CMyComPtr<ISequentialInStream> inStreamLoc(inStreamSpec);
+	UString path = DirPrefix + dirItem.FullPath;
+	if(!inStreamSpec->OpenShared(path, ShareForWrite))
+	{
+	  return Callback->OpenFileError(path, ::GetLastError());
+	}
+	*inStream = inStreamLoc.Detach();
   }
   return S_OK;
   COM_TRY_END
@@ -231,9 +231,9 @@ STDMETHODIMP CArchiveUpdateCallback::SetOperationResult(Int32 operationResult)
 STDMETHODIMP CArchiveUpdateCallback::GetVolumeSize(UInt32 index, UInt64 *size)
 {
   if (VolumesSizes.Size() == 0)
-    return S_FALSE;
+	return S_FALSE;
   if (index >= (UInt32)VolumesSizes.Size())
-    index = VolumesSizes.Size() - 1;
+	index = VolumesSizes.Size() - 1;
   *size = VolumesSizes[index];
   return S_OK;
 }
@@ -245,7 +245,7 @@ STDMETHODIMP CArchiveUpdateCallback::GetVolumeStream(UInt32 index, ISequentialOu
   ConvertUInt64ToString(index + 1, temp);
   UString res = temp;
   while (res.Length() < 2)
-    res = UString(L'0') + res;
+	res = UString(L'0') + res;
   UString fileName = VolName;
   fileName += L'.';
   fileName += res;
@@ -253,7 +253,7 @@ STDMETHODIMP CArchiveUpdateCallback::GetVolumeStream(UInt32 index, ISequentialOu
   COutFileStream *streamSpec = new COutFileStream;
   CMyComPtr<ISequentialOutStream> streamLoc(streamSpec);
   if(!streamSpec->Create(fileName, false))
-    return ::GetLastError();
+	return ::GetLastError();
   *volumeStream = streamLoc.Detach();
   return S_OK;
   COM_TRY_END

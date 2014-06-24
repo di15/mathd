@@ -2,9 +2,6 @@
 
 
 
-
-
-
 #include "../utils.h"
 #include "shader.h"
 #include "../platform.h"
@@ -24,12 +21,12 @@ GLint Shader::getuniform(const char* strVariable)
 
 GLint Shader::getattrib(const char* strVariable)
 {
-    g_log<<"shader "<<(int)(this-g_shader)<<" attrib "<<strVariable<<" = ";
+	g_log<<"shader "<<(int)(this-g_shader)<<" attrib "<<strVariable<<" = ";
 
 	if(!m_program)
 		return -1;
 
-    g_log<<glGetAttribLocation(m_program, strVariable)<<endl;
+	g_log<<glGetAttribLocation(m_program, strVariable)<<endl;
 
 	return glGetAttribLocation(m_program, strVariable);
 }
@@ -83,39 +80,39 @@ void InitGLSL()
 	//strstr("abab", "ba");
 	glewExperimental = GL_TRUE;
 	GLenum glewError = glewInit();
-    if( glewError != GLEW_OK )
-    {
-        ErrorMessage("Error initializing GLEW!", (const char*)glewGetErrorString( glewError ));
-        return;
-    }
+	if( glewError != GLEW_OK )
+	{
+		ErrorMessage("Error initializing GLEW!", (const char*)glewGetErrorString( glewError ));
+		return;
+	}
 
 	g_log<<"Renderer: "<<(char*)glGetString(GL_RENDERER)<<endl;
 	g_log<<"GL_VERSION = "<<(char*)glGetString(GL_VERSION)<<endl;
 
 #if 0
-    //Make sure OpenGL 2.1 is supported
-    if( !GLEW_VERSION_2_1 )
-    {
-        ErrorMessage("Error", "OpenGL 2.1 not supported!\n" );
-        return;
-    }
+	//Make sure OpenGL 2.1 is supported
+	if( !GLEW_VERSION_2_1 )
+	{
+		ErrorMessage("Error", "OpenGL 2.1 not supported!\n" );
+		return;
+	}
 #elif 0
-    if( !GLEW_VERSION_3_2 )
-    {
-        ErrorMessage("Error", "OpenGL 3.2 not supported!\n" );
-        return;
-    }
+	if( !GLEW_VERSION_3_2 )
+	{
+		ErrorMessage("Error", "OpenGL 3.2 not supported!\n" );
+		return;
+	}
 #else
-    if( !GLEW_VERSION_3_0 )
-    {
-        ErrorMessage("Error", "OpenGL 3.0 not supported!\n" );
+	if( !GLEW_VERSION_3_0 )
+	{
+		ErrorMessage("Error", "OpenGL 3.0 not supported!\n" );
 		g_quit = true;
-        return;
-    }
+		return;
+	}
 #endif
 
 #if 1
-	char *szGLExtensions = (char*)glGetString(GL_EXTENSIONS);
+	char* szGLExtensions = (char*)glGetString(GL_EXTENSIONS);
 
 	g_log<<szGLExtensions<<endl;
 	g_log.flush();
@@ -198,8 +195,8 @@ void LoadShader(int shader, char* strVertex, char* strFragment)
 	strVShader = LoadTextFile(strVertex);
 	strFShader = LoadTextFile(strFragment);
 
-	const char *szVShader = strVShader.c_str();
-	const char *szFShader = strFShader.c_str();
+	const char* szVShader = strVShader.c_str();
+	const char* szFShader = strFShader.c_str();
 
 	glShaderSource(s->m_vertshader, 1, &szVShader, NULL);
 	glShaderSource(s->m_fragshader, 1, &szFShader, NULL);
@@ -207,9 +204,9 @@ void LoadShader(int shader, char* strVertex, char* strFragment)
 	glCompileShader(s->m_vertshader);
 	GLint logLength;
 	glGetShaderiv(s->m_vertshader, GL_INFO_LOG_LENGTH, &logLength);
-    if(logLength > 0)
-    {
-        GLchar *log = (GLchar *)malloc(logLength);
+	if(logLength > 0)
+	{
+		GLchar* log = (GLchar*)malloc(logLength);
 
 		if(!log)
 		{
@@ -217,16 +214,16 @@ void LoadShader(int shader, char* strVertex, char* strFragment)
 			return;
 		}
 
-        glGetShaderInfoLog(s->m_vertshader, logLength, &logLength, log);
-        g_log<<"Shader "<<strVertex<<" compile log: "<<endl<<log<<endl;
-        free(log);
-    }
+		glGetShaderInfoLog(s->m_vertshader, logLength, &logLength, log);
+		g_log<<"Shader "<<strVertex<<" compile log: "<<endl<<log<<endl;
+		free(log);
+	}
 
 	glCompileShader(s->m_fragshader);
 	glGetShaderiv(s->m_fragshader, GL_INFO_LOG_LENGTH, &logLength);
-    if(logLength > 0)
-    {
-        GLchar *log = (GLchar *)malloc(logLength);
+	if(logLength > 0)
+	{
+		GLchar* log = (GLchar*)malloc(logLength);
 
 		if(!log)
 		{
@@ -234,10 +231,10 @@ void LoadShader(int shader, char* strVertex, char* strFragment)
 			return;
 		}
 
-        glGetShaderInfoLog(s->m_fragshader, logLength, &logLength, log);
-        g_log<<"Shader "<<strFragment<<" compile log: "<<endl<<log<<endl;
-        free(log);
-    }
+		glGetShaderInfoLog(s->m_fragshader, logLength, &logLength, log);
+		g_log<<"Shader "<<strFragment<<" compile log: "<<endl<<log<<endl;
+		free(log);
+	}
 
 	s->m_program = glCreateProgram();
 	glAttachShader(s->m_program, s->m_vertshader);
@@ -251,8 +248,9 @@ void LoadShader(int shader, char* strVertex, char* strFragment)
 	g_log<<"Program "<<strVertex<<" / "<<strFragment<<" :";
 
 	glGetProgramiv(s->m_program, GL_INFO_LOG_LENGTH, &logLength);
-	if (logLength > 0) {
-		GLchar *log = (GLchar *)malloc(logLength);
+	if (logLength > 0)
+	{
+		GLchar* log = (GLchar*)malloc(logLength);
 		glGetProgramInfoLog(s->m_program, logLength, &logLength, log);
 		g_log<<"Program link log:"<<endl<<log<<endl;
 		free(log);
@@ -272,12 +270,12 @@ void LoadShader(int shader, char* strVertex, char* strFragment)
 	g_log<<endl<<endl;
 
 
-    s->mapattrib(SSLOT_POSITION, "position");
-    s->mapattrib(SSLOT_NORMAL, "normalIn");
-    s->mapattrib(SSLOT_TEXCOORD0, "texCoordIn0");
-    s->mapattrib(SSLOT_TEXCOORD1, "texCoordIn1");
+	s->mapattrib(SSLOT_POSITION, "position");
+	s->mapattrib(SSLOT_NORMAL, "normalIn");
+	s->mapattrib(SSLOT_TEXCOORD0, "texCoordIn0");
+	//s->mapattrib(SSLOT_TEXCOORD1, "texCoordIn1");
 	s->mapattrib(SSLOT_VERTCOLORS, "vertcolors");
-    //s->mapattrib(SSLOT_TANGENT, "tangent");
+	//s->mapattrib(SSLOT_TANGENT, "tangent");
 	s->mapuniform(SSLOT_SHADOWMAP, "shadowmap");
 	s->mapuniform(SSLOT_LIGHTMATRIX, "lightMatrix");
 	s->mapuniform(SSLOT_LIGHTPOS, "lightPos");
@@ -285,21 +283,21 @@ void LoadShader(int shader, char* strVertex, char* strFragment)
 	s->mapuniform(SSLOT_TEXTURE0, "texture0");
 	s->mapuniform(SSLOT_NORMALMAP, "normalmap");
 	s->mapuniform(SSLOT_SPECULARMAP, "specularmap");
-    s->mapuniform(SSLOT_PROJECTION, "projection");
-    s->mapuniform(SSLOT_MODELMAT, "model");
-    s->mapuniform(SSLOT_VIEWMAT, "view");
-    s->mapuniform(SSLOT_MVP, "mvp");
-    s->mapuniform(SSLOT_MODELVIEW, "modelview");
+	s->mapuniform(SSLOT_PROJECTION, "projection");
+	s->mapuniform(SSLOT_MODELMAT, "model");
+	s->mapuniform(SSLOT_VIEWMAT, "view");
+	s->mapuniform(SSLOT_MVP, "mvp");
+	s->mapuniform(SSLOT_MODELVIEW, "modelview");
 	s->mapuniform(SSLOT_NORMALMAT, "normalMat");
 	//s->mapuniform(SSLOT_INVMODLVIEWMAT, "invModelView");
-    s->mapuniform(SSLOT_COLOR, "color");
-    s->mapuniform(SSLOT_OWNCOLOR, "owncolor");
-    s->mapuniform(SSLOT_WIDTH, "width");
-    s->mapuniform(SSLOT_HEIGHT, "height");
-    s->mapuniform(SSLOT_MIND, "mind");
-    s->mapuniform(SSLOT_MAXD, "maxd");
-    s->mapuniform(SSLOT_CAMERAPOS, "cameraPos");
-    s->mapuniform(SSLOT_SCALE, "scale");
+	s->mapuniform(SSLOT_COLOR, "color");
+	s->mapuniform(SSLOT_OWNCOLOR, "owncolor");
+	s->mapuniform(SSLOT_WIDTH, "width");
+	s->mapuniform(SSLOT_HEIGHT, "height");
+	s->mapuniform(SSLOT_MIND, "mind");
+	s->mapuniform(SSLOT_MAXD, "maxd");
+	s->mapuniform(SSLOT_CAMERAPOS, "cameraPos");
+	s->mapuniform(SSLOT_SCALE, "scale");
 	s->mapuniform(SSLOT_MAXELEV, "maxelev");
 	s->mapuniform(SSLOT_SANDONLYMAXY, "sandonlymaxy");
 	s->mapuniform(SSLOT_SANDGRASSMAXY, "sandgrassmaxy");
@@ -331,7 +329,7 @@ void LoadShader(int shader, char* strVertex, char* strFragment)
 
 void UseS(int shader)
 {
-#ifdef DEBUG
+#ifdef GLDEBUG
 	CheckGLError(__FILE__, __LINE__);
 #endif
 	g_curS = shader;
@@ -340,29 +338,29 @@ void UseS(int shader)
 
 	//glUseProgramObject(g_shader[shader].m_program);
 	glUseProgram(s->m_program);
-#ifdef DEBUG
+#ifdef GLDEBUG
 	CheckGLError(__FILE__, __LINE__);
 #endif
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
-#ifdef DEBUG
+#ifdef GLDEBUG
 	CheckGLError(__FILE__, __LINE__);
 #endif
 	if(s->m_slot[SSLOT_POSITION] != -1)	glEnableVertexAttribArray(s->m_slot[SSLOT_POSITION]);
-#ifdef DEBUG
+#ifdef GLDEBUG
 	CheckGLError(__FILE__, __LINE__);
 #endif
 	if(s->m_slot[SSLOT_TEXCOORD0] != -1) glEnableVertexAttribArray(s->m_slot[SSLOT_TEXCOORD0]);
-#ifdef DEBUG
+#ifdef GLDEBUG
 	CheckGLError(__FILE__, __LINE__);
 #endif
 	if(s->m_slot[SSLOT_NORMAL] != -1)	glEnableVertexAttribArray(s->m_slot[SSLOT_NORMAL]);
-#ifdef DEBUG
+#ifdef GLDEBUG
 	CheckGLError(__FILE__, __LINE__);
 #endif
 
-	Player* py = &g_player[g_currP];
+	Player* py = &g_player[g_curP];
 
 	if(s->m_slot[SSLOT_MIND] != -1) glUniform1f(s->m_slot[SSLOT_MIND], MIN_DISTANCE);
 	if(s->m_slot[SSLOT_MAXD] != -1) glUniform1f(s->m_slot[SSLOT_MAXD], MAX_DISTANCE / py->zoom);
@@ -370,7 +368,7 @@ void UseS(int shader)
 
 void EndS()
 {
-#ifdef DEBUG
+#ifdef GLDEBUG
 	CheckGLError(__FILE__, __LINE__);
 #endif
 
@@ -379,19 +377,19 @@ void EndS()
 
 	Shader* s = &g_shader[g_curS];
 
-#ifdef DEBUG
+#ifdef GLDEBUG
 	CheckGLError(__FILE__, __LINE__);
 #endif
 	if(s->m_slot[SSLOT_POSITION] != -1)	glDisableVertexAttribArray(s->m_slot[SSLOT_POSITION]);
-#ifdef DEBUG
+#ifdef GLDEBUG
 	CheckGLError(__FILE__, __LINE__);
 #endif
 	if(s->m_slot[SSLOT_TEXCOORD0] != -1) glDisableVertexAttribArray(s->m_slot[SSLOT_TEXCOORD0]);
-#ifdef DEBUG
+#ifdef GLDEBUG
 	CheckGLError(__FILE__, __LINE__);
 #endif
 	if(s->m_slot[SSLOT_NORMAL] != -1)	glDisableVertexAttribArray(s->m_slot[SSLOT_NORMAL]);
-#ifdef DEBUG
+#ifdef GLDEBUG
 	CheckGLError(__FILE__, __LINE__);
 #endif
 

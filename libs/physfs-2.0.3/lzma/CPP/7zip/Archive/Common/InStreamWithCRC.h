@@ -28,9 +28,9 @@ public:
   void SetStream(ISequentialInStream *stream) { _stream = stream;  }
   void Init()
   {
-    _size = 0;
-    _wasFinished = false;
-    _crc = CRC_INIT_VAL;
+	_size = 0;
+	_wasFinished = false;
+	_crc = CRC_INIT_VAL;
   }
   void ReleaseStream() { _stream.Release(); }
   UInt32 GetCRC() const { return CRC_GET_DIGEST(_crc); }
@@ -56,9 +56,9 @@ public:
   void SetStream(IInStream *stream) { _stream = stream;  }
   void Init()
   {
-    _size = 0;
-    _wasFinished = false;
-    _crc = CRC_INIT_VAL;
+	_size = 0;
+	_wasFinished = false;
+	_crc = CRC_INIT_VAL;
   }
   void ReleaseStream() { _stream.Release(); }
   UInt32 GetCRC() const { return CRC_GET_DIGEST(_crc); }

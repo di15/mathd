@@ -1,5 +1,4 @@
 
-
 #ifndef BUILDPREVIEW_H
 #define BUILDPREVIEW_H
 
@@ -23,13 +22,13 @@ public:
 
 	Image left_outer_topleftcorner;
 	Image left_outer;
-	
+
 	Image right_outer_toprightcorner;
 	Image right_outer;
-	
+
 	Image middle_outer_top;
 	Image middle_outer_bottom;
-	
+
 	ViewportW viewport;
 
 	Image white_bg;

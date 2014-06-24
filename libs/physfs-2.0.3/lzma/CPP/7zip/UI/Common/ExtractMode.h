@@ -7,24 +7,24 @@ namespace NExtract {
   
   namespace NPathMode
   {
-    enum EEnum
-    {
-      kFullPathnames,
-      kCurrentPathnames,
-      kNoPathnames
-    };
+	enum EEnum
+	{
+	  kFullPathnames,
+	  kCurrentPathnames,
+	  kNoPathnames
+	};
   }
   
   namespace NOverwriteMode
   {
-    enum EEnum
-    {
-      kAskBefore,
-      kWithoutPrompt,
-      kSkipExisting,
-      kAutoRename,
-      kAutoRenameExisting
-    };
+	enum EEnum
+	{
+	  kAskBefore,
+	  kWithoutPrompt,
+	  kSkipExisting,
+	  kAutoRename,
+	  kAutoRenameExisting
+	};
   }
 }  
 

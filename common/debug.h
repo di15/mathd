@@ -1,6 +1,5 @@
 
 
-
 #ifndef DEBUG_H
 #define DEBUG_H
 
@@ -13,9 +12,37 @@ void LastNum(const char* l);
 void CheckGLError(const char* file, int line);
 
 
-enum PROFILE{FRAME, EVENT, UPDATE, DRAW, UPDATEUNITS, UPDATEBUILDINGS, UPDUONCHECK, UPDUNITAI, MOVEUNIT, ANIMUNIT, DRAWBUILDINGS, DRAWUNITS, DRAWRIM, DRAWWATER, DRAWCRPIPES, DRAWPOWLS, DRAWFOLIAGE, SORTPARTICLES, DRAWPARTICLES, DRAWMAP, SHADOWS, DRAWSKY, DRAWPOWERLINES, DRAWROADS, DRAWMODEL1, DRAWMODEL2, DRAWMODEL3, PROFILES};
+#define	TIMER_FRAME				0
+#define TIMER_EVENT				1
+#define TIMER_UPDATE			2
+#define TIMER_DRAW				3
+#define TIMER_DRAWSETUP			4
+#define TIMER_DRAWGUI			5
+#define TIMER_DRAWMINIMAP		6
+#define TIMER_UPDATEUNITS		7
+#define TIMER_UPDATEBUILDINGS	8
+#define TIMER_UPDUONCHECK		9
+#define TIMER_UPDUNITAI			10
+#define TIMER_MOVEUNIT			11
+#define TIMER_ANIMUNIT			12
+#define TIMER_DRAWBL			13
+#define TIMER_DRAWUNITS			14
+#define TIMER_DRAWRIM			15
+#define TIMER_DRAWWATER			16
+#define TIMER_DRAWCRPIPES		17
+#define TIMER_DRAWPOWLS			18
+#define TIMER_DRAWFOLIAGE		19
+#define TIMER_SORTPARTICLES		20
+#define TIMER_DRAWPARTICLES		21
+#define TIMER_DRAWMAP			22
+#define TIMER_DRAWSCENEDEPTH	23
+#define TIMER_DRAWSKY			24
+#define TIMER_DRAWROADS			25
+#define TIMER_DRAWMAPDEPTH		26
+#define TIMER_DRAWUNITSDEPTH	27
+#define TIMERS					28
 
-class Profile
+class Timer
 {
 public:
 	char name[64];
@@ -29,7 +56,7 @@ public:
 	int lastframeelapsed;
 	int inside;
 
-	Profile()
+	Timer()
 	{
 		averagems = 0.0;
 		lastframeelapsed = 0;
@@ -39,7 +66,7 @@ public:
 	}
 };
 
-extern Profile g_profile[PROFILES];
+extern Timer g_profile[TIMERS];
 
 void StartTimer(int id);
 void StopTimer(int id);

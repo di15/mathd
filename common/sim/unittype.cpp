@@ -1,4 +1,3 @@
-
 #include "unittype.h"
 #include "../texture.h"
 #include "resources.h"

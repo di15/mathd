@@ -22,9 +22,9 @@ public:
   MY_UNKNOWN_IMP
   void Init(const Byte *data, size_t size)
   {
-    Data = data;
-    Size = size;
-    Pos = 0;
+	Data = data;
+	Size = size;
+	Pos = 0;
   }
   STDMETHOD(Read)(void *data, UInt32 size, UInt32 *processedSize);
 };
@@ -32,12 +32,12 @@ public:
 STDMETHODIMP CInStreamRam::Read(void *data, UInt32 size, UInt32 *processedSize)
 {
   if (size > (Size - Pos))
-    size = (UInt32)(Size - Pos);
+	size = (UInt32)(Size - Pos);
   for (UInt32 i = 0; i < size; i++)
-    ((Byte *)data)[i] = Data[Pos + i];
+	((Byte *)data)[i] = Data[Pos + i];
   Pos += size;
   if(processedSize != NULL)
-    *processedSize = size;
+	*processedSize = size;
   return S_OK;
 }
   
@@ -52,26 +52,26 @@ public:
   bool Overflow;
   void Init(Byte *data, size_t size)
   {
-    Data = data;
-    Size = size;
-    Pos = 0;
-    Overflow = false;
+	Data = data;
+	Size = size;
+	Pos = 0;
+	Overflow = false;
   }
   void SetPos(size_t pos)
   {
-    Overflow = false;
-    Pos = pos;
+	Overflow = false;
+	Pos = pos;
   }
   MY_UNKNOWN_IMP
   HRESULT WriteByte(Byte b)
   {
-    if (Pos >= Size)
-    {
-      Overflow = true;
-      return E_FAIL;
-    }
-    Data[Pos++] = b;
-    return S_OK;
+	if (Pos >= Size)
+	{
+	  Overflow = true;
+	  return E_FAIL;
+	}
+	Data[Pos++] = b;
+	return S_OK;
   }
   STDMETHOD(Write)(const void *data, UInt32 size, UInt32 *processedSize);
 };
@@ -80,13 +80,13 @@ STDMETHODIMP COutStreamRam::Write(const void *data, UInt32 size, UInt32 *process
 {
   UInt32 i;
   for (i = 0; i < size && Pos < Size; i++)
-    Data[Pos++] = ((const Byte *)data)[i];
+	Data[Pos++] = ((const Byte *)data)[i];
   if(processedSize != NULL)
-    *processedSize = i;
+	*processedSize = i;
   if (i != size)
   {
-    Overflow = true;
-    return E_FAIL;
+	Overflow = true;
+	return E_FAIL;
   }
   return S_OK;
 }
@@ -96,9 +96,9 @@ STDMETHODIMP COutStreamRam::Write(const void *data, UInt32 size, UInt32 *process
 #define SZE_OUT_OVERFLOW (3)
 
 int LzmaRamEncode(
-    const Byte *inBuffer, size_t inSize, 
-    Byte *outBuffer, size_t outSize, size_t *outSizeProcessed, 
-    UInt32 dictionarySize, ESzFilterMode filterMode)
+	const Byte *inBuffer, size_t inSize, 
+	Byte *outBuffer, size_t outSize, size_t *outSizeProcessed, 
+	UInt32 dictionarySize, ESzFilterMode filterMode)
 {
   #ifndef _NO_EXCEPTIONS
   try { 
@@ -109,15 +109,15 @@ int LzmaRamEncode(
   const size_t kLzmaPropsSize = 5;
   const size_t kMinDestSize = kIdSize + kLzmaPropsSize + 8;
   if (outSize < kMinDestSize)
-    return SZE_OUT_OVERFLOW;
+	return SZE_OUT_OVERFLOW;
   NCompress::NLZMA::CEncoder *encoderSpec = new NCompress::NLZMA::CEncoder;
   CMyComPtr<ICompressCoder> encoder = encoderSpec;
 
   PROPID propIDs[] = 
   { 
-    NCoderPropID::kAlgorithm,
-    NCoderPropID::kDictionarySize,  
-    NCoderPropID::kNumFastBytes,
+	NCoderPropID::kAlgorithm,
+	NCoderPropID::kDictionarySize,  
+	NCoderPropID::kNumFastBytes,
   };
   const int kNumProps = sizeof(propIDs) / sizeof(propIDs[0]);
   PROPVARIANT properties[kNumProps];
@@ -129,32 +129,32 @@ int LzmaRamEncode(
   properties[2].ulVal = (UInt32)64;
 
   if (encoderSpec->SetCoderProperties(propIDs, properties, kNumProps) != S_OK)
-    return 1;
+	return 1;
   
   COutStreamRam *outStreamSpec = new COutStreamRam;
   if (outStreamSpec == 0)
-    return SZ_RAM_E_OUTOFMEMORY;
+	return SZ_RAM_E_OUTOFMEMORY;
   CMyComPtr<ISequentialOutStream> outStream = outStreamSpec;
   CInStreamRam *inStreamSpec = new CInStreamRam;
   if (inStreamSpec == 0)
-    return SZ_RAM_E_OUTOFMEMORY;
+	return SZ_RAM_E_OUTOFMEMORY;
   CMyComPtr<ISequentialInStream> inStream = inStreamSpec;
 
   outStreamSpec->Init(outBuffer, outSize);
   if (outStreamSpec->WriteByte(0) != S_OK)
-    return SZE_OUT_OVERFLOW;
+	return SZE_OUT_OVERFLOW;
 
   if (encoderSpec->WriteCoderProperties(outStream) != S_OK)
-    return SZE_OUT_OVERFLOW;
+	return SZE_OUT_OVERFLOW;
   if (outStreamSpec->Pos != kIdSize + kLzmaPropsSize)
-    return 1;
+	return 1;
   
   int i;
   for (i = 0; i < 8; i++)
   {
-    UInt64 t = (UInt64)(inSize);
-    if (outStreamSpec->WriteByte((Byte)((t) >> (8 * i))) != S_OK)
-      return SZE_OUT_OVERFLOW;
+	UInt64 t = (UInt64)(inSize);
+	if (outStreamSpec->WriteByte((Byte)((t) >> (8 * i))) != S_OK)
+	  return SZE_OUT_OVERFLOW;
   }
 
   Byte *filteredStream = 0;
@@ -162,16 +162,16 @@ int LzmaRamEncode(
   bool useFilter = (filterMode != SZ_FILTER_NO);
   if (useFilter)
   {
-    if (inSize != 0)
-    {
-      filteredStream = (Byte *)MyAlloc(inSize);
-      if (filteredStream == 0)
-        return SZ_RAM_E_OUTOFMEMORY;
-      memmove(filteredStream, inBuffer, inSize);
-    }
-    UInt32 x86State;
-    x86_Convert_Init(x86State);
-    x86_Convert(filteredStream, (SizeT)inSize, 0, &x86State, 1);
+	if (inSize != 0)
+	{
+	  filteredStream = (Byte *)MyAlloc(inSize);
+	  if (filteredStream == 0)
+		return SZ_RAM_E_OUTOFMEMORY;
+	  memmove(filteredStream, inBuffer, inSize);
+	}
+	UInt32 x86State;
+	x86_Convert_Init(x86State);
+	x86_Convert(filteredStream, (SizeT)inSize, 0, &x86State, 1);
   }
   
   size_t minSize = 0;
@@ -181,43 +181,43 @@ int LzmaRamEncode(
   size_t startPos = outStreamSpec->Pos;
   for (i = 0; i < numPasses; i++)
   {
-    if (numPasses > 1 && i == numPasses - 1 && !bestIsFiltered)
-      break;
-    outStreamSpec->SetPos(startPos);
-    bool curModeIsFiltered = false;
-    if (useFilter && i == 0)
-      curModeIsFiltered = true;
-    if (numPasses > 1 && i == numPasses - 1)
-      curModeIsFiltered = true;
+	if (numPasses > 1 && i == numPasses - 1 && !bestIsFiltered)
+	  break;
+	outStreamSpec->SetPos(startPos);
+	bool curModeIsFiltered = false;
+	if (useFilter && i == 0)
+	  curModeIsFiltered = true;
+	if (numPasses > 1 && i == numPasses - 1)
+	  curModeIsFiltered = true;
 
-    inStreamSpec->Init(curModeIsFiltered ? filteredStream : inBuffer, inSize);
-    
-    HRESULT lzmaResult = encoder->Code(inStream, outStream, 0, 0, 0);
-    
-    mainResult = 0;
-    if (lzmaResult == E_OUTOFMEMORY)
-    {
-      mainResult = SZ_RAM_E_OUTOFMEMORY;
-      break;
-    } 
-    if (i == 0 || outStreamSpec->Pos <= minSize)
-    {
-      minSize = outStreamSpec->Pos;
-      bestIsFiltered = curModeIsFiltered;
-    }
-    if (outStreamSpec->Overflow)
-      mainResult = SZE_OUT_OVERFLOW;
-    else if (lzmaResult != S_OK)
-    {
-      mainResult = SZ_RAM_E_FAIL;
-      break;
-    } 
+	inStreamSpec->Init(curModeIsFiltered ? filteredStream : inBuffer, inSize);
+	
+	HRESULT lzmaResult = encoder->Code(inStream, outStream, 0, 0, 0);
+	
+	mainResult = 0;
+	if (lzmaResult == E_OUTOFMEMORY)
+	{
+	  mainResult = SZ_RAM_E_OUTOFMEMORY;
+	  break;
+	} 
+	if (i == 0 || outStreamSpec->Pos <= minSize)
+	{
+	  minSize = outStreamSpec->Pos;
+	  bestIsFiltered = curModeIsFiltered;
+	}
+	if (outStreamSpec->Overflow)
+	  mainResult = SZE_OUT_OVERFLOW;
+	else if (lzmaResult != S_OK)
+	{
+	  mainResult = SZ_RAM_E_FAIL;
+	  break;
+	} 
   }
   *outSizeProcessed = outStreamSpec->Pos;
   if (bestIsFiltered)
-    outBuffer[0] = 1;
+	outBuffer[0] = 1;
   if (useFilter)
-    MyFree(filteredStream);
+	MyFree(filteredStream);
   return mainResult;
   
   #ifndef _NO_EXCEPTIONS

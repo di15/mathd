@@ -22,9 +22,9 @@ bool CFileBase::OpenBinary(const char *name, int flags)
 bool CFileBase::Close()
 {
   if(_handle == -1)
-    return true;
+	return true;
   if (close(_handle) != 0)
-    return false;
+	return false;
   _handle = -1;
   return true;
 }
@@ -68,9 +68,9 @@ bool COutFile::Create(const char *name, bool createAlways)
 {
   if (createAlways)
   {
-    Close();
-    _handle = ::creat(name, 0666);
-    return _handle != -1;
+	Close();
+	_handle = ::creat(name, 0666);
+	return _handle != -1;
   }
   return OpenBinary(name, O_CREAT | O_EXCL | O_WRONLY);
 }

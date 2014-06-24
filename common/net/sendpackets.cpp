@@ -21,71 +21,71 @@ void SendData(char* data, int size, struct sockaddr_in* paddr, bool reliable)
 #endif
 {
 #ifndef _SERVER
-    g_lastS = GetTickCount64();
+	g_lastS = GetTickCount64();
 #endif
 
 	if(reliable)
-    {
+	{
 #ifdef _SERVER
-        ((PacketHeader*)data)->ack = c->m_sendack;
+		((PacketHeader*)data)->ack = c->m_sendack;
 #else
-        ((PacketHeader*)data)->ack = g_sendack;
+		((PacketHeader*)data)->ack = g_sendack;
 #endif
-        OldPacket p;
-        p.buffer = new char[ size ];
-        p.len = size;
-        memcpy(p.buffer, data, size);
+		OldPacket p;
+		p.buffer = new char[ size ];
+		p.len = size;
+		memcpy(p.buffer, data, size);
 #ifdef _SERVER
 		memcpy((void*)&p.addr, (void*)paddr, sizeof(struct sockaddr_in));
 #endif
-        p.last = GetTickCount64();
+		p.last = GetTickCount64();
 		p.first = p.last;
-        g_sent.push_back(p);
+		g_sent.push_back(p);
 #ifdef _SERVER
-        c->m_sendack = NextAck(c->m_sendack);
+		c->m_sendack = NextAck(c->m_sendack);
 #else
-        g_sendack = NextAck(g_sendack);
+		g_sendack = NextAck(g_sendack);
 #endif
-    }
+	}
 
 #ifdef _SERVER
-    sendto(g_socket, data, size, 0, (struct sockaddr *)paddr, sizeof(struct sockaddr_in));
+	sendto(g_socket, data, size, 0, (struct sockaddr *)paddr, sizeof(struct sockaddr_in));
 #elif defined( _IOS )
-    // Address is NULL and the data is automatically sent to g_hostAddr by virtue of the fact that the socket is connected to that address
+	// Address is NULL and the data is automatically sent to g_hostAddr by virtue of the fact that the socket is connected to that address
 	ssize_t bytes = sendto(sock, data, size, 0, NULL, 0);
-    
-    int err;
-    int sock;
-    socklen_t addrLen;
+	
+	int err;
+	int sock;
+	socklen_t addrLen;
 	sock = CFSocketGetNative(g_cfSocket);
 
-    if(bytes < 0)
-        err = errno;
-    else if(bytes == 0)
-        err = EPIPE;
-    else
-        err = 0;
-    
-    if (err != 0)
-        NetError([NSError errorWithDomain:NSPOSIXErrorDomain code:err userInfo:nil]);
+	if(bytes < 0)
+		err = errno;
+	else if(bytes == 0)
+		err = EPIPE;
+	else
+		err = 0;
+	
+	if (err != 0)
+		NetError([NSError errorWithDomain:NSPOSIXErrorDomain code:err userInfo:nil]);
 #else
-    sendto(g_socket, data, size, 0, (struct sockaddr *)paddr, sizeof(struct sockaddr_in));
+	sendto(g_socket, data, size, 0, (struct sockaddr *)paddr, sizeof(struct sockaddr_in));
 #endif
 }
 
 void ResendPackets()
 {
-    OldPacket* p;
-    long long now = GetTickCount64();
-    long long due = now - RESEND_DELAY;
+	OldPacket* p;
+	long long now = GetTickCount64();
+	long long due = now - RESEND_DELAY;
 	long long expire = now - RESEND_EXPIRE;
-    
+	
 	auto i=g_sent.begin();
 	while(i!=g_sent.end())
-    {
-        p = &*i;
-        if(p->last > due)
-            continue;
+	{
+		p = &*i;
+		if(p->last > due)
+			continue;
 
 		if(p->first < expire)
 		{
@@ -98,15 +98,15 @@ void ResendPackets()
 
 			continue;
 		}
-        
+		
 #ifdef _SERVER
-        SendData(p->buffer, p->len, &p->addr, false, NULL);
+		SendData(p->buffer, p->len, &p->addr, false, NULL);
 #else
-        SendData(p->buffer, p->len, &g_sockaddr, false);
+		SendData(p->buffer, p->len, &g_sockaddr, false);
 #endif
-        p->last = now;
+		p->last = now;
 #ifdef _IOS
-        NSLog(@"Resent at %lld", now);
+		NSLog(@"Resent at %lld", now);
 #endif
 
 #ifdef _SERVER
@@ -115,7 +115,7 @@ void ResendPackets()
 #endif
 
 		i++;
-    }
+	}
 }
 
 #ifdef _SERVER
@@ -352,16 +352,16 @@ struct GarrisonPacket
 
 void Register(char* username, char* password, char* email)
 {
-    RegistrationPacket p;
-    p.header.type = PACKET_REGISTRATION;
-    //strcpy(p.username, [username UTF8String]);
-    //strcpy(p.email, [email UTF8String]);
-    //strcpy(p.password, [password UTF8String]);
-    strcpy(p.username, username);
-    strcpy(p.email, email);
-    strcpy(p.password, password);
+	RegistrationPacket p;
+	p.header.type = PACKET_REGISTRATION;
+	//strcpy(p.username, [username UTF8String]);
+	//strcpy(p.email, [email UTF8String]);
+	//strcpy(p.password, [password UTF8String]);
+	strcpy(p.username, username);
+	strcpy(p.email, email);
+	strcpy(p.password, password);
 
-    SendData((char*)&p, sizeof(struct RegistrationPacket), &g_sockaddr, true);
+	SendData((char*)&p, sizeof(struct RegistrationPacket), &g_sockaddr, true);
 }
 
 void Login(char* username, char* password)

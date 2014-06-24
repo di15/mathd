@@ -1,4 +1,3 @@
-
 #include "ms3d.h"
 #include "../texture.h"
 #include "../utils.h"
@@ -114,8 +113,8 @@ void MS3DModel::loadtex(unsigned int& diffm, unsigned int& specm, unsigned int& 
 				QueueTexture(&ownm, ownfile, false, true);
 			}
 		}
-		//else
-		//	m_pMaterials[i].m_diffusem = 0;
+	//else
+	//	m_pMaterials[i].m_diffusem = 0;
 }
 
 bool MS3DModel::load(const char *relative, unsigned int& diffm, unsigned int& specm, unsigned int& normm, unsigned int& ownm, bool dontqueue)
@@ -172,7 +171,7 @@ bool MS3DModel::load(const char *relative, unsigned int& diffm, unsigned int& sp
 	{
 		g_log << "Not an MS3D file "<< relative << endl;
 		return false;
-    }
+	}
 
 	if ( pHeader->m_version < 3 )
 	{
@@ -249,7 +248,8 @@ bool MS3DModel::load(const char *relative, unsigned int& diffm, unsigned int& sp
 		memcpy( m_pMaterials[i].m_specular, pMaterial->m_specular, sizeof( float )*4 );
 		memcpy( m_pMaterials[i].m_emissive, pMaterial->m_emissive, sizeof( float )*4 );
 		m_pMaterials[i].m_shininess = pMaterial->m_shininess;
-		if ( strncmp( pMaterial->m_diffusem, ".\\", 2 ) == 0 ) {
+		if ( strncmp( pMaterial->m_diffusem, ".\\", 2 ) == 0 )
+		{
 			// MS3D 1.5.x relative path
 			//StripPath(pMaterial->m_diffusem);
 			//m_pMaterials[i].m_pTextureFilename = new char[ strlen(relativepath.c_str()) + strlen(pMaterial->m_diffusem) + 1 ];
@@ -258,7 +258,8 @@ bool MS3DModel::load(const char *relative, unsigned int& diffm, unsigned int& sp
 			m_pMaterials[i].m_pTextureFilename = new char[strlen( pMaterial->m_diffusem )+1];
 			strcpy( m_pMaterials[i].m_pTextureFilename, pMaterial->m_diffusem );
 		}
-		else {
+		else
+		{
 			// MS3D 1.4.x or earlier - absolute path
 			m_pMaterials[i].m_pTextureFilename = new char[strlen( pMaterial->m_diffusem )+1];
 			strcpy( m_pMaterials[i].m_pTextureFilename, pMaterial->m_diffusem );
@@ -320,7 +321,8 @@ bool MS3DModel::load(const char *relative, unsigned int& diffm, unsigned int& sp
 					break;
 				}
 			}
-			if ( parentIndex == -1 ) {
+			if ( parentIndex == -1 )
+			{
 				g_log << "Unable to find parent bone in MS3D file" << endl;
 				return false;
 			}
@@ -505,7 +507,8 @@ void MS3DModel::genva(VertexArray** vertexArrays, Vec3f scale, Vec3f translate, 
 					Vec3f weighsum(0, 0, 0);
 
 					for(int l=0; l<normalweights[index].size(); l++)
-					{/*
+					{
+						/*
 						if(strstr(filepath, "flat"))
 						{
 							//g_log<<"weighsum + "<<normalweights[index][l].x<<","<<normalweights[index][l].y<<","<<normalweights[index][l].z<<endl;
@@ -548,7 +551,7 @@ void MS3DModel::genva(VertexArray** vertexArrays, Vec3f scale, Vec3f translate, 
 void MS3DModel::setjointkf( int jointIndex, int keyframeIndex, float time, float *parameter, bool isRotation )
 {
 	Keyframe& keyframe = isRotation ? m_pJoints[jointIndex].m_pRotationKeyframes[keyframeIndex] :
-		m_pJoints[jointIndex].m_pTranslationKeyframes[keyframeIndex];
+						 m_pJoints[jointIndex].m_pTranslationKeyframes[keyframeIndex];
 
 	keyframe.m_jointIndex = jointIndex;
 	keyframe.m_time = time;
@@ -586,11 +589,14 @@ void MS3DModel::setupjoints()
 		}
 	}
 
-	for ( i = 0; i < m_numTriangles; i++ ) {
+	for ( i = 0; i < m_numTriangles; i++ )
+	{
 		Triangle& triangle = m_pTriangles[i];
-		for ( int j = 0; j < 3; j++ ) {
+		for ( int j = 0; j < 3; j++ )
+		{
 			const Vertex& vertex = m_pVertices[triangle.m_vertexIndices[j]];
-			if ( vertex.m_boneID != -1 ) {
+			if ( vertex.m_boneID != -1 )
+			{
 				Matrix& matrix = m_pJoints[vertex.m_boneID].m_absolute;
 				matrix.inverseRotateVect( triangle.m_vertexNormals[j] );
 			}

@@ -13,7 +13,7 @@ class CLockedInStream
   NWindows::NSynchronization::CCriticalSection _criticalSection;
 public:
   void Init(IInStream *stream)
-    { _stream = stream; }
+	{ _stream = stream; }
   HRESULT Read(UInt64 startPos, void *data, UInt32 size, UInt32 *processedSize);
 };
 
@@ -26,8 +26,8 @@ class CLockedSequentialInStreamImp:
 public:
   void Init(CLockedInStream *lockedInStream, UInt64 startPos)
   {
-    _lockedInStream = lockedInStream;
-    _pos = startPos;
+	_lockedInStream = lockedInStream;
+	_pos = startPos;
   }
 
   MY_UNKNOWN_IMP

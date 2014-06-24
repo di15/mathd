@@ -1,4 +1,3 @@
-
 #include "projectile.h"
 #include "../texture.h"
 #include "../utils.h"
@@ -42,7 +41,7 @@ void NewProjectile(Vec3f start, Vec3f end, int type)
 
 void DrawProjectiles()
 {
-	Player* py = &g_player[g_currP];
+	Player* py = &g_player[g_curP];
 	Camera* cam = &py->camera;
 
 	Projectile* proj;

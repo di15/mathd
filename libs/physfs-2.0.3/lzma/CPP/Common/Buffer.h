@@ -13,9 +13,9 @@ protected:
 public:
   void Free()
   {
-    delete []_items;
-    _items = 0;
-    _capacity = 0;
+	delete []_items;
+	_items = 0;
+	_capacity = 0;
   }
   CBuffer(): _capacity(0), _items(0) {};
   CBuffer(const CBuffer &buffer): _capacity(0), _items(0) { *this = buffer; }
@@ -26,30 +26,30 @@ public:
   size_t GetCapacity() const { return  _capacity; }
   void SetCapacity(size_t newCapacity)
   {
-    if (newCapacity == _capacity)
-      return;
-    T *newBuffer;
-    if (newCapacity > 0)
-    {
-      newBuffer = new T[newCapacity];
-      if(_capacity > 0)
-        memmove(newBuffer, _items, MyMin(_capacity, newCapacity) * sizeof(T));
-    }
-    else
-      newBuffer = 0;
-    delete []_items;
-    _items = newBuffer;
-    _capacity = newCapacity;
+	if (newCapacity == _capacity)
+	  return;
+	T *newBuffer;
+	if (newCapacity > 0)
+	{
+	  newBuffer = new T[newCapacity];
+	  if(_capacity > 0)
+		memmove(newBuffer, _items, MyMin(_capacity, newCapacity) * sizeof(T));
+	}
+	else
+	  newBuffer = 0;
+	delete []_items;
+	_items = newBuffer;
+	_capacity = newCapacity;
   }
   CBuffer& operator=(const CBuffer &buffer)
   {
-    Free();
-    if(buffer._capacity > 0)
-    {
-      SetCapacity(buffer._capacity);
-      memmove(_items, buffer._items, buffer._capacity * sizeof(T));
-    }
-    return *this;
+	Free();
+	if(buffer._capacity > 0)
+	{
+	  SetCapacity(buffer._capacity);
+	  memmove(_items, buffer._items, buffer._capacity * sizeof(T));
+	}
+	return *this;
   }
 };
 
@@ -57,10 +57,10 @@ template <class T>
 bool operator==(const CBuffer<T>& b1, const CBuffer<T>& b2)
 {
   if (b1.GetCapacity() != b2.GetCapacity())
-    return false;
+	return false;
   for (size_t i = 0; i < b1.GetCapacity(); i++)
-    if (b1[i] != b2[i])
-      return false;
+	if (b1[i] != b2[i])
+	  return false;
   return true;
 }
 

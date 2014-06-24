@@ -154,7 +154,6 @@
 		<Unit filename="common/gui/widgets/vscrollbar.h" />
 		<Unit filename="common/gui/widgets/windoww.cpp" />
 		<Unit filename="common/gui/widgets/windoww.h" />
-		<Unit filename="common/keycodes.h" />
 		<Unit filename="common/math/3dmath.cpp" />
 		<Unit filename="common/math/3dmath.h" />
 		<Unit filename="common/math/barycentric.cpp" />

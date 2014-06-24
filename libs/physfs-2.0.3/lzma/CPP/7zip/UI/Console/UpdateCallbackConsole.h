@@ -27,23 +27,23 @@ public:
 
 
   CUpdateCallbackConsole(): 
-      m_PercentPrinter(1 << 16),
-      PasswordIsDefined(false),
-      AskPassword(false),
-      StdOutMode(false),
-      EnablePercents(true),
-      m_WarningsMode(false)
-      {}
+	  m_PercentPrinter(1 << 16),
+	  PasswordIsDefined(false),
+	  AskPassword(false),
+	  StdOutMode(false),
+	  EnablePercents(true),
+	  m_WarningsMode(false)
+	  {}
   
   ~CUpdateCallbackConsole() { Finilize(); }
   void Init(CStdOutStream *outStream)
   {
-    m_NeedBeClosed = false;
-    m_NeedNewLine = false;
-    FailedFiles.Clear();
-    FailedCodes.Clear();
-    OutStream = outStream;
-    m_PercentPrinter.OutStream = outStream;
+	m_NeedBeClosed = false;
+	m_NeedNewLine = false;
+	FailedFiles.Clear();
+	FailedCodes.Clear();
+	OutStream = outStream;
+	m_PercentPrinter.OutStream = outStream;
   }
 
   INTERFACE_IUpdateCallbackUI2(;)

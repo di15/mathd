@@ -1,5 +1,4 @@
 
-
 #include "../widget.h"
 #include "barbutton.h"
 #include "button.h"
@@ -117,7 +116,7 @@ void EditBox::frameupd()
 	g_log.flush();
 #endif
 
-	Player* py = &g_player[g_currP];
+	Player* py = &g_player[g_curP];
 
 	if(m_ldown)
 	{
@@ -181,7 +180,7 @@ void EditBox::inev(InEv* ev)
 	//g_log.flush();
 //#endif
 
-	Player* py = &g_player[g_currP];
+	Player* py = &g_player[g_curP];
 
 	if(ev->type == INEV_MOUSEMOVE)
 	{
@@ -476,11 +475,11 @@ void EditBox::inev(InEv* ev)
 			else
 #endif
 				unsigned int* ustr = ToUTF32((const unsigned char*)ev->text.c_str(), ev->text.length());
-				//RichText addstr(RichTextP(UString(ustr)));	//Why does MSVS2012 not accept this?
-				RichText addstr = RichText(RichTextP(UString(ustr)));
-				delete [] ustr;
+			//RichText addstr(RichTextP(UString(ustr)));	//Why does MSVS2012 not accept this?
+			RichText addstr = RichText(RichTextP(UString(ustr)));
+			delete [] ustr;
 
-				placestr(&addstr);
+			placestr(&addstr);
 		}
 
 		if(changefunc != NULL)
@@ -753,7 +752,7 @@ void EditBox::gainfocus()
 {
 	if(!m_opened)
 	{
-		Player* py = &g_player[g_currP];
+		Player* py = &g_player[g_curP];
 
 		if(py->kbfocus > 0)
 		{
@@ -777,7 +776,7 @@ void EditBox::losefocus()
 {
 	if(m_opened)
 	{
-		Player* py = &g_player[g_currP];
+		Player* py = &g_player[g_curP];
 
 		if(py->kbfocus > 0)
 		{

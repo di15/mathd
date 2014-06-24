@@ -1,5 +1,4 @@
 
-
 #include "pathnode.h"
 #include "collidertile.h"
 #include "../math/vec2i.h"
@@ -24,9 +23,9 @@
 #include "pathdebug.h"
 
 void PartialPath(int utype, int umode, int cmstartx, int cmstartz, int target, int target2, int targtype,
-			  std::list<Vec2i> *path, Vec2i *subgoal, Unit* thisu, Unit* ignoreu, Building* ignoreb,
-			  int cmgoalx, int cmgoalz, int cmgoalminx, int cmgoalminz, int cmgoalmaxx, int cmgoalmaxz,
-			  int maxsearch)
+				 std::list<Vec2i> *path, Vec2i *subgoal, Unit* thisu, Unit* ignoreu, Building* ignoreb,
+				 int cmgoalx, int cmgoalz, int cmgoalminx, int cmgoalminz, int cmgoalmaxx, int cmgoalmaxz,
+				 int maxsearch)
 {
 	UnitT* ut = &g_unitT[utype];
 
@@ -101,28 +100,28 @@ void IdentifySuccessors_QP(PathJob* pj, PathNode* node)
 	if(node->previous)
 		runningD = node->previous->totalD;
 
-    bool standable[DIRS];
+	bool standable[DIRS];
 
-    for(int i=0; i<DIRS; i++)
-        standable[i] = Standable(pj, npos.x + offsets[i].x, npos.y + offsets[i].y);
+	for(int i=0; i<DIRS; i++)
+		standable[i] = Standable(pj, npos.x + offsets[i].x, npos.y + offsets[i].y);
 
-    bool passable[DIRS];
+	bool passable[DIRS];
 
-    passable[DIR_NW] = standable[DIR_NW] && standable[DIR_N] && standable[DIR_W];
-    passable[DIR_N] = standable[DIR_N];
-    passable[DIR_NE] = standable[DIR_NE] && standable[DIR_N] && standable[DIR_E];
-    passable[DIR_E] = standable[DIR_E];
-    passable[DIR_SE] = standable[DIR_SE] && standable[DIR_S] && standable[DIR_E];
-    passable[DIR_S] = standable[DIR_S];
-    passable[DIR_SW] = standable[DIR_SW] && standable[DIR_S] && standable[DIR_W];
-    passable[DIR_W] = standable[DIR_W];
+	passable[DIR_NW] = standable[DIR_NW] && standable[DIR_N] && standable[DIR_W];
+	passable[DIR_N] = standable[DIR_N];
+	passable[DIR_NE] = standable[DIR_NE] && standable[DIR_N] && standable[DIR_E];
+	passable[DIR_E] = standable[DIR_E];
+	passable[DIR_SE] = standable[DIR_SE] && standable[DIR_S] && standable[DIR_E];
+	passable[DIR_S] = standable[DIR_S];
+	passable[DIR_SW] = standable[DIR_SW] && standable[DIR_S] && standable[DIR_W];
+	passable[DIR_W] = standable[DIR_W];
 
-    for(int i=0; i<DIRS; i++)
-    {
-        if(!passable[i])
-            continue;
+	for(int i=0; i<DIRS; i++)
+	{
+		if(!passable[i])
+			continue;
 
-        int newD = runningD + stepdist[i];
+		int newD = runningD + stepdist[i];
 
 		Vec2i nextnpos(npos.x + offsets[i].x, npos.y + offsets[i].y);
 		PathNode* nextn = PathNodeAt(nextnpos.x, nextnpos.y);
@@ -145,5 +144,5 @@ void IdentifySuccessors_QP(PathJob* pj, PathNode* node)
 				g_openlist.heapify(nextn);
 			}
 		}
-    }
+	}
 }

@@ -1,5 +1,4 @@
 
-
 #include "binheap.h"
 #include "pathnode.h"
 #include "../utils.h"
@@ -116,12 +115,12 @@ void Heap::heapify(PathNode* element)
 				break;
 			}
 
-			if(found)
-			{
-				heapifydown(i);
-				heapifydown(i);
-			}
-			return;
+		if(found)
+		{
+			heapifydown(i);
+			heapifydown(i);
+		}
+		return;
 	}
 	for(int i = floor(heap.size()/2); i; i--)
 	{
@@ -136,7 +135,8 @@ void Heap::print()
 {
 	std::vector<int>::iterator pos = heap.begin();
 	cout << "Heap = ";
-	while ( pos != heap.end() ) {
+	while ( pos != heap.end() )
+	{
 		cout << *pos << " ";
 		++pos;
 	}
@@ -151,7 +151,7 @@ void Heap::heapifyup(int index)
 	//cout << "heap[parent(index)]=" << heap[parent(index)] << endl;
 	//cout << "heap[index]=" << heap[index] << endl;
 	while ( ( index > 0 ) && ( parent(index) >= 0 ) &&
-		( heap[parent(index)]->F > heap[index]->F ) )
+			( heap[parent(index)]->F > heap[index]->F ) )
 	{
 		PathNode* tmp = heap[parent(index)];
 		heap[parent(index)] = heap[index];
@@ -167,7 +167,7 @@ void Heap::heapifydown(int index)
 	//cout << "right(index)=" << right(index) << endl;
 	int child = left(index);
 	if ( ( child > 0 ) && ( right(index) > 0 ) &&
-		( heap[child]->F > heap[right(index)]->F ) )
+			( heap[child]->F > heap[right(index)]->F ) )
 	{
 		child = right(index);
 	}

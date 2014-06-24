@@ -7,10 +7,10 @@
 #include "../Common/LoadCodecs.h"
 
 HRESULT ListArchives(
-    CCodecs *codecs,
-    UStringVector &archivePaths, UStringVector &archivePathsFull,
-    const NWildcard::CCensorNode &wildcardCensor,
-    bool enableHeaders, bool techMode, bool &passwordEnabled, UString &password, UInt64 &errors);
+	CCodecs *codecs,
+	UStringVector &archivePaths, UStringVector &archivePathsFull,
+	const NWildcard::CCensorNode &wildcardCensor,
+	bool enableHeaders, bool techMode, bool &passwordEnabled, UString &password, UInt64 &errors);
 
 #endif
 

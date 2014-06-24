@@ -1,4 +1,3 @@
-
 #include "platform.h"
 
 #ifdef PLATFORM_WIN

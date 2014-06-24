@@ -33,18 +33,18 @@ public:
   HRESULT Flush();
   void ReleaseStreams()
   {
-    _mainStream.ReleaseStream();
-    _callStream.ReleaseStream();
-    _jumpStream.ReleaseStream();
-    _rangeEncoder.ReleaseStream();
+	_mainStream.ReleaseStream();
+	_callStream.ReleaseStream();
+	_jumpStream.ReleaseStream();
+	_rangeEncoder.ReleaseStream();
   }
 
   class CCoderReleaser
   {
-    CEncoder *_coder;
+	CEncoder *_coder;
   public:
-    CCoderReleaser(CEncoder *coder): _coder(coder) {}
-    ~CCoderReleaser() {  _coder->ReleaseStreams(); }
+	CCoderReleaser(CEncoder *coder): _coder(coder) {}
+	~CCoderReleaser() {  _coder->ReleaseStreams(); }
   };
 
 public: 
@@ -52,19 +52,19 @@ public:
   MY_UNKNOWN_IMP
 
   HRESULT CodeReal(ISequentialInStream **inStreams,
-      const UInt64 **inSizes,
-      UInt32 numInStreams,
-      ISequentialOutStream **outStreams,
-      const UInt64 **outSizes,
-      UInt32 numOutStreams,
-      ICompressProgressInfo *progress);
+	  const UInt64 **inSizes,
+	  UInt32 numInStreams,
+	  ISequentialOutStream **outStreams,
+	  const UInt64 **outSizes,
+	  UInt32 numOutStreams,
+	  ICompressProgressInfo *progress);
   STDMETHOD(Code)(ISequentialInStream **inStreams,
-      const UInt64 **inSizes,
-      UInt32 numInStreams,
-      ISequentialOutStream **outStreams,
-      const UInt64 **outSizes,
-      UInt32 numOutStreams,
-      ICompressProgressInfo *progress);
+	  const UInt64 **inSizes,
+	  UInt32 numInStreams,
+	  ISequentialOutStream **outStreams,
+	  const UInt64 **outSizes,
+	  UInt32 numOutStreams,
+	  ICompressProgressInfo *progress);
 }; 
 
 #endif
@@ -84,38 +84,38 @@ public:
 
   void ReleaseStreams()
   {
-    _mainInStream.ReleaseStream();
-    _callStream.ReleaseStream();
-    _jumpStream.ReleaseStream();
-    _rangeDecoder.ReleaseStream();
-    _outStream.ReleaseStream();
+	_mainInStream.ReleaseStream();
+	_callStream.ReleaseStream();
+	_jumpStream.ReleaseStream();
+	_rangeDecoder.ReleaseStream();
+	_outStream.ReleaseStream();
   }
 
   HRESULT Flush() { return _outStream.Flush(); }
   class CCoderReleaser
   {
-    CDecoder *_coder;
+	CDecoder *_coder;
   public:
-    CCoderReleaser(CDecoder *coder): _coder(coder) {}
-    ~CCoderReleaser()  { _coder->ReleaseStreams(); }
+	CCoderReleaser(CDecoder *coder): _coder(coder) {}
+	~CCoderReleaser()  { _coder->ReleaseStreams(); }
   };
 
 public: 
   MY_UNKNOWN_IMP
   HRESULT CodeReal(ISequentialInStream **inStreams,
-      const UInt64 **inSizes,
-      UInt32 numInStreams,
-      ISequentialOutStream **outStreams,
-      const UInt64 **outSizes,
-      UInt32 numOutStreams,
-      ICompressProgressInfo *progress);
+	  const UInt64 **inSizes,
+	  UInt32 numInStreams,
+	  ISequentialOutStream **outStreams,
+	  const UInt64 **outSizes,
+	  UInt32 numOutStreams,
+	  ICompressProgressInfo *progress);
   STDMETHOD(Code)(ISequentialInStream **inStreams,
-      const UInt64 **inSizes,
-      UInt32 numInStreams,
-      ISequentialOutStream **outStreams,
-      const UInt64 **outSizes,
-      UInt32 numOutStreams,
-      ICompressProgressInfo *progress);
+	  const UInt64 **inSizes,
+	  UInt32 numInStreams,
+	  ISequentialOutStream **outStreams,
+	  const UInt64 **outSizes,
+	  UInt32 numOutStreams,
+	  ICompressProgressInfo *progress);
 }; 
 
 }}

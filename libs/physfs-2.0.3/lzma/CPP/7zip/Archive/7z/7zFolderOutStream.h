@@ -44,13 +44,13 @@ private:
   HRESULT WriteEmptyFiles();
 public:
   HRESULT Init(
-      const CArchiveDatabaseEx *archiveDatabase,
-      UInt32 ref2Offset,
-      UInt32 startIndex,
-      const CBoolVector *extractStatuses, 
-      IArchiveExtractCallback *extractCallback,
-      bool testMode,
-      bool checkCrc);
+	  const CArchiveDatabaseEx *archiveDatabase,
+	  UInt32 ref2Offset,
+	  UInt32 startIndex,
+	  const CBoolVector *extractStatuses, 
+	  IArchiveExtractCallback *extractCallback,
+	  bool testMode,
+	  bool checkCrc);
   HRESULT FlushCorrupted(Int32 resultEOperationResult);
   HRESULT WasWritingFinished();
 };

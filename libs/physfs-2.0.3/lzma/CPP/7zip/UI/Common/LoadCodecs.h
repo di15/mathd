@@ -60,40 +60,40 @@ struct CArcInfoEx
   bool KeepName;
   UString GetMainExt() const
   {
-    if (Exts.IsEmpty())
-      return UString();
-    return Exts[0].Ext;
+	if (Exts.IsEmpty())
+	  return UString();
+	return Exts[0].Ext;
   }
   int FindExtension(const UString &ext) const
   {
-    for (int i = 0; i < Exts.Size(); i++)
-      if (ext.CompareNoCase(Exts[i].Ext) == 0)
-        return i;
-    return -1;
+	for (int i = 0; i < Exts.Size(); i++)
+	  if (ext.CompareNoCase(Exts[i].Ext) == 0)
+		return i;
+	return -1;
   }
   UString GetAllExtensions() const
   {
-    UString s;
-    for (int i = 0; i < Exts.Size(); i++)
-    {
-      if (i > 0)
-        s += ' ';
-      s += Exts[i].Ext;
-    }
-    return s;
+	UString s;
+	for (int i = 0; i < Exts.Size(); i++)
+	{
+	  if (i > 0)
+		s += ' ';
+	  s += Exts[i].Ext;
+	}
+	return s;
   }
 
   void AddExts(const wchar_t* ext, const wchar_t* addExt);
 
   CArcInfoEx(): 
-    #ifdef EXTERNAL_CODECS
-    LibIndex(-1),
-    #endif
-    UpdateEnabled(false),
-    CreateInArchive(0), CreateOutArchive(0),
-    KeepName(false)
-    #ifndef _SFX
-    #endif
+	#ifdef EXTERNAL_CODECS
+	LibIndex(-1),
+	#endif
+	UpdateEnabled(false),
+	CreateInArchive(0), CreateOutArchive(0),
+	KeepName(false)
+	#ifndef _SFX
+	#endif
   {}
 };
 
@@ -110,8 +110,8 @@ struct CCodecLib
   #ifdef NEW_FOLDER_INTERFACE
   struct CIconPair
   {
-    UString Ext;
-    UInt32 IconIndex;
+	UString Ext;
+	UInt32 IconIndex;
   };
   CSysString Path;
   CObjectVector<CIconPair> IconPairs;
@@ -141,7 +141,7 @@ public:
 
   HRESULT CreateArchiveHandler(const CArcInfoEx &ai, void **archive, bool outHandler) const
   {
-    return Libs[ai.LibIndex].CreateObject(&ai.ClassID, outHandler ? &IID_IOutArchive : &IID_IInArchive, (void **)archive);
+	return Libs[ai.LibIndex].CreateObject(&ai.ClassID, outHandler ? &IID_IOutArchive : &IID_IInArchive, (void **)archive);
   }
   #endif
 
@@ -167,43 +167,43 @@ public:
 
   HRESULT CreateInArchive(int formatIndex, CMyComPtr<IInArchive> &archive) const
   { 
-    const CArcInfoEx &ai = Formats[formatIndex]; 
-    #ifdef EXTERNAL_CODECS
-    if (ai.LibIndex < 0)
-    #endif
-    {
-      archive = ai.CreateInArchive();
-      return S_OK;
-    }
-    #ifdef EXTERNAL_CODECS
-    return CreateArchiveHandler(ai, (void **)&archive, false); 
-    #endif
+	const CArcInfoEx &ai = Formats[formatIndex]; 
+	#ifdef EXTERNAL_CODECS
+	if (ai.LibIndex < 0)
+	#endif
+	{
+	  archive = ai.CreateInArchive();
+	  return S_OK;
+	}
+	#ifdef EXTERNAL_CODECS
+	return CreateArchiveHandler(ai, (void **)&archive, false); 
+	#endif
   }
   HRESULT CreateOutArchive(int formatIndex, CMyComPtr<IOutArchive> &archive) const
   { 
-    const CArcInfoEx &ai = Formats[formatIndex]; 
-    #ifdef EXTERNAL_CODECS
-    if (ai.LibIndex < 0)
-    #endif
-    {
-      archive = ai.CreateOutArchive();
-      return S_OK;
-    }
-    #ifdef EXTERNAL_CODECS
-    return CreateArchiveHandler(ai, (void **)&archive, true); 
-    #endif
+	const CArcInfoEx &ai = Formats[formatIndex]; 
+	#ifdef EXTERNAL_CODECS
+	if (ai.LibIndex < 0)
+	#endif
+	{
+	  archive = ai.CreateOutArchive();
+	  return S_OK;
+	}
+	#ifdef EXTERNAL_CODECS
+	return CreateArchiveHandler(ai, (void **)&archive, true); 
+	#endif
   }
   int FindOutFormatFromName(const UString &name) const
   {
-    for (int i = 0; i < Formats.Size(); i++)
-    {
-      const CArcInfoEx &arc = Formats[i];
-      if (!arc.UpdateEnabled)
-        continue;
-      if (arc.Name.CompareNoCase(name) == 0)
-        return i;
-    }
-    return -1;
+	for (int i = 0; i < Formats.Size(); i++)
+	{
+	  const CArcInfoEx &arc = Formats[i];
+	  if (!arc.UpdateEnabled)
+		continue;
+	  if (arc.Name.CompareNoCase(name) == 0)
+		return i;
+	}
+	return -1;
   }
 
   #ifdef EXTERNAL_CODECS

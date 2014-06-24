@@ -1,5 +1,4 @@
 
-
 #ifndef PLANE3F_H
 #define PLANE3F_H
 
@@ -11,12 +10,12 @@ class Plane3f
 public:
 	Vec3f m_normal;
 	float m_d;
-	
+
 	bool operator==(const Plane3f p) const
 	{
 		//if(fabs(m_normal.x - p.m_normal.x) <= EPSILON && fabs(m_normal.y - p.m_normal.y) <= EPSILON && fabs(m_normal.z - p.m_normal.z) <= EPSILON && fabs(m_d - p.m_d) <= EPSILON)
 		//	return true;
-		
+
 		if(m_normal.x == p.m_normal.x && m_normal.y == p.m_normal.y && m_normal.z == p.m_normal.z && m_d == p.m_d)
 			return true;
 

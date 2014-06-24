@@ -15,11 +15,11 @@ extern Byte k7zSignature[k7zSignatureSize];
 enum EIdEnum
 {
   k7zIdEnd,
-    
+	
   k7zIdHeader,
-    
+	
   k7zIdArchiveProperties,
-    
+	
   k7zIdAdditionalStreamsInfo,
   k7zIdMainStreamsInfo,
   k7zIdFilesInfo,

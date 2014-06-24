@@ -26,9 +26,9 @@ public:
   void ReleaseStream() { _stream.Release(); }
   void Init(bool calculate = true)
   {
-    _size = 0;
-    _calculate = calculate;
-    _crc = CRC_INIT_VAL;
+	_size = 0;
+	_calculate = calculate;
+	_crc = CRC_INIT_VAL;
   }
   void InitCRC() { _crc = CRC_INIT_VAL; }
   UInt64 GetSize() const { return _size; }

@@ -29,20 +29,20 @@ public:
   HRes Close() { return Event_Close(&_object); }
   #ifdef _WIN32
   HRes Create(bool manualReset, bool initiallyOwn, LPCTSTR name = NULL,
-      LPSECURITY_ATTRIBUTES securityAttributes = NULL)
+	  LPSECURITY_ATTRIBUTES securityAttributes = NULL)
   {
-    _object.handle = ::CreateEvent(securityAttributes, BoolToBOOL(manualReset),
-        BoolToBOOL(initiallyOwn), name);
-    if (_object.handle != 0)
-      return 0;
-    return ::GetLastError();
+	_object.handle = ::CreateEvent(securityAttributes, BoolToBOOL(manualReset),
+		BoolToBOOL(initiallyOwn), name);
+	if (_object.handle != 0)
+	  return 0;
+	return ::GetLastError();
   }
   HRes Open(DWORD desiredAccess, bool inheritHandle, LPCTSTR name)
   {
-    _object.handle = ::OpenEvent(desiredAccess, BoolToBOOL(inheritHandle), name);
-    if (_object.handle != 0)
-      return 0;
-    return ::GetLastError();
+	_object.handle = ::OpenEvent(desiredAccess, BoolToBOOL(inheritHandle), name);
+	if (_object.handle != 0)
+	  return 0;
+	return ::GetLastError();
   }
   #endif
 
@@ -57,18 +57,18 @@ class CManualResetEvent: public CBaseEvent
 public:
   HRes Create(bool initiallyOwn = false)
   {
-    return ManualResetEvent_Create(&_object, initiallyOwn ? 1: 0);
+	return ManualResetEvent_Create(&_object, initiallyOwn ? 1: 0);
   }
   HRes CreateIfNotCreated()
   {
-    if (IsCreated())
-      return 0;
-    return ManualResetEvent_CreateNotSignaled(&_object);
+	if (IsCreated())
+	  return 0;
+	return ManualResetEvent_CreateNotSignaled(&_object);
   }
   #ifdef _WIN32
   HRes CreateWithName(bool initiallyOwn, LPCTSTR name)
   {
-    return CBaseEvent::Create(true, initiallyOwn, name);
+	return CBaseEvent::Create(true, initiallyOwn, name);
   }
   #endif
 };
@@ -78,13 +78,13 @@ class CAutoResetEvent: public CBaseEvent
 public:
   HRes Create()
   {
-    return AutoResetEvent_CreateNotSignaled(&_object);
+	return AutoResetEvent_CreateNotSignaled(&_object);
   }
   HRes CreateIfNotCreated()
   {
-    if (IsCreated())
-      return 0;
-    return AutoResetEvent_CreateNotSignaled(&_object);
+	if (IsCreated())
+	  return 0;
+	return AutoResetEvent_CreateNotSignaled(&_object);
   }
 };
 
@@ -93,29 +93,29 @@ class CObject: public CHandle
 {
 public:
   HRes Lock(DWORD timeoutInterval = INFINITE)
-    { return (::WaitForSingleObject(_handle, timeoutInterval) == WAIT_OBJECT_0 ? 0 : ::GetLastError()); }
+	{ return (::WaitForSingleObject(_handle, timeoutInterval) == WAIT_OBJECT_0 ? 0 : ::GetLastError()); }
 };
 class CMutex: public CObject
 {
 public:
   HRes Create(bool initiallyOwn, LPCTSTR name = NULL,
-      LPSECURITY_ATTRIBUTES securityAttributes = NULL)
+	  LPSECURITY_ATTRIBUTES securityAttributes = NULL)
   {
-    _handle = ::CreateMutex(securityAttributes, BoolToBOOL(initiallyOwn), name);
-    if (_handle != 0)
-      return 0;
-    return ::GetLastError();
+	_handle = ::CreateMutex(securityAttributes, BoolToBOOL(initiallyOwn), name);
+	if (_handle != 0)
+	  return 0;
+	return ::GetLastError();
   }
   HRes Open(DWORD desiredAccess, bool inheritHandle, LPCTSTR name)
   {
-    _handle = ::OpenMutex(desiredAccess, BoolToBOOL(inheritHandle), name);
-    if (_handle != 0)
-      return 0;
-    return ::GetLastError();
+	_handle = ::OpenMutex(desiredAccess, BoolToBOOL(inheritHandle), name);
+	if (_handle != 0)
+	  return 0;
+	return ::GetLastError();
   }
   HRes Release() 
   { 
-    return ::ReleaseMutex(_handle) ? 0 : ::GetLastError();
+	return ::ReleaseMutex(_handle) ? 0 : ::GetLastError();
   }
 };
 class CMutexLock
@@ -137,7 +137,7 @@ public:
   operator HANDLE() { return _object.handle; }
   HRes Create(UInt32 initiallyCount, UInt32 maxCount)
   {
-    return Semaphore_Create(&_object, initiallyCount, maxCount);
+	return Semaphore_Create(&_object, initiallyCount, maxCount);
   }
   HRes Release() { return Semaphore_Release1(&_object); }
   HRes Release(UInt32 releaseCount) { return Semaphore_ReleaseN(&_object, releaseCount); }

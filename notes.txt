@@ -17,3 +17,12 @@ void * toUserdata(int crc, int offs = -1, int prototype_crc = 0);
 [1:02:21 PM] Евгений: можно посмотреть расширение os-datetime, там используется проталкивание внешних данных в скрипт, а именно нового объекта DateTime
 
 
+
+[8:54:06 AM] Denis Ivanov: привет. у тебя есть оптимизации для умножения матриц на х86? спасибо.
+[9:41:05 AM] Alexandr Feoktistov: Привет! Вроде бы компилятор сам должен сообразить, где использовать расширение, но я не уверен. 
+Знаю, что sse/simd арифметика лежит в хидере immintrin.h
+[9:41:23 AM] Alexandr Feoktistov: вот что нашел http://stackoverflow.com/questions/18499971/efficient-4x4-matrix-multiplication-c-vs-assembly
+[9:42:43 AM] Alexandr Feoktistov: там интересны первые 2 ответа
+
+
+

@@ -1,6 +1,5 @@
 
 
-
 #include "pathnode.h"
 #include "collidertile.h"
 #include "../math/vec2i.h"
@@ -30,8 +29,8 @@ Unit* g_pathunit = NULL;
 
 void DrawSteps()
 {
-    Shader* s = &g_shader[g_curS];
-	Player* py = &g_player[g_currP];
+	Shader* s = &g_shader[g_curS];
+	Player* py = &g_player[g_curP];
 
 	if(py->sel.units.size() <= 0)
 		return;
@@ -113,7 +112,7 @@ void DrawSteps()
 
 void DrawGrid()
 {
-    Shader* s = &g_shader[g_curS];
+	Shader* s = &g_shader[g_curS];
 
 #if 1
 	if(gridvecs.size() > 0)
@@ -130,7 +129,7 @@ void DrawGrid()
 #if 1
 	glUniform4f(s->m_slot[SSLOT_COLOR],  0.5f, 0, 0, 1);
 
-	Player* py = &g_player[g_currP];
+	Player* py = &g_player[g_curP];
 
 	if(py->sel.units.size() > 0)
 	{
@@ -237,7 +236,7 @@ void DrawUnitSquares()
 	Unit* u;
 	UnitT* t;
 	Vec3f p;
-    Shader* s = &g_shader[g_curS];
+	Shader* s = &g_shader[g_curS];
 
 	glUniform4f(s->m_slot[SSLOT_COLOR], 0.5f, 0, 0, 1);
 
@@ -259,12 +258,12 @@ void DrawUnitSquares()
 #endif
 
 		/*
-         glVertex3f(p.x - r, 0 + 1, p.z - r);
-         glVertex3f(p.x - r, 0 + 1, p.z + r);
-         glVertex3f(p.x + r, 0 + 1, p.z + r);
-         glVertex3f(p.x + r, 0 + 1, p.z - r);
-         glVertex3f(p.x - r, 0 + 1, p.z - r);
-         */
+		 glVertex3f(p.x - r, 0 + 1, p.z - r);
+		 glVertex3f(p.x - r, 0 + 1, p.z + r);
+		 glVertex3f(p.x + r, 0 + 1, p.z + r);
+		 glVertex3f(p.x + r, 0 + 1, p.z - r);
+		 glVertex3f(p.x - r, 0 + 1, p.z - r);
+		 */
 
 		Vec3i vmin(u->cmpos.x - t->size.x/2, 0, u->cmpos.y - t->size.z/2);
 
@@ -290,8 +289,8 @@ void DrawUnitSquares()
 void DrawPaths()
 {
 #if 1
-	Player* py = &g_player[g_currP];
-    Shader* s = &g_shader[g_curS];
+	Player* py = &g_player[g_curP];
+	Shader* s = &g_shader[g_curS];
 
 	int i = 0;
 
@@ -337,8 +336,8 @@ void DrawPaths()
 
 		if(vecs.size() > 1)
 		{
-            glVertexAttribPointer(s->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, &vecs[0]);
-            glDrawArrays(GL_LINE_STRIP, 0, vecs.size());
+			glVertexAttribPointer(s->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, &vecs[0]);
+			glDrawArrays(GL_LINE_STRIP, 0, vecs.size());
 		}
 		else
 		{
@@ -361,7 +360,7 @@ void DrawVelocities()
 	Unit* u;
 	Vec3f p;
 	UnitT* t;
-    Shader* s = &g_shader[g_curS];
+	Shader* s = &g_shader[g_curS];
 
 	glUniform4f(s->m_slot[SSLOT_COLOR], 1, 0, 1, 1);
 
@@ -376,14 +375,14 @@ void DrawVelocities()
 
 		std::vector<Vec3f> vecs;
 
-        vecs.push_back(u->drawpos + Vec3f(0, TILE_SIZE/20, 0));
+		vecs.push_back(u->drawpos + Vec3f(0, TILE_SIZE/20, 0));
 		Vec3f prevpos = Vec3f(u->prevpos.x, g_hmap.accheight(u->prevpos.x, u->prevpos.y), u->prevpos.y);
-        vecs.push_back(u->drawpos + (u->drawpos - prevpos) * (10*t->cmspeed) + Vec3f(0, TILE_SIZE/20, 0));
+		vecs.push_back(u->drawpos + (u->drawpos - prevpos) * (10*t->cmspeed) + Vec3f(0, TILE_SIZE/20, 0));
 
 		if(vecs.size() > 0)
 		{
-            glVertexAttribPointer(s->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, &vecs[0]);
-            glDrawArrays(GL_LINE_STRIP, 0, vecs.size());
+			glVertexAttribPointer(s->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, &vecs[0]);
+			glDrawArrays(GL_LINE_STRIP, 0, vecs.size());
 		}
 	}
 }
@@ -399,7 +398,7 @@ void LogPathDebug()
 		return;
 	}
 
-	Player* py = &g_player[g_currP];
+	Player* py = &g_player[g_curP];
 
 	if(py->sel.units.size() <= 0)
 		return;

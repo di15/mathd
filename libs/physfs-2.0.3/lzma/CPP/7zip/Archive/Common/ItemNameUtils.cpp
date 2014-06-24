@@ -27,22 +27,22 @@ UString GetOSName(const UString &name)
 UString GetOSName2(const UString &name)
 {
   if (name.IsEmpty())
-    return UString();
+	return UString();
   UString newName = GetOSName(name);
   if (newName[newName.Length() - 1] == kOSDirDelimiter)
-    newName.Delete(newName.Length() - 1);
+	newName.Delete(newName.Length() - 1);
   return newName;
 }
 
 bool HasTailSlash(const AString &name, UINT codePage)
 {
   if (name.IsEmpty())
-    return false;
+	return false;
   LPCSTR prev = 
   #ifdef _WIN32
-    CharPrevExA((WORD)codePage, name, &name[name.Length()], 0);
+	CharPrevExA((WORD)codePage, name, &name[name.Length()], 0);
   #else
-    (LPCSTR)(name) + (name.Length() - 1);
+	(LPCSTR)(name) + (name.Length() - 1);
   #endif
   return (*prev == '/');
 }

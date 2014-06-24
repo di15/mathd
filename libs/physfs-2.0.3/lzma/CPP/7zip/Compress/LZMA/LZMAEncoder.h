@@ -32,10 +32,10 @@ protected:
   UInt32 _repDistances[kNumRepDistances];
   void Init()
   {
-    _state.Init();
-    _previousByte = 0;
-    for(UInt32 i = 0 ; i < kNumRepDistances; i++)
-      _repDistances[i] = 0;
+	_state.Init();
+	_previousByte = 0;
+	for(UInt32 i = 0 ; i < kNumRepDistances; i++)
+	  _repDistances[i] = 0;
   }
 };
 
@@ -74,15 +74,15 @@ inline UInt32 GetPosSlot(UInt32 pos)
 {
   #ifdef LZMA_LOG_BSR
   if (pos < 2)
-    return pos;
+	return pos;
   unsigned long index;
   _BitScanReverse(&index, pos);
   return (index + index) + ((pos >> (index - 1)) & 1);
   #else
   if (pos < (1 << kNumLogBits))
-    return g_FastPos[pos];
+	return g_FastPos[pos];
   if (pos < (1 << (kNumLogBits * 2 - 1)))
-    return g_FastPos[pos >> (kNumLogBits - 1)] + (kNumLogBits - 1) * 2;
+	return g_FastPos[pos >> (kNumLogBits - 1)] + (kNumLogBits - 1) * 2;
   return g_FastPos[pos >> (kNumLogBits - 1) * 2] + (kNumLogBits - 1) * 4;
   #endif
 }
@@ -96,9 +96,9 @@ inline UInt32 GetPosSlot2(UInt32 pos)
   #else
   #ifdef LZMA_LOG_BRANCH
   if (pos < (1 << (kNumLogBits + 6)))
-    return g_FastPos[pos >> 6] + 12;
+	return g_FastPos[pos >> 6] + 12;
   if (pos < (1 << (kNumLogBits * 2 + 5)))
-    return g_FastPos[pos >> (kNumLogBits + 5)] + (kNumLogBits + 5) * 2;
+	return g_FastPos[pos >> (kNumLogBits + 5)] + (kNumLogBits + 5) * 2;
   return g_FastPos[pos >> (kNumLogBits * 2 + 4)] + (kNumLogBits * 2 + 4) * 2;
   #else
   // it's faster with VC6-32bit.
@@ -119,8 +119,8 @@ class CLiteralEncoder2
 public:
   void Init()
   {
-    for (int i = 0; i < 0x300; i++)
-      _encoders[i].Init();
+	for (int i = 0; i < 0x300; i++)
+	  _encoders[i].Init();
   }
   void Encode(NRangeCoder::CEncoder *rangeEncoder, Byte symbol);
   void EncodeMatched(NRangeCoder::CEncoder *rangeEncoder, Byte matchByte, Byte symbol);
@@ -138,30 +138,30 @@ public:
   ~CLiteralEncoder()  { Free(); }
   void Free()
   { 
-    MyFree(_coders);
-    _coders = 0;
+	MyFree(_coders);
+	_coders = 0;
   }
   bool Create(int numPosBits, int numPrevBits)
   {
-    if (_coders == 0 || (numPosBits + numPrevBits) != (_numPrevBits + _numPosBits))
-    {
-      Free();
-      UInt32 numStates = 1 << (numPosBits + numPrevBits);
-      _coders = (CLiteralEncoder2 *)MyAlloc(numStates * sizeof(CLiteralEncoder2));
-    }
-    _numPosBits = numPosBits;
-    _posMask = (1 << numPosBits) - 1;
-    _numPrevBits = numPrevBits;
-    return (_coders != 0);
+	if (_coders == 0 || (numPosBits + numPrevBits) != (_numPrevBits + _numPosBits))
+	{
+	  Free();
+	  UInt32 numStates = 1 << (numPosBits + numPrevBits);
+	  _coders = (CLiteralEncoder2 *)MyAlloc(numStates * sizeof(CLiteralEncoder2));
+	}
+	_numPosBits = numPosBits;
+	_posMask = (1 << numPosBits) - 1;
+	_numPrevBits = numPrevBits;
+	return (_coders != 0);
   }
   void Init()
   {
-    UInt32 numStates = 1 << (_numPrevBits + _numPosBits);
-    for (UInt32 i = 0; i < numStates; i++)
-      _coders[i].Init();
+	UInt32 numStates = 1 << (_numPrevBits + _numPosBits);
+	for (UInt32 i = 0; i < numStates; i++)
+	  _coders[i].Init();
   }
   CLiteralEncoder2 *GetSubCoder(UInt32 pos, Byte prevByte)
-    { return &_coders[((pos & _posMask) << _numPrevBits) + (prevByte >> (8 - _numPrevBits))]; }
+	{ return &_coders[((pos & _posMask) << _numPrevBits) + (prevByte >> (8 - _numPrevBits))]; }
 };
 
 namespace NLength {
@@ -191,20 +191,20 @@ public:
   UInt32 GetPrice(UInt32 symbol, UInt32 posState) const { return _prices[posState][symbol]; }
   void UpdateTable(UInt32 posState)
   {
-    SetPrices(posState, _tableSize, _prices[posState]);
-    _counters[posState] = _tableSize;
+	SetPrices(posState, _tableSize, _prices[posState]);
+	_counters[posState] = _tableSize;
   }
   void UpdateTables(UInt32 numPosStates)
   {
-    for (UInt32 posState = 0; posState < numPosStates; posState++)
-      UpdateTable(posState);
+	for (UInt32 posState = 0; posState < numPosStates; posState++)
+	  UpdateTable(posState);
   }
   void Encode(NRangeCoder::CEncoder *rangeEncoder, UInt32 symbol, UInt32 posState, bool updatePrice)
   {
-    CEncoder::Encode(rangeEncoder, symbol, posState);
-    if (updatePrice)
-      if (--_counters[posState] == 0)
-        UpdateTable(posState);
+	CEncoder::Encode(rangeEncoder, symbol, posState);
+	if (updatePrice)
+	  if (--_counters[posState] == 0)
+		UpdateTable(posState);
   }
 };
 
@@ -307,21 +307,21 @@ class CEncoder :
 
   void ReleaseMatchFinder()
   {
-    _matchFinder.Init = 0;
-    _seqInStream.RealStream.Release();
+	_matchFinder.Init = 0;
+	_seqInStream.RealStream.Release();
   }
 
   void ReleaseMFStream()
   {
-    if (_matchFinderObj && _needReleaseMFStream)
-    {
-      #ifdef COMPRESS_MF_MT
-      if (_mtMode)
-        MatchFinderMt_ReleaseStream(&_matchFinderMt);
-      #endif
-      _needReleaseMFStream = false;
-    }
-    _seqInStream.RealStream.Release();
+	if (_matchFinderObj && _needReleaseMFStream)
+	{
+	  #ifdef COMPRESS_MF_MT
+	  if (_mtMode)
+		MatchFinderMt_ReleaseStream(&_matchFinderMt);
+	  #endif
+	  _needReleaseMFStream = false;
+	}
+	_seqInStream.RealStream.Release();
   }
   
   UInt32 ReadMatchDistances(UInt32 &numDistancePairs);
@@ -329,65 +329,65 @@ class CEncoder :
   void MovePos(UInt32 num);
   UInt32 GetRepLen1Price(CState state, UInt32 posState) const
   {
-    return _isRepG0[state.Index].GetPrice0() +
-        _isRep0Long[state.Index][posState].GetPrice0();
+	return _isRepG0[state.Index].GetPrice0() +
+		_isRep0Long[state.Index][posState].GetPrice0();
   }
   
   UInt32 GetPureRepPrice(UInt32 repIndex, CState state, UInt32 posState) const
   {
-    UInt32 price;
-    if(repIndex == 0)
-    {
-      price = _isRepG0[state.Index].GetPrice0();
-      price += _isRep0Long[state.Index][posState].GetPrice1();
-    }
-    else
-    {
-      price = _isRepG0[state.Index].GetPrice1();
-      if (repIndex == 1)
-        price += _isRepG1[state.Index].GetPrice0();
-      else
-      {
-        price += _isRepG1[state.Index].GetPrice1();
-        price += _isRepG2[state.Index].GetPrice(repIndex - 2);
-      }
-    }
-    return price;
+	UInt32 price;
+	if(repIndex == 0)
+	{
+	  price = _isRepG0[state.Index].GetPrice0();
+	  price += _isRep0Long[state.Index][posState].GetPrice1();
+	}
+	else
+	{
+	  price = _isRepG0[state.Index].GetPrice1();
+	  if (repIndex == 1)
+		price += _isRepG1[state.Index].GetPrice0();
+	  else
+	  {
+		price += _isRepG1[state.Index].GetPrice1();
+		price += _isRepG2[state.Index].GetPrice(repIndex - 2);
+	  }
+	}
+	return price;
   }
   UInt32 GetRepPrice(UInt32 repIndex, UInt32 len, CState state, UInt32 posState) const
   {
-    return _repMatchLenEncoder.GetPrice(len - kMatchMinLen, posState) +
-        GetPureRepPrice(repIndex, state, posState);
+	return _repMatchLenEncoder.GetPrice(len - kMatchMinLen, posState) +
+		GetPureRepPrice(repIndex, state, posState);
   }
   /*
   UInt32 GetPosLen2Price(UInt32 pos, UInt32 posState) const
   {
-    if (pos >= kNumFullDistances)
-      return kIfinityPrice;
-    return _distancesPrices[0][pos] + _lenEncoder.GetPrice(0, posState);
+	if (pos >= kNumFullDistances)
+	  return kIfinityPrice;
+	return _distancesPrices[0][pos] + _lenEncoder.GetPrice(0, posState);
   }
   UInt32 GetPosLen3Price(UInt32 pos, UInt32 len, UInt32 posState) const
   {
-    UInt32 price;
-    UInt32 lenToPosState = GetLenToPosState(len);
-    if (pos < kNumFullDistances)
-      price = _distancesPrices[lenToPosState][pos];
-    else
-      price = _posSlotPrices[lenToPosState][GetPosSlot2(pos)] + 
-          _alignPrices[pos & kAlignMask];
-    return price + _lenEncoder.GetPrice(len - kMatchMinLen, posState);
+	UInt32 price;
+	UInt32 lenToPosState = GetLenToPosState(len);
+	if (pos < kNumFullDistances)
+	  price = _distancesPrices[lenToPosState][pos];
+	else
+	  price = _posSlotPrices[lenToPosState][GetPosSlot2(pos)] + 
+		  _alignPrices[pos & kAlignMask];
+	return price + _lenEncoder.GetPrice(len - kMatchMinLen, posState);
   }
   */
   UInt32 GetPosLenPrice(UInt32 pos, UInt32 len, UInt32 posState) const
   {
-    UInt32 price;
-    UInt32 lenToPosState = GetLenToPosState(len);
-    if (pos < kNumFullDistances)
-      price = _distancesPrices[lenToPosState][pos];
-    else
-      price = _posSlotPrices[lenToPosState][GetPosSlot2(pos)] + 
-          _alignPrices[pos & kAlignMask];
-    return price + _lenEncoder.GetPrice(len - kMatchMinLen, posState);
+	UInt32 price;
+	UInt32 lenToPosState = GetLenToPosState(len);
+	if (pos < kNumFullDistances)
+	  price = _distancesPrices[lenToPosState][pos];
+	else
+	  price = _posSlotPrices[lenToPosState][GetPosSlot2(pos)] + 
+		  _alignPrices[pos & kAlignMask];
+	return price + _lenEncoder.GetPrice(len - kMatchMinLen, posState);
   }
 
   UInt32 Backward(UInt32 &backRes, UInt32 cur);
@@ -396,20 +396,20 @@ class CEncoder :
 
   void FillDistancesPrices();
   void FillAlignPrices();
-    
+	
   void ReleaseStreams()
   {
-    ReleaseMFStream();
-    ReleaseOutStream();
+	ReleaseMFStream();
+	ReleaseOutStream();
   }
 
   HRESULT Flush(UInt32 nowPos);
   class CCoderReleaser
   {
-    CEncoder *_coder;
+	CEncoder *_coder;
   public:
-    CCoderReleaser(CEncoder *coder): _coder(coder) {}
-    ~CCoderReleaser() { _coder->ReleaseStreams(); }
+	CCoderReleaser(CEncoder *coder): _coder(coder) {}
+	~CCoderReleaser() { _coder->ReleaseStreams(); }
   };
   friend class CCoderReleaser;
 
@@ -418,38 +418,38 @@ class CEncoder :
 public:
   CEncoder();
   void SetWriteEndMarkerMode(bool writeEndMarker)
-    { _writeEndMark= writeEndMarker; }
+	{ _writeEndMark= writeEndMarker; }
 
   HRESULT Create();
 
   MY_UNKNOWN_IMP3(
-      ICompressSetOutStream,
-      ICompressSetCoderProperties,
-      ICompressWriteCoderProperties
-      )
-    
+	  ICompressSetOutStream,
+	  ICompressSetCoderProperties,
+	  ICompressWriteCoderProperties
+	  )
+	
   HRESULT Init();
   
   // ICompressCoder interface
   HRESULT SetStreams(ISequentialInStream *inStream,
-      ISequentialOutStream *outStream,
-      const UInt64 *inSize, const UInt64 *outSize);
+	  ISequentialOutStream *outStream,
+	  const UInt64 *inSize, const UInt64 *outSize);
   HRESULT CodeOneBlock(UInt64 *inSize, UInt64 *outSize, Int32 *finished);
 
   HRESULT CodeReal(ISequentialInStream *inStream,
-      ISequentialOutStream *outStream, 
-      const UInt64 *inSize, const UInt64 *outSize,
-      ICompressProgressInfo *progress);
+	  ISequentialOutStream *outStream, 
+	  const UInt64 *inSize, const UInt64 *outSize,
+	  ICompressProgressInfo *progress);
 
   // ICompressCoder interface
   STDMETHOD(Code)(ISequentialInStream *inStream,
-      ISequentialOutStream *outStream, 
-      const UInt64 *inSize, const UInt64 *outSize,
-      ICompressProgressInfo *progress);
+	  ISequentialOutStream *outStream, 
+	  const UInt64 *inSize, const UInt64 *outSize,
+	  ICompressProgressInfo *progress);
 
   // ICompressSetCoderProperties2
   STDMETHOD(SetCoderProperties)(const PROPID *propIDs, 
-      const PROPVARIANT *properties, UInt32 numProperties);
+	  const PROPVARIANT *properties, UInt32 numProperties);
   
   // ICompressWriteCoderProperties
   STDMETHOD(WriteCoderProperties)(ISequentialOutStream *outStream);

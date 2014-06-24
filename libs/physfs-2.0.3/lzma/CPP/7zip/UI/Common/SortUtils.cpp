@@ -17,6 +17,6 @@ void SortFileNames(const UStringVector &strings, CIntVector &indices)
   int numItems = strings.Size();
   indices.Reserve(numItems);
   for(int i = 0; i < numItems; i++)
-    indices.Add(i);
+	indices.Add(i);
   indices.Sort(CompareStrings, (void *)&strings);
 }

@@ -1,5 +1,4 @@
 
-
 #include "../platform.h"
 #include "quaternion.h"
 
@@ -32,7 +31,7 @@ void Quaternion::fromAngles( const float *angles )
 	m_quat[0] = ( float )( sr*cp*cy-cr*sp*sy );
 	m_quat[1] = ( float )( cr*sp*cy+sr*cp*sy );
 	m_quat[2] = ( float )( crcp*sy-srsp*cy );
-	m_quat[3] = ( float )( crcp*cy+srsp*sy ); 
+	m_quat[3] = ( float )( crcp*cy+srsp*sy );
 }
 
 void Quaternion::slerp( const Quaternion& q1, Quaternion& q2, float interp )

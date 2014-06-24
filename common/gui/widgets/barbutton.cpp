@@ -1,5 +1,4 @@
 
-
 #include "../widget.h"
 #include "barbutton.h"
 #include "button.h"
@@ -44,18 +43,20 @@ void BarButton::draw()
 
 	DrawImage(g_texture[m_tex].texname, m_pos[0], m_pos[1], m_pos[2], m_pos[3]);
 
-	Player* py = &g_player[g_currP];
+	Player* py = &g_player[g_curP];
 
 	EndS();
 	UseS(SHADER_COLOR2D);
-    glUniform1f(g_shader[SHADER_COLOR2D].m_slot[SSLOT_WIDTH], (float)py->currw);
-    glUniform1f(g_shader[SHADER_COLOR2D].m_slot[SSLOT_HEIGHT], (float)py->currh);
+	glUniform1f(g_shader[SHADER_COLOR2D].m_slot[SSLOT_WIDTH], (float)py->currw);
+	glUniform1f(g_shader[SHADER_COLOR2D].m_slot[SSLOT_HEIGHT], (float)py->currh);
 	DrawSquare(1, 0, 0, 1, m_pos[0], m_pos[3]-5, m_pos[2], m_pos[3]);
 	float bar = (m_pos[2] - m_pos[0]) * m_healthbar;
 	DrawSquare(0, 1, 0, 1, m_pos[0], m_pos[3]-5, m_pos[0]+bar, m_pos[3]);
 
 	EndS();
+#ifdef GLDEBUG
 	CheckGLError(__FILE__, __LINE__);
+#endif
 	Ortho(py->currw, py->currh, 1, 1, 1, 1);
 }
 

@@ -1,5 +1,4 @@
 
-
 #include "../../widget.h"
 #include "../barbutton.h"
 #include "../button.h"
@@ -31,18 +30,18 @@ BuildPreview::BuildPreview(Widget* parent, const char* n, void (*reframef)(Widge
 #if 0
 	Image left_outer_topleftcorner;
 	Image left_outer;
-	
+
 	Image right_outer_toprightcorner;
 	Image right_outer;
-	
+
 	Image middle_outer_top;
 	Image middle_outer_bottom;
-	
+
 	ViewportW viewport;
 
 	Image white_bg;
 #endif
-	
+
 #if 0
 	restext = Text(this, "res ticker", RichText("asdadasdasads"), MAINFONT16, NULL, true, 1, 1, 1, 1);
 	leftinnerdiagblur = Image(this, "gui/frames/innerdiagblur32x24halfwht.png", NULL, 1, 1, 1, 1,		0, 0, 1, 1);
@@ -52,9 +51,9 @@ BuildPreview::BuildPreview(Widget* parent, const char* n, void (*reframef)(Widge
 	righthlineblur = Image(this, "gui/frames/innerhlineblur30x3.png", NULL, 1, 1, 1, 1,		1, 0, 0, 1);
 	whitebg = Image(this, "gui/backg/white.jpg", NULL, 1, 1, 1, 1,		0, 0, 1, 1);
 #endif
-	
+
 	viewport = ViewportW(this, "viewport", NULL, &DrawViewport, &ViewportLDown, &ViewportLUp, &ViewportMousemove, &ViewportRDown, &ViewportRUp, ViewportMousewheel, VIEWPORT_ENTVIEW);
-	
+
 	left_outer_topleftcorner = Image(this, "gui/frames/outertopleft64x64.png", true, NULL, 1, 1, 1, 1,		1, 0, 0, 1);
 	right_outer_toprightcorner = Image(this, "gui/frames/outertopleft64x64.png", true, NULL, 1, 1, 1, 1,		0, 0, 1, 1);
 	middle_outer_top = Image(this, "gui/frames/outertop2x64.png", true, NULL, 1, 1, 1, 1,		0, 0, 1, 1);
@@ -74,7 +73,7 @@ void BuildPreview::reframe()	//resized or moved
 	viewport.m_pos[1] = m_pos[1] + 10;
 	viewport.m_pos[2] = (m_pos[0]+m_pos[2])/2;
 	viewport.m_pos[3] = (m_pos[1]+m_pos[3])/2;
-	
+
 	white_bg.m_pos[0] = m_pos[0];
 	white_bg.m_pos[1] = m_pos[1];
 	white_bg.m_pos[2] = m_pos[2];
@@ -110,7 +109,7 @@ void BuildPreview::draw()
 
 	//RichText rt = RichText(")A)JJF)@J)(J)(F$KJ(0jfjfjoi3jfwkjlekf");
 	//DrawShadowedTextF(MAINFONT16, m_pos[0]+32, m_pos[1]+4, 0, 0, 50, 50, &rt);
-	
+
 	leftinnerdiagblur.draw();
 	rightinnerdiagblur.draw();
 	lefthlineblur.draw();

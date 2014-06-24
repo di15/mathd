@@ -4,12 +4,12 @@ Copyright (c) 1985-95, Microsoft Corporation
 
 Module Name:
 
-    glaux.h
+	glaux.h
 
 Abstract:
 
-    Procedure declarations, constant definitions and macros for the OpenGL
-    Auxiliary Library.
+	Procedure declarations, constant definitions and macros for the OpenGL
+	Auxiliary Library.
 
 --*/
 
@@ -104,8 +104,8 @@ extern "C" {
 */
 
 typedef struct _AUX_EVENTREC {
-    GLint event;
-    GLint data[4];
+	GLint event;
+	GLint data[4];
 } AUX_EVENTREC;
 
 /* 
@@ -237,15 +237,15 @@ typedef struct _AUX_EVENTREC {
 extern float auxRGBMap[20][3];
 
 #define AUX_SETCOLOR(x, y) (AUX_WIND_IS_RGB((x)) ? \
-                           glColor3fv(auxRGBMap[(y)]) : glIndexf((y)))
+						   glColor3fv(auxRGBMap[(y)]) : glIndexf((y)))
 
 /*
 ** RGB Image Structure
 */
 
 typedef struct _AUX_RGBImageRec {
-    GLint sizeX, sizeY;
-    unsigned char *data;
+	GLint sizeX, sizeY;
+	unsigned char *data;
 } AUX_RGBImageRec;
 
 /*
@@ -356,9 +356,9 @@ HGLRC APIENTRY auxGetHGLRC(void);
 */
 /* Display Mode Selection Criteria */
 enum {
-    AUX_USE_ID = 1,
-    AUX_EXACT_MATCH,
-    AUX_MINIMUM_CRITERIA
+	AUX_USE_ID = 1,
+	AUX_EXACT_MATCH,
+	AUX_MINIMUM_CRITERIA
 };
 void   APIENTRY auxInitDisplayModePolicy(GLenum);
 GLenum APIENTRY auxInitDisplayModeID(GLint);

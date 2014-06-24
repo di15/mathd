@@ -1,4 +1,3 @@
-
 #ifndef PATHDEBUG_H
 #define PATHDEBUG_H
 

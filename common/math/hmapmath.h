@@ -1,4 +1,3 @@
-
 #ifndef HMAPMATH_H
 #define HMAPMATH_H
 

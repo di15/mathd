@@ -36,16 +36,16 @@ struct CUpdateItem
   bool AttributesAreDefined;
 
   bool HasStream() const 
-    { return !IsDirectory && !IsAnti && Size != 0; }
+	{ return !IsDirectory && !IsAnti && Size != 0; }
   CUpdateItem():  
-      IsAnti(false), 
-      AttributesAreDefined(false), 
-      IsCreationTimeDefined(false), 
-      IsLastWriteTimeDefined(false), 
-      IsLastAccessTimeDefined(false)
-      {}
+	  IsAnti(false), 
+	  AttributesAreDefined(false), 
+	  IsCreationTimeDefined(false), 
+	  IsLastWriteTimeDefined(false), 
+	  IsLastAccessTimeDefined(false)
+	  {}
   void SetDirectoryStatusFromAttributes()
-    { IsDirectory = ((Attributes & FILE_ATTRIBUTE_DIRECTORY) != 0); };
+	{ IsDirectory = ((Attributes & FILE_ATTRIBUTE_DIRECTORY) != 0); };
 
   int GetExtensionPos() const;
   UString GetExtension() const;
@@ -68,13 +68,13 @@ struct CUpdateOptions
 };
 
 HRESULT Update(
-    DECL_EXTERNAL_CODECS_LOC_VARS
-    IInStream *inStream,
-    const CArchiveDatabaseEx *database,
-    const CObjectVector<CUpdateItem> &updateItems,
-    ISequentialOutStream *seqOutStream,
-    IArchiveUpdateCallback *updateCallback,
-    const CUpdateOptions &options);
+	DECL_EXTERNAL_CODECS_LOC_VARS
+	IInStream *inStream,
+	const CArchiveDatabaseEx *database,
+	const CObjectVector<CUpdateItem> &updateItems,
+	ISequentialOutStream *seqOutStream,
+	IArchiveUpdateCallback *updateCallback,
+	const CUpdateOptions &options);
 }}
 
 #endif

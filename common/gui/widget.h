@@ -1,4 +1,3 @@
-
 #ifndef WIDGET_H
 #define WIDGET_H
 
@@ -50,7 +49,7 @@ public:
 	float m_pos[4];
 	float m_frame[4];
 	float m_texc[4];	//texture coordinates
-    float m_tpos[4];	//text pos
+	float m_tpos[4];	//text pos
 	unsigned int m_tex;
 	unsigned int m_bgtex;
 	unsigned int m_bgovertex;
@@ -117,7 +116,10 @@ public:
 	virtual void inev(InEv* ev) {}
 	virtual void frameupd()	{}
 	virtual void reframe();	//resized or moved
-	virtual void subframe(float* fr) { memcpy((void*)fr, (void*)m_pos, sizeof(float)*4); }
+	virtual void subframe(float* fr)
+	{
+		memcpy((void*)fr, (void*)m_pos, sizeof(float)*4);
+	}
 	virtual Widget* get(const char* name);
 	virtual void add(Widget* neww);
 	virtual void close();

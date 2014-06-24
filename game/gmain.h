@@ -1,5 +1,4 @@
 
-
 #ifndef GMAIN_H
 #define GMAIN_H
 

@@ -32,7 +32,7 @@ bool CStdInStream::Open(LPCTSTR fileName)
 bool CStdInStream::Close()
 {
   if(!_streamIsOpen)
-    return true;
+	return true;
   _streamIsOpen = (fclose(_stream) != 0);
   return !_streamIsOpen;
 }
@@ -47,15 +47,15 @@ AString CStdInStream::ScanStringUntilNewLine()
   AString s;
   for (;;)
   {
-    int intChar = GetChar();
-    if(intChar == EOF)
-      throw kEOFMessage;
-    char c = char(intChar);
-    if (c == kIllegalChar)
-      throw kIllegalCharMessage;
-    if(c == kNewLineChar)
-      break;
-    s += c;
+	int intChar = GetChar();
+	if(intChar == EOF)
+	  throw kEOFMessage;
+	char c = char(intChar);
+	if (c == kIllegalChar)
+	  throw kIllegalCharMessage;
+	if(c == kNewLineChar)
+	  break;
+	s += c;
   }
   return s;
 }
@@ -65,7 +65,7 @@ void CStdInStream::ReadToString(AString &resultString)
   resultString.Empty();
   int c;
   while((c = GetChar()) != EOF)
-    resultString += char(c);
+	resultString += char(c);
 }
 
 bool CStdInStream::Eof()
@@ -77,7 +77,7 @@ int CStdInStream::GetChar()
 {
   int c = fgetc(_stream); // getc() doesn't work in BeOS?
   if(c == EOF && !Eof())
-    throw kReadErrorMessage;
+	throw kReadErrorMessage;
   return c;
 }
 

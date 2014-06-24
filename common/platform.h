@@ -2,24 +2,24 @@
 #define PLATFORM_H
 
 #ifdef _WIN32
-    #define PLATFORM_WIN
+#define PLATFORM_WIN
 #elif __APPLE__
-    #include "TargetConditionals.h"
-    #if TARGET_OS_MAC
-        #define PLATFORM_MAC
-    #elif TARGET_OS_IPHONE
-        #define PLATFORM_IOS
-        #define PLATFORM_IPHONE
-    #elif TARGET_OS_IPAD
-        #define PLATFORM_IOS
-        #define PLATFORM_IPAD
-    #endif
+#include "TargetConditionals.h"
+#if TARGET_OS_MAC
+#define PLATFORM_MAC
+#elif TARGET_OS_IPHONE
+#define PLATFORM_IOS
+#define PLATFORM_IPHONE
+#elif TARGET_OS_IPAD
+#define PLATFORM_IOS
+#define PLATFORM_IPAD
+#endif
 #elif defined( __GNUC__ )
-    #define PLATFORM_LINUX
+#define PLATFORM_LINUX
 #elif defined( __linux__ )
-    #define PLATFORM_LINUX
+#define PLATFORM_LINUX
 #elif defined ( __linux )
-    #define PLATFORM_LINUX
+#define PLATFORM_LINUX
 #endif
 
 #define _CRT_SECURE_NO_WARNINGS

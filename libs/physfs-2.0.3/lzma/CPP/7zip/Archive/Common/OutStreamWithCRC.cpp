@@ -10,15 +10,15 @@ STDMETHODIMP COutStreamWithCRC::Write(const void *data, UInt32 size, UInt32 *pro
   HRESULT result;
   if(!_stream)
   {
-    realProcessedSize = size;
-    result = S_OK;
+	realProcessedSize = size;
+	result = S_OK;
   }
   else
-    result = _stream->Write(data, size, &realProcessedSize);
+	result = _stream->Write(data, size, &realProcessedSize);
   if (_calculate)
-    _crc = CrcUpdate(_crc, data, realProcessedSize);
+	_crc = CrcUpdate(_crc, data, realProcessedSize);
   _size += realProcessedSize;
   if(processedSize != NULL)
-    *processedSize = realProcessedSize;
+	*processedSize = realProcessedSize;
   return result;
 }

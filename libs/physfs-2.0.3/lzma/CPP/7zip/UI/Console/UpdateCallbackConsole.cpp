@@ -32,7 +32,7 @@ HRESULT CUpdateCallbackConsole::OpenResult(const wchar_t *name, HRESULT result)
 {
   (*OutStream) << endl;
   if (result != S_OK)
-    (*OutStream) << "Error: " << name << " is not supported archive" << endl;
+	(*OutStream) << "Error: " << name << " is not supported archive" << endl;
   return S_OK;
 }
 
@@ -49,9 +49,9 @@ HRESULT CUpdateCallbackConsole::CanNotFindError(const wchar_t *name, DWORD syste
   // m_PercentPrinter.ClosePrint();
   if (!m_WarningsMode)
   {
-    (*OutStream) << endl << endl;
-    m_PercentPrinter.PrintNewLine();
-    m_WarningsMode = true;
+	(*OutStream) << endl << endl;
+	m_PercentPrinter.PrintNewLine();
+	m_WarningsMode = true;
   }
   m_PercentPrinter.PrintString(name);
   m_PercentPrinter.PrintString(":  WARNING: ");
@@ -69,13 +69,13 @@ HRESULT CUpdateCallbackConsole::FinishScanning()
 HRESULT CUpdateCallbackConsole::StartArchive(const wchar_t *name, bool updating)
 {
   if(updating)
-    (*OutStream) << kUpdatingArchiveMessage;
+	(*OutStream) << kUpdatingArchiveMessage;
   else
-    (*OutStream) << kCreatingArchiveMessage; 
+	(*OutStream) << kCreatingArchiveMessage; 
   if (name != 0)
-    (*OutStream) << name;
+	(*OutStream) << name;
   else
-    (*OutStream) << "StdOut";
+	(*OutStream) << "StdOut";
   (*OutStream) << endl << endl;
   return S_OK;
 }
@@ -89,7 +89,7 @@ HRESULT CUpdateCallbackConsole::FinishArchive()
 HRESULT CUpdateCallbackConsole::CheckBreak()
 {
   if (NConsoleClose::TestBreakSignal())
-    return E_ABORT;
+	return E_ABORT;
   return S_OK;
 }
 
@@ -98,16 +98,16 @@ HRESULT CUpdateCallbackConsole::Finilize()
   MT_LOCK
   if (m_NeedBeClosed)
   {
-    if (EnablePercents)
-    {
-      m_PercentPrinter.ClosePrint();
-    }
-    if (!StdOutMode && m_NeedNewLine)
-    {
-      m_PercentPrinter.PrintNewLine();
-      m_NeedNewLine = false;
-    }
-    m_NeedBeClosed = false;
+	if (EnablePercents)
+	{
+	  m_PercentPrinter.ClosePrint();
+	}
+	if (!StdOutMode && m_NeedNewLine)
+	{
+	  m_PercentPrinter.PrintNewLine();
+	  m_NeedNewLine = false;
+	}
+	m_NeedBeClosed = false;
   }
   return S_OK;
 }
@@ -121,7 +121,7 @@ HRESULT CUpdateCallbackConsole::SetTotal(UInt64 size)
 {
   MT_LOCK
   if (EnablePercents)
-    m_PercentPrinter.SetTotal(size);
+	m_PercentPrinter.SetTotal(size);
   return S_OK;
 }
 
@@ -130,15 +130,15 @@ HRESULT CUpdateCallbackConsole::SetCompleted(const UInt64 *completeValue)
   MT_LOCK
   if (completeValue != NULL)
   {
-    if (EnablePercents)
-    {
-      m_PercentPrinter.SetRatio(*completeValue);
-      m_PercentPrinter.PrintRatio();
-      m_NeedBeClosed = true;
-    }
+	if (EnablePercents)
+	{
+	  m_PercentPrinter.SetRatio(*completeValue);
+	  m_PercentPrinter.PrintRatio();
+	  m_NeedBeClosed = true;
+	}
   }
   if (NConsoleClose::TestBreakSignal())
-    return E_ABORT;
+	return E_ABORT;
   return S_OK;
 }
 
@@ -146,7 +146,7 @@ HRESULT CUpdateCallbackConsole::SetRatioInfo(const UInt64 * /* inSize */, const 
 {
   /*
   if (NConsoleClose::TestBreakSignal())
-    return E_ABORT;
+	return E_ABORT;
   */
   return S_OK;
 }
@@ -155,16 +155,16 @@ HRESULT CUpdateCallbackConsole::GetStream(const wchar_t *name, bool isAnti)
 {
   MT_LOCK
   if (StdOutMode)
-    return S_OK;
+	return S_OK;
   if(isAnti)
-    m_PercentPrinter.PrintString("Anti item    ");
+	m_PercentPrinter.PrintString("Anti item    ");
   else
-    m_PercentPrinter.PrintString("Compressing  ");
+	m_PercentPrinter.PrintString("Compressing  ");
   if (name[0] == 0)
-    name = kEmptyFileAlias;
+	name = kEmptyFileAlias;
   m_PercentPrinter.PrintString(name);
   if (EnablePercents)
-    m_PercentPrinter.RePrintRatio();
+	m_PercentPrinter.RePrintRatio();
   return S_OK;
 }
 
@@ -175,11 +175,11 @@ HRESULT CUpdateCallbackConsole::OpenFileError(const wchar_t *name, DWORD systemE
   FailedFiles.Add(name);
   // if (systemError == ERROR_SHARING_VIOLATION)
   {
-    m_PercentPrinter.ClosePrint();
-    m_PercentPrinter.PrintNewLine();
-    m_PercentPrinter.PrintString("WARNING: ");
-    m_PercentPrinter.PrintString(NError::MyFormatMessageW(systemError));
-    return S_FALSE;
+	m_PercentPrinter.ClosePrint();
+	m_PercentPrinter.PrintNewLine();
+	m_PercentPrinter.PrintString("WARNING: ");
+	m_PercentPrinter.PrintString(NError::MyFormatMessageW(systemError));
+	return S_FALSE;
   }
   // return systemError;
 }
@@ -195,11 +195,11 @@ HRESULT CUpdateCallbackConsole::CryptoGetTextPassword2(Int32 *passwordIsDefined,
 {
   if (!PasswordIsDefined) 
   {
-    if (AskPassword)
-    {
-      Password = GetPassword(OutStream); 
-      PasswordIsDefined = true;
-    }
+	if (AskPassword)
+	{
+	  Password = GetPassword(OutStream); 
+	  PasswordIsDefined = true;
+	}
   }
   *passwordIsDefined = BoolToInt(PasswordIsDefined);
   CMyComBSTR tempName(Password);

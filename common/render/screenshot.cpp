@@ -1,5 +1,4 @@
 
-
 #include "../platform.h"
 #include "../window.h"
 #include "../utils.h"
@@ -8,7 +7,7 @@
 
 void SaveScreenshot()
 {
-	Player* py = &g_player[g_currP];
+	Player* py = &g_player[g_curP];
 
 	LoadedTex screenshot;
 	screenshot.channels = 3;

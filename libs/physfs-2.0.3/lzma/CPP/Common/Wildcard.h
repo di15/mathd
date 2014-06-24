@@ -69,7 +69,7 @@ class CCensor
 public:
   CObjectVector<CPair> Pairs;
   bool AllAreRelative() const
-    { return (Pairs.Size() == 1 && Pairs.Front().Prefix.IsEmpty()); }
+	{ return (Pairs.Size() == 1 && Pairs.Front().Prefix.IsEmpty()); }
   void AddItem(bool include, const UString &path, bool recursive);
   bool CheckPath(const UString &path, bool isFile) const;
   void ExtendExclude();

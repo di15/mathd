@@ -18,6 +18,6 @@ STDMETHODIMP CLockedSequentialInStreamImp::Read(void *data, UInt32 size, UInt32 
   HRESULT result = _lockedInStream->Read(_pos, data, size, &realProcessedSize);
   _pos += realProcessedSize;
   if (processedSize != NULL)
-    *processedSize = realProcessedSize;
+	*processedSize = realProcessedSize;
   return result;
 }

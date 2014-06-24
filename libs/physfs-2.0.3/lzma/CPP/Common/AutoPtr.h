@@ -11,8 +11,8 @@ public:
   CMyAutoPtr(CMyAutoPtr<T>& p): _p(p.release()) {}
   CMyAutoPtr<T>& operator=(CMyAutoPtr<T>& p) 
   {
-    reset(p.release());
-    return (*this);
+	reset(p.release());
+	return (*this);
   }
   ~CMyAutoPtr() { delete _p; }
   T& operator*() const { return *_p; }
@@ -20,15 +20,15 @@ public:
   T* get() const { return _p; }
   T* release()
   {
-    T *tmp = _p;
-    _p = 0;
-    return tmp;
+	T *tmp = _p;
+	_p = 0;
+	return tmp;
   }
   void reset(T* p = 0)
   {
-    if (p != _p)
-      delete _p;
-    _p = p;
+	if (p != _p)
+	  delete _p;
+	_p = p;
   }
 };
 

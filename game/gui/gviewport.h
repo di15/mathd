@@ -1,5 +1,4 @@
 
-
 #ifndef WEVIEWPORT_H
 #define WEVIEWPORT_H
 
@@ -19,7 +18,7 @@ public:
 	char m_label[32];
 	bool m_axial;
 
-	ViewportT(){}
+	ViewportT() {}
 	ViewportT(Vec3f offset, Vec3f up, const char* label, bool axial);
 };
 

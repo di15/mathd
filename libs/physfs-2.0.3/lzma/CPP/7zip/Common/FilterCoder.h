@@ -48,9 +48,9 @@ protected:
 
   HRESULT Init() 
   { 
-    _nowPos64 = 0;
-    _outSizeIsDefined = false;
-    return Filter->Init(); 
+	_nowPos64 = 0;
+	_outSizeIsDefined = false;
+	return Filter->Init(); 
   }
 
   CMyComPtr<ICryptoSetPassword> _setPassword;
@@ -68,37 +68,37 @@ public:
   ~CFilterCoder();
   HRESULT WriteWithLimit(ISequentialOutStream *outStream, UInt32 size);
   bool NeedMore() const  
-    { return (!_outSizeIsDefined || (_nowPos64 < _outSize)); }
+	{ return (!_outSizeIsDefined || (_nowPos64 < _outSize)); }
 
 public:
   MY_QUERYINTERFACE_BEGIN
-    MY_QUERYINTERFACE_ENTRY(ICompressCoder)
-    // #ifdef _ST_MODE
-    MY_QUERYINTERFACE_ENTRY(ICompressSetInStream)
-    MY_QUERYINTERFACE_ENTRY(ISequentialInStream)
+	MY_QUERYINTERFACE_ENTRY(ICompressCoder)
+	// #ifdef _ST_MODE
+	MY_QUERYINTERFACE_ENTRY(ICompressSetInStream)
+	MY_QUERYINTERFACE_ENTRY(ISequentialInStream)
 
-    MY_QUERYINTERFACE_ENTRY(ICompressSetOutStream)
-    MY_QUERYINTERFACE_ENTRY(ISequentialOutStream)
-    MY_QUERYINTERFACE_ENTRY(IOutStreamFlush)
-    // #endif
+	MY_QUERYINTERFACE_ENTRY(ICompressSetOutStream)
+	MY_QUERYINTERFACE_ENTRY(ISequentialOutStream)
+	MY_QUERYINTERFACE_ENTRY(IOutStreamFlush)
+	// #endif
 
-    #ifndef _NO_CRYPTO
-    MY_QUERYINTERFACE_ENTRY_AG(ICryptoSetPassword, Filter, _setPassword)
-    #endif
+	#ifndef _NO_CRYPTO
+	MY_QUERYINTERFACE_ENTRY_AG(ICryptoSetPassword, Filter, _setPassword)
+	#endif
 
-    #ifndef EXTRACT_ONLY
-    MY_QUERYINTERFACE_ENTRY_AG(ICompressSetCoderProperties, Filter, _SetCoderProperties)
-    MY_QUERYINTERFACE_ENTRY_AG(ICompressWriteCoderProperties, Filter, _writeCoderProperties)
-    // MY_QUERYINTERFACE_ENTRY_AG(ICryptoResetSalt, Filter, _CryptoResetSalt)
-    MY_QUERYINTERFACE_ENTRY_AG(ICryptoResetInitVector, Filter, _CryptoResetInitVector)
-    #endif
+	#ifndef EXTRACT_ONLY
+	MY_QUERYINTERFACE_ENTRY_AG(ICompressSetCoderProperties, Filter, _SetCoderProperties)
+	MY_QUERYINTERFACE_ENTRY_AG(ICompressWriteCoderProperties, Filter, _writeCoderProperties)
+	// MY_QUERYINTERFACE_ENTRY_AG(ICryptoResetSalt, Filter, _CryptoResetSalt)
+	MY_QUERYINTERFACE_ENTRY_AG(ICryptoResetInitVector, Filter, _CryptoResetInitVector)
+	#endif
 
-    MY_QUERYINTERFACE_ENTRY_AG(ICompressSetDecoderProperties2, Filter, _setDecoderProperties)
+	MY_QUERYINTERFACE_ENTRY_AG(ICompressSetDecoderProperties2, Filter, _setDecoderProperties)
   MY_QUERYINTERFACE_END
   MY_ADDREF_RELEASE
   STDMETHOD(Code)(ISequentialInStream *inStream,
-      ISequentialOutStream *outStream, const UInt64 *inSize, const UInt64 *outSize,
-      ICompressProgressInfo *progress);
+	  ISequentialOutStream *outStream, const UInt64 *inSize, const UInt64 *outSize,
+	  ICompressProgressInfo *progress);
   // #ifdef _ST_MODE
   STDMETHOD(ReleaseInStream)();
   STDMETHOD(SetInStream)(ISequentialInStream *inStream);
@@ -114,7 +114,7 @@ public:
   #endif
   #ifndef EXTRACT_ONLY
   STDMETHOD(SetCoderProperties)(const PROPID *propIDs, 
-      const PROPVARIANT *properties, UInt32 numProperties);
+	  const PROPVARIANT *properties, UInt32 numProperties);
   STDMETHOD(WriteCoderProperties)(ISequentialOutStream *outStream);
   // STDMETHOD(ResetSalt)();
   STDMETHOD(ResetInitVector)();

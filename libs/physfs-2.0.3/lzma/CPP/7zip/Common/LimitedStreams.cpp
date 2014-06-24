@@ -12,13 +12,13 @@ STDMETHODIMP CLimitedSequentialInStream::Read(void *data, UInt32 size, UInt32 *p
   HRESULT result = S_OK;
   if (sizeToRead > 0)
   {
-    result = _stream->Read(data, sizeToRead, &realProcessedSize);
-    _pos += realProcessedSize;
-    if (realProcessedSize == 0)
-      _wasFinished = true;
+	result = _stream->Read(data, sizeToRead, &realProcessedSize);
+	_pos += realProcessedSize;
+	if (realProcessedSize == 0)
+	  _wasFinished = true;
   }
   if(processedSize != NULL)
-    *processedSize = realProcessedSize;
+	*processedSize = realProcessedSize;
   return result;
 }
 

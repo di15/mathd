@@ -2,7 +2,6 @@
 
 
 
-
 #include "../platform.h"
 #include "font.h"
 #include "../texture.h"
@@ -386,7 +385,11 @@ void LoadFont(int id, const char* fontfile)
 	char texfile[128];
 	strcpy(texfile, fontfile);
 	FindTextureExtension(texfile);
+
+#ifdef GLDEBUG
 	CheckGLError(__FILE__, __LINE__);
+#endif
+
 	CreateTexture(f->texindex, texfile, true, false);
 	f->width = g_texwidth;
 	f->height = g_texheight;
@@ -448,7 +451,8 @@ void LoadFont(int id, const char* fontfile)
 
 		if(substr.length() > 9)
 			FSub(substr.c_str());
-	}while(i<size);
+	}
+	while(i<size);
 
 	f->gheight = f->glyph['A'].origsize[1];
 
@@ -703,7 +707,7 @@ void DrawLine(int fnt, float startx, float starty, const RichText* text, const f
 		for(int c=0; c<4; c++) currcolor[c] = color[c];
 	}
 
-	Player* py = &g_player[g_currP];
+	Player* py = &g_player[g_curP];
 	StartText(text, fnt, py->currw*2, py->currh*2, 0, startx);
 	UseFontTex();
 	TextLayer(startx, starty);
@@ -720,7 +724,7 @@ void DrawShadowedText(int fnt, float startx, float starty, const RichText* text,
 	currcolor[2] = 0;
 	currcolor[3] = color != NULL ? color[3] : 1;
 
-	Player* py = &g_player[g_currP];
+	Player* py = &g_player[g_curP];
 	StartText(text, fnt, py->currw*2, py->currh*2, 0, startx);
 	UseFontTex();
 	TextLayer(startx+1, starty);
@@ -765,7 +769,7 @@ void DrawLineF(int fnt, float startx, float starty, float framex1, float framey1
 		for(int c=0; c<4; c++) currcolor[c] = color[c];
 	}
 
-	Player* py = &g_player[g_currP];
+	Player* py = &g_player[g_curP];
 	StartTextF(text, fnt, py->currw*2, py->currh*2, 0, startx, framex1, framey1, framex2, framey2);
 	UseFontTex();
 	TextLayer(startx, starty);
@@ -780,7 +784,7 @@ void DrawShadowedTextF(int fnt, float startx, float starty, float framex1, float
 	currcolor[2] = 0;
 	currcolor[3] = color != NULL ? color[3] : 1;
 
-	Player* py = &g_player[g_currP];
+	Player* py = &g_player[g_curP];
 	StartTextF(text, fnt, py->currw*2, py->currh*2, 0, startx, framex1, framey1, framex2, framey2);
 	UseFontTex();
 	TextLayer(startx+1, starty);
@@ -811,7 +815,7 @@ void DrawShadowedTextF(int fnt, float startx, float starty, float framex1, float
 
 void HighlightF(int fnt, float startx, float starty, float framex1, float framey1, float framex2, float framey2, const RichText* text, int highlstarti, int highlendi)
 {
-	Player* py = &g_player[g_currP];
+	Player* py = &g_player[g_curP];
 	EndS();
 	UseS(SHADER_COLOR2D);
 	glUniform1f(g_shader[SHADER_COLOR2D].m_slot[SSLOT_WIDTH], (float)py->currw);
@@ -837,7 +841,9 @@ void HighlightF(int fnt, float startx, float starty, float framex1, float framey
 	}
 
 	EndS();
+#ifdef GLDEBUG
 	CheckGLError(__FILE__, __LINE__);
+#endif
 	Ortho(py->currw, py->currh, 1, 1, 1, 1);
 }
 
@@ -885,7 +891,7 @@ void DrawCenterShadText(int fnt, float startx, float starty, const RichText* tex
 	currcolor[2] = 0.0f;
 	currcolor[3] = color != NULL ? color[3] : 1;
 
-	Player* py = &g_player[g_currP];
+	Player* py = &g_player[g_curP];
 	StartText(text, fnt, py->currw*2, py->currh*2, 0, startx);
 	UseFontTex();
 	TextLayer(startx+1, starty);
@@ -1150,7 +1156,7 @@ int CountLines(const RichText* text, int fnt, float startx, float starty, float 
 
 int EndX(const RichText* text, int lastc, int fnt, float startx, float starty)
 {
-	Player* py = &g_player[g_currP];
+	Player* py = &g_player[g_curP];
 	StartText(text, fnt, py->currw*100, py->currh*100, 0, startx);
 	TextLayer(startx, starty);
 
@@ -1176,7 +1182,7 @@ int EndX(const RichText* text, int lastc, int fnt, float startx, float starty)
 
 int MatchGlyphF(const RichText* text, int fnt, int matchx, float startx, float starty, float framex1, float framey1, float framex2, float framey2)
 {
-	Player* py = &g_player[g_currP];
+	Player* py = &g_player[g_curP];
 
 	int lastclose = 0;
 

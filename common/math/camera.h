@@ -1,4 +1,3 @@
-
 #ifndef CAMERA_H
 #define CAMERA_H
 
@@ -8,13 +7,13 @@
 
 #define MOUSE_SENSITIVITY	0.0001f	//radians over pixels
 
-class Camera 
+class Camera
 {
 public:
-	Vec3f m_pos;					
-	Vec3f m_view;			
-	Vec3f m_up;		
-	Vec3f m_strafe;		
+	Vec3f m_pos;
+	Vec3f m_view;
+	Vec3f m_up;
+	Vec3f m_strafe;
 	Vec3f m_vel;
 	Vec2f m_orientv;	// pitch, yaw
 	Quaternion m_orientq;	//orientation quaternion
@@ -50,6 +49,6 @@ public:
 	float yaw();
 	float pitch();
 	Vec3f zoompos();
-};									
+};
 
 #endif

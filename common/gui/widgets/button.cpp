@@ -1,4 +1,3 @@
-
 #include "../widget.h"
 #include "barbutton.h"
 #include "button.h"
@@ -23,13 +22,13 @@ Button::Button() : Widget()
 {
 	m_parent = NULL;
 	m_type = WIDGET_BUTTON;
-    //m_text = RichText("");
-    m_font = MAINFONT8;
-    //float length = 0;
-    //for(int i=0; i<strlen(t); i++)
-    //    length += g_font[f].glyph[t[i]].w;
-    //m_tpos[0] = (left+right)/2.0f - length/2.0f;
-    //m_tpos[1] = (top+bottom)/2.0f - g_font[f].gheight/2.0f;
+	//m_text = RichText("");
+	m_font = MAINFONT8;
+	//float length = 0;
+	//for(int i=0; i<strlen(t); i++)
+	//    length += g_font[f].glyph[t[i]].w;
+	//m_tpos[0] = (left+right)/2.0f - length/2.0f;
+	//m_tpos[1] = (top+bottom)/2.0f - g_font[f].gheight/2.0f;
 	m_style = BUTTON_LINEBASED;
 	m_over = false;
 	m_ldown = false;
@@ -52,15 +51,15 @@ Button::Button(Widget* parent, const char* name, const char* filepath, const Ric
 	m_type = WIDGET_BUTTON;
 	m_name = name;
 	m_style = style;
-    m_text = tooltip;
+	m_text = tooltip;
 	m_label = label;
-    m_font = f;
-    float length = 0;
-    //for(int i=0; i<strlen(t); i++)
-    //    length += g_font[f].glyph[t[i]].origsize[0];
+	m_font = f;
+	float length = 0;
+	//for(int i=0; i<strlen(t); i++)
+	//    length += g_font[f].glyph[t[i]].origsize[0];
 	length = EndX(&m_text, m_text.rawlen(), m_font, 0, 0);
-    //m_tpos[0] = (left+right)/2.0f - length/2.0f;
-    //m_tpos[1] = (top+bottom)/2.0f - g_font[f].gheight/2.0f;
+	//m_tpos[0] = (left+right)/2.0f - length/2.0f;
+	//m_tpos[1] = (top+bottom)/2.0f - g_font[f].gheight/2.0f;
 	m_over = false;
 	m_ldown = false;
 	CreateTexture(m_tex, filepath, true, false);
@@ -89,7 +88,7 @@ void Button::reframe()
 
 void Button::inev(InEv* ev)
 {
-	Player* py = &g_player[g_currP];
+	Player* py = &g_player[g_curP];
 
 	if(ev->type == INEV_MOUSEUP && ev->key == MOUSE_LEFT && !ev->intercepted)
 	{
@@ -176,7 +175,7 @@ void Button::draw()
 	}
 	else if(m_style == BUTTON_LEFTIMAGE)
 	{
-		Player* py = &g_player[g_currP];
+		Player* py = &g_player[g_curP];
 
 		EndS();
 
@@ -207,7 +206,9 @@ void Button::draw()
 		DrawLine(darkcolor[0], darkcolor[1], darkcolor[2], darkcolor[3], m_pos[2], m_pos[1]+1, m_pos[2], m_pos[3]);
 
 		EndS();
-        CheckGLError(__FILE__, __LINE__);
+#ifdef GLDEBUG
+		CheckGLError(__FILE__, __LINE__);
+#endif
 		Ortho(py->currw, py->currh, 1, 1, 1, 1);
 
 		float w = m_pos[2]-m_pos[0]-2;
@@ -231,7 +232,7 @@ void Button::drawover()
 {
 	if(m_over)
 	{
-		Player* py = &g_player[g_currP];
+		Player* py = &g_player[g_curP];
 		//DrawShadowedText(m_font, m_tpos[0], m_tpos[1], m_text.c_str());
 		DrawShadowedText(m_font, py->mouse.x, py->mouse.y-g_font[m_font].gheight, &m_text);
 	}

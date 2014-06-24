@@ -1,5 +1,4 @@
 
-
 #ifndef VEC3I_H
 #define VEC3I_H
 
@@ -8,17 +7,17 @@ class Matrix;
 class Vec3i
 {
 public:
-	int x, y, z;	
+	int x, y, z;
 
-	Vec3i() 
+	Vec3i()
 	{
 		x = y = z = 0;
 	}
 
-	Vec3i(int X, int Y, int Z) 
-	{ 
-		x = X; 
-		y = Y; 
+	Vec3i(int X, int Y, int Z)
+	{
+		x = X;
+		y = Y;
 		z = Z;
 	}
 
@@ -52,12 +51,12 @@ public:
 	{
 		return Vec3i(x - vVector.x, y - vVector.y, z - vVector.z);
 	}
-	
+
 	Vec3i operator*(const int num) const
 	{
 		return Vec3i(x * num, y * num, z * num);
 	}
-	
+
 	Vec3i operator*(const Vec3i v) const
 	{
 		return Vec3i(x * v.x, y * v.y, z * v.z);
@@ -76,7 +75,7 @@ public:
 	}
 
 	void transform(const Matrix& m);
-	void transform3(const Matrix& m);					
+	void transform3(const Matrix& m);
 };
 
 bool Close(Vec3i a, Vec3i b);

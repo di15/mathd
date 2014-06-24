@@ -25,7 +25,7 @@
 
 @interface SDL_uikitviewcontroller : UIViewController {
 @private
-    SDL_Window *window;
+	SDL_Window *window;
 }
 
 @property (readwrite) SDL_Window *window;

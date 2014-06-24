@@ -1,4 +1,3 @@
-
 #ifndef TEXTBLOCK_H
 #define TEXTBLOCK_H
 

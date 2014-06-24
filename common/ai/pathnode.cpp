@@ -1,5 +1,4 @@
 
-
 #include "pathnode.h"
 #include "../math/vec2i.h"
 #include "../math/3dmath.h"
@@ -269,7 +268,7 @@ void SnapToNode(PathJob* pj)
 			return;
 	}
 
-	foundnode:
+foundnode:
 
 	Vec2i cmpos = Vec2i( npos.x * PATHNODE_SIZE + PATHNODE_SIZE/2, npos.y * PATHNODE_SIZE + PATHNODE_SIZE/2 );
 

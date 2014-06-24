@@ -1,5 +1,4 @@
 
-
 #include "pathjob.h"
 #include "pathnode.h"
 #include "collidertile.h"
@@ -102,14 +101,14 @@ bool PathJob::process()
 
 	if((pjtype == PATHJOB_QUICKPARTIAL || pjtype == PATHJOB_JPSPART) && closestnode)
 	{
-        pathfound = true;
+		pathfound = true;
 		ReconstructPath(this, closestnode);
 	}
 
 	ClearNodes(g_toclear);
 
-    if(callback)
-        callback(pathfound, this);
+	if(callback)
+		callback(pathfound, this);
 
 	return true;
 }

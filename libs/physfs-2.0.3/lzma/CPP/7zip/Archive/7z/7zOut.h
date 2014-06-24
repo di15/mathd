@@ -23,17 +23,17 @@ public:
   CWriteBufferLoc(): _size(0), _pos(0) {}
   void Init(Byte *data, size_t size)  
   { 
-    _pos = 0;
-    _data = data;
-    _size = size; 
+	_pos = 0;
+	_data = data;
+	_size = size; 
   }
   HRESULT Write(const void *data, size_t size)
   {
-    if (_pos + size > _size)
-      return E_FAIL;
-    memmove(_data + _pos, data, size);
-    _pos += size;
-    return S_OK; 
+	if (_pos + size > _size)
+	  return E_FAIL;
+	memmove(_data + _pos, data, size);
+	_pos += size;
+	return S_OK; 
   }
 };
 
@@ -45,14 +45,14 @@ public:
   CWriteDynamicBuffer(): _pos(0) {}
   void Init()  
   { 
-    _pos = 0;
+	_pos = 0;
   }
   void Write(const void *data, size_t size)
   {
-    if (_pos + size > _buffer.GetCapacity())
-      _buffer.EnsureCapacity(_pos + size);
-    memmove(((Byte *)_buffer) +_pos, data, size);
-    _pos += size;
+	if (_pos + size > _buffer.GetCapacity())
+	  _buffer.EnsureCapacity(_pos + size);
+	memmove(((Byte *)_buffer) +_pos, data, size);
+	_pos += size;
   }
   operator Byte *() { return (Byte *)_buffer; };
   operator const Byte *() const { return (const Byte *)_buffer; };
@@ -68,11 +68,11 @@ struct CHeaderOptions
   bool WriteAccessed;
 
   CHeaderOptions(): 
-      // UseAdditionalHeaderStreams(false), 
-      CompressMainHeader(true),
-      WriteModified(true),
-      WriteCreated(false),
-      WriteAccessed(false) {} 
+	  // UseAdditionalHeaderStreams(false), 
+	  CompressMainHeader(true),
+	  WriteModified(true),
+	  WriteCreated(false),
+	  WriteAccessed(false) {} 
 };
 
 class COutArchive
@@ -95,54 +95,54 @@ class COutArchive
   HRESULT WriteFileHeader(const CFileItem &itemInfo);
   HRESULT WriteBoolVector(const CBoolVector &boolVector);
   HRESULT WriteHashDigests(
-      const CRecordVector<bool> &digestsDefined,
-      const CRecordVector<UInt32> &hashDigests);
+	  const CRecordVector<bool> &digestsDefined,
+	  const CRecordVector<UInt32> &hashDigests);
 
   HRESULT WritePackInfo(
-      UInt64 dataOffset,
-      const CRecordVector<UInt64> &packSizes,
-      const CRecordVector<bool> &packCRCsDefined,
-      const CRecordVector<UInt32> &packCRCs);
+	  UInt64 dataOffset,
+	  const CRecordVector<UInt64> &packSizes,
+	  const CRecordVector<bool> &packCRCsDefined,
+	  const CRecordVector<UInt32> &packCRCs);
 
   HRESULT WriteUnPackInfo(const CObjectVector<CFolder> &folders);
 
   HRESULT WriteSubStreamsInfo(
-      const CObjectVector<CFolder> &folders,
-      const CRecordVector<CNum> &numUnPackStreamsInFolders,
-      const CRecordVector<UInt64> &unPackSizes,
-      const CRecordVector<bool> &digestsDefined,
-      const CRecordVector<UInt32> &hashDigests);
+	  const CObjectVector<CFolder> &folders,
+	  const CRecordVector<CNum> &numUnPackStreamsInFolders,
+	  const CRecordVector<UInt64> &unPackSizes,
+	  const CRecordVector<bool> &digestsDefined,
+	  const CRecordVector<UInt32> &hashDigests);
 
   /*
   HRESULT WriteStreamsInfo(
-      UInt64 dataOffset,
-      const CRecordVector<UInt64> &packSizes,
-      const CRecordVector<bool> &packCRCsDefined,
-      const CRecordVector<UInt32> &packCRCs,
-      bool externalFolders,
-      UInt64 externalFoldersStreamIndex,
-      const CObjectVector<CFolder> &folders,
-      const CRecordVector<CNum> &numUnPackStreamsInFolders,
-      const CRecordVector<UInt64> &unPackSizes,
-      const CRecordVector<bool> &digestsDefined,
-      const CRecordVector<UInt32> &hashDigests);
+	  UInt64 dataOffset,
+	  const CRecordVector<UInt64> &packSizes,
+	  const CRecordVector<bool> &packCRCsDefined,
+	  const CRecordVector<UInt32> &packCRCs,
+	  bool externalFolders,
+	  UInt64 externalFoldersStreamIndex,
+	  const CObjectVector<CFolder> &folders,
+	  const CRecordVector<CNum> &numUnPackStreamsInFolders,
+	  const CRecordVector<UInt64> &unPackSizes,
+	  const CRecordVector<bool> &digestsDefined,
+	  const CRecordVector<UInt32> &hashDigests);
   */
 
 
   HRESULT WriteTime(const CObjectVector<CFileItem> &files, Byte type);
 
   HRESULT EncodeStream(
-      DECL_EXTERNAL_CODECS_LOC_VARS
-      CEncoder &encoder, const Byte *data, size_t dataSize,
-      CRecordVector<UInt64> &packSizes, CObjectVector<CFolder> &folders);
+	  DECL_EXTERNAL_CODECS_LOC_VARS
+	  CEncoder &encoder, const Byte *data, size_t dataSize,
+	  CRecordVector<UInt64> &packSizes, CObjectVector<CFolder> &folders);
   HRESULT EncodeStream(
-      DECL_EXTERNAL_CODECS_LOC_VARS
-      CEncoder &encoder, const CByteBuffer &data, 
-      CRecordVector<UInt64> &packSizes, CObjectVector<CFolder> &folders);
+	  DECL_EXTERNAL_CODECS_LOC_VARS
+	  CEncoder &encoder, const CByteBuffer &data, 
+	  CRecordVector<UInt64> &packSizes, CObjectVector<CFolder> &folders);
   HRESULT WriteHeader(
-      const CArchiveDatabase &database,
-      const CHeaderOptions &headerOptions,
-      UInt64 &headerOffset);
+	  const CArchiveDatabase &database,
+	  const CHeaderOptions &headerOptions,
+	  UInt64 &headerOffset);
   
   bool _mainMode;
 
@@ -176,10 +176,10 @@ public:
   void Close();
   HRESULT SkeepPrefixArchiveHeader();
   HRESULT WriteDatabase(
-      DECL_EXTERNAL_CODECS_LOC_VARS
-      const CArchiveDatabase &database,
-      const CCompressionMethodMode *options, 
-      const CHeaderOptions &headerOptions);
+	  DECL_EXTERNAL_CODECS_LOC_VARS
+	  const CArchiveDatabase &database,
+	  const CCompressionMethodMode *options, 
+	  const CHeaderOptions &headerOptions);
 
   #ifdef _7Z_VOL
   static UInt32 GetVolHeadersSize(UInt64 dataSize, int nameLength = 0, bool props = false);

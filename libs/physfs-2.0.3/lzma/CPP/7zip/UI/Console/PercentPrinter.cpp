@@ -23,7 +23,7 @@ static void ClearPrev(char *p, int num)
 void CPercentPrinter::ClosePrint()
 {
   if (m_NumExtraChars == 0)
-    return;
+	return;
   char s[kMaxExtraSize * 3 + 1];
   ClearPrev(s, m_NumExtraChars);
   (*OutStream) << s;
@@ -58,23 +58,23 @@ void CPercentPrinter::RePrintRatio()
 
   int extraSize = kPaddingSize + MyMax(size, kPercentsSize);
   if (extraSize < m_NumExtraChars)
-    extraSize = m_NumExtraChars;
+	extraSize = m_NumExtraChars;
 
   char fullString[kMaxExtraSize * 3];
   char *p = fullString;
   int i;
   if (m_NumExtraChars == 0)
   {
-    for (i = 0; i < extraSize; i++) 
-      *p++ = ' ';
-    m_NumExtraChars = extraSize;
+	for (i = 0; i < extraSize; i++) 
+	  *p++ = ' ';
+	m_NumExtraChars = extraSize;
   }
 
   for (i = 0; i < m_NumExtraChars; i++) 
-    *p++ = '\b';
+	*p++ = '\b';
   m_NumExtraChars = extraSize;
   for (; size < m_NumExtraChars; size++)
-    *p++ = ' ';
+	*p++ = ' ';
   MyStringCopy(p, s);
   (*OutStream) << fullString;
   OutStream->Flush(); 
@@ -84,7 +84,7 @@ void CPercentPrinter::RePrintRatio()
 void CPercentPrinter::PrintRatio()
 {
   if (m_CurValue < m_PrevValue + m_MinStepSize && 
-      m_CurValue + m_MinStepSize > m_PrevValue && m_NumExtraChars != 0)
-    return;
+	  m_CurValue + m_MinStepSize > m_PrevValue && m_NumExtraChars != 0)
+	return;
   RePrintRatio();
 }

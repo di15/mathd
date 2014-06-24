@@ -1,4 +1,3 @@
-
 #ifndef LABOURER_H
 #define LABOURER_H
 

@@ -11,11 +11,11 @@
   freely, subject to the following restrictions:
 
   1. The origin of this software must not be misrepresented; you must not
-     claim that you wrote the original software. If you use this software
-     in a product, an acknowledgment in the product documentation would be
-     appreciated but is not required.
+	 claim that you wrote the original software. If you use this software
+	 in a product, an acknowledgment in the product documentation would be
+	 appreciated but is not required.
   2. Altered source versions must be plainly marked as such, and must not be
-     misrepresented as being the original software.
+	 misrepresented as being the original software.
   3. This notice may not be removed or altered from any source distribution.
 */
 
@@ -34,7 +34,7 @@ extern "C" {
 #ifdef SDL_DEFAULT_ASSERT_LEVEL
 #define SDL_ASSERT_LEVEL SDL_DEFAULT_ASSERT_LEVEL
 #elif defined(_DEBUG) || defined(DEBUG) || \
-      (defined(__GNUC__) && !defined(__OPTIMIZE__))
+	  (defined(__GNUC__) && !defined(__OPTIMIZE__))
 #define SDL_ASSERT_LEVEL 2
 #else
 #define SDL_ASSERT_LEVEL 1
@@ -49,16 +49,16 @@ assert can have unique static variables associated with it.
 
 #if defined(_MSC_VER)
 /* Don't include intrin.h here because it contains C++ code */
-    extern void __cdecl __debugbreak(void);
-    #define SDL_TriggerBreakpoint() __debugbreak()
+	extern void __cdecl __debugbreak(void);
+	#define SDL_TriggerBreakpoint() __debugbreak()
 #elif (defined(__GNUC__) && (defined(__i386__) || defined(__x86_64__)))
-    #define SDL_TriggerBreakpoint() __asm__ __volatile__ ( "int $3\n\t" )
+	#define SDL_TriggerBreakpoint() __asm__ __volatile__ ( "int $3\n\t" )
 #elif defined(HAVE_SIGNAL_H)
-    #include <signal.h>
-    #define SDL_TriggerBreakpoint() raise(SIGTRAP)
+	#include <signal.h>
+	#define SDL_TriggerBreakpoint() raise(SIGTRAP)
 #else
-    /* How do we trigger breakpoints on this platform? */
-    #define SDL_TriggerBreakpoint()
+	/* How do we trigger breakpoints on this platform? */
+	#define SDL_TriggerBreakpoint()
 #endif
 
 #if defined(__STDC_VERSION__) && (__STDC_VERSION__ >= 199901L) /* C99 supports __func__ as a standard. */
@@ -79,8 +79,8 @@ expensive checks at run time, just the constant size of what x WOULD be,
 which presumably gets optimized out as unused.
 This also solves the problem of...
 
-    int somevalue = blah();
-    SDL_assert(somevalue == 1);
+	int somevalue = blah();
+	SDL_assert(somevalue == 1);
 
 ...which would cause compiles to complain that somevalue is unused if we
 disable assertions.
@@ -93,60 +93,60 @@ disable assertions.
 #endif
 
 #define SDL_disabled_assert(condition) \
-    do { (void) sizeof ((condition)); } while (SDL_NULL_WHILE_LOOP_CONDITION)
+	do { (void) sizeof ((condition)); } while (SDL_NULL_WHILE_LOOP_CONDITION)
 
 typedef enum
 {
-    SDL_ASSERTION_RETRY,  /**< Retry the assert immediately. */
-    SDL_ASSERTION_BREAK,  /**< Make the debugger trigger a breakpoint. */
-    SDL_ASSERTION_ABORT,  /**< Terminate the program. */
-    SDL_ASSERTION_IGNORE,  /**< Ignore the assert. */
-    SDL_ASSERTION_ALWAYS_IGNORE  /**< Ignore the assert from now on. */
+	SDL_ASSERTION_RETRY,  /**< Retry the assert immediately. */
+	SDL_ASSERTION_BREAK,  /**< Make the debugger trigger a breakpoint. */
+	SDL_ASSERTION_ABORT,  /**< Terminate the program. */
+	SDL_ASSERTION_IGNORE,  /**< Ignore the assert. */
+	SDL_ASSERTION_ALWAYS_IGNORE  /**< Ignore the assert from now on. */
 } SDL_assert_state;
 
 typedef struct SDL_assert_data
 {
-    int always_ignore;
-    unsigned int trigger_count;
-    const char *condition;
-    const char *filename;
-    int linenum;
-    const char *function;
-    const struct SDL_assert_data *next;
+	int always_ignore;
+	unsigned int trigger_count;
+	const char *condition;
+	const char *filename;
+	int linenum;
+	const char *function;
+	const struct SDL_assert_data *next;
 } SDL_assert_data;
 
 #if (SDL_ASSERT_LEVEL > 0)
 
 /* Never call this directly. Use the SDL_assert* macros. */
 extern DECLSPEC SDL_assert_state SDLCALL SDL_ReportAssertion(SDL_assert_data *,
-                                                             const char *,
-                                                             const char *, int);
+															 const char *,
+															 const char *, int);
 
 /* the do {} while(0) avoids dangling else problems:
-    if (x) SDL_assert(y); else blah();
-       ... without the do/while, the "else" could attach to this macro's "if".
+	if (x) SDL_assert(y); else blah();
+	   ... without the do/while, the "else" could attach to this macro's "if".
    We try to handle just the minimum we need here in a macro...the loop,
    the static vars, and break points. The heavy lifting is handled in
    SDL_ReportAssertion(), in SDL_assert.c.
 */
 #define SDL_enabled_assert(condition) \
-    do { \
-        while ( !(condition) ) { \
-            static struct SDL_assert_data assert_data = { \
-                0, 0, #condition, 0, 0, 0, 0 \
-            }; \
-            const SDL_assert_state state = SDL_ReportAssertion(&assert_data, \
-                                                               SDL_FUNCTION, \
-                                                               SDL_FILE, \
-                                                               SDL_LINE); \
-            if (state == SDL_ASSERTION_RETRY) { \
-                continue; /* go again. */ \
-            } else if (state == SDL_ASSERTION_BREAK) { \
-                SDL_TriggerBreakpoint(); \
-            } \
-            break; /* not retrying. */ \
-        } \
-    } while (SDL_NULL_WHILE_LOOP_CONDITION)
+	do { \
+		while ( !(condition) ) { \
+			static struct SDL_assert_data assert_data = { \
+				0, 0, #condition, 0, 0, 0, 0 \
+			}; \
+			const SDL_assert_state state = SDL_ReportAssertion(&assert_data, \
+															   SDL_FUNCTION, \
+															   SDL_FILE, \
+															   SDL_LINE); \
+			if (state == SDL_ASSERTION_RETRY) { \
+				continue; /* go again. */ \
+			} else if (state == SDL_ASSERTION_BREAK) { \
+				SDL_TriggerBreakpoint(); \
+			} \
+			break; /* not retrying. */ \
+		} \
+	} while (SDL_NULL_WHILE_LOOP_CONDITION)
 
 #endif  /* enabled assertions support code */
 
@@ -176,7 +176,7 @@ extern DECLSPEC SDL_assert_state SDLCALL SDL_ReportAssertion(SDL_assert_data *,
 
 
 typedef SDL_assert_state (SDLCALL *SDL_AssertionHandler)(
-                                 const SDL_assert_data* data, void* userdata);
+								 const SDL_assert_data* data, void* userdata);
 
 /**
  *  \brief Set an application-defined assertion handler.
@@ -199,8 +199,8 @@ typedef SDL_assert_state (SDLCALL *SDL_AssertionHandler)(
  *  \param userdata A pointer passed to the callback as-is.
  */
 extern DECLSPEC void SDLCALL SDL_SetAssertionHandler(
-                                            SDL_AssertionHandler handler,
-                                            void *userdata);
+											SDL_AssertionHandler handler,
+											void *userdata);
 
 /**
  *  \brief Get a list of all assertion failures.

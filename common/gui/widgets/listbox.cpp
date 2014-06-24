@@ -1,6 +1,5 @@
 
 
-
 #include "../widget.h"
 #include "barbutton.h"
 #include "button.h"
@@ -98,7 +97,7 @@ void ListBox::draw()
 
 void ListBox::inev(InEv* ev)
 {
-	Player* py = &g_player[g_currP];
+	Player* py = &g_player[g_curP];
 
 	if(ev->type == INEV_MOUSEMOVE && !ev->intercepted)
 	{
@@ -144,7 +143,7 @@ void ListBox::inev(InEv* ev)
 			int row = i-(int)m_scroll[1];
 			// std::list item?
 			if(py->mouse.x >= m_pos[0] && py->mouse.x <= m_pos[2]-square() && py->mouse.y >= m_pos[1]+f->gheight*row
-				&& py->mouse.y <= m_pos[1]+f->gheight*(row+1))
+					&& py->mouse.y <= m_pos[1]+f->gheight*(row+1))
 			{
 				m_ldown = true;
 				ev->intercepted = true;
@@ -201,7 +200,7 @@ void ListBox::inev(InEv* ev)
 
 			// std::list item?
 			if(py->mouse.x >= m_pos[0] && py->mouse.x <= m_pos[2]-square() && py->mouse.y >= m_pos[1]+f->gheight*row
-				&& py->mouse.y <= m_pos[1]+f->gheight*(row+1))
+					&& py->mouse.y <= m_pos[1]+f->gheight*(row+1))
 			{
 				m_selected = i;
 				if(changefunc != NULL)

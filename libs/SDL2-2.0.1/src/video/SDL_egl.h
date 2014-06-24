@@ -11,11 +11,11 @@
   freely, subject to the following restrictions:
 
   1. The origin of this software must not be misrepresented; you must not
-     claim that you wrote the original software. If you use this software
-     in a product, an acknowledgment in the product documentation would be
-     appreciated but is not required.
+	 claim that you wrote the original software. If you use this software
+	 in a product, an acknowledgment in the product documentation would be
+	 appreciated but is not required.
   2. Altered source versions must be plainly marked as such, and must not be
-     misrepresented as being the original software.
+	 misrepresented as being the original software.
   3. This notice may not be removed or altered from any source distribution.
 */
 #include "SDL_config.h"
@@ -36,51 +36,51 @@
 
 typedef struct SDL_EGL_VideoData
 {
-    void *egl_dll_handle;
-    EGLDisplay egl_display;
-    EGLConfig egl_config;
-    int egl_swapinterval;
-    
-    EGLDisplay(*eglGetDisplay) (NativeDisplayType display);
-    EGLBoolean(*eglInitialize) (EGLDisplay dpy, EGLint * major,
-                                EGLint * minor);
-    EGLBoolean(*eglTerminate) (EGLDisplay dpy);
-    
-    void *(*eglGetProcAddress) (const char * procName);
-    
-    EGLBoolean(*eglChooseConfig) (EGLDisplay dpy,
-                                  const EGLint * attrib_list,
-                                  EGLConfig * configs,
-                                  EGLint config_size, EGLint * num_config);
-    
-    EGLContext(*eglCreateContext) (EGLDisplay dpy,
-                                   EGLConfig config,
-                                   EGLContext share_list,
-                                   const EGLint * attrib_list);
-    
-    EGLBoolean(*eglDestroyContext) (EGLDisplay dpy, EGLContext ctx);
-    
-    EGLSurface(*eglCreateWindowSurface) (EGLDisplay dpy,
-                                         EGLConfig config,
-                                         NativeWindowType window,
-                                         const EGLint * attrib_list);
-    EGLBoolean(*eglDestroySurface) (EGLDisplay dpy, EGLSurface surface);
-    
-    EGLBoolean(*eglMakeCurrent) (EGLDisplay dpy, EGLSurface draw,
-                                 EGLSurface read, EGLContext ctx);
-    
-    EGLBoolean(*eglSwapBuffers) (EGLDisplay dpy, EGLSurface draw);
-    
-    EGLBoolean(*eglSwapInterval) (EGLDisplay dpy, EGLint interval);
-    
-    const char *(*eglQueryString) (EGLDisplay dpy, EGLint name);
-    
-    EGLBoolean(*eglGetConfigAttrib) (EGLDisplay dpy, EGLConfig config,
-                                     EGLint attribute, EGLint * value);
-    
-    EGLBoolean(*eglWaitNative) (EGLint  engine);
+	void *egl_dll_handle;
+	EGLDisplay egl_display;
+	EGLConfig egl_config;
+	int egl_swapinterval;
+	
+	EGLDisplay(*eglGetDisplay) (NativeDisplayType display);
+	EGLBoolean(*eglInitialize) (EGLDisplay dpy, EGLint * major,
+								EGLint * minor);
+	EGLBoolean(*eglTerminate) (EGLDisplay dpy);
+	
+	void *(*eglGetProcAddress) (const char * procName);
+	
+	EGLBoolean(*eglChooseConfig) (EGLDisplay dpy,
+								  const EGLint * attrib_list,
+								  EGLConfig * configs,
+								  EGLint config_size, EGLint * num_config);
+	
+	EGLContext(*eglCreateContext) (EGLDisplay dpy,
+								   EGLConfig config,
+								   EGLContext share_list,
+								   const EGLint * attrib_list);
+	
+	EGLBoolean(*eglDestroyContext) (EGLDisplay dpy, EGLContext ctx);
+	
+	EGLSurface(*eglCreateWindowSurface) (EGLDisplay dpy,
+										 EGLConfig config,
+										 NativeWindowType window,
+										 const EGLint * attrib_list);
+	EGLBoolean(*eglDestroySurface) (EGLDisplay dpy, EGLSurface surface);
+	
+	EGLBoolean(*eglMakeCurrent) (EGLDisplay dpy, EGLSurface draw,
+								 EGLSurface read, EGLContext ctx);
+	
+	EGLBoolean(*eglSwapBuffers) (EGLDisplay dpy, EGLSurface draw);
+	
+	EGLBoolean(*eglSwapInterval) (EGLDisplay dpy, EGLint interval);
+	
+	const char *(*eglQueryString) (EGLDisplay dpy, EGLint name);
+	
+	EGLBoolean(*eglGetConfigAttrib) (EGLDisplay dpy, EGLConfig config,
+									 EGLint attribute, EGLint * value);
+	
+	EGLBoolean(*eglWaitNative) (EGLint  engine);
 
-    EGLBoolean(*eglWaitGL)(void);   
+	EGLBoolean(*eglWaitGL)(void);   
 } SDL_EGL_VideoData;
 
 /* OpenGLES functions */
@@ -105,24 +105,24 @@ extern void SDL_EGL_SwapBuffers(_THIS, EGLSurface egl_surface);
 #define SDL_EGL_SwapWindow_impl(BACKEND) void \
 BACKEND ## _GLES_SwapWindow(_THIS, SDL_Window * window) \
 {\
-    SDL_EGL_SwapBuffers(_this, ((SDL_WindowData *) window->driverdata)->egl_surface);\
+	SDL_EGL_SwapBuffers(_this, ((SDL_WindowData *) window->driverdata)->egl_surface);\
 }
 
 #define SDL_EGL_MakeCurrent_impl(BACKEND) int \
 BACKEND ## _GLES_MakeCurrent(_THIS, SDL_Window * window, SDL_GLContext context) \
 {\
-    if (window && context) { \
-        return SDL_EGL_MakeCurrent(_this, ((SDL_WindowData *) window->driverdata)->egl_surface, context); \
-    }\
-    else {\
-        return SDL_EGL_MakeCurrent(_this, NULL, NULL);\
-    }\
+	if (window && context) { \
+		return SDL_EGL_MakeCurrent(_this, ((SDL_WindowData *) window->driverdata)->egl_surface, context); \
+	}\
+	else {\
+		return SDL_EGL_MakeCurrent(_this, NULL, NULL);\
+	}\
 }
 
 #define SDL_EGL_CreateContext_impl(BACKEND) SDL_GLContext \
 BACKEND ## _GLES_CreateContext(_THIS, SDL_Window * window) \
 {\
-    return SDL_EGL_CreateContext(_this, ((SDL_WindowData *) window->driverdata)->egl_surface);\
+	return SDL_EGL_CreateContext(_this, ((SDL_WindowData *) window->driverdata)->egl_surface);\
 }
 
 #endif /* SDL_VIDEO_OPENGL_EGL */

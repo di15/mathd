@@ -11,11 +11,11 @@
   freely, subject to the following restrictions:
 
   1. The origin of this software must not be misrepresented; you must not
-     claim that you wrote the original software. If you use this software
-     in a product, an acknowledgment in the product documentation would be
-     appreciated but is not required.
+	 claim that you wrote the original software. If you use this software
+	 in a product, an acknowledgment in the product documentation would be
+	 appreciated but is not required.
   2. Altered source versions must be plainly marked as such, and must not be
-     misrepresented as being the original software.
+	 misrepresented as being the original software.
   3. This notice may not be removed or altered from any source distribution.
 */
 
@@ -33,7 +33,7 @@ extern int BE_GL_LoadLibrary(_THIS, const char *path);                  /* FIXME
 extern void *BE_GL_GetProcAddress(_THIS, const char *proc);             /* FIXME */
 extern void BE_GL_UnloadLibrary(_THIS);                                 /* TODO */
 extern int BE_GL_MakeCurrent(_THIS, SDL_Window * window,
-                              SDL_GLContext context);
+							  SDL_GLContext context);
 extern int BE_GL_SetSwapInterval(_THIS, int interval);                  /* TODO */
 extern int BE_GL_GetSwapInterval(_THIS);                                /* TODO */
 extern void BE_GL_SwapWindow(_THIS, SDL_Window * window);

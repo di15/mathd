@@ -11,11 +11,11 @@
   freely, subject to the following restrictions:
 
   1. The origin of this software must not be misrepresented; you must not
-     claim that you wrote the original software. If you use this software
-     in a product, an acknowledgment in the product documentation would be
-     appreciated but is not required.
+	 claim that you wrote the original software. If you use this software
+	 in a product, an acknowledgment in the product documentation would be
+	 appreciated but is not required.
   2. Altered source versions must be plainly marked as such, and must not be
-     misrepresented as being the original software.
+	 misrepresented as being the original software.
   3. This notice may not be removed or altered from any source distribution.
 */
 
@@ -45,19 +45,19 @@ typedef struct SDL_Cursor SDL_Cursor;   /* Implementation dependent */
  */
 typedef enum
 {
-    SDL_SYSTEM_CURSOR_ARROW,     /**< Arrow */
-    SDL_SYSTEM_CURSOR_IBEAM,     /**< I-beam */
-    SDL_SYSTEM_CURSOR_WAIT,      /**< Wait */
-    SDL_SYSTEM_CURSOR_CROSSHAIR, /**< Crosshair */
-    SDL_SYSTEM_CURSOR_WAITARROW, /**< Small wait cursor (or Wait if not available) */
-    SDL_SYSTEM_CURSOR_SIZENWSE,  /**< Double arrow pointing northwest and southeast */
-    SDL_SYSTEM_CURSOR_SIZENESW,  /**< Double arrow pointing northeast and southwest */
-    SDL_SYSTEM_CURSOR_SIZEWE,    /**< Double arrow pointing west and east */
-    SDL_SYSTEM_CURSOR_SIZENS,    /**< Double arrow pointing north and south */
-    SDL_SYSTEM_CURSOR_SIZEALL,   /**< Four pointed arrow pointing north, south, east, and west */
-    SDL_SYSTEM_CURSOR_NO,        /**< Slashed circle or crossbones */
-    SDL_SYSTEM_CURSOR_HAND,      /**< Hand */
-    SDL_NUM_SYSTEM_CURSORS
+	SDL_SYSTEM_CURSOR_ARROW,     /**< Arrow */
+	SDL_SYSTEM_CURSOR_IBEAM,     /**< I-beam */
+	SDL_SYSTEM_CURSOR_WAIT,      /**< Wait */
+	SDL_SYSTEM_CURSOR_CROSSHAIR, /**< Crosshair */
+	SDL_SYSTEM_CURSOR_WAITARROW, /**< Small wait cursor (or Wait if not available) */
+	SDL_SYSTEM_CURSOR_SIZENWSE,  /**< Double arrow pointing northwest and southeast */
+	SDL_SYSTEM_CURSOR_SIZENESW,  /**< Double arrow pointing northeast and southwest */
+	SDL_SYSTEM_CURSOR_SIZEWE,    /**< Double arrow pointing west and east */
+	SDL_SYSTEM_CURSOR_SIZENS,    /**< Double arrow pointing north and south */
+	SDL_SYSTEM_CURSOR_SIZEALL,   /**< Four pointed arrow pointing north, south, east, and west */
+	SDL_SYSTEM_CURSOR_NO,        /**< Slashed circle or crossbones */
+	SDL_SYSTEM_CURSOR_HAND,      /**< Hand */
+	SDL_NUM_SYSTEM_CURSORS
 } SDL_SystemCursor;
 
 /* Function prototypes */
@@ -96,7 +96,7 @@ extern DECLSPEC Uint32 SDLCALL SDL_GetRelativeMouseState(int *x, int *y);
  *  \note This function generates a mouse motion event
  */
 extern DECLSPEC void SDLCALL SDL_WarpMouseInWindow(SDL_Window * window,
-                                                   int x, int y);
+												   int x, int y);
 
 /**
  *  \brief Set relative mouse mode.
@@ -142,9 +142,9 @@ extern DECLSPEC SDL_bool SDLCALL SDL_GetRelativeMouseMode(void);
  *  \sa SDL_FreeCursor()
  */
 extern DECLSPEC SDL_Cursor *SDLCALL SDL_CreateCursor(const Uint8 * data,
-                                                     const Uint8 * mask,
-                                                     int w, int h, int hot_x,
-                                                     int hot_y);
+													 const Uint8 * mask,
+													 int w, int h, int hot_x,
+													 int hot_y);
 
 /**
  *  \brief Create a color cursor.
@@ -152,8 +152,8 @@ extern DECLSPEC SDL_Cursor *SDLCALL SDL_CreateCursor(const Uint8 * data,
  *  \sa SDL_FreeCursor()
  */
 extern DECLSPEC SDL_Cursor *SDLCALL SDL_CreateColorCursor(SDL_Surface *surface,
-                                                          int hot_x,
-                                                          int hot_y);
+														  int hot_x,
+														  int hot_y);
 
 /**
  *  \brief Create a system cursor.

@@ -2,7 +2,6 @@
 
 
 
-
 #include "frustum.h"
 #include "../utils.h"
 #include "../platform.h"
@@ -37,8 +36,8 @@ enum PlaneData
 void NormalizePlane(float frustum[6][4], int side)
 {
 	float magnitude = (float)sqrtf( frustum[side][A] * frustum[side][A] +
-								   frustum[side][B] * frustum[side][B] +
-								   frustum[side][C] * frustum[side][C] );
+									frustum[side][B] * frustum[side][B] +
+									frustum[side][C] * frustum[side][C] );
 
 	frustum[side][A] /= magnitude;
 	frustum[side][B] /= magnitude;
@@ -220,21 +219,21 @@ bool Frustum::cubein( float x, float y, float z, float size )
 	for(int i = 0; i < 6; i++ )
 	{
 		if(m_Frustum[i][A] * (x - size) + m_Frustum[i][B] * (y - size) + m_Frustum[i][C] * (z - size) + m_Frustum[i][D] > 0)
-		   continue;
+			continue;
 		if(m_Frustum[i][A] * (x + size) + m_Frustum[i][B] * (y - size) + m_Frustum[i][C] * (z - size) + m_Frustum[i][D] > 0)
-		   continue;
+			continue;
 		if(m_Frustum[i][A] * (x - size) + m_Frustum[i][B] * (y + size) + m_Frustum[i][C] * (z - size) + m_Frustum[i][D] > 0)
-		   continue;
+			continue;
 		if(m_Frustum[i][A] * (x + size) + m_Frustum[i][B] * (y + size) + m_Frustum[i][C] * (z - size) + m_Frustum[i][D] > 0)
-		   continue;
+			continue;
 		if(m_Frustum[i][A] * (x - size) + m_Frustum[i][B] * (y - size) + m_Frustum[i][C] * (z + size) + m_Frustum[i][D] > 0)
-		   continue;
+			continue;
 		if(m_Frustum[i][A] * (x + size) + m_Frustum[i][B] * (y - size) + m_Frustum[i][C] * (z + size) + m_Frustum[i][D] > 0)
-		   continue;
+			continue;
 		if(m_Frustum[i][A] * (x - size) + m_Frustum[i][B] * (y + size) + m_Frustum[i][C] * (z + size) + m_Frustum[i][D] > 0)
-		   continue;
+			continue;
 		if(m_Frustum[i][A] * (x + size) + m_Frustum[i][B] * (y + size) + m_Frustum[i][C] * (z + size) + m_Frustum[i][D] > 0)
-		   continue;
+			continue;
 
 		// If we get here, it isn't in the frustum
 		return false;

@@ -1,4 +1,3 @@
-
 #include "camera.h"
 #include "3dmath.h"
 #include "physics.h"
@@ -116,7 +115,7 @@ void Camera::rotatebymouse(int dx, int dy)
 	float angleZ = (float)( -dy ) * MOUSE_SENSITIVITY;
 
 	static float lastRotX = 0.0f;
- 	lastRotX = m_orientv.x; // We store off the currentRotX and will use it in when the angle is capped
+	lastRotX = m_orientv.x; // We store off the currentRotX and will use it in when the angle is capped
 
 	// Here we keep track of the current rotation (for up and down) so that
 	// we can restrict the camera from doing a full 360 loop.
@@ -370,7 +369,7 @@ void Camera::calcstrafe()
 
 Vec3f Camera::zoompos()
 {
-	Player* py = &g_player[g_currP];
+	Player* py = &g_player[g_curP];
 	Vec3f dir = Normalize( m_view - m_pos );
 	Vec3f posvec = m_view - dir * 1000.0f / py->zoom;
 	//return Vec3f(0,0,0);

@@ -72,143 +72,143 @@ moved and the "nearest" point has to be from the moved position.
 
 void MakeHull(Vec3f* norms, float* ds, const Vec3f pos, const float radius, const float height)
 {
-    MakePlane(&norms[0], &ds[0], pos + Vec3f(0, height, 0), Vec3f(0, 1, 0));	//up
-    MakePlane(&norms[1], &ds[1], pos + Vec3f(0, 0, 0), Vec3f(0, -1, 0));	//down
-    MakePlane(&norms[2], &ds[2], pos + Vec3f(-radius, 0, 0), Vec3f(-1, 0, 0));	//left
-    MakePlane(&norms[3], &ds[3], pos + Vec3f(radius, 0, 0), Vec3f(1, 0, 0));	//right
-    MakePlane(&norms[4], &ds[4], pos + Vec3f(0, 0, -radius), Vec3f(0, 0, -1));	//front
-    MakePlane(&norms[5], &ds[5], pos + Vec3f(0, 0, radius), Vec3f(0, 0, 1));	//back
+	MakePlane(&norms[0], &ds[0], pos + Vec3f(0, height, 0), Vec3f(0, 1, 0));	//up
+	MakePlane(&norms[1], &ds[1], pos + Vec3f(0, 0, 0), Vec3f(0, -1, 0));	//down
+	MakePlane(&norms[2], &ds[2], pos + Vec3f(-radius, 0, 0), Vec3f(-1, 0, 0));	//left
+	MakePlane(&norms[3], &ds[3], pos + Vec3f(radius, 0, 0), Vec3f(1, 0, 0));	//right
+	MakePlane(&norms[4], &ds[4], pos + Vec3f(0, 0, -radius), Vec3f(0, 0, -1));	//front
+	MakePlane(&norms[5], &ds[5], pos + Vec3f(0, 0, radius), Vec3f(0, 0, 1));	//back
 }
 
 void MakeHull(Vec3f* norms, float* ds, const Vec3f pos, const float hwx, const float hwz, const float height)
 {
-    MakePlane(&norms[0], &ds[0], pos + Vec3f(0, height, 0), Vec3f(0, 1, 0));	//up
-    MakePlane(&norms[1], &ds[1], pos + Vec3f(0, 0, 0), Vec3f(0, -1, 0));	//down
-    MakePlane(&norms[2], &ds[2], pos + Vec3f(-hwx, 0, 0), Vec3f(-1, 0, 0));	//left
-    MakePlane(&norms[3], &ds[3], pos + Vec3f(hwx, 0, 0), Vec3f(1, 0, 0));	//right
-    MakePlane(&norms[4], &ds[4], pos + Vec3f(0, 0, -hwz), Vec3f(0, 0, -1));	//front
-    MakePlane(&norms[5], &ds[5], pos + Vec3f(0, 0, hwz), Vec3f(0, 0, 1));	//back
+	MakePlane(&norms[0], &ds[0], pos + Vec3f(0, height, 0), Vec3f(0, 1, 0));	//up
+	MakePlane(&norms[1], &ds[1], pos + Vec3f(0, 0, 0), Vec3f(0, -1, 0));	//down
+	MakePlane(&norms[2], &ds[2], pos + Vec3f(-hwx, 0, 0), Vec3f(-1, 0, 0));	//left
+	MakePlane(&norms[3], &ds[3], pos + Vec3f(hwx, 0, 0), Vec3f(1, 0, 0));	//right
+	MakePlane(&norms[4], &ds[4], pos + Vec3f(0, 0, -hwz), Vec3f(0, 0, -1));	//front
+	MakePlane(&norms[5], &ds[5], pos + Vec3f(0, 0, hwz), Vec3f(0, 0, 1));	//back
 }
 
 void MakeHull(Vec3f* norms, float* ds, const Vec3f pos, const Vec3f vmin, const Vec3f vmax)
 {
-    MakePlane(&norms[0], &ds[0], pos + Vec3f(0, vmax.y, 0), Vec3f(0, 1, 0));	//up
-    MakePlane(&norms[1], &ds[1], pos + Vec3f(0, vmin.y, 0), Vec3f(0, -1, 0));	//down
-    MakePlane(&norms[2], &ds[2], pos + Vec3f(vmin.x, 0, 0), Vec3f(-1, 0, 0));	//left
-    MakePlane(&norms[3], &ds[3], pos + Vec3f(vmax.x, 0, 0), Vec3f(1, 0, 0));	//right
-    MakePlane(&norms[4], &ds[4], pos + Vec3f(0, 0, vmin.z), Vec3f(0, 0, -1));	//front
-    MakePlane(&norms[5], &ds[5], pos + Vec3f(0, 0, vmax.z), Vec3f(0, 0, 1));	//back
+	MakePlane(&norms[0], &ds[0], pos + Vec3f(0, vmax.y, 0), Vec3f(0, 1, 0));	//up
+	MakePlane(&norms[1], &ds[1], pos + Vec3f(0, vmin.y, 0), Vec3f(0, -1, 0));	//down
+	MakePlane(&norms[2], &ds[2], pos + Vec3f(vmin.x, 0, 0), Vec3f(-1, 0, 0));	//left
+	MakePlane(&norms[3], &ds[3], pos + Vec3f(vmax.x, 0, 0), Vec3f(1, 0, 0));	//right
+	MakePlane(&norms[4], &ds[4], pos + Vec3f(0, 0, vmin.z), Vec3f(0, 0, -1));	//front
+	MakePlane(&norms[5], &ds[5], pos + Vec3f(0, 0, vmax.z), Vec3f(0, 0, 1));	//back
 }
 
 bool HullsIntersect(Vec3f* hull1norms, float* hull1dist, int hull1planes, Vec3f* hull2norms, float* hull2dist, int hull2planes)
 {
-    return false;
+	return false;
 }
 
 // line intersects convex hull?
 bool LineInterHull(const Vec3f* line, Plane3f* planes, const int numplanes)
 {
-    for(int i=0; i<numplanes; i++)
-    {
-        Vec3f inter;
-        if(LineInterPlane(line, planes[i].m_normal, -planes[i].m_d, &inter))
-        {
-            bool allin = true;
-            for(int j=0; j<numplanes; j++)
-            {
-                if(i == j)
-                    continue;
+	for(int i=0; i<numplanes; i++)
+	{
+		Vec3f inter;
+		if(LineInterPlane(line, planes[i].m_normal, -planes[i].m_d, &inter))
+		{
+			bool allin = true;
+			for(int j=0; j<numplanes; j++)
+			{
+				if(i == j)
+					continue;
 
-                if(!PointOnOrBehindPlane(inter, planes[j]))
-                {
-                    allin = false;
-                    break;
-                }
-            }
-            if(allin)
-            {
-                return true;
-            }
-        }
-    }
+				if(!PointOnOrBehindPlane(inter, planes[j]))
+				{
+					allin = false;
+					break;
+				}
+			}
+			if(allin)
+			{
+				return true;
+			}
+		}
+	}
 
-    return false;
+	return false;
 }
 
 // line intersects convex hull?
 bool LineInterHull(const Vec3f* line, const Vec3f* norms, const float* ds, const int numplanes)
 {
-    for(int i=0; i<numplanes; i++)
-    {
-        Vec3f inter;
-        if(LineInterPlane(line, norms[i], -ds[i], &inter))
-        {
-            bool allin = true;
-            for(int j=0; j<numplanes; j++)
-            {
-                if(i == j)
-                    continue;
+	for(int i=0; i<numplanes; i++)
+	{
+		Vec3f inter;
+		if(LineInterPlane(line, norms[i], -ds[i], &inter))
+		{
+			bool allin = true;
+			for(int j=0; j<numplanes; j++)
+			{
+				if(i == j)
+					continue;
 
-                if(!PointOnOrBehindPlane(inter, norms[j], ds[j]))
-                {
-                    allin = false;
-                    break;
-                }
-            }
-            if(allin)
-            {
-                return true;
-            }
-        }
-    }
+				if(!PointOnOrBehindPlane(inter, norms[j], ds[j]))
+				{
+					allin = false;
+					break;
+				}
+			}
+			if(allin)
+			{
+				return true;
+			}
+		}
+	}
 
-    return false;
+	return false;
 }
 
 // line intersects convex hull?
 bool LineInterHull(const Vec3f* line, Plane3f* planes, const int numplanes, Vec3f* intersection)
 {
-    for(int i=0; i<numplanes; i++)
-    {
-        Vec3f planeinter;
-        if(LineInterPlane(line, planes[i].m_normal, -planes[i].m_d, &planeinter))
-        {
-            bool allin = true;
-            for(int j=0; j<numplanes; j++)
-            {
-                if(i == j)
-                    continue;
+	for(int i=0; i<numplanes; i++)
+	{
+		Vec3f planeinter;
+		if(LineInterPlane(line, planes[i].m_normal, -planes[i].m_d, &planeinter))
+		{
+			bool allin = true;
+			for(int j=0; j<numplanes; j++)
+			{
+				if(i == j)
+					continue;
 
-                if(!PointOnOrBehindPlane(planeinter, planes[j]))
-                {
-                    allin = false;
-                    break;
-                }
-            }
-            if(allin)
-            {
-                *intersection = planeinter;
-                return true;
-            }
-        }
-    }
+				if(!PointOnOrBehindPlane(planeinter, planes[j]))
+				{
+					allin = false;
+					break;
+				}
+			}
+			if(allin)
+			{
+				*intersection = planeinter;
+				return true;
+			}
+		}
+	}
 
-    return false;
+	return false;
 }
 
 // temporary hack
 bool LineInterHull(const Vec3f* line, const Vec3f* norms, const float* ds, const int numplanes, Vec3f* intersection)
 {
-    Plane3f* planes = new Plane3f[numplanes];
+	Plane3f* planes = new Plane3f[numplanes];
 
-    for(int i=0; i < numplanes; i++)
-    {
-        planes[i] = Plane3f(norms[i].x, norms[i].y, norms[i].z, ds[i]);
-    }
+	for(int i=0; i < numplanes; i++)
+	{
+		planes[i] = Plane3f(norms[i].x, norms[i].y, norms[i].z, ds[i]);
+	}
 
-    bool ret = LineInterHull(line, planes, numplanes, intersection);
+	bool ret = LineInterHull(line, planes, numplanes, intersection);
 
-    delete [] planes;
+	delete [] planes;
 
-    return ret;
+	return ret;
 }

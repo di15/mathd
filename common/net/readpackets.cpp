@@ -60,20 +60,20 @@ void ParseRecieved(unsigned int first, unsigned int last, struct sockaddr_in add
 void ParseRecieved(unsigned int first, unsigned int last)
 #endif
 {
-    OldPacket* p;
-    PacketHeader* header;
-    unsigned int current = first;
-    unsigned int afterlast = NextAck(last);
-    
-    do
-    {
-        for(auto i=g_recv.begin(); i!=g_recv.end(); i++)
-        {
+	OldPacket* p;
+	PacketHeader* header;
+	unsigned int current = first;
+	unsigned int afterlast = NextAck(last);
+	
+	do
+	{
+		for(auto i=g_recv.begin(); i!=g_recv.end(); i++)
+		{
 			p = &*i;
-            header = (PacketHeader*)&p->buffer;
+			header = (PacketHeader*)&p->buffer;
 
-            if(header->ack != current)
-                continue;
+			if(header->ack != current)
+				continue;
 
 #ifdef _SERVER
 			if(memcmp((void*)&p->addr, (void*)&addr, sizeof(struct sockaddr_in)) != 0)
@@ -81,15 +81,15 @@ void ParseRecieved(unsigned int first, unsigned int last)
 			
 			PacketSwitch(header->type, p->buffer, p->len, addr, c);
 #else
-            PacketSwitch(header->type, p->buffer, p->len);
+			PacketSwitch(header->type, p->buffer, p->len);
 #endif
-        
-            p->freemem();
-            i = g_recv.erase(i);
-            current = NextAck(current);
-            break;
-        }
-    }while(current != afterlast);
+		
+			p->freemem();
+			i = g_recv.erase(i);
+			current = NextAck(current);
+			break;
+		}
+	}while(current != afterlast);
 }
 
 #ifdef _SERVER
@@ -98,38 +98,38 @@ bool Recieved(unsigned int first, unsigned int last, struct sockaddr_in addr)
 bool Recieved(unsigned int first, unsigned int last)
 #endif
 {
-    OldPacket* p;
-    PacketHeader* header;
-    unsigned int current = first;
-    unsigned int afterlast = NextAck(last);
-    bool missed;
-    
-    do
-    {
-        missed = true;
-        for(auto i=g_recv.begin(); i!=g_recv.end(); i++)
-        {
-            p = &*i;
-            header = (PacketHeader*)&p->buffer;
+	OldPacket* p;
+	PacketHeader* header;
+	unsigned int current = first;
+	unsigned int afterlast = NextAck(last);
+	bool missed;
+	
+	do
+	{
+		missed = true;
+		for(auto i=g_recv.begin(); i!=g_recv.end(); i++)
+		{
+			p = &*i;
+			header = (PacketHeader*)&p->buffer;
 
-            if(header->ack != current)
-                continue;
+			if(header->ack != current)
+				continue;
 
 #ifdef _SERVER
 			if(memcmp((void*)&p->addr, (void*)&addr, sizeof(struct sockaddr_in)) != 0)
 				continue;
 #endif
 
-            current = NextAck(current);
-            missed = false;
-            break;
-        }
-        
-        if(missed)
-            return false;
-    }while(current != afterlast);
-    
-    return true;
+			current = NextAck(current);
+			missed = false;
+			break;
+		}
+		
+		if(missed)
+			return false;
+	}while(current != afterlast);
+	
+	return true;
 }
 
 #ifdef _SERVER
@@ -138,14 +138,14 @@ void AddRecieved(char* buffer, int len, struct sockaddr_in addr)
 void AddRecieved(char* buffer, int len)
 #endif
 {
-    OldPacket p;
-    p.buffer = new char[ len ];
-    p.len = len;
-    memcpy((void*)p.buffer, (void*)buffer, len);
+	OldPacket p;
+	p.buffer = new char[ len ];
+	p.len = len;
+	memcpy((void*)p.buffer, (void*)buffer, len);
 #ifdef _SERVER
 	memcpy((void*)&p.addr, (void*)&addr, sizeof(struct sockaddr_in));
 #endif
-    g_recv.push_back(p);
+	g_recv.push_back(p);
 }
 
 #ifdef _SERVER
@@ -199,8 +199,8 @@ void TranslatePacket(char* buffer, int bytes, bool checkprev)
 	case PACKET_CONNECTION_RESET:
 		{
 			checkprev = false;
-            break;
-        }
+			break;
+		}
 #endif
 	default: break;
 	}
@@ -219,55 +219,55 @@ void TranslatePacket(char* buffer, int bytes, bool checkprev)
 #else
 	if(checkprev)
 #endif
-    {
+	{
 #ifdef _SERVER
-        if(PastAck(header->ack, c->m_recvack) || Recieved(header->ack, header->ack, from))
+		if(PastAck(header->ack, c->m_recvack) || Recieved(header->ack, header->ack, from))
 #else
-        if(PastAck(header->ack, g_recvack) || Recieved(header->ack, header->ack))
+		if(PastAck(header->ack, g_recvack) || Recieved(header->ack, header->ack))
 #endif
-        {
+		{
 #ifdef _SERVER
-            Acknowledge(header->ack, from);
+			Acknowledge(header->ack, from);
 #else
-            Acknowledge(header->ack);
+			Acknowledge(header->ack);
 #endif
 			//g_log<<"ack "<<header->ack<<endl;
-            return;
-        }
-        
+			return;
+		}
+		
 #ifdef _SERVER
-        unsigned int next = NextAck(c->m_recvack);
+		unsigned int next = NextAck(c->m_recvack);
 #else
-        unsigned int next = NextAck(g_recvack);
+		unsigned int next = NextAck(g_recvack);
 #endif
 
-        if(header->ack == next) {}  // Translate packet
-        else  // More than +1 after recvack?
-        {
-            unsigned int last = PrevAck(header->ack);
+		if(header->ack == next) {}  // Translate packet
+		else  // More than +1 after recvack?
+		{
+			unsigned int last = PrevAck(header->ack);
 #ifdef _SERVER
-            if(Recieved(next, last, from))
-                ParseRecieved(next, last, from, c);  // Translate in order
+			if(Recieved(next, last, from))
+				ParseRecieved(next, last, from, c);  // Translate in order
 #else
-            if(Recieved(next, last))
-                ParseRecieved(next, last);  // Translate in order
+			if(Recieved(next, last))
+				ParseRecieved(next, last);  // Translate in order
 #endif
-            else
-            {
+			else
+			{
 #ifdef _SERVER
-                AddRecieved(buffer, bytes, from);
+				AddRecieved(buffer, bytes, from);
 #else
-                AddRecieved(buffer, bytes);
+				AddRecieved(buffer, bytes);
 #endif
-                return;
-            }
-        }
-    }
+				return;
+			}
+		}
+	}
 
 #ifdef _SERVER
 	PacketSwitch(header->type, buffer, bytes, from, c);
 #else
-    PacketSwitch(header->type, buffer, bytes);
+	PacketSwitch(header->type, buffer, bytes);
 #endif
 	
 	if(header->type != PACKET_ACKNOWLEDGMENT)
@@ -284,8 +284,8 @@ void TranslatePacket(char* buffer, int bytes, bool checkprev)
 			c->m_recvack = header->ack;
 		Acknowledge(header->ack, from);
 #else
-        g_recvack = header->ack;
-        Acknowledge(header->ack);
+		g_recvack = header->ack;
+		Acknowledge(header->ack);
 #endif
 	}
 }
@@ -534,28 +534,28 @@ void ReadAcknowledgmentPacket(AcknowledgmentPacket* ap, struct sockaddr_in from,
 void ReadAcknowledgmentPacket(AcknowledgmentPacket* ap)
 #endif
 {
-    OldPacket* p;
-    PacketHeader* header;
-    
-    for(auto i=g_sent.begin(); i!=g_sent.end(); i++)
-    {
-        p = &*i;
-        header = (PacketHeader*)p->buffer;
+	OldPacket* p;
+	PacketHeader* header;
+	
+	for(auto i=g_sent.begin(); i!=g_sent.end(); i++)
+	{
+		p = &*i;
+		header = (PacketHeader*)p->buffer;
 #ifdef _SERVER
-        if(header->ack == ap->header.ack && memcmp((void*)&p->addr, (void*)&from, sizeof(struct sockaddr_in)) == 0)
+		if(header->ack == ap->header.ack && memcmp((void*)&p->addr, (void*)&from, sizeof(struct sockaddr_in)) == 0)
 #else
-        if(header->ack == ap->header.ack)
+		if(header->ack == ap->header.ack)
 #endif
-        {
-            p->freemem();
-            i = g_sent.erase(i);
+		{
+			p->freemem();
+			i = g_sent.erase(i);
 #ifdef _SERVER
 			g_log<<"left to ack "<<g_sent.size()<<endl;
 			g_log.flush();
 #endif
-            return;
-        }
-    }
+			return;
+		}
+	}
 }
 
 #ifndef _SERVER

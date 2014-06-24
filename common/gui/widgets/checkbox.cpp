@@ -1,5 +1,4 @@
 
-
 #include "../widget.h"
 #include "barbutton.h"
 #include "button.h"
@@ -53,13 +52,13 @@ void CheckBox::draw()
 
 void CheckBox::inev(InEv* ev)
 {
-	Player* py = &g_player[g_currP];
+	Player* py = &g_player[g_curP];
 
 	if(ev->type == INEV_MOUSEMOVE && !ev->intercepted)
 	{
-		if(py->mouse.x >= m_pos[0] && py->mouse.y >= m_pos[1] && 
-		py->mouse.x <= m_pos[2] && 
-		py->mouse.y <= m_pos[3])
+		if(py->mouse.x >= m_pos[0] && py->mouse.y >= m_pos[1] &&
+				py->mouse.x <= m_pos[2] &&
+				py->mouse.y <= m_pos[3])
 		{
 			m_over = true;
 			ev->intercepted = true;
@@ -97,7 +96,7 @@ void CheckBox::inev(InEv* ev)
 			ev->intercepted = true;
 			return;
 		}
-	
+
 		m_ldown = false;
 	}
 }

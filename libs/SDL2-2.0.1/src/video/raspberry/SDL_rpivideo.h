@@ -11,11 +11,11 @@
   freely, subject to the following restrictions:
 
   1. The origin of this software must not be misrepresented; you must not
-     claim that you wrote the original software. If you use this software
-     in a product, an acknowledgment in the product documentation would be
-     appreciated but is not required.
+	 claim that you wrote the original software. If you use this software
+	 in a product, an acknowledgment in the product documentation would be
+	 appreciated but is not required.
   2. Altered source versions must be plainly marked as such, and must not be
-     misrepresented as being the original software.
+	 misrepresented as being the original software.
   3. This notice may not be removed or altered from any source distribution.
 */
 
@@ -32,21 +32,21 @@
 
 typedef struct SDL_VideoData
 {
-    uint32_t egl_refcount;      /* OpenGL ES reference count              */
+	uint32_t egl_refcount;      /* OpenGL ES reference count              */
 } SDL_VideoData;
 
 
 typedef struct SDL_DisplayData
 {
-    DISPMANX_DISPLAY_HANDLE_T dispman_display;
+	DISPMANX_DISPLAY_HANDLE_T dispman_display;
 } SDL_DisplayData;
 
 
 typedef struct SDL_WindowData
 {
-    EGL_DISPMANX_WINDOW_T dispman_window;
+	EGL_DISPMANX_WINDOW_T dispman_window;
 #if SDL_VIDEO_OPENGL_EGL  
-    EGLSurface egl_surface;
+	EGLSurface egl_surface;
 #endif    
 } SDL_WindowData;
 
@@ -80,7 +80,7 @@ void RPI_DestroyWindow(_THIS, SDL_Window * window);
 
 /* Window manager function */
 SDL_bool RPI_GetWindowWMInfo(_THIS, SDL_Window * window,
-                             struct SDL_SysWMinfo *info);
+							 struct SDL_SysWMinfo *info);
 
 /* OpenGL/OpenGL ES functions */
 int RPI_GLES_LoadLibrary(_THIS, const char *path);

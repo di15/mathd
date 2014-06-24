@@ -39,9 +39,9 @@ class CArchiveUpdateCallback:
 {
 public:
   MY_UNKNOWN_IMP3(
-      IArchiveUpdateCallback2, 
-      ICryptoGetTextPassword2,
-      ICompressProgressInfo)
+	  IArchiveUpdateCallback2, 
+	  ICryptoGetTextPassword2,
+	  ICompressProgressInfo)
 
   // IProgress
   STDMETHOD(SetTotal)(UInt64 size);
@@ -51,7 +51,7 @@ public:
   // IUpdateCallback
   STDMETHOD(EnumProperties)(IEnumSTATPROPSTG **enumerator);  
   STDMETHOD(GetUpdateItemInfo)(UInt32 index, 
-      Int32 *newData, Int32 *newProperties, UInt32 *indexInArchive);
+	  Int32 *newData, Int32 *newProperties, UInt32 *indexInArchive);
   STDMETHOD(GetProperty)(UInt32 index, PROPID propID, PROPVARIANT *value);
   STDMETHOD(GetStream)(UInt32 index, ISequentialInStream **inStream);
   STDMETHOD(SetOperationResult)(Int32 operationResult);

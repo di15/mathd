@@ -20,7 +20,7 @@
 * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
 * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
 * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
-* IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+* IN NO TIMER_EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
 * CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
 * TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
@@ -29,30 +29,66 @@
 #include "objectscript.h"
 #include <string>
 
-namespace ObjectScript {
+namespace ObjectScript
+{
 
 // =====================================================================
 
-template <class T> struct RemoveConst          { typedef T type; };
-template <class T> struct RemoveConst<const T> { typedef T type; };
-template <class T> struct RemoveConst<const T&> { typedef T type; };
-template <class T> struct RemoveConst<const T*> { typedef T * type; };
+template <class T> struct RemoveConst
+{
+	typedef T type;
+};
+template <class T> struct RemoveConst<const T>
+{
+	typedef T type;
+};
+template <class T> struct RemoveConst<const T&>
+{
+	typedef T type;
+};
+template <class T> struct RemoveConst<const T*>
+{
+	typedef T * type;
+};
 
-template <class T> struct RemoveRef		{ typedef T type; };
-template <class T> struct RemoveRef<T&> { typedef T type; };
+template <class T> struct RemoveRef
+{
+	typedef T type;
+};
+template <class T> struct RemoveRef<T&>
+{
+	typedef T type;
+};
 
-template <class T> struct RemovePtr		{ typedef T type; };
-template <class T> struct RemovePtr<T*> { typedef T type; };
+template <class T> struct RemovePtr
+{
+	typedef T type;
+};
+template <class T> struct RemovePtr<T*>
+{
+	typedef T type;
+};
 
-template <class T> struct PlainType { typedef typename RemovePtr<typename RemoveRef<typename RemoveConst<T>::type>::type>::type type; };
+template <class T> struct PlainType
+{
+	typedef typename RemovePtr<typename RemoveRef<typename RemoveConst<T>::type>::type>::type type;
+};
 
 // =====================================================================
 
 template <class T>
 struct CtypeId
 {
-	static int getId(){ static int id = (int)(intptr_t)&id; return id; }
-	static int getInstanceId(){ static int id = (int)(intptr_t)&id; return id; }
+	static int getId()
+	{
+		static int id = (int)(intptr_t)&id;
+		return id;
+	}
+	static int getInstanceId()
+	{
+		static int id = (int)(intptr_t)&id;
+		return id;
+	}
 };
 
 template <class T>
@@ -86,9 +122,15 @@ struct CtypeValue<bool>
 {
 	typedef bool type;
 
-	static bool isValid(type){ return true; }
+	static bool isValid(type)
+	{
+		return true;
+	}
 
-	static type def(ObjectScript::OS*){ return type(); }
+	static type def(ObjectScript::OS*)
+	{
+		return type();
+	}
 	static type getArg(ObjectScript::OS * os, int offs)
 	{
 		return os->toBool(offs);
@@ -109,9 +151,15 @@ struct CtypeValue<std::string>
 {
 	typedef std::string type;
 
-	static bool isValid(const type&){ return true; }
+	static bool isValid(const type&)
+	{
+		return true;
+	}
 
-	static type def(ObjectScript::OS*){ return type(); }
+	static type def(ObjectScript::OS*)
+	{
+		return type();
+	}
 	static type getArg(ObjectScript::OS * os, int offs)
 	{
 		return os->toString(offs).toChar();
@@ -132,9 +180,15 @@ struct CtypeValue<ObjectScript::OS::String>
 {
 	typedef ObjectScript::OS::String type;
 
-	static bool isValid(const type&){ return true; }
+	static bool isValid(const type&)
+	{
+		return true;
+	}
 
-	static type def(ObjectScript::OS * os){ return type(os); }
+	static type def(ObjectScript::OS * os)
+	{
+		return type(os);
+	}
 	static type getArg(ObjectScript::OS * os, int offs)
 	{
 		return os->toString(offs);
@@ -156,9 +210,15 @@ struct CtypeValue<OS_CHAR*>
 {
 	typedef const OS_CHAR * type;
 
-	static bool isValid(const OS_CHAR *){ return true; }
+	static bool isValid(const OS_CHAR *)
+	{
+		return true;
+	}
 
-	static type def(ObjectScript::OS*){ return ""; }
+	static type def(ObjectScript::OS*)
+	{
+		return "";
+	}
 	static type getArg(ObjectScript::OS * os, int offs)
 	{
 		return os->toString(offs).toChar();
@@ -179,9 +239,15 @@ struct CtypeValue<ObjectScript::OS*>
 {
 	typedef ObjectScript::OS * type;
 
-	static bool isValid(ObjectScript::OS * p){ return p != NULL; }
+	static bool isValid(ObjectScript::OS * p)
+	{
+		return p != NULL;
+	}
 
-	static type def(ObjectScript::OS * os){ return os; }
+	static type def(ObjectScript::OS * os)
+	{
+		return os;
+	}
 	static type getArg(ObjectScript::OS * os, int& offs)
 	{
 		offs--;
@@ -196,9 +262,15 @@ struct CtypeNumber
 {
 	typedef typename RemoveConst<T>::type type;
 
-	static bool isValid(type){ return true; }
+	static bool isValid(type)
+	{
+		return true;
+	}
 
-	static type def(ObjectScript::OS*){ return type(); }
+	static type def(ObjectScript::OS*)
+	{
+		return type();
+	}
 	static type getArg(ObjectScript::OS * os, int offs)
 	{
 		return (type)os->toNumber(offs);
@@ -259,18 +331,28 @@ template <class T> struct UserDataDestructor
 	}
 };
 
-template <class T> struct CtypeUserClass{};
+template <class T> struct CtypeUserClass {};
 template <class T> struct CtypeUserClass<T*>
 {
 	typedef typename RemoveConst<T>::type ttype;
 	typedef typename RemoveConst<T>::type * type;
 
-	static bool isValid(const type p){ return p != NULL; }
-	static type def(ObjectScript::OS*){ return type(); }
-	static type getArg(ObjectScript::OS * os, int offs){ return (type)os->toUserdata(CtypeId<ttype>::getInstanceId(), offs, CtypeId<ttype>::getId()); }
+	static bool isValid(const type p)
+	{
+		return p != NULL;
+	}
+	static type def(ObjectScript::OS*)
+	{
+		return type();
+	}
+	static type getArg(ObjectScript::OS * os, int offs)
+	{
+		return (type)os->toUserdata(CtypeId<ttype>::getInstanceId(), offs, CtypeId<ttype>::getId());
+	}
 	static void push(ObjectScript::OS * os, const type val)
 	{
-		if(!val){
+		if(!val)
+		{
 			os->pushNull();
 			return;
 		}
@@ -278,9 +360,12 @@ template <class T> struct CtypeUserClass<T*>
 		os->pushUserPointer(CtypeId<ttype>::getInstanceId(), val, UserDataDestructor<ttype>::dtor);
 		os->pushStackValue();
 		os->getGlobal(CtypeName<ttype>::getName());
-		if(!os->isUserdata(CtypeId<ttype>::getId(), -1)){
+		if(!os->isUserdata(CtypeId<ttype>::getId(), -1))
+		{
 			os->pop(2);
-		}else{
+		}
+		else
+		{
 			os->setPrototype(CtypeId<ttype>::getInstanceId());
 		}
 	}
@@ -395,10 +480,12 @@ template <class F> struct FunctionData: public FunctionDataChain
 	{
 		FunctionData<F> f(_f);
 		FunctionDataChain * found = f.find();
-		if(found){
+		if(found)
+		{
 			FunctionData<F> * r = dynamic_cast<FunctionData<F>*>(found);
 			// fix compiler bug!?
-			if(r){
+			if(r)
+			{
 				return r;
 			}
 		}

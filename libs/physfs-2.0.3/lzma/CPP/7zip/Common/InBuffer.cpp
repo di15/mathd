@@ -21,9 +21,9 @@ bool CInBuffer::Create(UInt32 bufferSize)
 {
   const UInt32 kMinBlockSize = 1;
   if (bufferSize < kMinBlockSize)
-    bufferSize = kMinBlockSize;
+	bufferSize = kMinBlockSize;
   if (_bufferBase != 0 && _bufferSize == bufferSize)
-    return true;
+	return true;
   Free();
   _bufferSize = bufferSize;
   _bufferBase = (Byte *)::MidAlloc(bufferSize);
@@ -56,10 +56,10 @@ bool CInBuffer::ReadBlock()
 {
   #ifdef _NO_EXCEPTIONS
   if (ErrorCode != S_OK)
-    return false;
+	return false;
   #endif
   if (_wasFinished)
-    return false;
+	return false;
   _processedSize += (_buffer - _bufferBase);
   UInt32 numProcessedBytes;
   HRESULT result = _stream->Read(_bufferBase, _bufferSize, &numProcessedBytes);
@@ -67,7 +67,7 @@ bool CInBuffer::ReadBlock()
   ErrorCode = result;
   #else
   if (result != S_OK)
-    throw CInBufferException(result);
+	throw CInBufferException(result);
   #endif
   _buffer = _bufferBase;
   _bufferLimit = _buffer + numProcessedBytes;
@@ -78,6 +78,6 @@ bool CInBuffer::ReadBlock()
 Byte CInBuffer::ReadBlock2()
 {
   if(!ReadBlock())
-    return 0xFF;
+	return 0xFF;
   return *_buffer++;
 }

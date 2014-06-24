@@ -1,5 +1,4 @@
 
-
 #include "matrix.h"
 #include "../platform.h"
 #include "quaternion.h"

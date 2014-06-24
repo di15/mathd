@@ -39,9 +39,9 @@ struct CCompressionMethodMode
 
   bool IsEmpty() const { return (Methods.IsEmpty() && !PasswordIsDefined); }
   CCompressionMethodMode(): PasswordIsDefined(false)
-      #ifdef COMPRESS_MT
-      , NumThreads(1) 
-      #endif
+	  #ifdef COMPRESS_MT
+	  , NumThreads(1) 
+	  #endif
   {}
 };
 

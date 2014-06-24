@@ -165,20 +165,20 @@ typedef struct tagPROPVARIANT
   PROPVAR_PAD3 wReserved3;
   union 
   {
-    CHAR cVal;
-    UCHAR bVal;
-    SHORT iVal;
-    USHORT uiVal;
-    LONG lVal;
-    ULONG ulVal;
-    INT intVal;
-    UINT uintVal;
-    LARGE_INTEGER hVal;
-    ULARGE_INTEGER uhVal;
-    VARIANT_BOOL boolVal;
-    SCODE scode;
-    FILETIME filetime;
-    BSTR bstrVal;
+	CHAR cVal;
+	UCHAR bVal;
+	SHORT iVal;
+	USHORT uiVal;
+	LONG lVal;
+	ULONG ulVal;
+	INT intVal;
+	UINT uintVal;
+	LARGE_INTEGER hVal;
+	ULARGE_INTEGER uhVal;
+	VARIANT_BOOL boolVal;
+	SCODE scode;
+	FILETIME filetime;
+	BSTR bstrVal;
   };
 } PROPVARIANT;
 

@@ -41,16 +41,16 @@ public:
   #endif
 
   CExtractOptions(): 
-      StdOutMode(false), 
-      YesToAll(false), 
-      TestMode(false),
-      PathMode(NExtract::NPathMode::kFullPathnames),
-      OverwriteMode(NExtract::NOverwriteMode::kAskBefore)
-      {}
+	  StdOutMode(false), 
+	  YesToAll(false), 
+	  TestMode(false),
+	  PathMode(NExtract::NPathMode::kFullPathnames),
+	  OverwriteMode(NExtract::NOverwriteMode::kAskBefore)
+	  {}
 
   /*
-    bool FullPathMode() const { return (ExtractMode == NExtractMode::kTest) || 
-    (ExtractMode == NExtractMode::kFullPath); }
+	bool FullPathMode() const { return (ExtractMode == NExtractMode::kTest) || 
+	(ExtractMode == NExtractMode::kFullPath); }
   */
 };
 
@@ -65,13 +65,13 @@ struct CDecompressStat
 };
 
 HRESULT DecompressArchives(
-    CCodecs *codecs,
-    UStringVector &archivePaths, UStringVector &archivePathsFull,
-    const NWildcard::CCensorNode &wildcardCensor,
-    const CExtractOptions &options,
-    IOpenCallbackUI *openCallback,
-    IExtractCallbackUI *extractCallback,
-    UString &errorMessage, 
-    CDecompressStat &stat);
+	CCodecs *codecs,
+	UStringVector &archivePaths, UStringVector &archivePathsFull,
+	const NWildcard::CCensorNode &wildcardCensor,
+	const CExtractOptions &options,
+	IOpenCallbackUI *openCallback,
+	IExtractCallbackUI *extractCallback,
+	UString &errorMessage, 
+	CDecompressStat &stat);
 
 #endif

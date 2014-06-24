@@ -1,4 +1,3 @@
-
 #include "unit.h"
 #include "../render/shader.h"
 #include "unittype.h"
@@ -78,9 +77,9 @@ bool UnitCollides(Unit* u)
 		int maxz2 = minz2 + t->size.z;
 
 		/*
-		It's important to test for 
+		It's important to test for
 		equality as being passable
-		because the units might be 
+		because the units might be
 		right beside each other.
 		*/
 		if(minx >= maxx2)
@@ -111,7 +110,7 @@ bool UnitCollides(Unit* u)
 
 			g_log<<"\tpathcell rect: ("<<cminx<<","<<cminz<<")->("<<cmaxx<<","<<cmaxz<<")"<<endl;
 			g_log<<"\tpathcell pos: ("<<cposx<<","<<cposz<<")"<<endl;
-			
+
 			g_log<<"-----------------------------------------"<<endl;
 
 			g_log.flush();
@@ -140,12 +139,12 @@ bool UnitCollides(Unit* u)
 				int tminz = b->tilepos.y - t2->widthz/2;
 				int tmaxx = tminx + t2->widthx;
 				int tmaxz = tminz + t2->widthz;
-				
+
 				int minx2 = tminx*TILE_SIZE;
 				int minz2 = tminz*TILE_SIZE;
 				int maxx2 = tmaxx*TILE_SIZE - 1;
 				int maxz2 = tmaxz*TILE_SIZE - 1;
-				
+
 				if(minx <= maxx2 && minz <= maxz2 && maxx >= minx2 && maxz >= minz2)
 				{
 #if 0
@@ -169,20 +168,20 @@ bool UnitCollides(Unit* u)
 
 				if(u2 == u)
 					continue;
-				
+
 				UnitT* t2 = &g_unitT[u2->type];
 				int minx2 = u2->cmpos.x - t2->size.x/2;
 				int minz2 = u2->cmpos.y - t2->size.z/2;
 				int maxx2 = minx2 + t2->size.x - 1;
 				int maxz2 = minz2 + t2->size.z - 1;
-				
+
 				if(minx <= maxx2 && minz <= maxz2 && maxx >= minx2 && maxz >= minz2)
 					return true;
 			}
 		}
 #endif
 
-		
+
 	if(u == g_pathunit)
 	{
 		g_log<<"no collision"<<endl;
@@ -226,21 +225,21 @@ void MoveUnit(Unit* u)
 			int nodesdist = Magnitude( u->goal - u->cmpos ) / PATHNODE_SIZE;
 #if 1
 			PartialPath(u->type, u->mode,
-				u->cmpos.x, u->cmpos.y, u->target, u->target2, u->targtype, &u->path, &u->subgoal, 
-				u, NULL, NULL, 
-				u->goal.x, u->goal.y,
-				u->goal.x, u->goal.y, u->goal.x, u->goal.y,
-				nodesdist*10);
-				//TILE_SIZE*4/PATHNODE_SIZE);
+						u->cmpos.x, u->cmpos.y, u->target, u->target2, u->targtype, &u->path, &u->subgoal,
+						u, NULL, NULL,
+						u->goal.x, u->goal.y,
+						u->goal.x, u->goal.y, u->goal.x, u->goal.y,
+						nodesdist*10);
+			//TILE_SIZE*4/PATHNODE_SIZE);
 #else
 			JPSPartPath(u->type, u->mode,
-				u->cmpos.x, u->cmpos.y, u->target, u->target2, u->targtype, &u->path, &u->subgoal,
-				u, NULL, NULL,
-				u->goal.x, u->goal.y,
-				u->goal.x, u->goal.y, u->goal.x, u->goal.y,
-				nodesdist*4);
+						u->cmpos.x, u->cmpos.y, u->target, u->target2, u->targtype, &u->path, &u->subgoal,
+						u, NULL, NULL,
+						u->goal.x, u->goal.y,
+						u->goal.x, u->goal.y, u->goal.x, u->goal.y,
+						nodesdist*4);
 #endif
-			
+
 #if 0
 			RichText rtext("ppathf");
 			NewTransx(u->drawpos + Vec3f(0,t->size.y,0), &rtext);
@@ -251,19 +250,19 @@ void MoveUnit(Unit* u)
 		{
 #if 0
 			if(!FullPath(0,
-				u->type, u->mode,
-				u->cmpos.x, u->cmpos.y, u->target, u->target, u->target2, u->path, u->subgoal, 
-				u, NULL, NULL, 
-				u->goal.x, u->goal.y,
-				u->goal.x, u->goal.y, u->goal.x, u->goal.y))
+						 u->type, u->mode,
+						 u->cmpos.x, u->cmpos.y, u->target, u->target, u->target2, u->path, u->subgoal,
+						 u, NULL, NULL,
+						 u->goal.x, u->goal.y,
+						 u->goal.x, u->goal.y, u->goal.x, u->goal.y))
 #endif
 
-			JPSPath(
-				u->type, u->mode,
-				u->cmpos.x, u->cmpos.y, u->target, u->target2, u->targtype, &u->path, &u->subgoal, 
-				u, NULL, NULL, 
-				u->goal.x, u->goal.y,
-				u->goal.x, u->goal.y, u->goal.x, u->goal.y);
+				JPSPath(
+					u->type, u->mode,
+					u->cmpos.x, u->cmpos.y, u->target, u->target2, u->targtype, &u->path, &u->subgoal,
+					u, NULL, NULL,
+					u->goal.x, u->goal.y,
+					u->goal.x, u->goal.y, u->goal.x, u->goal.y);
 		}
 
 		return;
@@ -290,7 +289,7 @@ void MoveUnit(Unit* u)
 			u->drawpos.x = u->cmpos.x;
 			u->drawpos.z = u->cmpos.y;
 			u->drawpos.y = g_hmap.accheight(u->drawpos.x, u->drawpos.z);
-			u->rotation.y = GetYaw(dir.x, dir.y); 
+			u->rotation.y = GetYaw(dir.x, dir.y);
 			return;
 		}
 #endif

@@ -11,11 +11,11 @@
   freely, subject to the following restrictions:
 
   1. The origin of this software must not be misrepresented; you must not
-     claim that you wrote the original software. If you use this software
-     in a product, an acknowledgment in the product documentation would be
-     appreciated but is not required.
+	 claim that you wrote the original software. If you use this software
+	 in a product, an acknowledgment in the product documentation would be
+	 appreciated but is not required.
   2. Altered source versions must be plainly marked as such, and must not be
-     misrepresented as being the original software.
+	 misrepresented as being the original software.
   3. This notice may not be removed or altered from any source distribution.
 */
 
@@ -237,7 +237,7 @@ extern "C" {
  *    "LandscapeLeft", "LandscapeRight", "Portrait" "PortraitUpsideDown"
  */
 #define SDL_HINT_ORIENTATIONS "SDL_IOS_ORIENTATIONS"
-    
+	
 /**
  *  \brief  A variable controlling whether an Android built-in accelerometer should be
  *  listed as a joystick device, rather than listing actual joysticks only.
@@ -441,9 +441,9 @@ extern "C" {
  */
 typedef enum
 {
-    SDL_HINT_DEFAULT,
-    SDL_HINT_NORMAL,
-    SDL_HINT_OVERRIDE
+	SDL_HINT_DEFAULT,
+	SDL_HINT_NORMAL,
+	SDL_HINT_OVERRIDE
 } SDL_HintPriority;
 
 
@@ -457,8 +457,8 @@ typedef enum
  *  \return SDL_TRUE if the hint was set, SDL_FALSE otherwise
  */
 extern DECLSPEC SDL_bool SDLCALL SDL_SetHintWithPriority(const char *name,
-                                                         const char *value,
-                                                         SDL_HintPriority priority);
+														 const char *value,
+														 SDL_HintPriority priority);
 
 /**
  *  \brief Set a hint with normal priority
@@ -466,7 +466,7 @@ extern DECLSPEC SDL_bool SDLCALL SDL_SetHintWithPriority(const char *name,
  *  \return SDL_TRUE if the hint was set, SDL_FALSE otherwise
  */
 extern DECLSPEC SDL_bool SDLCALL SDL_SetHint(const char *name,
-                                             const char *value);
+											 const char *value);
 
 /**
  *  \brief Get a hint
@@ -484,8 +484,8 @@ extern DECLSPEC const char * SDLCALL SDL_GetHint(const char *name);
  */
 typedef void (*SDL_HintCallback)(void *userdata, const char *name, const char *oldValue, const char *newValue);
 extern DECLSPEC void SDLCALL SDL_AddHintCallback(const char *name,
-                                                 SDL_HintCallback callback,
-                                                 void *userdata);
+												 SDL_HintCallback callback,
+												 void *userdata);
 
 /**
  *  \brief Remove a function watching a particular hint
@@ -495,8 +495,8 @@ extern DECLSPEC void SDLCALL SDL_AddHintCallback(const char *name,
  *  \param userdata A pointer being passed to the callback function
  */
 extern DECLSPEC void SDLCALL SDL_DelHintCallback(const char *name,
-                                                 SDL_HintCallback callback,
-                                                 void *userdata);
+												 SDL_HintCallback callback,
+												 void *userdata);
 
 /**
  *  \brief  Clear all hints

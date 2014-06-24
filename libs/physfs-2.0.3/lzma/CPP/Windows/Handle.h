@@ -15,20 +15,20 @@ public:
   ~CHandle() { Close(); }
   bool Close()
   {
-    if (_handle == NULL)
-      return true;
-    if (!::CloseHandle(_handle))
-      return false;
-    _handle = NULL;
-    return true;
+	if (_handle == NULL)
+	  return true;
+	if (!::CloseHandle(_handle))
+	  return false;
+	_handle = NULL;
+	return true;
   }
   void Attach(HANDLE handle) 
-    { _handle = handle; }
+	{ _handle = handle; }
   HANDLE Detach() 
   { 
-    HANDLE handle = _handle;
-    _handle = NULL; 
-    return handle;
+	HANDLE handle = _handle;
+	_handle = NULL; 
+	return handle;
   }
 };
 

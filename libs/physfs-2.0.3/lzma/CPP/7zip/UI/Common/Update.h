@@ -28,49 +28,49 @@ struct CArchivePath
   
   void ParseFromPath(const UString &path)
   {
-    SplitPathToParts(path, Prefix, Name);
-    if (Name.IsEmpty())
-      return;
-    int dotPos = Name.ReverseFind(L'.');
-    if (dotPos <= 0)
-      return;
-    if (dotPos == Name.Length() - 1)
-    {
-      Name = Name.Left(dotPos);
-      BaseExtension.Empty();
-      return;
-    }
-    if (BaseExtension.CompareNoCase(Name.Mid(dotPos + 1)) == 0)
-    {
-      BaseExtension = Name.Mid(dotPos + 1);
-      Name = Name.Left(dotPos);
-    }
-    else
-      BaseExtension.Empty();
+	SplitPathToParts(path, Prefix, Name);
+	if (Name.IsEmpty())
+	  return;
+	int dotPos = Name.ReverseFind(L'.');
+	if (dotPos <= 0)
+	  return;
+	if (dotPos == Name.Length() - 1)
+	{
+	  Name = Name.Left(dotPos);
+	  BaseExtension.Empty();
+	  return;
+	}
+	if (BaseExtension.CompareNoCase(Name.Mid(dotPos + 1)) == 0)
+	{
+	  BaseExtension = Name.Mid(dotPos + 1);
+	  Name = Name.Left(dotPos);
+	}
+	else
+	  BaseExtension.Empty();
   }
 
   UString GetPathWithoutExt() const
   {
-    return Prefix + Name;
+	return Prefix + Name;
   }
 
   UString GetFinalPath() const
   {
-    UString path = GetPathWithoutExt();
-    if (!BaseExtension.IsEmpty())
-      path += UString(L'.') + BaseExtension;
-    return path;
+	UString path = GetPathWithoutExt();
+	if (!BaseExtension.IsEmpty())
+	  path += UString(L'.') + BaseExtension;
+	return path;
   }
 
   
   UString GetTempPath() const
   {
-    UString path = TempPrefix + Name;
-    if (!BaseExtension.IsEmpty())
-      path += UString(L'.') + BaseExtension;
-    path += L".tmp";
-    path += TempPostfix;
-    return path; 
+	UString path = TempPrefix + Name;
+	if (!BaseExtension.IsEmpty())
+	  path += UString(L'.') + BaseExtension;
+	path += L".tmp";
+	path += TempPostfix;
+	return path; 
   }
 };
 
@@ -114,14 +114,14 @@ struct CUpdateOptions
   bool Init(const CCodecs *codecs, const UString &arcPath, const UString &arcType);
 
   CUpdateOptions():
-    UpdateArchiveItself(true),
-    SfxMode(false),
-    StdInMode(false),
-    StdOutMode(false),
-    EMailMode(false),
-    EMailRemoveAfter(false),
-    OpenShareForWrite(false)
-      {};
+	UpdateArchiveItself(true),
+	SfxMode(false),
+	StdInMode(false),
+	StdOutMode(false),
+	EMailMode(false),
+	EMailRemoveAfter(false),
+	OpenShareForWrite(false)
+	  {};
   CRecordVector<UInt64> VolumesSizes;
 };
 
@@ -155,11 +155,11 @@ struct IUpdateCallbackUI2: public IUpdateCallbackUI
 };
 
 HRESULT UpdateArchive(
-    CCodecs *codecs,
-    const NWildcard::CCensor &censor, 
-    CUpdateOptions &options,
-    CUpdateErrorInfo &errorInfo,
-    IOpenCallbackUI *openCallback,
-    IUpdateCallbackUI2 *callback);
+	CCodecs *codecs,
+	const NWildcard::CCensor &censor, 
+	CUpdateOptions &options,
+	CUpdateErrorInfo &errorInfo,
+	IOpenCallbackUI *openCallback,
+	IUpdateCallbackUI2 *callback);
 
 #endif

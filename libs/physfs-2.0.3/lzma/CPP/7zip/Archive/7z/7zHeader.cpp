@@ -16,10 +16,10 @@ class SignatureInitializer
 public:
   SignatureInitializer() 
   { 
-    kSignature[0]--; 
-    #ifdef _7Z_VOL
-    kFinishSignature[0]--;
-    #endif
+	kSignature[0]--; 
+	#ifdef _7Z_VOL
+	kFinishSignature[0]--;
+	#endif
   };
 } g_SignatureInitializer;
 

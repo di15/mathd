@@ -1,5 +1,4 @@
 
-
 #include "../widget.h"
 #include "barbutton.h"
 #include "button.h"
@@ -118,7 +117,7 @@ void DropDownS::drawover()
 
 void DropDownS::inev(InEv* ev)
 {
-	Player* py = &g_player[g_currP];
+	Player* py = &g_player[g_curP];
 
 	if(ev->type == INEV_MOUSEWHEEL && !ev->intercepted)
 	{
@@ -174,7 +173,7 @@ void DropDownS::inev(InEv* ev)
 			{
 				// std::list item?
 				if(py->mouse.x >= m_pos[0] && py->mouse.x <= m_pos[2]-square() && py->mouse.y >= m_pos[3]+g_font[m_font].gheight*(i-(int)m_scroll[1])
-					&& py->mouse.y <= m_pos[3]+g_font[m_font].gheight*(i-(int)m_scroll[1]+1))
+						&& py->mouse.y <= m_pos[3]+g_font[m_font].gheight*(i-(int)m_scroll[1]+1))
 				{
 					m_ldown = true;
 					ev->intercepted = true;
@@ -241,13 +240,13 @@ void DropDownS::inev(InEv* ev)
 				return;	// intercept mouse event
 			}
 
-			Player* py = &g_player[g_currP];
+			Player* py = &g_player[g_curP];
 
 			for(int i=(int)m_scroll[1]; i<(int)m_scroll[1]+rowsshown(); i++)
 			{
 				// std::list item?
 				if(py->mouse.x >= m_pos[0] && py->mouse.x <= m_pos[2]-square() && py->mouse.y >= m_pos[3]+g_font[m_font].gheight*(i-(int)m_scroll[1])
-					&& py->mouse.y <= m_pos[3]+g_font[m_font].gheight*(i-(int)m_scroll[1]+1))
+						&& py->mouse.y <= m_pos[3]+g_font[m_font].gheight*(i-(int)m_scroll[1]+1))
 				{
 					m_selected = i;
 					m_opened = false;

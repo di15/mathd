@@ -52,7 +52,7 @@ struct png_struct_def
 /* These were added in libpng-1.0.2 */
 #ifdef PNG_USER_TRANSFORM_PTR_SUPPORTED
 #if defined(PNG_READ_USER_TRANSFORM_SUPPORTED) || \
-    defined(PNG_WRITE_USER_TRANSFORM_SUPPORTED)
+	defined(PNG_WRITE_USER_TRANSFORM_SUPPORTED)
    png_voidp user_transform_ptr; /* user supplied struct for user transform */
    png_byte user_transform_depth;    /* bit depth of user transformed pixels */
    png_byte user_transform_channels; /* channels in user transformed pixels */
@@ -88,7 +88,7 @@ struct png_struct_def
 #endif
 /* Added at libpng 1.5.4 */
 #if defined(PNG_WRITE_COMPRESSED_TEXT_SUPPORTED) || \
-    defined(PNG_WRITE_CUSTOMIZE_ZTXT_COMPRESSION_SUPPORTED)
+	defined(PNG_WRITE_CUSTOMIZE_ZTXT_COMPRESSION_SUPPORTED)
    int zlib_text_level;            /* holds zlib compression level */
    int zlib_text_method;           /* holds zlib compression method */
    int zlib_text_window_bits;      /* holds zlib compression window bits */
@@ -106,11 +106,11 @@ struct png_struct_def
    png_uint_32 row_number;    /* current row in interlace pass */
    png_uint_32 chunk_name;    /* PNG_CHUNK() id of current chunk */
    png_bytep prev_row;        /* buffer to save previous (unfiltered) row.
-                               * This is a pointer into big_prev_row
-                               */
+							   * This is a pointer into big_prev_row
+							   */
    png_bytep row_buf;         /* buffer to save current (unfiltered) row.
-                               * This is a pointer into big_row_buf
-                               */
+							   * This is a pointer into big_row_buf
+							   */
    png_bytep sub_row;         /* buffer to save "sub" row when filtering */
    png_bytep up_row;          /* buffer to save "up" row when filtering */
    png_bytep avg_row;         /* buffer to save "avg" row when filtering */
@@ -141,11 +141,11 @@ struct png_struct_def
    png_byte usr_channels;     /* channels at start of write: write only */
    png_byte sig_bytes;        /* magic bytes read/written from start of file */
    png_byte maximum_pixel_depth;
-                              /* pixel depth used for the row buffers */
+							  /* pixel depth used for the row buffers */
    png_byte transformed_pixel_depth;
-                              /* pixel depth after read/write transforms */
+							  /* pixel depth after read/write transforms */
    png_byte io_chunk_string[5];
-                              /* string name of chunk */
+							  /* string name of chunk */
 
 #if defined(PNG_READ_FILLER_SUPPORTED) || defined(PNG_WRITE_FILLER_SUPPORTED)
    png_uint_16 filler;           /* filler bytes for pixel expansion */
@@ -309,9 +309,9 @@ struct png_struct_def
 /* The following three members were added at version 1.0.14 and 1.2.4 */
    png_bytep quantize_sort;          /* working sort array */
    png_bytep index_to_palette;       /* where the original index currently is
-                                        in the palette */
+										in the palette */
    png_bytep palette_to_index;       /* which original index points to this
-                                         palette color */
+										 palette color */
 #endif
 
 /* New members added in libpng-1.0.16 and 1.2.6 */
@@ -322,13 +322,13 @@ struct png_struct_def
    png_uint_32 user_height_max;
 
    /* Added in libpng-1.4.0: Total number of sPLT, text, and unknown
-    * chunks that can be stored (0 means unlimited).
-    */
+	* chunks that can be stored (0 means unlimited).
+	*/
    png_uint_32 user_chunk_cache_max;
 
    /* Total memory that a zTXt, sPLT, iTXt, iCCP, or unknown chunk
-    * can occupy when decompressed.  0 means unlimited.
-    */
+	* can occupy when decompressed.  0 means unlimited.
+	*/
    png_alloc_size_t user_chunk_malloc_max;
 #endif
 
@@ -353,6 +353,6 @@ struct png_struct_def
    png_bytep big_prev_row;
 
    void (*read_filter[PNG_FILTER_VALUE_LAST-1])(png_row_infop row_info,
-      png_bytep row, png_const_bytep prev_row);
+	  png_bytep row, png_const_bytep prev_row);
 };
 #endif /* PNGSTRUCT_H */

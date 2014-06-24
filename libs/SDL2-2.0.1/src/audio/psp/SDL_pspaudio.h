@@ -11,11 +11,11 @@
   freely, subject to the following restrictions:
 
   1. The origin of this software must not be misrepresented; you must not
-     claim that you wrote the original software. If you use this software
-     in a product, an acknowledgment in the product documentation would be
-     appreciated but is not required.
+	 claim that you wrote the original software. If you use this software
+	 in a product, an acknowledgment in the product documentation would be
+	 appreciated but is not required.
   2. Altered source versions must be plainly marked as such, and must not be
-     misrepresented as being the original software.
+	 misrepresented as being the original software.
   3. This notice may not be removed or altered from any source distribution.
 */
 
@@ -30,14 +30,14 @@
 #define NUM_BUFFERS 2
 
 struct SDL_PrivateAudioData {
-    /* The hardware output channel. */
-    int     channel;
-    /* The raw allocated mixing buffer. */
-    Uint8   *rawbuf;
-    /* Individual mixing buffers. */
-    Uint8   *mixbufs[NUM_BUFFERS];
-    /* Index of the next available mixing buffer. */
-    int     next_buffer;
+	/* The hardware output channel. */
+	int     channel;
+	/* The raw allocated mixing buffer. */
+	Uint8   *rawbuf;
+	/* Individual mixing buffers. */
+	Uint8   *mixbufs[NUM_BUFFERS];
+	/* Index of the next available mixing buffer. */
+	int     next_buffer;
 };
 
 #endif /* _SDL_pspaudio_h */

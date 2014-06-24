@@ -38,7 +38,7 @@ inline UInt32 GetLenToPosState(UInt32 len)
 {
   len -= 2;
   if (len < kNumLenToPosStates)
-    return len;
+	return len;
   return kNumLenToPosStates - 1;
 }
 

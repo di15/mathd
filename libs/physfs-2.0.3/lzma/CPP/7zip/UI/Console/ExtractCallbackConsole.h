@@ -23,9 +23,9 @@ public:
 
   // IFolderArchiveExtractCallback
   STDMETHOD(AskOverwrite)(
-      const wchar_t *existName, const FILETIME *existTime, const UInt64 *existSize,
-      const wchar_t *newName, const FILETIME *newTime, const UInt64 *newSize,
-      Int32 *answer);
+	  const wchar_t *existName, const FILETIME *existTime, const UInt64 *existSize,
+	  const wchar_t *newName, const FILETIME *newTime, const UInt64 *newSize,
+	  Int32 *answer);
   STDMETHOD (PrepareOperation)(const wchar_t *name, bool isFolder, Int32 askExtractMode, const UInt64 *position);
 
   STDMETHOD(MessageError)(const wchar_t *message);
@@ -54,10 +54,10 @@ public:
 
   void Init()
   {
-    NumArchives = 0;
-    NumArchiveErrors = 0;
-    NumFileErrors = 0;
-    NumFileErrorsInCurrentArchive = 0;
+	NumArchives = 0;
+	NumArchiveErrors = 0;
+	NumFileErrors = 0;
+	NumFileErrorsInCurrentArchive = 0;
   }
 
 };

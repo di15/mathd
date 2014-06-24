@@ -11,11 +11,11 @@
   freely, subject to the following restrictions:
 
   1. The origin of this software must not be misrepresented; you must not
-     claim that you wrote the original software. If you use this software
-     in a product, an acknowledgment in the product documentation would be
-     appreciated but is not required.
+	 claim that you wrote the original software. If you use this software
+	 in a product, an acknowledgment in the product documentation would be
+	 appreciated but is not required.
   2. Altered source versions must be plainly marked as such, and must not be
-     misrepresented as being the original software.
+	 misrepresented as being the original software.
   3. This notice may not be removed or altered from any source distribution.
 */
 #include "SDL_config.h"
@@ -29,53 +29,53 @@ typedef Uint32 SDL_MouseID;
 
 struct SDL_Cursor
 {
-    struct SDL_Cursor *next;
-    void *driverdata;
+	struct SDL_Cursor *next;
+	void *driverdata;
 };
 
 typedef struct
 {
-    /* Create a cursor from a surface */
-    SDL_Cursor *(*CreateCursor) (SDL_Surface * surface, int hot_x, int hot_y);
+	/* Create a cursor from a surface */
+	SDL_Cursor *(*CreateCursor) (SDL_Surface * surface, int hot_x, int hot_y);
 
-    /* Create a system cursor */
-    SDL_Cursor *(*CreateSystemCursor) (SDL_SystemCursor id);
+	/* Create a system cursor */
+	SDL_Cursor *(*CreateSystemCursor) (SDL_SystemCursor id);
 
-    /* Show the specified cursor, or hide if cursor is NULL */
-    int (*ShowCursor) (SDL_Cursor * cursor);
+	/* Show the specified cursor, or hide if cursor is NULL */
+	int (*ShowCursor) (SDL_Cursor * cursor);
 
-    /* This is called when a mouse motion event occurs */
-    void (*MoveCursor) (SDL_Cursor * cursor);
+	/* This is called when a mouse motion event occurs */
+	void (*MoveCursor) (SDL_Cursor * cursor);
 
-    /* Free a window manager cursor */
-    void (*FreeCursor) (SDL_Cursor * cursor);
+	/* Free a window manager cursor */
+	void (*FreeCursor) (SDL_Cursor * cursor);
 
-    /* Warp the mouse to (x,y) */
-    void (*WarpMouse) (SDL_Window * window, int x, int y);
+	/* Warp the mouse to (x,y) */
+	void (*WarpMouse) (SDL_Window * window, int x, int y);
 
-    /* Set relative mode */
-    int (*SetRelativeMouseMode) (SDL_bool enabled);
+	/* Set relative mode */
+	int (*SetRelativeMouseMode) (SDL_bool enabled);
 
-    /* Data common to all mice */
-    SDL_MouseID mouseID;
-    SDL_Window *focus;
-    int x;
-    int y;
-    int xdelta;
-    int ydelta;
-    int last_x, last_y;         /* the last reported x and y coordinates */
-    Uint32 buttonstate;
-    SDL_bool relative_mode;
-    /* the x and y coordinates when relative mode was activated */
-    int original_x, original_y;
+	/* Data common to all mice */
+	SDL_MouseID mouseID;
+	SDL_Window *focus;
+	int x;
+	int y;
+	int xdelta;
+	int ydelta;
+	int last_x, last_y;         /* the last reported x and y coordinates */
+	Uint32 buttonstate;
+	SDL_bool relative_mode;
+	/* the x and y coordinates when relative mode was activated */
+	int original_x, original_y;
 
-    SDL_Cursor *cursors;
-    SDL_Cursor *def_cursor;
-    SDL_Cursor *cur_cursor;
-    SDL_bool cursor_shown;
+	SDL_Cursor *cursors;
+	SDL_Cursor *def_cursor;
+	SDL_Cursor *cur_cursor;
+	SDL_bool cursor_shown;
 
-    /* Driver-dependent data. */
-    void *driverdata;
+	/* Driver-dependent data. */
+	void *driverdata;
 } SDL_Mouse;
 
 

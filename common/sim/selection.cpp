@@ -1,5 +1,4 @@
 
-
 #include "selection.h"
 #include "../math/matrix.h"
 #include "../window.h"
@@ -49,7 +48,7 @@ static Frustum g_selfrust;	//selection frustum
 
 void DrawMarquee()
 {
-	Player* py = &g_player[g_currP];
+	Player* py = &g_player[g_curP];
 
 	if(!py->mousekeys[0] || py->keyintercepted || g_mode != APPMODE_PLAY || py->build != BUILDING_NONE)
 		return;
@@ -90,10 +89,24 @@ void DrawSel(Matrix* projection, Matrix* modelmat, Matrix* viewmat)
 	glUniformMatrix4fv(s->m_slot[SSLOT_MODELMAT], 1, 0, modelmat->m_matrix);
 	glUniformMatrix4fv(s->m_slot[SSLOT_VIEWMAT], 1, 0, viewmat->m_matrix);
 
+	Matrix mvp;
+#if 0
+	mvp.set(modelview.m_matrix);
+	mvp.postmult(g_camproj);
+#elif 0
+	mvp.set(g_camproj.m_matrix);
+	mvp.postmult(modelview);
+#else
+	mvp.set(projection->m_matrix);
+	mvp.postmult(*viewmat);
+	mvp.postmult(*modelmat);
+#endif
+	glUniformMatrix4fv(s->m_slot[SSLOT_MVP], 1, 0, mvp.m_matrix);
+
 	float* color = g_player[g_localP].colorcode;
 	glUniform4f(s->m_slot[SSLOT_COLOR], color[0], color[1], color[2], 0.5f);
 
-	Player* py = &g_player[g_currP];
+	Player* py = &g_player[g_curP];
 
 	glLineWidth(3);
 
@@ -341,7 +354,7 @@ int SelectOneUnit(Vec3f *line)
 
 Selection SelectOne(Vec3f campos, Vec3f camside, Vec3f camup2, Vec3f viewdir)
 {
-	Player* py = &g_player[g_currP];
+	Player* py = &g_player[g_curP];
 
 	Vec3f ray = ScreenPerspRay(py->mouse.x, py->mouse.y, py->width, py->height, campos, camside, camup2, viewdir, FIELD_OF_VIEW);
 	Vec3f line[2];
@@ -431,7 +444,7 @@ std::list<int> SelectAreaUnits()
 
 Selection SelectAreaPersp(Vec3f campos, Vec3f camside, Vec3f camup2, Vec3f viewdir)
 {
-	Player* py = &g_player[g_currP];
+	Player* py = &g_player[g_curP];
 
 	int minx = std::min(py->mousestart.x, py->mouse.x);
 	int maxx = std::max(py->mousestart.x, py->mouse.x);
@@ -574,7 +587,7 @@ Selection SelectAreaPersp(Vec3f campos, Vec3f camside, Vec3f camup2, Vec3f viewd
 Selection DoSel(Vec3f campos, Vec3f camside, Vec3f camup2, Vec3f viewdir)
 {
 	Selection sel;
-	Player* py = &g_player[g_currP];
+	Player* py = &g_player[g_curP];
 
 	if(py->mousestart.x == py->mouse.x && py->mousestart.y == py->mouse.y)
 		sel = SelectOne(campos, camside, camup2, viewdir);
@@ -645,7 +658,7 @@ void AfterSel(Selection* s)
 
 	if(haveconstr)
 	{
-		Player* py = &g_player[g_currP];
+		Player* py = &g_player[g_curP];
 		GUI* gui = &py->gui;
 		ConstructionView* cv = (ConstructionView*)gui->get("construction view")->get("construction view");
 		cv->regen(s);

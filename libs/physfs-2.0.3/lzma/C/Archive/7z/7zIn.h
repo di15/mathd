@@ -32,13 +32,13 @@ typedef struct _ISzInStream
 {
   #ifdef _LZMA_IN_CB
   SZ_RESULT (*Read)(
-      void *object,           /* pointer to ISzInStream itself */
-      void **buffer,          /* out: pointer to buffer with data */
-      size_t maxRequiredSize, /* max required size to read */
-      size_t *processedSize); /* real processed size. 
-                                 processedSize can be less than maxRequiredSize.
-                                 If processedSize == 0, then there are no more 
-                                 bytes in stream. */
+	  void *object,           /* pointer to ISzInStream itself */
+	  void **buffer,          /* out: pointer to buffer with data */
+	  size_t maxRequiredSize, /* max required size to read */
+	  size_t *processedSize); /* real processed size. 
+								 processedSize can be less than maxRequiredSize.
+								 If processedSize == 0, then there are no more 
+								 bytes in stream. */
   #else
   SZ_RESULT (*Read)(void *object, void *buffer, size_t size, size_t *processedSize);
   #endif
@@ -47,9 +47,9 @@ typedef struct _ISzInStream
 
  
 int SzArchiveOpen(
-    ISzInStream *inStream, 
-    CArchiveDatabaseEx *db,
-    ISzAlloc *allocMain, 
-    ISzAlloc *allocTemp);
+	ISzInStream *inStream, 
+	CArchiveDatabaseEx *db,
+	ISzAlloc *allocMain, 
+	ISzAlloc *allocTemp);
  
 #endif

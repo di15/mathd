@@ -1,5 +1,4 @@
 
-
 #ifndef EDITORGUI_H
 #define EDITORGUI_H
 

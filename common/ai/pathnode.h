@@ -1,4 +1,3 @@
-
 #ifndef PATHNODE_H
 #define PATHNODE_H
 
@@ -10,7 +9,8 @@
 #define PATHNODE_DIAG	(sqrt(PATHNODE_SIZE*PATHNODE_SIZE*2))
 
 // Offsets for straights moves
-const Vec2i straightoffsets[4] = {
+const Vec2i straightoffsets[4] =
+{
 	Vec2i(1, 0), //E
 	Vec2i(-1, 0), //W
 	Vec2i(0, 1), //S
@@ -18,7 +18,8 @@ const Vec2i straightoffsets[4] = {
 };
 
 // Offsets for diagonal moves
-const Vec2i diagonaloffsets[4] = {
+const Vec2i diagonaloffsets[4] =
+{
 	Vec2i(-1, -1), //NW
 	Vec2i(1, -1), //NE
 	Vec2i(-1, 1), //SW
@@ -35,7 +36,8 @@ const Vec2i diagonaloffsets[4] = {
 #define DIR_W       7
 #define DIRS        8
 
-const Vec2i offsets[DIRS] = {
+const Vec2i offsets[DIRS] =
+{
 	Vec2i(-1, -1), //NW
 	Vec2i(0, -1), //N
 	Vec2i(1, -1), //NE
@@ -46,7 +48,8 @@ const Vec2i offsets[DIRS] = {
 	Vec2i(-1, 0) //W
 };
 
-const int stepdist[DIRS] = {
+const int stepdist[DIRS] =
+{
 	PATHNODE_DIAG, //NW
 	PATHNODE_SIZE, //N
 	PATHNODE_DIAG, //NE

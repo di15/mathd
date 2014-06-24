@@ -11,11 +11,11 @@
   freely, subject to the following restrictions:
 
   1. The origin of this software must not be misrepresented; you must not
-     claim that you wrote the original software. If you use this software
-     in a product, an acknowledgment in the product documentation would be
-     appreciated but is not required.
+	 claim that you wrote the original software. If you use this software
+	 in a product, an acknowledgment in the product documentation would be
+	 appreciated but is not required.
   2. Altered source versions must be plainly marked as such, and must not be
-     misrepresented as being the original software.
+	 misrepresented as being the original software.
   3. This notice may not be removed or altered from any source distribution.
 */
 
@@ -73,28 +73,28 @@ typedef void  (*SDLTest_TestCaseTearDownFp)(void *arg);
  * Holds information about a single test case.
  */
 typedef struct SDLTest_TestCaseReference {
-    /* !< Func2Stress */
-    SDLTest_TestCaseFp testCase;
-    /* !< Short name (or function name) "Func2Stress" */
-    char *name;
-    /* !< Long name or full description "This test pushes func2() to the limit." */
-    char *description;
-    /* !< Set to TEST_ENABLED or TEST_DISABLED (test won't be run) */
-    int enabled;
+	/* !< Func2Stress */
+	SDLTest_TestCaseFp testCase;
+	/* !< Short name (or function name) "Func2Stress" */
+	char *name;
+	/* !< Long name or full description "This test pushes func2() to the limit." */
+	char *description;
+	/* !< Set to TEST_ENABLED or TEST_DISABLED (test won't be run) */
+	int enabled;
 } SDLTest_TestCaseReference;
 
 /**
  * Holds information about a test suite (multiple test cases).
  */
 typedef struct SDLTest_TestSuiteReference {
-    /* !< "PlatformSuite" */
-    char *name;
-    /* !< The function that is run before each test. NULL skips. */
-    SDLTest_TestCaseSetUpFp testSetUp;
-    /* !< The test cases that are run as part of the suite. Last item should be NULL. */
-    const SDLTest_TestCaseReference **testCases;
-    /* !< The function that is run after each test. NULL skips. */
-    SDLTest_TestCaseTearDownFp testTearDown;
+	/* !< "PlatformSuite" */
+	char *name;
+	/* !< The function that is run before each test. NULL skips. */
+	SDLTest_TestCaseSetUpFp testSetUp;
+	/* !< The test cases that are run as part of the suite. Last item should be NULL. */
+	const SDLTest_TestCaseReference **testCases;
+	/* !< The function that is run after each test. NULL skips. */
+	SDLTest_TestCaseTearDownFp testTearDown;
 } SDLTest_TestSuiteReference;
 
 

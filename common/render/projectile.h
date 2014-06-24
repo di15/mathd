@@ -1,4 +1,3 @@
-
 #include "../platform.h"
 #include "../math/3dmath.h"
 #include "../math/vec3f.h"
@@ -13,7 +12,7 @@ public:
 	void Define(char* texpath);
 };
 
-enum PROJECTILE{GUNPROJ, PROJECTILE_TYPES};
+enum PROJECTILE {GUNPROJ, PROJECTILE_TYPES};
 extern ProjectileType g_projectileType[PROJECTILE_TYPES];
 
 class Projectile

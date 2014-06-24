@@ -11,11 +11,11 @@
   freely, subject to the following restrictions:
 
   1. The origin of this software must not be misrepresented; you must not
-     claim that you wrote the original software. If you use this software
-     in a product, an acknowledgment in the product documentation would be
-     appreciated but is not required.
+	 claim that you wrote the original software. If you use this software
+	 in a product, an acknowledgment in the product documentation would be
+	 appreciated but is not required.
   2. Altered source versions must be plainly marked as such, and must not be
-     misrepresented as being the original software.
+	 misrepresented as being the original software.
   3. This notice may not be removed or altered from any source distribution.
 */
 
@@ -66,7 +66,7 @@ typedef struct _SDL_Joystick SDL_Joystick;
 
 /* A structure that encodes the stable unique id for a joystick device */
 typedef struct {
-    Uint8 data[16];
+	Uint8 data[16];
 } SDL_JoystickGUID;
 
 typedef Sint32 SDL_JoystickID;
@@ -182,7 +182,7 @@ extern DECLSPEC int SDLCALL SDL_JoystickEventState(int state);
  *  The axis indices start at index 0.
  */
 extern DECLSPEC Sint16 SDLCALL SDL_JoystickGetAxis(SDL_Joystick * joystick,
-                                                   int axis);
+												   int axis);
 
 /**
  *  \name Hat positions
@@ -216,7 +216,7 @@ extern DECLSPEC Sint16 SDLCALL SDL_JoystickGetAxis(SDL_Joystick * joystick,
  *           - ::SDL_HAT_LEFTDOWN
  */
 extern DECLSPEC Uint8 SDLCALL SDL_JoystickGetHat(SDL_Joystick * joystick,
-                                                 int hat);
+												 int hat);
 
 /**
  *  Get the ball axis change since the last poll.
@@ -226,7 +226,7 @@ extern DECLSPEC Uint8 SDLCALL SDL_JoystickGetHat(SDL_Joystick * joystick,
  *  The ball indices start at index 0.
  */
 extern DECLSPEC int SDLCALL SDL_JoystickGetBall(SDL_Joystick * joystick,
-                                                int ball, int *dx, int *dy);
+												int ball, int *dx, int *dy);
 
 /**
  *  Get the current state of a button on a joystick.
@@ -234,7 +234,7 @@ extern DECLSPEC int SDLCALL SDL_JoystickGetBall(SDL_Joystick * joystick,
  *  The button indices start at index 0.
  */
 extern DECLSPEC Uint8 SDLCALL SDL_JoystickGetButton(SDL_Joystick * joystick,
-                                                    int button);
+													int button);
 
 /**
  *  Close a joystick previously opened with SDL_JoystickOpen().

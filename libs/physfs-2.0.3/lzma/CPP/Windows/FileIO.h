@@ -26,10 +26,10 @@ class CFileBase
 protected:
   HANDLE _handle;
   bool Create(LPCTSTR fileName, DWORD desiredAccess,
-      DWORD shareMode, DWORD creationDisposition,  DWORD flagsAndAttributes);
+	  DWORD shareMode, DWORD creationDisposition,  DWORD flagsAndAttributes);
   #ifndef _UNICODE
   bool Create(LPCWSTR fileName, DWORD desiredAccess,
-      DWORD shareMode, DWORD creationDisposition,  DWORD flagsAndAttributes);
+	  DWORD shareMode, DWORD creationDisposition,  DWORD flagsAndAttributes);
   #endif
 
 public:
@@ -81,9 +81,9 @@ public:
 
   /*
   void SetOpenCreationDisposition(DWORD creationDisposition)
-    { m_CreationDisposition = creationDisposition; }
+	{ m_CreationDisposition = creationDisposition; }
   void SetOpenCreationDispositionCreateAlways()
-    { m_CreationDisposition = CREATE_ALWAYS; }
+	{ m_CreationDisposition = CREATE_ALWAYS; }
   */
 
   bool SetTime(const FILETIME *creationTime, const FILETIME *lastAccessTime, const FILETIME *lastWriteTime);

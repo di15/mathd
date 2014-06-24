@@ -1,4 +1,3 @@
-
 #ifndef ROAD_H
 #define ROAD_H
 
@@ -14,7 +13,7 @@ class RoadTileType
 {
 public:
 	void draw(int x, int z);
-    
+
 	int model;
 };
 
@@ -33,10 +32,10 @@ public:
 	int transporter[RESOURCES];
 	Vec3f drawpos;
 	int maxcost[RESOURCES];
-    
+
 	RoadTile();
 	~RoadTile();
-    
+
 	int netreq(int res);
 	void destroy();
 	void allocate();

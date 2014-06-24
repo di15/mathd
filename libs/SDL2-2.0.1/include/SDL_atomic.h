@@ -11,11 +11,11 @@
   freely, subject to the following restrictions:
 
   1. The origin of this software must not be misrepresented; you must not
-     claim that you wrote the original software. If you use this software
-     in a product, an acknowledgment in the product documentation would be
-     appreciated but is not required.
+	 claim that you wrote the original software. If you use this software
+	 in a product, an acknowledgment in the product documentation would be
+	 appreciated but is not required.
   2. Altered source versions must be plainly marked as such, and must not be
-     misrepresented as being the original software.
+	 misrepresented as being the original software.
   3. This notice may not be removed or altered from any source distribution.
 */
 
@@ -252,11 +252,11 @@ extern DECLSPEC SDL_bool SDLCALL SDL_AtomicCAS(SDL_atomic_t *a, int oldval, int 
 #ifndef SDL_AtomicSet
 SDL_FORCE_INLINE int SDL_AtomicSet(SDL_atomic_t *a, int v)
 {
-    int value;
-    do {
-        value = a->value;
-    } while (!SDL_AtomicCAS(a, value, v));
-    return value;
+	int value;
+	do {
+		value = a->value;
+	} while (!SDL_AtomicCAS(a, value, v));
+	return value;
 }
 #endif
 
@@ -266,9 +266,9 @@ SDL_FORCE_INLINE int SDL_AtomicSet(SDL_atomic_t *a, int v)
 #ifndef SDL_AtomicGet
 SDL_FORCE_INLINE int SDL_AtomicGet(SDL_atomic_t *a)
 {
-    int value = a->value;
-    SDL_CompilerBarrier();
-    return value;
+	int value = a->value;
+	SDL_CompilerBarrier();
+	return value;
 }
 #endif
 
@@ -282,11 +282,11 @@ SDL_FORCE_INLINE int SDL_AtomicGet(SDL_atomic_t *a)
 #ifndef SDL_AtomicAdd
 SDL_FORCE_INLINE int SDL_AtomicAdd(SDL_atomic_t *a, int v)
 {
-    int value;
-    do {
-        value = a->value;
-    } while (!SDL_AtomicCAS(a, value, (value + v)));
-    return value;
+	int value;
+	do {
+		value = a->value;
+	} while (!SDL_AtomicCAS(a, value, (value + v)));
+	return value;
 }
 #endif
 
@@ -326,11 +326,11 @@ extern DECLSPEC SDL_bool SDLCALL SDL_AtomicCASPtr(void* *a, void *oldval, void *
 #ifndef SDL_AtomicSetPtr
 SDL_FORCE_INLINE void* SDL_AtomicSetPtr(void* *a, void* v)
 {
-    void* value;
-    do {
-        value = *a;
-    } while (!SDL_AtomicCASPtr(a, value, v));
-    return value;
+	void* value;
+	do {
+		value = *a;
+	} while (!SDL_AtomicCASPtr(a, value, v));
+	return value;
 }
 #endif
 
@@ -340,9 +340,9 @@ SDL_FORCE_INLINE void* SDL_AtomicSetPtr(void* *a, void* v)
 #ifndef SDL_AtomicGetPtr
 SDL_FORCE_INLINE void* SDL_AtomicGetPtr(void* *a)
 {
-    void* value = *a;
-    SDL_CompilerBarrier();
-    return value;
+	void* value = *a;
+	SDL_CompilerBarrier();
+	return value;
 }
 #endif
 

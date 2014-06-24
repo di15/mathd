@@ -1,5 +1,4 @@
 
-
 #ifndef WINDOWW_H
 #define WINDOWW_H
 
@@ -11,7 +10,7 @@
 class WindowW : public Widget
 {
 public:
-	
+
 	Image top_image;
 	Image topleft_image;
 	Image topright_image;
@@ -22,7 +21,7 @@ public:
 	Image bottomright_image;
 	Image bg_image;
 	Image bg_logo_image;
-	
+
 	Image inner_top_mid_image;
 	Image inner_top_leftdiag_image;
 	Image inner_top_rightdiag_image;
@@ -32,7 +31,7 @@ public:
 	Image inner_top_rightstripblur_image;
 	Image inner_top_leftvblur_image;
 	Image inner_top_rightvblur_image;
-	
+
 	Image inner_bottom_mid_image;
 	Image inner_bottom_leftdiag_image;
 	Image inner_bottom_rightdiag_image;

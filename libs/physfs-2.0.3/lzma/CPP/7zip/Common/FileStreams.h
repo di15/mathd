@@ -81,25 +81,25 @@ public:
   virtual ~COutFileStream() {}
   bool Create(LPCTSTR fileName, bool createAlways)
   {
-    ProcessedSize = 0;
-    return File.Create(fileName, createAlways);
+	ProcessedSize = 0;
+	return File.Create(fileName, createAlways);
   }
   bool Open(LPCTSTR fileName, DWORD creationDisposition)
   {
-    ProcessedSize = 0;
-    return File.Open(fileName, creationDisposition);
+	ProcessedSize = 0;
+	return File.Open(fileName, creationDisposition);
   }
   #ifdef USE_WIN_FILE
   #ifndef _UNICODE
   bool Create(LPCWSTR fileName, bool createAlways)
   {
-    ProcessedSize = 0;
-    return File.Create(fileName, createAlways);
+	ProcessedSize = 0;
+	return File.Create(fileName, createAlways);
   }
   bool Open(LPCWSTR fileName, DWORD creationDisposition)
   {
-    ProcessedSize = 0;
-    return File.Open(fileName, creationDisposition);
+	ProcessedSize = 0;
+	return File.Open(fileName, creationDisposition);
   }
   #endif
   #endif
@@ -111,11 +111,11 @@ public:
   #ifdef USE_WIN_FILE
   bool SetTime(const FILETIME *creationTime, const FILETIME *lastAccessTime, const FILETIME *lastWriteTime)
   {
-    return File.SetTime(creationTime, lastAccessTime, lastWriteTime);
+	return File.SetTime(creationTime, lastAccessTime, lastWriteTime);
   }
   bool SetLastWriteTime(const FILETIME *lastWriteTime)
   {
-    return File.SetLastWriteTime(lastWriteTime);
+	return File.SetLastWriteTime(lastWriteTime);
   }
   #endif
 

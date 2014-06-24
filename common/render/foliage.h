@@ -1,5 +1,4 @@
 
-
 #ifndef FOLIAGE_H
 #define FOLIAGE_H
 
