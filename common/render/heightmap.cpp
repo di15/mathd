@@ -1,4 +1,3 @@
-
 #include "../platform.h"
 #include "heightmap.h"
 
@@ -150,12 +149,12 @@ void Heightmap::destroy()
 
 	g_log<<"deleting [] g_open"<<endl;
 	g_log.flush();
-/*
-	delete [] g_open;
+	/*
+		delete [] g_open;
 
-	g_log<<"deleting [] g_road"<<endl;
-	g_log.flush();
-	*/
+		g_log<<"deleting [] g_road"<<endl;
+		g_log.flush();
+		*/
 
 	delete [] m_heightpoints;
 	delete [] m_drawvertices;
@@ -486,20 +485,20 @@ void Heightmap::remesh(float tilescale)
 
 			Combined with other tiles this will look like:
 
-			          |
-			          |
-			          |
-			         /
-			       /
+					  |
+					  |
+					  |
+					 /
+				   /
 			_____/
 
 			Otherwise, if we didn't check which way
 			to cut the tile into triangles, it would look
 			like a sharp corner:
 
-			          |
-			          |
-			          |
+					  |
+					  |
+					  |
 			__________|
 
 			*/
@@ -1353,18 +1352,33 @@ void Heightmap::draw()
 	glUniform1f(s->m_slot[SSLOT_MAPMAXY], ConvertHeight(255));
 
 	Matrix modelmat;
-    Matrix modelview;
-    modelview.set(modelmat.m_matrix);
+	modelmat.reset();
+	Matrix modelview;
 #ifdef SPECBUMPSHADOW
-    modelview.postmult(g_camview);
+    modelview.set(g_camview.m_matrix);
 #endif
-    //modelview.set(g_camview.m_matrix);
-    //modelview.postmult(modelmat);
+    modelview.postmult(modelmat);
+	glUniformMatrix4fv(s->m_slot[SSLOT_MODELVIEW], 1, 0, modelview.m_matrix);
+
+	Matrix mvp;
+#if 0
+	mvp.set(modelview.m_matrix);
+	mvp.postmult(g_camproj);
+#elif 0
+	mvp.set(g_camproj.m_matrix);
+	mvp.postmult(modelview);
+#else
+	mvp.set(g_camproj.m_matrix);
+	mvp.postmult(g_camview);
+	mvp.postmult(modelmat);
+#endif
+	glUniformMatrix4fv(s->m_slot[SSLOT_MVP], 1, 0, mvp.m_matrix);
+
 	Matrix modelviewinv;
 	Transpose(modelview, modelview);
 	Inverse2(modelview, modelviewinv);
 	//Transpose(modelviewinv, modelviewinv);
-    glUniformMatrix4fv(s->m_slot[SSLOT_NORMALMAT], 1, 0, modelviewinv.m_matrix);
+	glUniformMatrix4fv(s->m_slot[SSLOT_NORMALMAT], 1, 0, modelviewinv.m_matrix);
 
 	/*
 	for(int x=0; x<m_widthx; x++)
@@ -1415,44 +1429,57 @@ void Heightmap::draw2()
 	glBindTexture(GL_TEXTURE_2D, g_texture[ g_tiletexs[TILE_SAND] ].texname);
 	glUniform1i(s->m_slot[SSLOT_SANDTEX], 0);
 
+#ifdef GLDEBUG
 	CheckGLError(__FILE__, __LINE__);
+#endif
 
 	glActiveTexture(GL_TEXTURE1);
 	glBindTexture(GL_TEXTURE_2D, g_texture[ g_tiletexs[TILE_GRASS] ].texname);
 	glUniform1i(s->m_slot[SSLOT_GRASSTEX], 1);
 
+#ifdef GLDEBUG
 	CheckGLError(__FILE__, __LINE__);
+#endif
 
 	//glActiveTexture(GL_TEXTURE2);
 	//glBindTexture(GL_TEXTURE_2D, g_texture[ g_tiletexs[TILE_SNOW] ].texname);
 	//glUniform1i(s->m_slot[SSLOT_SNOWTEX], 2);
 
+#ifdef GLDEBUG
 	CheckGLError(__FILE__, __LINE__);
+#endif
 
 	glActiveTexture(GL_TEXTURE3);
 	glBindTexture(GL_TEXTURE_2D, g_texture[ g_tiletexs[TILE_ROCK] ].texname);
 	glUniform1i(s->m_slot[SSLOT_ROCKTEX], 3);
 
+#ifdef GLDEBUG
 	CheckGLError(__FILE__, __LINE__);
+#endif
 
 	glActiveTexture(GL_TEXTURE4);
 	glBindTexture(GL_TEXTURE_2D, g_texture[ g_tiletexs[TILE_CRACKEDROCK] ].texname);
 	glUniform1i(s->m_slot[SSLOT_CRACKEDROCKTEX], 4);
 
+#ifdef GLDEBUG
 	CheckGLError(__FILE__, __LINE__);
+#endif
 
 	glActiveTexture(GL_TEXTURE5);
 	glBindTexture(GL_TEXTURE_2D, g_texture[ g_tiletexs[TILE_CRACKEDROCK_NORM] ].texname);
 	glUniform1i(s->m_slot[SSLOT_CRACKEDROCKNORMTEX], 5);
 
+#ifdef GLDEBUG
 	CheckGLError(__FILE__, __LINE__);
+#endif
 
 	glActiveTexture(GL_TEXTURE6);
 	glBindTexture(GL_TEXTURE_2D, g_texture[ g_tiletexs[TILE_ROCK_NORM] ].texname);
 	glUniform1i(s->m_slot[SSLOT_ROCKNORMTEX], 6);
 
+#ifdef GLDEBUG
 	CheckGLError(__FILE__, __LINE__);
-
+#endif
 
 	//float yscale = TILE_Y_SCALE / 2000.0f;
 	glUniform1f(s->m_slot[SSLOT_SANDONLYMAXY], ELEV_SANDONLYMAXY);
@@ -1467,20 +1494,37 @@ void Heightmap::draw2()
 	glUniform1f(s->m_slot[SSLOT_MAPMAXY], ConvertHeight(255));
 
 	Matrix modelmat;
-    Matrix modelview;
-    modelview.set(modelmat.m_matrix);
+	modelmat.reset();
+	Matrix modelview;
 #ifdef SPECBUMPSHADOW
-    modelview.postmult(g_camview);
+    modelview.set(g_camview.m_matrix);
 #endif
-    //modelview.set(g_camview.m_matrix);
-    //modelview.postmult(modelmat);
+    modelview.postmult(modelmat);
+	glUniformMatrix4fv(s->m_slot[SSLOT_MODELVIEW], 1, 0, modelview.m_matrix);
+
+	Matrix mvp;
+#if 0
+	mvp.set(modelview.m_matrix);
+	mvp.postmult(g_camproj);
+#elif 0
+	mvp.set(g_camproj.m_matrix);
+	mvp.postmult(modelview);
+#else
+	mvp.set(g_camproj.m_matrix);
+	mvp.postmult(g_camview);
+	mvp.postmult(modelmat);
+#endif
+	glUniformMatrix4fv(s->m_slot[SSLOT_MVP], 1, 0, mvp.m_matrix);
+
 	Matrix modelviewinv;
 	Transpose(modelview, modelview);
 	Inverse2(modelview, modelviewinv);
 	//Transpose(modelviewinv, modelviewinv);
-    glUniformMatrix4fv(s->m_slot[SSLOT_NORMALMAT], 1, 0, modelviewinv.m_matrix);
+	glUniformMatrix4fv(s->m_slot[SSLOT_NORMALMAT], 1, 0, modelviewinv.m_matrix);
 
+#ifdef GLDEBUG
 	CheckGLError(__FILE__, __LINE__);
+#endif
 
 
 	/*
@@ -1499,20 +1543,28 @@ void Heightmap::draw2()
 	// Draw all tiles
 	glVertexAttribPointer(s->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, m_collverts);
 
+#ifdef GLDEBUG
 	CheckGLError(__FILE__, __LINE__);
+#endif
 
 	glVertexAttribPointer(s->m_slot[SSLOT_TEXCOORD0], 2, GL_FLOAT, GL_FALSE, 0, m_texcoords0);
 
+#ifdef GLDEBUG
 	CheckGLError(__FILE__, __LINE__);
+#endif
 
 	if(s->m_slot[SSLOT_NORMAL] != -1)
 		glVertexAttribPointer(s->m_slot[SSLOT_NORMAL], 3, GL_FLOAT, GL_FALSE, 0, m_normals);
 
+#ifdef GLDEBUG
 	CheckGLError(__FILE__, __LINE__);
+#endif
 
 	glDrawArrays(GL_TRIANGLES, 0, (m_widthx) * (m_widthz) * 3 * 2);
 
+#ifdef GLDEBUG
 	CheckGLError(__FILE__, __LINE__);
+#endif
 
 
 #else
@@ -1566,18 +1618,33 @@ void Heightmap::drawrim()
 	glUniform1f(s->m_slot[SSLOT_MAPMAXY], ConvertHeight(255));
 
 	Matrix modelmat;
-    Matrix modelview;
-    modelview.set(modelmat.m_matrix);
+	modelmat.reset();
+	Matrix modelview;
 #ifdef SPECBUMPSHADOW
-    modelview.postmult(g_camview);
+    modelview.set(g_camview.m_matrix);
 #endif
-    //modelview.set(g_camview.m_matrix);
-    //modelview.postmult(modelmat);
+    modelview.postmult(modelmat);
+	glUniformMatrix4fv(s->m_slot[SSLOT_MODELVIEW], 1, 0, modelview.m_matrix);
+
+	Matrix mvp;
+#if 0
+	mvp.set(modelview.m_matrix);
+	mvp.postmult(g_camproj);
+#elif 0
+	mvp.set(g_camproj.m_matrix);
+	mvp.postmult(modelview);
+#else
+	mvp.set(g_camproj.m_matrix);
+	mvp.postmult(g_camview);
+	mvp.postmult(modelmat);
+#endif
+	glUniformMatrix4fv(s->m_slot[SSLOT_MVP], 1, 0, mvp.m_matrix);
+
 	Matrix modelviewinv;
 	Transpose(modelview, modelview);
 	Inverse2(modelview, modelviewinv);
 	//Transpose(modelviewinv, modelviewinv);
-    glUniformMatrix4fv(s->m_slot[SSLOT_NORMALMAT], 1, 0, modelviewinv.m_matrix);
+	glUniformMatrix4fv(s->m_slot[SSLOT_NORMALMAT], 1, 0, modelviewinv.m_matrix);
 
 	/*
 	for(int x=0; x<m_widthx; x++)

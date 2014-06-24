@@ -31,9 +31,9 @@ bool CStdOutStream::Open(const char *fileName)
 bool CStdOutStream::Close()
 {
   if(!_streamIsOpen)
-    return true;
+	return true;
   if (fclose(_stream) != 0)
-    return false;
+	return false;
   _stream = 0;
   _streamIsOpen = false;
   return true;

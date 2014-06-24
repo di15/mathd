@@ -11,11 +11,11 @@
   freely, subject to the following restrictions:
 
   1. The origin of this software must not be misrepresented; you must not
-     claim that you wrote the original software. If you use this software
-     in a product, an acknowledgment in the product documentation would be
-     appreciated but is not required.
+	 claim that you wrote the original software. If you use this software
+	 in a product, an acknowledgment in the product documentation would be
+	 appreciated but is not required.
   2. Altered source versions must be plainly marked as such, and must not be
-     misrepresented as being the original software.
+	 misrepresented as being the original software.
   3. This notice may not be removed or altered from any source distribution.
 */
 #include "SDL_config.h"
@@ -27,26 +27,26 @@
 
 typedef struct GLES2_ShaderInstance
 {
-    GLenum type;
-    GLenum format;
-    int length;
-    const void *data;
+	GLenum type;
+	GLenum format;
+	int length;
+	const void *data;
 } GLES2_ShaderInstance;
 
 typedef struct GLES2_Shader
 {
-    int instance_count;
-    const GLES2_ShaderInstance *instances[4];
+	int instance_count;
+	const GLES2_ShaderInstance *instances[4];
 } GLES2_Shader;
 
 typedef enum
 {
-    GLES2_SHADER_VERTEX_DEFAULT,
-    GLES2_SHADER_FRAGMENT_SOLID_SRC,
-    GLES2_SHADER_FRAGMENT_TEXTURE_ABGR_SRC,
-    GLES2_SHADER_FRAGMENT_TEXTURE_ARGB_SRC,
-    GLES2_SHADER_FRAGMENT_TEXTURE_BGR_SRC,
-    GLES2_SHADER_FRAGMENT_TEXTURE_RGB_SRC
+	GLES2_SHADER_VERTEX_DEFAULT,
+	GLES2_SHADER_FRAGMENT_SOLID_SRC,
+	GLES2_SHADER_FRAGMENT_TEXTURE_ABGR_SRC,
+	GLES2_SHADER_FRAGMENT_TEXTURE_ARGB_SRC,
+	GLES2_SHADER_FRAGMENT_TEXTURE_BGR_SRC,
+	GLES2_SHADER_FRAGMENT_TEXTURE_RGB_SRC
 } GLES2_ShaderType;
 
 #define GLES2_SOURCE_SHADER (GLenum)-1

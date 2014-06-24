@@ -52,42 +52,42 @@ namespace NID
 {
   enum EEnum
   {
-    kEnd,
+	kEnd,
 
-    kHeader,
+	kHeader,
 
-    kArchiveProperties,
-    
-    kAdditionalStreamsInfo,
-    kMainStreamsInfo,
-    kFilesInfo,
-    
-    kPackInfo,
-    kUnPackInfo,
-    kSubStreamsInfo,
+	kArchiveProperties,
+	
+	kAdditionalStreamsInfo,
+	kMainStreamsInfo,
+	kFilesInfo,
+	
+	kPackInfo,
+	kUnPackInfo,
+	kSubStreamsInfo,
 
-    kSize,
-    kCRC,
+	kSize,
+	kCRC,
 
-    kFolder,
+	kFolder,
 
-    kCodersUnPackSize,
-    kNumUnPackStream,
+	kCodersUnPackSize,
+	kNumUnPackStream,
 
-    kEmptyStream,
-    kEmptyFile,
-    kAnti,
+	kEmptyStream,
+	kEmptyFile,
+	kAnti,
 
-    kName,
-    kCreationTime,
-    kLastAccessTime,
-    kLastWriteTime,
-    kWinAttributes,
-    kComment,
+	kName,
+	kCreationTime,
+	kLastAccessTime,
+	kLastWriteTime,
+	kWinAttributes,
+	kComment,
 
-    kEncodedHeader,
+	kEncodedHeader,
 
-    kStartPos
+	kStartPos
   };
 }
 

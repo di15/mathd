@@ -1,5 +1,4 @@
 
-
 #include "../render/heightmap.h"
 #include "../texture.h"
 #include "../utils.h"
@@ -73,7 +72,7 @@ void PlaceUnits()
 				break;
 			}
 			//else
-				//g_log<<"not placed at"<<tpos.x<<","<<tpos.y<<endl;
+			//g_log<<"not placed at"<<tpos.x<<","<<tpos.y<<endl;
 		}
 	}
 }
@@ -85,7 +84,9 @@ void LoadJPGMap(const char* relative)
 	g_hmap4.destroy();
 	g_hmap8.destroy();
 
+#ifdef GLDEBUG
 	CheckGLError(__FILE__, __LINE__);
+#endif
 
 	LoadedTex *pImage = NULL;
 
@@ -96,7 +97,10 @@ void LoadJPGMap(const char* relative)
 
 	if(!pImage)
 		return;
+
+#ifdef GLDEBUG
 	CheckGLError(__FILE__, __LINE__);
+#endif
 
 	g_hmap.allocate((pImage->sizeX-1), (pImage->sizeY-1));
 #if 0
@@ -105,7 +109,9 @@ void LoadJPGMap(const char* relative)
 	g_hmap8.allocate((pImage->sizeX-1)/8, (pImage->sizeY-1)/8);
 #endif
 
+#ifdef GLDEBUG
 	CheckGLError(__FILE__, __LINE__);
+#endif
 	for(int x=0; x<pImage->sizeX; x++)
 	{
 		for(int z=0; z<pImage->sizeY; z++)
@@ -132,9 +138,13 @@ void LoadJPGMap(const char* relative)
 		}
 	}
 
+#ifdef GLDEBUG
 	CheckGLError(__FILE__, __LINE__);
+#endif
 	AllocWater(g_hmap.m_widthx, g_hmap.m_widthz);
+#ifdef GLDEBUG
 	CheckGLError(__FILE__, __LINE__);
+#endif
 
 	g_hmap.remesh(1);
 #if 0
@@ -142,7 +152,9 @@ void LoadJPGMap(const char* relative)
 	g_hmap4.remesh(4);
 	g_hmap8.remesh(8);
 #endif
+#ifdef GLDEBUG
 	CheckGLError(__FILE__, __LINE__);
+#endif
 
 #if 1
 	AllocPathGrid(g_hmap.m_widthx*TILE_SIZE, g_hmap.m_widthz*TILE_SIZE);
@@ -150,11 +162,13 @@ void LoadJPGMap(const char* relative)
 	FillColliderGrid();
 #endif
 
+#ifdef GLDEBUG
 	CheckGLError(__FILE__, __LINE__);
+#endif
 	FillForest();
 	PlaceUnits();
 
-	Player* py = &g_player[g_currP];
+	Player* py = &g_player[g_curP];
 	Camera* c = &py->camera;
 
 	Vec3f center = Vec3f( g_hmap.m_widthx * TILE_SIZE/2.0f, g_hmap.getheight(g_hmap.m_widthx/2, g_hmap.m_widthz/2), g_hmap.m_widthz * TILE_SIZE/2.0f );
@@ -194,7 +208,7 @@ void FreeMap()
 	FreeFoliage();
 	FreeBuildings();
 	FreeDeposits();
-	Player* py = &g_player[g_currP];
+	Player* py = &g_player[g_curP];
 	py->sel.clear();
 }
 
@@ -255,10 +269,10 @@ void SaveFoliage(FILE *fp)
 	for(int i=0; i<FOLIAGES; i++)
 	{
 #if 0
-	bool on;
-	unsigned char type;
-	Vec3f pos;
-	float yaw;
+		bool on;
+		unsigned char type;
+		Vec3f pos;
+		float yaw;
 #endif
 
 		Foliage *f = &g_foliage[i];
@@ -299,12 +313,12 @@ void SaveDeposits(FILE *fp)
 	for(int i=0; i<DEPOSITS; i++)
 	{
 #if 0
-	bool on;
-	bool occupied;
-	int restype;
-	int amount;
-	Vec2i tilepos;
-	Vec3f drawpos;
+		bool on;
+		bool occupied;
+		int restype;
+		int amount;
+		Vec2i tilepos;
+		Vec3f drawpos;
 #endif
 
 		Deposit *d = &g_deposit[i];
@@ -347,25 +361,25 @@ void SaveUnits(FILE *fp)
 	{
 #if 0
 		bool on;
-	int type;
-	int stateowner;
-	int corpowner;
-	int unitowner;
+		int type;
+		int stateowner;
+		int corpowner;
+		int unitowner;
 
-	/*
-	The f (floating-point) position vectory is used for drawing.
-	*/
-	Vec3f fpos;
+		/*
+		The f (floating-point) position vectory is used for drawing.
+		*/
+		Vec3f fpos;
 
-	/*
-	The real position is stored in integers.
-	*/
-	Vec2i cmpos;
-	Vec3f facing;
-	Vec2f rotation;
+		/*
+		The real position is stored in integers.
+		*/
+		Vec2i cmpos;
+		Vec3f facing;
+		Vec2f rotation;
 
-	std::list<Vec2i> path;
-	Vec2i goal;
+		std::list<Vec2i> path;
+		Vec2i goal;
 #endif
 
 		Unit *u = &g_unit[i];
@@ -398,28 +412,28 @@ void SaveUnits(FILE *fp)
 		fwrite(&u->goal, sizeof(Vec2i), 1, fp);
 
 #if 0
-	int target;
-	int target2;
-	bool targetu;
-	bool underorder;
-	int fuelstation;
-	int belongings[RESOURCES];
-	int hp;
-	bool passive;
-	Vec2i prevpos;
-	int taskframe;
-	bool pathblocked;
-	int frameslookjobago;
-	int supplier;
-	int reqamt;
-	int targtype;
-	int home;
-	int car;
-	//std::vector<TransportJob> bids;
+		int target;
+		int target2;
+		bool targetu;
+		bool underorder;
+		int fuelstation;
+		int belongings[RESOURCES];
+		int hp;
+		bool passive;
+		Vec2i prevpos;
+		int taskframe;
+		bool pathblocked;
+		int frameslookjobago;
+		int supplier;
+		int reqamt;
+		int targtype;
+		int home;
+		int car;
+		//std::vector<TransportJob> bids;
 
-	float frame[2];
+		float frame[2];
 
-	Vec2i subgoal;
+		Vec2i subgoal;
 #endif
 
 		fwrite(&u->target, sizeof(int), 1, fp);
@@ -443,11 +457,11 @@ void SaveUnits(FILE *fp)
 		fwrite(&u->subgoal, sizeof(Vec2i), 1, fp);
 
 #if 0
-	unsigned char mode;
-	int pathdelay;
-	long long lastpath;
+		unsigned char mode;
+		int pathdelay;
+		long long lastpath;
 
-	bool threadwait;
+		bool threadwait;
 #endif
 
 
@@ -520,19 +534,19 @@ void SaveBuildings(FILE *fp)
 	{
 #if 0
 		bool on;
-	int type;
-	int stateowner;
-	int corpowner;
-	int unitowner;
+		int type;
+		int stateowner;
+		int corpowner;
+		int unitowner;
 
-	Vec2i tilepos;	//position in tiles
-	Vec3f drawpos;	//drawing position in centimeters
+		Vec2i tilepos;	//position in tiles
+		Vec3f drawpos;	//drawing position in centimeters
 
-	bool finished;
+		bool finished;
 
-	int pownetw;
-	int crpipenetw;
-	std::list<int> roadnetw;
+		int pownetw;
+		int crpipenetw;
+		std::list<int> roadnetw;
 #endif
 
 		Building *b = &g_building[i];
@@ -608,14 +622,14 @@ void ReadBuildings(FILE *fp)
 
 void SaveZoomCam(FILE *fp)
 {
-	Player* py = &g_player[g_currP];
+	Player* py = &g_player[g_curP];
 	fwrite(&py->camera, sizeof(Camera), 1, fp);
 	fwrite(&py->zoom, sizeof(float), 1, fp);
 }
 
 void ReadZoomCam(FILE *fp)
 {
-	Player* py = &g_player[g_currP];
+	Player* py = &g_player[g_curP];
 	fread(&py->camera, sizeof(Camera), 1, fp);
 	fread(&py->zoom, sizeof(float), 1, fp);
 }

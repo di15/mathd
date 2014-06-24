@@ -1,5 +1,4 @@
 
-
 #include "../gmain.h"
 #include "../../common/gui/gui.h"
 #include "../../common/gui/widgets/windoww.h"
@@ -26,7 +25,7 @@
 
 void Resize_ResNamesTextBlock(Widget* thisw)
 {
-	Player* py = &g_player[g_currP];
+	Player* py = &g_player[g_curP];
 	thisw->m_pos[0] = 0;
 	thisw->m_pos[1] = 10;
 	thisw->m_pos[2] = py->width;
@@ -35,7 +34,7 @@ void Resize_ResNamesTextBlock(Widget* thisw)
 
 void Resize_ResAmtsTextBlock(Widget* thisw)
 {
-	Player* py = &g_player[g_currP];
+	Player* py = &g_player[g_curP];
 	thisw->m_pos[0] = 150;
 	thisw->m_pos[1] = 10;
 	thisw->m_pos[2] = py->width;
@@ -44,7 +43,7 @@ void Resize_ResAmtsTextBlock(Widget* thisw)
 
 void Resize_ResDeltasTextBlock(Widget* thisw)
 {
-	Player* py = &g_player[g_currP];
+	Player* py = &g_player[g_curP];
 	thisw->m_pos[0] = 250;
 	thisw->m_pos[1] = 10;
 	thisw->m_pos[2] = py->width;
@@ -57,7 +56,7 @@ void Out_Build()
 
 void Resize_ResTicker(Widget* thisw)
 {
-	Player* py = &g_player[g_currP];
+	Player* py = &g_player[g_curP];
 	thisw->m_pos[0] = 0;
 	thisw->m_pos[1] = 0;
 	thisw->m_pos[2] = py->width;
@@ -72,24 +71,55 @@ void UpdateResTicker()
 
 	static float tickerpos = 0;
 
-	Player* py = &g_player[g_currP];
+	Player* py = &g_player[g_curP];
 	GUI* gui = &py->gui;
 	ViewLayer* playguiview = (ViewLayer*)gui->get("play gui");
 	ResTicker* restickerw = (ResTicker*)playguiview->get("res ticker");
 	Widget* restickertw = &restickerw->restext;
-		RichText restext;
+	RichText restext;
 
-	restext.m_part.push_back(RichTextP(RICHTEXT_ICON, ICON_DOLLARS)); restext.m_part.push_back(RichTextP(" Funds: 100 +1/")); restext.m_part.push_back(RichTextP(RICHTEXT_ICON, ICON_TIME)); restext.m_part.push_back(RichTextP("    "));
-	restext.m_part.push_back(RichTextP(RICHTEXT_ICON, ICON_HOUSING)); restext.m_part.push_back(RichTextP(" Housing: 100/120")); restext.m_part.push_back(RichTextP("    "));
-	restext.m_part.push_back(RichTextP(RICHTEXT_ICON, ICON_FARMPRODUCT)); restext.m_part.push_back(RichTextP(" Farm Products: 100 +1/")); restext.m_part.push_back(RichTextP(RICHTEXT_ICON, ICON_TIME)); restext.m_part.push_back(RichTextP("    "));
-	restext.m_part.push_back(RichTextP(RICHTEXT_ICON, ICON_RETFOOD)); restext.m_part.push_back(RichTextP(" Retail Food: 100 +1/")); restext.m_part.push_back(RichTextP(RICHTEXT_ICON, ICON_TIME)); restext.m_part.push_back(RichTextP("    "));
-	restext.m_part.push_back(RichTextP(RICHTEXT_ICON, ICON_PRODUCTION)); restext.m_part.push_back(RichTextP(" Production: 100 +1/")); restext.m_part.push_back(RichTextP(RICHTEXT_ICON, ICON_TIME)); restext.m_part.push_back(RichTextP("    "));
-	restext.m_part.push_back(RichTextP(RICHTEXT_ICON, ICON_IRONORE)); restext.m_part.push_back(RichTextP(" Minerals: 100 +1/")); restext.m_part.push_back(RichTextP(RICHTEXT_ICON, ICON_TIME)); restext.m_part.push_back(RichTextP("    "));
-	restext.m_part.push_back(RichTextP(RICHTEXT_ICON, ICON_CRUDEOIL)); restext.m_part.push_back(RichTextP(" Crude Oil: 100 +1/")); restext.m_part.push_back(RichTextP(RICHTEXT_ICON, ICON_TIME)); restext.m_part.push_back(RichTextP("    "));
-	restext.m_part.push_back(RichTextP(RICHTEXT_ICON, ICON_WSFUEL)); restext.m_part.push_back(RichTextP(" Wholesale Fuel: 100 +1/")); restext.m_part.push_back(RichTextP(RICHTEXT_ICON, ICON_TIME)); restext.m_part.push_back(RichTextP("    "));
-	restext.m_part.push_back(RichTextP(RICHTEXT_ICON, ICON_RETFUEL)); restext.m_part.push_back(RichTextP(" Retail Fuel: 100 +1/")); restext.m_part.push_back(RichTextP(RICHTEXT_ICON, ICON_TIME)); restext.m_part.push_back(RichTextP("    "));
-	restext.m_part.push_back(RichTextP(RICHTEXT_ICON, ICON_ENERGY)); restext.m_part.push_back(RichTextP(" Energy: 100/120")); restext.m_part.push_back(RichTextP("    "));
-	restext.m_part.push_back(RichTextP(RICHTEXT_ICON, ICON_ENRICHEDURAN)); restext.m_part.push_back(RichTextP(" Uranium: 100 +1/")); restext.m_part.push_back(RichTextP(RICHTEXT_ICON, ICON_TIME)); restext.m_part.push_back(RichTextP("    "));
+	restext.m_part.push_back(RichTextP(RICHTEXT_ICON, ICON_DOLLARS));
+	restext.m_part.push_back(RichTextP(" Funds: 100 +1/"));
+	restext.m_part.push_back(RichTextP(RICHTEXT_ICON, ICON_TIME));
+	restext.m_part.push_back(RichTextP("    "));
+	restext.m_part.push_back(RichTextP(RICHTEXT_ICON, ICON_HOUSING));
+	restext.m_part.push_back(RichTextP(" Housing: 100/120"));
+	restext.m_part.push_back(RichTextP("    "));
+	restext.m_part.push_back(RichTextP(RICHTEXT_ICON, ICON_FARMPRODUCT));
+	restext.m_part.push_back(RichTextP(" Farm Products: 100 +1/"));
+	restext.m_part.push_back(RichTextP(RICHTEXT_ICON, ICON_TIME));
+	restext.m_part.push_back(RichTextP("    "));
+	restext.m_part.push_back(RichTextP(RICHTEXT_ICON, ICON_RETFOOD));
+	restext.m_part.push_back(RichTextP(" Retail Food: 100 +1/"));
+	restext.m_part.push_back(RichTextP(RICHTEXT_ICON, ICON_TIME));
+	restext.m_part.push_back(RichTextP("    "));
+	restext.m_part.push_back(RichTextP(RICHTEXT_ICON, ICON_PRODUCTION));
+	restext.m_part.push_back(RichTextP(" Production: 100 +1/"));
+	restext.m_part.push_back(RichTextP(RICHTEXT_ICON, ICON_TIME));
+	restext.m_part.push_back(RichTextP("    "));
+	restext.m_part.push_back(RichTextP(RICHTEXT_ICON, ICON_IRONORE));
+	restext.m_part.push_back(RichTextP(" Minerals: 100 +1/"));
+	restext.m_part.push_back(RichTextP(RICHTEXT_ICON, ICON_TIME));
+	restext.m_part.push_back(RichTextP("    "));
+	restext.m_part.push_back(RichTextP(RICHTEXT_ICON, ICON_CRUDEOIL));
+	restext.m_part.push_back(RichTextP(" Crude Oil: 100 +1/"));
+	restext.m_part.push_back(RichTextP(RICHTEXT_ICON, ICON_TIME));
+	restext.m_part.push_back(RichTextP("    "));
+	restext.m_part.push_back(RichTextP(RICHTEXT_ICON, ICON_WSFUEL));
+	restext.m_part.push_back(RichTextP(" Wholesale Fuel: 100 +1/"));
+	restext.m_part.push_back(RichTextP(RICHTEXT_ICON, ICON_TIME));
+	restext.m_part.push_back(RichTextP("    "));
+	restext.m_part.push_back(RichTextP(RICHTEXT_ICON, ICON_RETFUEL));
+	restext.m_part.push_back(RichTextP(" Retail Fuel: 100 +1/"));
+	restext.m_part.push_back(RichTextP(RICHTEXT_ICON, ICON_TIME));
+	restext.m_part.push_back(RichTextP("    "));
+	restext.m_part.push_back(RichTextP(RICHTEXT_ICON, ICON_ENERGY));
+	restext.m_part.push_back(RichTextP(" Energy: 100/120"));
+	restext.m_part.push_back(RichTextP("    "));
+	restext.m_part.push_back(RichTextP(RICHTEXT_ICON, ICON_ENRICHEDURAN));
+	restext.m_part.push_back(RichTextP(" Uranium: 100 +1/"));
+	restext.m_part.push_back(RichTextP(RICHTEXT_ICON, ICON_TIME));
+	restext.m_part.push_back(RichTextP("    "));
 
 	int len = restext.texlen();
 
@@ -105,7 +135,7 @@ void UpdateResTicker()
 
 void Resize_BottomPanel(Widget* thisw)
 {
-	Player* py = &g_player[g_currP];
+	Player* py = &g_player[g_curP];
 
 	thisw->m_pos[0] = 0;
 	thisw->m_pos[1] = py->height - MINIMAP_SIZE - 32;
@@ -115,14 +145,14 @@ void Resize_BottomPanel(Widget* thisw)
 
 void Out_BuildButton()
 {
-	Player* py = &g_player[g_currP];
+	Player* py = &g_player[g_curP];
 	GUI* gui = &py->gui;
 	gui->close("build preview");
 }
 
 void Click_BuildButton(int bwhat)
 {
-	Player* py = &g_player[g_currP];
+	Player* py = &g_player[g_curP];
 	py->build = bwhat;
 	//g_log<<"b "<<py->build<<endl;
 	Out_BuildButton();
@@ -130,7 +160,7 @@ void Click_BuildButton(int bwhat)
 
 void Over_BuildButton(int bwhat)
 {
-	Player* py = &g_player[g_currP];
+	Player* py = &g_player[g_curP];
 	GUI* gui = &py->gui;
 
 	if(gui->get("construction view")->m_opened)
@@ -153,7 +183,7 @@ void Click_NextBuildButton(int nextpage)
 
 void BuildMenu_OpenPage1()
 {
-	Player* py = &g_player[g_currP];
+	Player* py = &g_player[g_curP];
 	GUI* gui = &py->gui;
 	ViewLayer* playguiview = (ViewLayer*)gui->get("play gui");
 
@@ -196,7 +226,7 @@ void BuildMenu_OpenPage1()
 
 void BuildMenu_OpenPage2()
 {
-	Player* py = &g_player[g_currP];
+	Player* py = &g_player[g_curP];
 	GUI* gui = &py->gui;
 	ViewLayer* playguiview = (ViewLayer*)gui->get("play gui");
 
@@ -234,7 +264,7 @@ void BuildMenu_OpenPage2()
 
 void Resize_Fullscreen(Widget* thisw)
 {
-	Player* py = &g_player[g_currP];
+	Player* py = &g_player[g_curP];
 
 	thisw->m_pos[0] = 0;
 	thisw->m_pos[1] = 0;
@@ -244,7 +274,7 @@ void Resize_Fullscreen(Widget* thisw)
 
 void Resize_BuildPreview(Widget* thisw)
 {
-	Player* py = &g_player[g_currP];
+	Player* py = &g_player[g_curP];
 
 #if 0
 	int centerx = py->width/2;
@@ -264,7 +294,7 @@ void Resize_BuildPreview(Widget* thisw)
 
 void Resize_ConstructionView(Widget* thisw)
 {
-	Player* py = &g_player[g_currP];
+	Player* py = &g_player[g_curP];
 
 	thisw->m_pos[0] = 0;
 	thisw->m_pos[1] = py->height - MINIMAP_SIZE - 32 - 400;
@@ -278,7 +308,7 @@ void Click_MoveConstruction()
 	Zero(alloced);
 	int totalloc = 0;
 
-	Player* py = &g_player[g_currP];
+	Player* py = &g_player[g_curP];
 	GUI* gui = &py->gui;
 
 	for(auto siter = py->sel.buildings.begin(); siter != py->sel.buildings.end(); siter++)
@@ -370,7 +400,7 @@ void Click_MoveConstruction()
 
 void Click_CancelConstruction()
 {
-	Player* py = &g_player[g_currP];
+	Player* py = &g_player[g_curP];
 	GUI* gui = &py->gui;
 
 	for(auto siter = py->sel.buildings.begin(); siter != py->sel.buildings.end(); siter++)
@@ -407,7 +437,7 @@ void Click_CancelConstruction()
 
 void Click_ProceedConstruction()
 {
-	Player* py = &g_player[g_currP];
+	Player* py = &g_player[g_curP];
 	GUI* gui = &py->gui;
 
 	ViewLayer* cv = (ViewLayer*)gui->get("construction view");
@@ -472,7 +502,7 @@ void Click_ProceedConstruction()
 
 void Click_EstimateConstruction()
 {
-	Player* py = &g_player[g_currP];
+	Player* py = &g_player[g_curP];
 	ClearSel(&py->sel);
 	GUI* gui = &py->gui;
 	gui->close("construction view");
@@ -480,7 +510,7 @@ void Click_EstimateConstruction()
 
 void Resize_Message(Widget* thisw)
 {
-	Player* py = &g_player[g_currP];
+	Player* py = &g_player[g_curP];
 	thisw->m_pos[0] = py->width/2 - 200;
 	thisw->m_pos[1] = py->height/2 - 100;
 	thisw->m_pos[2] = py->width/2 + 200;
@@ -489,7 +519,7 @@ void Resize_Message(Widget* thisw)
 
 void Resize_MessageContinue(Widget* thisw)
 {
-	Player* py = &g_player[g_currP];
+	Player* py = &g_player[g_curP];
 	thisw->m_pos[0] = py->width/2 - 80;
 	thisw->m_pos[1] = py->height/2 + 70;
 	thisw->m_pos[2] = py->width/2 + 80;
@@ -515,14 +545,14 @@ void Click_MessageContinue()
 	}
 #endif
 
-	Player* py = &g_player[g_currP];
+	Player* py = &g_player[g_curP];
 	GUI* gui = &py->gui;
 	gui->close("message view");
 }
 
 void ShowMessage(const RichText& msg)
 {
-	Player* py = &g_player[g_currP];
+	Player* py = &g_player[g_curP];
 	GUI* gui = &py->gui;
 	ViewLayer* msgview = (ViewLayer*)gui->get("message view");
 	TextBlock* msgblock = (TextBlock*)msgview->get("message");
@@ -532,7 +562,7 @@ void ShowMessage(const RichText& msg)
 
 void Resize_Window(Widget* thisw)
 {
-	Player* py = &g_player[g_currP];
+	Player* py = &g_player[g_curP];
 	thisw->m_pos[0] = py->width/2 - 200;
 	thisw->m_pos[1] = py->height/2 - 200;
 	thisw->m_pos[2] = py->width/2 + 200;
@@ -541,7 +571,7 @@ void Resize_Window(Widget* thisw)
 
 void FillPlayGUI()
 {
-	Player* py = &g_player[g_currP];
+	Player* py = &g_player[g_curP];
 	GUI* gui = &py->gui;
 
 	g_viewportT[VIEWPORT_MINIMAP] = ViewportT(Vec3f(0, 0, 0), Vec3f(0, 1, 0), "Minimap", true);

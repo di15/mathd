@@ -11,11 +11,11 @@
   freely, subject to the following restrictions:
 
   1. The origin of this software must not be misrepresented; you must not
-     claim that you wrote the original software. If you use this software
-     in a product, an acknowledgment in the product documentation would be
-     appreciated but is not required.
+	 claim that you wrote the original software. If you use this software
+	 in a product, an acknowledgment in the product documentation would be
+	 appreciated but is not required.
   2. Altered source versions must be plainly marked as such, and must not be
-     misrepresented as being the original software.
+	 misrepresented as being the original software.
   3. This notice may not be removed or altered from any source distribution.
 */
 #include "SDL_config.h"
@@ -26,47 +26,47 @@
 
 struct SDL_SW_YUVTexture
 {
-    Uint32 format;
-    Uint32 target_format;
-    int w, h;
-    Uint8 *pixels;
-    int *colortab;
-    Uint32 *rgb_2_pix;
-    void (*Display1X) (int *colortab, Uint32 * rgb_2_pix,
-                       unsigned char *lum, unsigned char *cr,
-                       unsigned char *cb, unsigned char *out,
-                       int rows, int cols, int mod);
-    void (*Display2X) (int *colortab, Uint32 * rgb_2_pix,
-                       unsigned char *lum, unsigned char *cr,
-                       unsigned char *cb, unsigned char *out,
-                       int rows, int cols, int mod);
+	Uint32 format;
+	Uint32 target_format;
+	int w, h;
+	Uint8 *pixels;
+	int *colortab;
+	Uint32 *rgb_2_pix;
+	void (*Display1X) (int *colortab, Uint32 * rgb_2_pix,
+					   unsigned char *lum, unsigned char *cr,
+					   unsigned char *cb, unsigned char *out,
+					   int rows, int cols, int mod);
+	void (*Display2X) (int *colortab, Uint32 * rgb_2_pix,
+					   unsigned char *lum, unsigned char *cr,
+					   unsigned char *cb, unsigned char *out,
+					   int rows, int cols, int mod);
 
-    /* These are just so we don't have to allocate them separately */
-    Uint16 pitches[3];
-    Uint8 *planes[3];
+	/* These are just so we don't have to allocate them separately */
+	Uint16 pitches[3];
+	Uint8 *planes[3];
 
-    /* This is a temporary surface in case we have to stretch copy */
-    SDL_Surface *stretch;
-    SDL_Surface *display;
+	/* This is a temporary surface in case we have to stretch copy */
+	SDL_Surface *stretch;
+	SDL_Surface *display;
 };
 
 typedef struct SDL_SW_YUVTexture SDL_SW_YUVTexture;
 
 SDL_SW_YUVTexture *SDL_SW_CreateYUVTexture(Uint32 format, int w, int h);
 int SDL_SW_QueryYUVTexturePixels(SDL_SW_YUVTexture * swdata, void **pixels,
-                                 int *pitch);
+								 int *pitch);
 int SDL_SW_UpdateYUVTexture(SDL_SW_YUVTexture * swdata, const SDL_Rect * rect,
-                            const void *pixels, int pitch);
+							const void *pixels, int pitch);
 int SDL_SW_UpdateYUVTexturePlanar(SDL_SW_YUVTexture * swdata, const SDL_Rect * rect,
-                                  const Uint8 *Yplane, int Ypitch,
-                                  const Uint8 *Uplane, int Upitch,
-                                  const Uint8 *Vplane, int Vpitch);
+								  const Uint8 *Yplane, int Ypitch,
+								  const Uint8 *Uplane, int Upitch,
+								  const Uint8 *Vplane, int Vpitch);
 int SDL_SW_LockYUVTexture(SDL_SW_YUVTexture * swdata, const SDL_Rect * rect,
-                          void **pixels, int *pitch);
+						  void **pixels, int *pitch);
 void SDL_SW_UnlockYUVTexture(SDL_SW_YUVTexture * swdata);
 int SDL_SW_CopyYUVToRGB(SDL_SW_YUVTexture * swdata, const SDL_Rect * srcrect,
-                        Uint32 target_format, int w, int h, void *pixels,
-                        int pitch);
+						Uint32 target_format, int w, int h, void *pixels,
+						int pitch);
 void SDL_SW_DestroyYUVTexture(SDL_SW_YUVTexture * swdata);
 
 /* vi: set ts=4 sw=4 expandtab: */

@@ -52,19 +52,19 @@ public:
   HRESULT SetParams(COneMethodInfo &oneMethodInfo, const UString &srcString);
 
   void SetCompressionMethod2(COneMethodInfo &oneMethodInfo
-      #ifdef COMPRESS_MT
-      , UInt32 numThreads
-      #endif
-      );
+	  #ifdef COMPRESS_MT
+	  , UInt32 numThreads
+	  #endif
+	  );
 
   void InitSolidFiles() { _numSolidFiles = (UInt64)(Int64)(-1); }
   void InitSolidSize()  { _numSolidBytes = (UInt64)(Int64)(-1); }
   void InitSolid()
   {
-    InitSolidFiles();
-    InitSolidSize();
-    _solidExtension = false;
-    _numSolidBytesDefined = false;
+	InitSolidFiles();
+	InitSolidSize();
+	_solidExtension = false;
+	_numSolidBytesDefined = false;
   }
 
   void Init();

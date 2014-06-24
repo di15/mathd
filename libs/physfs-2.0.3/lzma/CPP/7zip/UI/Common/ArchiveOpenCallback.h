@@ -37,15 +37,15 @@ class COpenCallbackImp:
 public:
   #ifndef _NO_CRYPTO
   MY_UNKNOWN_IMP3(
-      IArchiveOpenVolumeCallback, 
-      ICryptoGetTextPassword,
-      IArchiveOpenSetSubArchiveName
-      )
+	  IArchiveOpenVolumeCallback, 
+	  ICryptoGetTextPassword,
+	  IArchiveOpenSetSubArchiveName
+	  )
   #else
   MY_UNKNOWN_IMP2(
-      IArchiveOpenVolumeCallback, 
-      IArchiveOpenSetSubArchiveName
-      )
+	  IArchiveOpenVolumeCallback, 
+	  IArchiveOpenSetSubArchiveName
+	  )
   #endif
 
   STDMETHOD(SetTotal)(const UInt64 *files, const UInt64 *bytes);
@@ -62,9 +62,9 @@ public:
 
   STDMETHOD(SetSubArchiveName(const wchar_t *name))
   {
-    _subArchiveMode = true;
-    _subArchiveName = name;
-    return  S_OK;
+	_subArchiveMode = true;
+	_subArchiveName = name;
+	return  S_OK;
   }
 
 private:
@@ -80,12 +80,12 @@ public:
   COpenCallbackImp(): Callback(NULL) {}
   void Init(const UString &folderPrefix,  const UString &fileName)
   {
-    _folderPrefix = folderPrefix;
-    if (!NWindows::NFile::NFind::FindFile(_folderPrefix + fileName, _fileInfo))
-      throw 1;
-    FileNames.Clear();
-    _subArchiveMode = false;
-    TotalSize = 0;
+	_folderPrefix = folderPrefix;
+	if (!NWindows::NFile::NFind::FindFile(_folderPrefix + fileName, _fileInfo))
+	  throw 1;
+	FileNames.Clear();
+	_subArchiveMode = false;
+	TotalSize = 0;
   }
   int FindName(const UString &name);
 };

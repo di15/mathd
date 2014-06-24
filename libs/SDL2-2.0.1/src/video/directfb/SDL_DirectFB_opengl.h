@@ -11,11 +11,11 @@
   freely, subject to the following restrictions:
 
   1. The origin of this software must not be misrepresented; you must not
-     claim that you wrote the original software. If you use this software
-     in a product, an acknowledgment in the product documentation would be
-     appreciated but is not required.
+	 claim that you wrote the original software. If you use this software
+	 in a product, an acknowledgment in the product documentation would be
+	 appreciated but is not required.
   2. Altered source versions must be plainly marked as such, and must not be
-     misrepresented as being the original software.
+	 misrepresented as being the original software.
   3. This notice may not be removed or altered from any source distribution.
 */
 
@@ -32,11 +32,11 @@
 typedef struct _DirectFB_GLContext DirectFB_GLContext;
 struct _DirectFB_GLContext
 {
-    IDirectFBGL         *context;
-    DirectFB_GLContext  *next;
+	IDirectFBGL         *context;
+	DirectFB_GLContext  *next;
 
-    SDL_Window          *sdl_window;
-    int                 is_locked;
+	SDL_Window          *sdl_window;
+	int                 is_locked;
 };
 
 /* OpenGL functions */
@@ -47,7 +47,7 @@ extern int DirectFB_GL_LoadLibrary(_THIS, const char *path);
 extern void *DirectFB_GL_GetProcAddress(_THIS, const char *proc);
 extern SDL_GLContext DirectFB_GL_CreateContext(_THIS, SDL_Window * window);
 extern int DirectFB_GL_MakeCurrent(_THIS, SDL_Window * window,
-                                   SDL_GLContext context);
+								   SDL_GLContext context);
 extern int DirectFB_GL_SetSwapInterval(_THIS, int interval);
 extern int DirectFB_GL_GetSwapInterval(_THIS);
 extern void DirectFB_GL_SwapWindow(_THIS, SDL_Window * window);

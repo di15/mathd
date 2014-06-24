@@ -9,10 +9,10 @@ static UString ReplaceIncorrectChars(const UString &s)
   UString res;
   for (int i = 0; i < s.Length(); i++)
   {
-    wchar_t c = s[i];
-    if (c < 0x20 || c == '*' || c == '?' || c == '<' || c == '>'  || c == '|' || c == ':' || c == '"')
-      c = '_';
-    res += c;
+	wchar_t c = s[i];
+	if (c < 0x20 || c == '*' || c == '?' || c == '<' || c == '>'  || c == '|' || c == ':' || c == '"')
+	  c = '_';
+	res += c;
   }
   return res;
   #else
@@ -30,7 +30,7 @@ static bool CheckTail(const UString &name, int len)
 {
   int dotPos = name.Find(L'.');
   if (dotPos < 0)
-    dotPos = name.Length();
+	dotPos = name.Length();
   UString s = name.Left(dotPos);
   s.TrimRight();
   return (s.Length() != len);
@@ -40,12 +40,12 @@ static bool CheckNameNum(const UString &name, const wchar_t *reservedName)
 {
   int len = MyStringLen(reservedName);
   if (name.Length() <= len)
-    return true;
+	return true;
   if (name.Left(len).CompareNoCase(reservedName) != 0)
-    return true;
+	return true;
   wchar_t c = name[len];
   if (c < L'0' || c > L'9')
-    return true;
+	return true;
   return CheckTail(name, len + 1);
 }
 
@@ -53,17 +53,17 @@ static bool IsSupportedName(const UString &name)
 {
   for (int i = 0; i < sizeof(g_ReservedNames) / sizeof(g_ReservedNames[0]); i++)
   {
-    const wchar_t *reservedName = g_ReservedNames[i];
-    int len = MyStringLen(reservedName);
-    if (name.Length() < len)
-      continue;
-    if (name.Left(len).CompareNoCase(reservedName) != 0)
-      continue;
-    if (!CheckTail(name, len))
-      return false;
+	const wchar_t *reservedName = g_ReservedNames[i];
+	int len = MyStringLen(reservedName);
+	if (name.Length() < len)
+	  continue;
+	if (name.Left(len).CompareNoCase(reservedName) != 0)
+	  continue;
+	if (!CheckTail(name, len))
+	  return false;
   }
   if (!CheckNameNum(name, L"COM"))
-    return false;
+	return false;
   return CheckNameNum(name, L"LPT");
 }
 #endif
@@ -71,7 +71,7 @@ static bool IsSupportedName(const UString &name)
 static UString GetCorrectFileName(const UString &path)
 {
   if (path == L".." || path == L".")
-    return UString();
+	return UString();
   return ReplaceIncorrectChars(path);
 }
 
@@ -79,18 +79,18 @@ void MakeCorrectPath(UStringVector &pathParts)
 {
   for (int i = 0; i < pathParts.Size();)
   {
-    UString &s = pathParts[i];
-    s = GetCorrectFileName(s);
-    if (s.IsEmpty())
-      pathParts.Delete(i);
-    else
-    {
-      #ifdef _WIN32
-      if (!IsSupportedName(s))
-        s = (UString)L"_" + s;
-      #endif
-      i++;
-    }
+	UString &s = pathParts[i];
+	s = GetCorrectFileName(s);
+	if (s.IsEmpty())
+	  pathParts.Delete(i);
+	else
+	{
+	  #ifdef _WIN32
+	  if (!IsSupportedName(s))
+		s = (UString)L"_" + s;
+	  #endif
+	  i++;
+	}
   }
 }
 

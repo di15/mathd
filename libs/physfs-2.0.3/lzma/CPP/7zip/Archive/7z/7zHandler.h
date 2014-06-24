@@ -120,15 +120,15 @@ private:
   HRESULT SetPassword(CCompressionMethodMode &methodMode, IArchiveUpdateCallback *updateCallback);
 
   HRESULT SetCompressionMethod(CCompressionMethodMode &method,
-      CObjectVector<COneMethodInfo> &methodsInfo
-      #ifdef COMPRESS_MT
-      , UInt32 numThreads
-      #endif
-      );
+	  CObjectVector<COneMethodInfo> &methodsInfo
+	  #ifdef COMPRESS_MT
+	  , UInt32 numThreads
+	  #endif
+	  );
 
   HRESULT SetCompressionMethod(
-      CCompressionMethodMode &method,
-      CCompressionMethodMode &headerMethod);
+	  CCompressionMethodMode &method,
+	  CCompressionMethodMode &headerMethod);
 
   #endif
 

@@ -70,8 +70,8 @@ LoadedTex *LoadBMP(const char *fullpath)
 	free(pBitbldg);
 #endif // PLATFORM_WIN
 #ifdef PLATFORM_LINUX
-        SDL_Surface *s = nullptr;
-        s = SDL_LoadBMP(fullpath);
+	SDL_Surface *s = nullptr;
+	s = SDL_LoadBMP(fullpath);
 
 	pImage->channels = 3;
 	pImage->sizeX = s->h;
@@ -476,14 +476,14 @@ LoadedTex *LoadPNG(const char *fullpath)
 	LoadedTex *pImageData = NULL;
 
 	png_structp png_ptr;
-    png_infop info_ptr;
-    unsigned int sig_read = 0;
-    //int color_type, interlace_type;
-    FILE *fp;
+	png_infop info_ptr;
+	unsigned int sig_read = 0;
+	//int color_type, interlace_type;
+	FILE *fp;
 
 	/*
 	if ((fp = fopen(relative, "rb")) == NULL)
-        return NULL;
+		return NULL;
 	png_byte header[8];
 	fread(header, sizeof(png_byte), 8, fp);
 	fclose(fp);
@@ -493,86 +493,86 @@ LoadedTex *LoadPNG(const char *fullpath)
 		<<(int)header[4]<<","<<(int)header[5]<<","<<(int)header[6]<<","<<(int)header[7]<<endl;
 	*/
 	if ((fp = fopen(fullpath, "rb")) == NULL)
-        return NULL;
+		return NULL;
 
 
 	/* Create and initialize the png_struct
-     * with the desired error handler
-     * functions.  If you want to use the
-     * default stderr and longjump method,
-     * you can supply NULL for the last
-     * three parameters.  We also supply the
-     * the compiler header file version, so
-     * that we know if the application
-     * was compiled with a compatible version
-     * of the library.  REQUIRED
-     */
+	 * with the desired error handler
+	 * functions.  If you want to use the
+	 * default stderr and longjump method,
+	 * you can supply NULL for the last
+	 * three parameters.  We also supply the
+	 * the compiler header file version, so
+	 * that we know if the application
+	 * was compiled with a compatible version
+	 * of the library.  REQUIRED
+	 */
 
 	png_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
 
 	if (png_ptr == NULL)
 	{
-        fclose(fp);
-        return NULL;
-    }
+		fclose(fp);
+		return NULL;
+	}
 
 	/* allocate/initialize the memory
-     * for image information.  REQUIRED. */
-    info_ptr = png_create_info_struct(png_ptr);
-    if (info_ptr == NULL)
+	 * for image information.  REQUIRED. */
+	info_ptr = png_create_info_struct(png_ptr);
+	if (info_ptr == NULL)
 	{
-        fclose(fp);
-        png_destroy_read_struct(&png_ptr, png_infopp_NULL, png_infopp_NULL);
-        return NULL;
-    }
+		fclose(fp);
+		png_destroy_read_struct(&png_ptr, png_infopp_NULL, png_infopp_NULL);
+		return NULL;
+	}
 
 	/* Set error handling if you are
-     * using the setjmp/longjmp method
-     * (this is the normal method of
-     * doing things with libpng).
-     * REQUIRED unless you  set up
-     * your own error handlers in
-     * the png_create_read_struct()
-     * earlier.
-     */
-    if (setjmp(png_jmpbuf(png_ptr)))
+	 * using the setjmp/longjmp method
+	 * (this is the normal method of
+	 * doing things with libpng).
+	 * REQUIRED unless you  set up
+	 * your own error handlers in
+	 * the png_create_read_struct()
+	 * earlier.
+	 */
+	if (setjmp(png_jmpbuf(png_ptr)))
 	{
-        /* Free all of the memory associated
-         * with the png_ptr and info_ptr */
-        png_destroy_read_struct(&png_ptr, &info_ptr, png_infopp_NULL);
-        fclose(fp);
-        /* If we get here, we had a
-         * problem reading the file */
-        return NULL;
-    }
+		/* Free all of the memory associated
+		 * with the png_ptr and info_ptr */
+		png_destroy_read_struct(&png_ptr, &info_ptr, png_infopp_NULL);
+		fclose(fp);
+		/* If we get here, we had a
+		 * problem reading the file */
+		return NULL;
+	}
 
 	/* Set up the output control if
-     * you are using standard C streams */
-    png_init_io(png_ptr, fp);
+	 * you are using standard C streams */
+	png_init_io(png_ptr, fp);
 
 	/* If we have already
-     * read some of the signature */
-    png_set_sig_bytes(png_ptr, sig_read);
+	 * read some of the signature */
+	png_set_sig_bytes(png_ptr, sig_read);
 
 	/*
-     * If you have enough memory to read
-     * in the entire image at once, and
-     * you need to specify only
-     * transforms that can be controlled
-     * with one of the PNG_TRANSFORM_*
-     * bits (this presently excludes
-     * dithering, filling, setting
-     * background, and doing gamma
-     * adjustment), then you can read the
-     * entire image (including pixels)
-     * into the info structure with this
-     * call
-     *
-     * PNG_TRANSFORM_STRIP_16 |
-     * PNG_TRANSFORM_PACKING  forces 8 bit
-     * PNG_TRANSFORM_EXPAND forces to
-     *  expand a palette into RGB
-     */
+	 * If you have enough memory to read
+	 * in the entire image at once, and
+	 * you need to specify only
+	 * transforms that can be controlled
+	 * with one of the PNG_TRANSFORM_*
+	 * bits (this presently excludes
+	 * dithering, filling, setting
+	 * background, and doing gamma
+	 * adjustment), then you can read the
+	 * entire image (including pixels)
+	 * into the info structure with this
+	 * call
+	 *
+	 * PNG_TRANSFORM_STRIP_16 |
+	 * PNG_TRANSFORM_PACKING  forces 8 bit
+	 * PNG_TRANSFORM_EXPAND forces to
+	 *  expand a palette into RGB
+	 */
 	png_read_png(png_ptr, info_ptr, PNG_TRANSFORM_STRIP_16 | PNG_TRANSFORM_PACKING | PNG_TRANSFORM_EXPAND, png_voidp_NULL);
 
 	pImageData = new LoadedTex;
@@ -581,24 +581,24 @@ LoadedTex *LoadPNG(const char *fullpath)
 		OutOfMem(__FILE__, __LINE__);
 
 	pImageData->sizeX = png_get_image_width(png_ptr, info_ptr); //info_ptr->width;
-    pImageData->sizeY = png_get_image_height(png_ptr, info_ptr); //info_ptr->height;
-    //switch (info_ptr->color_type)
+	pImageData->sizeY = png_get_image_height(png_ptr, info_ptr); //info_ptr->height;
+	//switch (info_ptr->color_type)
 	switch( png_get_color_type(png_ptr, info_ptr) )
 	{
-        case PNG_COLOR_TYPE_RGBA:
-            pImageData->channels = 4;
-            break;
-        case PNG_COLOR_TYPE_RGB:
-            pImageData->channels = 3;
-            break;
-        default:
-			g_log<<fullpath<<" color type "<<png_get_color_type(png_ptr, info_ptr)<<" not supported"<<endl;
-            //std::cout << "Color type " << info_ptr->color_type << " not supported" << std::endl;
-            png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
-            fclose(fp);
-			free(pImageData);
-            return NULL;
-    }
+	case PNG_COLOR_TYPE_RGBA:
+		pImageData->channels = 4;
+		break;
+	case PNG_COLOR_TYPE_RGB:
+		pImageData->channels = 3;
+		break;
+	default:
+		g_log<<fullpath<<" color type "<<png_get_color_type(png_ptr, info_ptr)<<" not supported"<<endl;
+		//std::cout << "Color type " << info_ptr->color_type << " not supported" << std::endl;
+		png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
+		fclose(fp);
+		free(pImageData);
+		return NULL;
+	}
 
 	unsigned int row_bytes = png_get_rowbytes(png_ptr, info_ptr);
 	pImageData->data = (unsigned char*) malloc(row_bytes * pImageData->sizeY);
@@ -614,17 +614,17 @@ LoadedTex *LoadPNG(const char *fullpath)
 
 	for (int i = 0; i < pImageData->sizeY; i++)
 	{
-        // note that png is ordered top to
-        // bottom, but OpenGL expect it bottom to top
-        // so the order or swapped
+		// note that png is ordered top to
+		// bottom, but OpenGL expect it bottom to top
+		// so the order or swapped
 
-        memcpy((void*)(pImageData->data+(row_bytes * i)), row_pointers[i], row_bytes);
-        //memcpy((void*)(pImageData->data+(row_bytes * (pImageData->sizeY-1-i))), row_pointers[i], row_bytes);
-    }
+		memcpy((void*)(pImageData->data+(row_bytes * i)), row_pointers[i], row_bytes);
+		//memcpy((void*)(pImageData->data+(row_bytes * (pImageData->sizeY-1-i))), row_pointers[i], row_bytes);
+	}
 
 	/* Clean up after the read,
-     * and free any memory allocated */
-    png_destroy_read_struct(&png_ptr, &info_ptr, png_infopp_NULL);
+	 * and free any memory allocated */
+	png_destroy_read_struct(&png_ptr, &info_ptr, png_infopp_NULL);
 	fclose(fp);
 
 	return pImageData;
@@ -817,7 +817,9 @@ bool Load1Texture()
 	if(g_lastLTex+1 < g_texLoad.size())
 		Status(g_texLoad[g_lastLTex+1].relative);
 
+#ifdef GLDEBUG
 	CheckGLError(__FILE__, __LINE__);
+#endif
 
 	if(g_lastLTex >= 0)
 	{
@@ -888,7 +890,9 @@ LoadedTex* LoadTexture(const char* full)
 
 bool CreateTexture(unsigned int &texindex, const char* relative, bool clamp, bool mipmaps, bool reload)
 {
+#ifdef GLDEBUG
 	CheckGLError(__FILE__, __LINE__);
+#endif
 
 	if(!relative)
 		return false;
@@ -921,15 +925,21 @@ bool CreateTexture(unsigned int &texindex, const char* relative, bool clamp, boo
 	// Generate a texture with the associative texture ID stored in the array
 	glGenTextures(1, &texname);
 
+#ifdef GLDEBUG
 	CheckGLError(__FILE__, __LINE__);
+#endif
 	// This sets the alignment requirements for the start of each pixel row in memory.
 	glPixelStorei (GL_UNPACK_ALIGNMENT, 1);
+#ifdef GLDEBUG
 	CheckGLError(__FILE__, __LINE__);
+#endif
 
 	// Bind the texture to the texture arrays index and init the texture
 	glBindTexture(GL_TEXTURE_2D, texname);
 
+#ifdef GLDEBUG
 	CheckGLError(__FILE__, __LINE__);
+#endif
 	// Assume that the texture is a 24 bit RGB texture (We convert 16-bit ones to 24-bit)
 	int textureType = GL_RGB;
 	bool transp = false;
@@ -942,7 +952,9 @@ bool CreateTexture(unsigned int &texindex, const char* relative, bool clamp, boo
 	}
 
 
+#ifdef GLDEBUG
 	CheckGLError(__FILE__, __LINE__);
+#endif
 
 #if 1
 
@@ -973,7 +985,9 @@ bool CreateTexture(unsigned int &texindex, const char* relative, bool clamp, boo
 		glTexImage2D(GL_TEXTURE_2D, 0, textureType, pImage->sizeX, pImage->sizeY, 0, textureType, GL_UNSIGNED_BYTE, pImage->data);
 		glGenerateMipmap(GL_TEXTURE_2D);
 
+#ifdef GLDEBUG
 		CheckGLError(__FILE__, __LINE__);
+#endif
 	}
 	else
 	{
@@ -994,10 +1008,14 @@ bool CreateTexture(unsigned int &texindex, const char* relative, bool clamp, boo
 
 		glTexImage2D(GL_TEXTURE_2D, 0, textureType, pImage->sizeX, pImage->sizeY, 0, textureType, GL_UNSIGNED_BYTE, pImage->data);
 
+#ifdef GLDEBUG
 		CheckGLError(__FILE__, __LINE__);
+#endif
 	}
 
+#ifdef GLDEBUG
 	CheckGLError(__FILE__, __LINE__);
+#endif
 #else
 	// Option 3: without mipmaps linear
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -1077,8 +1095,8 @@ void OwnPath(const char* basepath, char* ownpath)
 void AllocTex(LoadedTex* empty, int width, int height, int channels)
 {
 	empty->data = (unsigned char*)malloc(width * height * channels * sizeof(unsigned char));
-    empty->sizeX = width;
-    empty->sizeY = height;
+	empty->sizeX = width;
+	empty->sizeY = height;
 	empty->channels = channels;
 
 	if(!empty->data)
@@ -1129,160 +1147,160 @@ void Blit(LoadedTex* src, LoadedTex* dest, Vec2i pos)
 void SaveJPEG(const char* fullpath, LoadedTex* image, float quality)
 {
 	FILE *outfile;
-    if ((outfile = fopen(fullpath, "wb")) == NULL)
+	if ((outfile = fopen(fullpath, "wb")) == NULL)
 	{
 		return;
 	}
 
 	struct jpeg_compress_struct cinfo;
-    struct jpeg_error_mgr       jerr;
+	struct jpeg_error_mgr       jerr;
 
-    cinfo.err = jpeg_std_error(&jerr);
-    jpeg_create_compress(&cinfo);
-    jpeg_stdio_dest(&cinfo, outfile);
+	cinfo.err = jpeg_std_error(&jerr);
+	jpeg_create_compress(&cinfo);
+	jpeg_stdio_dest(&cinfo, outfile);
 
-    cinfo.image_width      = image->sizeX;
-    cinfo.image_height     = image->sizeY;
-    cinfo.input_components = 3;
-    cinfo.in_color_space   = JCS_RGB;
+	cinfo.image_width      = image->sizeX;
+	cinfo.image_height     = image->sizeY;
+	cinfo.input_components = 3;
+	cinfo.in_color_space   = JCS_RGB;
 
-    jpeg_set_defaults(&cinfo);
-    /*set the quality [0..100]  */
-    jpeg_set_quality (&cinfo, 100*quality, true);
-    jpeg_start_compress(&cinfo, true);
+	jpeg_set_defaults(&cinfo);
+	/*set the quality [0..100]  */
+	jpeg_set_quality (&cinfo, 100*quality, true);
+	jpeg_start_compress(&cinfo, true);
 
-    JSAMPROW row_pointer;
-    int row_stride = image->sizeX * 3;
+	JSAMPROW row_pointer;
+	int row_stride = image->sizeX * 3;
 
-    while (cinfo.next_scanline < cinfo.image_height)
+	while (cinfo.next_scanline < cinfo.image_height)
 	{
 		row_pointer = (JSAMPROW) &image->data[cinfo.next_scanline*row_stride];
 		jpeg_write_scanlines(&cinfo, &row_pointer, 1);
-    }
+	}
 
-    jpeg_finish_compress(&cinfo);
+	jpeg_finish_compress(&cinfo);
 
-    fclose(outfile);
+	fclose(outfile);
 
-    jpeg_destroy_compress(&cinfo);
+	jpeg_destroy_compress(&cinfo);
 }
 
 
 int SavePNG(const char* fullpath, LoadedTex* image)
 {
 	FILE *fp;
-   png_structp png_ptr;
-   png_infop info_ptr;
-   //png_colorp palette;
+	png_structp png_ptr;
+	png_infop info_ptr;
+	//png_colorp palette;
 
-   /* Open the file */
-   fp = fopen(fullpath, "wb");
-   if (fp == NULL)
-      return (ERROR);
+	/* Open the file */
+	fp = fopen(fullpath, "wb");
+	if (fp == NULL)
+		return (ERROR);
 
-   /* Create and initialize the png_struct with the desired error handler
-    * functions.  If you want to use the default stderr and longjump method,
-    * you can supply NULL for the last three parameters.  We also check that
-    * the library version is compatible with the one used at compile time,
-    * in case we are using dynamically linked libraries.  REQUIRED.
-    */
-   png_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING,
-      (png_voidp) NULL, NULL, NULL);
+	/* Create and initialize the png_struct with the desired error handler
+	 * functions.  If you want to use the default stderr and longjump method,
+	 * you can supply NULL for the last three parameters.  We also check that
+	 * the library version is compatible with the one used at compile time,
+	 * in case we are using dynamically linked libraries.  REQUIRED.
+	 */
+	png_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING,
+									  (png_voidp) NULL, NULL, NULL);
 
-   if (png_ptr == NULL)
-   {
-      fclose(fp);
-      return (ERROR);
-   }
+	if (png_ptr == NULL)
+	{
+		fclose(fp);
+		return (ERROR);
+	}
 
-   /* Allocate/initialize the image information data.  REQUIRED */
-   info_ptr = png_create_info_struct(png_ptr);
-   if (info_ptr == NULL)
-   {
-      fclose(fp);
-      png_destroy_write_struct(&png_ptr,  NULL);
-      return (ERROR);
-   }
+	/* Allocate/initialize the image information data.  REQUIRED */
+	info_ptr = png_create_info_struct(png_ptr);
+	if (info_ptr == NULL)
+	{
+		fclose(fp);
+		png_destroy_write_struct(&png_ptr,  NULL);
+		return (ERROR);
+	}
 
-   int color_type = PNG_COLOR_TYPE_RGB;
+	int color_type = PNG_COLOR_TYPE_RGB;
 
-   if(image->channels == 4)
-	   color_type = PNG_COLOR_TYPE_RGBA;
+	if(image->channels == 4)
+		color_type = PNG_COLOR_TYPE_RGBA;
 
-   png_set_IHDR(png_ptr, info_ptr, image->sizeX, image->sizeY, 8, color_type, PNG_INTERLACE_NONE, PNG_COMPRESSION_TYPE_DEFAULT, PNG_FILTER_TYPE_DEFAULT);
+	png_set_IHDR(png_ptr, info_ptr, image->sizeX, image->sizeY, 8, color_type, PNG_INTERLACE_NONE, PNG_COMPRESSION_TYPE_DEFAULT, PNG_FILTER_TYPE_DEFAULT);
 
-   /* Set error handling.  REQUIRED if you aren't supplying your own
-    * error handling functions in the png_create_write_struct() call.
-    */
-   if (setjmp(png_jmpbuf(png_ptr)))
-   {
-      /* If we get here, we had a problem writing the file */
-      fclose(fp);
-      png_destroy_write_struct(&png_ptr, &info_ptr);
-      return (ERROR);
-   }
+	/* Set error handling.  REQUIRED if you aren't supplying your own
+	 * error handling functions in the png_create_write_struct() call.
+	 */
+	if (setjmp(png_jmpbuf(png_ptr)))
+	{
+		/* If we get here, we had a problem writing the file */
+		fclose(fp);
+		png_destroy_write_struct(&png_ptr, &info_ptr);
+		return (ERROR);
+	}
 
-   /* One of the following I/O initialization functions is REQUIRED */
+	/* One of the following I/O initialization functions is REQUIRED */
 
-   /* Set up the output control if you are using standard C streams */
-   png_init_io(png_ptr, fp);
+	/* Set up the output control if you are using standard C streams */
+	png_init_io(png_ptr, fp);
 
 
-   png_bytep* row_pointers = (png_bytep*) malloc(sizeof(png_bytep) * image->sizeY);
+	png_bytep* row_pointers = (png_bytep*) malloc(sizeof(png_bytep) * image->sizeY);
 
-   if(!row_pointers)
-   {
-	   OutOfMem(__FILE__, __LINE__);
-	   return NULL;
-   }
+	if(!row_pointers)
+	{
+		OutOfMem(__FILE__, __LINE__);
+		return NULL;
+	}
 
-   for (int y=0; y<image->sizeY; y++)
-	   row_pointers[y] = (png_byte*)&image->data[y*image->sizeX*image->channels];
+	for (int y=0; y<image->sizeY; y++)
+		row_pointers[y] = (png_byte*)&image->data[y*image->sizeX*image->channels];
 
-   png_write_info(png_ptr, info_ptr);
-   png_write_image(png_ptr, row_pointers);
-   png_write_end(png_ptr, NULL);
+	png_write_info(png_ptr, info_ptr);
+	png_write_image(png_ptr, row_pointers);
+	png_write_end(png_ptr, NULL);
 
-   //for (y=0; y<image->sizeY; y++)
+	//for (y=0; y<image->sizeY; y++)
 	//   free(row_pointers[y]);
-   free(row_pointers);
+	free(row_pointers);
 
 
-   /* This is the easy way.  Use it if you already have all the
-    * image info living in the structure.  You could "|" many
-    * PNG_TRANSFORM flags into the png_transforms integer here.
-    */
-   //png_write_png(png_ptr, info_ptr, NULL, NULL);
+	/* This is the easy way.  Use it if you already have all the
+	 * image info living in the structure.  You could "|" many
+	 * PNG_TRANSFORM flags into the png_transforms integer here.
+	 */
+	//png_write_png(png_ptr, info_ptr, NULL, NULL);
 
-   /* If you png_malloced a palette, free it here (don't free info_ptr->palette,
-    * as recommended in versions 1.0.5m and earlier of this example; if
-    * libpng mallocs info_ptr->palette, libpng will free it).  If you
-    * allocated it with malloc() instead of png_malloc(), use free() instead
-    * of png_free().
-    */
-   //png_free(png_ptr, palette);
-   //palette = NULL;
+	/* If you png_malloced a palette, free it here (don't free info_ptr->palette,
+	 * as recommended in versions 1.0.5m and earlier of this example; if
+	 * libpng mallocs info_ptr->palette, libpng will free it).  If you
+	 * allocated it with malloc() instead of png_malloc(), use free() instead
+	 * of png_free().
+	 */
+	//png_free(png_ptr, palette);
+	//palette = NULL;
 
-   /* Similarly, if you png_malloced any data that you passed in with
-    * png_set_something(), such as a hist or trans array, free it here,
-    * when you can be sure that libpng is through with it.
-    */
-   //png_free(png_ptr, trans);
-   //trans = NULL;
-   /* Whenever you use png_free() it is a good idea to set the pointer to
-    * NULL in case your application inadvertently tries to png_free() it
-    * again.  When png_free() sees a NULL it returns without action, thus
-    * avoiding the double-free security problem.
-    */
+	/* Similarly, if you png_malloced any data that you passed in with
+	 * png_set_something(), such as a hist or trans array, free it here,
+	 * when you can be sure that libpng is through with it.
+	 */
+	//png_free(png_ptr, trans);
+	//trans = NULL;
+	/* Whenever you use png_free() it is a good idea to set the pointer to
+	 * NULL in case your application inadvertently tries to png_free() it
+	 * again.  When png_free() sees a NULL it returns without action, thus
+	 * avoiding the double-free security problem.
+	 */
 
-   /* Clean up after the write, and free any memory allocated */
-   png_destroy_write_struct(&png_ptr, &info_ptr);
+	/* Clean up after the write, and free any memory allocated */
+	png_destroy_write_struct(&png_ptr, &info_ptr);
 
-   /* Close the file */
-   fclose(fp);
+	/* Close the file */
+	fclose(fp);
 
-   /* That's it */
-   return (1);
+	/* That's it */
+	return (1);
 }
 
 void FlipImage(LoadedTex* image)
@@ -1363,8 +1381,8 @@ int SaveBMP(const char* fullpath, LoadedTex* image)
 
 #if 0
 	for(int imageIdx = image->channels * (image->sizeX - 1);
-		imageIdx < image->sizeX * image->sizeY * image->channels;
-		imageIdx += image->channels * image->sizeX)
+			imageIdx < image->sizeX * image->sizeY * image->channels;
+			imageIdx += image->channels * image->sizeX)
 	{
 		image->data[imageIdx] = image->data[imageIdx-3];
 		image->data[imageIdx+1] = image->data[imageIdx-2];

@@ -1,6 +1,5 @@
 
 
-
 #include "platform.h"
 #include "debug.h"
 #include "utils.h"
@@ -17,7 +16,7 @@
 #include "window.h"
 #include "../game/gmain.h"
 
-Profile g_profile[PROFILES];
+Timer g_profile[TIMERS];
 ofstream g_profF;
 
 void StartTimer(int id)
@@ -38,7 +37,7 @@ void StopTimer(int id)
 		return;
 
 #ifdef DEBUG
-	if(id == UPDATE)
+	if(id == TIMER_UPDATE)
 	{
 		g_log<<endl<<"upd el = "<<GetTickCount()<<" - "<<g_profile[id].starttick<<endl<<endl;
 	}
@@ -47,19 +46,19 @@ void StopTimer(int id)
 	int elapsed = GetTickCount() - g_profile[id].starttick;
 	g_profile[id].starttick = GetTickCount();
 	g_profile[id].lastframeelapsed += elapsed;
-	
+
 #ifdef DEBUG
-	if(id == UPDATE)
+	if(id == TIMER_UPDATE)
 	{
 		g_log<<endl<<"upd el"<<elapsed<<" tot"<<g_profile[id].lastframeelapsed<<" avg"<<g_profile[id].averagems<<endl<<endl;
 	}
 #endif
 
-	if(id == FRAME || g_profile[id].lastframe < g_profile[FRAME].lastframe)
+	if(id == TIMER_FRAME || g_profile[id].lastframe < g_profile[TIMER_FRAME].lastframe)
 	{
-		
+
 #ifdef DEBUG
-		if(id == UPDATE)
+		if(id == TIMER_UPDATE)
 		{
 			g_log<<endl<<"upd ( (double)"<<g_profile[id].lastframeelapsed<<" + "<<g_profile[id].averagems<<"*(double)"<<g_profile[id].frames<<" ) / (double)("<<g_profile[id].frames<<"+1); = ";
 		}
@@ -70,11 +69,11 @@ void StopTimer(int id)
 		g_profile[id].frames++;
 		//g_profile[id].timescountedperframe = 0;
 		g_profile[id].lastframeelapsed = 0;
-		g_profile[id].lastframe = g_profile[FRAME].lastframe;
+		g_profile[id].lastframe = g_profile[TIMER_FRAME].lastframe;
 
-		
+
 #ifdef DEBUG
-		if(id == UPDATE)
+		if(id == TIMER_UPDATE)
 		{
 			g_log<<g_profile[id].averagems<<endl<<endl;
 		}
@@ -82,7 +81,7 @@ void StopTimer(int id)
 
 		//g_log<<g_profile[id].name<<" "<<g_profile[id].averagems<<"ms"<<endl;
 	}
-	if(id == FRAME)
+	if(id == TIMER_FRAME)
 		g_profile[id].lastframe++;
 
 	//g_profile[id].lastframeaverage = ( elapsed + g_profile[id].lastframeaverage*g_profile[id].timescountedperframe ) / (g_profile[id].timescountedperframe+1);
@@ -91,13 +90,27 @@ void StopTimer(int id)
 
 void WriteProfiles(int in, int layer)
 {
+	double parentavgms;
+
 	if(in == -1)
-		g_profF.open("profiles.txt", ios_base::out);
+	{
+		char fullpath[MAX_PATH+1];
+		FullPath("profiles.txt", fullpath);
+		g_profF.open(fullpath, ios_base::out);
+		parentavgms = g_profile[TIMER_FRAME].averagems;
+	}
+	else
+	{
+		parentavgms = g_profile[in].averagems;
+	}
 
+	double ofparentpct;
 	double totalms = 0;
+	double totalofparentpct = 0;
 	double percentage;
+	int subprofiles = 0;
 
-	for(int j=0; j<PROFILES; j++)
+	for(int j=0; j<TIMERS; j++)
 	{
 		if(g_profile[j].inside != in)
 			continue;
@@ -105,12 +118,15 @@ void WriteProfiles(int in, int layer)
 		totalms += g_profile[j].averagems;
 	}
 
-	for(int j=0; j<PROFILES; j++)
+	for(int j=0; j<TIMERS; j++)
 	{
 		if(g_profile[j].inside != in)
 			continue;
 
 		percentage = 100.0 * g_profile[j].averagems / totalms;
+		ofparentpct = 100.0 * g_profile[j].averagems / parentavgms;
+		totalofparentpct += ofparentpct;
+		subprofiles++;
 
 		for(int k=0; k<layer; k++)
 			g_profF<<"\t";
@@ -120,11 +136,19 @@ void WriteProfiles(int in, int layer)
 		WriteProfiles(j, layer+1);
 	}
 
+	if(subprofiles > 0)
+	{
+		for(int k=0; k<layer; k++)
+			g_profF<<"\t";
+
+		g_profF<<"level total sum: "<<totalms<<" ms per frame, that means "<<totalofparentpct<<"% of this parent's duration underwent profiling"<<endl;
+	}
+
 	if(in == -1)
 		g_profF.flush();
 }
 
-void DefProfile(int id, int inside, char* name)
+void DefTimer(int id, int inside, char* name)
 {
 	g_profile[id].inside = inside;
 	strcpy(g_profile[id].name, name);
@@ -132,33 +156,40 @@ void DefProfile(int id, int inside, char* name)
 
 void InitProfiles()
 {
-	DefProfile(FRAME, -1, "Frame");
-	DefProfile(EVENT, FRAME, "EventProc");
-	DefProfile(DRAW, FRAME, "Draw();");
-	DefProfile(UPDATE, FRAME, "Update();");
-	DefProfile(UPDATEUNITS, UPDATE, "UpdateUnits();");
-	DefProfile(UPDUONCHECK, UPDATEUNITS, "Upd U On Ch");
-	DefProfile(UPDUNITAI, UPDATEUNITS, "Upd Unit AI");
-	DefProfile(MOVEUNIT, UPDATEUNITS, "Move Unit");
-	DefProfile(ANIMUNIT, UPDATEUNITS, "Anim Unit");
-	DefProfile(UPDATEBUILDINGS, UPDATE, "UpdateBuildings();");
-	DefProfile(DRAWBUILDINGS, DRAW, "DrawBuildings();");
-	DefProfile(DRAWUNITS, DRAW, "DrawUnits();");
-	DefProfile(DRAWRIM, DRAW, "DrawRim();");
-	DefProfile(DRAWWATER, DRAW, "DrawWater();");
-	DefProfile(DRAWCRPIPES, DRAW, "DrawCrPipes();");
-	DefProfile(DRAWPOWLS, DRAW, "DrawPowls();");
-	DefProfile(DRAWFOLIAGE, DRAW, "DrawFoliage();");
-	DefProfile(SORTPARTICLES, DRAW, "SortParticles();");
-	DefProfile(DRAWPARTICLES, DRAW, "DrawParticles();");
-	DefProfile(DRAWMAP, DRAW, "DrawMap();");
-	DefProfile(SHADOWS, DRAW, "Shadows");
-	DefProfile(DRAWSKY, DRAW, "DrawSky();");
-	DefProfile(DRAWPOWERLINES, DRAW, "DrawPowls();");
-	DefProfile(DRAWROADS, DRAW, "DrawRoads();");
-	DefProfile(DRAWMODEL1, DRAWBUILDINGS, "Draw model 1");
-	DefProfile(DRAWMODEL2, DRAWBUILDINGS, "Draw model 2");
-	DefProfile(DRAWMODEL3, DRAWBUILDINGS, "Draw model 3");
+	DefTimer(TIMER_FRAME, -1, "Frame");
+	DefTimer(TIMER_EVENT, TIMER_FRAME, "EventProc");
+	DefTimer(TIMER_DRAW, TIMER_FRAME, "Draw();");
+	DefTimer(TIMER_DRAWSCENEDEPTH, TIMER_DRAW, "DrawSceneDepth();");
+	DefTimer(TIMER_DRAWSETUP, TIMER_DRAW, "Draw(); setup");
+	DefTimer(TIMER_DRAWGUI, TIMER_DRAW, "DrawGUI();");
+	DefTimer(TIMER_DRAWMINIMAP, TIMER_DRAW, "DrawMinimap();");
+	DefTimer(TIMER_UPDATE, TIMER_FRAME, "Update();");
+	DefTimer(TIMER_UPDATEUNITS, TIMER_UPDATE, "UpdateUnits();");
+	DefTimer(TIMER_UPDUONCHECK, TIMER_UPDATEUNITS, "Upd U On Ch");
+	DefTimer(TIMER_UPDUNITAI, TIMER_UPDATEUNITS, "Upd Unit AI");
+	DefTimer(TIMER_MOVEUNIT, TIMER_UPDATEUNITS, "Move Unit");
+	DefTimer(TIMER_ANIMUNIT, TIMER_UPDATEUNITS, "Anim Unit");
+	DefTimer(TIMER_UPDATEBUILDINGS, TIMER_UPDATE, "UpdateBuildings();");
+	DefTimer(TIMER_DRAWBL, TIMER_DRAW, "DrawBuildings();");
+	DefTimer(TIMER_DRAWUNITS, TIMER_DRAW, "DrawUnits();");
+	DefTimer(TIMER_DRAWRIM, TIMER_DRAW, "DrawRim();");
+	DefTimer(TIMER_DRAWWATER, TIMER_DRAW, "DrawWater();");
+	DefTimer(TIMER_DRAWCRPIPES, TIMER_DRAW, "DrawCrPipes();");
+	DefTimer(TIMER_DRAWPOWLS, TIMER_DRAW, "DrawPowls();");
+	DefTimer(TIMER_DRAWFOLIAGE, TIMER_DRAW, "DrawFoliage();");
+	DefTimer(TIMER_SORTPARTICLES, TIMER_DRAW, "SortParticles();");
+	DefTimer(TIMER_DRAWPARTICLES, TIMER_DRAW, "DrawParticles();");
+	DefTimer(TIMER_DRAWMAP, TIMER_DRAW, "DrawMap();");
+	//DefTimer(SHADOWS, TIMER_DRAW, "Shadows");
+	DefTimer(TIMER_DRAWSKY, TIMER_DRAW, "DrawSky();");
+	DefTimer(TIMER_DRAWROADS, TIMER_DRAW, "DrawRoads();");
+	//DefTimer(DRAWMODEL1, TIMER_DRAWBL, "Draw model 1");
+	//DefTimer(DRAWMODEL2, TIMER_DRAWBL, "Draw model 2");
+	//DefTimer(DRAWMODEL3, TIMER_DRAWBL, "Draw model 3");
+	DefTimer(TIMER_DRAWMAPDEPTH, TIMER_DRAWSCENEDEPTH, "DrawMap(); depth");
+	DefTimer(TIMER_DRAWUMAT, TIMER_DRAWUNITS, "CPU-side matrix math etc.");
+	DefTimer(TIMER_DRAWUGL, TIMER_DRAWUNITS, "GPU-side");
+	DefTimer(TIMER_DRAWUTEXBIND, TIMER_DRAWUNITS, "texture bind");
 }
 
 void CheckNum(const char* num)
@@ -166,7 +197,7 @@ void CheckNum(const char* num)
 	g_log<<"Check #"<<num;
 	g_log.flush();
 
-	Player* py = &g_player[g_currP];
+	Player* py = &g_player[g_curP];
 	GUI* gui = &py->gui;
 
 	ViewLayer* v = (ViewLayer*)gui->get("construction view");
@@ -224,7 +255,7 @@ void LogRich(const RichText* rt)
 		else if(rtiter->m_type == RICHTEXT_TEXT)
 		{
 			const UString* ustr = &rtiter->m_text;
-			
+
 			for(int i=0; i<ustr->m_length; i++)
 			{
 				g_log<<"[char#"<<ustr->m_data[i]<<"'"<<(char)ustr->m_data[i]<<"']";
@@ -246,7 +277,7 @@ void UDebug(int i)
 
 	g_log<<"UNIT DEBUG: "<<t->name<<" ("<<i<<")"<<endl;
 	g_log<<"path size: "<<u->path.size()<<endl;
-	
+
 	if(u->collidesfast())
 	{
 		g_log<<"COLLIDES: type:"<<g_collidertype<<" ID:"<<g_lastcollider<<endl;

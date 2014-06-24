@@ -1,5 +1,4 @@
 
-
 #include "building.h"
 #include "../math/hmapmath.h"
 #include "../render/heightmap.h"
@@ -142,14 +141,14 @@ bool PlaceBuilding(int type, Vec2i pos, bool finished, int owner)
 		//b->allocres();
 		b->inoperation = false;
 
-		Player* py = &g_player[g_currP];
+		Player* py = &g_player[g_curP];
 
 		ClearSel(&py->sel);
 		py->sel.buildings.push_back(i);
 
 		if(!b->finished)
 		{
-			Player* py = &g_player[g_currP];
+			Player* py = &g_player[g_curP];
 			GUI* gui = &py->gui;
 			ConstructionView* cv = (ConstructionView*)gui->get("construction view")->get("construction view");
 			cv->regen(&py->sel);
@@ -204,9 +203,9 @@ void Building::allocres()
 
 	if(transx.m_part.size() > 0
 #ifdef LOCAL_TRANSX
-       && owner == g_localP
+			&& owner == g_localP
 #endif
-       )
+	  )
 		NewTransx(drawpos, &transx);
 
 	checkconstruction();
@@ -296,7 +295,7 @@ void DrawBl()
 		float pitch = 0;
 		float yaw = 0;
 		Matrix modelmat;
-		float radians[] = {static_cast<float>(DEGTORAD(pitch)), static_cast<float>(DEGTORAD(yaw)), 0};
+		float radians[] = {(float)DEGTORAD(pitch), (float)DEGTORAD(yaw), 0};
 		modelmat.translation((const float*)&b->drawpos);
 		Matrix rotation;
 		rotation.rotrad(radians);
@@ -304,12 +303,26 @@ void DrawBl()
 		glUniformMatrix4fv(s->m_slot[SSLOT_MODELMAT], 1, 0, modelmat.m_matrix);
 
 		Matrix modelview;
-		modelview.set(modelmat.m_matrix);
 #ifdef SPECBUMPSHADOW
-		modelview.postmult(g_camview);
+   	 modelview.set(g_camview.m_matrix);
 #endif
-		//modelview.set(g_camview.m_matrix);
-		//modelview.postmult(modelmat);
+    	modelview.postmult(modelmat);
+		glUniformMatrix4fv(s->m_slot[SSLOT_MODELVIEW], 1, 0, modelview.m_matrix);
+
+		Matrix mvp;
+#if 0
+		mvp.set(modelview.m_matrix);
+		mvp.postmult(g_camproj);
+#elif 0
+		mvp.set(g_camproj.m_matrix);
+		mvp.postmult(modelview);
+#else
+		mvp.set(g_camproj.m_matrix);
+		mvp.postmult(g_camview);
+		mvp.postmult(modelmat);
+#endif
+		glUniformMatrix4fv(s->m_slot[SSLOT_MVP], 1, 0, mvp.m_matrix);
+
 		Matrix modelviewinv;
 		Transpose(modelview, modelview);
 		Inverse2(modelview, modelviewinv);
@@ -455,8 +468,8 @@ void StageCopyVA(VertexArray* to, VertexArray* from, float completion)
 #if 0
 #if 0
 				void barycent(double x0, double y0, double z0, double x1, double y1, double z1, double x2, double y2, double z2,
-                         double vx, double vy, double vz,
-                         double *u, double *v, double *w)
+							  double vx, double vy, double vz,
+							  double *u, double *v, double *w)
 #endif
 
 				double ratio0 = 0;
@@ -464,10 +477,10 @@ void StageCopyVA(VertexArray* to, VertexArray* from, float completion)
 				double ratio2 = 0;
 
 				barycent(prevt[0].x, prevt[0].y, prevt[0].z,
-					prevt[1].x, prevt[1].y, prevt[1].z,
-					prevt[2].x, prevt[2].y, prevt[2].z,
-					to->vertices[v].x, to->vertices[v].y, to->vertices[v].z,
-					&ratio0, &ratio1, &ratio2);
+						 prevt[1].x, prevt[1].y, prevt[1].z,
+						 prevt[2].x, prevt[2].y, prevt[2].z,
+						 to->vertices[v].x, to->vertices[v].y, to->vertices[v].z,
+						 &ratio0, &ratio1, &ratio2);
 
 				to->texcoords[v].x = ratio0 * prevc[0].x + ratio1 * prevc[1].x + ratio2 * prevc[2].x;
 				to->texcoords[v].y = ratio0 * prevc[0].y + ratio1 * prevc[1].y + ratio2 * prevc[2].y;
@@ -542,22 +555,22 @@ void Explode(Building* b)
 		EmitParticle(PARTICLE_FIREBALL2, p + b->drawpos);
 	}
 	/*
-     for(int i=0; i<5; i++)
-     {
-     p.x = hwx * (float)(rand()%1000 - 500)/500.0f;
-     p.y = 8;
-     p.z = hwz * (float)(rand()%1000 - 500)/500.0f;
-     EmitParticle(SMOKE, p + pos);
-     }
+	 for(int i=0; i<5; i++)
+	 {
+	 p.x = hwx * (float)(rand()%1000 - 500)/500.0f;
+	 p.y = 8;
+	 p.z = hwz * (float)(rand()%1000 - 500)/500.0f;
+	 EmitParticle(SMOKE, p + pos);
+	 }
 
-     for(int i=0; i<5; i++)
-     {
-     p.x = hwx * (float)(rand()%1000 - 500)/500.0f;
-     p.y = 8;
-     p.z = hwz * (float)(rand()%1000 - 500)/500.0f;
-     EmitParticle(SMOKE2, p + pos);
-     }
-     */
+	 for(int i=0; i<5; i++)
+	 {
+	 p.x = hwx * (float)(rand()%1000 - 500)/500.0f;
+	 p.y = 8;
+	 p.z = hwz * (float)(rand()%1000 - 500)/500.0f;
+	 EmitParticle(SMOKE2, p + pos);
+	 }
+	 */
 	for(int i=0; i<20; i++)
 	{
 		p.x = hwx * (float)(rand()%1000 - 500)/500.0f;

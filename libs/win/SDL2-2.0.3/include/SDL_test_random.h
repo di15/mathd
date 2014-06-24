@@ -11,11 +11,11 @@
   freely, subject to the following restrictions:
 
   1. The origin of this software must not be misrepresented; you must not
-     claim that you wrote the original software. If you use this software
-     in a product, an acknowledgment in the product documentation would be
-     appreciated but is not required.
+	 claim that you wrote the original software. If you use this software
+	 in a product, an acknowledgment in the product documentation would be
+	 appreciated but is not required.
   2. Altered source versions must be plainly marked as such, and must not be
-     misrepresented as being the original software.
+	 misrepresented as being the original software.
   3. This notice may not be removed or altered from any source distribution.
 */
 
@@ -57,11 +57,11 @@ extern "C" {
  * Context structure for the random number generator state.
  */
   typedef struct {
-    unsigned int a;
-    unsigned int x;
-    unsigned int c;
-    unsigned int ah;
-    unsigned int al;
+	unsigned int a;
+	unsigned int x;
+	unsigned int c;
+	unsigned int ah;
+	unsigned int al;
   } SDLTest_RandomContext;
 
 
@@ -79,7 +79,7 @@ extern "C" {
  *
  */
  void SDLTest_RandomInit(SDLTest_RandomContext * rndContext, unsigned int xi,
-                  unsigned int ci);
+				  unsigned int ci);
 
 /**
  *  \brief Initialize random number generator based on current system time.

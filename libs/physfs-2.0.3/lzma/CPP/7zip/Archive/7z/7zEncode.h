@@ -33,7 +33,7 @@ class CEncoder
   CRecordVector<CMethodId> _decompressionMethods;
 
   HRESULT CreateMixerCoder(DECL_EXTERNAL_CODECS_LOC_VARS
-      const UInt64 *inSizeForReduce);
+	  const UInt64 *inSizeForReduce);
 
   bool _constructed;
 public:
@@ -41,13 +41,13 @@ public:
   ~CEncoder();
   HRESULT EncoderConstr();
   HRESULT Encode(
-      DECL_EXTERNAL_CODECS_LOC_VARS
-      ISequentialInStream *inStream,
-      const UInt64 *inStreamSize, const UInt64 *inSizeForReduce,
-      CFolder &folderItem,
-      ISequentialOutStream *outStream,
-      CRecordVector<UInt64> &packSizes,
-      ICompressProgressInfo *compressProgress);
+	  DECL_EXTERNAL_CODECS_LOC_VARS
+	  ISequentialInStream *inStream,
+	  const UInt64 *inStreamSize, const UInt64 *inSizeForReduce,
+	  CFolder &folderItem,
+	  ISequentialOutStream *outStream,
+	  CRecordVector<UInt64> &packSizes,
+	  ICompressProgressInfo *compressProgress);
 };
 
 }}

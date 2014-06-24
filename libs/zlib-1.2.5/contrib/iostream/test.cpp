@@ -15,7 +15,7 @@ int main() {
   os << "hello, hello, hi, ho!" << endl;
 
   setcompressionlevel( os, Z_DEFAULT_COMPRESSION )
-    << "I'm compressing again" << endl;
+	<< "I'm compressing again" << endl;
 
   os.close();
 

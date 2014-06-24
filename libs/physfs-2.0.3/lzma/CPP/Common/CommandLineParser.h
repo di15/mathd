@@ -13,11 +13,11 @@ void SplitCommandLine(const UString &s, UStringVector &parts);
 namespace NSwitchType {
   enum EEnum
   { 
-    kSimple,
-    kPostMinus,
-    kLimitedPostString,
-    kUnLimitedPostString,
-    kPostChar
+	kSimple,
+	kPostMinus,
+	kLimitedPostString,
+	kUnLimitedPostString,
+	kPostChar
   };
 }
 
@@ -50,7 +50,7 @@ public:
   CParser(int numSwitches);
   ~CParser();
   void ParseStrings(const CSwitchForm *switchForms, 
-    const UStringVector &commandStrings);
+	const UStringVector &commandStrings);
   const CSwitchResult& operator[](size_t index) const;
 };
 
@@ -65,7 +65,7 @@ struct CCommandForm
 
 // Returns: Index of form and postString; -1, if there is no match
 int ParseCommand(int numCommandForms, const CCommandForm *commandForms, 
-    const UString &commandString, UString &postString);
+	const UString &commandString, UString &postString);
 
 }
 

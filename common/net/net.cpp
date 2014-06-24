@@ -40,7 +40,7 @@ unsigned int PrevAck(unsigned int ack)
 	//	ack --;
 
 	ack--;
-    
+	
 	return ack;
 }
 
@@ -177,10 +177,10 @@ void NetIn()
 
 void ClearPackets()
 {
-    for(auto i=g_sent.begin(); i!=g_sent.end(); i++)
-        i->freemem();
-    
-    for(auto i=g_recv.begin(); i!=g_recv.end(); i++)
-        i->freemem();
+	for(auto i=g_sent.begin(); i!=g_sent.end(); i++)
+		i->freemem();
+	
+	for(auto i=g_recv.begin(); i!=g_recv.end(); i++)
+		i->freemem();
 }
 

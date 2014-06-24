@@ -1,4 +1,3 @@
-
 #ifndef TRIANGLE_H
 #define TRIANGLE_H
 
@@ -10,7 +9,7 @@ class Vec3f;
 class Triangle
 {
 public:
-   Vec3f m_vertex[3];
+	Vec3f m_vertex[3];
 };
 
 class Triangle2 : public Triangle

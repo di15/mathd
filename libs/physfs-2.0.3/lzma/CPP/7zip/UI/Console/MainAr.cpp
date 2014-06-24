@@ -29,7 +29,7 @@ static inline bool IsItWindowsNT()
   OSVERSIONINFO versionInfo;
   versionInfo.dwOSVersionInfoSize = sizeof(versionInfo);
   if (!::GetVersionEx(&versionInfo)) 
-    return false;
+	return false;
   return (versionInfo.dwPlatformId == VER_PLATFORM_WIN32_NT);
 }
 #endif
@@ -66,8 +66,8 @@ int numArguments, const char *arguments[]
   #ifndef _WIN64
   if (!IsItWindowsNT())
   {
-    (*g_StdStream) << "This program requires Windows NT/2000/XP/2003/Vista";
-    return NExitCode::kFatalError;
+	(*g_StdStream) << "This program requires Windows NT/2000/XP/2003/Vista";
+	return NExitCode::kFatalError;
   }
   #endif
   #else
@@ -81,81 +81,81 @@ int numArguments, const char *arguments[]
   int res = 0;
   try
   {
-    res = Main2(
+	res = Main2(
 #ifndef _WIN32
-      numArguments, arguments
+	  numArguments, arguments
 #endif
-    );
+	);
   }
   catch(const CNewException &)
   {
-    (*g_StdStream) << kMemoryExceptionMessage;
-    return (NExitCode::kMemoryError);
+	(*g_StdStream) << kMemoryExceptionMessage;
+	return (NExitCode::kMemoryError);
   }
   catch(const NConsoleClose::CCtrlBreakException &)
   {
-    (*g_StdStream) << endl << kUserBreak;
-    return (NExitCode::kUserBreak);
+	(*g_StdStream) << endl << kUserBreak;
+	return (NExitCode::kUserBreak);
   }
   catch(const CArchiveCommandLineException &e)
   {
-    (*g_StdStream) << kExceptionErrorMessage << e << endl;
-    return (NExitCode::kUserError);
+	(*g_StdStream) << kExceptionErrorMessage << e << endl;
+	return (NExitCode::kUserError);
   }
   catch(const CSystemException &systemError)
   {
-    if (systemError.ErrorCode == E_OUTOFMEMORY)
-    {
-      (*g_StdStream) << kMemoryExceptionMessage;
-      return (NExitCode::kMemoryError);
-    }
-    if (systemError.ErrorCode == E_ABORT)
-    {
-      (*g_StdStream) << endl << kUserBreak;
-      return (NExitCode::kUserBreak);
-    }
-    UString message;
-    NError::MyFormatMessage(systemError.ErrorCode, message);
-    (*g_StdStream) << endl << endl << "System error:" << endl << 
-        message << endl;
-    return (NExitCode::kFatalError);
+	if (systemError.ErrorCode == E_OUTOFMEMORY)
+	{
+	  (*g_StdStream) << kMemoryExceptionMessage;
+	  return (NExitCode::kMemoryError);
+	}
+	if (systemError.ErrorCode == E_ABORT)
+	{
+	  (*g_StdStream) << endl << kUserBreak;
+	  return (NExitCode::kUserBreak);
+	}
+	UString message;
+	NError::MyFormatMessage(systemError.ErrorCode, message);
+	(*g_StdStream) << endl << endl << "System error:" << endl << 
+		message << endl;
+	return (NExitCode::kFatalError);
   }
   catch(NExitCode::EEnum &exitCode)
   {
-    (*g_StdStream) << kInternalExceptionMessage << exitCode << endl;
-    return (exitCode);
+	(*g_StdStream) << kInternalExceptionMessage << exitCode << endl;
+	return (exitCode);
   }
   /*
   catch(const NExitCode::CMultipleErrors &multipleErrors)
   {
-    (*g_StdStream) << endl << multipleErrors.NumErrors << " errors" << endl;
-    return (NExitCode::kFatalError);
+	(*g_StdStream) << endl << multipleErrors.NumErrors << " errors" << endl;
+	return (NExitCode::kFatalError);
   }
   */
   catch(const UString &s)
   {
-    (*g_StdStream) << kExceptionErrorMessage << s << endl;
-    return (NExitCode::kFatalError);
+	(*g_StdStream) << kExceptionErrorMessage << s << endl;
+	return (NExitCode::kFatalError);
   }
   catch(const AString &s)
   {
-    (*g_StdStream) << kExceptionErrorMessage << s << endl;
-    return (NExitCode::kFatalError);
+	(*g_StdStream) << kExceptionErrorMessage << s << endl;
+	return (NExitCode::kFatalError);
   }
   catch(const char *s)
   {
-    (*g_StdStream) << kExceptionErrorMessage << s << endl;
-    return (NExitCode::kFatalError);
+	(*g_StdStream) << kExceptionErrorMessage << s << endl;
+	return (NExitCode::kFatalError);
   }
   catch(int t)
   {
-    (*g_StdStream) << kInternalExceptionMessage << t << endl;
-    return (NExitCode::kFatalError);
+	(*g_StdStream) << kInternalExceptionMessage << t << endl;
+	return (NExitCode::kFatalError);
   }
   catch(...)
   {
-    (*g_StdStream) << kUnknownExceptionMessage;
-    return (NExitCode::kFatalError);
+	(*g_StdStream) << kUnknownExceptionMessage;
+	return (NExitCode::kFatalError);
   }
   return  res;
 }

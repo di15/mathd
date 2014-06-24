@@ -28,15 +28,15 @@ struct CCoder2: public CCoderInfo2, public CVirtThread
 /*
   SetBindInfo()
   for each coder
-    AddCoder[2]()
+	AddCoder[2]()
   SetProgressIndex(UInt32 coderIndex);
  
   for each file
   {
-    ReInit()
-    for each coder
-      SetCoderInfo  
-    Code
+	ReInit()
+	for each coder
+	  SetCoderInfo  
+	Code
   }
 */
 
@@ -57,12 +57,12 @@ public:
   MY_UNKNOWN_IMP
 
   STDMETHOD(Code)(ISequentialInStream **inStreams,
-      const UInt64 **inSizes, 
-      UInt32 numInStreams,
-      ISequentialOutStream **outStreams, 
-      const UInt64 **outSizes,
-      UInt32 numOutStreams,
-      ICompressProgressInfo *progress);
+	  const UInt64 **inSizes, 
+	  UInt32 numInStreams,
+	  ISequentialOutStream **outStreams, 
+	  const UInt64 **outSizes,
+	  UInt32 numOutStreams,
+	  ICompressProgressInfo *progress);
 
   HRESULT SetBindInfo(const CBindInfo &bindInfo);
   void AddCoder(ICompressCoder *coder);
@@ -71,9 +71,9 @@ public:
 
   void ReInit();
   void SetCoderInfo(UInt32 coderIndex, const UInt64 **inSizes, const UInt64 **outSizes)
-    {  _coders[coderIndex].SetCoderInfo(inSizes, outSizes); }
+	{  _coders[coderIndex].SetCoderInfo(inSizes, outSizes); }
   UInt64 GetWriteProcessedSize(UInt32 binderIndex) const
-    {  return _streamBinders[binderIndex].ProcessedSize; }
+	{  return _streamBinders[binderIndex].ProcessedSize; }
 };
 
 }

@@ -1,6 +1,5 @@
 
 
-
 #ifndef FONT_H
 #define FONT_H
 
@@ -8,21 +7,21 @@
 
 using namespace std;
 
-#define MAX_CHARS	256	
+#define MAX_CHARS	256
 #define CODE_POINTS	110000
 
 class Glyph
 {
 public:
-    int pixel[2];
+	int pixel[2];
 	int texsize[2];
-    int offset[2];
+	int offset[2];
 	int origsize[2];
 	float texcoord[4];
 
-    Glyph()
-    {
-        pixel[0] = 0;
+	Glyph()
+	{
+		pixel[0] = 0;
 		pixel[1] = 0;
 		texsize[0] = 0;
 		texsize[1] = 0;
@@ -34,18 +33,18 @@ public:
 		texcoord[1] = 0;
 		texcoord[2] = 0;
 		texcoord[3] = 0;
-    }
+	}
 };
 
 class Font
 {
 public:
-    unsigned int texindex;
-    float width;    //image width
-    float height;   //image height
-    float gheight;  //glyph height
-    Glyph glyph[CODE_POINTS];
-    
+	unsigned int texindex;
+	float width;    //image width
+	float height;   //image height
+	float gheight;  //glyph height
+	Glyph glyph[CODE_POINTS];
+
 	Font()
 	{
 		width = 0;

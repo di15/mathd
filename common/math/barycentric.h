@@ -1,5 +1,4 @@
 
-
 #ifndef BARYCENTRIC_H
 #define BARYCENTRIC_H
 
@@ -17,7 +16,7 @@ double dist(double x0, double y0, double z0, double x1, double y1, double z1);
 // point inside triangle: vx, vy,vz
 // *u,*v,*w are the coordinates returned
 void barycent(double x0, double y0, double z0, double x1, double y1, double z1, double x2, double y2, double z2,
-                         double vx, double vy, double vz,
-                         double *u, double *v, double *w);
+			  double vx, double vy, double vz,
+			  double *u, double *v, double *w);
 
 #endif

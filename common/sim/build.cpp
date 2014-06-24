@@ -1,5 +1,4 @@
 
-
 #include "build.h"
 #include "buildingtype.h"
 #include "road.h"
@@ -25,7 +24,7 @@
 
 void UpdateSBuild()
 {
-	Player* py = &g_player[g_currP];
+	Player* py = &g_player[g_curP];
 	Camera* c = &py->camera;
 
 	if(py->build == BUILDING_NONE)
@@ -64,7 +63,7 @@ void UpdateSBuild()
 		py->vdrag[0].z = tilepos.y * TILE_SIZE;
 
 		BuildingT* t = &g_buildingT[py->build];
-		
+
 		if(t->widthx%2 == 1)
 			py->vdrag[0].x += TILE_SIZE/2;
 		if(t->widthz%2 == 1)
@@ -77,7 +76,7 @@ void UpdateSBuild()
 			py->canplace = false;
 			py->bpcol = g_collidertype;
 		}
-			//PlaceBuilding(type, tilepos, true, -1, -1, -1);
+		//PlaceBuilding(type, tilepos, true, -1, -1, -1);
 	}
 	else if(py->build == BUILDING_ROAD)
 	{
@@ -113,7 +112,7 @@ void UpdateSBuild()
 
 void DrawSBuild()
 {
-	Player* py = &g_player[g_currP];
+	Player* py = &g_player[g_curP];
 
 	if(py->build == BUILDING_NONE)
 		return;
@@ -146,7 +145,7 @@ void DrawSBuild()
 
 void DrawBReason(Matrix* mvp, float width, float height, bool persp)
 {
-	Player* py = &g_player[g_currP];
+	Player* py = &g_player[g_curP];
 
 	if(py->canplace || py->build == BUILDING_NONE)
 		return;
@@ -215,7 +214,7 @@ bool BuildingLevel(int type, Vec2i tpos)
 {
 #if 1
 	BuildingT* t = &g_buildingT[type];
-    
+
 	Vec2i tmin;
 	Vec2i tmax;
 
@@ -223,13 +222,13 @@ bool BuildingLevel(int type, Vec2i tpos)
 	tmin.y = tpos.y - t->widthz/2;
 	tmax.x = tmin.x + t->widthx;
 	tmax.y = tmin.y + t->widthz;
-    
+
 	float miny = g_hmap.getheight(tmin.x, tmin.y);
 	float maxy = g_hmap.getheight(tmin.x, tmin.y);
-	
+
 	bool haswater = false;
 	bool hasland = false;
-    
+
 	for(int x=tmin.x; x<=tmax.x; x++)
 		for(int z=tmin.y; z<=tmax.y; z++)
 		{
@@ -246,20 +245,20 @@ bool BuildingLevel(int type, Vec2i tpos)
 			{
 				// If z is along building edge and x and x+1 are water tiles
 				if((z==tmin.y || z==tmax.y) && x+1 <= g_hmap.m_widthx && x+1 <= tmax.x && g_hmap.getheight(x+1, z) < WATER_LEVEL)
-						haswater = true;
+					haswater = true;
 				// If x is along building edge and z and z+1 are water tiles
 				if((x==tmin.x || x==tmax.x) && z+1 <= g_hmap.m_widthz && z+1 <= tmax.y && g_hmap.getheight(x, z+1) < WATER_LEVEL)
-						haswater = true;
+					haswater = true;
 			}
 			// Must have two adjacent land tiles to be road-accessible
 			else if(thisy > WATER_LEVEL)
 			{
 				// If z is along building edge and x and x+1 are land tiles
 				if((z==tmin.y || z==tmax.y) && x+1 <= g_hmap.m_widthx && x+1 <= tmax.x && g_hmap.getheight(x+1, z) > WATER_LEVEL)
-						hasland = true;
+					hasland = true;
 				// If x is along building edge and z and z+1 are land tiles
 				if((x==tmin.x || x==tmax.x) && z+1 <= g_hmap.m_widthz && z+1 <= tmax.y && g_hmap.getheight(x, z+1) > WATER_LEVEL)
-						hasland = true;
+					hasland = true;
 			}
 		}
 
@@ -323,21 +322,21 @@ bool BuildingLevel(int type, Vec2i tpos)
 		{
 			if(g_hmap.getheight(x, z) != compare)
 				return false;
-            
+
 			if(g_hmap.getheight(x, z) <= WATER_LEVEL)
 				return false;
 		}
 #endif
 #endif
-    
+
 	return true;
 }
 
 bool Offmap(int minx, int minz, int maxx, int maxz)
 {
 	if(minx < 0 || minz < 0
-		|| maxx >= g_hmap.m_widthx*TILE_SIZE
-		|| maxz >= g_hmap.m_widthz*TILE_SIZE)
+			|| maxx >= g_hmap.m_widthx*TILE_SIZE
+			|| maxz >= g_hmap.m_widthz*TILE_SIZE)
 	{
 		g_collidertype = COLLIDER_OFFMAP;
 		return true;
@@ -365,10 +364,10 @@ bool BuildingCollides(int type, Vec2i pos)
 	cmmin.y = tmin.y * TILE_SIZE;
 	cmmax.x = cmmin.x + t->widthx*TILE_SIZE - 1;
 	cmmax.y = cmmin.y + t->widthz*TILE_SIZE - 1;
-	
+
 	if(Offmap(cmmin.x, cmmin.y, cmmax.x, cmmax.y))
 		return true;
-	
+
 	for(int x=tmin.x; x<=tmax.x; x++)
 		for(int z=tmin.y; z<=tmax.y; z++)
 			if(RoadAt(x, z)->on)

@@ -1,5 +1,4 @@
 
-
 #include "resources.h"
 #include "building.h"
 #include "buildingtype.h"
@@ -32,14 +31,14 @@ void Zero(int *r)
 }
 
 /*
-Players have a global cache of resources, which are available at any point on the map 
-like in any other RTS game, and they also haave localized caches, which are located at 
-buildings and must be transported. 
+Players have a global cache of resources, which are available at any point on the map
+like in any other RTS game, and they also haave localized caches, which are located at
+buildings and must be transported.
 
-Players start off with a certain amount of global resources which can be used anywhere on 
+Players start off with a certain amount of global resources which can be used anywhere on
 the map because they don't have any buildings yet to supply localized resources or trucks
-to transport them. Global resources can't be replenished though. After a certain point, 
-all the players' resources will be localized. 
+to transport them. Global resources can't be replenished though. After a certain point,
+all the players' resources will be localized.
 
 When deducting payments/expenditures of resources, preference is given to using up the global
 cache first, and only then using up the localized cache of whatever building is in question.
@@ -58,7 +57,7 @@ bool TrySubtract(const int* cost, int* universal, int* stock, int* local, int* n
 
 	if(netch != NULL)
 		Zero(netch);
-	
+
 	for(int i=0; i<RESOURCES; i++)
 	{
 		if(i != RES_LABOUR && !g_resource[i].capacity)
@@ -68,7 +67,7 @@ bool TrySubtract(const int* cost, int* universal, int* stock, int* local, int* n
 
 		if(stock != NULL)
 			combined[i] += stock[i];
-		
+
 		if(cost[i] > combined[i])
 		{
 			if(insufres != NULL)
@@ -82,7 +81,7 @@ bool TrySubtract(const int* cost, int* universal, int* stock, int* local, int* n
 		if(i == RES_LABOUR)
 		{
 			stock[i] -= cost[i];
-			
+
 			if(netch != NULL)
 				netch[i] += cost[i];
 		}
@@ -94,14 +93,14 @@ bool TrySubtract(const int* cost, int* universal, int* stock, int* local, int* n
 
 			if(!g_resource[i].capacity)
 				local[i] -= (cost[i] - deducted);
-			
+
 			if(netch != NULL)
 				netch[i] += cost[i];
 		}
 		else
 		{
 			universal[i] -= cost[i];
-			
+
 			if(netch != NULL)
 				netch[i] += cost[i];
 		}

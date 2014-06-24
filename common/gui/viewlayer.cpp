@@ -1,5 +1,4 @@
 
-
 #include "gui.h"
 #include "../texture.h"
 #include "../sim/player.h"
@@ -33,13 +32,13 @@ void ViewLayer::inev(InEv* ev)
 
 void ViewLayer::reframe()
 {
-	Player* py = &g_player[g_currP];
+	Player* py = &g_player[g_curP];
 
 	m_pos[0] = 0;
 	m_pos[1] = 0;
 	m_pos[2] = py->width-1;
 	m_pos[3] = py->height-1;
-	
+
 	if(reframefunc)
 		reframefunc(this);
 

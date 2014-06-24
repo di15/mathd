@@ -103,11 +103,11 @@ typedef struct _CLzmaDecoderState
 #endif
 
 int LzmaDecode(CLzmaDecoderState *vs,
-    #ifdef _LZMA_IN_CB
-    ILzmaInCallback *inCallback,
-    #else
-    const unsigned char *inStream, SizeT inSize, SizeT *inSizeProcessed,
-    #endif
-    unsigned char *outStream, SizeT outSize, SizeT *outSizeProcessed);
+	#ifdef _LZMA_IN_CB
+	ILzmaInCallback *inCallback,
+	#else
+	const unsigned char *inStream, SizeT inSize, SizeT *inSizeProcessed,
+	#endif
+	unsigned char *outStream, SizeT outSize, SizeT *outSizeProcessed);
 
 #endif

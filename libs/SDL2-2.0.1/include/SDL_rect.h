@@ -11,11 +11,11 @@
   freely, subject to the following restrictions:
 
   1. The origin of this software must not be misrepresented; you must not
-     claim that you wrote the original software. If you use this software
-     in a product, an acknowledgment in the product documentation would be
-     appreciated but is not required.
+	 claim that you wrote the original software. If you use this software
+	 in a product, an acknowledgment in the product documentation would be
+	 appreciated but is not required.
   2. Altered source versions must be plainly marked as such, and must not be
-     misrepresented as being the original software.
+	 misrepresented as being the original software.
   3. This notice may not be removed or altered from any source distribution.
 */
 
@@ -46,8 +46,8 @@ extern "C" {
  */
 typedef struct SDL_Point
 {
-    int x;
-    int y;
+	int x;
+	int y;
 } SDL_Point;
 
 /**
@@ -62,8 +62,8 @@ typedef struct SDL_Point
  */
 typedef struct SDL_Rect
 {
-    int x, y;
-    int w, h;
+	int x, y;
+	int w, h;
 } SDL_Rect;
 
 /**
@@ -71,7 +71,7 @@ typedef struct SDL_Rect
  */
 SDL_FORCE_INLINE SDL_bool SDL_RectEmpty(const SDL_Rect *r)
 {
-    return ((!r) || (r->w <= 0) || (r->h <= 0)) ? SDL_TRUE : SDL_FALSE;
+	return ((!r) || (r->w <= 0) || (r->h <= 0)) ? SDL_TRUE : SDL_FALSE;
 }
 
 /**
@@ -79,8 +79,8 @@ SDL_FORCE_INLINE SDL_bool SDL_RectEmpty(const SDL_Rect *r)
  */
 SDL_FORCE_INLINE SDL_bool SDL_RectEquals(const SDL_Rect *a, const SDL_Rect *b)
 {
-    return (a && b && (a->x == b->x) && (a->y == b->y) &&
-            (a->w == b->w) && (a->h == b->h)) ? SDL_TRUE : SDL_FALSE;
+	return (a && b && (a->x == b->x) && (a->y == b->y) &&
+			(a->w == b->w) && (a->h == b->h)) ? SDL_TRUE : SDL_FALSE;
 }
 
 /**
@@ -89,7 +89,7 @@ SDL_FORCE_INLINE SDL_bool SDL_RectEquals(const SDL_Rect *a, const SDL_Rect *b)
  *  \return SDL_TRUE if there is an intersection, SDL_FALSE otherwise.
  */
 extern DECLSPEC SDL_bool SDLCALL SDL_HasIntersection(const SDL_Rect * A,
-                                                     const SDL_Rect * B);
+													 const SDL_Rect * B);
 
 /**
  *  \brief Calculate the intersection of two rectangles.
@@ -97,15 +97,15 @@ extern DECLSPEC SDL_bool SDLCALL SDL_HasIntersection(const SDL_Rect * A,
  *  \return SDL_TRUE if there is an intersection, SDL_FALSE otherwise.
  */
 extern DECLSPEC SDL_bool SDLCALL SDL_IntersectRect(const SDL_Rect * A,
-                                                   const SDL_Rect * B,
-                                                   SDL_Rect * result);
+												   const SDL_Rect * B,
+												   SDL_Rect * result);
 
 /**
  *  \brief Calculate the union of two rectangles.
  */
 extern DECLSPEC void SDLCALL SDL_UnionRect(const SDL_Rect * A,
-                                           const SDL_Rect * B,
-                                           SDL_Rect * result);
+										   const SDL_Rect * B,
+										   SDL_Rect * result);
 
 /**
  *  \brief Calculate a minimal rectangle enclosing a set of points
@@ -113,9 +113,9 @@ extern DECLSPEC void SDLCALL SDL_UnionRect(const SDL_Rect * A,
  *  \return SDL_TRUE if any points were within the clipping rect
  */
 extern DECLSPEC SDL_bool SDLCALL SDL_EnclosePoints(const SDL_Point * points,
-                                                   int count,
-                                                   const SDL_Rect * clip,
-                                                   SDL_Rect * result);
+												   int count,
+												   const SDL_Rect * clip,
+												   SDL_Rect * result);
 
 /**
  *  \brief Calculate the intersection of a rectangle and line segment.
@@ -123,9 +123,9 @@ extern DECLSPEC SDL_bool SDLCALL SDL_EnclosePoints(const SDL_Point * points,
  *  \return SDL_TRUE if there is an intersection, SDL_FALSE otherwise.
  */
 extern DECLSPEC SDL_bool SDLCALL SDL_IntersectRectAndLine(const SDL_Rect *
-                                                          rect, int *X1,
-                                                          int *Y1, int *X2,
-                                                          int *Y2);
+														  rect, int *X1,
+														  int *Y1, int *X2,
+														  int *Y2);
 
 /* Ends C function definitions when using C++ */
 #ifdef __cplusplus

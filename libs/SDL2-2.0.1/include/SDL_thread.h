@@ -11,11 +11,11 @@
   freely, subject to the following restrictions:
 
   1. The origin of this software must not be misrepresented; you must not
-     claim that you wrote the original software. If you use this software
-     in a product, an acknowledgment in the product documentation would be
-     appreciated but is not required.
+	 claim that you wrote the original software. If you use this software
+	 in a product, an acknowledgment in the product documentation would be
+	 appreciated but is not required.
   2. Altered source versions must be plainly marked as such, and must not be
-     misrepresented as being the original software.
+	 misrepresented as being the original software.
   3. This notice may not be removed or altered from any source distribution.
 */
 
@@ -57,9 +57,9 @@ typedef unsigned int SDL_TLSID;
  *  \note On many systems you require special privileges to set high priority.
  */
 typedef enum {
-    SDL_THREAD_PRIORITY_LOW,
-    SDL_THREAD_PRIORITY_NORMAL,
-    SDL_THREAD_PRIORITY_HIGH
+	SDL_THREAD_PRIORITY_LOW,
+	SDL_THREAD_PRIORITY_NORMAL,
+	SDL_THREAD_PRIORITY_HIGH
 } SDL_ThreadPriority;
 
 /**
@@ -93,11 +93,11 @@ typedef int (SDLCALL * SDL_ThreadFunction) (void *data);
 #include <process.h>            /* This has _beginthread() and _endthread() defined! */
 
 typedef uintptr_t(__cdecl * pfnSDL_CurrentBeginThread) (void *, unsigned,
-                                                        unsigned (__stdcall *
-                                                                  func) (void
-                                                                         *),
-                                                        void *arg, unsigned,
-                                                        unsigned *threadID);
+														unsigned (__stdcall *
+																  func) (void
+																		 *),
+														void *arg, unsigned,
+														unsigned *threadID);
 typedef void (__cdecl * pfnSDL_CurrentEndThread) (unsigned code);
 
 /**
@@ -105,8 +105,8 @@ typedef void (__cdecl * pfnSDL_CurrentEndThread) (unsigned code);
  */
 extern DECLSPEC SDL_Thread *SDLCALL
 SDL_CreateThread(SDL_ThreadFunction fn, const char *name, void *data,
-                 pfnSDL_CurrentBeginThread pfnBeginThread,
-                 pfnSDL_CurrentEndThread pfnEndThread);
+				 pfnSDL_CurrentBeginThread pfnBeginThread,
+				 pfnSDL_CurrentEndThread pfnEndThread);
 
 /**
  *  Create a thread.

@@ -1,6 +1,5 @@
 
 
-
 #include "billboard.h"
 #include "../platform.h"
 #include "../math/3dmath.h"
@@ -111,7 +110,7 @@ void PlaceBillboard(int type, Vec3f pos, float size, int particle)
 
 void SortBillboards()
 {
-	Player* py = &g_player[g_currP];
+	Player* py = &g_player[g_curP];
 	Camera* c = &py->camera;
 
 	Vec3f pos = c->m_pos;
@@ -169,7 +168,7 @@ void DrawBillboards()
 	BillboardT* t;
 	float size;
 
-	Player* py = &g_player[g_currP];
+	Player* py = &g_player[g_curP];
 	Camera* cam = &py->camera;
 
 	Vec3f vertical = cam->up2();

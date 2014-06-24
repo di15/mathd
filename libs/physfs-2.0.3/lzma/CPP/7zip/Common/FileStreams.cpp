@@ -14,10 +14,10 @@ static inline HRESULT ConvertBoolToHRESULT(bool result)
 {
   #ifdef _WIN32
   if (result)
-    return S_OK;
+	return S_OK;
   DWORD lastError = ::GetLastError();
   if (lastError == 0)
-    return E_FAIL;
+	return E_FAIL;
   return lastError;
   #else
   return result ? S_OK: E_FAIL;
@@ -59,18 +59,18 @@ STDMETHODIMP CInFileStream::Read(void *data, UInt32 size, UInt32 *processedSize)
   UInt32 realProcessedSize;
   bool result = File.ReadPart(data, size, realProcessedSize);
   if(processedSize != NULL)
-    *processedSize = realProcessedSize;
+	*processedSize = realProcessedSize;
   return ConvertBoolToHRESULT(result);
   
   #else
   
   if(processedSize != NULL)
-    *processedSize = 0;
+	*processedSize = 0;
   ssize_t res = File.Read(data, (size_t)size);
   if (res == -1)
-    return E_FAIL;
+	return E_FAIL;
   if(processedSize != NULL)
-    *processedSize = (UInt32)res;
+	*processedSize = (UInt32)res;
   return S_OK;
 
   #endif
@@ -82,27 +82,27 @@ STDMETHODIMP CStdInFileStream::Read(void *data, UInt32 size, UInt32 *processedSi
   #ifdef _WIN32
   UInt32 realProcessedSize;
   BOOL res = ::ReadFile(GetStdHandle(STD_INPUT_HANDLE), 
-      data, size, (DWORD *)&realProcessedSize, NULL);
+	  data, size, (DWORD *)&realProcessedSize, NULL);
   if(processedSize != NULL)
-    *processedSize = realProcessedSize;
+	*processedSize = realProcessedSize;
   if (res == FALSE && GetLastError() == ERROR_BROKEN_PIPE)
-    return S_OK;
+	return S_OK;
   return ConvertBoolToHRESULT(res != FALSE);
   
   #else
 
   if(processedSize != NULL)
-    *processedSize = 0;
+	*processedSize = 0;
   ssize_t res;
   do 
   {
-    res = read(0, data, (size_t)size);
+	res = read(0, data, (size_t)size);
   } 
   while (res < 0 && (errno == EINTR));
   if (res == -1)
-    return E_FAIL;
+	return E_FAIL;
   if(processedSize != NULL)
-    *processedSize = (UInt32)res;
+	*processedSize = (UInt32)res;
   return S_OK;
   
   #endif
@@ -111,26 +111,26 @@ STDMETHODIMP CStdInFileStream::Read(void *data, UInt32 size, UInt32 *processedSi
 #endif
 
 STDMETHODIMP CInFileStream::Seek(Int64 offset, UInt32 seekOrigin, 
-    UInt64 *newPosition)
+	UInt64 *newPosition)
 {
   if(seekOrigin >= 3)
-    return STG_E_INVALIDFUNCTION;
+	return STG_E_INVALIDFUNCTION;
 
   #ifdef USE_WIN_FILE
 
   UInt64 realNewPosition;
   bool result = File.Seek(offset, seekOrigin, realNewPosition);
   if(newPosition != NULL)
-    *newPosition = realNewPosition;
+	*newPosition = realNewPosition;
   return ConvertBoolToHRESULT(result);
   
   #else
   
   off_t res = File.Seek(offset, seekOrigin);
   if (res == -1)
-    return E_FAIL;
+	return E_FAIL;
   if(newPosition != NULL)
-    *newPosition = (UInt64)res;
+	*newPosition = (UInt64)res;
   return S_OK;
   
   #endif
@@ -158,18 +158,18 @@ STDMETHODIMP COutFileStream::Write(const void *data, UInt32 size, UInt32 *proces
   bool result = File.WritePart(data, size, realProcessedSize);
   ProcessedSize += realProcessedSize;
   if(processedSize != NULL)
-    *processedSize = realProcessedSize;
+	*processedSize = realProcessedSize;
   return ConvertBoolToHRESULT(result);
   
   #else
   
   if(processedSize != NULL)
-    *processedSize = 0;
+	*processedSize = 0;
   ssize_t res = File.Write(data, (size_t)size);
   if (res == -1)
-    return E_FAIL;
+	return E_FAIL;
   if(processedSize != NULL)
-    *processedSize = (UInt32)res;
+	*processedSize = (UInt32)res;
   ProcessedSize += res;
   return S_OK;
   
@@ -179,22 +179,22 @@ STDMETHODIMP COutFileStream::Write(const void *data, UInt32 size, UInt32 *proces
 STDMETHODIMP COutFileStream::Seek(Int64 offset, UInt32 seekOrigin, UInt64 *newPosition)
 {
   if(seekOrigin >= 3)
-    return STG_E_INVALIDFUNCTION;
+	return STG_E_INVALIDFUNCTION;
   #ifdef USE_WIN_FILE
 
   UInt64 realNewPosition;
   bool result = File.Seek(offset, seekOrigin, realNewPosition);
   if(newPosition != NULL)
-    *newPosition = realNewPosition;
+	*newPosition = realNewPosition;
   return ConvertBoolToHRESULT(result);
   
   #else
   
   off_t res = File.Seek(offset, seekOrigin);
   if (res == -1)
-    return E_FAIL;
+	return E_FAIL;
   if(newPosition != NULL)
-    *newPosition = (UInt64)res;
+	*newPosition = (UInt64)res;
   return S_OK;
   
   #endif
@@ -205,7 +205,7 @@ STDMETHODIMP COutFileStream::SetSize(Int64 newSize)
   #ifdef USE_WIN_FILE
   UInt64 currentPos;
   if(!File.Seek(0, FILE_CURRENT, currentPos))
-    return E_FAIL;
+	return E_FAIL;
   bool result = File.SetLength(newSize);
   UInt64 currentPos2;
   result = result && File.Seek(currentPos, currentPos2);
@@ -219,24 +219,24 @@ STDMETHODIMP COutFileStream::SetSize(Int64 newSize)
 STDMETHODIMP CStdOutFileStream::Write(const void *data, UInt32 size, UInt32 *processedSize)
 {
   if(processedSize != NULL)
-    *processedSize = 0;
+	*processedSize = 0;
 
   #ifdef _WIN32
   UInt32 realProcessedSize;
   BOOL res = TRUE;
   if (size > 0)
   {
-    // Seems that Windows doesn't like big amounts writing to stdout.
-    // So we limit portions by 32KB.
-    UInt32 sizeTemp = (1 << 15); 
-    if (sizeTemp > size)
-      sizeTemp = size;
-    res = ::WriteFile(GetStdHandle(STD_OUTPUT_HANDLE), 
-        data, sizeTemp, (DWORD *)&realProcessedSize, NULL);
-    size -= realProcessedSize;
-    data = (const void *)((const Byte *)data + realProcessedSize);
-    if(processedSize != NULL)
-      *processedSize += realProcessedSize;
+	// Seems that Windows doesn't like big amounts writing to stdout.
+	// So we limit portions by 32KB.
+	UInt32 sizeTemp = (1 << 15); 
+	if (sizeTemp > size)
+	  sizeTemp = size;
+	res = ::WriteFile(GetStdHandle(STD_OUTPUT_HANDLE), 
+		data, sizeTemp, (DWORD *)&realProcessedSize, NULL);
+	size -= realProcessedSize;
+	data = (const void *)((const Byte *)data + realProcessedSize);
+	if(processedSize != NULL)
+	  *processedSize += realProcessedSize;
   }
   return ConvertBoolToHRESULT(res != FALSE);
 
@@ -245,13 +245,13 @@ STDMETHODIMP CStdOutFileStream::Write(const void *data, UInt32 size, UInt32 *pro
   ssize_t res;
   do 
   {
-    res = write(1, data, (size_t)size);
+	res = write(1, data, (size_t)size);
   } 
   while (res < 0 && (errno == EINTR));
   if (res == -1)
-    return E_FAIL;
+	return E_FAIL;
   if(processedSize != NULL)
-    *processedSize = (UInt32)res;
+	*processedSize = (UInt32)res;
   return S_OK;
   
   return S_OK;

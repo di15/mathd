@@ -1,5 +1,4 @@
 
-
 #include "vec3i.h"
 #include "plane2i.h"
 #include "physics.h"
@@ -22,7 +21,7 @@ Plane2i::~Plane2i()
 }
 
 int PlaneDistance(Vec2i normal, Vec2i point)
-{	
+{
 	int distance = 0; // This variable holds the distance from the plane to the origin
 
 	// Use the plane equation to find the distance (Ax + By + Cz + D = 0)  We want to find D.

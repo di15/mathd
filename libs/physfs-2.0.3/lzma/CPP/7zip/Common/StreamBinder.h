@@ -20,7 +20,7 @@ public:
   HRes CreateEvents();
 
   void CreateStreams(ISequentialInStream **inStream, 
-      ISequentialOutStream **outStream);
+	  ISequentialOutStream **outStream);
   HRESULT Read(void *data, UInt32 size, UInt32 *processedSize);
   void CloseRead();
 

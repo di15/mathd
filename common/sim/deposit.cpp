@@ -1,4 +1,3 @@
-
 #include "deposit.h"
 #include "resources.h"
 #include "../math/3dmath.h"
@@ -43,7 +42,7 @@ void DrawDeposits(const Matrix projection, const Matrix viewmat)
 	mvp.set(projection.m_matrix);
 	mvp.postmult(viewmat);
 
-	Player* py = &g_player[g_currP];
+	Player* py = &g_player[g_curP];
 
 	for(int i=0; i<DEPOSITS; i++)
 	{

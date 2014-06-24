@@ -23,11 +23,11 @@ CLibrary::~CLibrary()
 bool CLibrary::Free()
 {
   if (_module == 0)
-    return true;
+	return true;
   // MessageBox(0, TEXT(""), TEXT("Free"), 0);
   // Sleep(5000);
   if (!::FreeLibrary(_module))
-    return false;
+	return false;
   _module = 0;
   return true;
 }
@@ -35,9 +35,9 @@ bool CLibrary::Free()
 bool CLibrary::LoadOperations(HMODULE newModule)
 {
   if (newModule == NULL)
-    return false;
+	return false;
   if(!Free())
-    return false;
+	return false;
   _module = newModule;
   return true;
 }
@@ -65,13 +65,13 @@ CSysString GetSysPath(LPCWSTR sysPath)
 bool CLibrary::LoadEx(LPCWSTR fileName, DWORD flags)
 {
   if (g_IsNT)
-    return LoadOperations(::LoadLibraryExW(fileName, NULL, flags));
+	return LoadOperations(::LoadLibraryExW(fileName, NULL, flags));
   return LoadEx(GetSysPath(fileName), flags);
 }
 bool CLibrary::Load(LPCWSTR fileName)
 {
   if (g_IsNT)
-    return LoadOperations(::LoadLibraryW(fileName));
+	return LoadOperations(::LoadLibraryW(fileName));
   return Load(GetSysPath(fileName));
 }
 #endif
@@ -83,8 +83,8 @@ bool MyGetModuleFileName(HMODULE hModule, CSysString &result)
   DWORD size = ::GetModuleFileName(hModule, fullPath, MAX_PATH + 1);
   if (size <= MAX_PATH && size != 0)
   {
-    result = fullPath;
-    return true;
+	result = fullPath;
+	return true;
   }
   return false;
 }
@@ -95,18 +95,18 @@ bool MyGetModuleFileName(HMODULE hModule, UString &result)
   result.Empty();
   if (g_IsNT)
   {
-    wchar_t fullPath[MAX_PATH + 2];
-    DWORD size = ::GetModuleFileNameW(hModule, fullPath, MAX_PATH + 1);
-    if (size <= MAX_PATH && size != 0)
-    {
-      result = fullPath;
-      return true;
-    }
-    return false;
+	wchar_t fullPath[MAX_PATH + 2];
+	DWORD size = ::GetModuleFileNameW(hModule, fullPath, MAX_PATH + 1);
+	if (size <= MAX_PATH && size != 0)
+	{
+	  result = fullPath;
+	  return true;
+	}
+	return false;
   }
   CSysString resultSys;
   if (!MyGetModuleFileName(hModule, resultSys))
-    return false;
+	return false;
   result = MultiByteToUnicodeString(resultSys, GetCurrentCodePage());
   return true;
 }

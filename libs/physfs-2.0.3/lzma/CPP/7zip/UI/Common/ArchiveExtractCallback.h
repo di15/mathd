@@ -67,17 +67,17 @@ private:
 
   struct CProcessedFileInfo
   {
-    FILETIME CreationTime;
-    FILETIME LastWriteTime;
-    FILETIME LastAccessTime;
-    UInt32 Attributes;
+	FILETIME CreationTime;
+	FILETIME LastWriteTime;
+	FILETIME LastAccessTime;
+	UInt32 Attributes;
   
-    bool IsCreationTimeDefined;
-    bool IsLastWriteTimeDefined;
-    bool IsLastAccessTimeDefined;
+	bool IsCreationTimeDefined;
+	bool IsLastWriteTimeDefined;
+	bool IsLastAccessTimeDefined;
 
-    bool IsDirectory;
-    bool AttributesAreDefined;
+	bool IsDirectory;
+	bool AttributesAreDefined;
   } _processedFileInfo;
 
   UInt64 _curSize;
@@ -94,13 +94,13 @@ private:
   HRESULT GetTime(int index, PROPID propID, FILETIME &filetime, bool &filetimeIsDefined);
 public:
   CArchiveExtractCallback():
-      WriteModified(true),
-      WriteCreated(false),
-      WriteAccessed(false),
-      _multiArchives(false)
+	  WriteModified(true),
+	  WriteCreated(false),
+	  WriteAccessed(false),
+	  _multiArchives(false)
   {
-    LocalProgressSpec = new CLocalProgress();
-    _localProgress = LocalProgressSpec;
+	LocalProgressSpec = new CLocalProgress();
+	_localProgress = LocalProgressSpec;
   }
 
   CLocalProgress *LocalProgressSpec;
@@ -114,24 +114,24 @@ public:
   UInt64 UnpackSize;
   
   void InitForMulti(bool multiArchives, 
-      NExtract::NPathMode::EEnum pathMode,
-      NExtract::NOverwriteMode::EEnum overwriteMode) 
+	  NExtract::NPathMode::EEnum pathMode,
+	  NExtract::NOverwriteMode::EEnum overwriteMode) 
   { 
-    _multiArchives = multiArchives; NumFolders = NumFiles = UnpackSize = 0; 
-    _pathMode = pathMode;
-    _overwriteMode = overwriteMode;
+	_multiArchives = multiArchives; NumFolders = NumFiles = UnpackSize = 0; 
+	_pathMode = pathMode;
+	_overwriteMode = overwriteMode;
   }
 
   void Init(
-      IInArchive *archiveHandler, 
-      IFolderArchiveExtractCallback *extractCallback2,
-      bool stdOutMode,
-      const UString &directoryPath,
-      const UStringVector &removePathParts,
-      const UString &itemDefaultName,
-      const FILETIME &utcLastWriteTimeDefault, 
-      UInt32 attributesDefault,
-      UInt64 packSize);
+	  IInArchive *archiveHandler, 
+	  IFolderArchiveExtractCallback *extractCallback2,
+	  bool stdOutMode,
+	  const UString &directoryPath,
+	  const UStringVector &removePathParts,
+	  const UString &itemDefaultName,
+	  const FILETIME &utcLastWriteTimeDefault, 
+	  UInt32 attributesDefault,
+	  UInt64 packSize);
 
   UInt64 _numErrors;
 };

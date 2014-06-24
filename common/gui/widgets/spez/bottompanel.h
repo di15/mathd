@@ -1,5 +1,4 @@
 
-
 #ifndef BOTTOMPANEL_H
 #define BOTTOMPANEL_H
 
@@ -18,7 +17,7 @@ public:
 	Image left_outer_toprightcorner;
 	Image left_outer_top;
 	ViewportW left_minimap;
-	
+
 	Image right_outer_topleftcorner;
 	Image right_outer_top;
 

@@ -1,5 +1,4 @@
 
-
 #ifndef VEC3F_H
 #define VEC3F_H
 
@@ -8,17 +7,17 @@ class Matrix;
 class Vec3f
 {
 public:
-	float x, y, z;	
+	float x, y, z;
 
-	Vec3f() 
+	Vec3f()
 	{
 		x = y = z = 0;
 	}
 
-	Vec3f(float X, float Y, float Z) 
-	{ 
-		x = X; 
-		y = Y; 
+	Vec3f(float X, float Y, float Z)
+	{
+		x = X;
+		y = Y;
 		z = Z;
 	}
 
@@ -52,12 +51,12 @@ public:
 	{
 		return Vec3f(x - vVector.x, y - vVector.y, z - vVector.z);
 	}
-	
+
 	Vec3f operator*(const float num) const
 	{
 		return Vec3f(x * num, y * num, z * num);
 	}
-	
+
 	Vec3f operator*(const Vec3f v) const
 	{
 		return Vec3f(x * v.x, y * v.y, z * v.z);
@@ -76,7 +75,7 @@ public:
 	}
 
 	void transform(const Matrix& m);
-	void transform3(const Matrix& m);					
+	void transform3(const Matrix& m);
 };
 
 bool Close(Vec3f a, Vec3f b);

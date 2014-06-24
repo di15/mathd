@@ -27,25 +27,25 @@ NUserAnswerMode::EEnum ScanUserYesNoAllQuit(CStdOutStream *outStream)
   (*outStream) << kFirstQuestionMessage;
   for(;;)
   {
-    (*outStream) << kHelpQuestionMessage;
-    AString scannedString = g_StdIn.ScanStringUntilNewLine();
-    scannedString.Trim();
-    if(!scannedString.IsEmpty())
-      switch(::MyCharUpper(scannedString[0]))
-      {
-        case kYes:
-          return NUserAnswerMode::kYes;
-        case kNo:
-          return NUserAnswerMode::kNo;
-        case kYesAll:
-          return NUserAnswerMode::kYesAll;
-        case kNoAll:
-          return NUserAnswerMode::kNoAll;
-        case kAutoRename:
-          return NUserAnswerMode::kAutoRename;
-        case kQuit:
-          return NUserAnswerMode::kQuit;
-      }
+	(*outStream) << kHelpQuestionMessage;
+	AString scannedString = g_StdIn.ScanStringUntilNewLine();
+	scannedString.Trim();
+	if(!scannedString.IsEmpty())
+	  switch(::MyCharUpper(scannedString[0]))
+	  {
+		case kYes:
+		  return NUserAnswerMode::kYes;
+		case kNo:
+		  return NUserAnswerMode::kNo;
+		case kYesAll:
+		  return NUserAnswerMode::kYesAll;
+		case kNoAll:
+		  return NUserAnswerMode::kNoAll;
+		case kAutoRename:
+		  return NUserAnswerMode::kAutoRename;
+		case kQuit:
+		  return NUserAnswerMode::kQuit;
+	  }
   }
 }
 

@@ -1,5 +1,4 @@
 
-
 #include "../render/heightmap.h"
 #include "../math/vec3f.h"
 #include "../math/polygon.h"
@@ -187,9 +186,9 @@ bool MoveIntoMap(Vec3f& point, Vec3f ray, Heightmap* hmap)
 {
 	// Already within map?
 	if(point.x >= 1
-		&& point.x < (hmap->m_widthx-1) * TILE_SIZE - 1
-		&& point.z >= 1
-		&& point.z < (hmap->m_widthz-1) * TILE_SIZE - 1)
+			&& point.x < (hmap->m_widthx-1) * TILE_SIZE - 1
+			&& point.z >= 1
+			&& point.z < (hmap->m_widthz-1) * TILE_SIZE - 1)
 		return true;
 
 	// Get x distance off the map.
@@ -222,9 +221,9 @@ bool MoveIntoMap(Vec3f& point, Vec3f ray, Heightmap* hmap)
 	// (maybe the ray is outside the map, beside a corner)
 	// then return false.
 	if(point.x < 1
-		|| point.x >= (hmap->m_widthx-1) * TILE_SIZE - 1
-		|| point.z < 1
-		|| point.z >= (hmap->m_widthz-1) * TILE_SIZE - 1)
+			|| point.x >= (hmap->m_widthx-1) * TILE_SIZE - 1
+			|| point.z < 1
+			|| point.z >= (hmap->m_widthz-1) * TILE_SIZE - 1)
 		return false;
 
 	return true;

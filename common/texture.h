@@ -46,7 +46,7 @@ extern Texture g_texture[TEXTURES];
 
 typedef struct
 {
-    struct jpeg_source_mgr  pub;
+	struct jpeg_source_mgr  pub;
 } JPEGSource;
 
 class LoadedTex

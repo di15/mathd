@@ -11,11 +11,11 @@
   freely, subject to the following restrictions:
 
   1. The origin of this software must not be misrepresented; you must not
-     claim that you wrote the original software. If you use this software
-     in a product, an acknowledgment in the product documentation would be
-     appreciated but is not required.
+	 claim that you wrote the original software. If you use this software
+	 in a product, an acknowledgment in the product documentation would be
+	 appreciated but is not required.
   2. Altered source versions must be plainly marked as such, and must not be
-     misrepresented as being the original software.
+	 misrepresented as being the original software.
   3. This notice may not be removed or altered from any source distribution.
 */
 
@@ -32,8 +32,8 @@ extern Uint8 SDL_numhaptics;
 
 struct haptic_effect
 {
-    SDL_HapticEffect effect;    /* The current event */
-    struct haptic_hweffect *hweffect;   /* The hardware behind the event */
+	SDL_HapticEffect effect;    /* The current event */
+	struct haptic_hweffect *hweffect;   /* The hardware behind the event */
 };
 
 /*
@@ -41,19 +41,19 @@ struct haptic_effect
  */
 struct _SDL_Haptic
 {
-    Uint8 index;                /* Stores index it is attached to */
+	Uint8 index;                /* Stores index it is attached to */
 
-    struct haptic_effect *effects;      /* Allocated effects */
-    int neffects;               /* Maximum amount of effects */
-    int nplaying;               /* Maximum amount of effects to play at the same time */
-    unsigned int supported;     /* Supported effects */
-    int naxes;                  /* Number of axes on the device. */
+	struct haptic_effect *effects;      /* Allocated effects */
+	int neffects;               /* Maximum amount of effects */
+	int nplaying;               /* Maximum amount of effects to play at the same time */
+	unsigned int supported;     /* Supported effects */
+	int naxes;                  /* Number of axes on the device. */
 
-    struct haptic_hwdata *hwdata;       /* Driver dependent */
-    int ref_count;              /* Count for multiple opens */
+	struct haptic_hwdata *hwdata;       /* Driver dependent */
+	int ref_count;              /* Count for multiple opens */
 
-    int rumble_id;              /* ID of rumble effect for simple rumble API. */
-    SDL_HapticEffect rumble_effect; /* Rumble effect. */
+	int rumble_id;              /* ID of rumble effect for simple rumble API. */
+	SDL_HapticEffect rumble_effect; /* Rumble effect. */
 };
 
 /*
@@ -96,14 +96,14 @@ extern int SDL_SYS_JoystickIsHaptic(SDL_Joystick * joystick);
  * Returns 0 on success, -1 on error.
  */
 extern int SDL_SYS_HapticOpenFromJoystick(SDL_Haptic * haptic,
-                                          SDL_Joystick * joystick);
+										  SDL_Joystick * joystick);
 /*
  * Checks to see if haptic device and joystick device are the same.
  *
  * Returns 1 if they are the same, 0 if they aren't.
  */
 extern int SDL_SYS_JoystickSameHaptic(SDL_Haptic * haptic,
-                                      SDL_Joystick * joystick);
+									  SDL_Joystick * joystick);
 
 /*
  * Closes a haptic device after usage.
@@ -122,8 +122,8 @@ extern void SDL_SYS_HapticQuit(void);
  * Returns 0 on success, -1 on error.
  */
 extern int SDL_SYS_HapticNewEffect(SDL_Haptic * haptic,
-                                   struct haptic_effect *effect,
-                                   SDL_HapticEffect * base);
+								   struct haptic_effect *effect,
+								   SDL_HapticEffect * base);
 
 /*
  * Updates the haptic effect on the haptic device using data
@@ -132,8 +132,8 @@ extern int SDL_SYS_HapticNewEffect(SDL_Haptic * haptic,
  * Returns 0 on success, -1 on error.
  */
 extern int SDL_SYS_HapticUpdateEffect(SDL_Haptic * haptic,
-                                      struct haptic_effect *effect,
-                                      SDL_HapticEffect * data);
+									  struct haptic_effect *effect,
+									  SDL_HapticEffect * data);
 
 /*
  * Runs the effect on the haptic device.
@@ -141,8 +141,8 @@ extern int SDL_SYS_HapticUpdateEffect(SDL_Haptic * haptic,
  * Returns 0 on success, -1 on error.
  */
 extern int SDL_SYS_HapticRunEffect(SDL_Haptic * haptic,
-                                   struct haptic_effect *effect,
-                                   Uint32 iterations);
+								   struct haptic_effect *effect,
+								   Uint32 iterations);
 
 /*
  * Stops the effect on the haptic device.
@@ -150,13 +150,13 @@ extern int SDL_SYS_HapticRunEffect(SDL_Haptic * haptic,
  * Returns 0 on success, -1 on error.
  */
 extern int SDL_SYS_HapticStopEffect(SDL_Haptic * haptic,
-                                    struct haptic_effect *effect);
+									struct haptic_effect *effect);
 
 /*
  * Cleanups up the effect on the haptic device.
  */
 extern void SDL_SYS_HapticDestroyEffect(SDL_Haptic * haptic,
-                                        struct haptic_effect *effect);
+										struct haptic_effect *effect);
 
 /*
  * Queries the device for the status of effect.
@@ -165,7 +165,7 @@ extern void SDL_SYS_HapticDestroyEffect(SDL_Haptic * haptic,
  * -1 on error.
  */
 extern int SDL_SYS_HapticGetEffectStatus(SDL_Haptic * haptic,
-                                         struct haptic_effect *effect);
+										 struct haptic_effect *effect);
 
 /*
  * Sets the global gain of the haptic device.

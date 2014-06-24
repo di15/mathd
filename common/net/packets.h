@@ -14,29 +14,29 @@
 class OldPacket
 {
 public:
-    char* buffer;
-    int len;
-    long long last;
+	char* buffer;
+	int len;
+	long long last;
 	long long first;
 #ifdef _SERVER
 	struct sockaddr_in addr;
 #endif
-    
-    void freemem()
-    {
-        if(buffer != NULL)
-            delete [] buffer;
+	
+	void freemem()
+	{
+		if(buffer != NULL)
+			delete [] buffer;
 		buffer = NULL;
-    }
-    
-    OldPacket()
-    {
-        buffer = NULL;
-    }
-    ~OldPacket()
-    {
+	}
+	
+	OldPacket()
+	{
+		buffer = NULL;
+	}
+	~OldPacket()
+	{
 		freemem();
-    }
+	}
 
 	OldPacket(const OldPacket& original)
 	{
@@ -93,45 +93,45 @@ public:
 
 struct PacketHeader
 {
-    int type;
-    unsigned int ack;
+	int type;
+	unsigned int ack;
 };
 
 struct LoginPacket
 {
-    PacketHeader header;
-    float version;
-    char username[UN_LEN];
-    char password[PW_LEN];
+	PacketHeader header;
+	float version;
+	char username[UN_LEN];
+	char password[PW_LEN];
 };
 
 struct IncorrectLoginPacket
 {
-    PacketHeader header;
+	PacketHeader header;
 };
 
 struct IncorrectVersionPacket
 {
-    PacketHeader header;
-    float version;
+	PacketHeader header;
+	float version;
 };
 
 struct RegistrationPacket
 {
-    PacketHeader header;
-    char username[UN_LEN];
-    char email[EM_LEN];
-    char password[PW_LEN];
+	PacketHeader header;
+	char username[UN_LEN];
+	char email[EM_LEN];
+	char password[PW_LEN];
 };
 
 struct UsernameExistsPacket
 {
-    PacketHeader header;
+	PacketHeader header;
 };
 
 struct EmailExistsPacket
 {
-    PacketHeader header;
+	PacketHeader header;
 };
 
 struct AcknowledgmentPacket

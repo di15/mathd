@@ -1,4 +1,3 @@
-
 #ifndef HEIGHTMAP_H
 #define HEIGHTMAP_H
 
@@ -84,9 +83,9 @@ public:
 	void drawrim();
 
 	inline float getheight(int tx, int tz)
-    {
-        return m_heightpoints[ (tz)*(m_widthx+1) + tx ];
-    }
+	{
+		return m_heightpoints[ (tz)*(m_widthx+1) + tx ];
+	}
 
 	float accheight(int x, int z);
 	float accheight2(int x, int z);

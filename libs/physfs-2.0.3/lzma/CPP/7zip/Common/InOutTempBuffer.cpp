@@ -40,22 +40,22 @@ void CInOutTempBuffer::InitWriting()
 bool CInOutTempBuffer::WriteToFile(const void *data, UInt32 size)
 {
   if (size == 0)
-    return true;
+	return true;
   if(!_tmpFileCreated)
   {
-    CSysString tempDirPath;
-    if(!MyGetTempPath(tempDirPath))
-      return false;
-    if (_tempFile.Create(tempDirPath, kTempFilePrefixString, _tmpFileName) == 0)
-      return false;
-    // _outFile.SetOpenCreationDispositionCreateAlways();
-    if(!_outFile.Create(_tmpFileName, true))
-      return false;
-    _tmpFileCreated = true;
+	CSysString tempDirPath;
+	if(!MyGetTempPath(tempDirPath))
+	  return false;
+	if (_tempFile.Create(tempDirPath, kTempFilePrefixString, _tmpFileName) == 0)
+	  return false;
+	// _outFile.SetOpenCreationDispositionCreateAlways();
+	if(!_outFile.Create(_tmpFileName, true))
+	  return false;
+	_tmpFileCreated = true;
   }
   UInt32 processedSize;
   if(!_outFile.Write(data, size, processedSize))
-    return false;
+	return false;
   _fileSize += processedSize;
   return (processedSize == size);
 }
@@ -69,12 +69,12 @@ bool CInOutTempBuffer::Write(const void *data, UInt32 size)
 {
   if(_bufferPosition < kTmpBufferMemorySize)
   {
-    UInt32 curSize = MyMin(kTmpBufferMemorySize - _bufferPosition, size);
-    memmove(_buffer + _bufferPosition, (const Byte *)data, curSize);
-    _bufferPosition += curSize;
-    size -= curSize;
-    data = ((const Byte *)data) + curSize;
-    _fileSize += curSize;
+	UInt32 curSize = MyMin(kTmpBufferMemorySize - _bufferPosition, size);
+	memmove(_buffer + _bufferPosition, (const Byte *)data, curSize);
+	_bufferPosition += curSize;
+	size -= curSize;
+	data = ((const Byte *)data) + curSize;
+	_fileSize += curSize;
   }
   return WriteToFile(data, size);
 }
@@ -83,7 +83,7 @@ bool CInOutTempBuffer::InitReading()
 {
   _currentPositionInBuffer = 0;
   if(_tmpFileCreated)
-    return _inFile.Open(_tmpFileName);
+	return _inFile.Open(_tmpFileName);
   return true;
 }
 
@@ -91,20 +91,20 @@ HRESULT CInOutTempBuffer::WriteToStream(ISequentialOutStream *stream)
 {
   if (_currentPositionInBuffer < _bufferPosition)
   {
-    UInt32 sizeToWrite = _bufferPosition - _currentPositionInBuffer;
-    RINOK(WriteStream(stream, _buffer + _currentPositionInBuffer, sizeToWrite, NULL));
-    _currentPositionInBuffer += sizeToWrite;
+	UInt32 sizeToWrite = _bufferPosition - _currentPositionInBuffer;
+	RINOK(WriteStream(stream, _buffer + _currentPositionInBuffer, sizeToWrite, NULL));
+	_currentPositionInBuffer += sizeToWrite;
   }
   if (!_tmpFileCreated)
-    return true;
+	return true;
   for (;;)
   {
-    UInt32 localProcessedSize;
-    if (!_inFile.ReadPart(_buffer, kTmpBufferMemorySize, localProcessedSize))
-      return E_FAIL;
-    if (localProcessedSize == 0)
-      return S_OK;
-    RINOK(WriteStream(stream, _buffer, localProcessedSize, NULL));
+	UInt32 localProcessedSize;
+	if (!_inFile.ReadPart(_buffer, kTmpBufferMemorySize, localProcessedSize))
+	  return E_FAIL;
+	if (localProcessedSize == 0)
+	  return S_OK;
+	RINOK(WriteStream(stream, _buffer, localProcessedSize, NULL));
   }
 }
 
@@ -112,11 +112,11 @@ STDMETHODIMP CSequentialOutTempBufferImp::Write(const void *data, UInt32 size, U
 {
   if (!_buffer->Write(data, size))
   {
-    if (processedSize != NULL)
-      *processedSize = 0;
-    return E_FAIL;
+	if (processedSize != NULL)
+	  *processedSize = 0;
+	return E_FAIL;
   }
   if (processedSize != NULL)
-    *processedSize = size;
+	*processedSize = size;
   return S_OK;
 }

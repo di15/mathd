@@ -1,5 +1,4 @@
 
-
 #include "../widget.h"
 #include "barbutton.h"
 #include "button.h"
@@ -49,7 +48,7 @@ TouchListener::TouchListener(Widget* parent, void (*reframef)(Widget* thisw), vo
 
 void TouchListener::inev(InEv* ev)
 {
-	Player* py = &g_player[g_currP];
+	Player* py = &g_player[g_curP];
 
 	if(ev->type == INEV_MOUSEUP && ev->key == MOUSE_LEFT && !ev->intercepted)
 	{
@@ -65,11 +64,11 @@ void TouchListener::inev(InEv* ev)
 
 			m_over = false;
 			m_ldown = false;
-			
+
 			ev->intercepted = true;
 			return;	// intercept mouse event
 		}
-		
+
 		if(m_ldown)
 		{
 			m_ldown = false;
@@ -98,7 +97,7 @@ void TouchListener::inev(InEv* ev)
 				overfunc();
 			if(overfunc2 != NULL)
 				overfunc2(m_param);
-			
+
 			m_over = true;
 
 			ev->intercepted = true;

@@ -1,5 +1,4 @@
 
-
 #include "vscrollbar.h"
 #include "../../sim/player.h"
 #include "../../render/shader.h"
@@ -77,7 +76,7 @@ void VScroll::draw()
 	DrawImage(g_texture[ m_uptex ].texname, m_uppos[0], m_uppos[1], m_uppos[2], m_uppos[3], 0, 0, 1, 1);
 	DrawImage(g_texture[ m_uptex ].texname, m_downpos[0], m_downpos[1], m_downpos[2], m_downpos[3], 0, 1, 1, 0);
 
-	Player* py = &g_player[g_currP];
+	Player* py = &g_player[g_curP];
 
 	EndS();
 
@@ -108,7 +107,9 @@ void VScroll::draw()
 	DrawLine(darkcolor[0], darkcolor[1], darkcolor[2], darkcolor[3], m_barpos[2], m_barpos[1]+1, m_barpos[2], m_barpos[3]);
 
 	EndS();
+#ifdef GLDEBUG
 	CheckGLError(__FILE__, __LINE__);
+#endif
 	Ortho(py->currw, py->currh, 1, 1, 1, 1);
 
 	for(auto w=m_subwidg.begin(); w!=m_subwidg.end(); w++)
@@ -129,13 +130,13 @@ void VScroll::inev(InEv* ev)
 	for(auto w=m_subwidg.rbegin(); w!=m_subwidg.rend(); w++)
 		(*w)->inev(ev);
 
-	Player* py = &g_player[g_currP];
+	Player* py = &g_player[g_curP];
 
 #if 1
 	if(m_ldown)
 	{
 		if(ev->type == INEV_MOUSEMOVE ||
-			( (ev->type == INEV_MOUSEDOWN || ev->type == INEV_MOUSEUP) && ev->key == MOUSE_LEFT) )
+				( (ev->type == INEV_MOUSEDOWN || ev->type == INEV_MOUSEUP) && ev->key == MOUSE_LEFT) )
 			ev->intercepted = true;
 
 		if(ev->type == INEV_MOUSEUP && ev->key == MOUSE_LEFT)
@@ -200,9 +201,9 @@ void VScroll::inev(InEv* ev)
 			m_ldown = true;
 
 			if(py->mouse.x >= m_barpos[0] &&
-				py->mouse.y >= m_barpos[1] &&
-				py->mouse.x <= m_barpos[2] &&
-				py->mouse.y <= m_barpos[3])
+					py->mouse.y >= m_barpos[1] &&
+					py->mouse.x <= m_barpos[2] &&
+					py->mouse.y <= m_barpos[3])
 			{
 				m_ldownbar = true;
 				m_mousedown[0] = py->mouse.x;
@@ -221,10 +222,10 @@ void VScroll::inev(InEv* ev)
 		}
 
 		if(!ev->intercepted &&
-			py->mouse.x >= m_pos[0] &&
-			py->mouse.y >= m_pos[1] &&
-			py->mouse.x <= m_pos[2] &&
-			py->mouse.y <= m_pos[3])
+				py->mouse.x >= m_pos[0] &&
+				py->mouse.y >= m_pos[1] &&
+				py->mouse.x <= m_pos[2] &&
+				py->mouse.y <= m_pos[3])
 		{
 			m_over = true;
 

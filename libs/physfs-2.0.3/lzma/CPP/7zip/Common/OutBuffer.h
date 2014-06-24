@@ -48,14 +48,14 @@ public:
 
   void WriteByte(Byte b)
   {
-    _buffer[_pos++] = b;
-    if(_pos == _limitPos)
-      FlushWithCheck();
+	_buffer[_pos++] = b;
+	if(_pos == _limitPos)
+	  FlushWithCheck();
   }
   void WriteBytes(const void *data, size_t size)
   {
-    for (size_t i = 0; i < size; i++)
-      WriteByte(((const Byte *)data)[i]);
+	for (size_t i = 0; i < size; i++)
+	  WriteByte(((const Byte *)data)[i]);
   }
 
   UInt64 GetProcessedSize() const;

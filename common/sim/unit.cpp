@@ -1,5 +1,4 @@
 
-
 #include "unit.h"
 #include "../render/shader.h"
 #include "unittype.h"
@@ -44,6 +43,8 @@ void DrawUnits()
 {
 	for(int i=0; i<UNITS; i++)
 	{
+		StartTimer(TIMER_DRAWUMAT);
+
 		Unit* u = &g_unit[i];
 
 		if(!u->on)
@@ -52,6 +53,8 @@ void DrawUnits()
 		UnitT* t = &g_unitT[u->type];
 
 		Model* m = &g_model[t->model];
+
+		StopTimer(TIMER_DRAWUMAT);
 
 		m->draw(u->frame[BODY_LOWER], u->drawpos, u->rotation.y);
 	}
@@ -215,26 +218,26 @@ void UpdateUnits()
 	for(int i = 0; i < UNITS; i++)
 	{
 
-		StartTimer(UPDUONCHECK);
+		StartTimer(TIMER_UPDUONCHECK);
 
 		Unit* u = &g_unit[i];
 
 		if(!u->on)
 		{
-			StopTimer(UPDUONCHECK);
+			StopTimer(TIMER_UPDUONCHECK);
 			continue;
 		}
 
-		StopTimer(UPDUONCHECK);
+		StopTimer(TIMER_UPDUONCHECK);
 
-		StartTimer(UPDUNITAI);
+		StartTimer(TIMER_UPDUNITAI);
 		UpdateAI(u);
-		StopTimer(UPDUNITAI);
-		StartTimer(MOVEUNIT);
+		StopTimer(TIMER_UPDUNITAI);
+		StartTimer(TIMER_MOVEUNIT);
 		MoveUnit(u);
-		StopTimer(MOVEUNIT);
-		StartTimer(ANIMUNIT);
+		StopTimer(TIMER_MOVEUNIT);
+		StartTimer(TIMER_ANIMUNIT);
 		AnimateUnit(u);
-		StopTimer(ANIMUNIT);
+		StopTimer(TIMER_ANIMUNIT);
 	}
 }

@@ -18,9 +18,9 @@ class CSequentialInStreamImp:
 public:
   void Init(const Byte *dataPointer, size_t size)
   {
-    _dataPointer = dataPointer;
-    _size = size;
-    _pos = 0;
+	_dataPointer = dataPointer;
+	_size = size;
+	_pos = 0;
   }
 
   MY_UNKNOWN_IMP
@@ -67,9 +67,9 @@ public:
 
   void Init(Byte *buffer, size_t size)  
   { 
-    _buffer = buffer;
-    _pos = 0;
-    _size = size; 
+	_buffer = buffer;
+	_pos = 0;
+	_size = size; 
   }
 
   size_t GetPos() const { return _pos; }
@@ -88,8 +88,8 @@ class CSequentialInStreamSizeCount:
 public:
   void Init(ISequentialInStream *stream)
   {
-    _stream = stream;
-    _size = 0;
+	_stream = stream;
+	_size = 0;
   }
   UInt64 GetSize() const { return _size; }
 

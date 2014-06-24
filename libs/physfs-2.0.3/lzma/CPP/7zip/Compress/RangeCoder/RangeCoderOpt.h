@@ -13,17 +13,17 @@
 
 #define RC_NORMALIZE \
   if (range < NCompress::NRangeCoder::kTopValue) \
-    { code = (code << 8) | rangeDecoder->Stream.ReadByte(); range <<= 8; }
+	{ code = (code << 8) | rangeDecoder->Stream.ReadByte(); range <<= 8; }
 
 #define RC_GETBIT2(numMoveBits, prob, mi, A0, A1) \
   { UInt32 bound = (range >> NCompress::NRangeCoder::kNumBitModelTotalBits) * prob; \
   if (code < bound) \
   { A0; range = bound; \
-    prob += (NCompress::NRangeCoder::kBitModelTotal - prob) >> numMoveBits; \
-    mi <<= 1; } \
+	prob += (NCompress::NRangeCoder::kBitModelTotal - prob) >> numMoveBits; \
+	mi <<= 1; } \
   else \
   { A1; range -= bound; code -= bound; prob -= (prob) >> numMoveBits; \
-    mi = (mi + mi) + 1; }} \
+	mi = (mi + mi) + 1; }} \
   RC_NORMALIZE
 
 #define RC_GETBIT(numMoveBits, prob, mi) RC_GETBIT2(numMoveBits, prob, mi, ; , ;)

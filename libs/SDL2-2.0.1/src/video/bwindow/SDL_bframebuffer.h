@@ -11,11 +11,11 @@
   freely, subject to the following restrictions:
 
   1. The origin of this software must not be misrepresented; you must not
-     claim that you wrote the original software. If you use this software
-     in a product, an acknowledgment in the product documentation would be
-     appreciated but is not required.
+	 claim that you wrote the original software. If you use this software
+	 in a product, an acknowledgment in the product documentation would be
+	 appreciated but is not required.
   2. Altered source versions must be plainly marked as such, and must not be
-     misrepresented as being the original software.
+	 misrepresented as being the original software.
   3. This notice may not be removed or altered from any source distribution.
 */
 
@@ -31,10 +31,10 @@ extern "C" {
 #include "../SDL_sysvideo.h"
 
 extern int BE_CreateWindowFramebuffer(_THIS, SDL_Window * window,
-                                       Uint32 * format,
-                                       void ** pixels, int *pitch);
+									   Uint32 * format,
+									   void ** pixels, int *pitch);
 extern int BE_UpdateWindowFramebuffer(_THIS, SDL_Window * window,
-                                       const SDL_Rect * rects, int numrects);
+									   const SDL_Rect * rects, int numrects);
 extern void BE_DestroyWindowFramebuffer(_THIS, SDL_Window * window);
 extern int32 BE_DrawThread(void *data);
 

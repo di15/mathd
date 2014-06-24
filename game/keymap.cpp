@@ -1,7 +1,6 @@
 
 
 
-
 #include "gmain.h"
 #include "keymap.h"
 #include "../common/platform.h"
@@ -17,7 +16,7 @@ void MouseMidButtonDown()
 {
 	if(g_mode == APPMODE_PLAY || g_mode == APPMODE_EDITOR)
 	{
-		Player* py = &g_player[g_currP];
+		Player* py = &g_player[g_curP];
 
 		if(py->mousekeys[MOUSE_MIDDLE])
 		{
@@ -34,7 +33,7 @@ void MouseWheel(int delta)
 {
 	if(g_mode == APPMODE_PLAY || g_mode == APPMODE_EDITOR)
 	{
-		Player* py = &g_player[g_currP];
+		Player* py = &g_player[g_curP];
 		Camera* c = &py->camera;
 
 		if(py->zoom <= MIN_ZOOM && delta < 0)

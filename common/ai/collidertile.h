@@ -1,4 +1,3 @@
-
 #ifndef PATHCELL_H
 #define PATHCELL_H
 

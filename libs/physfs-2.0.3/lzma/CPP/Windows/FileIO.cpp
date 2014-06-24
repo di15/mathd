@@ -29,21 +29,21 @@ bool GetLongPathBase(LPCWSTR s, UString &res)
   int len = MyStringLen(s);
   wchar_t c = s[0];
   if (len < 1 || c == L'\\' || c == L'.' && (len == 1 || len == 2 && s[1] == L'.'))
-    return true;
+	return true;
   UString curDir;
   bool isAbs = false;
   if (len > 3)
-    isAbs = (s[1] == L':' && s[2] == L'\\' && (c >= L'a' && c <= L'z' || c >= L'A' && c <= L'Z'));
+	isAbs = (s[1] == L':' && s[2] == L'\\' && (c >= L'a' && c <= L'z' || c >= L'A' && c <= L'Z'));
 
   if (!isAbs)
-    {
-      DWORD needLength = ::GetCurrentDirectoryW(MAX_PATH + 1, curDir.GetBuffer(MAX_PATH + 1));
-      curDir.ReleaseBuffer();
-      if (needLength == 0 || needLength > MAX_PATH)
-        return false;
-      if (curDir[curDir.Length() - 1] != L'\\')
-        curDir += L'\\';
-    }
+	{
+	  DWORD needLength = ::GetCurrentDirectoryW(MAX_PATH + 1, curDir.GetBuffer(MAX_PATH + 1));
+	  curDir.ReleaseBuffer();
+	  if (needLength == 0 || needLength > MAX_PATH)
+		return false;
+	  if (curDir[curDir.Length() - 1] != L'\\')
+		curDir += L'\\';
+	}
   res = UString(L"\\\\?\\") + curDir + s;
   return true;
 }
@@ -51,7 +51,7 @@ bool GetLongPathBase(LPCWSTR s, UString &res)
 bool GetLongPath(LPCWSTR path, UString &longPath)
 {
   if (GetLongPathBase(path, longPath)) 
-    return !longPath.IsEmpty();
+	return !longPath.IsEmpty();
   return false;
 }
 #endif
@@ -61,21 +61,21 @@ namespace NIO {
 CFileBase::~CFileBase() { Close(); }
 
 bool CFileBase::Create(LPCTSTR fileName, DWORD desiredAccess,
-    DWORD shareMode, DWORD creationDisposition, DWORD flagsAndAttributes)
+	DWORD shareMode, DWORD creationDisposition, DWORD flagsAndAttributes)
 {
   if (!Close())
-    return false;
+	return false;
   _handle = ::CreateFile(fileName, desiredAccess, shareMode, 
-      (LPSECURITY_ATTRIBUTES)NULL, creationDisposition, 
-      flagsAndAttributes, (HANDLE)NULL);
+	  (LPSECURITY_ATTRIBUTES)NULL, creationDisposition, 
+	  flagsAndAttributes, (HANDLE)NULL);
   #ifdef WIN_LONG_PATH2
   if (_handle == INVALID_HANDLE_VALUE)
   {
-    UString longPath;
-    if (GetLongPath(fileName, longPath))
-      _handle = ::CreateFileW(longPath, desiredAccess, shareMode, 
-        (LPSECURITY_ATTRIBUTES)NULL, creationDisposition, 
-        flagsAndAttributes, (HANDLE)NULL);
+	UString longPath;
+	if (GetLongPath(fileName, longPath))
+	  _handle = ::CreateFileW(longPath, desiredAccess, shareMode, 
+		(LPSECURITY_ATTRIBUTES)NULL, creationDisposition, 
+		flagsAndAttributes, (HANDLE)NULL);
   }
   #endif
   return (_handle != INVALID_HANDLE_VALUE);
@@ -83,24 +83,24 @@ bool CFileBase::Create(LPCTSTR fileName, DWORD desiredAccess,
 
 #ifndef _UNICODE
 bool CFileBase::Create(LPCWSTR fileName, DWORD desiredAccess,
-    DWORD shareMode, DWORD creationDisposition, DWORD flagsAndAttributes)
+	DWORD shareMode, DWORD creationDisposition, DWORD flagsAndAttributes)
 {
   if (!g_IsNT)
-    return Create(UnicodeStringToMultiByte(fileName, ::AreFileApisANSI() ? CP_ACP : CP_OEMCP), 
-      desiredAccess, shareMode, creationDisposition, flagsAndAttributes);
+	return Create(UnicodeStringToMultiByte(fileName, ::AreFileApisANSI() ? CP_ACP : CP_OEMCP), 
+	  desiredAccess, shareMode, creationDisposition, flagsAndAttributes);
   if (!Close())
-    return false;
+	return false;
   _handle = ::CreateFileW(fileName, desiredAccess, shareMode, 
-    (LPSECURITY_ATTRIBUTES)NULL, creationDisposition, 
-    flagsAndAttributes, (HANDLE)NULL);
+	(LPSECURITY_ATTRIBUTES)NULL, creationDisposition, 
+	flagsAndAttributes, (HANDLE)NULL);
   #ifdef WIN_LONG_PATH
   if (_handle == INVALID_HANDLE_VALUE)
   {
-    UString longPath;
-    if (GetLongPath(fileName, longPath))
-      _handle = ::CreateFileW(longPath, desiredAccess, shareMode, 
-        (LPSECURITY_ATTRIBUTES)NULL, creationDisposition, 
-        flagsAndAttributes, (HANDLE)NULL);
+	UString longPath;
+	if (GetLongPath(fileName, longPath))
+	  _handle = ::CreateFileW(longPath, desiredAccess, shareMode, 
+		(LPSECURITY_ATTRIBUTES)NULL, creationDisposition, 
+		flagsAndAttributes, (HANDLE)NULL);
   }
   #endif
   return (_handle != INVALID_HANDLE_VALUE);
@@ -110,9 +110,9 @@ bool CFileBase::Create(LPCWSTR fileName, DWORD desiredAccess,
 bool CFileBase::Close()
 {
   if (_handle == INVALID_HANDLE_VALUE)
-    return true;
+	return true;
   if (!::CloseHandle(_handle))
-    return false;
+	return false;
   _handle = INVALID_HANDLE_VALUE;
   return true;
 }
@@ -127,8 +127,8 @@ bool CFileBase::GetLength(UInt64 &length) const
   DWORD sizeHigh;
   DWORD sizeLow = ::GetFileSize(_handle, &sizeHigh);
   if(sizeLow == 0xFFFFFFFF)
-    if(::GetLastError() != NO_ERROR)
-      return false;
+	if(::GetLastError() != NO_ERROR)
+	  return false;
   length = (((UInt64)sizeHigh) << 32) + sizeLow;
   return true;
 }
@@ -139,8 +139,8 @@ bool CFileBase::Seek(Int64 distanceToMove, DWORD moveMethod, UInt64 &newPosition
   value.QuadPart = distanceToMove;
   value.LowPart = ::SetFilePointer(_handle, value.LowPart, &value.HighPart, moveMethod);
   if (value.LowPart == 0xFFFFFFFF)
-    if(::GetLastError() != NO_ERROR) 
-      return false;
+	if(::GetLastError() != NO_ERROR) 
+	  return false;
   newPosition = value.QuadPart;
   return true;
 }
@@ -165,7 +165,7 @@ bool CFileBase::GetFileInformation(CByHandleFileInfo &fileInfo) const
 {
   BY_HANDLE_FILE_INFORMATION winFileInfo;
   if(!::GetFileInformationByHandle(_handle, &winFileInfo))
-    return false;
+	return false;
   fileInfo.Attributes = winFileInfo.dwFileAttributes;
   fileInfo.CreationTime = winFileInfo.ftCreationTime;
   fileInfo.LastAccessTime = winFileInfo.ftLastAccessTime;
@@ -214,7 +214,7 @@ static UInt32 kChunkSizeMax = (1 << 22);
 bool CInFile::ReadPart(void *data, UInt32 size, UInt32 &processedSize)
 {
   if (size > kChunkSizeMax)
-    size = kChunkSizeMax;
+	size = kChunkSizeMax;
   DWORD processedLoc = 0;
   bool res = BOOLToBool(::ReadFile(_handle, data, size, &processedLoc, NULL));
   processedSize = (UInt32)processedLoc;
@@ -226,15 +226,15 @@ bool CInFile::Read(void *data, UInt32 size, UInt32 &processedSize)
   processedSize = 0;
   do
   {
-    UInt32 processedLoc = 0;
-    bool res = ReadPart(data, size, processedLoc);
-    processedSize += processedLoc;
-    if (!res)
-      return false;
-    if (processedLoc == 0)
-      return true;
-    data = (void *)((unsigned char *)data + processedLoc);
-    size -= processedLoc;
+	UInt32 processedLoc = 0;
+	bool res = ReadPart(data, size, processedLoc);
+	processedSize += processedLoc;
+	if (!res)
+	  return false;
+	if (processedLoc == 0)
+	  return true;
+	data = (void *)((unsigned char *)data + processedLoc);
+	size -= processedLoc;
   }
   while (size > 0);
   return true;
@@ -277,7 +277,7 @@ bool COutFile::SetLastWriteTime(const FILETIME *lastWriteTime)
 bool COutFile::WritePart(const void *data, UInt32 size, UInt32 &processedSize)
 {
   if (size > kChunkSizeMax)
-    size = kChunkSizeMax;
+	size = kChunkSizeMax;
   DWORD processedLoc = 0;
   bool res = BOOLToBool(::WriteFile(_handle, data, size, &processedLoc, NULL));
   processedSize = (UInt32)processedLoc;
@@ -289,15 +289,15 @@ bool COutFile::Write(const void *data, UInt32 size, UInt32 &processedSize)
   processedSize = 0;
   do
   {
-    UInt32 processedLoc = 0;
-    bool res = WritePart(data, size, processedLoc);
-    processedSize += processedLoc;
-    if (!res)
-      return false;
-    if (processedLoc == 0)
-      return true;
-    data = (const void *)((const unsigned char *)data + processedLoc);
-    size -= processedLoc;
+	UInt32 processedLoc = 0;
+	bool res = WritePart(data, size, processedLoc);
+	processedSize += processedLoc;
+	if (!res)
+	  return false;
+	if (processedLoc == 0)
+	  return true;
+	data = (const void *)((const unsigned char *)data + processedLoc);
+	size -= processedLoc;
   }
   while (size > 0);
   return true;
@@ -309,9 +309,9 @@ bool COutFile::SetLength(UInt64 length)
 {
   UInt64 newPosition;
   if(!Seek(length, newPosition))
-    return false;
+	return false;
   if(newPosition != length)
-    return false;
+	return false;
   return SetEndOfFile();
 }
 

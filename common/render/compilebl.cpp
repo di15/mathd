@@ -1,5 +1,4 @@
 
-
 #include "compilebl.h"
 #include "../utils.h"
 #include "../platform.h"
@@ -104,8 +103,8 @@ Vec2i TileTimes(VertexArray* va)
 void Resample(LoadedTex* original, LoadedTex* empty, Vec2i newdim)
 {
 #ifdef COMPILEB_DEBUG
-		g_log<<"resample...?"<<endl;
-		g_log.flush();
+	g_log<<"resample...?"<<endl;
+	g_log.flush();
 #endif
 
 	if(original == NULL || original->data == NULL || original->sizeX <= 0 || original->sizeY <= 0)
@@ -355,16 +354,16 @@ void CompileBuilding(const char* fullfile, EdBuilding* bldg)
 		tr->ownindex = i;
 
 #ifdef COMPILEB_DEBUG
-	g_log<<"------"<<endl;
-	if(images[tr->diffindex])
-		g_log<<fulldiffusepath<<" ("<<images[tr->diffindex]->sizeX<<","<<images[tr->diffindex]->sizeY<<")"<<endl;
-	if(images[tr->specindex])
-		g_log<<fullspecularpath<<" ("<<images[tr->specindex]->sizeX<<","<<images[tr->specindex]->sizeY<<")"<<endl;
-	if(images[tr->normindex])
-		g_log<<fullnormalpath<<" ("<<images[tr->normindex]->sizeX<<","<<images[tr->normindex]->sizeY<<")"<<endl;
-	g_log<<i<<endl;
-	g_log<<"------"<<endl;
-	g_log.flush();
+		g_log<<"------"<<endl;
+		if(images[tr->diffindex])
+			g_log<<fulldiffusepath<<" ("<<images[tr->diffindex]->sizeX<<","<<images[tr->diffindex]->sizeY<<")"<<endl;
+		if(images[tr->specindex])
+			g_log<<fullspecularpath<<" ("<<images[tr->specindex]->sizeX<<","<<images[tr->specindex]->sizeY<<")"<<endl;
+		if(images[tr->normindex])
+			g_log<<fullnormalpath<<" ("<<images[tr->normindex]->sizeX<<","<<images[tr->normindex]->sizeY<<")"<<endl;
+		g_log<<i<<endl;
+		g_log<<"------"<<endl;
+		g_log.flush();
 #endif
 	}
 
@@ -413,8 +412,8 @@ void CompileBuilding(const char* fullfile, EdBuilding* bldg)
 			if(thisheight >= lastheight || nextadd < 0)
 			{
 #ifdef COMPILEB_DEBUG
-	g_log<<thisheight<<" >= "<<lastheight<<endl;
-	g_log.flush();
+				g_log<<thisheight<<" >= "<<lastheight<<endl;
+				g_log.flush();
 #endif
 
 				lastheight = thisheight;
@@ -486,8 +485,8 @@ void CompileBuilding(const char* fullfile, EdBuilding* bldg)
 			maxdim.y += lt->sizeY * tfi->tiletimes.y;
 
 #ifdef COMPILEB_DEBUG
-	g_log<<"\tfit1 to "<<fit.bounds[0].x<<","<<fit.bounds[0].y<<"->"<<fit.bounds[1].x<<","<<fit.bounds[1].y<<endl;
-	g_log.flush();
+			g_log<<"\tfit1 to "<<fit.bounds[0].x<<","<<fit.bounds[0].y<<"->"<<fit.bounds[1].x<<","<<fit.bounds[1].y<<endl;
+			g_log.flush();
 #endif
 
 			continue;
@@ -537,8 +536,8 @@ void CompileBuilding(const char* fullfile, EdBuilding* bldg)
 			rows.push_back(row);
 
 #ifdef COMPILEB_DEBUG
-	g_log<<"\tfit2 to "<<fit.bounds[0].x<<","<<fit.bounds[0].y<<"->"<<fit.bounds[1].x<<","<<fit.bounds[1].y<<endl;
-	g_log.flush();
+			g_log<<"\tfit2 to "<<fit.bounds[0].x<<","<<fit.bounds[0].y<<"->"<<fit.bounds[1].x<<","<<fit.bounds[1].y<<endl;
+			g_log.flush();
 #endif
 
 			continue;
@@ -561,8 +560,8 @@ void CompileBuilding(const char* fullfile, EdBuilding* bldg)
 			maxdim.x = addto->bounds[1].x;
 
 #ifdef COMPILEB_DEBUG
-	g_log<<"\tfit3 to "<<fit.bounds[0].x<<","<<fit.bounds[0].y<<"->"<<fit.bounds[1].x<<","<<fit.bounds[1].y<<endl;
-	g_log.flush();
+		g_log<<"\tfit3 to "<<fit.bounds[0].x<<","<<fit.bounds[0].y<<"->"<<fit.bounds[1].x<<","<<fit.bounds[1].y<<endl;
+		g_log.flush();
 #endif
 	}
 
@@ -674,8 +673,8 @@ void CompileBuilding(const char* fullfile, EdBuilding* bldg)
 			tfi->bounds[1] = f->bounds[2];
 
 #ifdef COMPILEB_DEBUG
-	g_log<<"compile 7b1"<<endl;
-	g_log.flush();
+			g_log<<"compile 7b1"<<endl;
+			g_log.flush();
 #endif
 
 			for(int x=0; x<tfi->tiletimes.x; x++)
@@ -686,8 +685,8 @@ void CompileBuilding(const char* fullfile, EdBuilding* bldg)
 					newpos.y = f->bounds[0].y * scaley + y * tfi->newdim.y;
 
 #ifdef COMPILEB_DEBUG
-			g_log<<"compile 7b2 to "<<newpos.x<<","<<newpos.y<<endl;
-			g_log.flush();
+					g_log<<"compile 7b2 to "<<newpos.x<<","<<newpos.y<<endl;
+					g_log.flush();
 #endif
 
 					Blit( &resizedimages[ tr->diffindex ], &finaldiff, newpos );
@@ -696,8 +695,8 @@ void CompileBuilding(const char* fullfile, EdBuilding* bldg)
 					Blit( &resizedimages[ tr->ownindex ], &finalown, newpos );
 				}
 #ifdef COMPILEB_DEBUG
-	g_log<<"compile 7b3"<<endl;
-	g_log.flush();
+			g_log<<"compile 7b3"<<endl;
+			g_log.flush();
 #endif
 		}
 	}
@@ -711,8 +710,8 @@ void CompileBuilding(const char* fullfile, EdBuilding* bldg)
 	{
 
 #ifdef COMPILEB_DEBUG
-	g_log<<"compile 7c free image "<<i<<endl;
-	g_log.flush();
+		g_log<<"compile 7c free image "<<i<<endl;
+		g_log.flush();
 #endif
 
 		if(resizedimages[i].data)
@@ -850,10 +849,10 @@ void CompileBuilding(const char* fullfile, EdBuilding* bldg)
 
 #ifdef COMPILEB_DEBUG
 				if(fullva.texcoords[vindex + 0].x > 1.0f || fullva.texcoords[vindex + 0].y > 1.0f
-					//||
-					//fullva.texcoords[vindex + 1].x > 1.0f || fullva.texcoords[vindex + 1].y > 1.0f ||
-					//fullva.texcoords[vindex + 2].x > 1.0f || fullva.texcoords[vindex + 2].y > 1.0f
-					)
+						//||
+						//fullva.texcoords[vindex + 1].x > 1.0f || fullva.texcoords[vindex + 1].y > 1.0f ||
+						//fullva.texcoords[vindex + 2].x > 1.0f || fullva.texcoords[vindex + 2].y > 1.0f
+				  )
 				{
 
 					g_log<<"------tc "<<vindex<<"-------"<<endl;
@@ -867,9 +866,9 @@ void CompileBuilding(const char* fullfile, EdBuilding* bldg)
 					g_log<<"rangev = "<<rangev<<endl;
 					g_log<<"tiles times "<<tfi->tiletimes.x<<"x"<<tfi->tiletimes.y<<endl;
 					g_log<<"resized fit to region"\
-						" (pixels "<<tfi->bounds[0].x*scalex<<","<<tfi->bounds[0].y*scaley<<")->(pixels "<<tfi->bounds[1].x*scalex<<","<<tfi->bounds[1].y*scaley<<")"\
-						" i.e. (ratio "<<(float)tfi->bounds[0].x / (float)maxdim.x<<","<<(float)tfi->bounds[0].y / (float)maxdim.y<<")->(pixels "<<(tfi->newdim.x * tfi->tiletimes.x + tfi->bounds[0].x*scalex)<<","<<(tfi->newdim.y * tfi->tiletimes.y + tfi->bounds[0].y*scaley)<<")"\
-						" in image (0,0)->("<<finaldim.x<<","<<finaldim.y<<")"<<endl;
+						 " (pixels "<<tfi->bounds[0].x*scalex<<","<<tfi->bounds[0].y*scaley<<")->(pixels "<<tfi->bounds[1].x*scalex<<","<<tfi->bounds[1].y*scaley<<")"\
+						 " i.e. (ratio "<<(float)tfi->bounds[0].x / (float)maxdim.x<<","<<(float)tfi->bounds[0].y / (float)maxdim.y<<")->(pixels "<<(tfi->newdim.x * tfi->tiletimes.x + tfi->bounds[0].x*scalex)<<","<<(tfi->newdim.y * tfi->tiletimes.y + tfi->bounds[0].y*scaley)<<")"\
+						 " in image (0,0)->("<<finaldim.x<<","<<finaldim.y<<")"<<endl;
 					//g_log<<"offu,v = "<<offu<<","<<offv<<endl;
 					//g_log<<"tcleft,top = "<<tcleft<<","<<tctop<<endl;
 					//g_log<<"pixelsrangeu,v = "<<pixelsrangeu<<","<<pixelsrangev<<endl;

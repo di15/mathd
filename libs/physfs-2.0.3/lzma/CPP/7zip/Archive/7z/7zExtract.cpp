@@ -25,27 +25,27 @@ struct CExtractFolderInfo
   CBoolVector ExtractStatuses;
   UInt64 UnPackSize;
   CExtractFolderInfo(
-    #ifdef _7Z_VOL
-    int volumeIndex, 
-    #endif
-    CNum fileIndex, CNum folderIndex): 
-    #ifdef _7Z_VOL
-    VolumeIndex(volumeIndex),
-    #endif
-    FileIndex(fileIndex),
-    FolderIndex(folderIndex), 
-    UnPackSize(0) 
+	#ifdef _7Z_VOL
+	int volumeIndex, 
+	#endif
+	CNum fileIndex, CNum folderIndex): 
+	#ifdef _7Z_VOL
+	VolumeIndex(volumeIndex),
+	#endif
+	FileIndex(fileIndex),
+	FolderIndex(folderIndex), 
+	UnPackSize(0) 
   {
-    if (fileIndex != kNumNoIndex)
-    {
-      ExtractStatuses.Reserve(1);
-      ExtractStatuses.Add(true);
-    }
+	if (fileIndex != kNumNoIndex)
+	{
+	  ExtractStatuses.Reserve(1);
+	  ExtractStatuses.Add(true);
+	}
   };
 };
 
 STDMETHODIMP CHandler::Extract(const UInt32* indices, UInt32 numItems,
-    Int32 testModeSpec, IArchiveExtractCallback *extractCallbackSpec)
+	Int32 testModeSpec, IArchiveExtractCallback *extractCallbackSpec)
 {
   COM_TRY_BEGIN
   bool testMode = (testModeSpec != 0);
@@ -54,19 +54,19 @@ STDMETHODIMP CHandler::Extract(const UInt32* indices, UInt32 numItems,
 
   bool allFilesMode = (numItems == UInt32(-1));
   if (allFilesMode)
-    numItems = 
-    #ifdef _7Z_VOL
-    _refs.Size();
-    #else
-    _database.Files.Size();
-    #endif
+	numItems = 
+	#ifdef _7Z_VOL
+	_refs.Size();
+	#else
+	_database.Files.Size();
+	#endif
 
   if(numItems == 0)
-    return S_OK;
+	return S_OK;
 
   /*
   if(_volumes.Size() != 1)
-    return E_FAIL;
+	return E_FAIL;
   const CVolume &volume = _volumes.Front();
   const CArchiveDatabaseEx &_database = volume.Database;
   IInStream *_inStream = volume.Stream;
@@ -75,78 +75,78 @@ STDMETHODIMP CHandler::Extract(const UInt32* indices, UInt32 numItems,
   CObjectVector<CExtractFolderInfo> extractFolderInfoVector;
   for(UInt32 ii = 0; ii < numItems; ii++)
   {
-    // UInt32 fileIndex = allFilesMode ? indexIndex : indices[indexIndex];
-    UInt32 ref2Index = allFilesMode ? ii : indices[ii];
-    // const CRef2 &ref2 = _refs[ref2Index];
+	// UInt32 fileIndex = allFilesMode ? indexIndex : indices[indexIndex];
+	UInt32 ref2Index = allFilesMode ? ii : indices[ii];
+	// const CRef2 &ref2 = _refs[ref2Index];
 
-    // for(UInt32 ri = 0; ri < ref2.Refs.Size(); ri++)
-    {
-      #ifdef _7Z_VOL
-      // const CRef &ref = ref2.Refs[ri];
-      const CRef &ref = _refs[ref2Index];
+	// for(UInt32 ri = 0; ri < ref2.Refs.Size(); ri++)
+	{
+	  #ifdef _7Z_VOL
+	  // const CRef &ref = ref2.Refs[ri];
+	  const CRef &ref = _refs[ref2Index];
 
-      int volumeIndex = ref.VolumeIndex;
-      const CVolume &volume = _volumes[volumeIndex];
-      const CArchiveDatabaseEx &database = volume.Database;
-      UInt32 fileIndex = ref.ItemIndex;
-      #else
-      const CArchiveDatabaseEx &database = _database;
-      UInt32 fileIndex = ref2Index;
-      #endif
+	  int volumeIndex = ref.VolumeIndex;
+	  const CVolume &volume = _volumes[volumeIndex];
+	  const CArchiveDatabaseEx &database = volume.Database;
+	  UInt32 fileIndex = ref.ItemIndex;
+	  #else
+	  const CArchiveDatabaseEx &database = _database;
+	  UInt32 fileIndex = ref2Index;
+	  #endif
 
-      CNum folderIndex = database.FileIndexToFolderIndexMap[fileIndex];
-      if (folderIndex == kNumNoIndex)
-      {
-        extractFolderInfoVector.Add(CExtractFolderInfo(
-            #ifdef _7Z_VOL
-            volumeIndex, 
-            #endif
-            fileIndex, kNumNoIndex));
-        continue;
-      }
-      if (extractFolderInfoVector.IsEmpty() || 
-        folderIndex != extractFolderInfoVector.Back().FolderIndex 
-        #ifdef _7Z_VOL
-        || volumeIndex != extractFolderInfoVector.Back().VolumeIndex
-        #endif
-        )
-      {
-        extractFolderInfoVector.Add(CExtractFolderInfo(
-            #ifdef _7Z_VOL
-            volumeIndex, 
-            #endif
-            kNumNoIndex, folderIndex));
-        const CFolder &folderInfo = database.Folders[folderIndex];
-        UInt64 unPackSize = folderInfo.GetUnPackSize();
-        importantTotalUnPacked += unPackSize;
-        extractFolderInfoVector.Back().UnPackSize = unPackSize;
-      }
-      
-      CExtractFolderInfo &efi = extractFolderInfoVector.Back();
-      
-      // const CFolderInfo &folderInfo = m_dam_Folders[folderIndex];
-      CNum startIndex = database.FolderStartFileIndex[folderIndex];
-      for (CNum index = efi.ExtractStatuses.Size();
-          index <= fileIndex - startIndex; index++)
-      {
-        // UInt64 unPackSize = _database.Files[startIndex + index].UnPackSize;
-        // Count partial_folder_size
-        // efi.UnPackSize += unPackSize;
-        // importantTotalUnPacked += unPackSize;
-        efi.ExtractStatuses.Add(index == fileIndex - startIndex);
-      }
-    }
+	  CNum folderIndex = database.FileIndexToFolderIndexMap[fileIndex];
+	  if (folderIndex == kNumNoIndex)
+	  {
+		extractFolderInfoVector.Add(CExtractFolderInfo(
+			#ifdef _7Z_VOL
+			volumeIndex, 
+			#endif
+			fileIndex, kNumNoIndex));
+		continue;
+	  }
+	  if (extractFolderInfoVector.IsEmpty() || 
+		folderIndex != extractFolderInfoVector.Back().FolderIndex 
+		#ifdef _7Z_VOL
+		|| volumeIndex != extractFolderInfoVector.Back().VolumeIndex
+		#endif
+		)
+	  {
+		extractFolderInfoVector.Add(CExtractFolderInfo(
+			#ifdef _7Z_VOL
+			volumeIndex, 
+			#endif
+			kNumNoIndex, folderIndex));
+		const CFolder &folderInfo = database.Folders[folderIndex];
+		UInt64 unPackSize = folderInfo.GetUnPackSize();
+		importantTotalUnPacked += unPackSize;
+		extractFolderInfoVector.Back().UnPackSize = unPackSize;
+	  }
+	  
+	  CExtractFolderInfo &efi = extractFolderInfoVector.Back();
+	  
+	  // const CFolderInfo &folderInfo = m_dam_Folders[folderIndex];
+	  CNum startIndex = database.FolderStartFileIndex[folderIndex];
+	  for (CNum index = efi.ExtractStatuses.Size();
+		  index <= fileIndex - startIndex; index++)
+	  {
+		// UInt64 unPackSize = _database.Files[startIndex + index].UnPackSize;
+		// Count partial_folder_size
+		// efi.UnPackSize += unPackSize;
+		// importantTotalUnPacked += unPackSize;
+		efi.ExtractStatuses.Add(index == fileIndex - startIndex);
+	  }
+	}
   }
 
   extractCallback->SetTotal(importantTotalUnPacked);
 
   CDecoder decoder(
-    #ifdef _ST_MODE
-    false
-    #else
-    true
-    #endif
-    );
+	#ifdef _ST_MODE
+	false
+	#else
+	true
+	#endif
+	);
   // CDecoder1 decoder;
 
   UInt64 currentTotalPacked = 0;
@@ -159,108 +159,108 @@ STDMETHODIMP CHandler::Extract(const UInt32* indices, UInt32 numItems,
   lps->Init(extractCallback, false);
 
   for(int i = 0; i < extractFolderInfoVector.Size(); i++, 
-      currentTotalUnPacked += totalFolderUnPacked,
-      currentTotalPacked += totalFolderPacked)
+	  currentTotalUnPacked += totalFolderUnPacked,
+	  currentTotalPacked += totalFolderPacked)
   {
-    lps->OutSize = currentTotalUnPacked;
-    lps->InSize = currentTotalPacked;
-    RINOK(lps->SetCur());
-    
-    const CExtractFolderInfo &efi = extractFolderInfoVector[i];
-    totalFolderUnPacked = efi.UnPackSize;
+	lps->OutSize = currentTotalUnPacked;
+	lps->InSize = currentTotalPacked;
+	RINOK(lps->SetCur());
+	
+	const CExtractFolderInfo &efi = extractFolderInfoVector[i];
+	totalFolderUnPacked = efi.UnPackSize;
 
-    totalFolderPacked = 0;
+	totalFolderPacked = 0;
 
-    CFolderOutStream *folderOutStream = new CFolderOutStream;
-    CMyComPtr<ISequentialOutStream> outStream(folderOutStream);
+	CFolderOutStream *folderOutStream = new CFolderOutStream;
+	CMyComPtr<ISequentialOutStream> outStream(folderOutStream);
 
-    #ifdef _7Z_VOL
-    const CVolume &volume = _volumes[efi.VolumeIndex];
-    const CArchiveDatabaseEx &database = volume.Database;
-    #else
-    const CArchiveDatabaseEx &database = _database;
-    #endif
+	#ifdef _7Z_VOL
+	const CVolume &volume = _volumes[efi.VolumeIndex];
+	const CArchiveDatabaseEx &database = volume.Database;
+	#else
+	const CArchiveDatabaseEx &database = _database;
+	#endif
 
-    CNum startIndex;
-    if (efi.FileIndex != kNumNoIndex)
-      startIndex = efi.FileIndex;
-    else
-      startIndex = database.FolderStartFileIndex[efi.FolderIndex];
+	CNum startIndex;
+	if (efi.FileIndex != kNumNoIndex)
+	  startIndex = efi.FileIndex;
+	else
+	  startIndex = database.FolderStartFileIndex[efi.FolderIndex];
 
 
-    HRESULT result = folderOutStream->Init(&database, 
-        #ifdef _7Z_VOL
-        volume.StartRef2Index, 
-        #else
-        0,
-        #endif
-        startIndex, 
-        &efi.ExtractStatuses, extractCallback, testMode, _crcSize != 0);
+	HRESULT result = folderOutStream->Init(&database, 
+		#ifdef _7Z_VOL
+		volume.StartRef2Index, 
+		#else
+		0,
+		#endif
+		startIndex, 
+		&efi.ExtractStatuses, extractCallback, testMode, _crcSize != 0);
 
-    RINOK(result);
+	RINOK(result);
 
-    if (efi.FileIndex != kNumNoIndex)
-      continue;
+	if (efi.FileIndex != kNumNoIndex)
+	  continue;
 
-    CNum folderIndex = efi.FolderIndex;
-    const CFolder &folderInfo = database.Folders[folderIndex];
+	CNum folderIndex = efi.FolderIndex;
+	const CFolder &folderInfo = database.Folders[folderIndex];
 
-    totalFolderPacked = _database.GetFolderFullPackSize(folderIndex);
+	totalFolderPacked = _database.GetFolderFullPackSize(folderIndex);
 
-    CNum packStreamIndex = database.FolderStartPackStreamIndex[folderIndex];
-    UInt64 folderStartPackPos = database.GetFolderStreamPos(folderIndex, 0);
+	CNum packStreamIndex = database.FolderStartPackStreamIndex[folderIndex];
+	UInt64 folderStartPackPos = database.GetFolderStreamPos(folderIndex, 0);
 
-    #ifndef _NO_CRYPTO
-    CMyComPtr<ICryptoGetTextPassword> getTextPassword;
-    if (extractCallback)
-      extractCallback.QueryInterface(IID_ICryptoGetTextPassword, &getTextPassword);
-    #endif
+	#ifndef _NO_CRYPTO
+	CMyComPtr<ICryptoGetTextPassword> getTextPassword;
+	if (extractCallback)
+	  extractCallback.QueryInterface(IID_ICryptoGetTextPassword, &getTextPassword);
+	#endif
 
-    try
-    {
-      HRESULT result = decoder.Decode(
-          EXTERNAL_CODECS_VARS
-          #ifdef _7Z_VOL
-          volume.Stream,
-          #else
-          _inStream,
-          #endif
-          folderStartPackPos, 
-          &database.PackSizes[packStreamIndex],
-          folderInfo,
-          outStream,
-          progress
-          #ifndef _NO_CRYPTO
-          , getTextPassword
-          #endif
-          #ifdef COMPRESS_MT
-          , true, _numThreads
-          #endif
-          );
+	try
+	{
+	  HRESULT result = decoder.Decode(
+		  EXTERNAL_CODECS_VARS
+		  #ifdef _7Z_VOL
+		  volume.Stream,
+		  #else
+		  _inStream,
+		  #endif
+		  folderStartPackPos, 
+		  &database.PackSizes[packStreamIndex],
+		  folderInfo,
+		  outStream,
+		  progress
+		  #ifndef _NO_CRYPTO
+		  , getTextPassword
+		  #endif
+		  #ifdef COMPRESS_MT
+		  , true, _numThreads
+		  #endif
+		  );
 
-      if (result == S_FALSE)
-      {
-        RINOK(folderOutStream->FlushCorrupted(NArchive::NExtract::NOperationResult::kDataError));
-        continue;
-      }
-      if (result == E_NOTIMPL)
-      {
-        RINOK(folderOutStream->FlushCorrupted(NArchive::NExtract::NOperationResult::kUnSupportedMethod));
-        continue;
-      }
-      if (result != S_OK)
-        return result;
-      if (folderOutStream->WasWritingFinished() != S_OK)
-      {
-        RINOK(folderOutStream->FlushCorrupted(NArchive::NExtract::NOperationResult::kDataError));
-        continue;
-      }
-    }
-    catch(...)
-    {
-      RINOK(folderOutStream->FlushCorrupted(NArchive::NExtract::NOperationResult::kDataError));
-      continue;
-    }
+	  if (result == S_FALSE)
+	  {
+		RINOK(folderOutStream->FlushCorrupted(NArchive::NExtract::NOperationResult::kDataError));
+		continue;
+	  }
+	  if (result == E_NOTIMPL)
+	  {
+		RINOK(folderOutStream->FlushCorrupted(NArchive::NExtract::NOperationResult::kUnSupportedMethod));
+		continue;
+	  }
+	  if (result != S_OK)
+		return result;
+	  if (folderOutStream->WasWritingFinished() != S_OK)
+	  {
+		RINOK(folderOutStream->FlushCorrupted(NArchive::NExtract::NOperationResult::kDataError));
+		continue;
+	  }
+	}
+	catch(...)
+	{
+	  RINOK(folderOutStream->FlushCorrupted(NArchive::NExtract::NOperationResult::kDataError));
+	  continue;
+	}
   }
   return S_OK;
   COM_TRY_END

@@ -1,5 +1,4 @@
 
-
 #include "unicode.h"
 #include "../utils.h"
 
@@ -51,7 +50,8 @@ int main(int argc, char *argv[])
 		dump_unicode_string(unicode);
 		//      dump_unicode(buff, x);
 	}
-	else {
+	else
+	{
 		ERR("Invalid UTF-8 strings.");
 	}
 	//  printf("%s",buff);
@@ -90,19 +90,22 @@ int UTF8Len(unsigned char ch)
 	{
 		l = 4;
 	}
-	else {
+	else
+	{
 		c >>= 1;
 		if (c == 0xe)
 		{
 			l = 3;
 		}
-		else {
+		else
+		{
 			c >>= 1;
 			if (c == 0x6)
 			{
 				l = 2;
 			}
-			else {
+			else
+			{
 				l = 1;
 			}
 		}

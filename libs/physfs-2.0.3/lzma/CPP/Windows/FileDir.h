@@ -45,13 +45,13 @@ bool RemoveDirectoryWithSubItems(const UString &path);
 bool MyGetShortPathName(LPCTSTR longPath, CSysString &shortPath);
 
 bool MyGetFullPathName(LPCTSTR fileName, CSysString &resultPath, 
-    int &fileNamePartStartIndex);
+	int &fileNamePartStartIndex);
 bool MyGetFullPathName(LPCTSTR fileName, CSysString &resultPath);
 bool GetOnlyName(LPCTSTR fileName, CSysString &resultName);
 bool GetOnlyDirPrefix(LPCTSTR fileName, CSysString &resultName);
 #ifndef _UNICODE
 bool MyGetFullPathName(LPCWSTR fileName, UString &resultPath, 
-    int &fileNamePartStartIndex);
+	int &fileNamePartStartIndex);
 bool MyGetFullPathName(LPCWSTR fileName, UString &resultPath);
 bool GetOnlyName(LPCWSTR fileName, UString &resultName);
 bool GetOnlyDirPrefix(LPCWSTR fileName, UString &resultName);
@@ -142,10 +142,10 @@ public:
   bool Create(LPCTSTR prefix) ;
   bool Remove()
   {
-    if (!_mustBeDeleted)
-      return true;
-    _mustBeDeleted = !RemoveDirectoryWithSubItems(_tempDir);
-    return (!_mustBeDeleted);
+	if (!_mustBeDeleted)
+	  return true;
+	_mustBeDeleted = !RemoveDirectoryWithSubItems(_tempDir);
+	return (!_mustBeDeleted);
   }
   void DisableDeleting() { _mustBeDeleted = false; }
 };
@@ -164,10 +164,10 @@ public:
   bool Create(LPCWSTR prefix) ;
   bool Remove()
   {
-    if (!_mustBeDeleted)
-      return true;
-    _mustBeDeleted = !RemoveDirectoryWithSubItems(_tempDir);
-    return (!_mustBeDeleted);
+	if (!_mustBeDeleted)
+	  return true;
+	_mustBeDeleted = !RemoveDirectoryWithSubItems(_tempDir);
+	return (!_mustBeDeleted);
   }
   void DisableDeleting() { _mustBeDeleted = false; }
 };

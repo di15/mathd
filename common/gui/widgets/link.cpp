@@ -1,6 +1,5 @@
 
 
-
 #include "../widget.h"
 #include "barbutton.h"
 #include "button.h"
@@ -48,7 +47,7 @@ void Link::draw()
 
 void Link::inev(InEv* ev)
 {
-	Player* py = &g_player[g_currP];
+	Player* py = &g_player[g_curP];
 
 	if(ev->type == INEV_MOUSEUP && ev->key == MOUSE_LEFT && !ev->intercepted)
 	{
@@ -65,7 +64,7 @@ void Link::inev(InEv* ev)
 			ev->intercepted = true;
 			return;	// intercept mouse event
 		}
-		
+
 		m_over = false;
 		m_ldown = false;
 	}
@@ -83,9 +82,9 @@ void Link::inev(InEv* ev)
 	else if(ev->type == INEV_MOUSEMOVE)
 	{
 		int texlen = m_text.texlen();
-		if(py->mouse.x >= m_pos[0] && py->mouse.y >= m_pos[1] && 
-			py->mouse.x <= m_pos[0]+texlen*g_font[m_font].gheight/2 && 
-			py->mouse.y <= m_pos[1]+g_font[m_font].gheight)
+		if(py->mouse.x >= m_pos[0] && py->mouse.y >= m_pos[1] &&
+				py->mouse.x <= m_pos[0]+texlen*g_font[m_font].gheight/2 &&
+				py->mouse.y <= m_pos[1]+g_font[m_font].gheight)
 		{
 		}
 		else
@@ -95,12 +94,12 @@ void Link::inev(InEv* ev)
 
 		if(!ev->intercepted)
 		{
-			if(py->mouse.x >= m_pos[0] && py->mouse.y >= m_pos[1] && 
-				py->mouse.x <= m_pos[0]+texlen*g_font[m_font].gheight/2 && 
-				py->mouse.y <= m_pos[1]+g_font[m_font].gheight)
+			if(py->mouse.x >= m_pos[0] && py->mouse.y >= m_pos[1] &&
+					py->mouse.x <= m_pos[0]+texlen*g_font[m_font].gheight/2 &&
+					py->mouse.y <= m_pos[1]+g_font[m_font].gheight)
 			{
 				m_over = true;
-				
+
 				ev->intercepted = true;
 			}
 			else

@@ -1,5 +1,4 @@
 
-
 #ifndef RESTICKER_H
 #define RESTICKER_H
 

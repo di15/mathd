@@ -11,11 +11,11 @@
   freely, subject to the following restrictions:
 
   1. The origin of this software must not be misrepresented; you must not
-     claim that you wrote the original software. If you use this software
-     in a product, an acknowledgment in the product documentation would be
-     appreciated but is not required.
+	 claim that you wrote the original software. If you use this software
+	 in a product, an acknowledgment in the product documentation would be
+	 appreciated but is not required.
   2. Altered source versions must be plainly marked as such, and must not be
-     misrepresented as being the original software.
+	 misrepresented as being the original software.
   3. This notice may not be removed or altered from any source distribution.
 */
 #include "SDL_config.h"
@@ -27,27 +27,27 @@
 
 struct SDL_GLDriverData
 {
-    SDL_bool HAS_WGL_ARB_pixel_format;
-    SDL_bool HAS_WGL_EXT_swap_control_tear;
+	SDL_bool HAS_WGL_ARB_pixel_format;
+	SDL_bool HAS_WGL_EXT_swap_control_tear;
 
-    void *(WINAPI * wglGetProcAddress) (const char *proc);
-      HGLRC(WINAPI * wglCreateContext) (HDC hdc);
-      BOOL(WINAPI * wglDeleteContext) (HGLRC hglrc);
-      BOOL(WINAPI * wglMakeCurrent) (HDC hdc, HGLRC hglrc);
-      BOOL(WINAPI * wglShareLists) (HGLRC hglrc1, HGLRC hglrc2);
-      BOOL(WINAPI * wglChoosePixelFormatARB) (HDC hdc,
-                                              const int *piAttribIList,
-                                              const FLOAT * pfAttribFList,
-                                              UINT nMaxFormats,
-                                              int *piFormats,
-                                              UINT * nNumFormats);
-      BOOL(WINAPI * wglGetPixelFormatAttribivARB) (HDC hdc, int iPixelFormat,
-                                                   int iLayerPlane,
-                                                   UINT nAttributes,
-                                                   const int *piAttributes,
-                                                   int *piValues);
-    BOOL (WINAPI * wglSwapIntervalEXT) (int interval);
-    int (WINAPI * wglGetSwapIntervalEXT) (void);
+	void *(WINAPI * wglGetProcAddress) (const char *proc);
+	  HGLRC(WINAPI * wglCreateContext) (HDC hdc);
+	  BOOL(WINAPI * wglDeleteContext) (HGLRC hglrc);
+	  BOOL(WINAPI * wglMakeCurrent) (HDC hdc, HGLRC hglrc);
+	  BOOL(WINAPI * wglShareLists) (HGLRC hglrc1, HGLRC hglrc2);
+	  BOOL(WINAPI * wglChoosePixelFormatARB) (HDC hdc,
+											  const int *piAttribIList,
+											  const FLOAT * pfAttribFList,
+											  UINT nMaxFormats,
+											  int *piFormats,
+											  UINT * nNumFormats);
+	  BOOL(WINAPI * wglGetPixelFormatAttribivARB) (HDC hdc, int iPixelFormat,
+												   int iLayerPlane,
+												   UINT nAttributes,
+												   const int *piAttributes,
+												   int *piValues);
+	BOOL (WINAPI * wglSwapIntervalEXT) (int interval);
+	int (WINAPI * wglGetSwapIntervalEXT) (void);
 };
 
 /* OpenGL functions */
@@ -57,7 +57,7 @@ extern void WIN_GL_UnloadLibrary(_THIS);
 extern int WIN_GL_SetupWindow(_THIS, SDL_Window * window);
 extern SDL_GLContext WIN_GL_CreateContext(_THIS, SDL_Window * window);
 extern int WIN_GL_MakeCurrent(_THIS, SDL_Window * window,
-                              SDL_GLContext context);
+							  SDL_GLContext context);
 extern int WIN_GL_SetSwapInterval(_THIS, int interval);
 extern int WIN_GL_GetSwapInterval(_THIS);
 extern void WIN_GL_SwapWindow(_THIS, SDL_Window * window);

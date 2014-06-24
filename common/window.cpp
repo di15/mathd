@@ -1,4 +1,3 @@
-
 #include "window.h"
 #include "texture.h"
 #include "render/shader.h"
@@ -82,7 +81,7 @@ void Resize(int width, int height)
 
 	glViewport(0, 0, width, height);
 
-	Player* py = &g_player[g_currP];
+	Player* py = &g_player[g_curP];
 	GUI* gui = &py->gui;
 
 	if(py->width != width || py->height != height)
@@ -91,8 +90,8 @@ void Resize(int width, int height)
 		py->height = height;
 
 		//if(g_fullscreen)
-			//Reload();
-			//loadtex();
+		//Reload();
+		//loadtex();
 		gui->reframe();
 	}
 }
@@ -104,14 +103,14 @@ void CalcDrawRate()
 	static unsigned int lasttime;
 
 	// Get the current time in seconds
-    unsigned int currtime = timeGetTime();
+	unsigned int currtime = timeGetTime();
 
 	// We added a small value to the frame interval to account for some video
 	// cards (Radeon's) with fast computers falling through the floor without it.
 
 	// Here we store the elapsed time between the current and last frame,
 	// then keep the current frame in our static variable for the next frame.
- 	g_drawfrinterval = (currtime - frametime) / 1000.0f;	// + 0.005f;
+	g_drawfrinterval = (currtime - frametime) / 1000.0f;	// + 0.005f;
 
 	//g_instantdrawfps = 1.0f / (g_currentTime - frameTime);
 	//g_instantdrawfps = 1.0f / g_drawfrinterval;
@@ -119,20 +118,20 @@ void CalcDrawRate()
 	frametime = currtime;
 
 	// Increase the frame counter
-    ++framecounter;
+	++framecounter;
 
 	// Now we want to subtract the current time by the last time that was stored
 	// to see if the time elapsed has been over a second, which means we found our FPS.
-    if( currtime - lasttime > 1000 )
+	if( currtime - lasttime > 1000 )
 	{
 		g_instantdrawfps = framecounter;
 
 		// Here we set the lastTime to the currentTime
-	    lasttime = currtime;
+		lasttime = currtime;
 
 		// Reset the frames per second
-        framecounter = 0;
-    }
+		framecounter = 0;
+	}
 }
 
 bool DrawNextFrame(int desiredFrameRate)
@@ -230,12 +229,12 @@ void DestroyWindow(const char* title)
 	FreeTextures();
 	ReleaseShaders();
 
-    // Close and destroy the window
+	// Close and destroy the window
 	SDL_GL_DeleteContext(g_glcontext);
 #if 0
-    SDL_DestroyRenderer(g_renderer);
+	SDL_DestroyRenderer(g_renderer);
 #endif
-    SDL_DestroyWindow(g_window);
+	SDL_DestroyWindow(g_window);
 }
 
 bool MakeWindow(const char* title)
@@ -289,34 +288,36 @@ bool MakeWindow(const char* title)
 	}
 
 	// Create an application window with the following settings:
-    g_window = SDL_CreateWindow(
-        title,                  // window title
-        startx,           // initial x position
-        starty,           // initial y position
-        g_selectedRes.width,                               // width, in pixels
-        g_selectedRes.height,                               // height, in pixels
-        flags                  // flags - see below
-    );
+	g_window = SDL_CreateWindow(
+				   title,                  // window title
+				   startx,           // initial x position
+				   starty,           // initial y position
+				   g_selectedRes.width,                               // width, in pixels
+				   g_selectedRes.height,                               // height, in pixels
+				   flags                  // flags - see below
+			   );
 
-    // Check that the window was successfully made
-    if (g_window == NULL) {
-        // In the event that the window could not be made...
+	// Check that the window was successfully made
+	if (g_window == NULL)
+	{
+		// In the event that the window could not be made...
 		char msg[256];
-        sprintf(msg, "Could not create window: %s\n", SDL_GetError());
+		sprintf(msg, "Could not create window: %s\n", SDL_GetError());
 		ErrorMessage("Error", msg);
-        return false;
-    }
+		return false;
+	}
 
 #if 0
 	g_renderer = SDL_CreateRenderer(g_window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
 
-	if (g_renderer == NULL) {
-        // In the event that the window could not be made...
+	if (g_renderer == NULL)
+	{
+		// In the event that the window could not be made...
 		char msg[256];
-        sprintf(msg, "Could not create renderer: %s\n", SDL_GetError());
+		sprintf(msg, "Could not create renderer: %s\n", SDL_GetError());
 		ErrorMessage("Error", msg);
-        return false;
-    }
+		return false;
+	}
 #endif
 	//SDL_GL_SetSwapInterval(0);
 

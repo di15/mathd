@@ -11,11 +11,11 @@
   freely, subject to the following restrictions:
 
   1. The origin of this software must not be misrepresented; you must not
-     claim that you wrote the original software. If you use this software
-     in a product, an acknowledgment in the product documentation would be
-     appreciated but is not required.
+	 claim that you wrote the original software. If you use this software
+	 in a product, an acknowledgment in the product documentation would be
+	 appreciated but is not required.
   2. Altered source versions must be plainly marked as such, and must not be
-     misrepresented as being the original software.
+	 misrepresented as being the original software.
   3. This notice may not be removed or altered from any source distribution.
 */
 
@@ -46,10 +46,10 @@ extern "C" {
  */
 typedef struct SDL_Keysym
 {
-    SDL_Scancode scancode;      /**< SDL physical key code - see ::SDL_Scancode for details */
-    SDL_Keycode sym;            /**< SDL virtual key code - see ::SDL_Keycode for details */
-    Uint16 mod;                 /**< current key modifiers */
-    Uint32 unused;
+	SDL_Scancode scancode;      /**< SDL physical key code - see ::SDL_Scancode for details */
+	SDL_Keycode sym;            /**< SDL virtual key code - see ::SDL_Keycode for details */
+	Uint16 mod;                 /**< current key modifiers */
+	Uint32 unused;
 } SDL_Keysym;
 
 /* Function prototypes */

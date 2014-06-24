@@ -67,17 +67,21 @@ void OSHeapManager::SimpleStats::registerAlloc(OS_U32 used_size, OS_U32 data_siz
 	this->data_size += data_size;
 
 #ifdef OS_DEBUG
-	if(max_used_size < this->used_size){
+	if(max_used_size < this->used_size)
+	{
 		max_used_size = this->used_size;
 	}
-	if(max_data_size < this->data_size){
+	if(max_data_size < this->data_size)
+	{
 		max_data_size = this->data_size;
 	}
 
-	if(min_block_data_size > data_size){
+	if(min_block_data_size > data_size)
+	{
 		min_block_data_size = data_size;
 	}
-	if(max_block_data_size < data_size){
+	if(max_block_data_size < data_size)
+	{
 		max_block_data_size = data_size;
 	}
 #endif
@@ -108,7 +112,7 @@ OS_U32 OSHeapManager::SmallBlock::getSize() const
 }
 
 inline OS_U32 OSHeapManager::SmallBlock::getDataSize() const
-{ 
+{
 	return size_slot * ALIGN + ALIGN - sizeof(SmallBlock) - OS_DUMMY_ID_SIZE;
 }
 
@@ -151,14 +155,19 @@ void * OSHeapManager::allocSmall(OS_U32 size OS_DBG_FILEPOS_DECL)
 
 	SmallBlock * small_block;
 	FreeSmallBlock * first = free_small_blocks[i];
-	if(first){
+	if(first)
+	{
 		small_block = (SmallBlock*)first;
 		free_small_blocks[i] = first->next;
 		small_stats.hit_count++;
-	}else{
+	}
+	else
+	{
 		OS_U32 free_page_size = small_page->size - small_page_offs;
-		if(free_page_size < size){
-			if(free_page_size > ((ALIGN + ALIGN - 1 + sizeof(SmallBlock) + OS_DUMMY_ID_SIZE) & ~(ALIGN-1))){
+		if(free_page_size < size)
+		{
+			if(free_page_size > ((ALIGN + ALIGN - 1 + sizeof(SmallBlock) + OS_DUMMY_ID_SIZE) & ~(ALIGN-1)))
+			{
 				OS_U32 i = free_page_size / ALIGN - 1;
 				OS_ASSERT(i < SMALL_SLOT_COUNT);
 
@@ -175,7 +184,8 @@ void * OSHeapManager::allocSmall(OS_U32 size OS_DBG_FILEPOS_DECL)
 				free_small_blocks[i] = (FreeSmallBlock*)small_block;
 			}
 			SmallPage * new_small_page = (SmallPage*)STD_MALLOC(small_page_size);
-			if(!new_small_page){
+			if(!new_small_page)
+			{
 				return NULL;
 			}
 			new_small_page->size = small_page_size;
@@ -185,7 +195,9 @@ void * OSHeapManager::allocSmall(OS_U32 size OS_DBG_FILEPOS_DECL)
 
 			new_small_page->next = small_page;
 			small_page = new_small_page;
-		}else{
+		}
+		else
+		{
 			small_stats.hit_count++;
 		}
 		OS_ASSERT("Heap corrupted!" && (small_page_offs & 3) == 0);
@@ -348,12 +360,15 @@ void * OSHeapManager::allocMedium(OS_U32 size OS_DBG_FILEPOS_DECL)
 	OS_U32 saveSize = size;
 	size = (size + ALIGN - 1 + sizeof(Block) + OS_DUMMY_ID_SIZE) & ~(ALIGN - 1);
 	Block * block = dummy_free.next_free;
-	if(block->size < size){ // block == &dummy_free => dummy_free.size == 0
-		if(size > page_size / 2){
+	if(block->size < size)  // block == &dummy_free => dummy_free.size == 0
+	{
+		if(size > page_size / 2)
+		{
 			return allocLarge(saveSize OS_DBG_FILEPOS_PARAM);
 		}
 		block = (Block*)STD_MALLOC(page_size);
-		if(!block){
+		if(!block)
+		{
 			return NULL;
 		}
 #ifdef OS_DEBUG
@@ -367,10 +382,13 @@ void * OSHeapManager::allocMedium(OS_U32 size OS_DBG_FILEPOS_DECL)
 		((FreeBlock*)block)->insertBeforeFreeLink(dummy_free.next_free);
 
 		medium_stats.alloc_size += block->size;
-	}else{
+	}
+	else
+	{
 		medium_stats.hit_count++;
 #ifdef FIND_BEST_FREE_BLOCK
-		for(FreeBlock * next = ((FreeBlock*)block)->next_free; next->size >= size; ){
+		for(FreeBlock * next = ((FreeBlock*)block)->next_free; next->size >= size; )
+		{
 			block = next;
 			next = ((FreeBlock*)block)->next_free;
 		}
@@ -378,20 +396,24 @@ void * OSHeapManager::allocMedium(OS_U32 size OS_DBG_FILEPOS_DECL)
 	}
 
 	block->size -= size;
-	if(block->size < MAX_SMALL_SIZE && (block->size < MAX_SMALL_SIZE/2 || block->next->page != block->page)){
+	if(block->size < MAX_SMALL_SIZE && (block->size < MAX_SMALL_SIZE/2 || block->next->page != block->page))
+	{
 #ifdef OS_DEBUG
 		block->filename = dbg_filename;
 		block->line = dbg_line;
 #endif
 		block->size += size;
 		((FreeBlock*)block)->removeFreeLink();
-	}else{
+	}
+	else
+	{
 #ifdef OS_DEBUG
 		*(int*)(block+1) = DUMMY_MEDIUM_FREE_ID_PRE;
 		*(int*)((OS_BYTE*)(block+1) + block->getDataSize() + sizeof(int)) = DUMMY_MEDIUM_FREE_ID_POST;
 #endif
 
-		if(block->size < ((FreeBlock*)block)->next_free->size){
+		if(block->size < ((FreeBlock*)block)->next_free->size)
+		{
 			((FreeBlock*)block)->removeFreeLink();
 			insertFreeBlock((FreeBlock*)block);
 		}
@@ -403,7 +425,7 @@ void * OSHeapManager::allocMedium(OS_U32 size OS_DBG_FILEPOS_DECL)
 #endif
 		newBlock->page = block->page;
 		newBlock->size = size;
-		newBlock->insertAfter(block);    
+		newBlock->insertAfter(block);
 		block = newBlock;
 	}
 	block->is_free = false;
@@ -453,7 +475,8 @@ void OSHeapManager::freeMedium(void * p)
 	medium_stats.registerFree(block->size, block->getDataSize());
 
 	Block * prev = block->prev;
-	if(prev->is_free && prev->page == block->page){
+	if(prev->is_free && prev->page == block->page)
+	{
 		OS_ASSERT("Heap corrupted!"	&& ((OS_BYTE*)prev) + prev->size == (OS_BYTE*)block);
 		prev->size += block->size;
 
@@ -464,9 +487,10 @@ void OSHeapManager::freeMedium(void * p)
 		medium_stats.merge_count++;
 	}
 	Block * next = block->next;
-	if(next->is_free && next->page == block->page){
+	if(next->is_free && next->page == block->page)
+	{
 		OS_ASSERT("Heap corrupted!"
-			&& ((OS_BYTE*)block) + block->size == (OS_BYTE*)next);
+				  && ((OS_BYTE*)block) + block->size == (OS_BYTE*)next);
 		block->size += next->size;
 
 		((FreeBlock*)next)->removeFreeLink();
@@ -509,21 +533,23 @@ OS_U32 OSHeapManager::getSizeMedium(void * p)
 
 void OSHeapManager::insertFreeBlock(FreeBlock * freeBlock)
 {
-	for(FreeBlock * cur = dummy_free.next_free; ; cur = cur->next_free){
+	for(FreeBlock * cur = dummy_free.next_free; ; cur = cur->next_free)
+	{
 		OS_ASSERT("Heap corrupted!" && (freeBlock != cur));
-		if(freeBlock->size >= cur->size){
+		if(freeBlock->size >= cur->size)
+		{
 			freeBlock->insertBeforeFreeLink(cur);
 
 #ifdef FREE_FREEPAGES
 			FreeBlock * next_free;
-			if(freeBlock->size == page_size 
-				&& cur->size == page_size 
-				&& (next_free = cur->next_free)->size == page_size 
-				&& (next_free = next_free->next_free)->size == page_size
-				&& next_free->next_free->size == page_size
-				&& cur->page != cur->next->page
-				&& cur->page != cur->prev->page
-				)
+			if(freeBlock->size == page_size
+					&& cur->size == page_size
+					&& (next_free = cur->next_free)->size == page_size
+					&& (next_free = next_free->next_free)->size == page_size
+					&& next_free->next_free->size == page_size
+					&& cur->page != cur->next->page
+					&& cur->page != cur->prev->page
+			  )
 			{
 				medium_stats.alloc_size -= cur->size;
 				medium_stats.free_page_count++;
@@ -547,7 +573,8 @@ void * OSHeapManager::allocLarge(OS_U32 size OS_DBG_FILEPOS_DECL)
 {
 	size = (size + ALIGN - 1 + sizeof(Block) + OS_DUMMY_ID_SIZE) & ~(ALIGN - 1);
 	Block * block = (Block *)STD_MALLOC(size);
-	if(!block){
+	if(!block)
+	{
 		return NULL;
 	}
 
@@ -714,10 +741,10 @@ OSHeapManager::~OSHeapManager()
 	const char * dumpFilename = "dump-err-exit.log";
 	if(small_stats.alloc_count != small_stats.free_count
 #ifndef OS_USE_HEAP_SAVING_MODE
-		|| medium_stats.alloc_count != medium_stats.free_count
+			|| medium_stats.alloc_count != medium_stats.free_count
 #endif // OS_USE_HEAP_SAVING_MODE
-		|| large_stats.alloc_count != large_stats.free_count
-		)
+			|| large_stats.alloc_count != large_stats.free_count
+	  )
 	{
 		// dumpUsage(dumpFilename);
 		int i = 0;
@@ -738,7 +765,8 @@ OSHeapManager::~OSHeapManager()
 
 	// if(small_stats.alloc_count == small_stats.free_count)
 	{
-		while(small_page != &dummy_small_page){
+		while(small_page != &dummy_small_page)
+		{
 			SmallPage * cur_page = small_page;
 			small_page = small_page->next;
 			STD_FREE(cur_page);
@@ -747,7 +775,8 @@ OSHeapManager::~OSHeapManager()
 
 	// if(large_stats.alloc_count == large_stats.free_count)
 	{
-		while(dummy_large_block.next != &dummy_large_block){
+		while(dummy_large_block.next != &dummy_large_block)
+		{
 			void * p = (char*)(dummy_large_block.next+1) + OS_DUMMY_ID_SIZE/2;
 			free(p);
 		}
@@ -756,14 +785,17 @@ OSHeapManager::~OSHeapManager()
 #ifndef OS_USE_HEAP_SAVING_MODE
 	// if(medium_stats.alloc_count == medium_stats.free_count)
 	{
-		for(Block * block = dummy_block.next, * next; block != &dummy_block; block = next){
+		for(Block * block = dummy_block.next, * next; block != &dummy_block; block = next)
+		{
 			next = block->next;
-			if(!block->is_free){
+			if(!block->is_free)
+			{
 				void * p = (char*)(block+1) + OS_DUMMY_ID_SIZE/2;
 				free(p);
 			}
 		}
-		while(dummy_block.next != &dummy_block){
+		while(dummy_block.next != &dummy_block)
+		{
 			Block * curBlockPage = dummy_block.next;
 			curBlockPage->removeLink();
 #ifdef _MSC_VER
@@ -778,12 +810,14 @@ OSHeapManager::~OSHeapManager()
 
 void * OSHeapManager::malloc(int size OS_DBG_FILEPOS_DECL)
 {
-	if(size <= 0){
+	if(size <= 0)
+	{
 		return NULL;
 	}
 
 #ifndef USE_STD_MALLOC
-	if(!(size & ~(MAX_SMALL_SIZE - 1))){
+	if(!(size & ~(MAX_SMALL_SIZE - 1)))
+	{
 		return allocSmall(size OS_DBG_FILEPOS_PARAM);
 	}
 
@@ -792,7 +826,8 @@ void * OSHeapManager::malloc(int size OS_DBG_FILEPOS_DECL)
 #endif
 
 #ifndef OS_USE_HEAP_SAVING_MODE
-	if(!(size & ~medium_size_mask)){
+	if(!(size & ~medium_size_mask))
+	{
 		return allocMedium(size OS_DBG_FILEPOS_PARAM);
 	}
 #endif
@@ -806,7 +841,8 @@ void * OSHeapManager::malloc(int size OS_DBG_FILEPOS_DECL)
 
 void OSHeapManager::free(void * p)
 {
-	if(!p){
+	if(!p)
+	{
 		return;
 	}
 
@@ -816,7 +852,8 @@ void OSHeapManager::free(void * p)
 
 #ifndef USE_STD_MALLOC
 #ifndef OS_USE_HEAP_SAVING_MODE
-	switch(((OS_BYTE*)p)[-1-(int)OS_DUMMY_ID_SIZE/2]){
+	switch(((OS_BYTE*)p)[-1-(int)OS_DUMMY_ID_SIZE/2])
+	{
 	case BT_SMALL:
 		freeSmall(p);
 		break;
@@ -842,9 +879,12 @@ void OSHeapManager::free(void * p)
 		OS_ASSERT(false);
 	}
 #else
-	if(((OS_BYTE*)p)[-1-(int)OS_DUMMY_ID_SIZE/2] & BLOCK_TYPE_MASK){
+	if(((OS_BYTE*)p)[-1-(int)OS_DUMMY_ID_SIZE/2] & BLOCK_TYPE_MASK)
+	{
 		freeSmall(p);
-	}else{
+	}
+	else
+	{
 		freeLarge(p);
 	}
 #endif
@@ -916,13 +956,15 @@ int OSHeapManager::getCachedBytes()
 
 OS_U32 OSHeapManager::getSize(void * p)
 {
-	if(!p){
+	if(!p)
+	{
 		return 0;
 	}
 
 #ifndef OS_USE_HEAP_SAVING_MODE
 
-	switch(((OS_BYTE*)p)[-1-(int)OS_DUMMY_ID_SIZE/2]){
+	switch(((OS_BYTE*)p)[-1-(int)OS_DUMMY_ID_SIZE/2])
+	{
 	case BT_SMALL:
 		return getSizeSmall(p);
 
@@ -937,7 +979,8 @@ OS_U32 OSHeapManager::getSize(void * p)
 
 #else
 
-	if(((OS_BYTE*)p)[-1-(int)OS_DUMMY_ID_SIZE/2] & BLOCK_TYPE_MASK){
+	if(((OS_BYTE*)p)[-1-(int)OS_DUMMY_ID_SIZE/2] & BLOCK_TYPE_MASK)
+	{
 		return getSizeSmall(p);
 	}
 	return getSizeLarge(p);
@@ -945,7 +988,10 @@ OS_U32 OSHeapManager::getSize(void * p)
 #endif
 }
 
-OS_U32 OSHeapManager::getPageSize() const { return page_size; }
+OS_U32 OSHeapManager::getPageSize() const
+{
+	return page_size;
+}
 
 static const char mem_block_type_names[3][7] = {"small", "medium", "large"};
 
@@ -955,13 +1001,14 @@ void OSHeapManager::checkMemory()
 	OS_U32 alloc_size, used_size, data_size;
 
 	alloc_size = used_size = data_size = 0;
-	for(SmallPage * small_page = this->small_page; small_page; small_page = small_page->next){
+	for(SmallPage * small_page = this->small_page; small_page; small_page = small_page->next)
+	{
 		alloc_size += small_page->size;
 	}
 	OS_ASSERT("Heap corrupted!" && alloc_size == small_stats.alloc_size);
 
 	for(SmallBlock * small_block = dummy_small_block.next;
-		small_block != &dummy_small_block; small_block = small_block->next)
+			small_block != &dummy_small_block; small_block = small_block->next)
 	{
 		OS_ASSERT("Heap corrupted!" && small_block->next->prev == small_block);
 		OS_ASSERT("Heap corrupted!" && small_block->prev->next == small_block);
@@ -981,9 +1028,10 @@ void OSHeapManager::checkMemory()
 	OS_ASSERT("Heap corrupted!" && used_size == small_stats.used_size);
 	OS_ASSERT("Heap corrupted!" && data_size == small_stats.data_size);
 
-	for(int i = 0; i < SMALL_SLOT_COUNT; i++){
+	for(int i = 0; i < SMALL_SLOT_COUNT; i++)
+	{
 		for(FreeSmallBlock * free_small_block = free_small_blocks[i];
-			free_small_block; free_small_block = free_small_block->next)
+				free_small_block; free_small_block = free_small_block->next)
 		{
 			SmallBlock * small_block = (SmallBlock*)free_small_block;
 			OS_ASSERT("Heap corrupted!" && (small_block->getDataSize() & 3) == 0);
@@ -997,7 +1045,7 @@ void OSHeapManager::checkMemory()
 
 	alloc_size = used_size = data_size = 0;
 	for(Block * block = dummy_block.next; block != &dummy_block;
-		block = block->next)
+			block = block->next)
 	{
 		OS_ASSERT("Heap corrupted!" && block->is_free == 0 || block->is_free == 1);
 		OS_ASSERT("Heap corrupted!" && block->page < next_page);
@@ -1006,7 +1054,8 @@ void OSHeapManager::checkMemory()
 
 		OS_U32 block_data_size = block->getDataSize();
 		OS_ASSERT("Heap corrupted!" && (block_data_size & 3) == 0);
-		if(!block->is_free){
+		if(!block->is_free)
+		{
 			OS_ASSERT("Heap corrupted!" && block_data_size >=	medium_stats.min_block_data_size);
 			OS_ASSERT("Heap corrupted!" && block_data_size <=	medium_stats.max_block_data_size);
 			OS_ASSERT("Heap corrupted!" && *(int *)(block + 1) == DUMMY_MEDIUM_USED_ID_PRE);
@@ -1014,7 +1063,9 @@ void OSHeapManager::checkMemory()
 
 			used_size += block->size;
 			data_size += block_data_size;
-		}else{
+		}
+		else
+		{
 			// OS_ASSERT("Heap corrupted!" && data_size < page_size);
 			OS_ASSERT("Heap corrupted!" && *(int *)(block + 1) == DUMMY_MEDIUM_FREE_ID_PRE);
 			OS_ASSERT("Heap corrupted!" && *(int *)((OS_BYTE *)(block + 1) + block_data_size + sizeof(int)) == DUMMY_MEDIUM_FREE_ID_POST);
@@ -1026,7 +1077,7 @@ void OSHeapManager::checkMemory()
 	OS_ASSERT("Heap corrupted!" && data_size == medium_stats.data_size);
 
 	for(FreeBlock * block = dummy_free.next_free; block != &dummy_free;
-		block = block->next_free)
+			block = block->next_free)
 	{
 		OS_ASSERT("Heap corrupted!" && block->is_free == 1);
 		OS_ASSERT("Heap corrupted!" && block->page < next_page);
@@ -1038,7 +1089,7 @@ void OSHeapManager::checkMemory()
 	alloc_size = used_size = data_size = 0;
 
 	for(Block * large_block = dummy_large_block.next;
-		large_block != &dummy_large_block; large_block = large_block->next)
+			large_block != &dummy_large_block; large_block = large_block->next)
 	{
 		OS_ASSERT("Heap corrupted!" && large_block->next->prev == large_block);
 		OS_ASSERT("Heap corrupted!" && large_block->prev->next == large_block);
@@ -1096,25 +1147,25 @@ void OSHeapManager::writeStats(OS * os, OS::FileHandle * f)
 		OS_U32 cur_avg_data_size = cur_count ? stats[i].data_size / cur_count : 0;
 #ifndef OS_USE_HEAP_SAVING_MODE
 #ifdef OS_DEBUG
-		OS_SNPRINTF(buf, sizeof(buf)-1, "%s\t\t%d\t%d\t%d\t%d\t\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\n", mem_block_type_names[i], 
-			stats[i].alloc_count, stats[i].free_count, stats[i].hit_count, cur_count, cur_avg_data_size,
-			stats[i].alloc_size, stats[i].used_size, stats[i].data_size, stats[i].max_used_size, stats[i].max_data_size,
-			stats[i].min_block_data_size, stats[i].max_block_data_size);
+		OS_SNPRINTF(buf, sizeof(buf)-1, "%s\t\t%d\t%d\t%d\t%d\t\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\n", mem_block_type_names[i],
+					stats[i].alloc_count, stats[i].free_count, stats[i].hit_count, cur_count, cur_avg_data_size,
+					stats[i].alloc_size, stats[i].used_size, stats[i].data_size, stats[i].max_used_size, stats[i].max_data_size,
+					stats[i].min_block_data_size, stats[i].max_block_data_size);
 #else
-		OS_SNPRINTF(buf, sizeof(buf)-1, "%s\t\t%d\t%d\t%d\t%d\t\t%d\t%d\t%d\t%d\n", mem_block_type_names[i], 
-			stats[i].alloc_count, stats[i].free_count, stats[i].hit_count, cur_count, cur_avg_data_size,
-			stats[i].alloc_size, stats[i].used_size, stats[i].data_size);
+		OS_SNPRINTF(buf, sizeof(buf)-1, "%s\t\t%d\t%d\t%d\t%d\t\t%d\t%d\t%d\t%d\n", mem_block_type_names[i],
+					stats[i].alloc_count, stats[i].free_count, stats[i].hit_count, cur_count, cur_avg_data_size,
+					stats[i].alloc_size, stats[i].used_size, stats[i].data_size);
 #endif
 #else // OS_USE_HEAP_SAVING_MODE
 #ifdef OS_DEBUG
-		OS_SNPRINTF(buf, sizeof(buf)-1, "%s\t\t%d\t%d\t%d\t\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\n", mem_block_type_names[i], 
-			stats[i].alloc_count, stats[i].free_count, cur_count, cur_avg_data_size,
-			stats[i].alloc_size, stats[i].used_size, stats[i].data_size, stats[i].max_used_size, stats[i].max_data_size,
-			stats[i].min_block_data_size, stats[i].max_block_data_size);
+		OS_SNPRINTF(buf, sizeof(buf)-1, "%s\t\t%d\t%d\t%d\t\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\n", mem_block_type_names[i],
+					stats[i].alloc_count, stats[i].free_count, cur_count, cur_avg_data_size,
+					stats[i].alloc_size, stats[i].used_size, stats[i].data_size, stats[i].max_used_size, stats[i].max_data_size,
+					stats[i].min_block_data_size, stats[i].max_block_data_size);
 #else
-		OS_SNPRINTF(buf, sizeof(buf)-1, "%s\t\t%d\t%d\t%d\t\t%d\t%d\t%d\t%d\n", mem_block_type_names[i], 
-			stats[i].alloc_count, stats[i].free_count, cur_count, cur_avg_data_size,
-			stats[i].alloc_size, stats[i].used_size, stats[i].data_size);
+		OS_SNPRINTF(buf, sizeof(buf)-1, "%s\t\t%d\t%d\t%d\t\t%d\t%d\t%d\t%d\n", mem_block_type_names[i],
+					stats[i].alloc_count, stats[i].free_count, cur_count, cur_avg_data_size,
+					stats[i].alloc_size, stats[i].used_size, stats[i].data_size);
 #endif
 #endif // OS_USE_HEAP_SAVING_MODE
 		writeFile(os, f, buf);
@@ -1125,25 +1176,25 @@ void OSHeapManager::writeStats(OS * os, OS::FileHandle * f)
 	OS_U32 cur_count = summary_stats.alloc_count - summary_stats.free_count;
 #ifndef OS_USE_HEAP_SAVING_MODE
 #ifdef OS_DEBUG
-	OS_SNPRINTF(buf, sizeof(buf)-1, "SUMMARY\t\t%d\t%d\t%d\t%d\t\t\t%d\t%d\t%d\t%d\t%d\n\n", 
-		summary_stats.alloc_count, summary_stats.free_count, summary_stats.hit_count, cur_count, 
-		summary_stats.alloc_size, summary_stats.used_size, summary_stats.data_size, 
-		summary_stats.max_used_size, summary_stats.max_data_size);
+	OS_SNPRINTF(buf, sizeof(buf)-1, "SUMMARY\t\t%d\t%d\t%d\t%d\t\t\t%d\t%d\t%d\t%d\t%d\n\n",
+				summary_stats.alloc_count, summary_stats.free_count, summary_stats.hit_count, cur_count,
+				summary_stats.alloc_size, summary_stats.used_size, summary_stats.data_size,
+				summary_stats.max_used_size, summary_stats.max_data_size);
 #else
-	OS_SNPRINTF(buf, sizeof(buf)-1, "SUMMARY\t\t%d\t%d\t%d\t%d\t\t\t%d\t%d\t%d\n\n", 
-		summary_stats.alloc_count, summary_stats.free_count, summary_stats.hit_count, cur_count, 
-		summary_stats.alloc_size, summary_stats.used_size, summary_stats.data_size);
+	OS_SNPRINTF(buf, sizeof(buf)-1, "SUMMARY\t\t%d\t%d\t%d\t%d\t\t\t%d\t%d\t%d\n\n",
+				summary_stats.alloc_count, summary_stats.free_count, summary_stats.hit_count, cur_count,
+				summary_stats.alloc_size, summary_stats.used_size, summary_stats.data_size);
 #endif
 #else // OS_USE_HEAP_SAVING_MODE
 #ifdef OS_DEBUG
-	OS_SNPRINTF(buf, sizeof(buf)-1, "SUMMARY\t\t%d\t%d\t%d\t\t\t%d\t%d\t%d\t%d\t%d\n\n", 
-		summary_stats.alloc_count, summary_stats.free_count, cur_count, 
-		summary_stats.alloc_size, summary_stats.used_size, summary_stats.data_size, 
-		summary_stats.max_used_size, summary_stats.max_data_size);
+	OS_SNPRINTF(buf, sizeof(buf)-1, "SUMMARY\t\t%d\t%d\t%d\t\t\t%d\t%d\t%d\t%d\t%d\n\n",
+				summary_stats.alloc_count, summary_stats.free_count, cur_count,
+				summary_stats.alloc_size, summary_stats.used_size, summary_stats.data_size,
+				summary_stats.max_used_size, summary_stats.max_data_size);
 #else
-	OS_SNPRINTF(buf, sizeof(buf)-1, "SUMMARY\t\t%d\t%d\t%d\t\t\t%d\t%d\t%d\n\n", 
-		summary_stats.alloc_count, summary_stats.free_count, cur_count, 
-		summary_stats.alloc_size, summary_stats.used_size, summary_stats.data_size);
+	OS_SNPRINTF(buf, sizeof(buf)-1, "SUMMARY\t\t%d\t%d\t%d\t\t\t%d\t%d\t%d\n\n",
+				summary_stats.alloc_count, summary_stats.free_count, cur_count,
+				summary_stats.alloc_size, summary_stats.used_size, summary_stats.data_size);
 #endif
 #endif // OS_USE_HEAP_SAVING_MODE
 	writeFile(os, f, buf);
@@ -1169,7 +1220,8 @@ void OSHeapManager::writeSmallBlock(OS * os, OS::FileHandle * f, SmallBlock * bl
 void OSHeapManager::writeSmallBlocks(OS * os, OS::FileHandle * f)
 {
 	SmallBlock * block = dummy_small_block.next;
-	for(; block != &dummy_small_block; block = block->next){
+	for(; block != &dummy_small_block; block = block->next)
+	{
 		writeSmallBlock(os, f, block);
 	}
 	writeFile(os, f, "\n");
@@ -1203,8 +1255,10 @@ void OSHeapManager::writeBlock(OS * os, OS::FileHandle * f, Block * block)
 void OSHeapManager::writeBlocks(OS * os, OS::FileHandle * f, Block * dummy_block)
 {
 	Block * block = dummy_block->next;
-	for(; block != dummy_block; block = block->next){
-		if(!block->is_free){
+	for(; block != dummy_block; block = block->next)
+	{
+		if(!block->is_free)
+		{
 			writeBlock(os, f, block);
 		}
 	}
@@ -1229,7 +1283,8 @@ void OSHeapManager::writeFreeBlockHeader(OS * os, OS::FileHandle * f)
 void OSHeapManager::writeFreeBlocks(OS * os, OS::FileHandle * f)
 {
 	FreeBlock * block = dummy_free.next_free;
-	for(; block != &dummy_free; block = block->next_free){
+	for(; block != &dummy_free; block = block->next_free)
+	{
 		writeBlock(os, f, block);
 	}
 	writeFile(os, f, "\n");
@@ -1240,7 +1295,8 @@ void OSHeapManager::writeFreeBlocks(OS * os, OS::FileHandle * f)
 void OSHeapManager::dumpUsage(OS * os, const OS_CHAR * filename)
 {
 	OS::FileHandle * f = os->openFile(filename, "wt");
-	if(!f){
+	if(!f)
+	{
 		return;
 	}
 	OS_U32 free_size = 0x7fffffff;
@@ -1282,13 +1338,16 @@ void OSHeapManager::getStats(Stats& small_stats, Stats& medium_stats, Stats& lar
 	large_stats.merge_count = 0;
 
 #ifdef OS_DEBUG
-	if(small_stats.min_block_data_size > small_stats.max_block_data_size){
+	if(small_stats.min_block_data_size > small_stats.max_block_data_size)
+	{
 		small_stats.min_block_data_size = small_stats.max_block_data_size = 0;
 	}
-	if(medium_stats.min_block_data_size > medium_stats.max_block_data_size){
+	if(medium_stats.min_block_data_size > medium_stats.max_block_data_size)
+	{
 		medium_stats.min_block_data_size = medium_stats.max_block_data_size = 0;
 	}
-	if(large_stats.min_block_data_size > large_stats.max_block_data_size){
+	if(large_stats.min_block_data_size > large_stats.max_block_data_size)
+	{
 		large_stats.min_block_data_size = large_stats.max_block_data_size = 0;
 	}
 #endif
@@ -1309,23 +1368,32 @@ void OSHeapManager::getStats(SummaryStats& stats)
 	stats.max_used_size = small_stats.max_used_size + medium_stats.max_used_size + large_stats.max_used_size;
 	stats.max_data_size = small_stats.max_data_size + medium_stats.max_data_size + large_stats.max_data_size;
 
-	if(small_stats.min_block_data_size > small_stats.max_block_data_size){
+	if(small_stats.min_block_data_size > small_stats.max_block_data_size)
+	{
 		stats.min_small_block_data_size = stats.max_small_block_data_size = 0;
-	}else{
+	}
+	else
+	{
 		stats.min_small_block_data_size = small_stats.min_block_data_size;
 		stats.max_small_block_data_size = small_stats.max_block_data_size;
 	}
 
-	if(medium_stats.min_block_data_size > medium_stats.max_block_data_size){
+	if(medium_stats.min_block_data_size > medium_stats.max_block_data_size)
+	{
 		stats.min_medium_block_data_size = stats.max_medium_block_data_size = 0;
-	}else{
+	}
+	else
+	{
 		stats.min_medium_block_data_size = medium_stats.min_block_data_size;
 		stats.max_medium_block_data_size = medium_stats.max_block_data_size;
 	}
 
-	if(large_stats.min_block_data_size > large_stats.max_block_data_size){
+	if(large_stats.min_block_data_size > large_stats.max_block_data_size)
+	{
 		stats.min_large_block_data_size = stats.max_large_block_data_size = 0;
-	}else{
+	}
+	else
+	{
 		stats.min_large_block_data_size = large_stats.min_block_data_size;
 		stats.max_large_block_data_size = large_stats.max_block_data_size;
 	}
@@ -1345,16 +1413,22 @@ void OSHeapManager::getStats(SummaryStats& stats)
 	stats.max_used_size = small_stats.max_used_size + large_stats.max_used_size;
 	stats.max_data_size = small_stats.max_data_size + large_stats.max_data_size;
 
-	if(small_stats.min_block_data_size > small_stats.max_block_data_size){
+	if(small_stats.min_block_data_size > small_stats.max_block_data_size)
+	{
 		stats.min_small_block_data_size = stats.max_small_block_data_size = 0;
-	}else{
+	}
+	else
+	{
 		stats.min_small_block_data_size = small_stats.min_block_data_size;
 		stats.max_small_block_data_size = small_stats.max_block_data_size;
 	}
 
-	if(large_stats.min_block_data_size > large_stats.max_block_data_size){
+	if(large_stats.min_block_data_size > large_stats.max_block_data_size)
+	{
 		stats.min_large_block_data_size = stats.max_large_block_data_size = 0;
-	}else{
+	}
+	else
+	{
 		stats.min_large_block_data_size = large_stats.min_block_data_size;
 		stats.max_large_block_data_size = large_stats.max_block_data_size;
 	}

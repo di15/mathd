@@ -11,10 +11,10 @@ namespace NExtract
 {
   struct CInfo
   {
-    NPathMode::EEnum PathMode;
-    NOverwriteMode::EEnum OverwriteMode;
-    UStringVector Paths;
-    bool ShowPassword;
+	NPathMode::EEnum PathMode;
+	NOverwriteMode::EEnum OverwriteMode;
+	UStringVector Paths;
+	bool ShowPassword;
   };
 }
 
@@ -22,35 +22,35 @@ namespace NCompression {
   
   struct CFormatOptions
   {
-    CSysString FormatID;
-    UString Options;
-    UString Method;
-    UString EncryptionMethod;
-    UInt32 Level;
-    UInt32 Dictionary;
-    UInt32 Order;
-    UInt32 BlockLogSize;
-    UInt32 NumThreads;
-    void ResetForLevelChange() 
-    { 
-      BlockLogSize = NumThreads = Level = Dictionary = Order = UInt32(-1); 
-      Method.Empty();
-      // EncryptionMethod.Empty();
-      // Options.Empty();
-    }
-    CFormatOptions() { ResetForLevelChange(); }
+	CSysString FormatID;
+	UString Options;
+	UString Method;
+	UString EncryptionMethod;
+	UInt32 Level;
+	UInt32 Dictionary;
+	UInt32 Order;
+	UInt32 BlockLogSize;
+	UInt32 NumThreads;
+	void ResetForLevelChange() 
+	{ 
+	  BlockLogSize = NumThreads = Level = Dictionary = Order = UInt32(-1); 
+	  Method.Empty();
+	  // EncryptionMethod.Empty();
+	  // Options.Empty();
+	}
+	CFormatOptions() { ResetForLevelChange(); }
   };
 
   struct CInfo
   {
-    UStringVector HistoryArchives;
-    UInt32 Level;
-    UString ArchiveType;
+	UStringVector HistoryArchives;
+	UInt32 Level;
+	UString ArchiveType;
 
-    CObjectVector<CFormatOptions> FormatOptionsVector;
+	CObjectVector<CFormatOptions> FormatOptionsVector;
 
-    bool ShowPassword;
-    bool EncryptHeaders;
+	bool ShowPassword;
+	bool EncryptHeaders;
   };
 }
 
@@ -58,25 +58,25 @@ namespace NWorkDir{
   
   namespace NMode
   {
-    enum EEnum
-    {
-      kSystem,
-      kCurrent,
-      kSpecified
-    };
+	enum EEnum
+	{
+	  kSystem,
+	  kCurrent,
+	  kSpecified
+	};
   }
   struct CInfo
   {
-    NMode::EEnum Mode;
-    UString Path;
-    bool ForRemovableOnly;
-    void SetForRemovableOnlyDefault() { ForRemovableOnly = true; }
-    void SetDefault()
-    {
-      Mode = NMode::kSystem;
-      Path.Empty();
-      SetForRemovableOnlyDefault();
-    }
+	NMode::EEnum Mode;
+	UString Path;
+	bool ForRemovableOnly;
+	void SetForRemovableOnlyDefault() { ForRemovableOnly = true; }
+	void SetDefault()
+	{
+	  Mode = NMode::kSystem;
+	  Path.Empty();
+	  SetForRemovableOnlyDefault();
+	}
   };
 }
 

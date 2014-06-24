@@ -14,9 +14,9 @@ namespace NFileTimeType
 {
   enum EEnum
   {
-    kWindows,
-    kUnix,
-    kDOS
+	kWindows,
+	kUnix,
+	kDOS
   };
 }
 
@@ -24,49 +24,49 @@ namespace NArchive
 {
   enum 
   {
-    kName = 0,
-    kClassID,
-    kExtension,
-    kAddExtension,
-    kUpdate,
-    kKeepName,
-    kStartSignature,
-    kFinishSignature,
-    kAssociate
+	kName = 0,
+	kClassID,
+	kExtension,
+	kAddExtension,
+	kUpdate,
+	kKeepName,
+	kStartSignature,
+	kFinishSignature,
+	kAssociate
   };
 
   namespace NExtract
   {
-    namespace NAskMode
-    {
-      enum 
-      {
-        kExtract = 0,
-        kTest,
-        kSkip
-      };
-    }
-    namespace NOperationResult
-    {
-      enum 
-      {
-        kOK = 0,
-        kUnSupportedMethod,
-        kDataError,
-        kCRCError
-      };
-    }
+	namespace NAskMode
+	{
+	  enum 
+	  {
+		kExtract = 0,
+		kTest,
+		kSkip
+	  };
+	}
+	namespace NOperationResult
+	{
+	  enum 
+	  {
+		kOK = 0,
+		kUnSupportedMethod,
+		kDataError,
+		kCRCError
+	  };
+	}
   }
   namespace NUpdate
   {
-    namespace NOperationResult
-    {
-      enum 
-      {
-        kOK = 0,
-        kError
-      };
-    }
+	namespace NOperationResult
+	{
+	  enum 
+	  {
+		kOK = 0,
+		kError
+	  };
+	}
   }
 }
 
@@ -80,7 +80,7 @@ ARCHIVE_INTERFACE(IArchiveOpenCallback, 0x10)
 ARCHIVE_INTERFACE_SUB(IArchiveExtractCallback, IProgress, 0x20)
 {
   STDMETHOD(GetStream)(UInt32 index, ISequentialOutStream **outStream, 
-      Int32 askExtractMode) PURE;
+	  Int32 askExtractMode) PURE;
   // GetStream OUT: S_OK - OK, S_FALSE - skeep this file
   STDMETHOD(PrepareOperation)(Int32 askExtractMode) PURE;
   STDMETHOD(SetOperationResult)(Int32 resultEOperationResult) PURE;
@@ -134,10 +134,10 @@ ARCHIVE_INTERFACE(IInArchive, 0x60)
 ARCHIVE_INTERFACE_SUB(IArchiveUpdateCallback, IProgress, 0x80)
 {
   STDMETHOD(GetUpdateItemInfo)(UInt32 index, 
-      Int32 *newData, // 1 - new data, 0 - old data
-      Int32 *newProperties, // 1 - new properties, 0 - old properties
-      UInt32 *indexInArchive // -1 if there is no in archive, or if doesn't matter
-      ) PURE;
+	  Int32 *newData, // 1 - new data, 0 - old data
+	  Int32 *newProperties, // 1 - new properties, 0 - old properties
+	  UInt32 *indexInArchive // -1 if there is no in archive, or if doesn't matter
+	  ) PURE;
   STDMETHOD(GetProperty)(UInt32 index, PROPID propID, PROPVARIANT *value) PURE;
   STDMETHOD(GetStream)(UInt32 index, ISequentialInStream **inStream) PURE;
   STDMETHOD(SetOperationResult)(Int32 operationResult) PURE;
@@ -169,39 +169,39 @@ ARCHIVE_INTERFACE(ISetProperties, 0x03)
 
 #define IMP_IInArchive_GetProp(k) \
   (UInt32 index, BSTR *name, PROPID *propID, VARTYPE *varType) \
-    { if(index >= sizeof(k) / sizeof(k[0])) return E_INVALIDARG; \
-    const STATPROPSTG &srcItem = k[index]; \
-    *propID = srcItem.propid; *varType = srcItem.vt; *name = 0; return S_OK; } \
+	{ if(index >= sizeof(k) / sizeof(k[0])) return E_INVALIDARG; \
+	const STATPROPSTG &srcItem = k[index]; \
+	*propID = srcItem.propid; *varType = srcItem.vt; *name = 0; return S_OK; } \
 
 #define IMP_IInArchive_GetProp_WITH_NAME(k) \
   (UInt32 index, BSTR *name, PROPID *propID, VARTYPE *varType) \
-    { if(index >= sizeof(k) / sizeof(k[0])) return E_INVALIDARG; \
-    const STATPROPSTG &srcItem = k[index]; \
-    *propID = srcItem.propid; *varType = srcItem.vt; \
-    if (srcItem.lpwstrName == 0) *name = 0; else *name = ::SysAllocString(srcItem.lpwstrName); return S_OK; } \
+	{ if(index >= sizeof(k) / sizeof(k[0])) return E_INVALIDARG; \
+	const STATPROPSTG &srcItem = k[index]; \
+	*propID = srcItem.propid; *varType = srcItem.vt; \
+	if (srcItem.lpwstrName == 0) *name = 0; else *name = ::SysAllocString(srcItem.lpwstrName); return S_OK; } \
 
 #define IMP_IInArchive_Props \
   STDMETHODIMP CHandler::GetNumberOfProperties(UInt32 *numProperties) \
-    { *numProperties = sizeof(kProps) / sizeof(kProps[0]); return S_OK; } \
+	{ *numProperties = sizeof(kProps) / sizeof(kProps[0]); return S_OK; } \
   STDMETHODIMP CHandler::GetPropertyInfo IMP_IInArchive_GetProp(kProps)
 
 #define IMP_IInArchive_Props_WITH_NAME \
   STDMETHODIMP CHandler::GetNumberOfProperties(UInt32 *numProperties) \
-    { *numProperties = sizeof(kProps) / sizeof(kProps[0]); return S_OK; } \
+	{ *numProperties = sizeof(kProps) / sizeof(kProps[0]); return S_OK; } \
   STDMETHODIMP CHandler::GetPropertyInfo IMP_IInArchive_GetProp_WITH_NAME(kProps)
 
 
 #define IMP_IInArchive_ArcProps \
   STDMETHODIMP CHandler::GetNumberOfArchiveProperties(UInt32 *numProperties) \
-    { *numProperties = sizeof(kArcProps) / sizeof(kArcProps[0]); return S_OK; } \
+	{ *numProperties = sizeof(kArcProps) / sizeof(kArcProps[0]); return S_OK; } \
   STDMETHODIMP CHandler::GetArchivePropertyInfo IMP_IInArchive_GetProp(kArcProps)
 
 #define IMP_IInArchive_ArcProps_NO \
   STDMETHODIMP CHandler::GetNumberOfArchiveProperties(UInt32 *numProperties) \
-    { *numProperties = 0; return S_OK; } \
+	{ *numProperties = 0; return S_OK; } \
   STDMETHODIMP CHandler::GetArchivePropertyInfo(UInt32, BSTR *, PROPID *, VARTYPE *) \
-    { return E_NOTIMPL; } \
+	{ return E_NOTIMPL; } \
   STDMETHODIMP CHandler::GetArchiveProperty(PROPID, PROPVARIANT *value) \
-    { value->vt = VT_EMPTY; return S_OK; } 
+	{ value->vt = VT_EMPTY; return S_OK; } 
 
 #endif

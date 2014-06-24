@@ -11,11 +11,11 @@
   freely, subject to the following restrictions:
 
   1. The origin of this software must not be misrepresented; you must not
-     claim that you wrote the original software. If you use this software
-     in a product, an acknowledgment in the product documentation would be
-     appreciated but is not required.
+	 claim that you wrote the original software. If you use this software
+	 in a product, an acknowledgment in the product documentation would be
+	 appreciated but is not required.
   2. Altered source versions must be plainly marked as such, and must not be
-     misrepresented as being the original software.
+	 misrepresented as being the original software.
   3. This notice may not be removed or altered from any source distribution.
 */
 #include "SDL_config.h"
@@ -28,31 +28,31 @@
 /* The SDL joystick structure */
 struct _SDL_Joystick
 {
-    SDL_JoystickID instance_id; /* Device instance, monotonically increasing from 0 */
-    char *name;                 /* Joystick name - system dependent */
+	SDL_JoystickID instance_id; /* Device instance, monotonically increasing from 0 */
+	char *name;                 /* Joystick name - system dependent */
 
-    int naxes;                  /* Number of axis controls on the joystick */
-    Sint16 *axes;               /* Current axis states */
+	int naxes;                  /* Number of axis controls on the joystick */
+	Sint16 *axes;               /* Current axis states */
 
-    int nhats;                  /* Number of hats on the joystick */
-    Uint8 *hats;                /* Current hat states */
+	int nhats;                  /* Number of hats on the joystick */
+	Uint8 *hats;                /* Current hat states */
 
-    int nballs;                 /* Number of trackballs on the joystick */
-    struct balldelta {
-        int dx;
-        int dy;
-    } *balls;                   /* Current ball motion deltas */
+	int nballs;                 /* Number of trackballs on the joystick */
+	struct balldelta {
+		int dx;
+		int dy;
+	} *balls;                   /* Current ball motion deltas */
 
-    int nbuttons;               /* Number of buttons on the joystick */
-    Uint8 *buttons;             /* Current button states */
+	int nbuttons;               /* Number of buttons on the joystick */
+	Uint8 *buttons;             /* Current button states */
 
-    struct joystick_hwdata *hwdata;     /* Driver dependent information */
+	struct joystick_hwdata *hwdata;     /* Driver dependent information */
 
-    int ref_count;              /* Reference count for multiple opens */
+	int ref_count;              /* Reference count for multiple opens */
 
-    Uint8 closed;               /* 1 if this device is no longer valid */
-    Uint8 uncentered;           /* 1 if this device needs to have its state reset to 0 */
-    struct _SDL_Joystick *next; /* pointer to next joystick we have allocated */
+	Uint8 closed;               /* 1 if this device is no longer valid */
+	Uint8 uncentered;           /* 1 if this device needs to have its state reset to 0 */
+	struct _SDL_Joystick *next; /* pointer to next joystick we have allocated */
 };
 
 /* Function to scan the system for joysticks.

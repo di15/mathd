@@ -1,4 +1,3 @@
-
 #ifndef JPSEXPANSION_H
 #define JPSEXPANSION_H
 

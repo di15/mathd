@@ -1,5 +1,4 @@
 
-
 #include "gmain.h"
 #include "../common/gui/gui.h"
 #include "keymap.h"
@@ -51,7 +50,7 @@ double g_updfrinterval = 0;
 void SkipLogo()
 {
 	g_mode = APPMODE_LOADING;
-	Player* py = &g_player[g_currP];
+	Player* py = &g_player[g_curP];
 	GUI* gui = &py->gui;
 	gui->closeall();
 	gui->open("loading");
@@ -61,7 +60,7 @@ void UpdateLogo()
 {
 	static int stage = 0;
 
-	Player* py = &g_player[g_currP];
+	Player* py = &g_player[g_curP];
 	GUI* gui = &py->gui;
 
 	if(stage < 60)
@@ -86,7 +85,9 @@ void UpdateLoading()
 
 	switch(stage)
 	{
-	case 0: if(!Load1Model()) stage++; break;
+	case 0:
+		if(!Load1Model()) stage++;
+		break;
 	case 1:
 		if(!Load1Texture())
 		{
@@ -120,14 +121,14 @@ void CalcUpdRate()
 	static unsigned int lasttime;
 
 	// Get the current time in seconds
-    unsigned int currtime = timeGetTime();
+	unsigned int currtime = timeGetTime();
 
 	// We added a small value to the frame interval to account for some video
 	// cards (Radeon's) with fast computers falling through the floor without it.
 
 	// Here we store the elapsed time between the current and last frame,
 	// then keep the current frame in our static variable for the next frame.
- 	g_updfrinterval = (currtime - frametime) / 1000.0f;	// + 0.005f;
+	g_updfrinterval = (currtime - frametime) / 1000.0f;	// + 0.005f;
 
 	//g_instantdrawfps = 1.0f / (g_currentTime - frameTime);
 	//g_instantdrawfps = 1.0f / g_drawfrinterval;
@@ -135,20 +136,20 @@ void CalcUpdRate()
 	frametime = currtime;
 
 	// Increase the frame counter
-    ++framecounter;
+	++framecounter;
 
 	// Now we want to subtract the current time by the last time that was stored
 	// to see if the time elapsed has been over a second, which means we found our FPS.
-    if( currtime - lasttime > 1000 )
+	if( currtime - lasttime > 1000 )
 	{
 		g_instantupdfps = framecounter;
 
 		// Here we set the lastTime to the currentTime
-	    lasttime = currtime;
+		lasttime = currtime;
 
 		// Reset the frames per second
-        framecounter = 0;
-    }
+		framecounter = 0;
+	}
 }
 
 bool UpdNextFrame(int desiredFrameRate)
@@ -192,12 +193,12 @@ void UpdateGameState()
 {
 	g_simframe ++;
 
-	StartTimer(UPDATEUNITS);
+	StartTimer(TIMER_UPDATEUNITS);
 	UpdateUnits();
-	StopTimer(UPDATEUNITS);
-	StartTimer(UPDATEBUILDINGS);
+	StopTimer(TIMER_UPDATEUNITS);
+	StartTimer(TIMER_UPDATEBUILDINGS);
 	UpdateBuildings();
-	StopTimer(UPDATEBUILDINGS);
+	StopTimer(TIMER_UPDATEBUILDINGS);
 }
 
 void UpdateEditor()
@@ -225,13 +226,14 @@ void Update()
 
 void DrawScene(Matrix projection, Matrix viewmat, Matrix modelmat, Matrix modelviewinv, float lightpos[3], float lightdir[3])
 {
-	Player* py = &g_player[g_currP];
+	Player* py = &g_player[g_curP];
 	Camera* c = &py->camera;
 
 #if 1
 	Matrix mvpmat;
 	mvpmat.set(projection.m_matrix);
 	mvpmat.postmult(viewmat);
+	g_cammvp = mvpmat;
 
 	g_frustum.construct(projection.m_matrix, viewmat.m_matrix);
 
@@ -239,9 +241,11 @@ void DrawScene(Matrix projection, Matrix viewmat, Matrix modelmat, Matrix modelv
 	DrawSkyBox(c->zoompos());
 	//DrawSkyBox(Vec3f(0,0,0));
 	EndS();
+#ifdef GLDEBUG
 	CheckGLError(__FILE__, __LINE__);
+#endif
 
-	StartTimer(DRAWMAP);
+	StartTimer(TIMER_DRAWMAP);
 #if 1
 	UseShadow(SHADER_MAPTILES, projection, viewmat, modelmat, modelviewinv, lightpos, lightdir);
 	glActiveTexture(GL_TEXTURE8);
@@ -251,25 +255,35 @@ void DrawScene(Matrix projection, Matrix viewmat, Matrix modelmat, Matrix modelv
 	//g_hmap.draw();
 	EndS();
 #endif
-	StopTimer(DRAWMAP);
+	StopTimer(TIMER_DRAWMAP);
+#ifdef GLDEBUG
 	CheckGLError(__FILE__, __LINE__);
+#endif
 
-	StartTimer(DRAWRIM);
+	StartTimer(TIMER_DRAWRIM);
 #if 1
 	UseShadow(SHADER_RIM, projection, viewmat, modelmat, modelviewinv, lightpos, lightdir);
+#ifdef GLDEBUG
 	CheckGLError(__FILE__, __LINE__);
+#endif
 	glActiveTexture(GL_TEXTURE8);
 	glBindTexture(GL_TEXTURE_2D, g_depth);
 	glUniform1i(g_shader[g_curS].m_slot[SSLOT_SHADOWMAP], 8);
+#ifdef GLDEBUG
 	CheckGLError(__FILE__, __LINE__);
+#endif
 	g_hmap.drawrim();
+#ifdef GLDEBUG
 	CheckGLError(__FILE__, __LINE__);
+#endif
 	EndS();
 #endif
-	StopTimer(DRAWRIM);
+	StopTimer(TIMER_DRAWRIM);
+#ifdef GLDEBUG
 	CheckGLError(__FILE__, __LINE__);
+#endif
 
-	StartTimer(DRAWWATER);
+	StartTimer(TIMER_DRAWWATER);
 #if 1
 	UseShadow(SHADER_WATER, projection, viewmat, modelmat, modelviewinv, lightpos, lightdir);
 	glActiveTexture(GL_TEXTURE4);
@@ -279,8 +293,10 @@ void DrawScene(Matrix projection, Matrix viewmat, Matrix modelmat, Matrix modelv
 	//DrawWater();
 	EndS();
 #endif
-	StopTimer(DRAWWATER);
+	StopTimer(TIMER_DRAWWATER);
+#ifdef GLDEBUG
 	CheckGLError(__FILE__, __LINE__);
+#endif
 
 #if 1
 	UseShadow(SHADER_OWNED, projection, viewmat, modelmat, modelviewinv, lightpos, lightdir);
@@ -291,24 +307,26 @@ void DrawScene(Matrix projection, Matrix viewmat, Matrix modelmat, Matrix modelv
 	glUniform4f(g_shader[g_curS].m_slot[SSLOT_COLOR], 1, 1, 1, 1);
 	glUniform4f(g_shader[g_curS].m_slot[SSLOT_OWNCOLOR], 1, 0, 0, 1);
 	DrawPy();
-	StartTimer(DRAWBUILDINGS);
+	StartTimer(TIMER_DRAWBL);
 	DrawBl();
-	StopTimer(DRAWBUILDINGS);
-	StartTimer(DRAWROADS);
+	StopTimer(TIMER_DRAWBL);
+	StartTimer(TIMER_DRAWROADS);
 	DrawRoads();
-	StopTimer(DRAWROADS);
-	StartTimer(DRAWCRPIPES);
+	StopTimer(TIMER_DRAWROADS);
+	StartTimer(TIMER_DRAWCRPIPES);
 	DrawCrPipes();
-	StopTimer(DRAWCRPIPES);
-	StartTimer(DRAWPOWLS);
+	StopTimer(TIMER_DRAWCRPIPES);
+	StartTimer(TIMER_DRAWPOWLS);
 	DrawPowls();
-	StopTimer(DRAWPOWLS);
+	StopTimer(TIMER_DRAWPOWLS);
 	DrawSBuild();
 	EndS();
+#ifdef GLDEBUG
 	CheckGLError(__FILE__, __LINE__);
 #endif
+#endif
 
-	StartTimer(DRAWUNITS);
+	StartTimer(TIMER_DRAWUNITS);
 #if 1
 	UseShadow(SHADER_UNIT, projection, viewmat, modelmat, modelviewinv, lightpos, lightdir);
 	glActiveTexture(GL_TEXTURE5);
@@ -319,11 +337,13 @@ void DrawScene(Matrix projection, Matrix viewmat, Matrix modelmat, Matrix modelv
 	DrawUnits();
 	EndS();
 #endif
-	StopTimer(DRAWUNITS);
+	StopTimer(TIMER_DRAWUNITS);
+#ifdef GLDEBUG
 	CheckGLError(__FILE__, __LINE__);
+#endif
 
 #if 1
-	StartTimer(DRAWFOLIAGE);
+	StartTimer(TIMER_DRAWFOLIAGE);
 	UseShadow(SHADER_FOLIAGE, projection, viewmat, modelmat, modelviewinv, lightpos, lightdir);
 	glActiveTexture(GL_TEXTURE5);
 	glBindTexture(GL_TEXTURE_2D, g_depth);
@@ -331,10 +351,12 @@ void DrawScene(Matrix projection, Matrix viewmat, Matrix modelmat, Matrix modelv
 	glUniform4f(g_shader[g_curS].m_slot[SSLOT_COLOR], 1, 1, 1, 1);
 	DrawFoliage(c->zoompos(), c->m_up, c->m_strafe);
 	EndS();
-	StopTimer(DRAWFOLIAGE);
+	StopTimer(TIMER_DRAWFOLIAGE);
 #endif
 
+#ifdef GLDEBUG
 	CheckGLError(__FILE__, __LINE__);
+#endif
 
 #if 0
 	UseShadow(SHADER_BORDERS, projection, viewmat, modelmat, modelviewinv, lightpos, lightdir);
@@ -356,9 +378,13 @@ void DrawScene(Matrix projection, Matrix viewmat, Matrix modelmat, Matrix modelv
 #endif
 
 	DrawSel(&projection, &modelmat, &viewmat);
+#ifdef GLDEBUG
 	CheckGLError(__FILE__, __LINE__);
+#endif
 	DrawOrders(&projection, &modelmat, &viewmat);
+#ifdef GLDEBUG
 	CheckGLError(__FILE__, __LINE__);
+#endif
 
 #if 1
 	//UseShadow(SHADER_BILLBOARD, projection, viewmat, modelmat, modelviewinv, lightpos, lightdir);
@@ -370,20 +396,26 @@ void DrawScene(Matrix projection, Matrix viewmat, Matrix modelmat, Matrix modelv
 	glUniformMatrix4fv(s->m_slot[SSLOT_PROJECTION], 1, 0, projection.m_matrix);
 	glUniformMatrix4fv(s->m_slot[SSLOT_MODELMAT], 1, 0, modelmat.m_matrix);
 	glUniformMatrix4fv(s->m_slot[SSLOT_VIEWMAT], 1, 0, viewmat.m_matrix);
+	glUniformMatrix4fv(s->m_slot[SSLOT_MVP], 1, 0, mvpmat.m_matrix);
 	//glUniformMatrix4fv(s->m_slot[SSLOT_NORMALMAT], 1, 0, modelviewinv.m_matrix);
 	//glUniformMatrix4fv(s->m_slot[SSLOT_INVMODLVIEWMAT], 1, 0, modelviewinv.m_matrix);
 	glUniform4f(s->m_slot[SSLOT_COLOR], 1, 1, 1, 1);
+#ifdef GLDEBUG
 	CheckGLError(__FILE__, __LINE__);
+#endif
 	UpdateParticles();
-	StartTimer(SORTPARTICLES);
+	StartTimer(TIMER_SORTPARTICLES);
 	SortBillboards();
-	StopTimer(SORTPARTICLES);
+	StopTimer(TIMER_SORTPARTICLES);
 	DrawBillboards();
 	EndS();
 #endif
 
 #if 1
+	StartTimer(TIMER_DRAWGUI);
+#ifdef GLDEBUG
 	CheckGLError(__FILE__, __LINE__);
+#endif
 	Ortho(py->width, py->height, 1, 1, 1, 1);
 	glDisable(GL_DEPTH_TEST);
 	//DrawDeposits(projection, viewmat);
@@ -391,11 +423,14 @@ void DrawScene(Matrix projection, Matrix viewmat, Matrix modelmat, Matrix modelv
 	DrawBReason(&mvpmat, py->width, py->height, true);
 	glEnable(GL_DEPTH_TEST);
 	EndS();
+	StopTimer(TIMER_DRAWGUI);
 #endif
 #endif
 
 #if 0
+#ifdef GLDEBUG
 	CheckGLError(__FILE__, __LINE__);
+#endif
 	Ortho(py->width, py->height, 1, 1, 1, 1);
 	glDisable(GL_DEPTH_TEST);
 	FoliageT* t = &g_foliageT[FOLIAGE_TREE1];
@@ -417,60 +452,99 @@ void DrawScene(Matrix projection, Matrix viewmat, Matrix modelmat, Matrix modelv
 
 void DrawSceneDepth()
 {
-#if 1
-	Player* py = &g_player[g_currP];
+	StartTimer(TIMER_DRAWSCENEDEPTH);
 
+#if 1
+	Player* py = &g_player[g_curP];
+
+#ifdef GLDEBUG
 	CheckGLError(__FILE__, __LINE__);
+#endif
 	//if(rand()%2 == 1)
+	StartTimer(TIMER_DRAWMAPDEPTH);
 	g_hmap.draw2();
+	StopTimer(TIMER_DRAWMAPDEPTH);
+#ifdef GLDEBUG
 	CheckGLError(__FILE__, __LINE__);
+#endif
 	g_hmap.drawrim();
+#ifdef GLDEBUG
 	CheckGLError(__FILE__, __LINE__);
+#endif
 	//g_hmap.draw2();
 	DrawBl();
+#ifdef GLDEBUG
 	CheckGLError(__FILE__, __LINE__);
+#endif
 	DrawRoads();
+#ifdef GLDEBUG
 	CheckGLError(__FILE__, __LINE__);
+#endif
 	DrawCrPipes();
+#ifdef GLDEBUG
 	CheckGLError(__FILE__, __LINE__);
+#endif
 	DrawPowls();
+#ifdef GLDEBUG
 	CheckGLError(__FILE__, __LINE__);
+#endif
+	StartTimer(TIMER_DRAWUNITSDEPTH);
 	DrawUnits();
+	StopTimer(TIMER_DRAWUNITSDEPTH);
+#ifdef GLDEBUG
 	CheckGLError(__FILE__, __LINE__);
+#endif
 	DrawPy();
+#ifdef GLDEBUG
 	CheckGLError(__FILE__, __LINE__);
+#endif
 #if 1
 	DrawFoliage(g_lightpos, Vec3f(0,1,0), Cross(Vec3f(0,1,0), Normalize(g_lighteye - g_lightpos)));
+#ifdef GLDEBUG
 	CheckGLError(__FILE__, __LINE__);
 #endif
 #endif
+#endif
+
+	StopTimer(TIMER_DRAWSCENEDEPTH);
 }
 
 void Draw()
 {
-	CheckGLError(__FILE__, __LINE__);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	CheckGLError(__FILE__, __LINE__);
+	StartTimer(TIMER_DRAWSETUP);
 
-	Player* py = &g_player[g_currP];
+#ifdef GLDEBUG
+	CheckGLError(__FILE__, __LINE__);
+#endif
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+#ifdef GLDEBUG
+	CheckGLError(__FILE__, __LINE__);
+#endif
+
+	Player* py = &g_player[g_curP];
 	GUI* gui = &py->gui;
 	Camera* c = &py->camera;
+
+	StopTimer(TIMER_DRAWSETUP);
 
 #if 2
 	if(g_mode == APPMODE_PLAY || g_mode == APPMODE_EDITOR)
 	{
+		StartTimer(TIMER_DRAWSETUP);
 
 		float aspect = fabsf((float)py->width / (float)py->height);
 		Matrix projection = PerspProj(FIELD_OF_VIEW, aspect, MIN_DISTANCE, MAX_DISTANCE/py->zoom);
 		//Matrix projection = OrthoProj(-PROJ_RIGHT*aspect/py->zoom, PROJ_RIGHT*aspect/py->zoom, PROJ_RIGHT/py->zoom, -PROJ_RIGHT/py->zoom, MIN_DISTANCE, MAX_DISTANCE);
 
+		g_camproj = projection;
+
 		Vec3f focusvec = c->m_view;
 		Vec3f posvec = c->zoompos();
 		Vec3f upvec = c->m_up;
 
-		Matrix viewmat = gluLookAt3(posvec.x, posvec.y, posvec.z, focusvec.x, focusvec.y, focusvec.z, upvec.x, upvec.y, upvec.z);
+		Matrix viewmat = LookAt(posvec.x, posvec.y, posvec.z, focusvec.x, focusvec.y, focusvec.z, upvec.x, upvec.y, upvec.z);
 
-        g_camview = viewmat;
+		g_camview = viewmat;
 
 		Matrix modelview;
 		Matrix modelmat;
@@ -480,35 +554,43 @@ void Draw()
 		modelmat.reset();
 		modelview.postmult(viewmat);
 
+		g_cammodelview = modelview;
+
 		Matrix mvpmat;
 		mvpmat.set(projection.m_matrix);
 		mvpmat.postmult(viewmat);
 
-		//if(v->m_type == VIEWPORT_MAIN3D)
-		{
-			//RenderToShadowMap(projection, viewmat, modelmat, c->m_view);
-			//RenderToShadowMap(projection, viewmat, modelmat, Vec3f(0,0,0));
-			Vec3f focus;
-			Vec3f vLine[2];
-			Vec3f ray = Normalize(c->m_view - posvec);
-			Vec3f onnear = posvec;	//OnNear(py->width/2, py->height/2);
-			vLine[0] = onnear;
-			vLine[1] = onnear + (ray * 10000000.0f);
-			//if(!GetMapIntersection(&g_hmap, vLine, &focus))
-			//if(!FastMapIntersect(&g_hmap, vLine, &focus))
-				//if(!GetMapIntersection(&g_hmap, vLine, &focus))
-					//GetMapIntersection2(&g_hmap, vLine, &focus);
-					//if(!GetMapIntersection2(&g_hmap, vLine, &focus))
-						//GetMapIntersection(&g_hmap, vLine, &focus);
-			focus = c->m_view;
-			CheckGLError(__FILE__, __LINE__);
-			RenderToShadowMap(projection, viewmat, modelmat, focus, focus + g_lightoff / py->zoom, DrawSceneDepth);
-			CheckGLError(__FILE__, __LINE__);
-			RenderShadowedScene(projection, viewmat, modelmat, modelview, DrawScene);
-			CheckGLError(__FILE__, __LINE__);
-		}
+        Vec3f focus;
+        Vec3f vLine[2];
+        Vec3f ray = Normalize(c->m_view - posvec);
+        Vec3f onnear = posvec;	//OnNear(py->width/2, py->height/2);
+        vLine[0] = onnear;
+        vLine[1] = onnear + (ray * 10000000.0f);
+        //if(!GetMapIntersection(&g_hmap, vLine, &focus))
+        //if(!FastMapIntersect(&g_hmap, vLine, &focus))
+        //if(!GetMapIntersection(&g_hmap, vLine, &focus))
+        //GetMapIntersection2(&g_hmap, vLine, &focus);
+        //if(!GetMapIntersection2(&g_hmap, vLine, &focus))
+        //GetMapIntersection(&g_hmap, vLine, &focus);
+        focus = c->m_view;
+#ifdef GLDEBUG
+        CheckGLError(__FILE__, __LINE__);
+#endif
+
+        StopTimer(TIMER_DRAWSETUP);
+
+        RenderToShadowMap(projection, viewmat, modelmat, focus, focus + g_lightoff / py->zoom, DrawSceneDepth);
+#ifdef GLDEBUG
+        CheckGLError(__FILE__, __LINE__);
+#endif
+        RenderShadowedScene(projection, viewmat, modelmat, modelview, DrawScene);
+#ifdef GLDEBUG
+        CheckGLError(__FILE__, __LINE__);
+#endif
 	}
+#ifdef GLDEBUG
 	CheckGLError(__FILE__, __LINE__);
+#endif
 #endif
 
 #if 0
@@ -516,15 +598,18 @@ void Draw()
 	g_log.flush();
 #endif
 
-	gui->frameupd();
 
+	StartTimer(TIMER_DRAWGUI);
+	gui->frameupd();
 #if 0
 	g_log<<("before gui dr")<<endl;
 	g_log.flush();
 #endif
-
+#ifdef GLDEBUG
 	CheckGLError(__FILE__, __LINE__);
+#endif
 	gui->draw();
+	StopTimer(TIMER_DRAWGUI);
 
 #if 0
 	for(int i=0; i<30; i++)
@@ -538,17 +623,23 @@ void Draw()
 	glDrawPixels(blitscreen.sizeX, blitscreen.sizeY, GL_RGB, GL_BYTE, blitscreen.data);
 #endif
 
+#ifdef GLDEBUG
 	CheckGLError(__FILE__, __LINE__);
+#endif
 	Ortho(py->width, py->height, 1, 1, 1, 1);
+#ifdef GLDEBUG
 	CheckGLError(__FILE__, __LINE__);
+#endif
 	glDisable(GL_DEPTH_TEST);
+#ifdef GLDEBUG
 	CheckGLError(__FILE__, __LINE__);
+#endif
 
 #if 0
 	RichText uni;
 
 	for(int i=16000; i<19000; i++)
-	//for(int i=0; i<3000; i++)
+		//for(int i=0; i<3000; i++)
 	{
 		uni.m_part.push_back(RichTextP(i));
 	}
@@ -565,7 +656,9 @@ void Draw()
 	CheckGLError(__FILE__, __LINE__);
 	glEnable(GL_DEPTH_TEST);
 	EndS();
+#ifdef GLDEBUG
 	CheckGLError(__FILE__, __LINE__);
+#endif
 #endif
 
 #if 0
@@ -585,7 +678,7 @@ bool OverMinimap()
 
 void Scroll()
 {
-	Player* py = &g_player[g_currP];
+	Player* py = &g_player[g_curP];
 	Camera* c = &py->camera;
 
 	if(py->mouseout)
@@ -722,13 +815,13 @@ void LoadConfig()
 	ifstream f(cfgfull);
 
 	if(!f)
-        return;
+		return;
 
 	std::string line;
 	char keystr[128];
 	char actstr[128];
 
-	Player* py = &g_player[g_currP];
+	Player* py = &g_player[g_curP];
 
 	while(!f.eof())
 	{
@@ -738,7 +831,7 @@ void LoadConfig()
 		getline(f, line);
 
 		if(line.length() > 127)
-            continue;
+			continue;
 
 		sscanf(line.c_str(), "%s %s", keystr, actstr);
 
@@ -755,12 +848,26 @@ void LoadConfig()
 
 int testfunc(ObjectScript::OS* os, int nparams, int closure_values, int need_ret_values, void * param)
 {
-    InfoMessage("os", "test");
-    return 1;
+	InfoMessage("os", "test");
+	return 1;
+}
+
+// Define the function to be called when ctrl-c (SIGINT) signal is sent to process
+void SignalCallback(int signum)
+{
+    //printf("Caught signal %d\n",signum);
+    // Cleanup and close up stuff here
+
+    // Terminate program
+    g_quit = true;
 }
 
 void Init()
 {
+#ifdef PLATFORM_LINUX
+	signal(SIGINT, SignalCallback);
+#endif
+
 	SDL_Init(SDL_INIT_VIDEO);
 
 	OpenLog("log.txt", VERSION);
@@ -769,15 +876,15 @@ void Init()
 
 	LoadConfig();
 
-    g_os = ObjectScript::OS::create();
-    g_os->pushCFunction(testfunc);
-    g_os->setGlobal("testfunc");
-    //os->eval("testfunc();");
-    //os->eval("function require(){ /* if(relative == \"called.os\") */ { testfunc(); } }");
-    char autoexecpath[MAX_PATH+1];
-    FullPath("scripts/autoexec.os", autoexecpath);
-    //g_os->require(autoexecpath);
-    g_os->release();
+	g_os = ObjectScript::OS::create();
+	g_os->pushCFunction(testfunc);
+	g_os->setGlobal("testfunc");
+	//os->eval("testfunc();");
+	//os->eval("function require(){ /* if(relative == \"called.os\") */ { testfunc(); } }");
+	char autoexecpath[MAX_PATH+1];
+	FullPath("scripts/autoexec.os", autoexecpath);
+	//g_os->require(autoexecpath);
+	g_os->release();
 
 	//EnumerateMaps();
 	//EnumerateDisplay();
@@ -790,8 +897,8 @@ void Deinit()
 {
 	WriteProfiles(-1, 0);
 	DestroyWindow(TITLE);
-    // Clean up
-    SDL_Quit();
+	// Clean up
+	SDL_Quit();
 }
 
 void EventLoop()
@@ -801,42 +908,43 @@ void EventLoop()
 	SDLMod  e.key.keysym.mod
 	key->keysym.unicode
 
-        if( mod & KMOD_NUM ) printf( "NUMLOCK " );
-        if( mod & KMOD_CAPS ) printf( "CAPSLOCK " );
-        if( mod & KMOD_LCTRL ) printf( "LCTRL " );
-        if( mod & KMOD_RCTRL ) printf( "RCTRL " );
-        if( mod & KMOD_RSHIFT ) printf( "RSHIFT " );
-        if( mod & KMOD_LSHIFT ) printf( "LSHIFT " );
-        if( mod & KMOD_RALT ) printf( "RALT " );
-        if( mod & KMOD_LALT ) printf( "LALT " );
-        if( mod & KMOD_CTRL ) printf( "CTRL " );
-        if( mod & KMOD_SHIFT ) printf( "SHIFT " );
-        if( mod & KMOD_ALT ) printf( "ALT " );
+	if( mod & KMOD_NUM ) printf( "NUMLOCK " );
+	if( mod & KMOD_CAPS ) printf( "CAPSLOCK " );
+	if( mod & KMOD_LCTRL ) printf( "LCTRL " );
+	if( mod & KMOD_RCTRL ) printf( "RCTRL " );
+	if( mod & KMOD_RSHIFT ) printf( "RSHIFT " );
+	if( mod & KMOD_LSHIFT ) printf( "LSHIFT " );
+	if( mod & KMOD_RALT ) printf( "RALT " );
+	if( mod & KMOD_LALT ) printf( "LALT " );
+	if( mod & KMOD_CTRL ) printf( "CTRL " );
+	if( mod & KMOD_SHIFT ) printf( "SHIFT " );
+	if( mod & KMOD_ALT ) printf( "ALT " );
 #endif
 
 	//SDL_EnableUNICODE(SDL_ENABLE);
 
-	Player* py = &g_player[g_currP];
+	Player* py = &g_player[g_curP];
 	GUI* gui = &py->gui;
 
-	while (!g_quit) {
+	while (!g_quit)
+	{
 
-		StartTimer(FRAME);
+		StartTimer(TIMER_FRAME);
 
-        SDL_Event e;
+		SDL_Event e;
 
-		StartTimer(EVENT);
+		StartTimer(TIMER_EVENT);
 
-        while (SDL_PollEvent(&e))
-        {
-            InEv ev;
-            ev.intercepted = false;
+		while (SDL_PollEvent(&e))
+		{
+			InEv ev;
+			ev.intercepted = false;
 
-            if (e.type == SDL_QUIT)
-            {
-                g_quit = true;
-                break;
-            }
+			if (e.type == SDL_QUIT)
+			{
+				g_quit = true;
+				break;
+			}
 			else if(e.type == SDL_KEYDOWN)
 			{
 				ev.type = INEV_KEYDOWN;
@@ -942,8 +1050,8 @@ void EventLoop()
 				gui->inev(&ev);
 			}
 			else if (e.type == SDL_MOUSEBUTTONDOWN)
-            {
-                if (e.button.button == SDL_BUTTON_LEFT)
+			{
+				if (e.button.button == SDL_BUTTON_LEFT)
 				{
 					py->mousekeys[MOUSE_LEFT] = true;
 					py->moved = false;
@@ -958,7 +1066,7 @@ void EventLoop()
 
 					py->keyintercepted = ev.intercepted;
 				}
-                else if (e.button.button == SDL_BUTTON_RIGHT)
+				else if (e.button.button == SDL_BUTTON_RIGHT)
 				{
 					py->mousekeys[MOUSE_RIGHT] = true;
 
@@ -970,7 +1078,7 @@ void EventLoop()
 
 					gui->inev(&ev);
 				}
-                else if (e.button.button == SDL_BUTTON_MIDDLE)
+				else if (e.button.button == SDL_BUTTON_MIDDLE)
 				{
 					py->mousekeys[MOUSE_MIDDLE] = true;
 
@@ -982,10 +1090,10 @@ void EventLoop()
 
 					gui->inev(&ev);
 				}
-            }
+			}
 			else if (e.type == SDL_MOUSEBUTTONUP)
-            {
-                if (e.button.button == SDL_BUTTON_LEFT)
+			{
+				if (e.button.button == SDL_BUTTON_LEFT)
 				{
 					py->mousekeys[MOUSE_LEFT] = false;
 
@@ -997,7 +1105,7 @@ void EventLoop()
 
 					gui->inev(&ev);
 				}
-                else if (e.button.button == SDL_BUTTON_RIGHT)
+				else if (e.button.button == SDL_BUTTON_RIGHT)
 				{
 					py->mousekeys[MOUSE_RIGHT] = false;
 
@@ -1009,7 +1117,7 @@ void EventLoop()
 
 					gui->inev(&ev);
 				}
-                else if (e.button.button == SDL_BUTTON_MIDDLE)
+				else if (e.button.button == SDL_BUTTON_MIDDLE)
 				{
 					py->mousekeys[MOUSE_MIDDLE] = false;
 
@@ -1021,7 +1129,7 @@ void EventLoop()
 
 					gui->inev(&ev);
 				}
-            }
+			}
 			else if (e.type == SDL_MOUSEMOTION)
 			{
 				//py->mouse.x = e.motion.x;
@@ -1043,19 +1151,23 @@ void EventLoop()
 					gui->inev(&ev);
 				}
 			}
-        }
+		}
 
-		StopTimer(EVENT);
+		StopTimer(TIMER_EVENT);
 #if 1
 		if ((g_mode == APPMODE_LOADING || g_mode == APPMODE_RELOADING) || true /* DrawNextFrame(DRAW_FRAME_RATE) */ )
 #endif
 		{
-			StartTimer(DRAW);
+			StartTimer(TIMER_DRAW);
 
 			CalcDrawRate();
+#ifdef GLDEBUG
 			CheckGLError(__FILE__, __LINE__);
+#endif
 			Draw();
+#ifdef GLDEBUG
 			CheckGLError(__FILE__, __LINE__);
+#endif
 
 			if(g_mode == APPMODE_PLAY || g_mode == APPMODE_EDITOR)
 			{
@@ -1063,21 +1175,21 @@ void EventLoop()
 				UpdateResTicker();
 			}
 
-			StopTimer(DRAW);
+			StopTimer(TIMER_DRAW);
 		}
 
 		if((g_mode == APPMODE_LOADING || g_mode == APPMODE_RELOADING) || UpdNextFrame(SIM_FRAME_RATE) )
 		{
-			StartTimer(UPDATE);
+			StartTimer(TIMER_UPDATE);
 
 			CalcUpdRate();
 			Update();
 
-			StopTimer(UPDATE);
+			StopTimer(TIMER_UPDATE);
 		}
 
-		StopTimer(FRAME);
-    }
+		StopTimer(TIMER_FRAME);
+	}
 }
 
 #ifdef PLATFORM_WIN
@@ -1108,16 +1220,16 @@ int main(int argc, char* argv[])
 	g_log<<"3"<<endl;
 	g_log.flush();
 
-    EventLoop();
+	EventLoop();
 
 	g_log<<"4"<<endl;
 	g_log.flush();
 
-    //SDL_Delay(3000);  // Pause execution for 3000 milliseconds, for example
+	//SDL_Delay(3000);  // Pause execution for 3000 milliseconds, for example
 
 	Deinit();
 
 	SDL_ShowCursor(true);
 
-    return 0;
+	return 0;
 }

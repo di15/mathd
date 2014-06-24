@@ -10,11 +10,11 @@
 #endif
 
 SZ_RESULT SzDecode(const CFileSize *packSizes, const CFolder *folder,
-    #ifdef _LZMA_IN_CB
-    ISzInStream *stream, CFileSize startPos,
-    #else
-    const Byte *inBuffer,
-    #endif
-    Byte *outBuffer, size_t outSize, ISzAlloc *allocMain);
+	#ifdef _LZMA_IN_CB
+	ISzInStream *stream, CFileSize startPos,
+	#else
+	const Byte *inBuffer,
+	#endif
+	Byte *outBuffer, size_t outSize, ISzAlloc *allocMain);
 
 #endif

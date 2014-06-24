@@ -18,19 +18,19 @@ class CMultiStream:
 public:
   struct CSubStreamInfo
   {
-    CMyComPtr<IInStream> Stream;
-    UInt64 Pos;
-    UInt64 Size;
+	CMyComPtr<IInStream> Stream;
+	UInt64 Pos;
+	UInt64 Size;
   };
   CObjectVector<CSubStreamInfo> Streams;
   void Init()
   {
-    _streamIndex = 0;
-    _pos = 0;
-    _seekPos = 0;
-    _totalLength = 0;
-    for (int i = 0; i < Streams.Size(); i++)
-      _totalLength += Streams[i].Size;
+	_streamIndex = 0;
+	_pos = 0;
+	_seekPos = 0;
+	_totalLength = 0;
+	for (int i = 0; i < Streams.Size(); i++)
+	  _totalLength += Streams[i].Size;
   }
 
   MY_UNKNOWN_IMP1(IInStream)
@@ -51,19 +51,19 @@ class COutMultiStream:
 
   struct CSubStreamInfo
   {
-    CMyComPtr<ISequentialOutStream> Stream;
-    UInt64 Size;
-    UInt64 Pos;
+	CMyComPtr<ISequentialOutStream> Stream;
+	UInt64 Size;
+	UInt64 Pos;
  };
   CObjectVector<CSubStreamInfo> Streams;
 public:
   CMyComPtr<IArchiveUpdateCallback2> VolumeCallback;
   void Init()
   {
-    _streamIndex = 0;
-    _offsetPos = 0;
-    _absPos = 0;
-    _length = 0;
+	_streamIndex = 0;
+	_offsetPos = 0;
+	_absPos = 0;
+	_length = 0;
   }
 
   MY_UNKNOWN_IMP1(IOutStream)

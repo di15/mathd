@@ -1,7 +1,6 @@
 
 
 
-
 #ifndef SHADER_H
 #define SHADER_H
 
@@ -58,13 +57,17 @@
 #define SSLOT_MAPMINY			48
 #define SSLOT_MAPMAXY			49
 #define SSLOT_WAVEPHASE			50
-#define SSLOTS					51
+#define SSLOT_TEXCOORD0			51
+#define SSLOTS					52
 
 class Shader
 {
 public:
 	Shader()	{			 }
-	~Shader()	{ release(); }
+	~Shader()
+	{
+		release();
+	}
 
 	GLint getuniform(const char* strVariable);
 	GLint getattrib(const char* strVariable);

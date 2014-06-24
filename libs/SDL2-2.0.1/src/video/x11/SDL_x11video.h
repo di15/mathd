@@ -11,11 +11,11 @@
   freely, subject to the following restrictions:
 
   1. The origin of this software must not be misrepresented; you must not
-     claim that you wrote the original software. If you use this software
-     in a product, an acknowledgment in the product documentation would be
-     appreciated but is not required.
+	 claim that you wrote the original software. If you use this software
+	 in a product, an acknowledgment in the product documentation would be
+	 appreciated but is not required.
   2. Altered source versions must be plainly marked as such, and must not be
-     misrepresented as being the original software.
+	 misrepresented as being the original software.
   3. This notice may not be removed or altered from any source distribution.
 */
 #include "SDL_config.h"
@@ -72,50 +72,50 @@
 
 typedef struct SDL_VideoData
 {
-    Display *display;
-    char *classname;
-    pid_t pid;
-    XIM im;
-    Uint32 screensaver_activity;
-    int numwindows;
-    SDL_WindowData **windowlist;
-    int windowlistlength;
+	Display *display;
+	char *classname;
+	pid_t pid;
+	XIM im;
+	Uint32 screensaver_activity;
+	int numwindows;
+	SDL_WindowData **windowlist;
+	int windowlistlength;
 
-    /* This is true for ICCCM2.0-compliant window managers */
-    SDL_bool net_wm;
+	/* This is true for ICCCM2.0-compliant window managers */
+	SDL_bool net_wm;
 
-    /* Useful atoms */
-    Atom WM_PROTOCOLS;
-    Atom WM_DELETE_WINDOW;
-    Atom _NET_WM_STATE;
-    Atom _NET_WM_STATE_HIDDEN;
-    Atom _NET_WM_STATE_FOCUSED;
-    Atom _NET_WM_STATE_MAXIMIZED_VERT;
-    Atom _NET_WM_STATE_MAXIMIZED_HORZ;
-    Atom _NET_WM_STATE_FULLSCREEN;
-    Atom _NET_WM_ALLOWED_ACTIONS;
-    Atom _NET_WM_ACTION_FULLSCREEN;
-    Atom _NET_WM_NAME;
-    Atom _NET_WM_ICON_NAME;
-    Atom _NET_WM_ICON;
-    Atom _NET_WM_PING;
-    Atom _NET_ACTIVE_WINDOW;
-    Atom UTF8_STRING;
-    Atom PRIMARY;
-    Atom XdndEnter;
-    Atom XdndPosition;
-    Atom XdndStatus;
-    Atom XdndTypeList;
-    Atom XdndActionCopy;
-    Atom XdndDrop;
-    Atom XdndFinished;
-    Atom XdndSelection;
+	/* Useful atoms */
+	Atom WM_PROTOCOLS;
+	Atom WM_DELETE_WINDOW;
+	Atom _NET_WM_STATE;
+	Atom _NET_WM_STATE_HIDDEN;
+	Atom _NET_WM_STATE_FOCUSED;
+	Atom _NET_WM_STATE_MAXIMIZED_VERT;
+	Atom _NET_WM_STATE_MAXIMIZED_HORZ;
+	Atom _NET_WM_STATE_FULLSCREEN;
+	Atom _NET_WM_ALLOWED_ACTIONS;
+	Atom _NET_WM_ACTION_FULLSCREEN;
+	Atom _NET_WM_NAME;
+	Atom _NET_WM_ICON_NAME;
+	Atom _NET_WM_ICON;
+	Atom _NET_WM_PING;
+	Atom _NET_ACTIVE_WINDOW;
+	Atom UTF8_STRING;
+	Atom PRIMARY;
+	Atom XdndEnter;
+	Atom XdndPosition;
+	Atom XdndStatus;
+	Atom XdndTypeList;
+	Atom XdndActionCopy;
+	Atom XdndDrop;
+	Atom XdndFinished;
+	Atom XdndSelection;
 
-    SDL_Scancode key_layout[256];
-    SDL_bool selection_waiting;
+	SDL_Scancode key_layout[256];
+	SDL_bool selection_waiting;
 
 #if SDL_USE_LIBDBUS
-    DBusConnection *dbus;
+	DBusConnection *dbus;
 #endif
 } SDL_VideoData;
 

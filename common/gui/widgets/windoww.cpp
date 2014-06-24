@@ -1,5 +1,4 @@
 
-
 #include "../gui.h"
 #include "../../texture.h"
 #include "../../sim/player.h"
@@ -36,26 +35,40 @@ WindowW::WindowW(Widget* parent, const char* n, void (*reframef)(Widget* thisw))
 
 	const float alpha = 0.9f;
 
+#ifdef GLDEBUG
 	CheckGLError(__FILE__, __LINE__);
+#endif
 
 	top_image = Image(this, "gui/frames/outertop2x64.png", true, NULL, 1, 1, 1, alpha,		0, 0, 1, 1);
 
+#ifdef GLDEBUG
 	CheckGLError(__FILE__, __LINE__);
+#endif
 	topleft_image = Image(this, "gui/frames/outertopleft64x64.png", true, NULL, 1, 1, 1, alpha,		0, 0, 1, 1);
 
+#ifdef GLDEBUG
 	CheckGLError(__FILE__, __LINE__);
+#endif
 	topright_image = Image(this, "gui/frames/outertopleft64x64.png", true, NULL, 1, 1, 1, alpha,		1, 0, 0, 1);
 
+#ifdef GLDEBUG
 	CheckGLError(__FILE__, __LINE__);
+#endif
 	left_image = Image(this, "gui/frames/outerleft64x2.png", false, NULL, 1, 1, 1, alpha,		0, 0, 1, 1);
 
+#ifdef GLDEBUG
 	CheckGLError(__FILE__, __LINE__);
+#endif
 	right_image = Image(this, "gui/frames/outerleft64x2.png", false, NULL, 1, 1, 1, alpha,		1, 0, 0, 1);
 
+#ifdef GLDEBUG
 	CheckGLError(__FILE__, __LINE__);
+#endif
 	bottom_image = Image(this, "gui/frames/outertop2x64.png", true, NULL, 1, 1, 1, alpha,		0, 1, 1, 0);
 
+#ifdef GLDEBUG
 	CheckGLError(__FILE__, __LINE__);
+#endif
 	bottomleft_image = Image(this, "gui/frames/outertopleft64x64.png", true, NULL, 1, 1, 1, alpha,		0, 1, 1, 0);
 	bottomright_image = Image(this, "gui/frames/outertopleft64x64.png", true, NULL, 1, 1, 1, alpha,		1, 1, 0, 0);
 	bg_image = Image(this, "gui/backg/white.jpg", true, NULL, 1, 1, 1, alpha,		0, 0, 1, 1);
@@ -325,14 +338,14 @@ void WindowW::inev(InEv* ev)
 	for(auto w=m_subwidg.rbegin(); w!=m_subwidg.rend(); w++)
 		(*w)->inev(ev);
 
-	Player* py = &g_player[g_currP];
+	Player* py = &g_player[g_curP];
 
 	vscroll.inev(ev);
 
 	if(m_ldown)
 	{
 		if(ev->type == INEV_MOUSEMOVE ||
-			( (ev->type == INEV_MOUSEDOWN || ev->type == INEV_MOUSEUP) && ev->key == MOUSE_LEFT) )
+				( (ev->type == INEV_MOUSEDOWN || ev->type == INEV_MOUSEUP) && ev->key == MOUSE_LEFT) )
 			ev->intercepted = true;
 
 		if(ev->type == INEV_MOUSEUP && ev->key == MOUSE_LEFT)
@@ -352,10 +365,26 @@ void WindowW::inev(InEv* ev)
 				m_pos[2] += dx;
 				m_pos[3] += dy;
 
-				if(m_pos[0]-64 < 0)	{ m_pos[2] -= m_pos[0] - 64; m_pos[0] = 64; }
-				if(m_pos[2]+64 > py->width) { m_pos[0] -= m_pos[2] + 64 - py->width; m_pos[2] = py->width - 64; }
-				if(m_pos[1]-64 < 0)	{ m_pos[3] -= m_pos[1] - 64; m_pos[1] = 64; }
-				if(m_pos[3]+64 > py->height) { m_pos[1] -= m_pos[3] + 64 - py->height; m_pos[3] = py->height - 64; }
+				if(m_pos[0]-64 < 0)
+				{
+					m_pos[2] -= m_pos[0] - 64;
+					m_pos[0] = 64;
+				}
+				if(m_pos[2]+64 > py->width)
+				{
+					m_pos[0] -= m_pos[2] + 64 - py->width;
+					m_pos[2] = py->width - 64;
+				}
+				if(m_pos[1]-64 < 0)
+				{
+					m_pos[3] -= m_pos[1] - 64;
+					m_pos[1] = 64;
+				}
+				if(m_pos[3]+64 > py->height)
+				{
+					m_pos[1] -= m_pos[3] + 64 - py->height;
+					m_pos[3] = py->height - 64;
+				}
 
 				reframe();
 			}
@@ -482,10 +511,10 @@ void WindowW::inev(InEv* ev)
 		}
 
 		if(!ev->intercepted &&
-			py->mouse.x >= m_pos[0]-64 &&
-			py->mouse.y >= m_pos[1]-64 &&
-			py->mouse.x <= m_pos[2]+64 &&
-			py->mouse.y <= m_pos[3]+64)
+				py->mouse.x >= m_pos[0]-64 &&
+				py->mouse.y >= m_pos[1]-64 &&
+				py->mouse.x <= m_pos[2]+64 &&
+				py->mouse.y <= m_pos[3]+64)
 		{
 			m_over = true;
 
@@ -516,16 +545,16 @@ void WindowW::inev(InEv* ev)
 					py->curst = CU_RESZR;
 			}
 			else if(py->mouse.x >= m_pos[0]-32 &&
-				py->mouse.x <= m_pos[2]+32)
+					py->mouse.x <= m_pos[2]+32)
 			{
 				if(py->mouse.y <= m_pos[1]-32)
 					py->curst = CU_RESZT;
 				else if(py->mouse.y >= m_pos[3]+32)
 					py->curst = CU_RESZB;
 				else if(py->mouse.x <= m_pos[0] ||
-					py->mouse.y <= m_pos[1] ||
-					py->mouse.x >= m_pos[2] ||
-					py->mouse.y >= m_pos[3])
+						py->mouse.y <= m_pos[1] ||
+						py->mouse.x >= m_pos[2] ||
+						py->mouse.y >= m_pos[3])
 					py->curst = CU_MOVE;
 				else
 					py->curst = CU_DEFAULT;

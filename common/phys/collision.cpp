@@ -1,5 +1,4 @@
 
-
 #include "collision.h"
 #include "../sim/building.h"
 #include "../sim/buildingtype.h"
@@ -129,11 +128,11 @@ bool CollidesWithBuildings(int minx, int minz, int maxx, int maxz, int ignore)
 				continue;
 			}
 			/*
-             if(g_debug1)
-             {
-             g_log<<"fabs((p.x)"<<p.x<<"-(x)"<<x<<") < (hwx)"<<hwx<<"+(hwx2)"<<hwx2<<" && fabs((p.z)"<<p.z<<"- (z)"<<z<<") < (hwz)"<<hwz<<"+(hwz2)"<<hwz2<<endl;
-             g_log<<fabs(p.x-x)<<" < "<<(hwx+hwx2)<<" && "<<fabs(p.z-z)<<" < "<<(hwz+hwz2)<<endl;
-             }*/
+			 if(g_debug1)
+			 {
+			 g_log<<"fabs((p.x)"<<p.x<<"-(x)"<<x<<") < (hwx)"<<hwx<<"+(hwx2)"<<hwx2<<" && fabs((p.z)"<<p.z<<"- (z)"<<z<<") < (hwz)"<<hwz<<"+(hwz2)"<<hwz2<<endl;
+			 g_log<<fabs(p.x-x)<<" < "<<(hwx+hwx2)<<" && "<<fabs(p.z-z)<<" < "<<(hwz+hwz2)<<endl;
+			 }*/
 
 			g_lastcollider = i;
 			g_collidertype = COLLIDER_BUILDING;
@@ -446,11 +445,11 @@ bool Unit::Collides(Unit* ignoreUnit, int ignoreBuilding)
 	float r = t->radius;
 	Vec3f p = camera.Position();
 	/*
-     g_debug1 = false;
-     if(UnitID(this) == 0)
-     {
-     g_debug1=  true;
-     }*/
+	 g_debug1 = false;
+	 if(UnitID(this) == 0)
+	 {
+	 g_debug1=  true;
+	 }*/
 
 	if(AtWater(p.x, p.z))
 		return true;
@@ -468,8 +467,8 @@ bool Unit::Collides(Unit* ignoreUnit, int ignoreBuilding)
 
 	if(!t->passable && CollidesWithUnits(p.x, p.z, r, r, true, this, ignoreUnit, MIN_RADIUS/2.0f))
 	{
-        //if(type == TRUCK)
-        //	Chat("truck col");
+		//if(type == TRUCK)
+		//	Chat("truck col");
 
 		return true;
 	}

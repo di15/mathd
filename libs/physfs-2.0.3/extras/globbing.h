@@ -76,8 +76,8 @@ extern "C" {
  *   \return Null-terminated array of null-terminated strings.
  */
 __EXPORT__ char **PHYSFSEXT_enumerateFilesWildcard(const char *dir,
-                                                   const char *wildcard,
-                                                   int caseSensitive);
+												   const char *wildcard,
+												   int caseSensitive);
 
 #ifdef __cplusplus
 }

@@ -1,5 +1,4 @@
 
-
 #include "../../widget.h"
 #include "../barbutton.h"
 #include "../button.h"
@@ -103,7 +102,7 @@ void ConstructionView::regen(Selection* sel)
 	int qty = -1;
 	int* maxcost = NULL;
 
-	Player* py = &g_player[g_currP];
+	Player* py = &g_player[g_curP];
 
 	if(sel->buildings.size() > 0)
 	{
@@ -294,7 +293,7 @@ void ConstructionView::reframe()	//resized or moved
 	if(reframefunc)
 		reframefunc(this);
 
-	Player* py = &g_player[g_currP];
+	Player* py = &g_player[g_curP];
 
 	viewport.m_pos[0] = m_pos[0] + 10;
 	viewport.m_pos[1] = m_pos[1] + 10;

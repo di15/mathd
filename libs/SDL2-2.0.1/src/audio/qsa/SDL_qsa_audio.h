@@ -11,11 +11,11 @@
   freely, subject to the following restrictions:
 
   1. The origin of this software must not be misrepresented; you must not
-     claim that you wrote the original software. If you use this software
-     in a product, an acknowledgment in the product documentation would be
-     appreciated but is not required.
+	 claim that you wrote the original software. If you use this software
+	 in a product, an acknowledgment in the product documentation would be
+	 appreciated but is not required.
   2. Altered source versions must be plainly marked as such, and must not be
-     misrepresented as being the original software.
+	 misrepresented as being the original software.
   3. This notice may not be removed or altered from any source distribution.
 */
 
@@ -33,23 +33,23 @@
 
 struct SDL_PrivateAudioData
 {
-    /* SDL capture state */
-    int iscapture;
+	/* SDL capture state */
+	int iscapture;
 
-    /* The audio device handle */
-    int cardno;
-    int deviceno;
-    snd_pcm_t *audio_handle;
+	/* The audio device handle */
+	int cardno;
+	int deviceno;
+	snd_pcm_t *audio_handle;
 
-    /* The audio file descriptor */
-    int audio_fd;
+	/* The audio file descriptor */
+	int audio_fd;
 
-    /* Select timeout status */
-    uint32_t timeout_on_wait;
+	/* Select timeout status */
+	uint32_t timeout_on_wait;
 
-    /* Raw mixing buffer */
-    Uint8 *pcm_buf;
-    Uint32 pcm_len;
+	/* Raw mixing buffer */
+	Uint8 *pcm_buf;
+	Uint32 pcm_len;
 };
 
 #endif /* __SDL_QSA_AUDIO_H__ */

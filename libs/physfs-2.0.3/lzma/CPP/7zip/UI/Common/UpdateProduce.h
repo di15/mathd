@@ -24,8 +24,8 @@ struct CUpdatePair2
 };
 
 void UpdateProduce(
-    const CObjectVector<CUpdatePair> &updatePairs,
-    const NUpdateArchive::CActionSet &actionSet,
-    CObjectVector<CUpdatePair2> &operationChain);
+	const CObjectVector<CUpdatePair> &updatePairs,
+	const NUpdateArchive::CActionSet &actionSet,
+	CObjectVector<CUpdatePair2> &operationChain);
 
 #endif

@@ -52,41 +52,41 @@ static const int kPropMapSize = sizeof(kPropMap) / sizeof(kPropMap[0]);
 static int FindPropInMap(UInt64 filePropID)
 {
   for (int i = 0; i < kPropMapSize; i++)
-    if (kPropMap[i].FilePropID == filePropID)
-      return i;
+	if (kPropMap[i].FilePropID == filePropID)
+	  return i;
   return -1;
 }
 
 static void CopyOneItem(CRecordVector<UInt64> &src, 
-    CRecordVector<UInt64> &dest, UInt32 item)
+	CRecordVector<UInt64> &dest, UInt32 item)
 {
   for (int i = 0; i < src.Size(); i++)
-    if (src[i] == item)
-    {
-      dest.Add(item);
-      src.Delete(i);
-      return;
-    }
+	if (src[i] == item)
+	{
+	  dest.Add(item);
+	  src.Delete(i);
+	  return;
+	}
 }
 
 static void RemoveOneItem(CRecordVector<UInt64> &src, UInt32 item)
 {
   for (int i = 0; i < src.Size(); i++)
-    if (src[i] == item)
-    {
-      src.Delete(i);
-      return;
-    }
+	if (src[i] == item)
+	{
+	  src.Delete(i);
+	  return;
+	}
 }
 
 static void InsertToHead(CRecordVector<UInt64> &dest, UInt32 item)
 {
   for (int i = 0; i < dest.Size(); i++)
-    if (dest[i] == item)
-    {
-      dest.Delete(i);
-      break;
-    }
+	if (dest[i] == item)
+	{
+	  dest.Delete(i);
+	  break;
+	}
   dest.Insert(0, item);
 }
 
@@ -96,7 +96,7 @@ void CHandler::FillPopIDs()
 
   #ifdef _7Z_VOL
   if(_volumes.Size() < 1)
-    return;
+	return;
   const CVolume &volume = _volumes.Front();
   const CArchiveDatabaseEx &_database = volume.Database;
   #endif
@@ -145,13 +145,13 @@ STDMETHODIMP CHandler::GetNumberOfProperties(UInt32 *numProperties)
 }
 
 STDMETHODIMP CHandler::GetPropertyInfo(UInt32 index,     
-      BSTR *name, PROPID *propID, VARTYPE *varType)
+	  BSTR *name, PROPID *propID, VARTYPE *varType)
 {
   if((int)index >= _fileInfoPopIDs.Size())
-    return E_INVALIDARG;
+	return E_INVALIDARG;
   int indexInMap = FindPropInMap(_fileInfoPopIDs[index]);
   if (indexInMap == -1)
-    return E_INVALIDARG;
+	return E_INVALIDARG;
   const STATPROPSTG &srcItem = kPropMap[indexInMap].StatPROPSTG;
   *propID = srcItem.propid;
   *varType = srcItem.vt;

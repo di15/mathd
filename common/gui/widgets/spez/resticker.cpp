@@ -1,5 +1,4 @@
 
-
 #include "../../widget.h"
 #include "../barbutton.h"
 #include "../button.h"
@@ -36,7 +35,7 @@ ResTicker::ResTicker(Widget* parent, const char* n, void (*reframef)(Widget* thi
 	Image righthlineblur;
 	Image whitebg;
 #endif
-	
+
 	//restext = Text(this, "res ticker", RichText("asdadasdasads"), MAINFONT16, NULL, true, 1, 1, 1, 1);
 	restext = Text(this, "res ticker", RichText("asdadasdasads"), MAINFONT16, NULL, false, 0.2, 0.7, 0.8, 1);
 	leftinnerdiagblur = Image(this, "gui/frames/innerdiagblur32x24halfwht.png", true, NULL, 1, 1, 1, 1,		0, 0, 1, 1);
@@ -63,7 +62,7 @@ void ResTicker::reframe()	//resized or moved
 	leftinnerdiagblur.m_pos[1] = m_pos[1];
 	leftinnerdiagblur.m_pos[2] = m_pos[0]+32;
 	leftinnerdiagblur.m_pos[3] = m_pos[1]+RESTICKER_HEIGHT;
-	
+
 	rightinnerdiagblur.m_pos[0] = m_pos[2]-32;
 	rightinnerdiagblur.m_pos[1] = m_pos[1];
 	rightinnerdiagblur.m_pos[2] = m_pos[2];
@@ -97,7 +96,7 @@ void ResTicker::reframe()	//resized or moved
 	lefthlineblur.m_pos[1] = m_pos[1]+RESTICKER_HEIGHT-3;
 	lefthlineblur.m_pos[2] = centerw;
 	lefthlineblur.m_pos[3] = m_pos[1]+RESTICKER_HEIGHT;
-	
+
 	righthlineblur.m_pos[0] = centerw;
 	righthlineblur.m_pos[1] = m_pos[1]+RESTICKER_HEIGHT-3;
 	righthlineblur.m_pos[2] = m_pos[2]-32;
@@ -127,7 +126,7 @@ void ResTicker::draw()
 
 	//RichText rt = RichText(")A)JJF)@J)(J)(F$KJ(0jfjfjoi3jfwkjlekf");
 	//DrawShadowedTextF(MAINFONT16, m_pos[0]+32, m_pos[1]+4, 0, 0, 50, 50, &rt);
-	
+
 	leftinnerdiagblur.draw();
 	rightinnerdiagblur.draw();
 	lefthlineblur.draw();
@@ -143,7 +142,7 @@ void ResTicker::drawover()
 
 void ResTicker::inev(InEv* ev)
 {
-	Player* py = &g_player[g_currP];
+	Player* py = &g_player[g_curP];
 
 	for(auto i=m_subwidg.rbegin(); i!=m_subwidg.rend(); i++)
 		(*i)->inev(ev);

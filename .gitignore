@@ -53,3 +53,4 @@ obj/
 CorpStatesC/
 build/
 bin/
+*.idb

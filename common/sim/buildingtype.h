@@ -1,5 +1,4 @@
 
-
 #ifndef BUILDINGTYPE_H
 #define BUILDINGTYPE_H
 

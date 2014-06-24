@@ -20,7 +20,7 @@
 * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
 * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
 * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
-* IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+* IN NO TIMER_EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
 * CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
 * TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
@@ -28,39 +28,40 @@
 
 #include "objectscript.h"
 
-namespace ObjectScript {
+namespace ObjectScript
+{
 
-	/**
-	* \page memorymanager Memory management
-	* \section Overview Overview
-	* Efficient memory manager.
-	*
-	* \section tuning Symbols for configuring memory manager
-	* 
-	* \li \c OS_HEAP_CHUNK_SIZE
-	* defines size of chunk where each of objects with size <=
-	* OS_HEAP_CHUNK_SIZE is stored. Value must be a power of two.  Maximum
-	* recommended value is 256.  Defaults are 128 or 256 depending on memory
-	* allocation strategy (see OS_USE_HEAP_SAVING_MODE).
-	*
-	* \li \c OS_HEAP_PAGE_SIZE
-	* is used to define size of page where medium sized objects are stored.
-	* Value must be a power of two. Maximum recommended value is 65536. After
-	* exhausting existing page, new one with size OS_HEAP_PAGE_SIZE is
-	* allocated from system.  Default value is 32 kbytes.
-	*
-	* \li \c OS_DEBUG
-	* enables debugging mode in allocator. It uses more memory, but enables
-	* memory overrun and heap corruption detection.
-	*
-	* \li \c OS_USE_HEAP_SAVING_MODE
-	* enables heap-saving mode where pages are not used. But enabling this
-	* results in performance drop.
-	*
-	* \li \c DEBUG_APP_HEAP_DUMP_LEAK_ON_EXIT
-	* enables creation of log-file named "dump-err-exit.log" on application
-	* exit. File contains information about memory leaks.
-	*/
+/**
+* \page memorymanager Memory management
+* \section Overview Overview
+* Efficient memory manager.
+*
+* \section tuning Symbols for configuring memory manager
+*
+* \li \c OS_HEAP_CHUNK_SIZE
+* defines size of chunk where each of objects with size <=
+* OS_HEAP_CHUNK_SIZE is stored. Value must be a power of two.  Maximum
+* recommended value is 256.  Defaults are 128 or 256 depending on memory
+* allocation strategy (see OS_USE_HEAP_SAVING_MODE).
+*
+* \li \c OS_HEAP_PAGE_SIZE
+* is used to define size of page where medium sized objects are stored.
+* Value must be a power of two. Maximum recommended value is 65536. After
+* exhausting existing page, new one with size OS_HEAP_PAGE_SIZE is
+* allocated from system.  Default value is 32 kbytes.
+*
+* \li \c OS_DEBUG
+* enables debugging mode in allocator. It uses more memory, but enables
+* memory overrun and heap corruption detection.
+*
+* \li \c OS_USE_HEAP_SAVING_MODE
+* enables heap-saving mode where pages are not used. But enabling this
+* results in performance drop.
+*
+* \li \c DEBUG_APP_HEAP_DUMP_LEAK_ON_EXIT
+* enables creation of log-file named "dump-err-exit.log" on application
+* exit. File contains information about memory leaks.
+*/
 
 #ifndef OS_HEAP_CHUNK_SIZE
 #ifdef OS_USE_HEAP_SAVING_MODE
@@ -143,7 +144,7 @@ public:
 
 public:
 
-	enum 
+	enum
 	{
 		ALIGN = sizeof(void*),
 		MAX_SMALL_SIZE = OS_HEAP_CHUNK_SIZE,
@@ -314,7 +315,7 @@ public:
 
 	virtual void * malloc(int size OS_DBG_FILEPOS_DECL);
 	virtual void free(void * p);
-		
+
 	// void * realloc(void * p OS_DBG_FILEPOS_DECL);
 
 	virtual void setBreakpointId(int id);

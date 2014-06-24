@@ -1,5 +1,4 @@
 
-
 #include "richtext.h"
 #include "icon.h"
 #include "../utils.h"
@@ -234,7 +233,7 @@ RichText RichText::operator+(const RichText &other)
 	if(twopart.texlen() > 0 && havecombomid)
 		combined.m_part.push_back(twopart);
 
-		//g_log<<"combined2 rawstr = "<<combined.rawstr()<<endl;
+	//g_log<<"combined2 rawstr = "<<combined.rawstr()<<endl;
 
 	for(auto i=other.m_part.begin(); i!=other.m_part.end(); i++)
 	{

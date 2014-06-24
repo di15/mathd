@@ -40,28 +40,28 @@ inline AString GetOemString(const UString &unicodeString)
 
 #ifdef _UNICODE
   inline const wchar_t* GetSystemString(const wchar_t* unicodeString)
-    { return unicodeString;}
+	{ return unicodeString;}
   inline const UString& GetSystemString(const UString &unicodeString)
-    { return unicodeString;}
+	{ return unicodeString;}
   inline const wchar_t* GetSystemString(const wchar_t* unicodeString, UINT /* codePage */)
-    { return unicodeString;}
+	{ return unicodeString;}
   inline const UString& GetSystemString(const UString &unicodeString, UINT /* codePage */)
-    { return unicodeString;}
+	{ return unicodeString;}
   inline UString GetSystemString(const AString &multiByteString, UINT codePage)
-    { return MultiByteToUnicodeString(multiByteString, codePage);}
+	{ return MultiByteToUnicodeString(multiByteString, codePage);}
   inline UString GetSystemString(const AString &multiByteString)
-    { return MultiByteToUnicodeString(multiByteString);}
+	{ return MultiByteToUnicodeString(multiByteString);}
 #else
   inline const char* GetSystemString(const char *ansiString)
-    { return ansiString; }
+	{ return ansiString; }
   inline const AString& GetSystemString(const AString &multiByteString, UINT)
-    { return multiByteString; }
+	{ return multiByteString; }
   inline const char * GetSystemString(const char *multiByteString, UINT)
-    { return multiByteString; }
+	{ return multiByteString; }
   inline AString GetSystemString(const UString &unicodeString)
-    { return UnicodeStringToMultiByte(unicodeString); }
+	{ return UnicodeStringToMultiByte(unicodeString); }
   inline AString GetSystemString(const UString &unicodeString, UINT codePage)
-    { return UnicodeStringToMultiByte(unicodeString, codePage); }
+	{ return UnicodeStringToMultiByte(unicodeString, codePage); }
 #endif
 
 #ifndef _WIN32_WCE

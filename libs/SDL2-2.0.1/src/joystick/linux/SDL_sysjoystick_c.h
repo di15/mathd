@@ -11,11 +11,11 @@
   freely, subject to the following restrictions:
 
   1. The origin of this software must not be misrepresented; you must not
-     claim that you wrote the original software. If you use this software
-     in a product, an acknowledgment in the product documentation would be
-     appreciated but is not required.
+	 claim that you wrote the original software. If you use this software
+	 in a product, an acknowledgment in the product documentation would be
+	 appreciated but is not required.
   2. Altered source versions must be plainly marked as such, and must not be
-     misrepresented as being the original software.
+	 misrepresented as being the original software.
   3. This notice may not be removed or altered from any source distribution.
 */
 
@@ -26,32 +26,32 @@ struct SDL_joylist_item;
 /* The private structure used to keep track of a joystick */
 struct joystick_hwdata
 {
-    int fd;
-    struct SDL_joylist_item *item;
-    SDL_JoystickGUID guid;
-    char *fname;                /* Used in haptic subsystem */
+	int fd;
+	struct SDL_joylist_item *item;
+	SDL_JoystickGUID guid;
+	char *fname;                /* Used in haptic subsystem */
 
-    /* The current Linux joystick driver maps hats to two axes */
-    struct hwdata_hat
-    {
-        int axis[2];
-    } *hats;
-    /* The current Linux joystick driver maps balls to two axes */
-    struct hwdata_ball
-    {
-        int axis[2];
-    } *balls;
+	/* The current Linux joystick driver maps hats to two axes */
+	struct hwdata_hat
+	{
+		int axis[2];
+	} *hats;
+	/* The current Linux joystick driver maps balls to two axes */
+	struct hwdata_ball
+	{
+		int axis[2];
+	} *balls;
 
-    /* Support for the Linux 2.4 unified input interface */
-    Uint8 key_map[KEY_MAX - BTN_MISC];
-    Uint8 abs_map[ABS_MAX];
-    struct axis_correct
-    {
-        int used;
-        int coef[3];
-    } abs_correct[ABS_MAX];
+	/* Support for the Linux 2.4 unified input interface */
+	Uint8 key_map[KEY_MAX - BTN_MISC];
+	Uint8 abs_map[ABS_MAX];
+	struct axis_correct
+	{
+		int used;
+		int coef[3];
+	} abs_correct[ABS_MAX];
 
-    int fresh;
+	int fresh;
 };
 
 /* vi: set ts=4 sw=4 expandtab: */

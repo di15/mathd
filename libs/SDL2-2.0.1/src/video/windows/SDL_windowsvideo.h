@@ -11,11 +11,11 @@
   freely, subject to the following restrictions:
 
   1. The origin of this software must not be misrepresented; you must not
-     claim that you wrote the original software. If you use this software
-     in a product, an acknowledgment in the product documentation would be
-     appreciated but is not required.
+	 claim that you wrote the original software. If you use this software
+	 in a product, an acknowledgment in the product documentation would be
+	 appreciated but is not required.
   2. Altered source versions must be plainly marked as such, and must not be
-     misrepresented as being the original software.
+	 misrepresented as being the original software.
   3. This notice may not be removed or altered from any source distribution.
 */
 #include "SDL_config.h"
@@ -61,16 +61,16 @@
 DECLARE_HANDLE(HTOUCHINPUT);
 
 typedef struct _TOUCHINPUT {
-    LONG      x;
-    LONG      y;
-    HANDLE    hSource;
-    DWORD     dwID;
-    DWORD     dwFlags;
-    DWORD     dwMask;
-    DWORD     dwTime;
-    ULONG_PTR dwExtraInfo;
-    DWORD     cxContact;
-    DWORD     cyContact;
+	LONG      x;
+	LONG      y;
+	HANDLE    hSource;
+	DWORD     dwID;
+	DWORD     dwFlags;
+	DWORD     dwMask;
+	DWORD     dwTime;
+	ULONG_PTR dwExtraInfo;
+	DWORD     cxContact;
+	DWORD     cyContact;
 } TOUCHINPUT, *PTOUCHINPUT;
 
 #endif /* WINVER < 0x0601 */
@@ -80,94 +80,94 @@ typedef void  (*PFCoordTransform)(SDL_Window*, POINT*);
 
 typedef struct
 {
-    void **lpVtbl;
-    int refcount;
-    void *data;
+	void **lpVtbl;
+	int refcount;
+	void *data;
 } TSFSink;
 
 /* Definition from Win98DDK version of IMM.H */
 typedef struct tagINPUTCONTEXT2 {
-    HWND hWnd;
-    BOOL fOpen;
-    POINT ptStatusWndPos;
-    POINT ptSoftKbdPos;
-    DWORD fdwConversion;
-    DWORD fdwSentence;
-    union {
-        LOGFONTA A;
-        LOGFONTW W;
-    } lfFont;
-    COMPOSITIONFORM cfCompForm;
-    CANDIDATEFORM cfCandForm[4];
-    HIMCC hCompStr;
-    HIMCC hCandInfo;
-    HIMCC hGuideLine;
-    HIMCC hPrivate;
-    DWORD dwNumMsgBuf;
-    HIMCC hMsgBuf;
-    DWORD fdwInit;
-    DWORD dwReserve[3];
+	HWND hWnd;
+	BOOL fOpen;
+	POINT ptStatusWndPos;
+	POINT ptSoftKbdPos;
+	DWORD fdwConversion;
+	DWORD fdwSentence;
+	union {
+		LOGFONTA A;
+		LOGFONTW W;
+	} lfFont;
+	COMPOSITIONFORM cfCompForm;
+	CANDIDATEFORM cfCandForm[4];
+	HIMCC hCompStr;
+	HIMCC hCandInfo;
+	HIMCC hGuideLine;
+	HIMCC hPrivate;
+	DWORD dwNumMsgBuf;
+	HIMCC hMsgBuf;
+	DWORD fdwInit;
+	DWORD dwReserve[3];
 } INPUTCONTEXT2, *PINPUTCONTEXT2, NEAR *NPINPUTCONTEXT2, FAR *LPINPUTCONTEXT2;
 
 /* Private display data */
 
 typedef struct SDL_VideoData
 {
-    int render;
+	int render;
 
-    DWORD clipboard_count;
+	DWORD clipboard_count;
 
-    /* Touch input functions */
-    void* userDLL;
-    BOOL (WINAPI *CloseTouchInputHandle)( HTOUCHINPUT );
-    BOOL (WINAPI *GetTouchInputInfo)( HTOUCHINPUT, UINT, PTOUCHINPUT, int );
-    BOOL (WINAPI *RegisterTouchWindow)( HWND, ULONG );
+	/* Touch input functions */
+	void* userDLL;
+	BOOL (WINAPI *CloseTouchInputHandle)( HTOUCHINPUT );
+	BOOL (WINAPI *GetTouchInputInfo)( HTOUCHINPUT, UINT, PTOUCHINPUT, int );
+	BOOL (WINAPI *RegisterTouchWindow)( HWND, ULONG );
 
-    SDL_bool ime_com_initialized;
-    struct ITfThreadMgr *ime_threadmgr;
-    SDL_bool ime_initialized;
-    SDL_bool ime_enabled;
-    SDL_bool ime_available;
-    HWND ime_hwnd_main;
-    HWND ime_hwnd_current;
-    HIMC ime_himc;
+	SDL_bool ime_com_initialized;
+	struct ITfThreadMgr *ime_threadmgr;
+	SDL_bool ime_initialized;
+	SDL_bool ime_enabled;
+	SDL_bool ime_available;
+	HWND ime_hwnd_main;
+	HWND ime_hwnd_current;
+	HIMC ime_himc;
 
-    WCHAR ime_composition[SDL_TEXTEDITINGEVENT_TEXT_SIZE];
-    WCHAR ime_readingstring[16];
-    int ime_cursor;
+	WCHAR ime_composition[SDL_TEXTEDITINGEVENT_TEXT_SIZE];
+	WCHAR ime_readingstring[16];
+	int ime_cursor;
 
-    SDL_bool ime_candlist;
-    WCHAR ime_candidates[MAX_CANDLIST][MAX_CANDLENGTH];
-    DWORD ime_candcount;
-    DWORD ime_candref;
-    DWORD ime_candsel;
-    UINT ime_candpgsize;
-    int ime_candlistindexbase;
-    SDL_bool ime_candvertical;
+	SDL_bool ime_candlist;
+	WCHAR ime_candidates[MAX_CANDLIST][MAX_CANDLENGTH];
+	DWORD ime_candcount;
+	DWORD ime_candref;
+	DWORD ime_candsel;
+	UINT ime_candpgsize;
+	int ime_candlistindexbase;
+	SDL_bool ime_candvertical;
 
-    SDL_bool ime_dirty;
-    SDL_Rect ime_rect;
-    SDL_Rect ime_candlistrect;
-    int ime_winwidth;
-    int ime_winheight;
+	SDL_bool ime_dirty;
+	SDL_Rect ime_rect;
+	SDL_Rect ime_candlistrect;
+	int ime_winwidth;
+	int ime_winheight;
 
-    HKL ime_hkl;
-    void* ime_himm32;
-    UINT (WINAPI *GetReadingString)(HIMC himc, UINT uReadingBufLen, LPWSTR lpwReadingBuf, PINT pnErrorIndex, BOOL *pfIsVertical, PUINT puMaxReadingLen);
-    BOOL (WINAPI *ShowReadingWindow)(HIMC himc, BOOL bShow);
-    LPINPUTCONTEXT2 (WINAPI *ImmLockIMC)(HIMC himc);
-    BOOL (WINAPI *ImmUnlockIMC)(HIMC himc);
-    LPVOID (WINAPI *ImmLockIMCC)(HIMCC himcc);
-    BOOL (WINAPI *ImmUnlockIMCC)(HIMCC himcc);
+	HKL ime_hkl;
+	void* ime_himm32;
+	UINT (WINAPI *GetReadingString)(HIMC himc, UINT uReadingBufLen, LPWSTR lpwReadingBuf, PINT pnErrorIndex, BOOL *pfIsVertical, PUINT puMaxReadingLen);
+	BOOL (WINAPI *ShowReadingWindow)(HIMC himc, BOOL bShow);
+	LPINPUTCONTEXT2 (WINAPI *ImmLockIMC)(HIMC himc);
+	BOOL (WINAPI *ImmUnlockIMC)(HIMC himc);
+	LPVOID (WINAPI *ImmLockIMCC)(HIMCC himcc);
+	BOOL (WINAPI *ImmUnlockIMCC)(HIMCC himcc);
 
-    SDL_bool ime_uiless;
-    struct ITfThreadMgrEx *ime_threadmgrex;
-    DWORD ime_uielemsinkcookie;
-    DWORD ime_alpnsinkcookie;
-    DWORD ime_openmodesinkcookie;
-    DWORD ime_convmodesinkcookie;
-    TSFSink *ime_uielemsink;
-    TSFSink *ime_ippasink;
+	SDL_bool ime_uiless;
+	struct ITfThreadMgrEx *ime_threadmgrex;
+	DWORD ime_uielemsinkcookie;
+	DWORD ime_alpnsinkcookie;
+	DWORD ime_openmodesinkcookie;
+	DWORD ime_convmodesinkcookie;
+	TSFSink *ime_uielemsink;
+	TSFSink *ime_ippasink;
 } SDL_VideoData;
 
 

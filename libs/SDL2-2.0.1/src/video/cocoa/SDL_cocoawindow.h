@@ -11,11 +11,11 @@
   freely, subject to the following restrictions:
 
   1. The origin of this software must not be misrepresented; you must not
-     claim that you wrote the original software. If you use this software
-     in a product, an acknowledgment in the product documentation would be
-     appreciated but is not required.
+	 claim that you wrote the original software. If you use this software
+	 in a product, an acknowledgment in the product documentation would be
+	 appreciated but is not required.
   2. Altered source versions must be plainly marked as such, and must not be
-     misrepresented as being the original software.
+	 misrepresented as being the original software.
   3. This notice may not be removed or altered from any source distribution.
 */
 #include "SDL_config.h"
@@ -28,10 +28,10 @@
 typedef struct SDL_WindowData SDL_WindowData;
 
 @interface Cocoa_WindowListener : NSResponder <NSWindowDelegate> {
-    SDL_WindowData *_data;
-    BOOL observingVisible;
-    BOOL wasCtrlLeft;
-    BOOL wasVisible;
+	SDL_WindowData *_data;
+	BOOL observingVisible;
+	BOOL wasCtrlLeft;
+	BOOL wasVisible;
 }
 
 -(void) listen:(SDL_WindowData *) data;
@@ -68,10 +68,10 @@ typedef struct SDL_WindowData SDL_WindowData;
 
 /* Touch event handling */
 typedef enum {
-    COCOA_TOUCH_DOWN,
-    COCOA_TOUCH_UP,
-    COCOA_TOUCH_MOVE,
-    COCOA_TOUCH_CANCELLED
+	COCOA_TOUCH_DOWN,
+	COCOA_TOUCH_UP,
+	COCOA_TOUCH_MOVE,
+	COCOA_TOUCH_CANCELLED
 } cocoaTouchType;
 -(void) handleTouches:(cocoaTouchType)type withEvent:(NSEvent*) event;
 
@@ -82,17 +82,17 @@ typedef enum {
 
 struct SDL_WindowData
 {
-    SDL_Window *window;
-    NSWindow *nswindow;
-    NSMutableArray *nscontexts;
-    SDL_bool created;
-    Cocoa_WindowListener *listener;
-    struct SDL_VideoData *videodata;
+	SDL_Window *window;
+	NSWindow *nswindow;
+	NSMutableArray *nscontexts;
+	SDL_bool created;
+	Cocoa_WindowListener *listener;
+	struct SDL_VideoData *videodata;
 };
 
 extern int Cocoa_CreateWindow(_THIS, SDL_Window * window);
 extern int Cocoa_CreateWindowFrom(_THIS, SDL_Window * window,
-                                  const void *data);
+								  const void *data);
 extern void Cocoa_SetWindowTitle(_THIS, SDL_Window * window);
 extern void Cocoa_SetWindowIcon(_THIS, SDL_Window * window, SDL_Surface * icon);
 extern void Cocoa_SetWindowPosition(_THIS, SDL_Window * window);
@@ -112,7 +112,7 @@ extern int Cocoa_GetWindowGammaRamp(_THIS, SDL_Window * window, Uint16 * ramp);
 extern void Cocoa_SetWindowGrab(_THIS, SDL_Window * window, SDL_bool grabbed);
 extern void Cocoa_DestroyWindow(_THIS, SDL_Window * window);
 extern SDL_bool Cocoa_GetWindowWMInfo(_THIS, SDL_Window * window,
-                                      struct SDL_SysWMinfo *info);
+									  struct SDL_SysWMinfo *info);
 
 #endif /* _SDL_cocoawindow_h */
 

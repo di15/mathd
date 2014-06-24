@@ -21,14 +21,14 @@ public:
   ~CLibrary();
   void Attach(HMODULE m)
   {
-    Free();
-    _module = m;
+	Free();
+	_module = m;
   }
   HMODULE Detach()
   {
-    HMODULE m = _module;
-    _module = NULL;
-    return m;
+	HMODULE m = _module;
+	_module = NULL;
+	return m;
   }
 
   // operator HMODULE() const { return _module; };
@@ -41,7 +41,7 @@ public:
   bool Load(LPCWSTR fileName);
   #endif
   FARPROC GetProcAddress(LPCSTR procName) const
-    { return ::GetProcAddress(_module, procName); }
+	{ return ::GetProcAddress(_module, procName); }
 };
 
 bool MyGetModuleFileName(HMODULE hModule, CSysString &result);

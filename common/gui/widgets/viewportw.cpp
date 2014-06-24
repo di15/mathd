@@ -1,4 +1,3 @@
-
 #include "../widget.h"
 #include "barbutton.h"
 #include "button.h"
@@ -44,9 +43,9 @@ ViewportW::ViewportW(Widget* parent, const char* n, void (*reframef)(Widget* thi
 					 bool (*ldownf)(int p, int x, int y, int w, int h),
 					 bool (*lupf)(int p, int x, int y, int w, int h),
 					 bool (*mousemovef)(int p, int x, int y, int w, int h),
-					bool (*rdownf)(int p, int relx, int rely, int w, int h),
-					bool (*rupf)(int p, int relx, int rely, int w, int h),
-					bool (*mousewf)(int p, int d),
+					 bool (*rdownf)(int p, int relx, int rely, int w, int h),
+					 bool (*rupf)(int p, int relx, int rely, int w, int h),
+					 bool (*mousewf)(int p, int d),
 					 int parm)
 {
 	m_parent = parent;
@@ -69,37 +68,43 @@ void ViewportW::draw()
 {
 	//g_log<<m_pos[0]<<","<<m_pos[1]<<","<<m_pos[2]<<","<<m_pos[3]<<endl;
 
-	Player* py = &g_player[g_currP];
+	Player* py = &g_player[g_curP];
 	int w = m_pos[2] - m_pos[0];
 	int h = m_pos[3] - m_pos[1];
 
 	int viewport[4];
 	glGetIntegerv(GL_VIEWPORT, viewport);
 	glViewport(m_pos[0], py->height-m_pos[3], w, h);
-    glUniform1f(g_shader[SHADER_ORTHO].m_slot[SSLOT_WIDTH], (float)w);
-    glUniform1f(g_shader[SHADER_ORTHO].m_slot[SSLOT_HEIGHT], (float)h);
+	glUniform1f(g_shader[SHADER_ORTHO].m_slot[SSLOT_WIDTH], (float)w);
+	glUniform1f(g_shader[SHADER_ORTHO].m_slot[SSLOT_HEIGHT], (float)h);
 
 	EndS();
 
+#ifdef GLDEBUG
 	CheckGLError(__FILE__, __LINE__);
+#endif
 
 	if(drawfunc != NULL)
 		drawfunc(m_param, m_pos[0], m_pos[1], w, h);
 
+#ifdef GLDEBUG
 	CheckGLError(__FILE__, __LINE__);
+#endif
 
 	//glViewport(0, 0, py->width, py->height);
 	glViewport(viewport[0], viewport[1], viewport[2], viewport[3]);
-    //glUniform1f(g_shader[SHADER_ORTHO].m_slot[SSLOT_WIDTH], (float)py->width);
-    //glUniform1f(g_shader[SHADER_ORTHO].m_slot[SSLOT_HEIGHT], (float)py->height);
+	//glUniform1f(g_shader[SHADER_ORTHO].m_slot[SSLOT_WIDTH], (float)py->width);
+	//glUniform1f(g_shader[SHADER_ORTHO].m_slot[SSLOT_HEIGHT], (float)py->height);
 
+#ifdef GLDEBUG
 	CheckGLError(__FILE__, __LINE__);
-    Ortho(py->width, py->height, 1, 1, 1, 1);
+#endif
+	Ortho(py->width, py->height, 1, 1, 1, 1);
 }
 
 void ViewportW::inev(InEv* ev)
 {
-	Player* py = &g_player[g_currP];
+	Player* py = &g_player[g_curP];
 
 	if(ev->type == INEV_MOUSEMOVE)
 	{
@@ -131,7 +136,7 @@ void ViewportW::inev(InEv* ev)
 
 		if(ldownfunc != NULL)
 		{
-			Player* py = &g_player[g_currP];
+			Player* py = &g_player[g_curP];
 			int relx = py->mouse.x - m_pos[0];
 			int rely = py->mouse.y - m_pos[1];
 			int w = m_pos[2] - m_pos[0];
@@ -143,7 +148,7 @@ void ViewportW::inev(InEv* ev)
 	{
 		if(lupfunc != NULL)
 		{
-			Player* py = &g_player[g_currP];
+			Player* py = &g_player[g_curP];
 			int relx = py->mouse.x - m_pos[0];
 			int rely = py->mouse.y - m_pos[1];
 			int w = m_pos[2] - m_pos[0];
@@ -158,7 +163,7 @@ void ViewportW::inev(InEv* ev)
 
 		if(rdownfunc != NULL)
 		{
-			Player* py = &g_player[g_currP];
+			Player* py = &g_player[g_curP];
 			int relx = py->mouse.x - m_pos[0];
 			int rely = py->mouse.y - m_pos[1];
 			int w = m_pos[2] - m_pos[0];
@@ -170,7 +175,7 @@ void ViewportW::inev(InEv* ev)
 	{
 		if(rupfunc != NULL)
 		{
-			Player* py = &g_player[g_currP];
+			Player* py = &g_player[g_curP];
 			int relx = py->mouse.x - m_pos[0];
 			int rely = py->mouse.y - m_pos[1];
 			int w = m_pos[2] - m_pos[0];

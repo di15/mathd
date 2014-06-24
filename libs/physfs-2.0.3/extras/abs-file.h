@@ -100,7 +100,7 @@ static MY_FILETYPE* MY_OPEN_FOR_READ(const char *const filename)
 {
   MY_FILETYPE *const file = PHYSFS_openRead(filename);
   if (file) {
-    MY_SETBUFFER(file, PHYSFS_DEFAULT_READ_BUFFER);
+	MY_SETBUFFER(file, PHYSFS_DEFAULT_READ_BUFFER);
   }
   return file;
 }
@@ -110,33 +110,33 @@ static MY_FILETYPE* MY_OPEN_FOR_READ(const char *const filename)
 static int MY_GETC(MY_FILETYPE *const fp) {
   unsigned char c;
   /*if (PHYSFS_eof(fp)) {
-    return EOF;
+	return EOF;
   }
   MY_READ(&c, 1, 1, fp);*/
   if (MY_READ(&c, 1, 1, fp) != 1) {
-    return EOF;
+	return EOF;
   }
   return c;
 }
 static char * MY_GETS(char * const str, const int size, 
-                      MY_FILETYPE *const fp) {
+					  MY_FILETYPE *const fp) {
   int i = 0;
   int c;
   do {
-    if (i == size-1) {
-      break;
-    }
-    c = MY_GETC(fp);
-    if (c == EOF) {
-      break;
-    }
-    str[i++] = c;
+	if (i == size-1) {
+	  break;
+	}
+	c = MY_GETC(fp);
+	if (c == EOF) {
+	  break;
+	}
+	str[i++] = c;
   } while (c != '\0' && 
-      c != -1 && 
-      c != '\n');
+	  c != -1 && 
+	  c != '\n');
   str[i] = '\0';
   if (i == 0) {
-    return NULL;
+	return NULL;
   }
   return str;
 }

@@ -18,10 +18,10 @@ class CSequentialInStreamSizeCount2:
 public:
   void Init(ISequentialInStream *stream)
   {
-    _stream = stream;
-    _getSubStreamSize = 0;
-    _stream.QueryInterface(IID_ICompressGetSubStreamSize, &_getSubStreamSize);
-    _size = 0;
+	_stream = stream;
+	_getSubStreamSize = 0;
+	_stream.QueryInterface(IID_ICompressGetSubStreamSize, &_getSubStreamSize);
+	_size = 0;
   }
   UInt64 GetSize() const { return _size; }
 

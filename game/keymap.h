@@ -1,4 +1,3 @@
-
 #define SCROLL_BORDER	5
 
 void Escape();

@@ -1,5 +1,4 @@
 
-
 #include "../platform.h"
 #include "../math/vec3f.h"
 

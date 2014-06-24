@@ -24,7 +24,7 @@ and must NOT have multiple-inclusion protection.
 * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
 * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
 * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
-* IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+* IN NO TIMER_EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
 * CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
 * TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
@@ -442,7 +442,7 @@ and must NOT have multiple-inclusion protection.
 
 #endif
 
-template <class R, class T OS_BIND_FUNC_PARMS_COMMA OS_BIND_FUNC_TEMPLATE_PARMS> 
+template <class R, class T OS_BIND_FUNC_PARMS_COMMA OS_BIND_FUNC_TEMPLATE_PARMS>
 struct OS_BIND_FUNC_RUN_CLASS_NAME
 {
 	typedef R(OS_BIND_FUNC_CC T::*F)(OS_BIND_FUNC_PARMS)const OS_BIND_FUNC_CC_GNUC;
@@ -459,7 +459,7 @@ struct OS_BIND_FUNC_RUN_CLASS_NAME
 	}
 };
 
-template <class T OS_BIND_FUNC_PARMS_COMMA OS_BIND_FUNC_TEMPLATE_PARMS> 
+template <class T OS_BIND_FUNC_PARMS_COMMA OS_BIND_FUNC_TEMPLATE_PARMS>
 struct OS_BIND_FUNC_RUN_CLASS_NAME<void, T OS_BIND_FUNC_PARMS_COMMA OS_BIND_FUNC_PARMS>
 {
 	typedef void(OS_BIND_FUNC_CC T::*F)(OS_BIND_FUNC_PARMS)const OS_BIND_FUNC_CC_GNUC;
@@ -482,23 +482,24 @@ struct OS_BIND_FUNC_CLASS_NAME
 	const char * name;
 	F f;
 
-	OS_BIND_FUNC_CLASS_NAME(const char * _name, F _f): name(_name), f(_f){}
-	
-	operator OS::FuncDef() const 
-	{ 
-		OS::FuncDef def = {name, 
-			OS_BIND_FUNC_RUN_CLASS_NAME<R, T OS_BIND_FUNC_PARMS_COMMA OS_BIND_FUNC_PARMS>::run, 
-			&(FunctionData<F>::create(f))->f}; 
-		return def; 
+	OS_BIND_FUNC_CLASS_NAME(const char * _name, F _f): name(_name), f(_f) {}
+
+	operator OS::FuncDef() const
+	{
+		OS::FuncDef def = {name,
+						   OS_BIND_FUNC_RUN_CLASS_NAME<R, T OS_BIND_FUNC_PARMS_COMMA OS_BIND_FUNC_PARMS>::run,
+						   &(FunctionData<F>::create(f))->f
+						  };
+		return def;
 	}
 };
 
 // namespace ObjectScript {
 
-template <class R, class T OS_BIND_FUNC_PARMS_COMMA OS_BIND_FUNC_TEMPLATE_PARMS> 
+template <class R, class T OS_BIND_FUNC_PARMS_COMMA OS_BIND_FUNC_TEMPLATE_PARMS>
 OS::FuncDef def(const char * name, R(OS_BIND_FUNC_CC T::*f)(OS_BIND_FUNC_PARMS)const OS_BIND_FUNC_CC_GNUC)
 {
-	typedef OS_BIND_FUNC_CLASS_NAME<R, T OS_BIND_FUNC_PARMS_COMMA OS_BIND_FUNC_PARMS> Func; 
+	typedef OS_BIND_FUNC_CLASS_NAME<R, T OS_BIND_FUNC_PARMS_COMMA OS_BIND_FUNC_PARMS> Func;
 	return Func(name, f);
 }
 
@@ -747,7 +748,7 @@ OS::FuncDef def(const char * name, R(OS_BIND_FUNC_CC T::*f)(OS_BIND_FUNC_PARMS)c
 
 #endif
 
-template <class R, class T OS_BIND_FUNC_PARMS_COMMA OS_BIND_FUNC_TEMPLATE_PARMS> 
+template <class R, class T OS_BIND_FUNC_PARMS_COMMA OS_BIND_FUNC_TEMPLATE_PARMS>
 struct OS_BIND_FUNC_RUN_CLASS_NAME
 {
 	typedef R(OS_BIND_FUNC_CC T::*F)(OS_BIND_FUNC_PARMS) OS_BIND_FUNC_CC_GNUC;
@@ -764,7 +765,7 @@ struct OS_BIND_FUNC_RUN_CLASS_NAME
 	}
 };
 
-template <class T OS_BIND_FUNC_PARMS_COMMA OS_BIND_FUNC_TEMPLATE_PARMS> 
+template <class T OS_BIND_FUNC_PARMS_COMMA OS_BIND_FUNC_TEMPLATE_PARMS>
 struct OS_BIND_FUNC_RUN_CLASS_NAME<void, T OS_BIND_FUNC_PARMS_COMMA OS_BIND_FUNC_PARMS>
 {
 	typedef void(OS_BIND_FUNC_CC T::*F)(OS_BIND_FUNC_PARMS) OS_BIND_FUNC_CC_GNUC;
@@ -787,23 +788,24 @@ struct OS_BIND_FUNC_CLASS_NAME
 	const char * name;
 	F f;
 
-	OS_BIND_FUNC_CLASS_NAME(const char * _name, F _f): name(_name), f(_f){}
-	
-	operator OS::FuncDef() const 
-	{ 
-		OS::FuncDef def = {name, 
-			OS_BIND_FUNC_RUN_CLASS_NAME<R, T OS_BIND_FUNC_PARMS_COMMA OS_BIND_FUNC_PARMS>::run, 
-			&(FunctionData<F>::create(f))->f}; 
-		return def; 
+	OS_BIND_FUNC_CLASS_NAME(const char * _name, F _f): name(_name), f(_f) {}
+
+	operator OS::FuncDef() const
+	{
+		OS::FuncDef def = {name,
+						   OS_BIND_FUNC_RUN_CLASS_NAME<R, T OS_BIND_FUNC_PARMS_COMMA OS_BIND_FUNC_PARMS>::run,
+						   &(FunctionData<F>::create(f))->f
+						  };
+		return def;
 	}
 };
 
 // namespace ObjectScript {
 
-template <class R, class T OS_BIND_FUNC_PARMS_COMMA OS_BIND_FUNC_TEMPLATE_PARMS> 
+template <class R, class T OS_BIND_FUNC_PARMS_COMMA OS_BIND_FUNC_TEMPLATE_PARMS>
 OS::FuncDef def(const char * name, R(OS_BIND_FUNC_CC T::*f)(OS_BIND_FUNC_PARMS) OS_BIND_FUNC_CC_GNUC)
 {
-	typedef OS_BIND_FUNC_CLASS_NAME<R, T OS_BIND_FUNC_PARMS_COMMA OS_BIND_FUNC_PARMS> Func; 
+	typedef OS_BIND_FUNC_CLASS_NAME<R, T OS_BIND_FUNC_PARMS_COMMA OS_BIND_FUNC_PARMS> Func;
 	return Func(name, f);
 }
 
@@ -1054,7 +1056,7 @@ OS::FuncDef def(const char * name, R(OS_BIND_FUNC_CC T::*f)(OS_BIND_FUNC_PARMS) 
 
 #if OS_BIND_FUNC_NUM_ARGS > 0
 
-template <class R OS_BIND_FUNC_PARMS_COMMA OS_BIND_FUNC_TEMPLATE_PARMS> 
+template <class R OS_BIND_FUNC_PARMS_COMMA OS_BIND_FUNC_TEMPLATE_PARMS>
 struct OS_BIND_FUNC_RUN_CLASS_NAME
 {
 	typedef R(OS_BIND_FUNC_CC *F)(OS_BIND_FUNC_PARMS) OS_BIND_FUNC_CC_GNUC;
@@ -1069,7 +1071,7 @@ struct OS_BIND_FUNC_RUN_CLASS_NAME
 	}
 };
 
-template <OS_BIND_FUNC_TEMPLATE_PARMS> 
+template <OS_BIND_FUNC_TEMPLATE_PARMS>
 struct OS_BIND_FUNC_RUN_CLASS_NAME<void OS_BIND_FUNC_PARMS_COMMA OS_BIND_FUNC_PARMS>
 {
 	typedef void(OS_BIND_FUNC_CC *F)(OS_BIND_FUNC_PARMS) OS_BIND_FUNC_CC_GNUC;
@@ -1091,23 +1093,24 @@ struct OS_BIND_FUNC_CLASS_NAME
 	const char * name;
 	F f;
 
-	OS_BIND_FUNC_CLASS_NAME(const char * _name, F _f): name(_name), f(_f){}
+	OS_BIND_FUNC_CLASS_NAME(const char * _name, F _f): name(_name), f(_f) {}
 
-	operator OS::FuncDef() const 
-	{ 
-		OS::FuncDef def = {name, 
-			OS_BIND_FUNC_RUN_CLASS_NAME<R OS_BIND_FUNC_PARMS_COMMA OS_BIND_FUNC_PARMS>::run, 
-			&(FunctionData<F>::create(f))->f}; 
-		return def; 
+	operator OS::FuncDef() const
+	{
+		OS::FuncDef def = {name,
+						   OS_BIND_FUNC_RUN_CLASS_NAME<R OS_BIND_FUNC_PARMS_COMMA OS_BIND_FUNC_PARMS>::run,
+						   &(FunctionData<F>::create(f))->f
+						  };
+		return def;
 	}
 };
 
 // namespace ObjectScript {
 
-template <class R OS_BIND_FUNC_PARMS_COMMA OS_BIND_FUNC_TEMPLATE_PARMS> 
+template <class R OS_BIND_FUNC_PARMS_COMMA OS_BIND_FUNC_TEMPLATE_PARMS>
 OS::FuncDef def(const char * name, R(OS_BIND_FUNC_CC *f)(OS_BIND_FUNC_PARMS) OS_BIND_FUNC_CC_GNUC)
 {
-	typedef OS_BIND_FUNC_CLASS_NAME<R OS_BIND_FUNC_PARMS_COMMA OS_BIND_FUNC_PARMS> Func; 
+	typedef OS_BIND_FUNC_CLASS_NAME<R OS_BIND_FUNC_PARMS_COMMA OS_BIND_FUNC_PARMS> Func;
 	return Func(name, f);
 }
 
@@ -1115,7 +1118,7 @@ OS::FuncDef def(const char * name, R(OS_BIND_FUNC_CC *f)(OS_BIND_FUNC_PARMS) OS_
 
 #else
 
-template <class R> 
+template <class R>
 struct OS_BIND_FUNC_RUN_CLASS_NAME
 {
 	typedef R(OS_BIND_FUNC_CC *F)() OS_BIND_FUNC_CC_GNUC;
@@ -1130,7 +1133,7 @@ struct OS_BIND_FUNC_RUN_CLASS_NAME
 	}
 };
 
-template <> 
+template <>
 struct OS_BIND_FUNC_RUN_CLASS_NAME<void>
 {
 	typedef void(OS_BIND_FUNC_CC *F)() OS_BIND_FUNC_CC_GNUC;
@@ -1152,23 +1155,24 @@ struct OS_BIND_FUNC_CLASS_NAME
 	const char * name;
 	F f;
 
-	OS_BIND_FUNC_CLASS_NAME(const char * _name, F _f): name(_name), f(_f){}
+	OS_BIND_FUNC_CLASS_NAME(const char * _name, F _f): name(_name), f(_f) {}
 
-	operator OS::FuncDef() const 
-	{ 
-		OS::FuncDef def = {name, 
-			OS_BIND_FUNC_RUN_CLASS_NAME<R>::run, 
-			&(FunctionData<F>::create(f))->f}; 
-		return def; 
+	operator OS::FuncDef() const
+	{
+		OS::FuncDef def = {name,
+						   OS_BIND_FUNC_RUN_CLASS_NAME<R>::run,
+						   &(FunctionData<F>::create(f))->f
+						  };
+		return def;
 	}
 };
 
 // namespace ObjectScript {
 
-template <class R> 
+template <class R>
 OS::FuncDef def(const char * name, R(OS_BIND_FUNC_CC *f)() OS_BIND_FUNC_CC_GNUC)
 {
-	typedef OS_BIND_FUNC_CLASS_NAME<R> Func; 
+	typedef OS_BIND_FUNC_CLASS_NAME<R> Func;
 	return Func(name, f);
 }
 

@@ -1,7 +1,6 @@
 
 
 
-
 #ifndef _FRUSTUM_H
 #define _FRUSTUM_H
 
@@ -9,7 +8,7 @@
 #include "3dmath.h"
 #include "plane3f.h"
 
-class Frustum 
+class Frustum
 {
 public:
 	void construct(const Plane3f left, const Plane3f right, const Plane3f top, const Plane3f bottom, const Plane3f front, const Plane3f back);

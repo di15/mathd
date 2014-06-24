@@ -17,7 +17,7 @@ static const CArcInfo *g_Arcs[kNumArcsMax];
 void RegisterArc(const CArcInfo *arcInfo) 
 { 
   if (g_NumArcs < kNumArcsMax)
-    g_Arcs[g_NumArcs++] = arcInfo; 
+	g_Arcs[g_NumArcs++] = arcInfo; 
 }
 
 DEFINE_GUID(CLSID_CArchiveHandler, 
@@ -28,7 +28,7 @@ DEFINE_GUID(CLSID_CArchiveHandler,
 static inline HRESULT SetPropString(const char *s, unsigned int size, PROPVARIANT *value)
 {
   if ((value->bstrVal = ::SysAllocStringByteLen(s, size)) != 0)
-    value->vt = VT_BSTR;
+	value->vt = VT_BSTR;
   return S_OK;
 }
 
@@ -42,11 +42,11 @@ int FindFormatCalssId(const GUID *clsID)
   GUID cls = *clsID;
   CLS_ARC_ID_ITEM(cls) = 0;
   if (cls != CLSID_CArchiveHandler)
-    return -1;
+	return -1;
   Byte id = CLS_ARC_ID_ITEM(*clsID);
   for (UInt32 i = 0; i < g_NumArcs; i++)
-    if (g_Arcs[i]->ClassId == id)
-      return i;
+	if (g_Arcs[i]->ClassId == id)
+	  return i;
   return -1;
 }
 
@@ -54,27 +54,27 @@ STDAPI CreateArchiver(const GUID *clsid, const GUID *iid, void **outObject)
 {
   COM_TRY_BEGIN
   {
-    int needIn = (*iid == IID_IInArchive);
-    int needOut = (*iid == IID_IOutArchive);
-    if (!needIn && !needOut)
-      return E_NOINTERFACE;
-    int formatIndex = FindFormatCalssId(clsid);
-    if (formatIndex < 0)
-      return CLASS_E_CLASSNOTAVAILABLE;
-    
-    const CArcInfo &arc = *g_Arcs[formatIndex];
-    if (needIn)
-    {
-      *outObject = arc.CreateInArchive();
-      ((IInArchive *)*outObject)->AddRef();
-    }
-    else
-    {
-      if (!arc.CreateOutArchive)
-        return CLASS_E_CLASSNOTAVAILABLE;
-      *outObject = arc.CreateOutArchive();
-      ((IOutArchive *)*outObject)->AddRef();
-    }
+	int needIn = (*iid == IID_IInArchive);
+	int needOut = (*iid == IID_IOutArchive);
+	if (!needIn && !needOut)
+	  return E_NOINTERFACE;
+	int formatIndex = FindFormatCalssId(clsid);
+	if (formatIndex < 0)
+	  return CLASS_E_CLASSNOTAVAILABLE;
+	
+	const CArcInfo &arc = *g_Arcs[formatIndex];
+	if (needIn)
+	{
+	  *outObject = arc.CreateInArchive();
+	  ((IInArchive *)*outObject)->AddRef();
+	}
+	else
+	{
+	  if (!arc.CreateOutArchive)
+		return CLASS_E_CLASSNOTAVAILABLE;
+	  *outObject = arc.CreateOutArchive();
+	  ((IOutArchive *)*outObject)->AddRef();
+	}
   }
   COM_TRY_END
   return S_OK;
@@ -83,36 +83,36 @@ STDAPI CreateArchiver(const GUID *clsid, const GUID *iid, void **outObject)
 STDAPI GetHandlerProperty2(UInt32 formatIndex, PROPID propID, PROPVARIANT *value)
 {
   if (formatIndex >= g_NumArcs)
-    return E_INVALIDARG;
+	return E_INVALIDARG;
   const CArcInfo &arc = *g_Arcs[formatIndex];
   NWindows::NCOM::CPropVariant prop;
   switch(propID)
   {
-    case NArchive::kName:
-      prop = arc.Name;
-      break;
-    case NArchive::kClassID:
-    {
-      GUID clsId = CLSID_CArchiveHandler;
-      CLS_ARC_ID_ITEM(clsId) = arc.ClassId;
-      return SetPropGUID(clsId, value);
-    }
-    case NArchive::kExtension:
-      if (arc.Ext != 0)
-        prop = arc.Ext;
-      break;
-    case NArchive::kAddExtension:
-      if (arc.AddExt != 0)
-        prop = arc.AddExt;
-      break;
-    case NArchive::kUpdate:
-      prop = (bool)(arc.CreateOutArchive != 0);
-      break;
-    case NArchive::kKeepName:
-      prop = arc.KeepName;
-      break;
-    case NArchive::kStartSignature:
-      return SetPropString((const char *)arc.Signature, arc.SignatureSize, value);
+	case NArchive::kName:
+	  prop = arc.Name;
+	  break;
+	case NArchive::kClassID:
+	{
+	  GUID clsId = CLSID_CArchiveHandler;
+	  CLS_ARC_ID_ITEM(clsId) = arc.ClassId;
+	  return SetPropGUID(clsId, value);
+	}
+	case NArchive::kExtension:
+	  if (arc.Ext != 0)
+		prop = arc.Ext;
+	  break;
+	case NArchive::kAddExtension:
+	  if (arc.AddExt != 0)
+		prop = arc.AddExt;
+	  break;
+	case NArchive::kUpdate:
+	  prop = (bool)(arc.CreateOutArchive != 0);
+	  break;
+	case NArchive::kKeepName:
+	  prop = arc.KeepName;
+	  break;
+	case NArchive::kStartSignature:
+	  return SetPropString((const char *)arc.Signature, arc.SignatureSize, value);
   }
   prop.Detach(value);
   return S_OK;

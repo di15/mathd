@@ -1,5 +1,4 @@
 
-
 #include "../render/model.h"
 #include "buildingtype.h"
 
@@ -30,23 +29,23 @@ void DefB(int type, const char* name, Vec2i size, bool hugterr, const char* mode
 void BConMat(int type, int res, int amt)
 {
 	BuildingT* t = &g_buildingT[type];
-	t->conmat[res] = amt; 
+	t->conmat[res] = amt;
 }
 
 void BInput(int type, int res, int amt)
 {
 	BuildingT* t = &g_buildingT[type];
-	t->input[res] = amt; 
+	t->input[res] = amt;
 }
 
 void BOutput(int type, int res, int amt)
 {
 	BuildingT* t = &g_buildingT[type];
-	t->output[res] = amt; 
+	t->output[res] = amt;
 }
 
 void BEmitter(int type, int emitterindex, int ptype, Vec3f offset)
-{	
+{
 	BuildingT* t = &g_buildingT[type];
 	EmitterPlace* e = &t->emitterpl[emitterindex];
 	*e = EmitterPlace(ptype, offset);

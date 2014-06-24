@@ -1,5 +1,4 @@
 
-
 #include "../widget.h"
 #include "barbutton.h"
 #include "button.h"
@@ -57,9 +56,13 @@ Image::Image(Widget* parent, const char* filepath, bool clamp, void (*reframef)(
 	m_parent = parent;
 	m_type = WIDGET_IMAGE;
 	//CreateTexture(tex, filepath, true);
+#ifdef GLDEBUG
 	CheckGLError(__FILE__, __LINE__);
+#endif
 	CreateTexture(m_tex, filepath, clamp, false);
+#ifdef GLDEBUG
 	CheckGLError(__FILE__, __LINE__);
+#endif
 	//CreateTexture(tex, filepath, clamp);
 	reframefunc = reframef;
 	m_texc[0] = texleft;

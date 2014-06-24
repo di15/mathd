@@ -1,5 +1,4 @@
 
-
 #ifndef PLAYER_H
 #define PLAYER_H
 
@@ -64,7 +63,7 @@ public:
 
 extern Player g_player[PLAYERS];
 extern int g_localP;
-extern int g_currP;
+extern int g_curP;
 extern int g_playerm;
 
 

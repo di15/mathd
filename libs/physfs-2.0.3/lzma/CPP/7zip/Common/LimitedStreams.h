@@ -18,9 +18,9 @@ public:
   void SetStream(ISequentialInStream *stream) { _stream = stream; }
   void Init(UInt64 streamSize)  
   { 
-    _size = streamSize; 
-    _pos = 0; 
-    _wasFinished = false; 
+	_size = streamSize; 
+	_pos = 0; 
+	_wasFinished = false; 
   }
  
   MY_UNKNOWN_IMP

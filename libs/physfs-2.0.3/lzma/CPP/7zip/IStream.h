@@ -16,7 +16,7 @@ STREAM_INTERFACE(ISequentialInStream, 0x01)
   STDMETHOD(Read)(void *data, UInt32 size, UInt32 *processedSize) PURE;
   /*
   Out: if size != 0, return_value = S_OK and (*processedSize == 0),
-    then there are no more bytes in stream.
+	then there are no more bytes in stream.
   if (size > 0) && there are bytes in stream, 
   this function must read at least 1 byte.
   This function is allowed to read less than number of remaining bytes in stream.

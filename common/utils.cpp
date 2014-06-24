@@ -6,32 +6,32 @@ ofstream g_log;
 
 const std::string DateTime()
 {
-    time_t     now = time(0);
-    struct tm  tstruct;
-    char       buf[80];
-    tstruct = *localtime(&now);
-    // Visit http://www.cplusplus.com/reference/clibrary/ctime/strftime/
-    // for more information about date/time format
-    strftime(buf, sizeof(buf), "%Y-%m-%d %X", &tstruct);
+	time_t     now = time(0);
+	struct tm  tstruct;
+	char       buf[80];
+	tstruct = *localtime(&now);
+	// Visit http://www.cplusplus.com/reference/clibrary/ctime/strftime/
+	// for more information about date/time format
+	strftime(buf, sizeof(buf), "%Y-%m-%d %X", &tstruct);
 
-    return buf;
+	return buf;
 }
 
 const std::string FileDateTime()
 {
-    time_t     now = time(0);
-    struct tm  tstruct;
-    char       buf[80];
-    tstruct = *localtime(&now);
-    // Visit http://www.cplusplus.com/reference/clibrary/ctime/strftime/
-    // for more information about date/time format
-    strftime(buf, sizeof(buf), "%Y-%m-%d %X", &tstruct);
+	time_t     now = time(0);
+	struct tm  tstruct;
+	char       buf[80];
+	tstruct = *localtime(&now);
+	// Visit http://www.cplusplus.com/reference/clibrary/ctime/strftime/
+	// for more information about date/time format
+	strftime(buf, sizeof(buf), "%Y-%m-%d %X", &tstruct);
 
 	for(int i=0; i<strlen(buf); i++)
 		if(buf[i] == ':')
 			buf[i] = '-';
 
-    return buf;
+	return buf;
 }
 
 
@@ -71,7 +71,7 @@ std::string MakePathRelative(const char* full)
 
 	//g_log<<"subpath: "<<sub<<endl;
 
-    return sub;
+	return sub;
 }
 
 std::string StripFile(std::string filepath)
@@ -92,8 +92,8 @@ void StripPath(char* filepath)
 	size_t sep = s0.find_last_of("\\/");
 	std::string s1;
 
-    if (sep != std::string::npos)
-        s1 = s0.substr(sep + 1, s0.size() - sep - 1);
+	if (sep != std::string::npos)
+		s1 = s0.substr(sep + 1, s0.size() - sep - 1);
 	else
 		s1 = s0;
 
@@ -121,8 +121,8 @@ void StripPathExtension(const char* n, char* o)
 	size_t sep = s0.find_last_of("\\/");
 	std::string s1;
 
-    if (sep != std::string::npos)
-        s1 = s0.substr(sep + 1, s0.size() - sep - 1);
+	if (sep != std::string::npos)
+		s1 = s0.substr(sep + 1, s0.size() - sep - 1);
 	else
 		s1 = s0;
 
@@ -141,14 +141,14 @@ void StripPathExtension(const char* n, char* o)
 void ExePath(char* exepath)
 {
 #ifdef PLATFORM_WIN
-    //char buffer[MAX_PATH+1];
-    GetModuleFileName(NULL, exepath, MAX_PATH+1);
-    //std::string::size_type pos = std::string( buffer ).find_last_of( "\\/" );
-    //std::string strexepath = std::string( buffer ).substr( 0, pos);
+	//char buffer[MAX_PATH+1];
+	GetModuleFileName(NULL, exepath, MAX_PATH+1);
+	//std::string::size_type pos = std::string( buffer ).find_last_of( "\\/" );
+	//std::string strexepath = std::string( buffer ).substr( 0, pos);
 	//strcpy(exepath, strexepath.c_str());
 #else
 	char szTmp[32];
-    //char buffer[MAX_PATH+1];
+	//char buffer[MAX_PATH+1];
 	sprintf(szTmp, "/proc/%d/exe", getpid());
 	int bytes = std::min((int)readlink(szTmp, exepath, MAX_PATH+1), MAX_PATH);
 	if(bytes >= 0)
@@ -171,7 +171,7 @@ void FullPath(const char* filename, char* full)
 	char c = full[ strlen(full)-1 ];
 	if(c != '\\' && c != '/')
 		strcat(full, "\\");
-		//strcat(full, "/");
+	//strcat(full, "/");
 
 	strcat(full, filename);
 	CorrectSlashes(full);
@@ -182,31 +182,31 @@ float StrToFloat(const char *s)
 	if(s[0] == '\0')
 		return 1.0f;
 
-    float x;
-    istringstream iss(s);
-    iss >> x;
+	float x;
+	istringstream iss(s);
+	iss >> x;
 
 	if(_isnan(x))
 		x = 1.0f;
 
-    return x;
+	return x;
 }
 
 int HexToInt(const char* s)
 {
-    int x;
-    stringstream ss;
-    ss << std::hex << s;
-    ss >> x;
-    return x;
+	int x;
+	stringstream ss;
+	ss << std::hex << s;
+	ss >> x;
+	return x;
 }
 
 int StrToInt(const char *s)
 {
-    int x;
-    istringstream iss(s);
-    iss >> x;
-    return x;
+	int x;
+	istringstream iss(s);
+	iss >> x;
+	return x;
 }
 
 void CorrectSlashes(char* corrected)
@@ -228,21 +228,21 @@ void BackSlashes(char* corrected)
 void ErrorMessage(const char* title, const char* message)
 {
 	SDL_ShowCursor(true);
-    SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, title, message, NULL);
+	SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, title, message, NULL);
 	SDL_ShowCursor(false);
 }
 
 void InfoMessage(const char* title, const char* message)
 {
 	SDL_ShowCursor(true);
-    SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_INFORMATION, title, message, NULL);
+	SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_INFORMATION, title, message, NULL);
 	SDL_ShowCursor(false);
 }
 
 void WarningMessage(const char* title, const char* message)
 {
 	SDL_ShowCursor(true);
-    SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_WARNING, title, message, NULL);
+	SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_WARNING, title, message, NULL);
 	SDL_ShowCursor(false);
 }
 
@@ -259,25 +259,25 @@ void OutOfMem(const char* file, int line)
 static long long g_starttick = -1;
 long timeGetTime()
 {
-        return GetTickCount();
+	return GetTickCount();
 }
 
 long GetTickCount()
 {
-        if(g_starttick < 0)
-                g_starttick = GetTickCount64();
+	if(g_starttick < 0)
+		g_starttick = GetTickCount64();
 
-        return (long)(GetTickCount64() - g_starttick);
+	return (long)(GetTickCount64() - g_starttick);
 }
 
 long long GetTickCount64()
 {
-        return SDL_GetTicks();
+	return SDL_GetTicks();
 }
 
 void Sleep(int ms)
 {
-        SDL_Delay(ms);
+	SDL_Delay(ms);
 }
 #endif
 

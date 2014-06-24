@@ -11,11 +11,11 @@
   freely, subject to the following restrictions:
 
   1. The origin of this software must not be misrepresented; you must not
-     claim that you wrote the original software. If you use this software
-     in a product, an acknowledgment in the product documentation would be
-     appreciated but is not required.
+	 claim that you wrote the original software. If you use this software
+	 in a product, an acknowledgment in the product documentation would be
+	 appreciated but is not required.
   2. Altered source versions must be plainly marked as such, and must not be
-     misrepresented as being the original software.
+	 misrepresented as being the original software.
   3. This notice may not be removed or altered from any source distribution.
 */
 
@@ -36,19 +36,19 @@
 @interface SDL_uikitview : UIView {
 #endif
 
-    SDL_TouchID touchId;
-    UITouch *leftFingerDown;
+	SDL_TouchID touchId;
+	UITouch *leftFingerDown;
 #ifndef IPHONE_TOUCH_EFFICIENT_DANGEROUS
-    UITouch *finger[MAX_SIMULTANEOUS_TOUCHES];
+	UITouch *finger[MAX_SIMULTANEOUS_TOUCHES];
 #endif
 
 #if SDL_IPHONE_KEYBOARD
-    UITextField *textField;
-    BOOL keyboardVisible;
+	UITextField *textField;
+	BOOL keyboardVisible;
 #endif
 
 @public
-    SDL_uikitviewcontroller *viewcontroller;
+	SDL_uikitviewcontroller *viewcontroller;
 }
 - (CGPoint)touchLocation:(UITouch *)touch shouldNormalize:(BOOL)normalize;
 - (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event;

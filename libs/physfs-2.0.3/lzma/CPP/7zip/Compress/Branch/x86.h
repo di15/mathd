@@ -16,6 +16,6 @@ struct CBranch86
 };
 
 MyClassB(BCJ_x86, 0x01, 3, CBranch86 , 
-    virtual void SubInit() { x86Init(); })
+	virtual void SubInit() { x86Init(); })
 
 #endif

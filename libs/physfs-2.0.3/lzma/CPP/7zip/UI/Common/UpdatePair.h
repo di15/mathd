@@ -16,9 +16,9 @@ struct CUpdatePair
 };
 
 void GetUpdatePairInfoList(
-    const CObjectVector<CDirItem> &dirItems,
-    const CObjectVector<CArchiveItem> &archiveItems,
-    NFileTimeType::EEnum fileTimeType,
-    CObjectVector<CUpdatePair> &updatePairs);
+	const CObjectVector<CDirItem> &dirItems,
+	const CObjectVector<CArchiveItem> &archiveItems,
+	NFileTimeType::EEnum fileTimeType,
+	CObjectVector<CUpdatePair> &updatePairs);
 
 #endif

@@ -11,11 +11,11 @@
   freely, subject to the following restrictions:
 
   1. The origin of this software must not be misrepresented; you must not
-     claim that you wrote the original software. If you use this software
-     in a product, an acknowledgment in the product documentation would be
-     appreciated but is not required.
+	 claim that you wrote the original software. If you use this software
+	 in a product, an acknowledgment in the product documentation would be
+	 appreciated but is not required.
   2. Altered source versions must be plainly marked as such, and must not be
-     misrepresented as being the original software.
+	 misrepresented as being the original software.
   3. This notice may not be removed or altered from any source distribution.
 */
 
@@ -34,10 +34,10 @@ extern int32 BE_BPPToSDLPxFormat(int32 bpp);
 extern int BE_InitModes(_THIS);
 extern int BE_QuitModes(_THIS);
 extern int BE_GetDisplayBounds(_THIS, SDL_VideoDisplay *display,
-    SDL_Rect *rect);
+	SDL_Rect *rect);
 extern void BE_GetDisplayModes(_THIS, SDL_VideoDisplay *display);
 extern int BE_SetDisplayMode(_THIS, SDL_VideoDisplay *display,
-    SDL_DisplayMode *mode);
+	SDL_DisplayMode *mode);
 
 #ifdef __cplusplus
 }

@@ -11,11 +11,11 @@
   freely, subject to the following restrictions:
 
   1. The origin of this software must not be misrepresented; you must not
-     claim that you wrote the original software. If you use this software
-     in a product, an acknowledgment in the product documentation would be
-     appreciated but is not required.
+	 claim that you wrote the original software. If you use this software
+	 in a product, an acknowledgment in the product documentation would be
+	 appreciated but is not required.
   2. Altered source versions must be plainly marked as such, and must not be
-     misrepresented as being the original software.
+	 misrepresented as being the original software.
   3. This notice may not be removed or altered from any source distribution.
 */
 
@@ -51,94 +51,94 @@ extern "C" {
  */
 typedef struct SDL_RWops
 {
-    /**
-     *  Return the size of the file in this rwops, or -1 if unknown
-     */
-    Sint64 (SDLCALL * size) (struct SDL_RWops * context);
+	/**
+	 *  Return the size of the file in this rwops, or -1 if unknown
+	 */
+	Sint64 (SDLCALL * size) (struct SDL_RWops * context);
 
-    /**
-     *  Seek to \c offset relative to \c whence, one of stdio's whence values:
-     *  RW_SEEK_SET, RW_SEEK_CUR, RW_SEEK_END
-     *
-     *  \return the final offset in the data stream, or -1 on error.
-     */
-    Sint64 (SDLCALL * seek) (struct SDL_RWops * context, Sint64 offset,
-                             int whence);
+	/**
+	 *  Seek to \c offset relative to \c whence, one of stdio's whence values:
+	 *  RW_SEEK_SET, RW_SEEK_CUR, RW_SEEK_END
+	 *
+	 *  \return the final offset in the data stream, or -1 on error.
+	 */
+	Sint64 (SDLCALL * seek) (struct SDL_RWops * context, Sint64 offset,
+							 int whence);
 
-    /**
-     *  Read up to \c maxnum objects each of size \c size from the data
-     *  stream to the area pointed at by \c ptr.
-     *
-     *  \return the number of objects read, or 0 at error or end of file.
-     */
-    size_t (SDLCALL * read) (struct SDL_RWops * context, void *ptr,
-                             size_t size, size_t maxnum);
+	/**
+	 *  Read up to \c maxnum objects each of size \c size from the data
+	 *  stream to the area pointed at by \c ptr.
+	 *
+	 *  \return the number of objects read, or 0 at error or end of file.
+	 */
+	size_t (SDLCALL * read) (struct SDL_RWops * context, void *ptr,
+							 size_t size, size_t maxnum);
 
-    /**
-     *  Write exactly \c num objects each of size \c size from the area
-     *  pointed at by \c ptr to data stream.
-     *
-     *  \return the number of objects written, or 0 at error or end of file.
-     */
-    size_t (SDLCALL * write) (struct SDL_RWops * context, const void *ptr,
-                              size_t size, size_t num);
+	/**
+	 *  Write exactly \c num objects each of size \c size from the area
+	 *  pointed at by \c ptr to data stream.
+	 *
+	 *  \return the number of objects written, or 0 at error or end of file.
+	 */
+	size_t (SDLCALL * write) (struct SDL_RWops * context, const void *ptr,
+							  size_t size, size_t num);
 
-    /**
-     *  Close and free an allocated SDL_RWops structure.
-     *
-     *  \return 0 if successful or -1 on write error when flushing data.
-     */
-    int (SDLCALL * close) (struct SDL_RWops * context);
+	/**
+	 *  Close and free an allocated SDL_RWops structure.
+	 *
+	 *  \return 0 if successful or -1 on write error when flushing data.
+	 */
+	int (SDLCALL * close) (struct SDL_RWops * context);
 
-    Uint32 type;
-    union
-    {
+	Uint32 type;
+	union
+	{
 #if defined(ANDROID)
-        struct
-        {
-            void *fileNameRef;
-            void *inputStreamRef;
-            void *readableByteChannelRef;
-            void *readMethod;
-            void *assetFileDescriptorRef;
-            long position;
-            long size;
-            long offset;
-            int fd;
-        } androidio;
+		struct
+		{
+			void *fileNameRef;
+			void *inputStreamRef;
+			void *readableByteChannelRef;
+			void *readMethod;
+			void *assetFileDescriptorRef;
+			long position;
+			long size;
+			long offset;
+			int fd;
+		} androidio;
 #elif defined(__WIN32__)
-        struct
-        {
-            SDL_bool append;
-            void *h;
-            struct
-            {
-                void *data;
-                size_t size;
-                size_t left;
-            } buffer;
-        } windowsio;
+		struct
+		{
+			SDL_bool append;
+			void *h;
+			struct
+			{
+				void *data;
+				size_t size;
+				size_t left;
+			} buffer;
+		} windowsio;
 #endif
 
 #ifdef HAVE_STDIO_H
-        struct
-        {
-            SDL_bool autoclose;
-            FILE *fp;
-        } stdio;
+		struct
+		{
+			SDL_bool autoclose;
+			FILE *fp;
+		} stdio;
 #endif
-        struct
-        {
-            Uint8 *base;
-            Uint8 *here;
-            Uint8 *stop;
-        } mem;
-        struct
-        {
-            void *data1;
-            void *data2;
-        } unknown;
-    } hidden;
+		struct
+		{
+			Uint8 *base;
+			Uint8 *here;
+			Uint8 *stop;
+		} mem;
+		struct
+		{
+			void *data1;
+			void *data2;
+		} unknown;
+	} hidden;
 
 } SDL_RWops;
 
@@ -151,19 +151,19 @@ typedef struct SDL_RWops
 /* @{ */
 
 extern DECLSPEC SDL_RWops *SDLCALL SDL_RWFromFile(const char *file,
-                                                  const char *mode);
+												  const char *mode);
 
 #ifdef HAVE_STDIO_H
 extern DECLSPEC SDL_RWops *SDLCALL SDL_RWFromFP(FILE * fp,
-                                                SDL_bool autoclose);
+												SDL_bool autoclose);
 #else
 extern DECLSPEC SDL_RWops *SDLCALL SDL_RWFromFP(void * fp,
-                                                SDL_bool autoclose);
+												SDL_bool autoclose);
 #endif
 
 extern DECLSPEC SDL_RWops *SDLCALL SDL_RWFromMem(void *mem, int size);
 extern DECLSPEC SDL_RWops *SDLCALL SDL_RWFromConstMem(const void *mem,
-                                                      int size);
+													  int size);
 
 /* @} *//* RWFrom functions */
 

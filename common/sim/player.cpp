@@ -1,5 +1,4 @@
 
-
 #include "player.h"
 #include "resources.h"
 #include "../render/model.h"
@@ -10,7 +9,7 @@
 
 Player g_player[PLAYERS];
 int g_localP = 0;
-int g_currP = g_localP;
+int g_curP = g_localP;
 int g_playerm;
 
 Player::Player()

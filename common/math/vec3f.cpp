@@ -1,5 +1,4 @@
 
-
 #include "../platform.h"
 #include "vec3f.h"
 #include "matrix.h"

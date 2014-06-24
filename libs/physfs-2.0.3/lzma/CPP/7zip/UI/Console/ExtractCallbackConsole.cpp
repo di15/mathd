@@ -48,49 +48,49 @@ static const char *kUnknownError = "Unknown Error";
 STDMETHODIMP CExtractCallbackConsole::SetTotal(UInt64)
 {
   if (NConsoleClose::TestBreakSignal())
-    return E_ABORT;
+	return E_ABORT;
   return S_OK;
 }
 
 STDMETHODIMP CExtractCallbackConsole::SetCompleted(const UInt64 *)
 {
   if (NConsoleClose::TestBreakSignal())
-    return E_ABORT;
+	return E_ABORT;
   return S_OK;
 }
 
 STDMETHODIMP CExtractCallbackConsole::AskOverwrite(
-    const wchar_t *existName, const FILETIME *, const UInt64 *,
-    const wchar_t *newName, const FILETIME *, const UInt64 *,
-    Int32 *answer)
+	const wchar_t *existName, const FILETIME *, const UInt64 *,
+	const wchar_t *newName, const FILETIME *, const UInt64 *,
+	Int32 *answer)
 {
   (*OutStream) << "file " << existName << 
-    "\nalready exists. Overwrite with " << endl;
+	"\nalready exists. Overwrite with " << endl;
   (*OutStream) << newName;
   
   NUserAnswerMode::EEnum overwriteAnswer = ScanUserYesNoAllQuit(OutStream);
   
   switch(overwriteAnswer)
   {
-    case NUserAnswerMode::kQuit:
-      return E_ABORT;
-    case NUserAnswerMode::kNo:
-      *answer = NOverwriteAnswer::kNo;
-      break;
-    case NUserAnswerMode::kNoAll:
-      *answer = NOverwriteAnswer::kNoToAll;
-      break;
-    case NUserAnswerMode::kYesAll:
-      *answer = NOverwriteAnswer::kYesToAll;
-      break;
-    case NUserAnswerMode::kYes:
-      *answer = NOverwriteAnswer::kYes;
-      break;
-    case NUserAnswerMode::kAutoRename:
-      *answer = NOverwriteAnswer::kAutoRename;
-      break;
-    default:
-      return E_FAIL;
+	case NUserAnswerMode::kQuit:
+	  return E_ABORT;
+	case NUserAnswerMode::kNo:
+	  *answer = NOverwriteAnswer::kNo;
+	  break;
+	case NUserAnswerMode::kNoAll:
+	  *answer = NOverwriteAnswer::kNoToAll;
+	  break;
+	case NUserAnswerMode::kYesAll:
+	  *answer = NOverwriteAnswer::kYesToAll;
+	  break;
+	case NUserAnswerMode::kYes:
+	  *answer = NOverwriteAnswer::kYes;
+	  break;
+	case NUserAnswerMode::kAutoRename:
+	  *answer = NOverwriteAnswer::kAutoRename;
+	  break;
+	default:
+	  return E_FAIL;
   }
   return S_OK;
 }
@@ -99,19 +99,19 @@ STDMETHODIMP CExtractCallbackConsole::PrepareOperation(const wchar_t *name, bool
 {
   switch (askExtractMode)
   {
-    case NArchive::NExtract::NAskMode::kExtract:
-      (*OutStream) << kExtractingString;
-      break;
-    case NArchive::NExtract::NAskMode::kTest:
-      (*OutStream) << kTestingString;
-      break;
-    case NArchive::NExtract::NAskMode::kSkip:
-      (*OutStream) << kSkippingString;
-      break;
+	case NArchive::NExtract::NAskMode::kExtract:
+	  (*OutStream) << kExtractingString;
+	  break;
+	case NArchive::NExtract::NAskMode::kTest:
+	  (*OutStream) << kTestingString;
+	  break;
+	case NArchive::NExtract::NAskMode::kSkip:
+	  (*OutStream) << kSkippingString;
+	  break;
   };
   (*OutStream) << name;
   if (position != 0)
-    (*OutStream) << " <" << *position << ">";
+	(*OutStream) << " <" << *position << ">";
   return S_OK;
 }
 
@@ -127,28 +127,28 @@ STDMETHODIMP CExtractCallbackConsole::SetOperationResult(Int32 operationResult, 
 {
   switch(operationResult)
   {
-    case NArchive::NExtract::NOperationResult::kOK:
-      break;
-    default:
-    {
-      NumFileErrorsInCurrentArchive++;
-      NumFileErrors++;
-      (*OutStream) << "     ";
-      switch(operationResult)
-      {
-        case NArchive::NExtract::NOperationResult::kUnSupportedMethod:
-          (*OutStream) << kUnsupportedMethod;
-          break;
-        case NArchive::NExtract::NOperationResult::kCRCError:
-          (*OutStream) << (encrypted ? kCrcFailedEncrypted: kCrcFailed);
-          break;
-        case NArchive::NExtract::NOperationResult::kDataError:
-          (*OutStream) << (encrypted ? kDataErrorEncrypted : kDataError);
-          break;
-        default:
-          (*OutStream) << kUnknownError;
-      }
-    }
+	case NArchive::NExtract::NOperationResult::kOK:
+	  break;
+	default:
+	{
+	  NumFileErrorsInCurrentArchive++;
+	  NumFileErrors++;
+	  (*OutStream) << "     ";
+	  switch(operationResult)
+	  {
+		case NArchive::NExtract::NOperationResult::kUnSupportedMethod:
+		  (*OutStream) << kUnsupportedMethod;
+		  break;
+		case NArchive::NExtract::NOperationResult::kCRCError:
+		  (*OutStream) << (encrypted ? kCrcFailedEncrypted: kCrcFailed);
+		  break;
+		case NArchive::NExtract::NOperationResult::kDataError:
+		  (*OutStream) << (encrypted ? kDataErrorEncrypted : kDataError);
+		  break;
+		default:
+		  (*OutStream) << kUnknownError;
+	  }
+	}
   }
   (*OutStream) << endl;
   return S_OK;
@@ -158,8 +158,8 @@ STDMETHODIMP CExtractCallbackConsole::CryptoGetTextPassword(BSTR *password)
 {
   if (!PasswordIsDefined)
   {
-    Password = GetPassword(OutStream); 
-    PasswordIsDefined = true;
+	Password = GetPassword(OutStream); 
+	PasswordIsDefined = true;
   }
   CMyComBSTR tempName(Password);
   *password = tempName.Detach();
@@ -179,13 +179,13 @@ HRESULT CExtractCallbackConsole::OpenResult(const wchar_t * /* name */, HRESULT 
   (*OutStream) << endl;
   if (result != S_OK)
   {
-    (*OutStream) << "Error: ";
-    if (encrypted)
-      (*OutStream) << "Can not open encrypted archive. Wrong password?";
-    else
-      (*OutStream) << "Can not open file as archive";
-    (*OutStream) << endl;
-    NumArchiveErrors++;
+	(*OutStream) << "Error: ";
+	if (encrypted)
+	  (*OutStream) << "Can not open encrypted archive. Wrong password?";
+	else
+	  (*OutStream) << "Can not open file as archive";
+	(*OutStream) << endl;
+	NumArchiveErrors++;
   }
   return S_OK;
 }
@@ -200,28 +200,28 @@ HRESULT CExtractCallbackConsole::ExtractResult(HRESULT result)
 {
   if (result == S_OK)
   {
-    (*OutStream) << endl;
-    if (NumFileErrorsInCurrentArchive == 0)
-      (*OutStream) << kEverythingIsOk << endl;
-    else 
-    {
-      NumArchiveErrors++;
-      (*OutStream) << "Sub items Errors: " << NumFileErrorsInCurrentArchive << endl;
-    }
+	(*OutStream) << endl;
+	if (NumFileErrorsInCurrentArchive == 0)
+	  (*OutStream) << kEverythingIsOk << endl;
+	else 
+	{
+	  NumArchiveErrors++;
+	  (*OutStream) << "Sub items Errors: " << NumFileErrorsInCurrentArchive << endl;
+	}
   }
   if (result == S_OK)
-    return result;
+	return result;
   NumArchiveErrors++;
   if (result == E_ABORT || result == ERROR_DISK_FULL)
-    return result;
+	return result;
   (*OutStream) << endl << kError;
   if (result == E_OUTOFMEMORY)
-    (*OutStream) << kMemoryExceptionMessage;
+	(*OutStream) << kMemoryExceptionMessage;
   else
   {
-    UString message;
-    NError::MyFormatMessage(result, message);
-    (*OutStream) << message;
+	UString message;
+	NError::MyFormatMessage(result, message);
+	(*OutStream) << message;
   }
   (*OutStream) << endl;
   return S_OK;

@@ -22,17 +22,17 @@ STDMETHODIMP CLocalProgress::SetRatioInfo(const UInt64 *inSize, const UInt64 *ou
 {
   UInt64 inSizeNew = InSize, outSizeNew = OutSize;
   if (inSize)
-    inSizeNew += (*inSize);
+	inSizeNew += (*inSize);
   if (outSize)
-    outSizeNew += (*outSize);
+	outSizeNew += (*outSize);
   if (SendRatio && _ratioProgress)
   {
-    RINOK(_ratioProgress->SetRatioInfo(&inSizeNew, &outSizeNew));
+	RINOK(_ratioProgress->SetRatioInfo(&inSizeNew, &outSizeNew));
   }
   inSizeNew += ProgressOffset;
   outSizeNew += ProgressOffset;
   if (SendProgress)
-    return _progress->SetCompleted(_inSizeIsMain ? &inSizeNew : &outSizeNew);
+	return _progress->SetCompleted(_inSizeIsMain ? &inSizeNew : &outSizeNew);
   return S_OK;
 }
 

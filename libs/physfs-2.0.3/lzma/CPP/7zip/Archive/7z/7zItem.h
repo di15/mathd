@@ -43,42 +43,42 @@ struct CFolder
 
   UInt64 GetUnPackSize() const // test it
   { 
-    if (UnPackSizes.IsEmpty())
-      return 0;
-    for (int i = UnPackSizes.Size() - 1; i >= 0; i--)
-      if (FindBindPairForOutStream(i) < 0)
-        return UnPackSizes[i];
-    throw 1;
+	if (UnPackSizes.IsEmpty())
+	  return 0;
+	for (int i = UnPackSizes.Size() - 1; i >= 0; i--)
+	  if (FindBindPairForOutStream(i) < 0)
+		return UnPackSizes[i];
+	throw 1;
   }
 
   CNum GetNumOutStreams() const
   {
-    CNum result = 0;
-    for (int i = 0; i < Coders.Size(); i++)
-      result += Coders[i].NumOutStreams;
-    return result;
+	CNum result = 0;
+	for (int i = 0; i < Coders.Size(); i++)
+	  result += Coders[i].NumOutStreams;
+	return result;
   }
 
   int FindBindPairForInStream(CNum inStreamIndex) const
   {
-    for(int i = 0; i < BindPairs.Size(); i++)
-      if (BindPairs[i].InIndex == inStreamIndex)
-        return i;
-    return -1;
+	for(int i = 0; i < BindPairs.Size(); i++)
+	  if (BindPairs[i].InIndex == inStreamIndex)
+		return i;
+	return -1;
   }
   int FindBindPairForOutStream(CNum outStreamIndex) const
   {
-    for(int i = 0; i < BindPairs.Size(); i++)
-      if (BindPairs[i].OutIndex == outStreamIndex)
-        return i;
-    return -1;
+	for(int i = 0; i < BindPairs.Size(); i++)
+	  if (BindPairs[i].OutIndex == outStreamIndex)
+		return i;
+	return -1;
   }
   int FindPackStreamArrayIndex(CNum inStreamIndex) const
   {
-    for(int i = 0; i < PackStreams.Size(); i++)
-      if (PackStreams[i] == inStreamIndex)
-        return i;
-    return -1;
+	for(int i = 0; i < PackStreams.Size(); i++)
+	  if (PackStreams[i] == inStreamIndex)
+		return i;
+	return -1;
   }
 };
 
@@ -97,7 +97,7 @@ public:
   UString Name;
 
   bool HasStream; // Test it !!! it means that there is 
-                  // stream in some folder. It can be empty stream
+				  // stream in some folder. It can be empty stream
   bool IsDirectory;
   bool IsAnti;
   bool IsFileCRCDefined;
@@ -109,38 +109,38 @@ public:
 
   /*
   const bool HasStream() const { 
-      return !IsDirectory && !IsAnti && UnPackSize != 0; }
+	  return !IsDirectory && !IsAnti && UnPackSize != 0; }
   */
   CFileItem(): 
-    HasStream(true),
-    IsDirectory(false),
-    IsAnti(false),
-    IsFileCRCDefined(false),
-    AreAttributesDefined(false), 
-    IsCreationTimeDefined(false), 
-    IsLastWriteTimeDefined(false), 
-    IsLastAccessTimeDefined(false),
-    IsStartPosDefined(false)
-      {}
+	HasStream(true),
+	IsDirectory(false),
+	IsAnti(false),
+	IsFileCRCDefined(false),
+	AreAttributesDefined(false), 
+	IsCreationTimeDefined(false), 
+	IsLastWriteTimeDefined(false), 
+	IsLastAccessTimeDefined(false),
+	IsStartPosDefined(false)
+	  {}
   void SetAttributes(UInt32 attributes) 
   { 
-    AreAttributesDefined = true;
-    Attributes = attributes;
+	AreAttributesDefined = true;
+	Attributes = attributes;
   }
   void SetCreationTime(const CArchiveFileTime &creationTime) 
   { 
-    IsCreationTimeDefined = true;
-    CreationTime = creationTime;
+	IsCreationTimeDefined = true;
+	CreationTime = creationTime;
   }
   void SetLastWriteTime(const CArchiveFileTime &lastWriteTime) 
   {
-    IsLastWriteTimeDefined = true;
-    LastWriteTime = lastWriteTime;
+	IsLastWriteTimeDefined = true;
+	LastWriteTime = lastWriteTime;
   }
   void SetLastAccessTime(const CArchiveFileTime &lastAccessTime) 
   { 
-    IsLastAccessTimeDefined = true;
-    LastAccessTime = lastAccessTime;
+	IsLastAccessTimeDefined = true;
+	LastAccessTime = lastAccessTime;
   }
 };
 
@@ -154,28 +154,28 @@ struct CArchiveDatabase
   CObjectVector<CFileItem> Files;
   void Clear()
   {
-    PackSizes.Clear();
-    PackCRCsDefined.Clear();
-    PackCRCs.Clear();
-    Folders.Clear();
-    NumUnPackStreamsVector.Clear();
-    Files.Clear();
+	PackSizes.Clear();
+	PackCRCsDefined.Clear();
+	PackCRCs.Clear();
+	Folders.Clear();
+	NumUnPackStreamsVector.Clear();
+	Files.Clear();
   }
   bool IsEmpty() const
   {
-    return (PackSizes.IsEmpty() && 
-      PackCRCsDefined.IsEmpty() && 
-      PackCRCs.IsEmpty() && 
-      Folders.IsEmpty() && 
-      NumUnPackStreamsVector.IsEmpty() && 
-      Files.IsEmpty());
+	return (PackSizes.IsEmpty() && 
+	  PackCRCsDefined.IsEmpty() && 
+	  PackCRCs.IsEmpty() && 
+	  Folders.IsEmpty() && 
+	  NumUnPackStreamsVector.IsEmpty() && 
+	  Files.IsEmpty());
   }
   bool IsSolid() const
   {
-    for (int i = 0; i < NumUnPackStreamsVector.Size(); i++)
-      if (NumUnPackStreamsVector[i] > 1)
-        return true;
-    return false;
+	for (int i = 0; i < NumUnPackStreamsVector.Size(); i++)
+	  if (NumUnPackStreamsVector[i] > 1)
+		return true;
+	return false;
   }
 };
 

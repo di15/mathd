@@ -29,9 +29,9 @@ struct CMethodsMode
   #endif
 
   CMethodsMode()
-      #ifdef COMPRESS_MT
-      : NumThreads(1) 
-      #endif
+	  #ifdef COMPRESS_MT
+	  : NumThreads(1) 
+	  #endif
   {}
   bool IsEmpty() const { return Methods.IsEmpty() ; }
 };

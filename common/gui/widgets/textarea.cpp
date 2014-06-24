@@ -1,5 +1,4 @@
 
-
 #include "../widget.h"
 #include "barbutton.h"
 #include "button.h"
@@ -56,10 +55,10 @@ void TextArea::draw()
 	DrawImage(g_texture[m_downtex].texname, m_pos[2]-square(), m_pos[3]-square(), m_pos[2], m_pos[3]);
 	DrawImage(g_texture[m_filledtex].texname, m_pos[2]-square(), m_pos[1]+square()+scrollspace()*topratio(), m_pos[2], m_pos[1]+square()+scrollspace()*bottomratio());
 
-    float width = m_pos[2] - m_pos[0] - square();
-    float height = m_pos[3] - m_pos[1];
+	float width = m_pos[2] - m_pos[0] - square();
+	float height = m_pos[3] - m_pos[1];
 
-    //DrawBoxShadText(m_font, m_pos[0], m_pos[1], width, height, m_value.c_str(), m_rgba, m_scroll[1], m_opened ? m_caret : -1);
+	//DrawBoxShadText(m_font, m_pos[0], m_pos[1], width, height, m_value.c_str(), m_rgba, m_scroll[1], m_opened ? m_caret : -1);
 
 	DrawShadowedTextF(m_font, m_pos[0]+m_scroll[0], m_pos[1], m_pos[0], m_pos[1], m_pos[2], m_pos[3], &m_value, NULL, m_opened ? m_caret : -1);
 
@@ -85,7 +84,7 @@ float TextArea::scrollspace()
 
 void TextArea::inev(InEv* ev)
 {
-	Player* py = &g_player[g_currP];
+	Player* py = &g_player[g_curP];
 
 	if(ev->type == INEV_MOUSEMOVE && !ev->intercepted)
 	{
@@ -651,7 +650,7 @@ void TextArea::gainfocus()
 {
 	if(!m_opened)
 	{
-		Player* py = &g_player[g_currP];
+		Player* py = &g_player[g_curP];
 
 		if(py->kbfocus > 0)
 		{
@@ -675,7 +674,7 @@ void TextArea::losefocus()
 {
 	if(m_opened)
 	{
-		Player* py = &g_player[g_currP];
+		Player* py = &g_player[g_curP];
 
 		if(py->kbfocus > 0)
 		{

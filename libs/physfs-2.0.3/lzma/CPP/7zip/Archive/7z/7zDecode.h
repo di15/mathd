@@ -24,8 +24,8 @@ struct CBindInfoEx: public NCoderMixer::CBindInfo
   CRecordVector<CMethodId> CoderMethodIDs;
   void Clear()
   {
-    CBindInfo::Clear();
-    CoderMethodIDs.Clear();
+	CBindInfo::Clear();
+	CoderMethodIDs.Clear();
   }
 };
 
@@ -47,20 +47,20 @@ class CDecoder
 public:
   CDecoder(bool multiThread);
   HRESULT Decode(
-      DECL_EXTERNAL_CODECS_LOC_VARS
-      IInStream *inStream,
-      UInt64 startPos,
-      const UInt64 *packSizes,
-      const CFolder &folder, 
-      ISequentialOutStream *outStream,
-      ICompressProgressInfo *compressProgress
-      #ifndef _NO_CRYPTO
-      , ICryptoGetTextPassword *getTextPasswordSpec
-      #endif
-      #ifdef COMPRESS_MT
-      , bool mtMode, UInt32 numThreads
-      #endif
-      );
+	  DECL_EXTERNAL_CODECS_LOC_VARS
+	  IInStream *inStream,
+	  UInt64 startPos,
+	  const UInt64 *packSizes,
+	  const CFolder &folder, 
+	  ISequentialOutStream *outStream,
+	  ICompressProgressInfo *compressProgress
+	  #ifndef _NO_CRYPTO
+	  , ICryptoGetTextPassword *getTextPasswordSpec
+	  #endif
+	  #ifdef COMPRESS_MT
+	  , bool mtMode, UInt32 numThreads
+	  #endif
+	  );
 };
 
 }}

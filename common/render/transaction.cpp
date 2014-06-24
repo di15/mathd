@@ -1,5 +1,4 @@
 
-
 #include "../math/matrix.h"
 #include "transaction.h"
 #include "../gui/font.h"
@@ -14,7 +13,7 @@ void DrawTransactions(Matrix projmodlview)
 {
 	//return;
 
-	Player* py = &g_player[g_currP];
+	Player* py = &g_player[g_curP];
 
 	Vec3f* pos;
 	Vec4f screenpos;

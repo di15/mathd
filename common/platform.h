@@ -2,24 +2,24 @@
 #define PLATFORM_H
 
 #ifdef _WIN32
-    #define PLATFORM_WIN
+#define PLATFORM_WIN
 #elif __APPLE__
-    #include "TargetConditionals.h"
-    #if TARGET_OS_MAC
-        #define PLATFORM_MAC
-    #elif TARGET_OS_IPHONE
-        #define PLATFORM_IOS
-        #define PLATFORM_IPHONE
-    #elif TARGET_OS_IPAD
-        #define PLATFORM_IOS
-        #define PLATFORM_IPAD
-    #endif
+#include "TargetConditionals.h"
+#if TARGET_OS_MAC
+#define PLATFORM_MAC
+#elif TARGET_OS_IPHONE
+#define PLATFORM_IOS
+#define PLATFORM_IPHONE
+#elif TARGET_OS_IPAD
+#define PLATFORM_IOS
+#define PLATFORM_IPAD
+#endif
 #elif defined( __GNUC__ )
-    #define PLATFORM_LINUX
+#define PLATFORM_LINUX
 #elif defined( __linux__ )
-    #define PLATFORM_LINUX
+#define PLATFORM_LINUX
 #elif defined ( __linux )
-    #define PLATFORM_LINUX
+#define PLATFORM_LINUX
 #endif
 
 #define _CRT_SECURE_NO_WARNINGS
@@ -39,6 +39,7 @@
 /* POSIX! getpid(), readlink() */
 #include <sys/types.h>
 #include <unistd.h>
+#include <signal.h>
 #endif
 
 
@@ -138,11 +139,6 @@ int _isnan(double x) { return x != x; }
 
 #ifdef PLATFORM_WIN
 extern HINSTANCE g_hInstance;
-#endif
-
-#ifdef PLATFORM_LINUX
-//extern Display *g_display;
-//extern Window g_window;
 #endif
 
 extern SDL_Window *g_window;

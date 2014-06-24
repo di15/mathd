@@ -26,7 +26,7 @@ static bool IsItWindowsNT()
   OSVERSIONINFO versionInfo;
   versionInfo.dwOSVersionInfoSize = sizeof(versionInfo);
   if (!::GetVersionEx(&versionInfo)) 
-    return false;
+	return false;
   return (versionInfo.dwPlatformId == VER_PLATFORM_WIN32_NT);
 }
 #endif
@@ -37,12 +37,12 @@ BOOL WINAPI DllMain(HINSTANCE hInstance, DWORD dwReason, LPVOID /*lpReserved*/)
 {
   if (dwReason == DLL_PROCESS_ATTACH)
   {
-    g_hInstance = hInstance;
-    #ifndef _UNICODE
-    #ifdef _WIN32
-    g_IsNT = IsItWindowsNT();
-    #endif
-    #endif
+	g_hInstance = hInstance;
+	#ifndef _UNICODE
+	#ifdef _WIN32
+	g_IsNT = IsItWindowsNT();
+	#endif
+	#endif
   }
   return TRUE;
 }
@@ -64,11 +64,11 @@ STDAPI CreateObject(const GUID *clsid, const GUID *iid, void **outObject)
   *outObject = 0;
   if (*iid == IID_ICompressCoder || *iid == IID_ICompressCoder2 || *iid == IID_ICompressFilter)
   {
-    return CreateCoder(clsid, iid, outObject);
+	return CreateCoder(clsid, iid, outObject);
   }
   else
   {
-    return CreateArchiver(clsid, iid, outObject);
+	return CreateArchiver(clsid, iid, outObject);
   }
   // COM_TRY_END
 }

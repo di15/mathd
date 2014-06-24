@@ -112,7 +112,7 @@ void Click_BuildNum(int param)
 		g_canselect = true;
 
 	//if(g_mode != APPMODE_EDITOR)
-		gui->close("build selector");
+	gui->close("build selector");
 
 	py->build = param;
 
@@ -259,7 +259,7 @@ void Resize_NewGameLink(Widget* thisw)
 
 void Resize_LoadingStatus(Widget* thisw)
 {
-	Player* py = &g_player[g_currP];
+	Player* py = &g_player[g_curP];
 
 	thisw->m_pos[0] = py->width/2;
 	thisw->m_pos[1] = py->height/2;
@@ -281,7 +281,9 @@ void Resize_WinText(Widget* thisw)
 
 void Click_NewGame()
 {
+#ifdef GLDEBUG
 	CheckGLError(__FILE__, __LINE__);
+#endif
 #if 1
 	//LoadJPGMap("heightmaps/heightmap0e2s.jpg");
 	LoadJPGMap("heightmaps/heightmap0e2.jpg");
@@ -298,17 +300,19 @@ void Click_NewGame()
 	CheckGLError(__FILE__, __LINE__);
 
 	for(int i=0; i<10; i++)
-	for(int j=0; j<20; j++)
-	{
+		for(int j=0; j<20; j++)
+		{
 
-		Vec3i cmpos((g_hmap.m_widthx+4)*TILE_SIZE/2 + (i+2)*PATHNODE_SIZE, 0, g_hmap.m_widthz*TILE_SIZE/2 + (j+2)*PATHNODE_SIZE);
-		cmpos.y = g_hmap.accheight(cmpos.x, cmpos.z);
+			Vec3i cmpos((g_hmap.m_widthx+4)*TILE_SIZE/2 + (i+2)*PATHNODE_SIZE, 0, g_hmap.m_widthz*TILE_SIZE/2 + (j+2)*PATHNODE_SIZE);
+			cmpos.y = g_hmap.accheight(cmpos.x, cmpos.z);
 
-		PlaceUnit(UNIT_ROBOSOLDIER, cmpos, 0);
-		//PlaceUnit(UNIT_LABOURER, cmpos, 0);
-	}
+			PlaceUnit(UNIT_ROBOSOLDIER, cmpos, 0);
+			//PlaceUnit(UNIT_LABOURER, cmpos, 0);
+		}
 
+#ifdef GLDEBUG
 	CheckGLError(__FILE__, __LINE__);
+#endif
 
 	PlaceBuilding(BUILDING_HOUR, Vec2i(g_hmap.m_widthx/2-1, g_hmap.m_widthz/2-3), true, 0);
 	PlaceBuilding(BUILDING_APARTMENT, Vec2i(g_hmap.m_widthx/2+2, g_hmap.m_widthz/2-2), true, 0);
@@ -357,18 +361,22 @@ void Click_NewGame()
 	CheckGLError(__FILE__, __LINE__);
 	PlaceBuilding(BUILDING_GASSTATION, Vec2i(g_hmap.m_widthx/2+14, g_hmap.m_widthz/2-1), true, 0);
 
+#ifdef GLDEBUG
 	CheckGLError(__FILE__, __LINE__);
+#endif
 
 	g_mode = APPMODE_PLAY;
 
-	Player* py = &g_player[g_currP];
+	Player* py = &g_player[g_curP];
 	GUI* gui = &py->gui;
 
 	gui->closeall();
 	gui->open("play gui");
 	gui->open("play right opener");
 
+#ifdef GLDEBUG
 	CheckGLError(__FILE__, __LINE__);
+#endif
 
 	gui->add(new WindowW(gui, "window", Resize_Window));
 	//gui->open("window");
@@ -392,14 +400,18 @@ void Click_NewGame()
 
 void Click_OpenEditor()
 {
+#ifdef GLDEBUG
 	CheckGLError(__FILE__, __LINE__);
+#endif
 	LoadJPGMap("heightmaps/heightmap0e2.jpg");
+#ifdef GLDEBUG
 	CheckGLError(__FILE__, __LINE__);
+#endif
 
 	g_mode = APPMODE_EDITOR;
 
 
-	Player* py = &g_player[g_currP];
+	Player* py = &g_player[g_curP];
 	GUI* gui = &py->gui;
 
 	gui->closeall();
@@ -410,7 +422,7 @@ void Click_OpenEditor()
 
 void FillMenuGUI()
 {
-	Player* py = &g_player[g_currP];
+	Player* py = &g_player[g_curP];
 	GUI* gui = &py->gui;
 
 	// Main ViewLayer
@@ -422,7 +434,7 @@ void FillMenuGUI()
 
 void StartRoadPlacement()
 {
-	Player* py = &g_player[g_currP];
+	Player* py = &g_player[g_curP];
 	Camera* c = &py->camera;
 
 	py->vdrag[0] = Vec3f(-1,-1,-1);
@@ -454,22 +466,22 @@ void MouseLDown()
 		int edtool = GetEdTool();
 
 		if(edtool == EDTOOL_PLACEROADS ||
-			edtool == EDTOOL_PLACECRUDEPIPES ||
-			edtool == EDTOOL_PLACEPOWERLINES)
+				edtool == EDTOOL_PLACECRUDEPIPES ||
+				edtool == EDTOOL_PLACEPOWERLINES)
 		{
 			StartRoadPlacement();
 		}
 	}
 	else if(g_mode == APPMODE_PLAY)
 	{
-		Player* py = &g_player[g_currP];
+		Player* py = &g_player[g_curP];
 		py->mousestart = py->mouse;
 	}
 }
 
 void EdPlaceUnit()
 {
-	Player* py = &g_player[g_currP];
+	Player* py = &g_player[g_curP];
 	Camera* c = &py->camera;
 
 	Vec3f ray = ScreenPerspRay(py->mouse.x, py->mouse.y, py->width, py->height, c->zoompos(), c->m_strafe, c->up2(), c->m_view - c->m_pos, FIELD_OF_VIEW);
@@ -502,7 +514,7 @@ void EdPlaceUnit()
 
 void EdPlaceBuilding()
 {
-	Player* py = &g_player[g_currP];
+	Player* py = &g_player[g_curP];
 	Camera* c = &py->camera;
 
 	Vec3f ray = ScreenPerspRay(py->mouse.x, py->mouse.y, py->width, py->height, c->zoompos(), c->m_strafe, c->up2(), c->m_view - c->m_pos, FIELD_OF_VIEW);
@@ -538,7 +550,7 @@ void EdPlaceBuilding()
 
 void EdDeleteObject()
 {
-	Player* py = &g_player[g_currP];
+	Player* py = &g_player[g_curP];
 	Camera* c = &py->camera;
 
 	Selection sel = DoSel(c->zoompos(), c->m_strafe, c->up2(), c->m_view - c->m_pos);
@@ -571,7 +583,7 @@ void MouseLUp()
 	}
 	else if(g_mode == APPMODE_PLAY)
 	{
-		Player* py = &g_player[g_currP];
+		Player* py = &g_player[g_curP];
 		Camera* c = &py->camera;
 		GUI* gui = &py->gui;
 
@@ -613,7 +625,7 @@ void MouseLUp()
 
 void RotateAbout()
 {
-	Player* py = &g_player[g_currP];
+	Player* py = &g_player[g_curP];
 	Camera* c = &py->camera;
 
 	float dx = py->mouse.x - py->width/2;
@@ -648,7 +660,7 @@ void RotateAbout()
 
 void UpdateRoadPlans()
 {
-	Player* py = &g_player[g_currP];
+	Player* py = &g_player[g_curP];
 	Camera* c = &py->camera;
 
 	py->vdrag[1] = py->vdrag[0];
@@ -675,7 +687,7 @@ void UpdateRoadPlans()
 
 void UpdateCrPipePlans()
 {
-	Player* py = &g_player[g_currP];
+	Player* py = &g_player[g_curP];
 	Camera* c = &py->camera;
 
 	py->vdrag[1] = py->vdrag[0];
@@ -702,7 +714,7 @@ void UpdateCrPipePlans()
 
 void UpdatePowlPlans()
 {
-	Player* py = &g_player[g_currP];
+	Player* py = &g_player[g_curP];
 	Camera* c = &py->camera;
 
 	py->vdrag[1] = py->vdrag[0];
@@ -731,7 +743,7 @@ void MouseMove()
 {
 	if(g_mode == APPMODE_PLAY || g_mode == APPMODE_EDITOR)
 	{
-		Player* py = &g_player[g_currP];
+		Player* py = &g_player[g_curP];
 
 		if(py->mousekeys[MOUSE_MIDDLE])
 		{
@@ -769,7 +781,7 @@ void MouseRUp()
 {
 	if(g_mode == APPMODE_PLAY)
 	{
-		Player* py = &g_player[g_currP];
+		Player* py = &g_player[g_curP];
 		Camera* c = &py->camera;
 
 		if(!py->keyintercepted)
@@ -784,19 +796,19 @@ void FillGUI()
 	//DrawSceneFunc = DrawScene;
 	//DrawSceneDepthFunc = DrawSceneDepth;
 
-    g_log<<"2.1"<<endl;
-    g_log.flush();
+	g_log<<"2.1"<<endl;
+	g_log.flush();
 
 	for(int i=0; i<PLAYERS; i++)
 	{
-        g_log<<"2.1.1"<<endl;
-        g_log.flush();
+		g_log<<"2.1.1"<<endl;
+		g_log.flush();
 
 		Player* py = &g_player[i];
 		GUI* gui = &py->gui;
 
-        g_log<<"2.1.2"<<endl;
-        g_log.flush();
+		g_log<<"2.1.2"<<endl;
+		g_log.flush();
 
 		gui->assignkey(SDL_SCANCODE_F1, SaveScreenshot, NULL);
 		gui->assignkey(SDL_SCANCODE_F2, LogPathDebug, NULL);
@@ -804,46 +816,46 @@ void FillGUI()
 		gui->assignrbutton(MouseRDown, MouseRUp);
 		gui->assignmousemove(MouseMove);
 
-        g_log<<"2.1.3"<<endl;
-        g_log.flush();
+		g_log<<"2.1.3"<<endl;
+		g_log.flush();
 	}
 
-    g_log<<"2.2"<<endl;
-    g_log.flush();
+	g_log<<"2.2"<<endl;
+	g_log.flush();
 
 	// Loading ViewLayer
-	Player* py = &g_player[g_currP];
+	Player* py = &g_player[g_curP];
 	GUI* gui = &py->gui;
 
-    g_log<<"2.2"<<endl;
-    g_log.flush();
+	g_log<<"2.2"<<endl;
+	g_log.flush();
 
 	gui->add(new ViewLayer(gui, "loading"));
 	ViewLayer* loadingview = (ViewLayer*)gui->get("loading");
 
-    g_log<<"2.3"<<endl;
-    g_log.flush();
+	g_log<<"2.3"<<endl;
+	g_log.flush();
 
 	loadingview->add(new Text(NULL, "status", RichText("Loading..."), MAINFONT8, Resize_LoadingStatus));
 
 	gui->closeall();
 	gui->open("loading");
 
-    g_log<<"2.4"<<endl;
-    g_log.flush();
+	g_log<<"2.4"<<endl;
+	g_log.flush();
 
 	FillMenuGUI();
 
-    g_log<<"2.5"<<endl;
-    g_log.flush();
+	g_log<<"2.5"<<endl;
+	g_log.flush();
 
 	FillEditorGUI();
 
-    g_log<<"2.6"<<endl;
-    g_log.flush();
+	g_log<<"2.6"<<endl;
+	g_log.flush();
 
 	FillPlayGUI();
 
-    g_log<<"2.7"<<endl;
-    g_log.flush();
+	g_log<<"2.7"<<endl;
+	g_log.flush();
 }

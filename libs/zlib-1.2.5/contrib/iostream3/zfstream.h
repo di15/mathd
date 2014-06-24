@@ -47,7 +47,7 @@ public:
   */
   int
   setcompression(int comp_level,
-                 int comp_strategy = Z_DEFAULT_STRATEGY);
+				 int comp_strategy = Z_DEFAULT_STRATEGY);
 
   /**
    *  @brief  Check if file is open.
@@ -64,7 +64,7 @@ public:
   */
   gzfilebuf*
   open(const char* name,
-       std::ios_base::openmode mode);
+	   std::ios_base::openmode mode);
 
   /**
    *  @brief  Attach to already open gzipped file.
@@ -74,7 +74,7 @@ public:
   */
   gzfilebuf*
   attach(int fd,
-         std::ios_base::openmode mode);
+		 std::ios_base::openmode mode);
 
   /**
    *  @brief  Close gzipped file.
@@ -90,7 +90,7 @@ protected:
   */
   bool
   open_mode(std::ios_base::openmode mode,
-            char* c_mode) const;
+			char* c_mode) const;
 
   /**
    *  @brief  Number of characters available in stream buffer.
@@ -134,7 +134,7 @@ protected:
   */
   virtual std::streambuf*
   setbuf(char_type* p,
-         std::streamsize n);
+		 std::streamsize n);
 
   /**
    *  @brief  Flush stream buffer to file.
@@ -244,7 +244,7 @@ public:
   */
   explicit
   gzifstream(const char* name,
-             std::ios_base::openmode mode = std::ios_base::in);
+			 std::ios_base::openmode mode = std::ios_base::in);
 
   /**
    *  @brief  Construct stream on already open gzipped file.
@@ -253,7 +253,7 @@ public:
   */
   explicit
   gzifstream(int fd,
-             std::ios_base::openmode mode = std::ios_base::in);
+			 std::ios_base::openmode mode = std::ios_base::in);
 
   /**
    *  Obtain underlying stream buffer.
@@ -283,7 +283,7 @@ public:
   */
   void
   open(const char* name,
-       std::ios_base::openmode mode = std::ios_base::in);
+	   std::ios_base::openmode mode = std::ios_base::in);
 
   /**
    *  @brief  Attach to already open gzipped file.
@@ -295,7 +295,7 @@ public:
   */
   void
   attach(int fd,
-         std::ios_base::openmode mode = std::ios_base::in);
+		 std::ios_base::openmode mode = std::ios_base::in);
 
   /**
    *  @brief  Close gzipped file.
@@ -333,7 +333,7 @@ public:
   */
   explicit
   gzofstream(const char* name,
-             std::ios_base::openmode mode = std::ios_base::out);
+			 std::ios_base::openmode mode = std::ios_base::out);
 
   /**
    *  @brief  Construct stream on already open gzipped file.
@@ -342,7 +342,7 @@ public:
   */
   explicit
   gzofstream(int fd,
-             std::ios_base::openmode mode = std::ios_base::out);
+			 std::ios_base::openmode mode = std::ios_base::out);
 
   /**
    *  Obtain underlying stream buffer.
@@ -372,7 +372,7 @@ public:
   */
   void
   open(const char* name,
-       std::ios_base::openmode mode = std::ios_base::out);
+	   std::ios_base::openmode mode = std::ios_base::out);
 
   /**
    *  @brief  Attach to already open gzipped file.
@@ -384,7 +384,7 @@ public:
   */
   void
   attach(int fd,
-         std::ios_base::openmode mode = std::ios_base::out);
+		 std::ios_base::openmode mode = std::ios_base::out);
 
   /**
    *  @brief  Close gzipped file.
@@ -413,24 +413,24 @@ template<typename T1, typename T2>
   class gzomanip2
   {
   public:
-    // Allows insertor to peek at internals
-    template <typename Ta, typename Tb>
-      friend gzofstream&
-      operator<<(gzofstream&,
-                 const gzomanip2<Ta,Tb>&);
+	// Allows insertor to peek at internals
+	template <typename Ta, typename Tb>
+	  friend gzofstream&
+	  operator<<(gzofstream&,
+				 const gzomanip2<Ta,Tb>&);
 
-    // Constructor
-    gzomanip2(gzofstream& (*f)(gzofstream&, T1, T2),
-              T1 v1,
-              T2 v2);
+	// Constructor
+	gzomanip2(gzofstream& (*f)(gzofstream&, T1, T2),
+			  T1 v1,
+			  T2 v2);
   private:
-    // Underlying manipulator function
-    gzofstream&
-    (*func)(gzofstream&, T1, T2);
+	// Underlying manipulator function
+	gzofstream&
+	(*func)(gzofstream&, T1, T2);
 
-    // Arguments for manipulator function
-    T1 val1;
-    T2 val2;
+	// Arguments for manipulator function
+	T1 val1;
+	T2 val2;
   };
 
 /*****************************************************************************/
@@ -447,8 +447,8 @@ setcompression(gzofstream &gzs, int l, int s = Z_DEFAULT_STRATEGY)
 template<typename T1, typename T2>
   inline
   gzomanip2<T1,T2>::gzomanip2(gzofstream &(*f)(gzofstream &, T1, T2),
-                              T1 v1,
-                              T2 v2)
+							  T1 v1,
+							  T2 v2)
   : func(f), val1(v1), val2(v2)
   { }
 

@@ -1,4 +1,3 @@
-
 #ifndef UNITTYPE_H
 #define UNITTYPE_H
 

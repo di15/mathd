@@ -17,10 +17,10 @@ UString ConvertMethodIdToString(UInt64 id)
   s[--len] = 0;
   do
   {
-    s[--len] = GetHex((Byte)id & 0xF);
-    id >>= 4;
-    s[--len] = GetHex((Byte)id & 0xF);
-    id >>= 4;
+	s[--len] = GetHex((Byte)id & 0xF);
+	id >>= 4;
+	s[--len] = GetHex((Byte)id & 0xF);
+	id >>= 4;
   }
   while (id != 0);
   return s + len;

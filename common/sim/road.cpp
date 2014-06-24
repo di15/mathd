@@ -2,7 +2,7 @@
 //  road.m
 //  corpstates
 //
-//  Created by polyf Ivanov on 2013-05-30.
+//  Created by polyf  on 2013-05-30.
 //  Copyright (c) 2013 DMD 'Ware. All rights reserved.
 //
 
@@ -156,50 +156,50 @@ void RoadTile::freecollider()
 		}
 
 #if 0
-		int roadx, roadz;
+	int roadx, roadz;
 
-		RoadXZ(this, roadx, roadz);
-		Vec3f pos = RoadPosition(roadx, roadz);
+	RoadXZ(this, roadx, roadz);
+	Vec3f pos = RoadPosition(roadx, roadz);
 
-		//BuildingT* bt = &g_buildingT[type];
-		float hwx = TILE_SIZE/2.0f;
-		float hwz = TILE_SIZE/2.0f;
+	//BuildingT* bt = &g_buildingT[type];
+	float hwx = TILE_SIZE/2.0f;
+	float hwz = TILE_SIZE/2.0f;
 
-		float fstartx = pos.x-hwx;
-		float fstartz = pos.z-hwz;
-		float fendx = pos.x+hwx;
-		float fendz = pos.z+hwz;
+	float fstartx = pos.x-hwx;
+	float fstartz = pos.z-hwz;
+	float fendx = pos.x+hwx;
+	float fendz = pos.z+hwz;
 
-		//int extentx = ceil(r/cellwx);
-		//int extentz = ceil(r/cellwz);
-		const float cellwx = MIN_RADIUS*2.0f;
-		const float cellwz = MIN_RADIUS*2.0f;
+	//int extentx = ceil(r/cellwx);
+	//int extentz = ceil(r/cellwz);
+	const float cellwx = MIN_RADIUS*2.0f;
+	const float cellwz = MIN_RADIUS*2.0f;
 
-		int startx = fstartx/cellwx;
-		int startz = fstartz/cellwz;
-		int endx = ceil(fendx/cellwx);
-		int endz = ceil(fendz/cellwz);
-		//int endx = startx+extentx;
-		//int endz = startz+extentz;
+	int startx = fstartx/cellwx;
+	int startz = fstartz/cellwz;
+	int endx = ceil(fendx/cellwx);
+	int endz = ceil(fendz/cellwz);
+	//int endx = startx+extentx;
+	//int endz = startz+extentz;
 
-		for(int x=startx; x<endx; x++)
-			for(int z=startz; z<endz; z++)
+	for(int x=startx; x<endx; x++)
+		for(int z=startz; z<endz; z++)
+		{
+			bool found = false;
+			ColliderTile* cell = ColliderTileAt(x, z);
+			for(int i=0; i<cell->colliders.size(); i++)
 			{
-				bool found = false;
-				ColliderTile* cell = ColliderTileAt(x, z);
-				for(int i=0; i<cell->colliders.size(); i++)
+				Collider* c = &cell->colliders[i];
+				if(c->type == COLLIDER_NOROAD)
 				{
-					Collider* c = &cell->colliders[i];
-					if(c->type == COLLIDER_NOROAD)
-					{
-						found = true;
-						break;
-					}
+					found = true;
+					break;
 				}
-
-				if(!found)
-					cell->colliders.push_back(Collider(COLLIDER_NOROAD, -1));
 			}
+
+			if(!found)
+				cell->colliders.push_back(Collider(COLLIDER_NOROAD, -1));
+		}
 #endif
 }
 
@@ -226,48 +226,48 @@ void RoadTile::fillcollider()
 		}
 
 #if 0
-		int roadx, roadz;
+	int roadx, roadz;
 
-		RoadXZ(this, roadx, roadz);
-		Vec3f pos = RoadPosition(roadx, roadz);
+	RoadXZ(this, roadx, roadz);
+	Vec3f pos = RoadPosition(roadx, roadz);
 
-		//BuildingT* bt = &g_buildingT[type];
-		float hwx = TILE_SIZE/2.0f;
-		float hwz = TILE_SIZE/2.0f;
+	//BuildingT* bt = &g_buildingT[type];
+	float hwx = TILE_SIZE/2.0f;
+	float hwz = TILE_SIZE/2.0f;
 
-		float fstartx = pos.x-hwx;
-		float fstartz = pos.z-hwz;
-		float fendx = pos.x+hwx;
-		float fendz = pos.z+hwz;
+	float fstartx = pos.x-hwx;
+	float fstartz = pos.z-hwz;
+	float fendx = pos.x+hwx;
+	float fendz = pos.z+hwz;
 
-		//int extentx = ceil(r/cellwx);
-		//int extentz = ceil(r/cellwz);
-		const float cellwx = MIN_RADIUS*2.0f;
-		const float cellwz = MIN_RADIUS*2.0f;
+	//int extentx = ceil(r/cellwx);
+	//int extentz = ceil(r/cellwz);
+	const float cellwx = MIN_RADIUS*2.0f;
+	const float cellwz = MIN_RADIUS*2.0f;
 
-		int startx = fstartx/cellwx;
-		int startz = fstartz/cellwz;
-		int endx = ceil(fendx/cellwx);
-		int endz = ceil(fendz/cellwz);
-		//int endx = startx+extentx;
-		//int endz = startz+extentz;
+	int startx = fstartx/cellwx;
+	int startz = fstartz/cellwz;
+	int endx = ceil(fendx/cellwx);
+	int endz = ceil(fendz/cellwz);
+	//int endx = startx+extentx;
+	//int endz = startz+extentz;
 
-		for(int x=startx; x<endx; x++)
-			for(int z=startz; z<endz; z++)
+	for(int x=startx; x<endx; x++)
+		for(int z=startz; z<endz; z++)
+		{
+			ColliderTile* cell = ColliderTileAt(x, z);
+			//cell->colliders.push_back(Collider(COLLIDER_UNIT, uID));
+			for(int i=0; i<cell->colliders.size(); i++)
 			{
-				ColliderTile* cell = ColliderTileAt(x, z);
-				//cell->colliders.push_back(Collider(COLLIDER_UNIT, uID));
-				for(int i=0; i<cell->colliders.size(); i++)
+				Collider* c = &cell->colliders[i];
+				if(c->type == COLLIDER_NOROAD)
 				{
-					Collider* c = &cell->colliders[i];
-					if(c->type == COLLIDER_NOROAD)
-					{
-						cell->colliders.erase( cell->colliders.begin() + i );
-						//break;
-						i--;
-					}
+					cell->colliders.erase( cell->colliders.begin() + i );
+					//break;
+					i--;
 				}
 			}
+		}
 #endif
 }
 
@@ -303,9 +303,9 @@ void RoadTile::allocate()
 
 	if(transx[0] != '\0'
 #ifdef LOCAL_TRANSX
-		&& owner == g_localP
+			&& owner == g_localP
 #endif
-		)
+	  )
 	{
 		int x, z;
 		RoadXZ(this, x, z);
@@ -421,12 +421,12 @@ void DrawRoadPlan(int x, int z)
 
 void DrawRoads()
 {
-	//StartTimer(DRAWROADS);
+	//StartTimer(TIMER_DRAWROADS);
 
 	//int type;
 	//RoadTile* r;
 
-	Player* py = &g_player[g_currP];
+	Player* py = &g_player[g_curP];
 
 	for(int x=0; x<g_hmap.m_widthx; x++)
 		for(int z=0; z<g_hmap.m_widthz; z++)
@@ -445,29 +445,29 @@ void DrawRoads()
 			DrawRoad(x, z);
 		}
 
-		if(py->build != BUILDING_ROAD)
-			return;
+	if(py->build != BUILDING_ROAD)
+		return;
 
-		//glColor4f(1,1,1,0.5f);
-		glUniform4f(g_shader[g_curS].m_slot[SSLOT_COLOR], 1, 1, 1, 0.5f);
+	//glColor4f(1,1,1,0.5f);
+	glUniform4f(g_shader[g_curS].m_slot[SSLOT_COLOR], 1, 1, 1, 0.5f);
 
-		for(int x=0; x<g_hmap.m_widthx; x++)
-			for(int z=0; z<g_hmap.m_widthz; z++)
+	for(int x=0; x<g_hmap.m_widthx; x++)
+		for(int z=0; z<g_hmap.m_widthz; z++)
+		{
+			/*
+			r = RoadPlanAt(x, z);
+			if(r->on)
 			{
-				/*
-				r = RoadPlanAt(x, z);
-				if(r->on)
-				{
-				type = r->type;
-				g_roadT[type][FINISHED].Draw(x, z, s);
-				}*/
-				DrawRoadPlan(x, z);
-			}
+			type = r->type;
+			g_roadT[type][FINISHED].Draw(x, z, s);
+			}*/
+			DrawRoadPlan(x, z);
+		}
 
-			//glColor4f(1,1,1,1);
-			glUniform4f(g_shader[g_curS].m_slot[SSLOT_COLOR], 1, 1, 1, 1);
+	//glColor4f(1,1,1,1);
+	glUniform4f(g_shader[g_curS].m_slot[SSLOT_COLOR], 1, 1, 1, 1);
 
-			//StopTimer(DRAWROADS);
+	//StopTimer(TIMER_DRAWROADS);
 }
 
 int GetRoadType(int x, int z, bool plan=false)
@@ -564,12 +564,12 @@ void MeshRoad(int x, int z, bool plan)
 		//Chat(msg);
 	}
 
-    for(int i=0; i<rva->numverts; i+=3)
-    {
-        rva->normals[i+0] = Normal(&rva->vertices[i]);
-        rva->normals[i+1] = Normal(&rva->vertices[i]);
-        rva->normals[i+2] = Normal(&rva->vertices[i]);
-    }
+	for(int i=0; i<rva->numverts; i+=3)
+	{
+		rva->normals[i+0] = Normal(&rva->vertices[i]);
+		rva->normals[i+1] = Normal(&rva->vertices[i]);
+		rva->normals[i+2] = Normal(&rva->vertices[i]);
+	}
 
 	//g_log<<"done meshroad"<<endl;
 	//g_log.flush();
@@ -882,7 +882,7 @@ bool ReRoadRoad()
 			}
 		}
 
-		return change;
+	return change;
 }
 
 void CheckRoadAccess()
@@ -971,7 +971,8 @@ void ReRoadNetw()
 
 		if(ReRoadRoad())
 			change = true;
-	}while(change);
+	}
+	while(change);
 
 #if 0
 	CheckRoadAccess();
@@ -1076,7 +1077,7 @@ void PlaceRoad()
 	g_log<<"place road 1"<<endl;
 	g_log.flush();
 #endif
-	Player* py = &g_player[g_currP];
+	Player* py = &g_player[g_curP];
 
 	if(g_mode == APPMODE_PLAY)
 	{
@@ -1124,7 +1125,7 @@ void PlaceRoad()
 
 	if(g_mode == APPMODE_PLAY)
 	{
-		Player* py = &g_player[g_currP];
+		Player* py = &g_player[g_curP];
 		GUI* gui = &py->gui;
 
 		if(py->sel.roads.size() > 0)
@@ -1268,7 +1269,7 @@ bool RoadLevel(float iterx, float iterz, float testx, float testz, float dx, flo
 	g_log.flush();
 #endif
 	if((n && e && s && w) || (n && e && s && !w) || (n && e && !s && w) || (n && e && !s && !w) || (n && !e && s && w)
-		|| (n && !e && !s && w) || (!n && e && s && !w) || (!n && !e && s && w) || (!n && !e && !s && !w) || (!n && e && s && w))
+			|| (n && !e && !s && w) || (!n && e && s && !w) || (!n && !e && s && w) || (!n && !e && !s && !w) || (!n && e && s && w))
 	{
 		float compare = g_hmap.getheight(ix, iz);
 		if(fabs(g_hmap.getheight(ix+1, iz) - compare) > ROAD_MAX_SIDEW_INCLINE)	return false;

@@ -26,48 +26,48 @@ class CLiteralDecoder2
 public:
   void Init()
   {
-    for (int i = 0; i < 0x300; i++)
-      _decoders[i].Init();
+	for (int i = 0; i < 0x300; i++)
+	  _decoders[i].Init();
   }
   Byte DecodeNormal(NRangeCoder::CDecoder *rangeDecoder)
   {
-    UInt32 symbol = 1;
-    RC_INIT_VAR
-    do
-    {
-      // symbol = (symbol << 1) | _decoders[0][symbol].Decode(rangeDecoder);
-      RC_GETBIT(kNumMoveBits, _decoders[symbol].Prob, symbol)
-    }
-    while (symbol < 0x100);
-    RC_FLUSH_VAR
-    return (Byte)symbol;
+	UInt32 symbol = 1;
+	RC_INIT_VAR
+	do
+	{
+	  // symbol = (symbol << 1) | _decoders[0][symbol].Decode(rangeDecoder);
+	  RC_GETBIT(kNumMoveBits, _decoders[symbol].Prob, symbol)
+	}
+	while (symbol < 0x100);
+	RC_FLUSH_VAR
+	return (Byte)symbol;
   }
   Byte DecodeWithMatchByte(NRangeCoder::CDecoder *rangeDecoder, Byte matchByte)
   {
-    UInt32 symbol = 1;
-    RC_INIT_VAR
-    do
-    {
-      UInt32 matchBit = (matchByte >> 7) & 1;
-      matchByte <<= 1;
-      // UInt32 bit = _decoders[1 + matchBit][symbol].Decode(rangeDecoder);
-      // symbol = (symbol << 1) | bit;
-      UInt32 bit;
-      RC_GETBIT2(kNumMoveBits, _decoders[0x100 + (matchBit << 8) + symbol].Prob, symbol, 
-          bit = 0, bit = 1)
-      if (matchBit != bit)
-      {
-        while (symbol < 0x100)
-        {
-          // symbol = (symbol << 1) | _decoders[0][symbol].Decode(rangeDecoder);
-          RC_GETBIT(kNumMoveBits, _decoders[symbol].Prob, symbol)
-        }
-        break;
-      }
-    }
-    while (symbol < 0x100);
-    RC_FLUSH_VAR
-    return (Byte)symbol;
+	UInt32 symbol = 1;
+	RC_INIT_VAR
+	do
+	{
+	  UInt32 matchBit = (matchByte >> 7) & 1;
+	  matchByte <<= 1;
+	  // UInt32 bit = _decoders[1 + matchBit][symbol].Decode(rangeDecoder);
+	  // symbol = (symbol << 1) | bit;
+	  UInt32 bit;
+	  RC_GETBIT2(kNumMoveBits, _decoders[0x100 + (matchBit << 8) + symbol].Prob, symbol, 
+		  bit = 0, bit = 1)
+	  if (matchBit != bit)
+	  {
+		while (symbol < 0x100)
+		{
+		  // symbol = (symbol << 1) | _decoders[0][symbol].Decode(rangeDecoder);
+		  RC_GETBIT(kNumMoveBits, _decoders[symbol].Prob, symbol)
+		}
+		break;
+	  }
+	}
+	while (symbol < 0x100);
+	RC_FLUSH_VAR
+	return (Byte)symbol;
   }
 };
 
@@ -82,35 +82,35 @@ public:
   ~CLiteralDecoder()  { Free(); }
   void Free()
   { 
-    MyFree(_coders);
-    _coders = 0;
+	MyFree(_coders);
+	_coders = 0;
   }
   bool Create(int numPosBits, int numPrevBits)
   {
-    if (_coders == 0 || (numPosBits + numPrevBits) != 
-        (_numPrevBits + _numPosBits) )
-    {
-      Free();
-      UInt32 numStates = 1 << (numPosBits + numPrevBits);
-      _coders = (CLiteralDecoder2 *)MyAlloc(numStates * sizeof(CLiteralDecoder2));
-    }
-    _numPosBits = numPosBits;
-    _posMask = (1 << numPosBits) - 1;
-    _numPrevBits = numPrevBits;
-    return (_coders != 0);
+	if (_coders == 0 || (numPosBits + numPrevBits) != 
+		(_numPrevBits + _numPosBits) )
+	{
+	  Free();
+	  UInt32 numStates = 1 << (numPosBits + numPrevBits);
+	  _coders = (CLiteralDecoder2 *)MyAlloc(numStates * sizeof(CLiteralDecoder2));
+	}
+	_numPosBits = numPosBits;
+	_posMask = (1 << numPosBits) - 1;
+	_numPrevBits = numPrevBits;
+	return (_coders != 0);
   }
   void Init()
   {
-    UInt32 numStates = 1 << (_numPrevBits + _numPosBits);
-    for (UInt32 i = 0; i < numStates; i++)
-      _coders[i].Init();
+	UInt32 numStates = 1 << (_numPrevBits + _numPosBits);
+	for (UInt32 i = 0; i < numStates; i++)
+	  _coders[i].Init();
   }
   UInt32 GetState(UInt32 pos, Byte prevByte) const
-    { return ((pos & _posMask) << _numPrevBits) + (prevByte >> (8 - _numPrevBits)); }
+	{ return ((pos & _posMask) << _numPrevBits) + (prevByte >> (8 - _numPrevBits)); }
   Byte DecodeNormal(NRangeCoder::CDecoder *rangeDecoder, UInt32 pos, Byte prevByte)
-    { return _coders[GetState(pos, prevByte)].DecodeNormal(rangeDecoder); }
+	{ return _coders[GetState(pos, prevByte)].DecodeNormal(rangeDecoder); }
   Byte DecodeWithMatchByte(NRangeCoder::CDecoder *rangeDecoder, UInt32 pos, Byte prevByte, Byte matchByte)
-    { return _coders[GetState(pos, prevByte)].DecodeWithMatchByte(rangeDecoder, matchByte); }
+	{ return _coders[GetState(pos, prevByte)].DecodeWithMatchByte(rangeDecoder, matchByte); }
 };
 
 namespace NLength {
@@ -125,22 +125,22 @@ class CDecoder
 public:
   void Init(UInt32 numPosStates)
   {
-    _choice.Init();
-    _choice2.Init();
-    for (UInt32 posState = 0; posState < numPosStates; posState++)
-    {
-      _lowCoder[posState].Init();
-      _midCoder[posState].Init();
-    }
-    _highCoder.Init();
+	_choice.Init();
+	_choice2.Init();
+	for (UInt32 posState = 0; posState < numPosStates; posState++)
+	{
+	  _lowCoder[posState].Init();
+	  _midCoder[posState].Init();
+	}
+	_highCoder.Init();
   }
   UInt32 Decode(NRangeCoder::CDecoder *rangeDecoder, UInt32 posState)
   {
-    if(_choice.Decode(rangeDecoder) == 0)
-      return _lowCoder[posState].Decode(rangeDecoder);
-    if(_choice2.Decode(rangeDecoder) == 0)
-      return kNumLowSymbols + _midCoder[posState].Decode(rangeDecoder);
-    return kNumLowSymbols + kNumMidSymbols + _highCoder.Decode(rangeDecoder);
+	if(_choice.Decode(rangeDecoder) == 0)
+	  return _lowCoder[posState].Decode(rangeDecoder);
+	if(_choice2.Decode(rangeDecoder) == 0)
+	  return kNumLowSymbols + _midCoder[posState].Decode(rangeDecoder);
+	return kNumLowSymbols + kNumMidSymbols + _highCoder.Decode(rangeDecoder);
   }
 };
 
@@ -193,46 +193,46 @@ public:
 
   #ifndef NO_READ_FROM_CODER
   MY_UNKNOWN_IMP5(
-      ICompressSetDecoderProperties2, 
-      ICompressGetInStreamProcessedSize,
-      ICompressSetInStream, 
-      ICompressSetOutStreamSize, 
-      ISequentialInStream)
+	  ICompressSetDecoderProperties2, 
+	  ICompressGetInStreamProcessedSize,
+	  ICompressSetInStream, 
+	  ICompressSetOutStreamSize, 
+	  ISequentialInStream)
   #else
   MY_UNKNOWN_IMP2(
-      ICompressSetDecoderProperties2,
-      ICompressGetInStreamProcessedSize)
+	  ICompressSetDecoderProperties2,
+	  ICompressGetInStreamProcessedSize)
   #endif
 
   void ReleaseStreams()
   {
-    _outWindowStream.ReleaseStream();
-    ReleaseInStream();
+	_outWindowStream.ReleaseStream();
+	ReleaseInStream();
   }
 
   class CDecoderFlusher
   {
-    CDecoder *_decoder;
+	CDecoder *_decoder;
   public:
-    bool NeedFlush;
-    CDecoderFlusher(CDecoder *decoder): _decoder(decoder), NeedFlush(true) {}
-    ~CDecoderFlusher() 
-    { 
-      if (NeedFlush)
-        _decoder->Flush();
-      _decoder->ReleaseStreams(); 
-    }
+	bool NeedFlush;
+	CDecoderFlusher(CDecoder *decoder): _decoder(decoder), NeedFlush(true) {}
+	~CDecoderFlusher() 
+	{ 
+	  if (NeedFlush)
+		_decoder->Flush();
+	  _decoder->ReleaseStreams(); 
+	}
   };
 
   HRESULT Flush() {  return _outWindowStream.Flush(); }  
 
   STDMETHOD(CodeReal)(ISequentialInStream *inStream,
-      ISequentialOutStream *outStream, const UInt64 *inSize, const UInt64 *outSize,
-      ICompressProgressInfo *progress);
+	  ISequentialOutStream *outStream, const UInt64 *inSize, const UInt64 *outSize,
+	  ICompressProgressInfo *progress);
   
   STDMETHOD(Code)(ISequentialInStream *inStream,
-      ISequentialOutStream *outStream, const UInt64 *inSize, const UInt64 *outSize,
-      ICompressProgressInfo *progress);
+	  ISequentialOutStream *outStream, const UInt64 *inSize, const UInt64 *outSize,
+	  ICompressProgressInfo *progress);
 
   STDMETHOD(SetDecoderProperties2)(const Byte *data, UInt32 size);
 

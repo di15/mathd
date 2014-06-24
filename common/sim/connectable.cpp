@@ -2,7 +2,7 @@
 //  connection.m
 //  corpstates
 //
-//  Created by polyf Ivanov on 2013-05-30.
+//  Created by polyf  on 2013-05-30.
 //  Copyright (c) 2013 DMD 'Ware. All rights reserved.
 //
 
@@ -45,15 +45,15 @@ int GetConnectionType(bool n, bool e, bool s, bool w)
 		return CONNECTION_NOCONNECTION;
 
 	/*
-     int r = rand()%4;
+	 int r = rand()%4;
 
-     if(r == 0)
-     return CONNECTION_NORTH;
-     else if(r == 1)
-     return CONNECTION_EAST;
-     else if(r == 2)
-     return CONNECTION_SOUTH;
-     else
-     return CONNECTION_WEST;*/
+	 if(r == 0)
+	 return CONNECTION_NORTH;
+	 else if(r == 1)
+	 return CONNECTION_EAST;
+	 else if(r == 2)
+	 return CONNECTION_SOUTH;
+	 else
+	 return CONNECTION_WEST;*/
 }
 
