@@ -43,6 +43,8 @@ void DrawUnits()
 {
 	for(int i=0; i<UNITS; i++)
 	{
+		StartTimer(TIMER_DRAWUMAT);
+
 		Unit* u = &g_unit[i];
 
 		if(!u->on)
@@ -51,6 +53,8 @@ void DrawUnits()
 		UnitT* t = &g_unitT[u->type];
 
 		Model* m = &g_model[t->model];
+
+		StopTimer(TIMER_DRAWUMAT);
 
 		m->draw(u->frame[BODY_LOWER], u->drawpos, u->rotation.y);
 	}

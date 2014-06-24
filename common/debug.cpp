@@ -187,7 +187,9 @@ void InitProfiles()
 	//DefTimer(DRAWMODEL2, TIMER_DRAWBL, "Draw model 2");
 	//DefTimer(DRAWMODEL3, TIMER_DRAWBL, "Draw model 3");
 	DefTimer(TIMER_DRAWMAPDEPTH, TIMER_DRAWSCENEDEPTH, "DrawMap(); depth");
-	DefTimer(TIMER_DRAWUNITSDEPTH, TIMER_DRAWSCENEDEPTH, "DrawUnits(); depth");
+	DefTimer(TIMER_DRAWUMAT, TIMER_DRAWUNITS, "CPU-side matrix math etc.");
+	DefTimer(TIMER_DRAWUGL, TIMER_DRAWUNITS, "GPU-side");
+	DefTimer(TIMER_DRAWUTEXBIND, TIMER_DRAWUNITS, "texture bind");
 }
 
 void CheckNum(const char* num)

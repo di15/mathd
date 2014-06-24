@@ -40,7 +40,10 @@ void CheckGLError(const char* file, int line);
 #define TIMER_DRAWROADS			25
 #define TIMER_DRAWMAPDEPTH		26
 #define TIMER_DRAWUNITSDEPTH	27
-#define TIMERS					28
+#define TIMER_DRAWUMAT			28
+#define TIMER_DRAWUTEXBIND		29
+#define TIMER_DRAWUGL			30
+#define TIMERS					31
 
 class Timer
 {

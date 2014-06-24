@@ -152,6 +152,9 @@ void Model::usetex()
 
 void Model::draw(int frame, Vec3f pos, float yaw)
 {
+	if(g_curS == SHADER_UNIT)
+		StartTimer(TIMER_DRAWUMAT);
+
 	Shader* s = &g_shader[g_curS];
 
 	float pitch = 0;
@@ -192,7 +195,20 @@ void Model::draw(int frame, Vec3f pos, float yaw)
 
 	VertexArray* va = &m_va[frame];
 
+
+	if(g_curS == SHADER_UNIT)
+	{
+		StopTimer(TIMER_DRAWUMAT);
+		StartTimer(TIMER_DRAWUTEXBIND);
+	}
+
 	usetex();
+
+	if(g_curS == SHADER_UNIT)
+	{
+		StopTimer(TIMER_DRAWUTEXBIND);
+		StartTimer(TIMER_DRAWUGL);
+	}
 
 	glVertexAttribPointer(s->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, va->vertices);
 	glVertexAttribPointer(s->m_slot[SSLOT_TEXCOORD0], 2, GL_FLOAT, GL_FALSE, 0, va->texcoords);
@@ -201,6 +217,9 @@ void Model::draw(int frame, Vec3f pos, float yaw)
 		glVertexAttribPointer(s->m_slot[SSLOT_NORMAL], 3, GL_FLOAT, GL_FALSE, 0, va->normals);
 
 	glDrawArrays(GL_TRIANGLES, 0, va->numverts);
+
+	if(g_curS == SHADER_UNIT)
+		StopTimer(TIMER_DRAWUGL);
 }
 
 int FindModel(const char* relative)
