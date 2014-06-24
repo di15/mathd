@@ -40,10 +40,6 @@
 #include "../common/render/skybox.h"
 #include "../common/script/script.h"
 
-#ifndef GLDEBUG
-#define CheckGLError(a,b) (void)0
-#endif
-
 int g_mode = APPMODE_LOADING;
 
 double g_instantupdfps = 0;
