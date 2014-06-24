@@ -41,7 +41,7 @@
 #include "../common/script/script.h"
 
 #ifndef GLDEBUG
-#define CheckGLError(a) (void)0
+#define CheckGLError(a,b) (void)0
 #endif
 
 int g_mode = APPMODE_LOADING;
