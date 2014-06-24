@@ -1104,37 +1104,37 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 int main(int argc, char* argv[])
 #endif
 {
+	g_log << "Log start"    << endl; /* TODO, include date */
+	g_log << "Init: "       << endl;
+	g_log.flush();
+
 	Init();
 
-	g_log<<"0"<<endl;
+	g_log << "MakeWindow: " << endl;
 	g_log.flush();
 
 	MakeWindow(TITLE);
 
-	g_log<<"1"<<endl;
+	g_log << "Queue: "      << endl;
 	g_log.flush();
 
 	SDL_ShowCursor(false);
-
 	Queue();
 
-	g_log<<"2"<<endl;
+	g_log << "FillGUI: "    << endl;
 	g_log.flush();
 
 	FillGUI();
 
-	g_log<<"3"<<endl;
+	g_log << "EventLoop: "  << endl;
 	g_log.flush();
 
 	EventLoop();
 
-	g_log<<"4"<<endl;
+	g_log << "Deinit: "     << endl;
 	g_log.flush();
 
-	//SDL_Delay(3000);  // Pause execution for 3000 milliseconds, for example
-
 	Deinit();
-
 	SDL_ShowCursor(true);
 
 	return 0;
