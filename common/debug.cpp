@@ -228,6 +228,7 @@ void LastNum(const char* l)
 #endif
 }
 
+#ifdef GLDEBUG
 void CheckGLError(const char* file, int line)
 {
 	//char msg[2048];
@@ -240,7 +241,7 @@ void CheckGLError(const char* file, int line)
 
 	g_log<<"GL Error #"<<error<<" in "<<file<<" on line "<<line<<" using shader #"<<g_curS<<endl;
 }
-
+#endif
 
 void LogRich(const RichText* rt)
 {

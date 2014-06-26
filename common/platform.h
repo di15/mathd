@@ -75,8 +75,8 @@
 #ifdef PLATFORM_LINUX
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_opengl.h>
-#include <GL/glut.h>
-#include <SDL/SDL_net.h>
+//#include <GL/glut.h>
+#include <SDL2/SDL_net.h>
 #endif
 
 #ifdef PLATFORM_MAC
@@ -147,19 +147,11 @@ extern SDL_GLContext g_glcontext;
 
 #include "../libs/objectscript/objectscript.h"
 
-#if 0   //are these meant to be included by OS itself?
-#include "../libs/objectscript/os-binder.h"
-#include "../libs/objectscript/os-binder-arg-cc-functions.h"
-#include "../libs/objectscript/os-heap.h"
-#include "../libs/objectscript/os-binder-cc-functions.h"
-#include "../libs/objectscript/os-binder-function.h"
-#endif
-
 #define SPECBUMPSHADOW
 
 //#define GLDEBUG
 #ifndef GLDEBUG
-#define CheckGLError(a,b) (void)0
+#define CheckGLError(a,b); a;b;
 #endif
 
 

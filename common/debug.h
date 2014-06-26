@@ -6,12 +6,6 @@
 #include "platform.h"
 #include "gui/richtext.h"
 
-void LogRich(const RichText* rt);
-void CheckNum(const char* num);
-void LastNum(const char* l);
-void CheckGLError(const char* file, int line);
-
-
 #define	TIMER_FRAME				0
 #define TIMER_EVENT				1
 #define TIMER_UPDATE			2
@@ -78,9 +72,12 @@ void DefTimer(int id, int inside, char* name);
 void WriteProfiles(int in, int layer);
 void InitProfiles();
 
+void LogRich(const RichText* rt);
 void CheckNum(const char* num);
 void LastNum(const char* l);
 
+#ifdef GLDEBUG
 void CheckGLError(const char* file, int line);
+#endif
 
 #endif	//DEBUG_H
