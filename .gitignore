@@ -62,3 +62,4 @@ CorpStatesC/
 build/
 bin/
 *.idb
+*~
