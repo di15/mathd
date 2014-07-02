@@ -7,6 +7,7 @@
 #include "../platform.h"
 #include "../window.h"
 #include "../sim/player.h"
+#include "../debug.h"
 
 Shader g_shader[SHADERS];
 int g_curS = 0;
@@ -103,9 +104,9 @@ void InitGLSL()
 		return;
 	}
 #else
-	if( !GLEW_VERSION_3_0 )
+	if( !GLEW_VERSION_1_4 )
 	{
-		ErrorMessage("Error", "OpenGL 3.0 not supported!\n" );
+		ErrorMessage("Error", "OpenGL 1.4 not supported!\n" );
 		g_quit = true;
 		return;
 	}
@@ -116,6 +117,21 @@ void InitGLSL()
 
 	g_log<<szGLExtensions<<endl;
 	g_log.flush();
+
+	if(!strstr(szGLExtensions, "GL_ARB_debug_output"))
+	{
+		//ErrorMessage("Error", "GL_ARB_debug_output extension not supported!");
+		//g_quit = true;
+		//return;
+		g_log<<"GL_ARB_debug_output extension not supported"<<std::endl;
+	}
+	else
+	{
+		g_log<<"Reging debug handler"<<std::endl;
+		g_log.flush();
+		glDebugMessageCallbackARB(&GLMessageHandler, 0);
+		CheckGLError(__FILE__, __LINE__);
+	}
 
 	if(!strstr(szGLExtensions, "GL_ARB_shader_objects"))
 	{
@@ -135,29 +151,29 @@ void InitGLSL()
 	int major, minor;
 	GetGLVersion(&major, &minor);
 
-	if(major < 3 || ( major == 3 && minor < 0 ))
+	if(major < 1 || ( major == 1 && minor < 4 ))
 	{
-		ErrorMessage("Error", "OpenGL 3.0 is not supported!");
+		ErrorMessage("Error", "OpenGL 1.4 is not supported!");
 		g_quit = true;
 	}
 
-	LoadShader(SHADER_ORTHO, "shaders/ortho.vert", "shaders/ortho.frag");
-	LoadShader(SHADER_COLOR2D, "shaders/color2d.vert", "shaders/color2d.frag");
-	LoadShader(SHADER_COLOR3D, "shaders/color3d.vert", "shaders/color3d.frag");
-	LoadShader(SHADER_BILLBOARD, "shaders/billboard.vert", "shaders/billboard.frag");
-	LoadShader(SHADER_DEPTH, "shaders/depth.vert", "shaders/depth.frag");
-	LoadShader(SHADER_DEPTHTRANSP, "shaders/depth.vert", "shaders/depthtransp.frag");
-	LoadShader(SHADER_OWNED, "shaders/owned.vert", "shaders/owned.frag");
+	LoadShader(SHADER_ORTHO, "shaders/ortho.vert", "shaders/ortho.frag", true, false);
+	LoadShader(SHADER_COLOR2D, "shaders/color2d.vert", "shaders/color2d.frag", false, false);
+	LoadShader(SHADER_COLOR3D, "shaders/color3d.vert", "shaders/color3d.frag", true, false);
+	LoadShader(SHADER_BILLBOARD, "shaders/billboard.vert", "shaders/billboard.frag", true, false);
+	LoadShader(SHADER_DEPTH, "shaders/depth.vert", "shaders/depth.frag", true, false);
+	LoadShader(SHADER_DEPTHTRANSP, "shaders/depth.vert", "shaders/depthtransp.frag", true, false);
+	LoadShader(SHADER_OWNED, "shaders/owned.vert", "shaders/owned.frag", true, true);
 	//LoadShader(SHADER_MODEL, "shaders/building.vert", "shaders/building.frag");
 	//LoadShader(SHADER_MAPTILES, "shaders/maptilesmegatex.vert", "shaders/maptilesmegatex.frag");
-	LoadShader(SHADER_MAPTILES, "shaders/maptiles.vert", "shaders/maptiles.frag");
-	LoadShader(SHADER_WATER, "shaders/water.vert", "shaders/water.frag");
-	LoadShader(SHADER_FOLIAGE, "shaders/foliage.vert", "shaders/foliage.frag");
-	LoadShader(SHADER_MAPTILESMM, "shaders/maptilesmm2.vert", "shaders/maptilesmm2.frag");
-	LoadShader(SHADER_WATERMM, "shaders/watermm.vert", "shaders/watermm.frag");
-	LoadShader(SHADER_RIM, "shaders/rim.vert", "shaders/rim.frag");
-	LoadShader(SHADER_SKYBOX, "shaders/skybox.vert", "shaders/skybox.frag");
-	LoadShader(SHADER_UNIT, "shaders/unit.vert", "shaders/unit.frag");
+	LoadShader(SHADER_MAPTILES, "shaders/maptiles.vert", "shaders/maptiles.frag", true, true);
+	LoadShader(SHADER_WATER, "shaders/water.vert", "shaders/water.frag", true, true);
+	LoadShader(SHADER_FOLIAGE, "shaders/foliage.vert", "shaders/foliage.frag", true, true);
+	LoadShader(SHADER_MAPTILESMM, "shaders/maptilesmm2.vert", "shaders/maptilesmm2.frag", true, true);
+	LoadShader(SHADER_WATERMM, "shaders/watermm.vert", "shaders/watermm.frag", true, true);
+	LoadShader(SHADER_RIM, "shaders/rim.vert", "shaders/rim.frag", true, true);
+	LoadShader(SHADER_SKYBOX, "shaders/skybox.vert", "shaders/skybox.frag", true, false);
+	LoadShader(SHADER_UNIT, "shaders/unit.vert", "shaders/unit.frag", true, true);
 }
 
 std::string LoadTextFile(char* strFile)
@@ -181,7 +197,7 @@ std::string LoadTextFile(char* strFile)
 	return strText;
 }
 
-void LoadShader(int shader, char* strVertex, char* strFragment)
+void LoadShader(int shader, char* strVertex, char* strFragment, bool hastexcoords, bool hasnormals)
 {
 	Shader* s = &g_shader[shader];
 	std::string strVShader, strFShader;
@@ -189,6 +205,8 @@ void LoadShader(int shader, char* strVertex, char* strFragment)
 	if(s->m_vertshader || s->m_fragshader || s->m_program)
 		s->release();
 
+    s->m_hastexcoords = hastexcoords;
+    s->m_hasnormals = hasnormals;
 	s->m_vertshader = glCreateShader(GL_VERTEX_SHADER);
 	s->m_fragshader = glCreateShader(GL_FRAGMENT_SHADER);
 
@@ -323,8 +341,6 @@ void LoadShader(int shader, char* strVertex, char* strFragment)
 	s->mapuniform(SSLOT_MAPMINY, "mapminy");
 	s->mapuniform(SSLOT_MAPMAXY, "mapmaxy");
 	s->mapuniform(SSLOT_WAVEPHASE, "wavephase");
-
-	g_log<<"fragloc"<<(int)glGetFragDataLocation(s->m_program, "outfrag")<<endl;
 }
 
 void UseS(int shader)
@@ -337,18 +353,12 @@ void UseS(int shader)
 	//glUseProgramObject(g_shader[shader].m_program);
 	glUseProgram(s->m_program);
 	CheckGLError(__FILE__, __LINE__);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-
-	CheckGLError(__FILE__, __LINE__);
-	if(s->m_slot[SSLOT_POSITION] != -1)	glEnableVertexAttribArray(s->m_slot[SSLOT_POSITION]);
-	CheckGLError(__FILE__, __LINE__);
-	if(s->m_slot[SSLOT_TEXCOORD0] != -1) glEnableVertexAttribArray(s->m_slot[SSLOT_TEXCOORD0]);
-	CheckGLError(__FILE__, __LINE__);
-	if(s->m_slot[SSLOT_NORMAL] != -1)	glEnableVertexAttribArray(s->m_slot[SSLOT_NORMAL]);
-	CheckGLError(__FILE__, __LINE__);
 
 	Player* py = &g_player[g_curP];
+
+	glEnableClientState(GL_VERTEX_ARRAY);
+	if(s->m_hastexcoords)	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+	if(s->m_hasnormals)	glEnableClientState(GL_NORMAL_ARRAY);
 
 	if(s->m_slot[SSLOT_MIND] != -1) glUniform1f(s->m_slot[SSLOT_MIND], MIN_DISTANCE);
 	if(s->m_slot[SSLOT_MAXD] != -1) glUniform1f(s->m_slot[SSLOT_MAXD], MAX_DISTANCE / py->zoom);
@@ -363,13 +373,8 @@ void EndS()
 
 	Shader* s = &g_shader[g_curS];
 
-	CheckGLError(__FILE__, __LINE__);
-	if(s->m_slot[SSLOT_POSITION] != -1)	glDisableVertexAttribArray(s->m_slot[SSLOT_POSITION]);
-	CheckGLError(__FILE__, __LINE__);
-	if(s->m_slot[SSLOT_TEXCOORD0] != -1) glDisableVertexAttribArray(s->m_slot[SSLOT_TEXCOORD0]);
-	CheckGLError(__FILE__, __LINE__);
-	if(s->m_slot[SSLOT_NORMAL] != -1)	glDisableVertexAttribArray(s->m_slot[SSLOT_NORMAL]);
-	CheckGLError(__FILE__, __LINE__);
+	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+	glDisableClientState(GL_NORMAL_ARRAY);
 
 	glUseProgram(0);
 

@@ -127,8 +127,8 @@ typedef int16_t WORD;
 #define _isnan isnan
 #define stricmp strcasecmp
 #define _stricmp strcasecmp
-
 #define ERROR 0
+#define APIENTRY
 #endif
 
 /*
@@ -136,10 +136,6 @@ typedef int16_t WORD;
 int _isnan(double x) { return x != x; }
 #endif
 */
-
-#ifdef PLATFORM_WIN
-extern HINSTANCE g_hInstance;
-#endif
 
 extern SDL_Window *g_window;
 extern SDL_Renderer* g_renderer;
@@ -149,7 +145,9 @@ extern SDL_GLContext g_glcontext;
 
 #define SPECBUMPSHADOW
 
-//#define GLDEBUG
+#define GLDEBUG
+#define DEBUG
+
 #ifndef GLDEBUG
 #define CheckGLError(a,b); a;b;
 #endif

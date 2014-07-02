@@ -80,4 +80,6 @@ void LastNum(const char* l);
 void CheckGLError(const char* file, int line);
 #endif
 
+GLvoid APIENTRY GLMessageHandler(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, GLvoid* userParam);
+
 #endif	//DEBUG_H

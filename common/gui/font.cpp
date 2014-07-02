@@ -461,25 +461,22 @@ void DrawGlyph(float left, float top, float right, float bottom, float texleft, 
 	float vertices[] =
 	{
 		//posx, posy    texx, texy
-		left, top,0,          texleft, textop,
-		right, top,0,         texright, textop,
-		right, bottom,0,      texright, texbottom,
+		left, top,          texleft, textop,
+		right, top,         texright, textop,
+		right, bottom,      texright, texbottom,
 
-		right, bottom,0,      texright, texbottom,
-		left, bottom,0,       texleft, texbottom,
-		left, top,0,          texleft, textop
+		right, bottom,      texright, texbottom,
+		left, bottom,       texleft, texbottom,
+		left, top,          texleft, textop
 	};
 
-	//g_log<<"draw glyph: "<<texleft<<","<<textop<<","<<texright<<","<<texbottom<<endl;
+#ifdef DEBUG
+	g_log<<"draw glyph: "<<texleft<<","<<textop<<","<<texright<<","<<texbottom<<endl;
+    g_log.flush();
+#endif
 
-	//glVertexAttribPointer(g_slots[SHADER_ORTHO][POSITION], 3, GL_FLOAT, GL_FALSE, sizeof(float)*5, &vertices[0]);
-	//glVertexAttribPointer(g_slots[SHADER_ORTHO][TEXCOORD], 2, GL_FLOAT, GL_FALSE, sizeof(float)*5, &vertices[3]);
-
-	//glVertexPointer(3, GL_FLOAT, sizeof(float)*5, &vertices[0]);
-	//glTexCoordPointer(2, GL_FLOAT, sizeof(float)*5, &vertices[3]);
-
-	glVertexAttribPointer(g_shader[SHADER_ORTHO].m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, sizeof(float)*5, &vertices[0]);
-	glVertexAttribPointer(g_shader[SHADER_ORTHO].m_slot[SSLOT_TEXCOORD0], 2, GL_FLOAT, GL_FALSE, sizeof(float)*5, &vertices[3]);
+	glVertexPointer(2, GL_FLOAT, sizeof(float)*4, &vertices[0]);
+	glTexCoordPointer(2, GL_FLOAT, sizeof(float)*4, &vertices[2]);
 
 	glDrawArrays(GL_TRIANGLES, 0, 6);
 }
@@ -592,22 +589,25 @@ void DrawGlyphF(float left, float top, float right, float bottom, float texleft,
 	}
 #endif
 
-
+#ifdef DEBUG
+	g_log<<"text "<<__FILE__<<" "<<__LINE__<<endl;
+    g_log.flush();
+#endif
 
 	float vertices[] =
 	{
 		//posx, posy    texx, texy
-		newleft, newtop,0,          newtexleft, newtextop,
-		newright, newtop,0,         newtexright, newtextop,
-		newright, newbottom,0,      newtexright, newtexbottom,
+		newleft, newtop,          newtexleft, newtextop,
+		newright, newtop,         newtexright, newtextop,
+		newright, newbottom,      newtexright, newtexbottom,
 
-		newright, newbottom,0,      newtexright, newtexbottom,
-		newleft, newbottom,0,       newtexleft, newtexbottom,
-		newleft, newtop,0,          newtexleft, newtextop
+		newright, newbottom,      newtexright, newtexbottom,
+		newleft, newbottom,       newtexleft, newtexbottom,
+		newleft, newtop,          newtexleft, newtextop
 	};
 
-	glVertexAttribPointer(g_shader[SHADER_ORTHO].m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, sizeof(float)*5, &vertices[0]);
-	glVertexAttribPointer(g_shader[SHADER_ORTHO].m_slot[SSLOT_TEXCOORD0], 2, GL_FLOAT, GL_FALSE, sizeof(float)*5, &vertices[3]);
+	glVertexPointer(2, GL_FLOAT, sizeof(float)*4, &vertices[0]);
+	glTexCoordPointer(2, GL_FLOAT, sizeof(float)*4, &vertices[2]);
 
 	glDrawArrays(GL_TRIANGLES, 0, 6);
 }
@@ -680,6 +680,11 @@ void DrawLineF(int caret)
 	{
 		if(caret == i)
 			DrawCaretF();
+
+#ifdef DEBUG
+	g_log<<"text "<<__FILE__<<" "<<__LINE__<<endl;
+    g_log.flush();
+#endif
 
 		DrawGlyphF();
 		AdvanceGlyph();
@@ -782,8 +787,20 @@ void DrawShadowedTextF(int fnt, float startx, float starty, float framex1, float
 
 	Player* py = &g_player[g_curP];
 	StartTextF(text, fnt, py->currw*2, py->currh*2, 0, startx, framex1, framey1, framex2, framey2);
+
+#ifdef DEBUG
+	g_log<<"text "<<__FILE__<<" "<<__LINE__<<endl;
+    g_log.flush();
+#endif
+
 	UseFontTex();
 	TextLayer(startx+1, starty);
+
+#ifdef DEBUG
+	g_log<<"text "<<__FILE__<<" "<<__LINE__<<endl;
+    g_log.flush();
+#endif
+
 	DrawLineF(caret);
 	TextLayer(startx, starty+1);
 	DrawLineF(caret);

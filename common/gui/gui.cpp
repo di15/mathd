@@ -28,7 +28,14 @@ void GUI::draw()
 #endif
 
 	for(auto i=m_subwidg.begin(); i!=m_subwidg.end(); i++)
+	{
+#ifdef DEBUG
+	g_log<<"draw "<<(*i)->m_name<<" "<<__FILE__<<" "<<__LINE__<<endl;
+    g_log.flush();
+#endif
+
 		(*i)->draw();
+    }
 
 	CheckGLError(__FILE__, __LINE__);
 

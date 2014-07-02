@@ -473,6 +473,11 @@ void Draw()
 
 	StopTimer(TIMER_DRAWSETUP);
 
+#ifdef DEBUG
+	g_log<<"draw "<<__FILE__<<" "<<__LINE__<<endl;
+    g_log.flush();
+#endif
+
 #if 2
 	if(g_mode == APPMODE_PLAY || g_mode == APPMODE_EDITOR)
 	{
@@ -531,18 +536,19 @@ void Draw()
 	CheckGLError(__FILE__, __LINE__);
 #endif
 
-#if 0
-	g_log<<("before framupd")<<endl;
-	g_log.flush();
+#ifdef DEBUG
+	g_log<<"draw "<<__FILE__<<" "<<__LINE__<<endl;
+    g_log.flush();
 #endif
-
 
 	StartTimer(TIMER_DRAWGUI);
 	gui->frameupd();
-#if 0
-	g_log<<("before gui dr")<<endl;
-	g_log.flush();
+
+#ifdef DEBUG
+	g_log<<"draw "<<__FILE__<<" "<<__LINE__<<endl;
+    g_log.flush();
 #endif
+
 	CheckGLError(__FILE__, __LINE__);
 	gui->draw();
 	StopTimer(TIMER_DRAWGUI);
@@ -578,6 +584,11 @@ void Draw()
 	DrawBoxShadText(MAINFONT8, 0, 0, py->width, py->height, &uni, color, 0, -1);
 #endif
 
+#ifdef DEBUG
+	g_log<<"draw "<<__FILE__<<" "<<__LINE__<<endl;
+    g_log.flush();
+#endif
+
 #if 1
 	char fpsstr[256];
 	sprintf(fpsstr, "draw fps: %lf (%lf s/frame), upd fps: %lf (%lf s/frame), zoom: %f, simframe: %lld", g_instantdrawfps, 1.0/g_instantdrawfps, g_instantupdfps, 1.0/g_instantupdfps, py->zoom, g_simframe);
@@ -589,9 +600,9 @@ void Draw()
 	CheckGLError(__FILE__, __LINE__);
 #endif
 
-#if 0
-	g_log<<("bef sw bf")<<endl;
-	g_log.flush();
+#ifdef DEBUG
+	g_log<<"draw "<<__FILE__<<" "<<__LINE__<<endl;
+    g_log.flush();
 #endif
 
 	SDL_GL_SwapWindow(g_window);
@@ -965,6 +976,7 @@ void EventLoop()
                                         ev.amount = e.wheel.y;
 
                                         gui->inev(&ev);
+                                        break;
                                 case SDL_MOUSEBUTTONDOWN:
                                         switch (e.button.button) {
                                         case SDL_BUTTON_LEFT:
@@ -1070,14 +1082,33 @@ void EventLoop()
 		{
 			StartTimer(TIMER_DRAW);
 
+#ifdef DEBUG
+	g_log<<"main "<<__FILE__<<" "<<__LINE__<<endl;
+    g_log.flush();
+#endif
 			CalcDrawRate();
+
 			CheckGLError(__FILE__, __LINE__);
+
+#ifdef DEBUG
+	g_log<<"main "<<__FILE__<<" "<<__LINE__<<endl;
+    g_log.flush();
+#endif
+
 			Draw();
 			CheckGLError(__FILE__, __LINE__);
 
 			if(g_mode == APPMODE_PLAY || g_mode == APPMODE_EDITOR)
 			{
+#ifdef DEBUG
+	g_log<<"main "<<__FILE__<<" "<<__LINE__<<endl;
+    g_log.flush();
+#endif
 				Scroll();
+#ifdef DEBUG
+	g_log<<"main "<<__FILE__<<" "<<__LINE__<<endl;
+    g_log.flush();
+#endif
 				UpdateResTicker();
 			}
 
@@ -1088,6 +1119,10 @@ void EventLoop()
 		{
 			StartTimer(TIMER_UPDATE);
 
+#ifdef DEBUG
+	g_log<<"main "<<__FILE__<<" "<<__LINE__<<endl;
+    g_log.flush();
+#endif
 			CalcUpdRate();
 			Update();
 

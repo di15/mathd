@@ -11,20 +11,17 @@ void DrawImage(unsigned int tex, float left, float top, float right, float botto
 	float vertices[] =
 	{
 		//posx, posy    texx, texy
-		left, top,0,          texleft, textop,
-		right, top,0,         texright, textop,
-		right, bottom,0,      texright, texbottom,
+		left, top,          texleft, textop,
+		right, top,         texright, textop,
+		right, bottom,     texright, texbottom,
 
-		right, bottom,0,      texright, texbottom,
-		left, bottom,0,       texleft, texbottom,
-		left, top,0,          texleft, textop
+		right, bottom,      texright, texbottom,
+		left, bottom,       texleft, texbottom,
+		left, top,          texleft, textop
 	};
 
-	glVertexAttribPointer(g_shader[SHADER_ORTHO].m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, sizeof(float)*5, &vertices[0]);
-	glVertexAttribPointer(g_shader[SHADER_ORTHO].m_slot[SSLOT_TEXCOORD0], 2, GL_FLOAT, GL_FALSE, sizeof(float)*5, &vertices[3]);
-
-	//glVertexPointer(3, GL_FLOAT, sizeof(float)*5, &vertices[0]);
-	//glTexCoordPointer(2, GL_FLOAT, sizeof(float)*5, &vertices[3]);
+    glVertexPointer(2, GL_FLOAT, sizeof(float) * 4, &vertices[0]);
+    glTexCoordPointer(2, GL_FLOAT, sizeof(float) * 4, &vertices[2]);
 
 	glDrawArrays(GL_TRIANGLES, 0, 6);
 }
