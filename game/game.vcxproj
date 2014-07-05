@@ -1,22 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
-    <ProjectConfiguration Include="32 bit 2|Win32">
-      <Configuration>32 bit 2</Configuration>
-      <Platform>Win32</Platform>
-    </ProjectConfiguration>
-    <ProjectConfiguration Include="32 bit 2|x64">
-      <Configuration>32 bit 2</Configuration>
-      <Platform>x64</Platform>
-    </ProjectConfiguration>
-    <ProjectConfiguration Include="32 bit release|Win32">
-      <Configuration>32 bit release</Configuration>
-      <Platform>Win32</Platform>
-    </ProjectConfiguration>
-    <ProjectConfiguration Include="32 bit release|x64">
-      <Configuration>32 bit release</Configuration>
-      <Platform>x64</Platform>
-    </ProjectConfiguration>
     <ProjectConfiguration Include="Debug|Win32">
       <Configuration>Debug</Configuration>
       <Platform>Win32</Platform>
@@ -59,35 +43,7 @@
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>NotSet</CharacterSet>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='32 bit release|Win32'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
-    <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v110</PlatformToolset>
-    <WholeProgramOptimization>true</WholeProgramOptimization>
-    <CharacterSet>NotSet</CharacterSet>
-  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
-    <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v110</PlatformToolset>
-    <WholeProgramOptimization>true</WholeProgramOptimization>
-    <CharacterSet>NotSet</CharacterSet>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='32 bit release|x64'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
-    <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v110</PlatformToolset>
-    <WholeProgramOptimization>true</WholeProgramOptimization>
-    <CharacterSet>NotSet</CharacterSet>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='32 bit 2|Win32'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
-    <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v110</PlatformToolset>
-    <WholeProgramOptimization>true</WholeProgramOptimization>
-    <CharacterSet>NotSet</CharacterSet>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='32 bit 2|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v110</PlatformToolset>
@@ -106,26 +62,14 @@
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
-  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='32 bit release|Win32'" Label="PropertySheets">
-    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-  </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
-    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-  </ImportGroup>
-  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='32 bit release|x64'" Label="PropertySheets">
-    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-  </ImportGroup>
-  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='32 bit 2|Win32'" Label="PropertySheets">
-    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-  </ImportGroup>
-  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='32 bit 2|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>$(SolutionDir)\libs\win\SDL2-2.0.3\include;$(SolutionDir)\libs\glew\include;$(SolutionDir)\libs\lpng;$(SolutionDir)\libs\;$(SolutionDir)\libs\libzip-0.11.1\lib;$(SolutionDir)\libs\jpeglib;$(IncludePath)</IncludePath>
-    <LibraryPath>$(SolutionDir)\libs\win\SDL2-2.0.3\lib;$(SolutionDir)\libs\glew\lib\Release\Win32;$(SolutionDir)\libs\GL;$(SolutionDir)\libs\zlib-1.2.5\build\Release;$(SolutionDir)\libs\libzip-0.11.1\build\lib\Release;$(SolutionDir)\libs\lpng\lib;$(SolutionDir)\libs\jpeglib;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(SolutionDir)..\libs\win\SDL2_net-2.0.0\include;$(SolutionDir)..\libs\win\SDL2-2.0.3\include;$(SolutionDir)..\libs\glew\include;$(SolutionDir)..\libs\lpng;$(SolutionDir)..\libs\;$(SolutionDir)..\libs\libzip-0.11.1\lib;$(SolutionDir)..\libs\jpeglib;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)..\libs\win\SDL2_net-2.0.0\lib;$(SolutionDir)..\libs\win\SDL2-2.0.3\lib;$(SolutionDir)..\libs\glew\lib\Release\Win32;$(SolutionDir)..\libs\GL;$(SolutionDir)..\libs\zlib-1.2.5\build\Release;$(SolutionDir)..\libs\libzip-0.11.1\build\lib\Release;$(SolutionDir)..\libs\lpng\lib;$(SolutionDir)..\libs\jpeglib;$(LibraryPath)</LibraryPath>
     <TargetName>CorpStatesDbg</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -133,31 +77,11 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>$(SolutionDir)\libs\win\SDL2-2.0.3\include;$(SolutionDir)\libs\glew\include;$(SolutionDir)\libs\lpng;$(SolutionDir)\libs\jpeglib;$(SolutionDir)\libs\libzip-0.11.1\lib;$(SolutionDir)\libs\;$(IncludePath)</IncludePath>
-    <LibraryPath>$(SolutionDir)\libs\win\SDL2-2.0.3\lib;$(SolutionDir)\libs\glew\lib\Release\Win32;$(SolutionDir)\libs\lpng\lib;$(SolutionDir)\libs\jpeglib;$(SolutionDir)\libs\zlib-1.2.5\build\Release;$(SolutionDir)\libs\GL;$(SolutionDir)\libs\libzip-0.11.1\build\lib\Release;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(SolutionDir)..\libs\win\SDL2_net-2.0.0\include;$(SolutionDir)..\libs\win\SDL2-2.0.3\include;$(SolutionDir)..\libs\glew\include;$(SolutionDir)..\libs\lpng;$(SolutionDir)..\libs\jpeglib;$(SolutionDir)..\libs\libzip-0.11.1\lib;$(SolutionDir)..\libs\;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)..\libs\win\SDL2_net-2.0.0\lib;$(SolutionDir)..\libs\win\SDL2-2.0.3\lib;$(SolutionDir)..\libs\glew\lib\Release\Win32;$(SolutionDir)..\libs\lpng\lib;$(SolutionDir)..\libs\jpeglib;$(SolutionDir)..\libs\zlib-1.2.5\build\Release;$(SolutionDir)..\libs\GL;$(SolutionDir)..\libs\libzip-0.11.1\build\lib\Release;$(LibraryPath)</LibraryPath>
     <TargetName>CorpStates</TargetName>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='32 bit release|Win32'">
-    <LinkIncremental>false</LinkIncremental>
-    <IncludePath>C:\Libs\jpeglib;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Libs\jpeglib;$(LibraryPath)</LibraryPath>
-  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <LinkIncremental>false</LinkIncremental>
-    <IncludePath>C:\Libs\jpeglib;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Libs\jpeglib;$(LibraryPath)</LibraryPath>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='32 bit release|x64'">
-    <LinkIncremental>false</LinkIncremental>
-    <IncludePath>C:\Libs\jpeglib;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Libs\jpeglib;$(LibraryPath)</LibraryPath>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='32 bit 2|Win32'">
-    <LinkIncremental>false</LinkIncremental>
-    <IncludePath>C:\Libs\jpeglib;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Libs\jpeglib;$(LibraryPath)</LibraryPath>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='32 bit 2|x64'">
     <LinkIncremental>false</LinkIncremental>
     <IncludePath>C:\Libs\jpeglib;$(IncludePath)</IncludePath>
     <LibraryPath>C:\Libs\jpeglib;$(LibraryPath)</LibraryPath>
@@ -176,7 +100,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <PostBuildEvent>
-      <Command>copy /Y "$(SolutionDir)Debug\$(TargetFileName)" "$(SolutionDir)..\testfolder\$(TargetFileName)"</Command>
+      <Command>copy /Y "$(SolutionDir)Debug\$(TargetFileName)" "$(SolutionDir)..\..\testfolder\$(TargetFileName)"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -210,82 +134,10 @@
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
     <PostBuildEvent>
-      <Command>copy /Y "$(SolutionDir)Release\$(TargetFileName)" "$(SolutionDir)..\testfolder\$(TargetFileName)"</Command>
+      <Command>copy /Y "$(SolutionDir)Release\$(TargetFileName)" "$(SolutionDir)..\..\testfolder\$(TargetFileName)"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='32 bit release|Win32'">
-    <ClCompile>
-      <WarningLevel>Level3</WarningLevel>
-      <PrecompiledHeader>
-      </PrecompiledHeader>
-      <Optimization>MaxSpeed</Optimization>
-      <FunctionLevelLinking>true</FunctionLevelLinking>
-      <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
-    </ClCompile>
-    <Link>
-      <SubSystem>Windows</SubSystem>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
-      <EnableCOMDATFolding>true</EnableCOMDATFolding>
-      <OptimizeReferences>true</OptimizeReferences>
-    </Link>
-  </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <ClCompile>
-      <WarningLevel>Level3</WarningLevel>
-      <PrecompiledHeader>
-      </PrecompiledHeader>
-      <Optimization>MaxSpeed</Optimization>
-      <FunctionLevelLinking>true</FunctionLevelLinking>
-      <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
-    </ClCompile>
-    <Link>
-      <SubSystem>Windows</SubSystem>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
-      <EnableCOMDATFolding>true</EnableCOMDATFolding>
-      <OptimizeReferences>true</OptimizeReferences>
-    </Link>
-  </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='32 bit release|x64'">
-    <ClCompile>
-      <WarningLevel>Level3</WarningLevel>
-      <PrecompiledHeader>
-      </PrecompiledHeader>
-      <Optimization>MaxSpeed</Optimization>
-      <FunctionLevelLinking>true</FunctionLevelLinking>
-      <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
-    </ClCompile>
-    <Link>
-      <SubSystem>Windows</SubSystem>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
-      <EnableCOMDATFolding>true</EnableCOMDATFolding>
-      <OptimizeReferences>true</OptimizeReferences>
-    </Link>
-  </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='32 bit 2|Win32'">
-    <ClCompile>
-      <WarningLevel>Level3</WarningLevel>
-      <PrecompiledHeader>
-      </PrecompiledHeader>
-      <Optimization>MaxSpeed</Optimization>
-      <FunctionLevelLinking>true</FunctionLevelLinking>
-      <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
-    </ClCompile>
-    <Link>
-      <SubSystem>Windows</SubSystem>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
-      <EnableCOMDATFolding>true</EnableCOMDATFolding>
-      <OptimizeReferences>true</OptimizeReferences>
-    </Link>
-  </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='32 bit 2|x64'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <PrecompiledHeader>
@@ -372,7 +224,6 @@
     <ClCompile Include="..\common\phys\trace.cpp" />
     <ClCompile Include="..\common\platform.cpp" />
     <ClCompile Include="..\common\render\billboard.cpp" />
-    <ClCompile Include="..\common\render\compilebl.cpp" />
     <ClCompile Include="..\common\render\dmdmodel.cpp" />
     <ClCompile Include="..\common\render\foliage.cpp" />
     <ClCompile Include="..\common\render\heightmap.cpp" />
@@ -490,7 +341,6 @@
     <ClInclude Include="..\common\phys\trace.h" />
     <ClInclude Include="..\common\platform.h" />
     <ClInclude Include="..\common\render\billboard.h" />
-    <ClInclude Include="..\common\render\compilebl.h" />
     <ClInclude Include="..\common\render\dmdmodel.h" />
     <ClInclude Include="..\common\render\foliage.h" />
     <ClInclude Include="..\common\render\heightmap.h" />

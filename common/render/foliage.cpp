@@ -289,7 +289,7 @@ void FillForest()
 	{
 
 		int maxfoliage = FOLIAGES*g_hmap.m_widthx*g_hmap.m_widthz/MAX_MAP/MAX_MAP;
-		maxfoliage = std::min(FOLIAGES, maxfoliage);
+		maxfoliage = imin(FOLIAGES, maxfoliage);
 
 		for(int i=0; i<maxfoliage; i++)
 		{

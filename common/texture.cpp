@@ -1426,3 +1426,64 @@ void StreamRaw(FILE* fp, unsigned int* texname, Vec2i fullsz, Vec2i srcpos, Vec2
 	newtex.destroy();
 }
 
+void Resample(LoadedTex* original, LoadedTex* empty, Vec2i newdim)
+{
+#ifdef COMPILEB_DEBUG
+	g_log<<"resample...?"<<endl;
+	g_log.flush();
+#endif
+
+	if(original == NULL || original->data == NULL || original->sizeX <= 0 || original->sizeY <= 0)
+	{
+#ifdef COMPILEB_DEBUG
+		g_log<<"resample NULL 1"<<endl;
+		g_log.flush();
+#endif
+
+		empty->data = NULL;
+
+#ifdef COMPILEB_DEBUG
+		g_log<<"resample NULL 2"<<endl;
+		g_log.flush();
+#endif
+
+		empty->sizeX = 0;
+		empty->sizeY = 0;
+
+		if(original != NULL)
+			empty->channels = original->channels;
+
+		return;
+	}
+
+#ifdef COMPILEB_DEBUG
+	g_log<<"resample "<<original->sizeX<<","<<original->sizeY<<" to "<<newdim.x<<","<<newdim.y<<endl;
+	g_log.flush();
+#endif
+
+	AllocTex(empty, newdim.x, newdim.y, original->channels);
+
+	double scaleW =  (double)newdim.x / (double)original->sizeX;
+	double scaleH = (double)newdim.y / (double)original->sizeY;
+
+	for(int cy = 0; cy < newdim.y; cy++)
+	{
+		for(int cx = 0; cx < newdim.x; cx++)
+		{
+			int pixel = cy * (newdim.x * original->channels) + cx*original->channels;
+			int nearestMatch =  (int)(cy / scaleH) * original->sizeX * original->channels + (int)(cx / scaleW) * original->channels;
+
+			empty->data[pixel    ] =  original->data[nearestMatch    ];
+			empty->data[pixel + 1] =  original->data[nearestMatch + 1];
+			empty->data[pixel + 2] =  original->data[nearestMatch + 2];
+
+			if(original->channels > 3)
+				empty->data[pixel + 3] =  original->data[nearestMatch + 3];
+		}
+	}
+
+#ifdef COMPILEB_DEBUG
+	g_log<<"\t done resample"<<endl;
+	g_log.flush();
+#endif
+}

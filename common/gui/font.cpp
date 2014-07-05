@@ -100,7 +100,7 @@ void NextLineBreak()
 		{
 			if(lastspace < 0)
 			{
-				nextlb = std::max(j, i+1);
+				nextlb = imax(j, i+1);
 
 				//if(w <= g2->w)
 				//	nextlb++;
@@ -474,9 +474,11 @@ void DrawGlyph(float left, float top, float right, float bottom, float texleft, 
 	g_log<<"draw glyph: "<<texleft<<","<<textop<<","<<texright<<","<<texbottom<<endl;
     g_log.flush();
 #endif
-
-	glVertexPointer(2, GL_FLOAT, sizeof(float)*4, &vertices[0]);
-	glTexCoordPointer(2, GL_FLOAT, sizeof(float)*4, &vertices[2]);
+	
+	//glVertexPointer(2, GL_FLOAT, sizeof(float)*4, &vertices[0]);
+	//glTexCoordPointer(2, GL_FLOAT, sizeof(float)*4, &vertices[2]);
+	glVertexAttribPointer(g_shader[g_curS].m_slot[SSLOT_POSITION], 2, GL_FLOAT, GL_FALSE, sizeof(float)*4, &vertices[0]);
+	glVertexAttribPointer(g_shader[g_curS].m_slot[SSLOT_TEXCOORD0], 2, GL_FLOAT, GL_FALSE, sizeof(float)*4, &vertices[2]);
 
 	glDrawArrays(GL_TRIANGLES, 0, 6);
 }
@@ -606,8 +608,10 @@ void DrawGlyphF(float left, float top, float right, float bottom, float texleft,
 		newleft, newtop,          newtexleft, newtextop
 	};
 
-	glVertexPointer(2, GL_FLOAT, sizeof(float)*4, &vertices[0]);
-	glTexCoordPointer(2, GL_FLOAT, sizeof(float)*4, &vertices[2]);
+	//glVertexPointer(2, GL_FLOAT, sizeof(float)*4, &vertices[0]);
+	//glTexCoordPointer(2, GL_FLOAT, sizeof(float)*4, &vertices[2]);
+	glVertexAttribPointer(g_shader[g_curS].m_slot[SSLOT_POSITION], 2, GL_FLOAT, GL_FALSE, sizeof(float)*4, &vertices[0]);
+	glVertexAttribPointer(g_shader[g_curS].m_slot[SSLOT_TEXCOORD0], 2, GL_FLOAT, GL_FALSE, sizeof(float)*4, &vertices[2]);
 
 	glDrawArrays(GL_TRIANGLES, 0, 6);
 }

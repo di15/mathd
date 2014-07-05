@@ -6,6 +6,7 @@
 #include "../sim/unittype.h"
 #include "collidertile.h"
 #include "binheap.h"
+#include "../utils.h"
 
 Vec2i g_pathdim(0,0);
 PathNode* g_pathnode = NULL;
@@ -102,13 +103,13 @@ void SnapToNode(PathJob* pj)
 {
 	Vec2i npos = Vec2i( (pj->cmstartx+PATHNODE_SIZE/2) / PATHNODE_SIZE, (pj->cmstartz+PATHNODE_SIZE/2) / PATHNODE_SIZE );
 
-	npos.x = std::min(g_pathdim.x-1, npos.x);
-	npos.y = std::min(g_pathdim.y-1, npos.y);
+	npos.x = imin(g_pathdim.x-1, npos.x);
+	npos.y = imin(g_pathdim.y-1, npos.y);
 
 	Vec2i npos_min = npos - Vec2i(1,1);
 
-	npos_min.x = std::max(0, npos_min.x);
-	npos_min.y = std::max(0, npos_min.y);
+	npos_min.x = imax(0, npos_min.x);
+	npos_min.y = imax(0, npos_min.y);
 
 	Vec2i npos_max = npos_min + Vec2i(1,1);
 

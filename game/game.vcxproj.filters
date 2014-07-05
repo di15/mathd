@@ -341,9 +341,6 @@
     <ClCompile Include="..\common\ai\localavoid.cpp">
       <Filter>Source Files\common\ai</Filter>
     </ClCompile>
-    <ClCompile Include="..\common\render\compilebl.cpp">
-      <Filter>Source Files\common\render</Filter>
-    </ClCompile>
     <ClCompile Include="..\common\econ\demand.cpp">
       <Filter>Source Files\common\econ</Filter>
     </ClCompile>
@@ -693,9 +690,6 @@
     </ClInclude>
     <ClInclude Include="..\common\ai\localavoid.h">
       <Filter>Source Files\common\ai</Filter>
-    </ClInclude>
-    <ClInclude Include="..\common\render\compilebl.h">
-      <Filter>Source Files\common\render</Filter>
     </ClInclude>
     <ClInclude Include="..\common\econ\demand.h">
       <Filter>Source Files\common\econ</Filter>

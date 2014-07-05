@@ -23,7 +23,6 @@
 #include "foliage.h"
 #include "../save/savemap.h"
 #include "../texture.h"
-#include "compilebl.h"
 #include "water.h"
 #include "../sim/player.h"
 #include "../debug.h"

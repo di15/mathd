@@ -355,10 +355,14 @@ void UseS(int shader)
 	CheckGLError(__FILE__, __LINE__);
 
 	Player* py = &g_player[g_curP];
-
-	glEnableClientState(GL_VERTEX_ARRAY);
-	if(s->m_hastexcoords)	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-	if(s->m_hasnormals)	glEnableClientState(GL_NORMAL_ARRAY);
+	
+	CheckGLError(__FILE__, __LINE__);
+	if(s->m_slot[SSLOT_POSITION] != -1)	glEnableVertexAttribArray(s->m_slot[SSLOT_POSITION]);
+	CheckGLError(__FILE__, __LINE__);
+	if(s->m_slot[SSLOT_TEXCOORD0] != -1) glEnableVertexAttribArray(s->m_slot[SSLOT_TEXCOORD0]);
+	CheckGLError(__FILE__, __LINE__);
+	if(s->m_slot[SSLOT_NORMAL] != -1)	glEnableVertexAttribArray(s->m_slot[SSLOT_NORMAL]);
+	CheckGLError(__FILE__, __LINE__);
 
 	if(s->m_slot[SSLOT_MIND] != -1) glUniform1f(s->m_slot[SSLOT_MIND], MIN_DISTANCE);
 	if(s->m_slot[SSLOT_MAXD] != -1) glUniform1f(s->m_slot[SSLOT_MAXD], MAX_DISTANCE / py->zoom);
@@ -373,8 +377,16 @@ void EndS()
 
 	Shader* s = &g_shader[g_curS];
 
-	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-	glDisableClientState(GL_NORMAL_ARRAY);
+	CheckGLError(__FILE__, __LINE__);
+	if(s->m_slot[SSLOT_POSITION] != -1)	glDisableVertexAttribArray(s->m_slot[SSLOT_POSITION]);
+	CheckGLError(__FILE__, __LINE__);
+	if(s->m_slot[SSLOT_TEXCOORD0] != -1) glDisableVertexAttribArray(s->m_slot[SSLOT_TEXCOORD0]);
+	CheckGLError(__FILE__, __LINE__);
+	if(s->m_slot[SSLOT_NORMAL] != -1)	glDisableVertexAttribArray(s->m_slot[SSLOT_NORMAL]);
+	CheckGLError(__FILE__, __LINE__);
+
+	//glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+	//glDisableClientState(GL_NORMAL_ARRAY);
 
 	glUseProgram(0);
 

@@ -43,10 +43,10 @@ void DrawSteps()
 #if 1
 
 	Vec2i npos = Vec2i( u->cmpos.x / PATHNODE_SIZE, u->cmpos.y / PATHNODE_SIZE );
-	int nminx = std::max(0, npos.x-50);
-	int nminz = std::max(0, npos.y-50);
-	int nmaxx = std::min(g_pathdim.x-1, npos.x+50);
-	int nmaxz = std::min(g_pathdim.y-1, npos.y+50);
+	int nminx = imax(0, npos.x-50);
+	int nminz = imax(0, npos.y-50);
+	int nmaxx = imin(g_pathdim.x-1, npos.x+50);
+	int nmaxz = imin(g_pathdim.y-1, npos.y+50);
 
 	for(int x = nminx; x <= nmaxx; x ++)
 		for(int z = nminz; z <= nmaxz; z++)
@@ -147,8 +147,8 @@ void DrawGrid()
 		int ux = u->cmpos.x / PATHNODE_SIZE;
 		int uz = u->cmpos.y / PATHNODE_SIZE;
 
-		for(int x=std::max(0, ux-50); x<std::min(ux+50, g_pathdim.x); x++)
-			for(int z=std::max(0, uz-50); z<std::min(uz+50, g_pathdim.y); z++)
+		for(int x=imax(0, ux-50); x<imin(ux+50, g_pathdim.x); x++)
+			for(int z=imax(0, uz-50); z<imin(uz+50, g_pathdim.y); z++)
 			{
 				ColliderTile* cell = ColliderTileAt(x, z);
 

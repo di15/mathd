@@ -70,7 +70,7 @@ float CompletPct(int* cost, int* current)
 
 	for(int i=0; i<RESOURCES; i++)
 	{
-		totalhave += std::min(cost[i], current[i]);
+		totalhave += imin(cost[i], current[i]);
 	}
 
 	return (float)totalhave/(float)totalreq;

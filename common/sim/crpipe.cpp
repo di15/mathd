@@ -721,8 +721,8 @@ void ClearCrPipes()
 
 void MergeCrPipe(int A, int B)
 {
-	int mini = std::min(A, B);
-	int maxi = std::max(A, B);
+	int mini = imin(A, B);
+	int maxi = imax(A, B);
 
 	for(int i=0; i<BUILDINGS; i++)
 	{

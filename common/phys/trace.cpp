@@ -166,8 +166,8 @@ int Trace(int utype, int umode,
 	int cmmaxx = cmminx + ut->size.x;
 	int cmmaxz = cmminx + ut->size.z;
 
-	Vec2i absmin( std::min(vstart.x + cmmaxx, vend.x + cmmaxx), std::min(vstart.y + cmmaxz, vend.y + cmmaxz) );
-	Vec2i absmax( std::max(vstart.x + cmmaxx, vend.x + cmmaxx), std::max(vstart.y + cmmaxz, vend.y + cmmaxz) );
+	Vec2i absmin( imin(vstart.x + cmmaxx, vend.x + cmmaxx), imin(vstart.y + cmmaxz, vend.y + cmmaxz) );
+	Vec2i absmax( imax(vstart.x + cmmaxx, vend.x + cmmaxx), imax(vstart.y + cmmaxz, vend.y + cmmaxz) );
 
 	int cminx = absmin.x / PATHNODE_SIZE;
 	int cminz = absmin.y / PATHNODE_SIZE;

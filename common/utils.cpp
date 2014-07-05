@@ -281,17 +281,3 @@ void Sleep(int ms)
 }
 #endif
 
-#ifdef PLATFORM_WIN
-
-float fmax(float a, float b)
-{
-	return (((a)>(b))?(a):(b));
-}
-
-
-float fmin(float a, float b)
-{
-	return (((a)<(b))?(a):(b));
-}
-
-#endif

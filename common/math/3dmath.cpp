@@ -19,19 +19,19 @@
 
 float Clipf(float n, float lower, float upper)
 {
-	return std::max(lower, std::min(n, upper));
+	return fmax(lower, fmin(n, upper));
 }
 
 int Clipi(int n, int lower, int upper)
 {
-	return std::max(lower, std::min(n, upper));
+	return imax(lower, imin(n, upper));
 }
 
 Vec3f VMin(float minf, Vec3f v)
 {
-	v.x = std::min(minf, v.x);
-	v.y = std::min(minf, v.y);
-	v.z = std::min(minf, v.z);
+	v.x = fmin(minf, v.x);
+	v.y = fmin(minf, v.y);
+	v.z = fmin(minf, v.z);
 	return v;
 }
 

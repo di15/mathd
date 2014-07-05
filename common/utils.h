@@ -1,3 +1,7 @@
+
+#ifndef UTILS_H
+#define UTILS_H
+
 #include "platform.h"
 
 using namespace std;
@@ -39,8 +43,26 @@ void Sleep(int ms);
 
 #ifdef PLATFORM_WIN
 
-float fmax(float a, float b);
-float fmin(float a, float b);
+inline float fmax(const float a, const float b)
+{
+	return (((a)>(b))?(a):(b));
+}
+
+inline float fmin(const float a, const float b)
+{
+	return (((a)<(b))?(a):(b));
+}
+
+inline int imax(const int a, const int b)
+{
+	return (((a)>(b))?(a):(b));
+}
+
+inline int imin(const int a, const int b)
+{
+	return (((a)<(b))?(a):(b));
+}
 
 #endif
 
+#endif	//UTILS_H

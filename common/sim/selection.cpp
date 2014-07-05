@@ -259,7 +259,7 @@ int SelectOneBuilding(Vec3f *line)
 
 		const float y = g_hmap.accheight(cmx, cmz);
 
-		const int maxy = y + std::max(t->widthx, t->widthz) * TILE_SIZE;
+		const int maxy = y + imax(t->widthx, t->widthz) * TILE_SIZE;
 
 		Vec3f normals[6];
 		float dists[6];
@@ -446,10 +446,10 @@ Selection SelectAreaPersp(Vec3f campos, Vec3f camside, Vec3f camup2, Vec3f viewd
 {
 	Player* py = &g_player[g_curP];
 
-	int minx = std::min(py->mousestart.x, py->mouse.x);
-	int maxx = std::max(py->mousestart.x, py->mouse.x);
-	int miny = std::min(py->mousestart.y, py->mouse.y);
-	int maxy = std::max(py->mousestart.y, py->mouse.y);
+	int minx = imin(py->mousestart.x, py->mouse.x);
+	int maxx = imax(py->mousestart.x, py->mouse.x);
+	int miny = imin(py->mousestart.y, py->mouse.y);
+	int maxy = imax(py->mousestart.y, py->mouse.y);
 
 	//Vec3f campos = c->m_pos;
 	//Vec3f camside = c->m_strafe;

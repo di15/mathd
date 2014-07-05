@@ -160,7 +160,7 @@ void LoadJPGMap(const char* relative)
 	Vec3f delta = center - c->m_view;
 	c->move(delta);
 	Vec3f viewvec = c->m_view - c->m_pos;
-	viewvec = Normalize(viewvec) * std::max(g_hmap.m_widthx, g_hmap.m_widthz) * TILE_SIZE;
+	viewvec = Normalize(viewvec) * imax(g_hmap.m_widthx, g_hmap.m_widthz) * TILE_SIZE;
 	c->m_pos = c->m_view - viewvec;
 	py->zoom = INI_ZOOM;
 

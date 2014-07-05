@@ -119,8 +119,8 @@ std::list<PathNode*> FindNeighbours(PathJob* pj, PathNode* node)
 		// Gets the direction of move
 		Vec2i delta = pos - PathNodePos(node->previous);
 		Vec2i prevpos = PathNodePos(node->previous);
-		delta.x = (pos.x-prevpos.x)/std::max(abs(pos.x-prevpos.x),1);
-		delta.y = (pos.y-prevpos.y)/std::max(abs(pos.y-prevpos.y),1);
+		delta.x = (pos.x-prevpos.x)/imax(abs(pos.x-prevpos.x),1);
+		delta.y = (pos.y-prevpos.y)/imax(abs(pos.y-prevpos.y),1);
 
 		// Diagonal move case
 		if( delta.x!=0 && delta.y!=0 )

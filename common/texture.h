@@ -107,6 +107,6 @@ int SavePNG(const char* fullpath, LoadedTex* image);
 void FlipImage(LoadedTex* image);
 int SaveBMP(const char* fullpath, LoadedTex* image);
 bool SaveRAW(const char* fullpath, LoadedTex* image);
-
+void Resample(LoadedTex* original, LoadedTex* empty, Vec2i newdim);
 
 #endif
