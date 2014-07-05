@@ -167,7 +167,7 @@ void DrawSel(Matrix* projection, Matrix* modelmat, Matrix* viewmat)
 	glUniformMatrix4fv(s->m_slot[SSLOT_VIEWMAT], 1, 0, viewmat->m_matrix);
 
 	color = g_player[g_localP].colorcode;
-	glUniform4f(s->m_slot[SSLOT_COLOR], color[0], color[1], color[2], 0.5f);
+	glUniform4f(s->m_slot[SSLOT_COLOR], color[0], color[1], color[2], 1.0f);
 
 	//glEnableVertexAttribArray(s->m_slot[SSLOT_POSITION]);
 	//glEnableVertexAttribArray(s->m_slot[SSLOT_TEXCOORD0]);

@@ -95,10 +95,12 @@ void FreeWater()
 
 void DrawWater3()
 {
-	static int wavephase = 0;
-
-	wavephase ++;
-	wavephase = wavephase % 2000;
+	static float wavephase = 0;
+	
+	wavephase += g_drawfrinterval;
+	int iwp = (int)wavephase;
+	float rem = wavephase - (float)iwp;
+	wavephase = (int)wavephase % 2000 + rem;
 
 	Shader* s = &g_shader[g_curS];
 
@@ -176,10 +178,12 @@ void DrawWater3()
 
 void DrawWater()
 {
-	static int wavephase = 0;
+	static float wavephase = 0;
 
-	wavephase ++;
-	wavephase = wavephase % 200;
+	wavephase += g_drawfrinterval;
+	int iwp = (int)wavephase;
+	float rem = wavephase - (float)iwp;
+	wavephase = (int)wavephase % 2000 + rem;
 
 	Shader* s = &g_shader[g_curS];
 

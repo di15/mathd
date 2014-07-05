@@ -1,6 +1,7 @@
 
 #version 130
 
+
 uniform vec4 color;
 uniform vec4 owncolor;
 
@@ -29,14 +30,11 @@ const vec2 poissonDisk[4] = vec2[](
 );
 
 out vec4 outfrag;
-in float logz;
 
 void main (void)
 {
 	//if(elevy > maxelev)
 	//	discard;
-
-	gl_FragDepth = logz;
 
 	vec4 texel0 = texture(texture0, texCoordOut0);
 
@@ -50,45 +48,25 @@ void main (void)
 
 	alph = 1.0;
 
-	float cosTheta = dot( normalOut, light_vec );
-	float shadow_bias = 0.005 * tan(acos(cosTheta)); 
-	// cosTheta is dot( n,l ), clamped between 0 and 1
-	shadow_bias = clamp(shadow_bias, 0,0.01);
+	//vec3 bump = normalize( texture(normalmap, texCoordOut0).xyz * 2.0 - 1.0);
 
-	vec3 smcoord = lpos.xyz / lpos.w;
-	//float shadow = max(0.6, 
-	//	float(smcoord.z - shadow_bias <= texture(shadowmap, smcoord.xy).x));
-		//float(smcoord.z <= texture(shadowmap, smcoord.xy).x));
-	float shadow = 1;
+	vec3 lvec = normalize(light_vec);
+	float diffuse = max(dot(lvec, normalOut), 0.0) + 0.50;
 
-	for (int i=0;i<4;i++)
-	{
-  		if ( texture2D( shadowmap, smcoord.xy + poissonDisk[i]/700.0 ).z 
-			<  smcoord.z - shadow_bias )
-		{
-    			shadow-=0.1;
-  		}
-	}
-
-	vec3 bump = normalize( texture(normalmap, texCoordOut0).xyz * 2.0 - 1.0);
-
-	//vec3 lvec = normalize(light_vec);
-	//float diffuse = max(dot(-lvec, normalOut), 0.0) + 0.50;
-
-	float distSqr = dot(light_vec, light_vec);
-	vec3 lvec = light_vec * inversesqrt(distSqr);
+	//float distSqr = dot(light_vec, light_vec);
+	//vec3 lvec = light_vec * inversesqrt(distSqr);
 	//float diffuse = max( dot(lvec, vec3(0,0,1)), 0.0 ) * 0.75 + 0.50;
-	float diffuse = max( dot(lvec, bump), 0.0 ) * 0.75 + 0.50;
+	//float diffuse = max( dot(lvec, bump), 0.0 ) * 0.75 + 0.50;
 
-	vec3 vvec = normalize(eyevec);
-	float specular = pow(clamp(dot(reflect(-lvec, bump), vvec), 0.0, 1.0), 0.7 );
+	//vec3 vvec = normalize(eyevec);
+	//float specular = pow(clamp(dot(reflect(-lvec, bump), vvec), 0.0, 1.0), 0.7 );
 	//float specular = pow(clamp(dot(reflect(-lvec, vec3(0,0,1)), vvec), 0.0, 1.0), 0.7 );
 	//vec3 vspecular = vec3(0,0,0);
-	vec3 vspecular = texture(specularmap, texCoordOut0).xyz * specular;
+	//vec3 vspecular = texture(specularmap, texCoordOut0).xyz * specular;
 
-	float minlight = min(shadow, diffuse);
+	float minlight = diffuse;
 
-	outfrag = vec4(color.xyz * stexel.xyz * minlight + vspecular, alph);
+	outfrag = vec4(color.xyz * stexel.xyz * minlight, alph);
 	//gl_FragColor = vec4(color.xyz * stexel.xyz, alph);
 	//gl_FragColor = vec4(color.xyz * stexel.xyz * shadow * diffuse, alph);
 	//gl_FragColor = vec4(1,0,0,1);

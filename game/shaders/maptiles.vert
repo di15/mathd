@@ -1,16 +1,18 @@
 
 #version 130
 
+
 in vec4 position;
 
-//uniform mat4 projection;
+uniform mat4 projection;
 uniform mat4 model;
-uniform mat4 modelview;
-//uniform mat4 view;
+uniform mat4 view;
+uniform mat4 normalMatrix;
 uniform mat4 mvp;
 
 uniform mat4 lightMatrix;
 uniform vec3 lightPos;
+uniform vec3 lightDir;
 
 out vec4 lpos;
 out vec3 light_vec;
@@ -23,7 +25,6 @@ in vec2 texCoordIn0;
 out vec2 texCoordOut0;
 
 //uniform mat4 invModelView;
-//uniform mat4 normalMat;
 
 out vec3 eyevec;
 //attribute vec3 tangent;
@@ -80,81 +81,6 @@ void main(void)
 
 	//elevy = position.y;
 
-	if(position.y < sandonlymaxy)
-	{
-		sandalpha = 1;
-		grassalpha = 0;
-		rockalpha = 0;
-		snowalpha = 0;
-	}
-	else if(position.y < sandgrassmaxy)
-	{
-		float transition = (position.y - sandonlymaxy) / (sandgrassmaxy - sandonlymaxy);
-		sandalpha = 1.0 - transition;
-		grassalpha = transition;
-		rockalpha = 0;
-		snowalpha = 0;
-	}
-	else if(position.y < grassonlymaxy)
-	{
-		sandalpha = 0;
-		grassalpha = 1;
-		rockalpha = 0;
-		snowalpha = 0;
-	}
-	else if(position.y < grassrockmaxy)
-	{
-		float transition = (position.y - grassonlymaxy) / (grassrockmaxy - grassonlymaxy);
-		sandalpha = 0;
-		grassalpha = 1.0 - transition;
-		snowalpha = 0;
-		rockalpha = transition;
-	}
-	else
-	{
-		sandalpha = 0;
-		grassalpha = 0;
-		snowalpha = 0;
-		rockalpha = 1;
-	}
-
-	// Make cracked rock ridges appear at more horizontal-facing polygons.
-	// Higher normal.y means the polygon is more upward-facing.
-	crackedrockalpha = min(1, 
-				max(0, 
-					1.0 - (normalIn.y - 0.2)/0.6
-				)
-				);
-
-	// We don't want sandy beaches with steep inclines to look like rock.
-	if(position.y < sandonlymaxy)
-		crackedrockalpha = 0;
-
-	float otheralpha = snowalpha + grassalpha + rockalpha + sandalpha;
-	float alphascale = (1.0 - crackedrockalpha) / otheralpha;
-	
-	snowalpha *= alphascale;
-	grassalpha *= alphascale;
-	rockalpha *= alphascale;
-	sandalpha *= alphascale;
-
-	const float minalph = 0.25;
-	const float maxalph = 0.75;
-	const float arange = maxalph - minalph;
-
-	sandalpha = (max(minalph, min(maxalph, sandalpha)) - minalph) / arange;
-	grassalpha = (max(minalph, min(maxalph, grassalpha)) - minalph) / arange;
-	rockalpha = (max(minalph, min(maxalph, rockalpha)) - minalph) / arange;
-	snowalpha = (max(minalph, min(maxalph, snowalpha)) - minalph) / arange;
-	crackedrockalpha = (max(minalph, min(maxalph, crackedrockalpha)) - minalph) / arange;
-
-	float totalalpha = sandalpha + grassalpha + rockalpha + snowalpha + crackedrockalpha;
-	sandalpha /= totalalpha;
-	grassalpha /= totalalpha;
-	rockalpha /= totalalpha;
-	snowalpha /= totalalpha;
-	crackedrockalpha /= totalalpha;
-
 /*
 	sandalpha = 1;
 	grassalpha = 1;
@@ -168,7 +94,7 @@ void main(void)
 	rockalpha = 0;
 */
 
-	vpos = modelview * position;
+	vpos = (view * (model * position));
 
 	//vec3 normalEyeSpace = vec3( normalMatrix * vec4(normalIn, 0.0) );
 	//vec3 normalEyeSpace = mat3(normalMatrix) * normalIn;
@@ -177,7 +103,7 @@ void main(void)
 	vec3 normalEyeSpace = vec3( normalMat * vec4(normalIn, 0.0) );
 	normalOut = normalize(normalEyeSpace);
 	//normalOut = normalIn;
-
+/*
 	vec3 n = normalIn;
 	//vec3 tangentEyeSpace = vec3( normalMat * vec4(tangent, 0.0) );
 	//vec3 t = normalize(tangentEyeSpace);
@@ -201,9 +127,7 @@ void main(void)
 	vec3 b = normalize(cross(n, t));
 	//vec3 b = normalOut;
 
-	//vec3 vVertex = vec3(view * (model * position));
-	//vec3 vVertex = vec3(modelview * position);
-	vec3 vVertex = vec3(vpos);
+	vec3 vVertex = vec3(view * (model * position));
 
 
 	//light_vec = vpos.xyz - lightPos;
@@ -212,19 +136,19 @@ void main(void)
 	light_vec.x = dot(tmpVec, t);
 	light_vec.y = dot(tmpVec, b);
 	light_vec.z = dot(tmpVec, n);
-
-	//light_vec = sundirection;
+*/
+	light_vec = sundirection;
 
 	//light_vec = n;
 	//light_vec = normalIn * 0.5 + 0.5;
 	//light_vec = t;
 	//light_vec = t * 0.5 + 0.5;
 	//light_vec = b * 0.5 + 0.5;
-
+/*
 	tmpVec = -vVertex;
 	eyevec.x = dot(tmpVec, t);
 	eyevec.y = dot(tmpVec, b);
 	eyevec.z = dot(tmpVec, n);
-
+*/
 	texCoordOut0 = texCoordIn0;
 }

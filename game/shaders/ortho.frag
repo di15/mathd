@@ -1,11 +1,15 @@
 
-#version 120
+#version 130
 
 
 uniform vec4 color;
+
+in vec2 texCoordOut0;
 uniform sampler2D texture0;
+
+out vec4 outfrag;
 
 void main(void)
 {
-	gl_FragColor = color * texture2D(texture0, gl_TexCoord[0].xy);
+	outfrag = color * texture2D(texture0, texCoordOut0);
 }

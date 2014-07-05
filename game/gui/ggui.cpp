@@ -283,8 +283,8 @@ void Click_NewGame()
 {
 	CheckGLError(__FILE__, __LINE__);
 #if 1
-	//LoadJPGMap("heightmaps/heightmap0e2s.jpg");
-	LoadJPGMap("heightmaps/heightmap0e2.jpg");
+	LoadJPGMap("heightmaps/heightmap0e2s.jpg");
+	//LoadJPGMap("heightmaps/heightmap0e2.jpg");
 	//LoadJPGMap("heightmaps/heightmap0e.jpg");
 #elif 1
 	LoadJPGMap("heightmaps/heightmap0c.jpg");
@@ -304,8 +304,10 @@ void Click_NewGame()
 			Vec3i cmpos((g_hmap.m_widthx+4)*TILE_SIZE/2 + (i+2)*PATHNODE_SIZE, 0, g_hmap.m_widthz*TILE_SIZE/2 + (j+2)*PATHNODE_SIZE);
 			cmpos.y = g_hmap.accheight(cmpos.x, cmpos.z);
 
-			PlaceUnit(UNIT_ROBOSOLDIER, cmpos, 0);
-			//PlaceUnit(UNIT_LABOURER, cmpos, 0);
+			if(rand()%2 == 1)
+				PlaceUnit(UNIT_ROBOSOLDIER, cmpos, 0);
+			else
+				PlaceUnit(UNIT_LABOURER, cmpos, 0);
 		}
 
 	CheckGLError(__FILE__, __LINE__);

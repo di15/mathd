@@ -90,27 +90,12 @@ void InitGLSL()
 	g_log<<"Renderer: "<<(char*)glGetString(GL_RENDERER)<<endl;
 	g_log<<"GL_VERSION = "<<(char*)glGetString(GL_VERSION)<<endl;
 
-#if 0
-	//Make sure OpenGL 2.1 is supported
-	if( !GLEW_VERSION_2_1 )
+	if( !GLEW_VERSION_3_0 )
 	{
-		ErrorMessage("Error", "OpenGL 2.1 not supported!\n" );
-		return;
-	}
-#elif 0
-	if( !GLEW_VERSION_3_2 )
-	{
-		ErrorMessage("Error", "OpenGL 3.2 not supported!\n" );
-		return;
-	}
-#else
-	if( !GLEW_VERSION_1_4 )
-	{
-		ErrorMessage("Error", "OpenGL 1.4 not supported!\n" );
+		ErrorMessage("Error", "OpenGL 3.0 not supported!\n" );
 		g_quit = true;
 		return;
 	}
-#endif
 
 #if 1
 	char* szGLExtensions = (char*)glGetString(GL_EXTENSIONS);
@@ -151,9 +136,9 @@ void InitGLSL()
 	int major, minor;
 	GetGLVersion(&major, &minor);
 
-	if(major < 1 || ( major == 1 && minor < 4 ))
+	if(major < 3 || ( major == 3 && minor < 0 ))
 	{
-		ErrorMessage("Error", "OpenGL 1.4 is not supported!");
+		ErrorMessage("Error", "OpenGL 3.0 is not supported!");
 		g_quit = true;
 	}
 

@@ -1,16 +1,18 @@
 
 #version 130
 
+
 in vec4 position;
 
-//uniform mat4 projection;
+uniform mat4 projection;
 uniform mat4 model;
-uniform mat4 modelview;
-//uniform mat4 view;
-//uniform mat4 mvp;
+uniform mat4 view;
+uniform mat4 normalMatrix;
+uniform mat4 mvp;
 
 uniform mat4 lightMatrix;
 uniform vec3 lightPos;
+uniform vec3 lightDir;
 
 out vec4 lpos;
 out vec3 light_vec;
@@ -168,8 +170,7 @@ void main(void)
 	rockalpha = 0;
 */
 
-	//vpos = (view * (model * position));
-	vpos = modelview * position;
+	vpos = (view * (model * position));
 
 	//vec3 normalEyeSpace = vec3( normalMatrix * vec4(normalIn, 0.0) );
 	//vec3 normalEyeSpace = mat3(normalMatrix) * normalIn;
@@ -178,7 +179,7 @@ void main(void)
 	vec3 normalEyeSpace = vec3( normalMat * vec4(normalIn, 0.0) );
 	normalOut = normalize(normalEyeSpace);
 	//normalOut = normalIn;
-
+/*
 	vec3 n = normalIn;
 	//vec3 tangentEyeSpace = vec3( normalMat * vec4(tangent, 0.0) );
 	//vec3 t = normalize(tangentEyeSpace);
@@ -202,7 +203,7 @@ void main(void)
 	vec3 b = normalize(cross(n, t));
 	//vec3 b = normalOut;
 
-	vec3 vVertex = vec3(vpos);
+	vec3 vVertex = vec3(view * (model * position));
 
 
 	//light_vec = vpos.xyz - lightPos;
@@ -211,19 +212,19 @@ void main(void)
 	light_vec.x = dot(tmpVec, t);
 	light_vec.y = dot(tmpVec, b);
 	light_vec.z = dot(tmpVec, n);
-
-	//light_vec = sundirection;
+*/
+	light_vec = sundirection;
 
 	//light_vec = n;
 	//light_vec = normalIn * 0.5 + 0.5;
 	//light_vec = t;
 	//light_vec = t * 0.5 + 0.5;
 	//light_vec = b * 0.5 + 0.5;
-
+/*
 	tmpVec = -vVertex;
 	eyevec.x = dot(tmpVec, t);
 	eyevec.y = dot(tmpVec, b);
 	eyevec.z = dot(tmpVec, n);
-
+*/
 	texCoordOut0 = texCoordIn0;
 }

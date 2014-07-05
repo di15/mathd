@@ -151,7 +151,7 @@ void LoadJPGMap(const char* relative)
 
 	CheckGLError(__FILE__, __LINE__);
 	FillForest();
-	PlaceUnits();
+	//PlaceUnits();
 
 	Player* py = &g_player[g_curP];
 	Camera* c = &py->camera;

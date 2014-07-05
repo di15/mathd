@@ -1,6 +1,7 @@
 
 #version 130
 
+
 uniform vec4 color;
 
 //uniform sampler2D texture0;
@@ -40,13 +41,6 @@ uniform sampler2D crackedrocknormtex;
 
 uniform vec3 sundirection;
 
-const vec2 poissonDisk[4] = vec2[](
-  vec2( -0.94201624, -0.39906216 ),
-  vec2( 0.94558609, -0.76890725 ),
-  vec2( -0.094184101, -0.92938870 ),
-  vec2( 0.34495938, 0.29387760 )
-);
-
 const float tile_tex_scale = 5.3;
 const float cracked_rock_tex_scale = 5.3;
 //const float shadow_bias = 0.0;
@@ -59,18 +53,6 @@ void main (void)
 	//if(elevy > maxelev)
 	//	discard;
 
-	float cosTheta = dot( normalOut, light_vec );
-	float shadow_bias = 0.005 * tan(acos(cosTheta)); 
-	// cosTheta is dot( n,l ), clamped between 0 and 1
-	shadow_bias = clamp(shadow_bias, 0, 0.01);
-	//shadow_bias = 0;
-
-	//vec3 smcoord = lpos.xyz / lpos.w;
-	vec3 smcoord = lpos.xyz;
-	//float shadow = max(0.6, 
-	//	float(smcoord.z - shadow_bias <= texture(shadowmap, smcoord.xy).x));
-	//	float(smcoord.z <= texture(shadowmap, smcoord.xy).x));
-
 	//gl_FragColor = vec4(lpos.x, lpos.y, 0, 1);
 	//gl_FragColor = vec4(0, lpos.y, 0, 1);
 	//gl_FragColor = vec4(lpos.x, 0, 0, 1);
@@ -80,29 +62,20 @@ void main (void)
 	//gl_FragColor = vec4(lpos.w/100.0, lpos.w/100.0, lpos.w/100.0, 1);
 	//return;
 
-	float shadow = 1;
-
-	for (int i=0;i<4;i++)
-	{
-  		if ( texture2D( shadowmap, smcoord.xy + poissonDisk[i]/700.0 ).z 
-			<  smcoord.z - shadow_bias )
-		{
-    			shadow-=0.1;
-  		}
-	}
 
 	//vec3 bump = normalize( texture(normalmap, texCoordOut0).xyz * 2.0 - 1.0);
 	vec3 bump = vec3(0,0,1);
 	vec3 rockbump = normalize( texture(rocknormtex, texCoordOut0 / tile_tex_scale).xyz * 2.0 - 1.0);
 	vec3 crackedrockbump = normalize( texture(crackedrocknormtex, texCoordOut0 / cracked_rock_tex_scale ).xyz * 2.0 - 1.0);
 
-	//vec3 lvec = normalize(sundirection);
+	vec3 lvec = normalize(sundirection);
 	//vec3f unitnormal = normalize(normalOut);
 	//float diffuse = min(1, max(dot(lvec, unitnormal), 0.0) * 0.75 + 0.50);
+	float diffuse = max(dot(lvec, normalOut), 0.0) * 0.75 + 0.50;
 
-	float distSqr = dot(light_vec, light_vec);
-	vec3 lvec = light_vec * inversesqrt(distSqr);
-	float diffuse = max( dot(lvec, bump), 0.0 ) + 0.25;
+	//float distSqr = dot(light_vec, light_vec);
+	//vec3 lvec = light_vec * inversesqrt(distSqr);
+	//float diffuse = max( dot(lvec, bump), 0.0 ) + 0.25;
 	//float diffuse = min(1, max( dot(lvec, bump), 0.0 ));
 	//float rockdiffuse = min(1, max( dot(lvec, rockbump), 0.0 ));
 	//float crackedrockdiffuse = min(1, max( dot(lvec, crackedrockbump), 0.0 ) * 0.75 + 0.50);
@@ -241,8 +214,8 @@ void main (void)
 
 	//diffuse = diffuse * (1.0 - crackedrockalpha2) + crackedrockdiffuse * crackedrockalpha2;
 
-	float minlight = min(shadow, diffuse);
 	//float minlight = diffuse;
+	float minlight = diffuse;
 	//minlight = 1;
 
 	//gl_FragColor = vec4(stexel.xyz * minlight, 1);

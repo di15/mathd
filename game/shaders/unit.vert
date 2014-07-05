@@ -1,12 +1,13 @@
 
 #version 130
 
+
 in vec4 position;
 
-//uniform mat4 projection;
+uniform mat4 projection;
 uniform mat4 model;
-uniform mat4 modelview;
-//uniform mat4 view;
+uniform mat4 view;
+uniform mat4 normalMatrix;
 uniform mat4 mvp;
 
 uniform mat4 lightMatrix;
@@ -61,11 +62,10 @@ void main(void)
 	normalOut = normalize(normalEyeSpace);
 
 	//vec3 vVertex = vec3(view * (model * position));
-	vec3 vVertex = vec3(modelview * position);
 
 	light_vec = sundirection;
 
-	eyevec = -vVertex;
+	//eyevec = -vVertex;
 
 	texCoordOut0 = texCoordIn0;
 }

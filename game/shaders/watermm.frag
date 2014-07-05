@@ -1,6 +1,7 @@
 
 #version 130
 
+
 uniform vec4 color;
 
 uniform sampler2D texture0;
@@ -28,8 +29,6 @@ uniform float maxelev;
 uniform sampler2D gradienttex;
 uniform sampler2D detailtex;
 
-in float logz;
-
 out vec4 outfrag;
 
 void main (void)
@@ -37,23 +36,19 @@ void main (void)
 	//if(elevy > maxelev)
 	//	discard;
 
-	vec3 smcoord = lpos.xyz / lpos.w;
-	float shadow = max(0.6, float(smcoord.z <= texture(shadowmap, smcoord.xy).x));
-	//float shadow = 1;
+	//vec3 bump = normalize( texture(normalmap, phasetexCoordOut/10).xyz * 2.0 - 1.0);
 
-	vec3 bump = normalize( texture(normalmap, phasetexCoordOut/10).xyz * 2.0 - 1.0);
+	vec3 lvec = normalize(light_vec);
+	float diffuse = max(dot(lvec, normalOut), 0.0) + 0.50;
 
-	//vec3 lvec = normalize(light_vec);
-	//float diffuse = max(dot(-lvec, normalOut), 0.0) + 0.50;
+	//float distSqr = dot(light_vec, light_vec);
+	//vec3 lvec = light_vec * inversesqrt(distSqr);
+	//float diffuse = max( dot(lvec, bump), 0.0 ) * 0.75 + 0.50;
 
-	float distSqr = dot(light_vec, light_vec);
-	vec3 lvec = light_vec * inversesqrt(distSqr);
-	float diffuse = max( dot(lvec, bump), 0.0 ) * 0.75 + 0.50;
-
-	vec3 vvec = normalize(eyevec);
-	float specular = pow(clamp(dot(reflect(-lvec, bump), vvec), 0.0, 1.0), 0.7 );
+	//vec3 vvec = normalize(eyevec);
+	//float specular = pow(clamp(dot(reflect(-lvec, bump), vvec), 0.0, 1.0), 0.7 );
 	//vec3 vspecular = vec3(0,0,0);
-	vec3 vspecular = texture(specularmap, phasetexCoordOut/10).xyz * specular;
+	//vec3 vspecular = texture(specularmap, phasetexCoordOut/10).xyz * specular;
 
 	vec4 gradtxl = texture(gradienttex, texCoordOut0 / 20);
 	vec4 dettxl = texture(detailtex, phasetexCoordOut/10);
@@ -64,10 +59,7 @@ void main (void)
 	//float alph = color.w * texel0.w * elevtransp;
 	float alph = color.w * stexel.w;
 
-	float minlight = min(shadow, diffuse);
-
-	//outfrag = vec4(color.xyz * stexel.xyz * shadow * diffuse + vspecular, alph);	//buggy
-	outfrag = vec4(color.xyz * stexel.xyz * minlight + vspecular, alph);
+	outfrag = vec4(color.xyz * stexel.xyz * diffuse, alph);
 	//gl_FragColor = vec4(1,0,0,1);
 	//gl_FragColor = texel0;
 	//gl_FragColor = vec4(light_vec, color.w * texel0.w);	

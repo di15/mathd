@@ -4,13 +4,15 @@
 
 in vec4 position;
 
-//uniform mat4 projection;
+uniform mat4 projection;
 uniform mat4 model;
-//uniform mat4 view;
+uniform mat4 view;
+uniform mat4 normalMatrix;
 uniform mat4 mvp;
 
 uniform mat4 lightMatrix;
 uniform vec3 lightPos;
+uniform vec3 lightDir;
 
 out vec4 lpos;
 out vec3 light_vec;
