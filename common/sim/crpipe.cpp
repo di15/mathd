@@ -454,6 +454,8 @@ void MeshCrPipe(int x, int z, bool plan)
 
 	//g_log<<"done meshpowl"<<endl;
 	//g_log.flush();
+
+	pva->genvbo();
 }
 
 void TypeCrPipe(int x, int z, bool plan)

@@ -573,6 +573,8 @@ void MeshRoad(int x, int z, bool plan)
 
 	//g_log<<"done meshroad"<<endl;
 	//g_log.flush();
+
+	rva->genvbo();
 }
 
 void TypeRoad(int x, int z, bool plan)

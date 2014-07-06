@@ -451,6 +451,8 @@ void MeshPowl(int x, int z, bool plan)
 
 	//g_log<<"done meshpowl"<<endl;
 	//g_log.flush();
+
+	pva->genvbo();
 }
 
 void TypePowl(int x, int z, bool plan)
