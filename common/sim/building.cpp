@@ -21,6 +21,7 @@
 #include "crpipe.h"
 #include "../../game/gmain.h"
 #include "../render/shadow.h"
+#include "../math/frustum.h"
 
 Building g_building[BUILDINGS];
 
@@ -225,6 +226,8 @@ void Building::remesh()
 
 	if(t->hugterr)
 		HugTerrain(&drawva, drawpos);
+
+	drawva.genvbo();
 }
 
 bool Building::checkconstruction()
@@ -277,13 +280,17 @@ void DrawBl()
 		Building* b = &g_building[i];
 
 		if(!b->on)
-		{
 			continue;
-		}
 
 		const BuildingT* t = &g_buildingT[b->type];
 		//const BuildingT* t = &g_buildingT[BUILDING_APARTMENT];
 		Model* m = &g_model[ t->model ];
+
+		Vec3f vmin(b->drawpos.x - t->widthx*TILE_SIZE/2, b->drawpos.y, b->drawpos.z - t->widthz*TILE_SIZE/2);
+		Vec3f vmax(b->drawpos.x + t->widthx*TILE_SIZE/2, b->drawpos.y + (t->widthx+t->widthz)*TILE_SIZE/2, b->drawpos.z + t->widthz*TILE_SIZE/2);
+
+		if(!g_frustum.boxin2(vmin.x, vmin.y, vmin.z, vmax.x, vmax.y, vmax.z))
+			continue;
 
 		if(!b->finished)
 			m = &g_model[ t->cmodel ];

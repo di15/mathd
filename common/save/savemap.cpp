@@ -685,6 +685,8 @@ void ReadRoads(FILE* fp)
 			if(RoadAt(x, z)->finished)
 				RoadAt(x, z)->fillcollider();
 		}
+
+	g_hmap.genvbo();
 }
 
 void SavePowls(FILE* fp)

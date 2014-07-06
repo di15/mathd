@@ -97,16 +97,35 @@ void main (void)
 	//sandalpha2 = 0;
 	//grassalpha2 = 0;
 	//rockalpha2 = 1;
-/*
+
+	float sandalpha2 = 0.01 + sandalpha * sandtxl.w * 0.5;
+	float grassalpha2 = grassalpha * grasstxl.w;
+	float rockalpha2 = rockalpha * rocktxl.w;
+	//float snowalpha2 = snowalpha * snowtxl.w;
+	float crackedrockalpha2 = crackedrockalpha * crackedrocktxl.w;
+
+	float totalalpha = sandalpha2 + 
+				grassalpha2 +
+				rockalpha2 +
+				//snowalpha2 +
+				crackedrockalpha2;
+
+	sandalpha2 /= totalalpha;
+	grassalpha2 /= totalalpha;
+	rockalpha2 /= totalalpha;
+	//snowalpha2 /= totalalpha;
+	crackedrockalpha2 /= totalalpha;
+
+
 	vec4 stexel = vec4( vec3(sandtxl.xyz * sandalpha2) +
 				vec3(grasstxl.xyz * grassalpha2) +
 				vec3(rocktxl.xyz * rockalpha2) +
 				//vec3(snowtxl.xyz * snowalpha2) +
 				vec3(crackedrocktxl.xyz * crackedrockalpha2),
 				1.0);
-*/
 
-	vec4 stexel = grasstxl;
+
+	//vec4 stexel = grasstxl;
 
 	//float alph = color.w * texel0.w * elevtransp;
 	float alph = 1;

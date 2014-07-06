@@ -58,7 +58,7 @@ public:
 	int m_widthz;
 
 	float *m_heightpoints;
-	Vec3f *m_drawvertices;
+	Vec3f *m_drawverts;
 	Vec3f *m_collverts;
 	Vec2f *m_texcoords0;
 	Vec3f *m_normals;
@@ -68,16 +68,21 @@ public:
 	float m_tilescale;
 	LoadedTex m_fulltex;
 	VertexArray m_rimva;
+	unsigned int m_vbo[VBOS];
 
 	Heightmap()
 	{
 		m_widthx = 0;
 		m_widthz = 0;
 		m_fulltex.data = NULL;
+		for(int i=0; i<VBOS; i++)
+			m_vbo[i] = -1;
 	}
 
 	void allocate(int wx, int wz);
 	void remesh(float tilescale);
+	void genvbo();
+	void delvbo();
 	void draw();
 	void draw2();
 	void drawrim();

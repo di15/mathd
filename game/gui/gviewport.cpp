@@ -331,6 +331,11 @@ void DrawPreview(Matrix projection, Matrix viewmat, Matrix modelmat, Matrix mode
 	if(!m)
 		return;
 
+	py->bpyaw += g_drawfrinterval * 100.0f;
+	int iyaw = (int)py->bpyaw;
+	float rem = py->bpyaw - (float)iyaw;
+	py->bpyaw = (int)py->bpyaw % 360 + rem;
+
 	float pitch = 0;
 	float yaw = py->bpyaw;
 	int frame = 0;
@@ -410,7 +415,7 @@ void DrawPreviewDepth()
 	if(!m)
 		return;
 
-	py->bpyaw = (int)(py->bpyaw+2)%360;
+	//py->bpyaw = (int)(py->bpyaw+2)%360;
 
 	float pitch = 0;
 	float yaw = py->bpyaw;

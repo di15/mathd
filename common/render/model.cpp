@@ -87,9 +87,9 @@ void DrawVA(VertexArray* va, Vec3f pos)
 
 	Matrix modelview;
 #ifdef SPECBUMPSHADOW
-    modelview.set(g_camview.m_matrix);
+	modelview.set(g_camview.m_matrix);
 #endif
-    modelview.postmult(modelmat);
+	modelview.postmult(modelmat);
 	glUniformMatrix4fv(s->m_slot[SSLOT_MODELVIEW], 1, 0, modelview.m_matrix);
 
 	Matrix mvp;
@@ -114,11 +114,24 @@ void DrawVA(VertexArray* va, Vec3f pos)
 	//Transpose(modelviewinv, modelviewinv);
 	glUniformMatrix4fv(s->m_slot[SSLOT_NORMALMAT], 1, 0, modelviewinv.m_matrix);
 
+#if 1
 	glVertexAttribPointer(s->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, va->vertices);
 	glVertexAttribPointer(s->m_slot[SSLOT_TEXCOORD0], 2, GL_FLOAT, GL_FALSE, 0, va->texcoords);
 
 	if(s->m_slot[SSLOT_NORMAL] != -1)
 		glVertexAttribPointer(s->m_slot[SSLOT_NORMAL], 3, GL_FLOAT, GL_FALSE, 0, va->normals);
+#else
+	glBindBuffer(GL_ARRAY_BUFFER, va->vbo[VBO_POSITION]);
+	glVertexAttribPointer(s->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, 0);
+	glBindBuffer(GL_ARRAY_BUFFER, va->vbo[VBO_TEXCOORD]);
+	glVertexAttribPointer(s->m_slot[SSLOT_TEXCOORD0], 2, GL_FLOAT, GL_FALSE, 0, 0);
+
+	if(s->m_slot[SSLOT_NORMAL] != -1)
+	{
+		glBindBuffer(GL_ARRAY_BUFFER, va->vbo[VBO_NORMAL]);
+		glVertexAttribPointer(s->m_slot[SSLOT_NORMAL], 3, GL_FLOAT, GL_FALSE, 0, 0);
+	}
+#endif
 
 	glDrawArrays(GL_TRIANGLES, 0, va->numverts);
 }
@@ -168,9 +181,9 @@ void Model::draw(int frame, Vec3f pos, float yaw)
 
 	Matrix modelview;
 #ifdef SPECBUMPSHADOW
-    modelview.set(g_camview.m_matrix);
+	modelview.set(g_camview.m_matrix);
 #endif
-    modelview.postmult(modelmat);
+	modelview.postmult(modelmat);
 	glUniformMatrix4fv(s->m_slot[SSLOT_MODELVIEW], 1, 0, modelview.m_matrix);
 
 	Matrix mvp;
@@ -210,11 +223,24 @@ void Model::draw(int frame, Vec3f pos, float yaw)
 		StartTimer(TIMER_DRAWUGL);
 	}
 
+#if 0
 	glVertexAttribPointer(s->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, va->vertices);
 	glVertexAttribPointer(s->m_slot[SSLOT_TEXCOORD0], 2, GL_FLOAT, GL_FALSE, 0, va->texcoords);
 
 	if(s->m_slot[SSLOT_NORMAL] != -1)
 		glVertexAttribPointer(s->m_slot[SSLOT_NORMAL], 3, GL_FLOAT, GL_FALSE, 0, va->normals);
+#else
+	glBindBuffer(GL_ARRAY_BUFFER, va->vbo[VBO_POSITION]);
+	glVertexAttribPointer(s->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, 0);
+	glBindBuffer(GL_ARRAY_BUFFER, va->vbo[VBO_TEXCOORD]);
+	glVertexAttribPointer(s->m_slot[SSLOT_TEXCOORD0], 2, GL_FLOAT, GL_FALSE, 0, 0);
+
+	if(s->m_slot[SSLOT_NORMAL] != -1)
+	{
+		glBindBuffer(GL_ARRAY_BUFFER, va->vbo[VBO_NORMAL]);
+		glVertexAttribPointer(s->m_slot[SSLOT_NORMAL], 3, GL_FLOAT, GL_FALSE, 0, 0);
+	}
+#endif
 
 	glDrawArrays(GL_TRIANGLES, 0, va->numverts);
 
@@ -279,12 +305,12 @@ bool Model::load(const char* relative, Vec3f scale, Vec3f translate, bool dontqu
 		strcpy(corrected, full);
 		CorrectSlashes(corrected);
 		m_fullpath = corrected;
+		m_nframes = 1;
+		genvbo();
 		return true;
 	}
 
-	bool result = m_ms3d.load(relative, m_diffusem, m_specularm, m_normalm, m_ownerm, dontqueue);
-
-	if(result)
+	if(m_ms3d.load(relative, m_diffusem, m_specularm, m_normalm, m_ownerm, dontqueue))
 	{
 		m_on = true;
 		m_ms3d.genva(&m_va, scale, translate, relative, blendnorm);
@@ -294,17 +320,26 @@ bool Model::load(const char* relative, Vec3f scale, Vec3f translate, bool dontqu
 		strcpy(corrected, full);
 		CorrectSlashes(corrected);
 		m_fullpath = corrected;
+		m_nframes = m_ms3d.m_totalFrames;
+		genvbo();
+		return true;
 	}
 
-	/*
-	if(result)
-	{
-	//CreateTexture(spectex, specfile);
-	//QueueTexture(&spectex, specfile, true);
-	CorrectNormals();
-	}*/
+	return false;
+}
 
-	return result;
+void Model::genvbo()
+{
+	delvbo();
+
+	for(int i=0; i<m_nframes; i++)
+		m_va[i].genvbo();
+}
+
+void Model::delvbo()
+{
+	for(int i=0; i<m_nframes; i++)
+		m_va[i].delvbo();
 }
 
 bool PlayAnimation(float& frame, int first, int last, bool loop, float rate)

@@ -81,6 +81,81 @@ void main(void)
 
 	//elevy = position.y;
 
+	if(position.y < sandonlymaxy)
+	{
+		sandalpha = 1;
+		grassalpha = 0;
+		rockalpha = 0;
+		snowalpha = 0;
+	}
+	else if(position.y < sandgrassmaxy)
+	{
+		float transition = (position.y - sandonlymaxy) / (sandgrassmaxy - sandonlymaxy);
+		sandalpha = 1.0 - transition;
+		grassalpha = transition;
+		rockalpha = 0;
+		snowalpha = 0;
+	}
+	else if(position.y < grassonlymaxy)
+	{
+		sandalpha = 0;
+		grassalpha = 1;
+		rockalpha = 0;
+		snowalpha = 0;
+	}
+	else if(position.y < grassrockmaxy)
+	{
+		float transition = (position.y - grassonlymaxy) / (grassrockmaxy - grassonlymaxy);
+		sandalpha = 0;
+		grassalpha = 1.0 - transition;
+		snowalpha = 0;
+		rockalpha = transition;
+	}
+	else
+	{
+		sandalpha = 0;
+		grassalpha = 0;
+		snowalpha = 0;
+		rockalpha = 1;
+	}
+
+	// Make cracked rock ridges appear at more horizontal-facing polygons.
+	// Higher normal.y means the polygon is more upward-facing.
+	crackedrockalpha = min(1, 
+				max(0, 
+					1.0 - (normalIn.y - 0.2)/0.6
+				)
+				);
+
+	// We don't want sandy beaches with steep inclines to look like rock.
+	if(position.y < sandonlymaxy)
+		crackedrockalpha = 0;
+
+	float otheralpha = snowalpha + grassalpha + rockalpha + sandalpha;
+	float alphascale = (1.0 - crackedrockalpha) / otheralpha;
+	
+	snowalpha *= alphascale;
+	grassalpha *= alphascale;
+	rockalpha *= alphascale;
+	sandalpha *= alphascale;
+
+	const float minalph = 0.25;
+	const float maxalph = 0.75;
+	const float arange = maxalph - minalph;
+
+	sandalpha = (max(minalph, min(maxalph, sandalpha)) - minalph) / arange;
+	grassalpha = (max(minalph, min(maxalph, grassalpha)) - minalph) / arange;
+	rockalpha = (max(minalph, min(maxalph, rockalpha)) - minalph) / arange;
+	snowalpha = (max(minalph, min(maxalph, snowalpha)) - minalph) / arange;
+	crackedrockalpha = (max(minalph, min(maxalph, crackedrockalpha)) - minalph) / arange;
+
+	float totalalpha = sandalpha + grassalpha + rockalpha + snowalpha + crackedrockalpha;
+	sandalpha /= totalalpha;
+	grassalpha /= totalalpha;
+	rockalpha /= totalalpha;
+	snowalpha /= totalalpha;
+	crackedrockalpha /= totalalpha;
+
 /*
 	sandalpha = 1;
 	grassalpha = 1;

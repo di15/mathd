@@ -7,6 +7,11 @@
 #include "../math/vec3f.h"
 #include "../math/vec2f.h"
 
+#define VBO_POSITION		0
+#define VBO_TEXCOORD		1
+#define VBO_NORMAL			2
+#define VBOS				3
+
 class VertexArray
 {
 public:
@@ -15,12 +20,15 @@ public:
 	Vec2f* texcoords;
 	Vec3f* normals;
 	//Vec3f* tangents;
+	unsigned int vbo[VBOS];
 
 	VertexArray(const VertexArray& original);
 	VertexArray& operator=(VertexArray const &original);
 	VertexArray()
 	{
 		numverts = 0;
+		for(int i=0; i<VBOS; i++)
+			vbo[i] = -1;
 	}
 
 	~VertexArray()
@@ -28,6 +36,8 @@ public:
 		free();
 	}
 
+	void genvbo();
+	void delvbo();
 	void alloc(int numv);
 	void free();
 };

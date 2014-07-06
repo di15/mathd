@@ -11,6 +11,7 @@
 #include "sim.h"
 #include "labourer.h"
 #include "../debug.h"
+#include "../math/frustum.h"
 
 Unit g_unit[UNITS];
 
@@ -51,6 +52,12 @@ void DrawUnits()
 			continue;
 
 		UnitT* t = &g_unitT[u->type];
+
+		Vec3f vmin(u->drawpos.x - t->size.x/2, u->drawpos.y, u->drawpos.z - t->size.x/2);
+		Vec3f vmax(u->drawpos.x + t->size.x/2, u->drawpos.y + t->size.y, u->drawpos.z + t->size.x/2);
+
+		if(!g_frustum.boxin2(vmin.x, vmin.y, vmin.z, vmax.x, vmax.y, vmax.z))
+			continue;
 
 		Model* m = &g_model[t->model];
 

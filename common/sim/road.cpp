@@ -1122,6 +1122,7 @@ void PlaceRoad()
 
 	ClearRoadPlans();
 	ReRoadNetw();
+	g_hmap.genvbo();
 
 	if(g_mode == APPMODE_PLAY)
 	{

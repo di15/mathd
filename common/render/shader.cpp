@@ -351,6 +351,9 @@ void UseS(int shader)
 
 	if(s->m_slot[SSLOT_MIND] != -1) glUniform1f(s->m_slot[SSLOT_MIND], MIN_DISTANCE);
 	if(s->m_slot[SSLOT_MAXD] != -1) glUniform1f(s->m_slot[SSLOT_MAXD], MAX_DISTANCE / py->zoom);
+	
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 }
 
 void EndS()
@@ -372,6 +375,9 @@ void EndS()
 
 	//glDisableClientState(GL_TEXTURE_COORD_ARRAY);
 	//glDisableClientState(GL_NORMAL_ARRAY);
+
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
 	glUseProgram(0);
 

@@ -358,6 +358,7 @@ void Click_NewGame()
 	PlaceRoad(g_hmap.m_widthx/2+13, g_hmap.m_widthz/2+1, 1, false);
 	CheckGLError(__FILE__, __LINE__);
 	PlaceBuilding(BUILDING_GASSTATION, Vec2i(g_hmap.m_widthx/2+14, g_hmap.m_widthz/2-1), true, 0);
+	g_hmap.genvbo();
 
 	CheckGLError(__FILE__, __LINE__);
 

@@ -97,7 +97,7 @@ void DrawWater3()
 {
 	static float wavephase = 0;
 	
-	wavephase += g_drawfrinterval;
+	wavephase += g_drawfrinterval * 12.0f;
 	int iwp = (int)wavephase;
 	float rem = wavephase - (float)iwp;
 	wavephase = (int)wavephase % 2000 + rem;
@@ -180,7 +180,7 @@ void DrawWater()
 {
 	static float wavephase = 0;
 
-	wavephase += g_drawfrinterval;
+	wavephase += g_drawfrinterval * 12.0f;
 	int iwp = (int)wavephase;
 	float rem = wavephase - (float)iwp;
 	wavephase = (int)wavephase % 2000 + rem;
