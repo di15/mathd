@@ -11,6 +11,7 @@
 #include "../common/render/heightmap.h"
 #include "../common/window.h"
 #include "../common/sim/player.h"
+#include "../common/script/console.h"
 
 void MouseMidButtonDown()
 {
@@ -91,8 +92,9 @@ void MapKeys()
 		GUI* gui = &py->gui;
 		gui->assignmousewheel(&MouseWheel);
 		gui->assignmbutton(MouseMidButtonDown, MouseMidButtonUp);
-		gui->assignkey('R', ZoomOut, NULL);
-		gui->assignkey('F', ZoomIn, NULL);
+		gui->assignkey(SDL_SCANCODE_R, ZoomOut, NULL);
+		gui->assignkey(SDL_SCANCODE_F, ZoomIn, NULL);
+		gui->assignkey(SDL_SCANCODE_GRAVE, NULL, ToggleConsole);
 	}
 
 	/*

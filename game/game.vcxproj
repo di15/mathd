@@ -239,6 +239,8 @@
     <ClCompile Include="..\common\render\vertexarray.cpp" />
     <ClCompile Include="..\common\render\water.cpp" />
     <ClCompile Include="..\common\save\savemap.cpp" />
+    <ClCompile Include="..\common\script\console.cpp" />
+    <ClCompile Include="..\common\script\script.cpp" />
     <ClCompile Include="..\common\sim\build.cpp" />
     <ClCompile Include="..\common\sim\building.cpp" />
     <ClCompile Include="..\common\sim\buildingtype.cpp" />
@@ -356,6 +358,8 @@
     <ClInclude Include="..\common\render\vertexarray.h" />
     <ClInclude Include="..\common\render\water.h" />
     <ClInclude Include="..\common\save\savemap.h" />
+    <ClInclude Include="..\common\script\console.h" />
+    <ClInclude Include="..\common\script\script.h" />
     <ClInclude Include="..\common\sim\build.h" />
     <ClInclude Include="..\common\sim\building.h" />
     <ClInclude Include="..\common\sim\buildingtype.h" />

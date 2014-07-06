@@ -25,6 +25,7 @@
 #include "../../common/sim/player.h"
 #include "../../common/gui/widgets/windoww.h"
 #include "../../common/debug.h"
+#include "../../common/script/console.h"
 
 //bool g_canselect = true;
 
@@ -849,4 +850,6 @@ void FillGUI()
 
 	g_log<<"2.7"<<endl;
 	g_log.flush();
+
+	FillConsole();
 }

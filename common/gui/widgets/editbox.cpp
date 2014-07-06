@@ -30,6 +30,8 @@ EditBox::EditBox() : Widget()
 	m_passw = false;
 	m_maxlen = 0;
 	reframefunc = NULL;
+	submitfunc = NULL;
+	changefunc3 = NULL;
 	m_scroll[0] = 0;
 	m_highl[0] = 0;
 	m_highl[1] = 0;
@@ -39,7 +41,7 @@ EditBox::EditBox() : Widget()
 	//reframe();
 }
 
-EditBox::EditBox(Widget* parent, const char* n, const RichText t, int f, void (*reframef)(Widget* thisw), bool pw, int maxl, void (*change2)(int p), int parm) : Widget()
+EditBox::EditBox(Widget* parent, const char* n, const RichText t, int f, void (*reframef)(Widget* thisw), bool pw, int maxl, void (*change3)(unsigned int key, unsigned int scancode, bool down), void (*submitf)(), int parm) : Widget()
 {
 	m_parent = parent;
 	m_type = WIDGET_EDITBOX;
@@ -51,12 +53,14 @@ EditBox::EditBox(Widget* parent, const char* n, const RichText t, int f, void (*
 	m_passw = pw;
 	m_maxlen = maxl;
 	reframefunc = reframef;
+	submitfunc = submitf;
+	changefunc3 = change3;
 	m_scroll[0] = 0;
 	m_highl[0] = 0;
 	m_highl[1] = 0;
 	CreateTexture(m_frametex, "gui/frame.jpg", true, false);
 	m_param = parm;
-	changefunc2 = change2;
+	changefunc2 = NULL;
 	reframe();
 }
 
@@ -400,9 +404,11 @@ void EditBox::inev(InEv* ev)
 			ev->intercepted = true;
 			return;
 		}
-		else if(ev->key == SDLK_RETURN)
+		else if(ev->key == SDLK_RETURN || ev->key == SDLK_RETURN2)
 		{
 			ev->intercepted = true;
+			if(submitfunc)
+				submitfunc();
 			return;
 		}
 #if 0
@@ -415,12 +421,18 @@ void EditBox::inev(InEv* ev)
 		if(changefunc2 != NULL)
 			changefunc2(m_param);
 
+		if(changefunc3 != NULL)
+			changefunc3(ev->key, ev->scancode, true);
+
 		ev->intercepted = true;
 	}
 	else if(ev->type == INEV_KEYUP && !ev->intercepted)
 	{
 		if(!m_opened)
 			return;
+		
+		if(changefunc3 != NULL)
+			changefunc3(ev->key, ev->scancode, false);
 
 		ev->intercepted = true;
 	}
@@ -436,8 +448,6 @@ void EditBox::inev(InEv* ev)
 		if(m_caret > len)
 			m_caret = len;
 
-
-
 		//g_log<<"vk "<<ev->key<<endl;
 		//g_log.flush();
 
@@ -449,44 +459,46 @@ void EditBox::inev(InEv* ev)
 		}
 		else
 #endif
-		{
 
 #ifdef PASTE_DEBUG
 			g_log<<"charin "<<(char)ev->key<<" ("<<ev->key<<")"<<endl;
-			g_log.flush();
+		g_log.flush();
 #endif
 
 #if 0
-			//if(ev->key == 'C' && py->keys[SDLK_CONTROL])
-			if(ev->key == 3)	//copy
-			{
-				copyval();
-			}
-			//else if(ev->key == 'V' && py->keys[SDLK_CONTROL])
-			else if(ev->key == 22)	//paste
-			{
-				pasteval();
-			}
-			//else if(ev->key == 'A' && py->keys[SDLK_CONTROL])
-			else if(ev->key == 1)	//select all
-			{
-				selectall();
-			}
-			else
-#endif
-				unsigned int* ustr = ToUTF32((const unsigned char*)ev->text.c_str(), ev->text.length());
-			//RichText addstr(RichTextP(UString(ustr)));	//Why does MSVS2012 not accept this?
-			RichText addstr = RichText(RichTextP(UString(ustr)));
-			delete [] ustr;
-
-			placestr(&addstr);
+		//if(ev->key == 'C' && py->keys[SDLK_CONTROL])
+		if(ev->key == 3)	//copy
+		{
+			copyval();
 		}
+		//else if(ev->key == 'V' && py->keys[SDLK_CONTROL])
+		else if(ev->key == 22)	//paste
+		{
+			pasteval();
+		}
+		//else if(ev->key == 'A' && py->keys[SDLK_CONTROL])
+		else if(ev->key == 1)	//select all
+		{
+			selectall();
+		}
+		else
+#endif
+			unsigned int* ustr = ToUTF32((const unsigned char*)ev->text.c_str(), ev->text.length());
+		//RichText addstr(RichTextP(UString(ustr)));	//Why does MSVS2012 not accept this?
+		RichText addstr = RichText(RichTextP(UString(ustr)));
+		unsigned int first = ustr[0];
+		delete [] ustr;
+
+		placestr(&addstr);
 
 		if(changefunc != NULL)
 			changefunc();
 
 		if(changefunc2 != NULL)
 			changefunc2(m_param);
+		
+		if(changefunc3 != NULL)
+			changefunc3(first, 0, true);
 
 		ev->intercepted = true;
 	}

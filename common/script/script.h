@@ -1,3 +1,3 @@
 #include "../platform.h"
 
-extern  ObjectScript::OS* g_os;
+extern ObjectScript::OS* g_os;

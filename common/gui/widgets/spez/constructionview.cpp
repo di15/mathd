@@ -205,7 +205,7 @@ void ConstructionView::regen(Selection* sel)
 			}
 			RichText editrt;
 			editrt.m_part.push_back( RichTextP(edittext) );
-			reqrow.editbox = EditBox(this, "editbox", editrt, font, NULL, false, 6, NULL, -1);
+			reqrow.editbox = EditBox(this, "editbox", editrt, font, NULL, false, 6, NULL, NULL, -1);
 
 			RichText perunitrt;
 			char perunitcstr[256];
@@ -269,7 +269,7 @@ void ConstructionView::regen(Selection* sel)
 			}
 			RichText editrt;
 			editrt.m_part.push_back( RichTextP(edittext) );
-			reqrow.editbox = EditBox(this, "editbox", editrt, font, NULL, false, 6, NULL, -1);
+			reqrow.editbox = EditBox(this, "editbox", editrt, font, NULL, false, 6, NULL, NULL, -1);
 
 			RichText perunitrt;
 			char perunitcstr2[256];

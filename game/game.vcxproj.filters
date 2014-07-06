@@ -401,6 +401,12 @@
     <ClCompile Include="..\common\gui\widgets\vscrollbar.cpp">
       <Filter>Source Files\common\gui\widgets</Filter>
     </ClCompile>
+    <ClCompile Include="..\common\script\console.cpp">
+      <Filter>Source Files\common\script</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\script\script.cpp">
+      <Filter>Source Files\common\script</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="gmain.h">
@@ -750,6 +756,12 @@
     </ClInclude>
     <ClInclude Include="..\common\gui\widgets\vscrollbar.h">
       <Filter>Source Files\common\gui\widgets</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\script\console.h">
+      <Filter>Source Files\common\script</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\script\script.h">
+      <Filter>Source Files\common\script</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
