@@ -114,7 +114,7 @@ void DrawSel(Matrix* projection, Matrix* modelmat, Matrix* viewmat)
 	{
 		const int bi = *seliter;
 		const Building* b = &g_building[bi];
-		const BuildingT* t = &g_buildingT[b->type];
+		const BuildingT* t = &g_bltype[b->type];
 
 		const int tminx = b->tilepos.x - t->widthx/2;
 		const int tminz = b->tilepos.y - t->widthz/2;
@@ -182,7 +182,7 @@ void DrawSel(Matrix* projection, Matrix* modelmat, Matrix* viewmat)
 		Unit* u = &g_unit[ *seliter ];
 		//Entity* e = g_entity[ 0 ];
 		Vec3f p = u->drawpos;
-		UnitT* t = &g_unitT[ u->type ];
+		UnitT* t = &g_utype[ u->type ];
 
 		//Vec3f p = c->m_pos + Vec3f(0, t->vmin.y, 0) + Vec3f(0, 1.0f, 0);
 
@@ -242,7 +242,7 @@ int SelectOneBuilding(Vec3f *line)
 		if(!b->on)
 			continue;
 
-		BuildingT* t = &g_buildingT[ b->type ];
+		BuildingT* t = &g_bltype[ b->type ];
 
 		const int tminx = b->tilepos.x - t->widthx/2;
 		const int tminz = b->tilepos.y - t->widthz/2;
@@ -325,7 +325,7 @@ int SelectOneUnit(Vec3f *line)
 		if(!u->on)
 			continue;
 
-		UnitT* t = &g_unitT[ u->type ];
+		UnitT* t = &g_utype[ u->type ];
 
 		Vec3f normals[6];
 		float dists[6];
@@ -424,7 +424,7 @@ std::list<int> SelectAreaUnits()
 		if(!u->on)
 			continue;
 
-		UnitT* t = &g_unitT[ u->type ];
+		UnitT* t = &g_utype[ u->type ];
 
 		Vec3f vmin = u->drawpos + Vec3f(-t->size.x/2, 0, -t->size.z/2);
 #if 1

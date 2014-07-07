@@ -39,6 +39,7 @@
 #include "../common/texture.h"
 #include "../common/render/skybox.h"
 #include "../common/script/script.h"
+#include "../common/ai/ai.h"
 
 int g_mode = APPMODE_LOADING;
 
@@ -193,8 +194,9 @@ void UpdateGameState()
 {
 	g_simframe ++;
 
+	UpdateAI();
 	StartTimer(TIMER_UPDATEUNITS);
-	UpdateUnits();
+	UpdUnits();
 	StopTimer(TIMER_UPDATEUNITS);
 	StartTimer(TIMER_UPDATEBUILDINGS);
 	UpdateBuildings();
@@ -1158,16 +1160,16 @@ int main(int argc, char* argv[])
 
 	MakeWindow(TITLE);
 
+	g_log << "FillGUI: "    << endl;
+	g_log.flush();
+
+	FillGUI();
+	
 	g_log << "Queue: "      << endl;
 	g_log.flush();
 
 	SDL_ShowCursor(false);
 	Queue();
-
-	g_log << "FillGUI: "    << endl;
-	g_log.flush();
-
-	FillGUI();
 
 	g_log << "EventLoop: "  << endl;
 	g_log.flush();

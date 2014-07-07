@@ -35,14 +35,16 @@ ResTicker::ResTicker(Widget* parent, const char* n, void (*reframef)(Widget* thi
 	Image righthlineblur;
 	Image whitebg;
 #endif
-
+	
 	//restext = Text(this, "res ticker", RichText("asdadasdasads"), MAINFONT16, NULL, true, 1, 1, 1, 1);
 	restext = Text(this, "res ticker", RichText("asdadasdasads"), MAINFONT16, NULL, false, 0.2, 0.7, 0.8, 1);
+#if 0
 	leftinnerdiagblur = Image(this, "gui/frames/innerdiagblur32x24halfwht.png", true, NULL, 1, 1, 1, 1,		0, 0, 1, 1);
 	rightinnerdiagblur = Image(this, "gui/frames/innerdiagblur32x24halfwht.png", true, NULL, 1, 1, 1, 1,		1, 0, 0, 1);
 	innerbottom = Image(this, "gui/frames/innerbottom3x3.png", true, NULL, 1, 1, 1, 1,		0, 0, 1, 1);
 	lefthlineblur = Image(this, "gui/frames/innerhlineblur30x3.png", true, NULL, 1, 1, 1, 1,		0, 0, 1, 1);
 	righthlineblur = Image(this, "gui/frames/innerhlineblur30x3.png", true, NULL, 1, 1, 1, 1,		1, 0, 0, 1);
+#endif
 	whitebg = Image(this, "gui/backg/white.jpg", true, NULL, 1, 1, 1, 1,		0, 0, 1, 1);
 
 	reframe();
@@ -58,6 +60,29 @@ void ResTicker::reframe()	//resized or moved
 	for(auto i=m_subwidg.begin(); i!=m_subwidg.end(); i++)
 		(*i)->reframe();
 
+#if 0
+	whitebg.m_pos[0] = m_pos[0]+32;
+	whitebg.m_pos[1] = m_pos[1];
+	whitebg.m_pos[2] = m_pos[2]-32;
+	whitebg.m_pos[3] = m_pos[1]+RESTICKER_HEIGHT;
+	
+	restext.m_pos[0] = m_pos[0]+32;
+	restext.m_pos[1] = m_pos[1];
+	restext.m_pos[2] = m_pos[2]-32;
+	restext.m_pos[3] = m_pos[1]+RESTICKER_HEIGHT-3;
+#else
+	whitebg.m_pos[0] = m_pos[0];
+	whitebg.m_pos[1] = m_pos[1];
+	whitebg.m_pos[2] = m_pos[2];
+	whitebg.m_pos[3] = m_pos[1]+24;
+	
+	restext.m_pos[0] = m_pos[0];
+	restext.m_pos[1] = m_pos[1];
+	restext.m_pos[2] = m_pos[2];
+	restext.m_pos[3] = m_pos[1]+24;
+#endif
+
+#if 0
 	leftinnerdiagblur.m_pos[0] = m_pos[0];
 	leftinnerdiagblur.m_pos[1] = m_pos[1];
 	leftinnerdiagblur.m_pos[2] = m_pos[0]+32;
@@ -67,23 +92,6 @@ void ResTicker::reframe()	//resized or moved
 	rightinnerdiagblur.m_pos[1] = m_pos[1];
 	rightinnerdiagblur.m_pos[2] = m_pos[2];
 	rightinnerdiagblur.m_pos[3] = m_pos[1]+RESTICKER_HEIGHT;
-
-	restext.m_pos[0] = m_pos[0]+32;
-	restext.m_pos[1] = m_pos[1];
-	restext.m_pos[2] = m_pos[2]-32;
-	restext.m_pos[3] = m_pos[1]+RESTICKER_HEIGHT-3;
-
-#if 1
-	whitebg.m_pos[0] = m_pos[0]+32;
-	whitebg.m_pos[1] = m_pos[1];
-	whitebg.m_pos[2] = m_pos[2]-32;
-	whitebg.m_pos[3] = m_pos[1]+RESTICKER_HEIGHT;
-#else
-	whitebg.m_pos[0] = m_pos[0];
-	whitebg.m_pos[1] = m_pos[1];
-	whitebg.m_pos[2] = m_pos[2];
-	whitebg.m_pos[3] = m_pos[1]+24;
-#endif
 
 	innerbottom.m_pos[0] = m_pos[0]+32;
 	innerbottom.m_pos[1] = m_pos[1]+RESTICKER_HEIGHT-3;
@@ -101,6 +109,8 @@ void ResTicker::reframe()	//resized or moved
 	righthlineblur.m_pos[1] = m_pos[1]+RESTICKER_HEIGHT-3;
 	righthlineblur.m_pos[2] = m_pos[2]-32;
 	righthlineblur.m_pos[3] = m_pos[1]+RESTICKER_HEIGHT;
+#endif
+
 }
 
 void ResTicker::draw()
@@ -122,16 +132,18 @@ void ResTicker::draw()
 	for(auto i=m_subwidg.begin(); i!=m_subwidg.end(); i++)
 		(*i)->draw();
 
-	restext.draw();
 
 	//RichText rt = RichText(")A)JJF)@J)(J)(F$KJ(0jfjfjoi3jfwkjlekf");
 	//DrawShadowedTextF(MAINFONT16, m_pos[0]+32, m_pos[1]+4, 0, 0, 50, 50, &rt);
+	restext.draw();
 
+#if 0
 	leftinnerdiagblur.draw();
 	rightinnerdiagblur.draw();
 	lefthlineblur.draw();
 	righthlineblur.draw();
 	//innerbottom.draw();
+#endif
 }
 
 void ResTicker::drawover()

@@ -156,6 +156,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\common\ai\ai.cpp" />
     <ClCompile Include="..\common\ai\astarpath.cpp" />
     <ClCompile Include="..\common\ai\binheap.cpp" />
     <ClCompile Include="..\common\ai\jpsexpansion.cpp" />
@@ -170,6 +171,7 @@
     <ClCompile Include="..\common\ai\reconstructpath.cpp" />
     <ClCompile Include="..\common\ai\pathnode.cpp" />
     <ClCompile Include="..\common\debug.cpp" />
+    <ClCompile Include="..\common\econ\balance.cpp" />
     <ClCompile Include="..\common\econ\demand.cpp" />
     <ClCompile Include="..\common\gui\cursor.cpp" />
     <ClCompile Include="..\common\gui\draw2d.cpp" />
@@ -272,6 +274,7 @@
     <ClCompile Include="keymap.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\common\ai\ai.h" />
     <ClInclude Include="..\common\ai\astarpath.h" />
     <ClInclude Include="..\common\ai\binheap.h" />
     <ClInclude Include="..\common\ai\jpsexpansion.h" />
@@ -286,6 +289,7 @@
     <ClInclude Include="..\common\ai\reconstructpath.h" />
     <ClInclude Include="..\common\ai\pathnode.h" />
     <ClInclude Include="..\common\debug.h" />
+    <ClInclude Include="..\common\econ\balance.h" />
     <ClInclude Include="..\common\econ\demand.h" />
     <ClInclude Include="..\common\gui\cursor.h" />
     <ClInclude Include="..\common\gui\draw2d.h" />

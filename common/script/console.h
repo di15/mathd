@@ -5,9 +5,12 @@
 #include "../gui/widgets/text.h"
 #include "../gui/widgets/editbox.h"
 
-#define CONSOLE_LINES	7
+#define CONSOLE_LINES	17
+
+class RichText;
 
 void FillConsole();
 void ToggleConsole();
+void SubmitConsole(RichText* rt);
 
 #endif

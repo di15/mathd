@@ -312,7 +312,7 @@ void DrawPreview(Matrix projection, Matrix viewmat, Matrix modelmat, Matrix mode
 
 	if(py->bptype >= 0 && py->bptype < BUILDING_TYPES)
 	{
-		BuildingT* t = &g_buildingT[py->bptype];
+		BuildingT* t = &g_bltype[py->bptype];
 		m = &g_model[t->model];
 	}
 	else if(py->bptype == BUILDING_ROAD)
@@ -396,7 +396,7 @@ void DrawPreviewDepth()
 
 	if(py->bptype >= 0 && py->bptype < BUILDING_TYPES)
 	{
-		BuildingT* t = &g_buildingT[py->bptype];
+		BuildingT* t = &g_bltype[py->bptype];
 		m = &g_model[t->model];
 	}
 	else if(py->bptype == BUILDING_ROAD)

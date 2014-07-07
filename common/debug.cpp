@@ -164,7 +164,7 @@ void InitProfiles()
 	DefTimer(TIMER_DRAWGUI, TIMER_DRAW, "DrawGUI();");
 	DefTimer(TIMER_DRAWMINIMAP, TIMER_DRAW, "DrawMinimap();");
 	DefTimer(TIMER_UPDATE, TIMER_FRAME, "Update();");
-	DefTimer(TIMER_UPDATEUNITS, TIMER_UPDATE, "UpdateUnits();");
+	DefTimer(TIMER_UPDATEUNITS, TIMER_UPDATE, "UpdUnits();");
 	DefTimer(TIMER_UPDUONCHECK, TIMER_UPDATEUNITS, "Upd U On Ch");
 	DefTimer(TIMER_UPDUNITAI, TIMER_UPDATEUNITS, "Upd Unit AI");
 	DefTimer(TIMER_MOVEUNIT, TIMER_UPDATEUNITS, "Move Unit");
@@ -286,7 +286,7 @@ void UDebug(int i)
 		if(g_collidertype == COLLIDER_BUILDING)
 		{
 			Building* b = &g_building[g_lastcollider];
-			BuildingT* bt = &g_buildingT[b->type];
+			BuildingT* bt = &g_bltype[b->type];
 
 			g_log<<"COLLIDER B: "<<bt->name<<endl;
 

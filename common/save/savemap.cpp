@@ -40,7 +40,7 @@ float ConvertHeight(unsigned char brightness)
 
 void PlaceUnits()
 {
-	UnitT* ut = &g_unitT[UNIT_LABOURER];
+	UnitT* ut = &g_utype[UNIT_LABOURER];
 	PathJob pj;
 	pj.airborne = ut->airborne;
 	pj.landborne = ut->landborne;

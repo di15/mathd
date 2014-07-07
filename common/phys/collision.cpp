@@ -18,8 +18,8 @@ bool BuildingAdjacent(int i, int j)
 	Building* bi = &g_building[i];
 	Building* bj = &g_building[j];
 
-	BuildingT* ti = &g_buildingT[bi->type];
-	BuildingT* tj = &g_buildingT[bj->type];
+	BuildingT* ti = &g_bltype[bi->type];
+	BuildingT* tj = &g_bltype[bj->type];
 
 	Vec2i tpi = bi->tilepos;
 	Vec2i tpj = bj->tilepos;
@@ -47,7 +47,7 @@ bool BuildingAdjacent(int i, int j)
 bool PowlAdjacent(int i, int x, int z)
 {
 	Building* b = &g_building[i];
-	BuildingT* t = &g_buildingT[b->type];
+	BuildingT* t = &g_bltype[b->type];
 
 	Vec2i tp = b->tilepos;
 
@@ -76,7 +76,7 @@ bool PowlAdjacent(int i, int x, int z)
 bool CrPipeAdjacent(int i, int x, int z)
 {
 	Building* b = &g_building[i];
-	BuildingT* t = &g_buildingT[b->type];
+	BuildingT* t = &g_bltype[b->type];
 
 	Vec2i tp = b->tilepos;
 
@@ -113,7 +113,7 @@ bool CollidesWithBuildings(int minx, int minz, int maxx, int maxz, int ignore)
 		if(!b->on)
 			continue;
 
-		BuildingT* t = &g_buildingT[ b->type ];
+		BuildingT* t = &g_bltype[ b->type ];
 
 		int minx2 = (b->tilepos.x - t->widthx/2)*TILE_SIZE;
 		int minz2 = (b->tilepos.y - t->widthz/2)*TILE_SIZE;
@@ -161,7 +161,7 @@ bool CollidesWithUnits(int minx, int minz, int maxx, int maxz, bool isunit, Unit
 		if(u->hidden())
 			continue;
 
-		UnitT* t = &g_unitT[u->type];
+		UnitT* t = &g_utype[u->type];
 
 		int minx2 = u->cmpos.x - t->size.x/2;
 		int minz2 = u->cmpos.y - t->size.z/2;
@@ -201,7 +201,7 @@ bool OffMap(int minx, int minz, int maxx, int maxz)
 // TO DO: REWRITE
 bool BuildingCollides(int type, Vec3f pos)
 {
-	BuildingT* t = &g_buildingT[type];
+	BuildingT* t = &g_bltype[type];
 
 	if(Offmap(pos.x, pos.z, t->widthX*TILE_SIZE/2, t->widthZ*TILE_SIZE/2))
 		return true;
@@ -276,7 +276,7 @@ bool Unit::confirmcollision(int ctype, int ID, float eps)
 	if(ctype == COLLIDER_BUILDING)
 	{
 		Building* b = &g_building[ID];
-		BuildingT* bt = &g_buildingT[b->type];
+		BuildingT* bt = &g_bltype[b->type];
 		Vec3f p2 = b->pos;
 		float hwx = bt->widthX*TILE_SIZE/2.0;
 		float hwz = bt->widthZ*TILE_SIZE/2.0;

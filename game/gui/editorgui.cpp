@@ -170,7 +170,7 @@ void FillPlaceUnitsView()
 	Widget* unitselector = placeunitsview->get("unit selector");
 
 	for(int i=0; i<UNIT_TYPES; i++)
-		unitselector->m_options.push_back(RichText(g_unitT[i].name));
+		unitselector->m_options.push_back(RichText(g_utype[i].name));
 
 	//unitselector->m_options.push_back(RichText("Labourer"));
 	//unitselector->m_options.push_back(RichText("Truck"));
@@ -231,7 +231,7 @@ void FillPlaceBuildingsView()
 
 	for(int i=0; i<BUILDING_TYPES; i++)
 	{
-		buildingselector->m_options.push_back(RichText(g_buildingT[i].name));
+		buildingselector->m_options.push_back(RichText(g_bltype[i].name));
 	}
 
 	//placebuildingsview->add(new DropDownS(NULL, "country owner selector", MAINFONT8, Resize_BuildingCountryDropDownSelector, NULL));

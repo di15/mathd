@@ -253,7 +253,7 @@ void Order(int mousex, int mousey, int viewwidth, int viewheight, Vec3f campos, 
 				u->pathdelay = 0;
 				u->lastpath = g_simframe;
 				//e->underorder = true;
-				t = &g_unitT[u->type];
+				t = &g_utype[u->type];
 				if(t->size.x > radius)
 					radius = t->size.x;
 				//e->pathblocked = false;
@@ -287,7 +287,7 @@ void Order(int mousex, int mousey, int viewwidth, int viewheight, Vec3f campos, 
 				u->pathdelay = 0;
 				u->lastpath = g_simframe;
 				u->target = -1;
-				t = &g_unitT[u->type];
+				t = &g_utype[u->type];
 				int radius = t->size.x;
 				//u->goal.x = Clip(u->goal.x, 0 + radius, g_hmap.m_widthX*TILE_SIZE - radius);
 				//u->goal.z = Clip(u->goal.z, 0 + radius, g_hmap.m_widthZ*TILE_SIZE - radius);

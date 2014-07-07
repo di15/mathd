@@ -896,12 +896,12 @@ bool ReCrPipeCrPipe()
 				if(!CrPipeAdjacent(i, x, z))
 					continue;
 
-				//g_log<<"pipeline adjacent "<<g_buildingT[b->type].name<<endl;
+				//g_log<<"pipeline adjacent "<<g_bltype[b->type].name<<endl;
 
 				if(!ResB(i, RES_CRUDEOIL))
 					continue;
 
-				//g_log<<"pipeline adjacent "<<g_buildingT[b->type].name<<endl;
+				//g_log<<"pipeline adjacent "<<g_bltype[b->type].name<<endl;
 
 				if(CompareBCrPipe(b, pipe))
 				{
@@ -954,7 +954,7 @@ void ResetCrPipe()
 		if(!b->finished)
 			continue;
 
-		t = &g_buildingT[b->type];
+		t = &g_bltype[b->type];
 
 		if(t->output[RES_CRUDEOIL] <= 0.0f)
 			continue;

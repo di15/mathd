@@ -51,7 +51,7 @@ void DrawUnits()
 		if(!u->on)
 			continue;
 
-		UnitT* t = &g_unitT[u->type];
+		UnitT* t = &g_utype[u->type];
 
 		Vec3f vmin(u->drawpos.x - t->size.x/2, u->drawpos.y, u->drawpos.z - t->size.x/2);
 		Vec3f vmax(u->drawpos.x + t->size.x/2, u->drawpos.y + t->size.y, u->drawpos.z + t->size.x/2);
@@ -147,7 +147,7 @@ bool PlaceUnit(int type, Vec3i cmpos, int owner)
 #endif
 
 	Unit* u = &g_unit[i];
-	UnitT* t = &g_unitT[type];
+	UnitT* t = &g_utype[type];
 
 	u->on = true;
 	u->type = type;
@@ -200,7 +200,7 @@ bool Unit::hidden() const
 
 void AnimateUnit(Unit* u)
 {
-	UnitT* t = &g_unitT[u->type];
+	UnitT* t = &g_utype[u->type];
 
 	if(u->type == UNIT_ROBOSOLDIER || u->type == UNIT_LABOURER)
 	{
@@ -220,7 +220,7 @@ void UpdateAI(Unit* u)
 		UpdateLabourer(u);
 }
 
-void UpdateUnits()
+void UpdUnits()
 {
 	for(int i = 0; i < UNITS; i++)
 	{

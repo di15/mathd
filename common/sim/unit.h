@@ -84,6 +84,6 @@ extern Unit g_unit[UNITS];
 void DrawUnits();
 bool PlaceUnit(int type, Vec3i cmpos, int owner);
 void FreeUnits();
-void UpdateUnits();
+void UpdUnits();
 
 #endif

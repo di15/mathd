@@ -108,7 +108,7 @@ void ConstructionView::regen(Selection* sel)
 	{
 		int bi = *sel->buildings.begin();
 		Building* b = &g_building[bi];
-		BuildingT* t = &g_buildingT[b->type];
+		BuildingT* t = &g_bltype[b->type];
 
 		//RichText newtitle;
 		//newtitle.m_part.push_back( RichTextP(t->name) );

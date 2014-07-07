@@ -65,4 +65,20 @@ inline int imin(const int a, const int b)
 
 #endif
 
+//deterministic ceil
+inline int Ceili(const int num, const int denom)
+{
+	if(denom  == 0)
+		return 0;
+
+	int div = num / denom;
+	const int mul = div * denom;
+	const int rem = num - mul;
+
+	if(rem > 0)
+		div += 1;
+
+	return div;
+}
+
 #endif	//UTILS_H

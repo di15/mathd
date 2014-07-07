@@ -22,7 +22,7 @@
 
 bool UnitCollides(Unit* u)
 {
-	UnitT* t = &g_unitT[u->type];
+	UnitT* t = &g_utype[u->type];
 	int minx = u->cmpos.x - t->size.x/2;
 	int minz = u->cmpos.y - t->size.z/2;
 	int maxx = minx + t->size.x - 1;
@@ -70,7 +70,7 @@ bool UnitCollides(Unit* u)
 		if(u2 == u)
 			continue;
 
-		t = &g_unitT[u2->type];
+		t = &g_utype[u2->type];
 		int minx2 = u2->cmpos.x - t->size.x/2;
 		int minz2 = u2->cmpos.y - t->size.z/2;
 		int maxx2 = minx2 + t->size.x;
@@ -133,7 +133,7 @@ bool UnitCollides(Unit* u)
 			if(cell->building >= 0)
 			{
 				Building* b = &g_building[cell->building];
-				BuildingT* t2 = &g_buildingT[b->type];
+				BuildingT* t2 = &g_bltype[b->type];
 
 				int tminx = b->tilepos.x - t2->widthx/2;
 				int tminz = b->tilepos.y - t2->widthz/2;
@@ -169,7 +169,7 @@ bool UnitCollides(Unit* u)
 				if(u2 == u)
 					continue;
 
-				UnitT* t2 = &g_unitT[u2->type];
+				UnitT* t2 = &g_utype[u2->type];
 				int minx2 = u2->cmpos.x - t2->size.x/2;
 				int minz2 = u2->cmpos.y - t2->size.z/2;
 				int maxx2 = minx2 + t2->size.x - 1;
@@ -194,7 +194,7 @@ bool UnitCollides(Unit* u)
 
 void MoveUnit(Unit* u)
 {
-	UnitT* t = &g_unitT[u->type];
+	UnitT* t = &g_utype[u->type];
 	u->prevpos = u->cmpos;
 	u->collided = false;
 

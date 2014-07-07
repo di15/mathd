@@ -31,7 +31,7 @@ bool PassUnits(Vec2i vstart, Vec2i vend,
 	float endratio = 1.0f;
 	bool startsout = false;
 
-	UnitT* u2t = &g_unitT[u2->type];
+	UnitT* u2t = &g_utype[u2->type];
 
 	int cmminx2 = u2->cmpos.x - u2t->size.x/2;
 	int cmminz2 = u2->cmpos.y - u2t->size.z/2;
@@ -159,7 +159,7 @@ int Trace(int utype, int umode,
 		  Vec2i vstart, Vec2i vend,
 		  Unit* thisu, Unit* ignoreu, Building* ignoreb)
 {
-	UnitT* ut = &g_unitT[utype];
+	UnitT* ut = &g_utype[utype];
 
 	int cmminx = -ut->size.x/2;
 	int cmminz = -ut->size.z/2;

@@ -31,7 +31,7 @@ void UpdFoodDem(Unit* u)
 		foodd = &*g_demand.rbegin();
 	}
 
-	UnitT* ut = &g_unitT[u->type];
+	UnitT* ut = &g_utype[u->type];
 	unsigned char curry = g_player[u->owner].currencyres;
 
 	foodd->cmpos = u->cmpos;
@@ -67,7 +67,7 @@ void UpdHousDem(Unit* u)
 		housd = &*g_demand.rbegin();
 	}
 
-	UnitT* ut = &g_unitT[u->type];
+	UnitT* ut = &g_utype[u->type];
 	unsigned char curry = g_player[u->owner].currencyres;
 
 	housd->cmpos = u->cmpos;

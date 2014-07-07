@@ -950,7 +950,7 @@ void ResetPow()
 		if(!b->finished)
 			continue;
 
-		t = &g_buildingT[b->type];
+		t = &g_bltype[b->type];
 
 		if(t->output[RES_ENERGY] <= 0.0f)
 			continue;

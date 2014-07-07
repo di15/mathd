@@ -138,11 +138,11 @@ void DrawGrid()
 
 		bool roadVeh = false;
 #if 1
-		if(g_unitT[u->type].roaded)
+		if(g_utype[u->type].roaded)
 			roadVeh = true;
 #endif
 
-		UnitT* t = &g_unitT[u->type];
+		UnitT* t = &g_utype[u->type];
 
 		int ux = u->cmpos.x / PATHNODE_SIZE;
 		int uz = u->cmpos.y / PATHNODE_SIZE;
@@ -247,7 +247,7 @@ void DrawUnitSquares()
 		if(!u->on)
 			continue;
 
-		t = &g_unitT[u->type];
+		t = &g_utype[u->type];
 		p = Vec3f(u->cmpos.x, u->drawpos.y + TILE_SIZE/100, u->cmpos.y);
 
 #if 1
@@ -371,7 +371,7 @@ void DrawVelocities()
 		if(!u->on)
 			continue;
 
-		t = &g_unitT[u->type];
+		t = &g_utype[u->type];
 
 		std::vector<Vec3f> vecs;
 

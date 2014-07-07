@@ -1,4 +1,5 @@
 #include "sim.h"
+#include "../script/console.h"
 
 long long g_simframe = 0;
 
@@ -179,101 +180,96 @@ void Queue()
 #define RES_ROUBLES			7
 #endif
 
-	DefP(0, 1, 0, 0, 1, RichText("USA (Red)"));
-	DefP(1, 0, 1, 0, 1, RichText("Mexico (Green)"));
-	DefP(2, 0, 0, 1, 1, RichText("EU (Blue)"));
-	DefP(3, 1, 0, 1, 1, RichText("UK (Purple)"));
-	DefP(4, 1, 1, 0, 1, RichText("Switzerland (Yellow)"));
-	DefP(5, 0, 1, 1, 1, RichText("Japan (Cyan)"));
-	DefP(6, 150.0f/255.0f, 249.0f/255.0f, 123.0f/255.0f, 1, RichText("India (Light Green)"));
-	DefP(7, 3.0f/255.0f, 53.0f/255.0f, 0.0f/255.0f, 1, RichText("Russia (Dark Green)"));
-
 #if 0
-#define UNIT_LABOURER		0
-#if 0
-#define UNIT_BLIZZAIAMECH	1
-#define UNIT_918132634MECH	2
-#define UNIT_CALMMECH		3
-#define UNIT_GIZAMECH		4
-#define UNIT_ZENITHMECH		5
-#define UNIT_M1A2TANK		6
-#define UNIT_OPLOTTANK		7
-#define UNIT_LAVAPC			8
-#define UNIT_GEPARDAA		9
-#define UNIT_TYPES			10
-#else
-#define UNIT_TRUCK			1
-#define UNIT_SOLDIER		2
-#define UNIT_CAR			3
-#define UNIT_CONCTRUCK		4
-#define UNIT_TANKERTRUCK	5
-#define UNIT_CARGOSHIP		6
-#define UNIT_LOGHARVESTER	7
-#define UNIT_LOGFORWARDER	8
-#define UNIT_TYPES			9
-#endif
+	DefP(0, 1, 0, 0, 1, RichText("Player 0 (Red)"));
+	DefP(1, 0, 1, 0, 1, RichText("Player 1 (Green)"));
+	DefP(2, 0, 0, 1, 1, RichText("Player 2 (Blue)"));
+	DefP(3, 1, 0, 1, 1, RichText("Player 3 (Purple)"));
+	DefP(4, 1, 1, 0, 1, RichText("Player 4 (Yellow)"));
+	DefP(5, 0, 1, 1, 1, RichText("Player 5 (Cyan)"));
+	DefP(6, 150.0f/255.0f, 249.0f/255.0f, 123.0f/255.0f, 1, RichText("Player 6 (Light Green)"));
+	DefP(7, 3.0f/255.0f, 53.0f/255.0f, 0.0f/255.0f, 1, RichText("Player 7 (Dark Green)"));
 #endif
 
-#if 0
-	//int type, const char* texrelative, Vec3i size, Vec2i bilbsize, const char* name, int starthp, bool landborne, bool walker, bool roaded, bool seaborne, bool airborne
-	//DefU(UNIT_LABOURER, "billboards/units/labourer/smiley.png", Vec3i(50, 50, 50));
-	DefU(UNIT_LABOURER, "billboards/units/labourer/worker.png", Vec3i(125, 8/3*125, 125), Vec2i(125, 8/3*125), "Worker", 100, true, true, false, false, false);
-#if 0
-	DefU(UNIT_BLIZZAIAMECH, "billboards/units/mech/blizzaia.png", Vec3i(375, 95/67.0f*375, 375), Vec2i(575, 95/67.0f*575), "Blizzaia Mech");
-	DefU(UNIT_918132634MECH, "billboards/units/mech/918132634.png", Vec3i(375, 351/330.0f*375, 375), Vec2i(775, 351/330.0f*775), "918 Mech");
-	DefU(UNIT_CALMMECH, "billboards/units/mech/Calm_Render_thumb.png", Vec3i(375, 540/554.0f*375, 375), Vec2i(775, 540/554.0f*775), "Calm Mech");
-	DefU(UNIT_GIZAMECH, "billboards/units/mech/Giza_wanzer_00.png", Vec3i(375, 850/850.0f*375, 375), Vec2i(575, 850/850.0f*575), "Giza Mech");
-	DefU(UNIT_ZENITHMECH, "billboards/units/mech/Zenith_wanzer_01.png", Vec3i(375, 850/850.0f*375, 375), Vec2i(675, 850/850.0f*675), "Zenith Mech");
-	DefU(UNIT_M1A2TANK, "billboards/units/tank/01809-03579.png", Vec3i(375, 769/1680.0f*375, 375), Vec2i(775, 769/1680.0f*775), "M1A2 Tank");
-	DefU(UNIT_OPLOTTANK, "billboards/units/tank/Oplot main battle tanks 1.png", Vec3i(375, 929/1444.0f*375, 375), Vec2i(575, 929/1444.0f*575), "Oplot Tank");
-	DefU(UNIT_LAVAPC, "billboards/units/tank/QAMR_vehicle.png", Vec3i(375, 1302/2308.0f*375, 375), Vec2i(600, 1302/2308.0f*600), "LAV APC");
-	DefU(UNIT_GEPARDAA, "billboards/units/gepardaa/gepardaa.png", Vec3i(500, 1503/1951.0f*500, 500), Vec2i(500, 1503/1951.0f*500), "Gepard Anti-Air");
-#else
-	DefU(UNIT_TRUCK, "billboards/units/truck/truck.png", Vec3i(250, 767/964.0f*250, 250), Vec2i(400, 767/964.0f*400), "Truck", 1000, true, false, true, false, false);
-	DefU(UNIT_CAR, "billboards/units/car/car.png", Vec3i(250, 246/388.0f*250, 250), Vec2i(300, 246/388.0f*300), "Car", 500, true, false, true, false, false);
-	DefU(UNIT_SOLDIER, "billboards/units/soldier/soldier.png", Vec3i(125, 1551/1134.0f*125, 125), Vec2i(175, 1551/1134.0f*175), "Soldier", 500, true, true, false, false, false);
-	DefU(UNIT_CONCTRUCK, "billboards/units/conctruck.png", Vec3i(250, 767/964.0f*250, 250), Vec2i(400, 333/512.0f*400), "Concrete Truck", 1000, true, false, true, false, false);
-	DefU(UNIT_TANKERTRUCK, "billboards/units/tankertruck.png", Vec3i(250, 767/964.0f*250, 250), Vec2i(600, 161/512.0f*600), "Tanker Truck", 1000, true, false, true, false, false);
-	DefU(UNIT_CARGOSHIP, "billboards/units/cargoship.png", Vec3i(250, 767/964.0f*250, 250), Vec2i(800, 400/600.0f*800), "Cargo Ship", 5000, false, false, false, true, false);
-	DefU(UNIT_LOGHARVESTER, "billboards/units/logharvester.png", Vec3i(250, 767/964.0f*250, 250), Vec2i(500, 250/330.0f*500), "Log Harvester", 1000, true, false, false, false, false);
-	DefU(UNIT_LOGFORWARDER, "billboards/units/forwarder.png", Vec3i(250, 767/964.0f*250, 250), Vec2i(500, 443/640.0f*500), "Log Forwarder", 1000, true, false, false, false, false);
+	struct PlayerColor
+	{
+		unsigned char color[3];
+		char name[32];
+	};
+	
+	PlayerColor pcs[] =
+	{
+		{{0x7e, 0x1e, 0x9c}, "Purple"},
+		{{0x15, 0xb0, 0x1a}, "Green"},
+		{{0x03, 0x43, 0xdf}, "Blue"},
+		{{0xff, 0x81, 0xc0}, "Pink"},
+		{{0x65, 0x37, 0x00}, "Brown"},
+		{{0xe5, 0x00, 0x00}, "Red"},
+		{{0x95, 0xd0, 0xfc}, "Light Blue"},
+		{{0x02, 0x93, 0x86}, "Teal"},
+		{{0xf9, 0x73, 0x06}, "Orange"},
+		{{0x96, 0xf9, 0x7b}, "Light Green"},
+		{{0xc2, 0x00, 0x78}, "Magenta"},
+		{{0xff, 0xff, 0x14}, "Yellow"},
+		{{0x75, 0xbb, 0xfd}, "Sky Blue"},
+		{{0x92, 0x95, 0x91}, "Grey"},
+		{{0x89, 0xfe, 0x05}, "Lime Green"},
+		{{0xbf, 0x77, 0xf6}, "Light Purple"},
+		{{0x9a, 0x0e, 0xea}, "Violet"},
+		{{0x33, 0x35, 0x00}, "Dark Green"},
+		{{0x06, 0xc2, 0xac}, "Turquoise"},
+		{{0xc7, 0x9f, 0xef}, "Lavender"},
+		{{0x00, 0x03, 0x5b}, "Dark Blue"},
+		{{0xd1, 0xb2, 0x6f}, "Tan"},
+		{{0x00, 0xff, 0xff}, "Cyan"},
+		{{0x13, 0xea, 0xc9}, "Aqua"},
+		{{0x06, 0x47, 0x0c}, "Forest Green"},
+		{{0xae, 0x71, 0x81}, "Mauve"},
+		{{0x35, 0x06, 0x3e}, "Dark Purple"},
+		{{0x01, 0xff, 0x07}, "Bright Green"},
+		{{0x65, 0x00, 0x21}, "Maroon"},
+		{{0x6e, 0x75, 0x0e}, "Olive"},
+		{{0xff, 0x79, 0x6c}, "Salmon"},
+		{{0xe6, 0xda, 0xa6}, "Beige"},
+		{{0x05, 0x04, 0xaa}, "Royal Blue"},
+		{{0x00, 0x11, 0x46}, "Navy Blue"},
+		{{0xce, 0xa2, 0xfd}, "Lilac"},
+		{{0x00, 0x00, 0x00}, "Black"},
+		{{0xff, 0x02, 0x8d}, "Hot Pink"},
+		{{0xad, 0x81, 0x50}, "Light Brown"},
+		{{0xc7, 0xfd, 0xb5}, "Pale Green"},
+		{{0xff, 0xb0, 0x7c}, "Peach"},
+		{{0x67, 0x7a, 0x04}, "Olive Green"},
+		{{0xcb, 0x41, 0x6b}, "Dark Pink"},
+		{{0x8e, 0x82, 0xfe}, "Periwinkle"},
+		{{0x53, 0xfc, 0xa1}, "Sea Green"},
+		{{0xaa, 0xff, 0x32}, "Lime"},
+		{{0x38, 0x02, 0x82}, "Indigo"},
+		{{0xce, 0xb3, 0x01}, "Mustard"},
+		{{0xff, 0xd1, 0xdf}, "Light Pink"}
+	};
+
+#if 1
+	for(int i=0; i<PLAYERS; i++)
+	{
+		Player* p = &g_player[i];
+
+		char name[64];
+		sprintf(name, "Player %d (%s)", i, pcs[i].name);
+		
+		DefP(i, pcs[i].color[0]/255.0f, pcs[i].color[1]/255.0f, pcs[i].color[2]/255.0f, 1, RichText(name));
+
+		SubmitConsole(&p->name);
+	}
 #endif
-#endif
-#if 0
-	DefU(UNIT_ROBOSOLDIER, "models/battlecomp2013/battlecomp.ms3d", Vec3f(1,1,1)*182.0f/70.0f, Vec3f(0,70,0)*182.0f/70.0f, Vec3i(125, 8/3*125, 125), "Robot Soldier", 100, true, true, false, false, false);
-#elif 0
-	DefU(UNIT_ROBOSOLDIER, "models/battlecomp2013/battlecomp.ms3d", Vec3f(1,1,1)*8.0f/3.0f*125.0f/70.0f, Vec3f(0,70,0)*8.0f/3.0f*125.0f/70.0f, Vec3i(125, 8.0f/3.0f*125, 125), "Robot Soldier", 100, true, true, false, false, false, 5);
-#elif 0
-	DefU(UNIT_ROBOSOLDIER, "models/battlecomp2013/battlecomp.ms3d", Vec3f(1,1,1)*182.0f/70.0f, Vec3f(0,67,0)*182.0f/70.0f, Vec3i(50, 182, 50), "Robot Soldier", 100, true, true, false, false, false, 5);
-#elif 1
+
 	DefU(UNIT_ROBOSOLDIER, "models/battlecomp2011simp/battlecomp.ms3d", Vec3f(1,1,1)*182.0f/70.0f, Vec3f(0,0,0)*182.0f/70.0f, Vec3i(125, 250, 125), "Robot Soldier", 100, true, true, false, false, false, 6, true);
-	DefU(UNIT_LABOURER, "models/labourer/labourer.ms3d", Vec3f(1,1,1)*182.0f/70.0f, Vec3f(0,0,0)*182.0f/70.0f, Vec3i(125, 250, 125), "Labourer", 100, true, true, false, false, false, 6, true);
-#else
-	DefU(UNIT_ROBOSOLDIER, "models/battlecomp2013/battlecomp.ms3d", Vec3f(1,1,1)*500.0f/70.0f, Vec3f(0,67,0)*500.0f/70.0f, Vec3i(50, 182, 50), "Robot Soldier", 100, true, true, false, false, false, 5);
-#endif
+	DefU(UNIT_LABOURER, "models/labourer/labourer.ms3d", Vec3f(1,1,1)*182.0f/70.0f, Vec3f(0,0,0)*182.0f/70.0f, Vec3i(125, 250, 125), "Labourer", 100, true, true, false, false, false, 6, false);
+	DefU(UNIT_TRUCK, "models/truck/truck.ms3d", Vec3f(1,1,1)*30.0f, Vec3f(0,0,0), Vec3i(125, 250, 125), "Truck", 100, true, false, true, false, false, 30, false);
 
-#if 0
-	DefF(FOLIAGE_TREE1, "billboards/foliage/img1380909552.png", Vec3i(500, 7/3*500, 500));
-	DefF(FOLIAGE_TREE2, "billboards/foliage/img1380909741.png", Vec3i(500, 500, 500));
-	DefF(FOLIAGE_TREE3, "billboards/foliage/tree_34_png_by_gd08-d30unt3.png", Vec3i(500, 500, 500));
-#endif
-#if 0
-	DefF(FOLIAGE_BUSH1, "billboards/foliage/tree_png_by_dbszabo1-d4ftcdo.png", Vec3i(200, 739/900.0f*200, 200));
-#endif
-
-#if 0
-	DefF(FOLIAGE_TREE1, "models/spruce1/spruce1.ms3d", Vec3f(20,20,20), Vec3f(0,0,0), Vec3i(40, 60, 500)*20);
-	DefF(FOLIAGE_TREE2, "models/spruce1/spruce1.ms3d", Vec3f(20,20,20), Vec3f(0,0,0), Vec3i(40, 60, 500)*20);
-	DefF(FOLIAGE_TREE3, "models/spruce1/spruce1.ms3d", Vec3f(20,20,20), Vec3f(0,0,0), Vec3i(40, 60, 500)*20);
-#elif 1
 	DefF(FOLIAGE_TREE1, "models/pine/pine.ms3d", Vec3f(200,200,200), Vec3f(0,0,0), Vec3i(40, 60, 500)*20);
 	DefF(FOLIAGE_TREE2, "models/pine/pine.ms3d", Vec3f(200,200,200), Vec3f(0,0,0), Vec3i(40, 60, 500)*20);
 	DefF(FOLIAGE_TREE3, "models/pine/pine.ms3d", Vec3f(200,200,200), Vec3f(0,0,0), Vec3i(40, 60, 500)*20);
-#elif 1
-	DefF(FOLIAGE_TREE1, "models/apartment2/b1911", Vec3f(1,1,1), Vec3f(0,0,0), Vec3i(40, 60, 500)*20);
-	DefF(FOLIAGE_TREE2, "models/apartment2/b1911", Vec3f(1,1,1), Vec3f(0,0,0), Vec3i(40, 60, 500)*20);
-	DefF(FOLIAGE_TREE3, "models/apartment2/b1911", Vec3f(1,1,1), Vec3f(0,0,0), Vec3i(40, 60, 500)*20);
-#endif
 
 #if 0
 #define BUILDING_NONE			-1

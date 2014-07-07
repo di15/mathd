@@ -101,7 +101,7 @@ public:
 
 #define TOTAL_BUILDABLES		(BUILDING_TYPES+5)
 
-extern BuildingT g_buildingT[BUILDING_TYPES];
+extern BuildingT g_bltype[BUILDING_TYPES];
 
 void DefB(int type, const char* name, Vec2i size, bool hugterr, const char* modelrelative, Vec3f scale, Vec3f translate, const char* cmodelrelative,  Vec3f cscale, Vec3f ctranslate, int foundation, int reqdeposit);
 void BConMat(int type, int res, int amt);

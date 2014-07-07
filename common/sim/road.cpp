@@ -161,7 +161,7 @@ void RoadTile::freecollider()
 	RoadXZ(this, roadx, roadz);
 	Vec3f pos = RoadPosition(roadx, roadz);
 
-	//BuildingT* bt = &g_buildingT[type];
+	//BuildingT* bt = &g_bltype[type];
 	float hwx = TILE_SIZE/2.0f;
 	float hwz = TILE_SIZE/2.0f;
 
@@ -231,7 +231,7 @@ void RoadTile::fillcollider()
 	RoadXZ(this, roadx, roadz);
 	Vec3f pos = RoadPosition(roadx, roadz);
 
-	//BuildingT* bt = &g_buildingT[type];
+	//BuildingT* bt = &g_bltype[type];
 	float hwx = TILE_SIZE/2.0f;
 	float hwz = TILE_SIZE/2.0f;
 
@@ -783,7 +783,7 @@ bool CompareRoad(RoadTile* r, int x, int z)
 bool RoadAdjacent(int i, int x, int z)
 {
 	Building* b = &g_building[i];
-	BuildingT* t = &g_buildingT[b->type];
+	BuildingT* t = &g_bltype[b->type];
 
 	Vec2i tp = b->tilepos;
 

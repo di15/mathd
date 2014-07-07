@@ -29,7 +29,7 @@ void JPSPath(int utype, int umode, int cmstartx, int cmstartz, int target, int t
 			 std::list<Vec2i> *path, Vec2i *subgoal, Unit* thisu, Unit* ignoreu, Building* ignoreb,
 			 int cmgoalx, int cmgoalz, int cmgoalminx, int cmgoalminz, int cmgoalmaxx, int cmgoalmaxz)
 {
-	UnitT* ut = &g_unitT[utype];
+	UnitT* ut = &g_utype[utype];
 
 	PathJob* pj = new PathJob;
 	pj->utype = utype;

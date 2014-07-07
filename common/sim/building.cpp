@@ -89,7 +89,7 @@ bool PlaceBuilding(int type, Vec2i pos, bool finished, int owner)
 	b->type = type;
 	b->tilepos = pos;
 
-	BuildingT* t = &g_buildingT[type];
+	BuildingT* t = &g_bltype[type];
 
 	Vec2i tmin;
 	Vec2i tmax;
@@ -168,7 +168,7 @@ bool PlaceBuilding(int type, Vec2i pos, bool finished, int owner)
 
 void Building::allocres()
 {
-	BuildingT* t = &g_buildingT[type];
+	BuildingT* t = &g_bltype[type];
 	Player* py = &g_player[owner];
 
 	int alloc;
@@ -214,7 +214,7 @@ void Building::allocres()
 
 void Building::remesh()
 {
-	BuildingT* t = &g_buildingT[type];
+	BuildingT* t = &g_bltype[type];
 
 	if(finished)
 		CopyVA(&drawva, &g_model[t->model].m_va[0]);
@@ -232,7 +232,7 @@ void Building::remesh()
 
 bool Building::checkconstruction()
 {
-	BuildingT* t = &g_buildingT[type];
+	BuildingT* t = &g_bltype[type];
 
 	bool haveall = true;
 
@@ -282,8 +282,8 @@ void DrawBl()
 		if(!b->on)
 			continue;
 
-		const BuildingT* t = &g_buildingT[b->type];
-		//const BuildingT* t = &g_buildingT[BUILDING_APARTMENT];
+		const BuildingT* t = &g_bltype[b->type];
+		//const BuildingT* t = &g_bltype[BUILDING_APARTMENT];
 		Model* m = &g_model[ t->model ];
 
 		Vec3f vmin(b->drawpos.x - t->widthx*TILE_SIZE/2, b->drawpos.y, b->drawpos.z - t->widthz*TILE_SIZE/2);
@@ -359,15 +359,15 @@ void UpdateBuildings()
 		Explode(&g_building[1]);
 
 #if 1
-	//StageCopyVA(&g_building[0].drawva, &g_model[g_buildingT[g_building[0].type].model].m_va[0], completion);
-	HeightCopyVA(&g_building[1].drawva, &g_model[g_buildingT[g_building[1].type].model].m_va[0], Clipf(completion, 0, 1));
+	//StageCopyVA(&g_building[0].drawva, &g_model[g_bltype[g_building[0].type].model].m_va[0], completion);
+	HeightCopyVA(&g_building[1].drawva, &g_model[g_bltype[g_building[1].type].model].m_va[0], Clipf(completion, 0, 1));
 
 	completion -= 0.01f;
 
 	if(completion < -1.0f)
 		completion = 2.0f;
 #elif 1
-	HeightCopyVA(&g_building[0].drawva, &g_model[g_buildingT[g_building[0].type].model].m_va[0], completion);
+	HeightCopyVA(&g_building[0].drawva, &g_model[g_bltype[g_building[0].type].model].m_va[0], completion);
 
 	completion *= 0.95f;
 
@@ -377,14 +377,14 @@ void UpdateBuildings()
 #elif 0
 	static float completion = 2.0f;
 
-	StageCopyVA(&g_building[0].drawva, &g_model[g_buildingT[g_building[0].type].cmodel].m_va[0], completion);
+	StageCopyVA(&g_building[0].drawva, &g_model[g_bltype[g_building[0].type].cmodel].m_va[0], completion);
 
 	completion += 0.005f;
 
 	if(completion < 2.0f && completion >= 1.0f)
 	{
 		g_building[0].finished = true;
-		CopyVA(&g_building[0].drawva, &g_model[g_buildingT[g_building[0].type].model].m_va[0]);
+		CopyVA(&g_building[0].drawva, &g_model[g_bltype[g_building[0].type].model].m_va[0]);
 	}
 	if(completion >= 2.0f)
 	{
@@ -400,7 +400,7 @@ void UpdateBuildings()
 		if(!b->on)
 			continue;
 
-		BuildingT* t = &g_buildingT[b->type];
+		BuildingT* t = &g_bltype[b->type];
 		EmitterPlace* ep;
 		ParticleT* pt;
 
@@ -541,7 +541,7 @@ void HugTerrain(VertexArray* va, Vec3f pos)
 
 void Explode(Building* b)
 {
-	BuildingT* t = &g_buildingT[b->type];
+	BuildingT* t = &g_bltype[b->type];
 	float hwx = t->widthx*TILE_SIZE/2.0f;
 	float hwz = t->widthz*TILE_SIZE/2.0f;
 	Vec3f p;

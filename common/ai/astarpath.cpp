@@ -27,7 +27,7 @@ void AStarPath(int utype, int umode, int cmstartx, int cmstartz, int target, int
 			   int cmgoalx, int cmgoalz, int cmgoalminx, int cmgoalminz, int cmgoalmaxx, int cmgoalmaxz,
 			   int maxsearch)
 {
-	UnitT* ut = &g_unitT[utype];
+	UnitT* ut = &g_utype[utype];
 
 	PathJob* pj = new PathJob;
 	pj->utype = utype;

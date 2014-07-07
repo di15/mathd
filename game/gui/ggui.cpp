@@ -284,9 +284,9 @@ void Click_NewGame()
 {
 	CheckGLError(__FILE__, __LINE__);
 #if 1
-	LoadJPGMap("heightmaps/heightmap0e2s.jpg");
+	//LoadJPGMap("heightmaps/heightmap0e2s.jpg");
 	//LoadJPGMap("heightmaps/heightmap0e2.jpg");
-	//LoadJPGMap("heightmaps/heightmap0e.jpg");
+	LoadJPGMap("heightmaps/heightmap0e.jpg");
 #elif 1
 	LoadJPGMap("heightmaps/heightmap0c.jpg");
 #else
@@ -305,14 +305,49 @@ void Click_NewGame()
 			Vec3i cmpos((g_hmap.m_widthx+4)*TILE_SIZE/2 + (i+2)*PATHNODE_SIZE, 0, g_hmap.m_widthz*TILE_SIZE/2 + (j+2)*PATHNODE_SIZE);
 			cmpos.y = g_hmap.accheight(cmpos.x, cmpos.z);
 
-			if(rand()%2 == 1)
-				PlaceUnit(UNIT_ROBOSOLDIER, cmpos, 0);
-			else
+			//if(rand()%2 == 1)
+			//	PlaceUnit(UNIT_ROBOSOLDIER, cmpos, 0);
+			//else
 				PlaceUnit(UNIT_LABOURER, cmpos, 0);
 		}
 
 	CheckGLError(__FILE__, __LINE__);
 
+	for(int i=0; i<PLAYERS; i++)
+	{
+		if(i == g_localP)
+			continue;
+
+		Player* p = &g_player[i];
+
+		p->on = true;
+		p->ai = true;
+
+		p->global[RES_FUNDS] = 4000;
+		p->global[RES_FARMPRODUCTS] = 4000;
+		p->global[RES_RETFOOD] = 4000;
+		p->global[RES_MINERALS] = 4000;
+		p->global[RES_WSFUEL] = 4000;
+		p->global[RES_URANIUM] = 4000;
+
+#if 0	
+#define RES_FUNDS			0
+#define RES_LABOUR			1
+#define RES_HOUSING			2
+#define RES_FARMPRODUCTS	3
+#define RES_RETFOOD			4
+#define RES_PRODUCTION		5
+#define RES_MINERALS		6
+#define RES_CRUDEOIL		7
+#define RES_WSFUEL			8
+#define RES_RETFUEL			9
+#define RES_ENERGY			10
+#define RES_URANIUM			11
+#define RESOURCES			12
+#endif
+	}
+
+#if 0
 	PlaceBuilding(BUILDING_HOUR, Vec2i(g_hmap.m_widthx/2-1, g_hmap.m_widthz/2-3), true, 0);
 	PlaceBuilding(BUILDING_APARTMENT, Vec2i(g_hmap.m_widthx/2+2, g_hmap.m_widthz/2-2), true, 0);
 	PlaceBuilding(BUILDING_APARTMENT, Vec2i(g_hmap.m_widthx/2+4, g_hmap.m_widthz/2-3), true, 0);
@@ -360,6 +395,7 @@ void Click_NewGame()
 	CheckGLError(__FILE__, __LINE__);
 	PlaceBuilding(BUILDING_GASSTATION, Vec2i(g_hmap.m_widthx/2+14, g_hmap.m_widthz/2-1), true, 0);
 	g_hmap.genvbo();
+#endif
 
 	CheckGLError(__FILE__, __LINE__);
 

@@ -407,6 +407,12 @@
     <ClCompile Include="..\common\script\script.cpp">
       <Filter>Source Files\common\script</Filter>
     </ClCompile>
+    <ClCompile Include="..\common\ai\ai.cpp">
+      <Filter>Source Files\common\ai</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\econ\balance.cpp">
+      <Filter>Source Files\common\econ</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="gmain.h">
@@ -762,6 +768,12 @@
     </ClInclude>
     <ClInclude Include="..\common\script\script.h">
       <Filter>Source Files\common\script</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\ai\ai.h">
+      <Filter>Source Files\common\ai</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\econ\balance.h">
+      <Filter>Source Files\common\econ</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
