@@ -10,6 +10,12 @@ int g_rdem[RESOURCES];	//resource demands
 int g_udem[UNIT_TYPES];	//unit demands
 int g_bdem[BUILDING_TYPES];	//building demands
 
+DemNode::DemNode()
+{
+	demtype = DEM_NODE;
+	parent = NULL;
+}
+
 int CountU(int utype)
 {
 	int cnt = 0;
