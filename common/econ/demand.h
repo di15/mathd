@@ -21,7 +21,6 @@ class DemNode
 public:
 	int demtype;
 	DemNode* parent;
-	std::list<DemNode*> subdem;
 
 	DemNode();
 };
@@ -55,21 +54,35 @@ public:
 class DemsAtB : public DemNode
 {
 public:
+	int bi;
+	int btype;
 	std::list<DemNode*> condems;	//construction material
+	std::list<DemNode*> proddems;	//construction material
 	int prodratio;
-	int totaldem[RESOURCES];
+	int condem[RESOURCES];
+	int supplying[RESOURCES];
 
 	DemsAtB() : DemNode()
 	{
 		demtype = DEM_BNODE;
 		prodratio = 0;
-		Zero(totaldem);
+		Zero(supplying);
+	}
 
+	~DemsAtB()
+	{
 		auto riter = condems.begin();
 		while(riter != condems.end())
 		{
 			delete *riter;
 			riter = condems.erase(riter);
+		}
+
+		riter = proddems.begin();
+		while(riter != proddems.end())
+		{
+			delete *riter;
+			riter = proddems.erase(riter);
 		}
 	}
 };
@@ -120,7 +133,7 @@ public:
 	std::list<DemsAtB*> supbpcopy;	//master copy, this one will be freed
 	std::list<DemsAtU*> supupcopy;	//master copy, this one will be freed
 
-	~DemTree()
+	void free()
 	{
 		auto biter = supbpcopy.begin();
 		while(biter != supbpcopy.end())
@@ -143,11 +156,12 @@ public:
 			riter = nodes.erase(riter);
 		}
 	}
-};
 
-extern int g_rdem[RESOURCES];
-extern int g_udem[UNIT_TYPES];
-extern int g_bdem[BUILDING_TYPES];
+	~DemTree()
+	{
+		free();
+	}
+};
 
 void CalcDem();
 

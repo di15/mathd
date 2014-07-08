@@ -6,9 +6,7 @@
 #include "../sim/labourer.h"
 #include "../utils.h"
 
-int g_rdem[RESOURCES];	//resource demands
-int g_udem[UNIT_TYPES];	//unit demands
-int g_bdem[BUILDING_TYPES];	//building demands
+DemTree g_demtree;
 
 DemNode::DemNode()
 {
@@ -75,12 +73,58 @@ int CalcSup(int rtype)
 	}
 }
 
-#define MAX_REQ		1000
+#define MAX_REQ		50
 
-void AddReq(int rtype, int reqamount, int depth)
+void AddReq(DemTree* dm, std::list<DemNode*>* nodes, DemNode* parent, int rtype, int ramt, int depth)
 {
 	if(depth > MAX_REQ)
 		return;
+
+	int remain = ramt;
+
+	for(auto biter = dm->supbpcopy.begin(); biter != dm->supbpcopy.end(); biter++)
+	{
+		DemsAtB* demb = *biter;
+		BuildingT* bt = &g_bltype[demb->btype];
+		int capleft = bt->output[rtype];
+
+		if(demb->bi >= 0)
+		{
+			Building* b = &g_building[demb->bi];
+		}
+
+		capleft -= demb->supplying[rtype];
+
+		if(capleft <= 0)
+			continue;
+
+		int suphere = imin(capleft, remain);
+		remain -= suphere;
+
+		//int producing = bt->output[rtype] * demb->prodratio / RATIO_DENOM;
+		//int overprod = producing - demb->supplying[rtype] - suphere;
+
+		int newprodlevel = (demb->supplying[rtype] + suphere) * RATIO_DENOM / bt->output[rtype];
+		demb->supplying[rtype] += suphere;
+
+		if(newprodlevel > demb->prodratio)
+		{
+			int extraprodlev = newprodlevel - demb->prodratio;
+
+			for(int ri=0; ri<RESOURCES; ri++)
+			{
+				if(bt->input[ri] <= 0)
+					continue;
+
+				int rreq = imax(1, extraprodlev * bt->input[ri] / RATIO_DENOM);
+
+				AddReq(dm, &demb->proddems, demb, ri, rreq, depth+1);
+			}
+		}
+
+		if(remain <= 0)
+			return;
+	}
 
 	struct Producer
 	{
@@ -117,20 +161,104 @@ void AddReq(int rtype, int reqamount, int depth)
 		return;
 
 	BuildingT* t = &g_bltype[leastplb];
-	int reqnb = max(1, Ceili(reqamount, t->output[rtype]));
+	int reqnb = imax(1, Ceili(ramt, t->output[rtype]));
+
+	do
+	{
+		DemsAtB* demb = new DemsAtB();
+
+		demb->parent = NULL;
+		demb->prodratio = 0;
+		Zero(demb->supplying);
+		Zero(demb->condem);
+		demb->bi = -1;
+		demb->btype = leastplb;
+
+		dm->supbpcopy.push_back(demb);
+
+		BuildingT* bt = &g_bltype[demb->btype];
+
+		for(int ri=0; ri<RESOURCES; ri++)
+		{
+			if(bt->conmat[ri] <= 0)
+				continue;
+
+			AddReq(dm, &demb->condems, demb, ri, bt->conmat[ri], depth+1);
+		}
+
+		// TO DO: requisites for production, calc prodratio
+
+		remain -= bt->output[rtype];
+	}while(remain > 0);
 
 	for(int i=0; i<RESOURCES; i++)
 	{
-		int reqconmat = (t->conmat[i] + t->input[i]) * reqnb;
-		int sup = CalcSup(i);
-		sup -= g_rdem[i];
-
+		int reqconmat = t->conmat[i] + t->input[i] * reqnb;
 
 		if(reqconmat > 0)
 			AddReq(i, reqconmat, depth+1);
 	}
+}
 
+void AddBl(DemTree* dm)
+{
+	for(int i=0; i<BUILDINGS; i++)
+	{
+		Building* b = &g_building[i];
 
+		if(!b->on)
+			continue;
+
+		DemsAtB* demb = new DemsAtB();
+
+		demb->parent = NULL;
+		demb->prodratio = 0;
+		Zero(demb->supplying);
+		Zero(demb->condem);
+		demb->bi = i;
+		demb->btype = b->type;
+
+		dm->supbpcopy.push_back(demb);
+	}
+}
+
+void BlConReq(DemTree* dm)
+{
+	for(auto biter = dm->supbpcopy.begin(); biter != dm->supbpcopy.end(); biter++)
+	{
+		const int bi = (*biter)->bi;
+
+		BuildingT* bt = NULL;
+		int conmat[RESOURCES];
+		bool finished = false;
+
+		if(bi >= 0)
+		{
+			Building* b = &g_building[bi];
+			bt = &g_bltype[b->type];
+			memcpy(conmat, b->conmat, sizeof(int)*RESOURCES);
+			finished = b->finished;
+		}
+		else
+		{
+			bt = &g_bltype[(*biter)->btype];
+			memcpy(conmat, (*biter)->condem, sizeof(int)*RESOURCES);
+			finished = false;
+		}
+
+		if(!finished)
+		{
+			for(int i=0; i<RESOURCES; i++)
+			{
+				const int req = bt->conmat[i] - conmat[i];
+				if(req > 0)
+					AddReq(dm, &(*biter)->condems, *biter, i, req, 0);
+			}
+		}
+		else
+		{
+		}
+	}
 }
 
 #define AVG_DIST		(TILE_SIZE*6)
@@ -138,16 +266,12 @@ void AddReq(int rtype, int reqamount, int depth)
 
 void CalcDem()
 {
-	Zero(g_rdem);
-	for(int i=0; i<UNIT_TYPES; i++)
-		g_udem[i] = 0;
-	for(int i=0; i<BUILDING_TYPES; i++)
-		g_bdem[i] = 0;
+	g_demtree.free();
+	AddBl(&g_demtree);
+	BlConReq(&g_demtree);
 
 	int nlab = CountU(UNIT_LABOURER);
 
-	g_rdem[RES_RETFOOD] += LABOURER_FOODCONSUM * CYCLE_FRAMES;
-
-	AddReq(RES_RETFOOD, LABOURER_FOODCONSUM * CYCLE_FRAMES, 0);
+	AddReq(&g_demtree, &g_demtree.nodes, NULL, RES_RETFOOD, LABOURER_FOODCONSUM * CYCLE_FRAMES, 0);
 }
 
