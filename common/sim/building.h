@@ -52,8 +52,8 @@ public:
 
 extern Building g_building[BUILDINGS];
 
+int NewBuilding();
 void FreeBuildings();
-bool PlaceBuilding(int type, Vec2i pos, bool finished, int owner);
 void DrawBl();
 void UpdateBuildings();
 void StageCopyVA(VertexArray* to, VertexArray* from, float completion);

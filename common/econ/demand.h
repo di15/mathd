@@ -10,6 +10,8 @@
 #include "../sim/build.h"
 
 #define RATIO_DENOM		100000
+#define AVG_DIST		(TILE_SIZE*6)
+#define CYCLE_FRAMES	(SIM_FRAME_RATE*60)	
 
 #define DEM_NODE		0	//	unknown node
 #define DEM_RNODE		1	//	resource demand
@@ -24,6 +26,9 @@ public:
 
 	DemNode();
 };
+
+class DemsAtB;
+class DemsAtU;
 
 class RDemNode : public DemNode
 {
@@ -171,6 +176,8 @@ public:
 		free();
 	}
 };
+
+extern DemTree g_demtree;
 
 void CalcDem();
 

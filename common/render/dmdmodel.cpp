@@ -6,7 +6,7 @@
 #include "../math/vec3f.h"
 #include "../math/vec2f.h"
 
-bool LoadDMDModel(VertexArray** va, unsigned int& diffusem, unsigned int& specularm, unsigned int& normalm, unsigned int& ownerm, const char* relative, bool dontqueue)
+bool LoadDMDModel(VertexArray** va, unsigned int& diffusem, unsigned int& specularm, unsigned int& normalm, unsigned int& ownerm, Vec3f scale, Vec3f translate, const char* relative, bool dontqueue)
 {
 	char fullpath[MAX_PATH+1];
 	FullPath(relative, fullpath);
@@ -40,6 +40,9 @@ bool LoadDMDModel(VertexArray** va, unsigned int& diffusem, unsigned int& specul
 	fread((*va)[0].normals, sizeof(Vec3f), numv, fp);
 
 	fclose(fp);
+
+	for(int i=0; i<numv; i++)
+		(*va)->vertices[i] = (*va)->vertices[i] * scale + translate;
 
 #if 0
 	g_log<<"numv "<<numv<<endl;

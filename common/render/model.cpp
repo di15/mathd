@@ -296,7 +296,7 @@ bool Model::load(const char* relative, Vec3f scale, Vec3f translate, bool dontqu
 	m_normalm = 0;
 	m_ownerm = 0;
 
-	if(LoadDMDModel(&m_va, m_diffusem, m_specularm, m_normalm, m_ownerm, relative, dontqueue))
+	if(LoadDMDModel(&m_va, m_diffusem, m_specularm, m_normalm, m_ownerm, scale, translate, relative, dontqueue))
 	{
 		m_on = true;
 		char full[MAX_PATH+1];

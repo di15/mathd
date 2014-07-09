@@ -21,6 +21,11 @@
 #include "../math/vec4f.h"
 #include "../gui/icon.h"
 #include "player.h"
+#include "../../game/gmain.h"
+#include "../gui/gui.h"
+#include "../gui/widget.h"
+#include "../gui/widgets/spez/constructionview.h"
+#include "../render/foliage.h"
 
 void UpdateSBuild()
 {
@@ -394,4 +399,296 @@ bool CheckCanPlace(int type, Vec2i pos)
 		return false;
 
 	return true;
+}
+
+bool PlaceBuilding(int type, Vec2i pos, bool finished, int owner, int* bid)
+{
+	int i = NewBuilding();
+
+	if(bid)
+		*bid = i;
+
+	if(i < 0)
+		return false;
+
+	Building* b = &g_building[i];
+	b->on = true;
+	b->type = type;
+	b->tilepos = pos;
+
+	BuildingT* t = &g_bltype[type];
+
+	Vec2i tmin;
+	Vec2i tmax;
+
+	tmin.x = pos.x - t->widthx/2;
+	tmin.y = pos.y - t->widthz/2;
+	tmax.x = tmin.x + t->widthx;
+	tmax.y = tmin.y + t->widthz;
+
+	b->drawpos = Vec3f(pos.x*TILE_SIZE, Lowest(tmin.x, tmin.y, tmax.x, tmax.y), pos.y*TILE_SIZE);
+
+	if(t->foundation == FOUNDATION_SEA)
+		b->drawpos.y = WATER_LEVEL;
+
+#if 1
+	if(t->widthx % 2 == 1)
+		b->drawpos.x += TILE_SIZE/2;
+
+	if(t->widthz % 2 == 1)
+		b->drawpos.z += TILE_SIZE/2;
+
+	b->owner = owner;
+
+	b->finished = finished;
+
+	Zero(b->conmat);
+	Zero(b->stocked);
+	Zero(b->maxcost);
+
+	int cmminx = tmin.x*TILE_SIZE;
+	int cmminz = tmin.y*TILE_SIZE;
+	int cmmaxx = cmminx + t->widthx*TILE_SIZE;
+	int cmmaxz = cmminz + t->widthz*TILE_SIZE;
+
+	ClearFoliage(cmminx, cmminz, cmmaxx, cmmaxz);
+#if 0
+	ClearPowerlines(cmminx, cmminz, cmmaxx, cmmaxz);
+	ClearPipelines(cmminx, cmminz, cmmaxx, cmmaxz);
+	RePow();
+	RePipe();
+	ReRoadNetw();
+#endif
+
+#endif
+
+	b->remesh();
+
+	if(g_mode == APPMODE_PLAY)
+	{
+		//b->allocres();
+		b->inoperation = false;
+		
+		if(!b->finished && owner == g_curP)
+		{
+			Player* py = &g_player[g_curP];
+
+			ClearSel(&py->sel);
+			py->sel.buildings.push_back(i);
+
+			GUI* gui = &py->gui;
+			ConstructionView* cv = (ConstructionView*)gui->get("construction view")->get("construction view");
+			cv->regen(&py->sel);
+			gui->open("construction view");
+		}
+	}
+	else
+	{
+		b->inoperation = true;
+	}
+
+	b->fillcollider();
+
+	return true;
+}
+
+bool PlaceAbout(int btype, Vec2i tabout, Vec2i* tpos)
+{
+	//g_log<<"PlaceBAround "<<player<<endl;
+	//g_log.flush();
+    
+	BuildingT* t = &g_bltype[btype];
+	int shell = 1;
+    
+	//char msg[128];
+	//sprintf(msg, "place b a %f,%f,%f", vAround.x/16, vAround.y/16, vAround.z/16);
+	//Chat(msg);
+    
+	do
+	{
+		vector<Vec2i> canplace;
+		Vec2i ttry;
+		int tilex, tilez;
+		int left, right, top, bottom;
+		left = tabout.x - shell;
+		top = tabout.y - shell;
+		right = tabout.x + shell;
+		bottom = tabout.y + shell;
+
+		canplace.reserve( (right-left)*2 + (bottom-top)*2 - 4 );
+        
+		tilez = top;
+		for(tilex=left; tilex<right; tilex++)
+		{
+			ttry = Vec2i(tilex, tilez);
+
+			int cmstartx = ttry.x*TILE_SIZE - t->widthx/2;
+			int cmendx = cmstartx + t->widthx - 1;
+			int cmstartz = ttry.y*TILE_SIZE - t->widthz/2;
+			int cmendz = cmstartz + t->widthz - 1;
+			
+			if(t->widthx%2 == 1)
+			{
+				cmstartx += TILE_SIZE/2;
+				cmendx += TILE_SIZE/2;
+			}
+			if(t->widthz%2 == 1)
+			{
+				cmstartz += TILE_SIZE/2;
+				cmendz += TILE_SIZE/2;
+			}
+            
+			if(cmstartx < 0)
+				continue;
+			else if(cmendx >= g_hmap.m_widthx * TILE_SIZE)
+				continue;
+			if(cmstartz < 0)
+				continue;
+			else if(cmendz >= g_hmap.m_widthz * TILE_SIZE)
+				continue;
+            
+			//char msg[128];
+			//sprintf(msg, "check %d,%d,%d,%d", startx, startz, endx, endz);
+			//Chat(msg);
+            
+			if(!CheckCanPlace(btype, ttry))
+				continue;
+			canplace.push_back(ttry);
+		}
+        
+		tilex = right;
+		for(tilez=top; tilez<bottom; tilez++)
+		{
+			ttry = Vec2i(tilex, tilez);
+
+			int cmstartx = ttry.x*TILE_SIZE - t->widthx/2;
+			int cmendx = cmstartx + t->widthx - 1;
+			int cmstartz = ttry.y*TILE_SIZE - t->widthz/2;
+			int cmendz = cmstartz + t->widthz - 1;
+			
+			if(t->widthx%2 == 1)
+			{
+				cmstartx += TILE_SIZE/2;
+				cmendx += TILE_SIZE/2;
+			}
+			if(t->widthz%2 == 1)
+			{
+				cmstartz += TILE_SIZE/2;
+				cmendz += TILE_SIZE/2;
+			}
+            
+			if(cmstartx < 0)
+				continue;
+			else if(cmendx >= g_hmap.m_widthx * TILE_SIZE)
+				continue;
+			if(cmstartz < 0)
+				continue;
+			else if(cmendz >= g_hmap.m_widthz * TILE_SIZE)
+				continue;
+            
+			//char msg[128];
+			//sprintf(msg, "check %d,%d,%d,%d", startx, startz, endx, endz);
+			//Chat(msg);
+            
+			if(!CheckCanPlace(btype, ttry))
+				continue;
+			canplace.push_back(ttry);
+		}
+        
+		tilez = bottom;
+		for(tilex=right; tilex>left; tilex--)
+		{
+			ttry = Vec2i(tilex, tilez);
+
+			int cmstartx = ttry.x*TILE_SIZE - t->widthx/2;
+			int cmendx = cmstartx + t->widthx - 1;
+			int cmstartz = ttry.y*TILE_SIZE - t->widthz/2;
+			int cmendz = cmstartz + t->widthz - 1;
+			
+			if(t->widthx%2 == 1)
+			{
+				cmstartx += TILE_SIZE/2;
+				cmendx += TILE_SIZE/2;
+			}
+			if(t->widthz%2 == 1)
+			{
+				cmstartz += TILE_SIZE/2;
+				cmendz += TILE_SIZE/2;
+			}
+            
+			if(cmstartx < 0)
+				continue;
+			else if(cmendx >= g_hmap.m_widthx * TILE_SIZE)
+				continue;
+			if(cmstartz < 0)
+				continue;
+			else if(cmendz >= g_hmap.m_widthz * TILE_SIZE)
+				continue;
+            
+			//char msg[128];
+			//sprintf(msg, "check %d,%d,%d,%d", startx, startz, endx, endz);
+			//Chat(msg);
+            
+			if(!CheckCanPlace(btype, ttry))
+				continue;
+			canplace.push_back(ttry);
+		}
+        
+		tilex = left;
+		for(tilez=bottom; tilez>top; tilez--)
+		{
+			ttry = Vec2i(tilex, tilez);
+
+			int cmstartx = ttry.x*TILE_SIZE - t->widthx/2;
+			int cmendx = cmstartx + t->widthx - 1;
+			int cmstartz = ttry.y*TILE_SIZE - t->widthz/2;
+			int cmendz = cmstartz + t->widthz - 1;
+			
+			if(t->widthx%2 == 1)
+			{
+				cmstartx += TILE_SIZE/2;
+				cmendx += TILE_SIZE/2;
+			}
+			if(t->widthz%2 == 1)
+			{
+				cmstartz += TILE_SIZE/2;
+				cmendz += TILE_SIZE/2;
+			}
+            
+			if(cmstartx < 0)
+				continue;
+			else if(cmendx >= g_hmap.m_widthx * TILE_SIZE)
+				continue;
+			if(cmstartz < 0)
+				continue;
+			else if(cmendz >= g_hmap.m_widthz * TILE_SIZE)
+				continue;
+            
+			//char msg[128];
+			//sprintf(msg, "check %d,%d,%d,%d", startx, startz, endx, endz);
+			//Chat(msg);
+            
+			if(!CheckCanPlace(btype, ttry))
+				continue;
+			canplace.push_back(ttry);
+		}
+        
+		if(canplace.size() > 0)
+		{
+			//Chat("placing");
+			//g_log<<"placeb t="<<btype<<" "<<vTile.x<<","<<vTile.y<<","<<vTile.z<<"("<<(vTile.x/16)<<","<<(vTile.y/16)<<","<<(vTile.z/16)<<")"<<endl;
+			//g_log.flush();
+			*tpos = canplace[ rand()%canplace.size() ];
+            
+			return true;
+		}
+        
+		//char msg[128];
+		//sprintf(msg, "shell %d", shell);
+		//Chat(msg);
+        
+		shell++;
+	}while(shell < g_hmap.m_widthx || shell < g_hmap.m_widthz);
+    
+	return false;
 }

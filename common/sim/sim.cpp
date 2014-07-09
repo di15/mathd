@@ -313,12 +313,13 @@ void Queue()
 	BConMat(BUILDING_APARTMENT, RES_MINERALS, 5);
 	BConMat(BUILDING_APARTMENT, RES_LABOUR, 10);
 	BInput(BUILDING_APARTMENT, RES_ENERGY, 5);
-	BOutput(BUILDING_APARTMENT, RES_HOUSING, 5);
+	BOutput(BUILDING_APARTMENT, RES_HOUSING, 15);
 
-	DefB(BUILDING_FACTORY, "Factory", Vec2i(2,2),  false, "models/factory3/factory3", Vec3f(1,1,1), Vec3f(0,0,0), "models/factory3/factory3", Vec3f(1,1,1), Vec3f(0,0,0), FOUNDATION_LAND, RES_NONE);
+	DefB(BUILDING_FACTORY, "Factory", Vec2i(1,1),  false, "models/factory3/factory3", Vec3f(1,1,1)/2, Vec3f(0,0,0), "models/factory3/factory3", Vec3f(1,1,1)/2, Vec3f(0,0,0), FOUNDATION_LAND, RES_NONE);
 	BConMat(BUILDING_FACTORY, RES_MINERALS, 5);
 	BConMat(BUILDING_FACTORY, RES_LABOUR, 10);
 	BInput(BUILDING_FACTORY, RES_ENERGY, 5);
+	BOutput(BUILDING_FACTORY, RES_PRODUCTION, 5);
 
 	DefB(BUILDING_REFINERY, "Refinery", Vec2i(2,2),  false, "models/refinery2/refinery2", Vec3f(1,1,1), Vec3f(0,0,0), "models/refinery2/refinery2", Vec3f(1,1,1), Vec3f(0,0,0), FOUNDATION_LAND, RES_NONE);
 	BConMat(BUILDING_REFINERY, RES_MINERALS, 5);
@@ -343,14 +344,15 @@ void Queue()
 	BConMat(BUILDING_FARM, RES_MINERALS, 5);
 	BConMat(BUILDING_FARM, RES_LABOUR, 10);
 	BInput(BUILDING_FARM, RES_ENERGY, 5);
-	BOutput(BUILDING_FARM, RES_FARMPRODUCTS, 5);
+	BOutput(BUILDING_FARM, RES_FARMPRODUCTS, 15);
 
 	DefB(BUILDING_STORE, "Store", Vec2i(2,1), true, "models/store1/hugterr.ms3d", Vec3f(100,100,100), Vec3f(0,0,0), "models/store1/hugterr.ms3d", Vec3f(100,100,100), Vec3f(0,0,0), FOUNDATION_LAND, RES_NONE);
 	BConMat(BUILDING_STORE, RES_MINERALS, 5);
 	BConMat(BUILDING_STORE, RES_LABOUR, 10);
 	BInput(BUILDING_STORE, RES_ENERGY, 5);
-	BInput(BUILDING_STORE, RES_FARMPRODUCTS, 5);
-	BOutput(BUILDING_STORE, RES_RETFOOD, 5);
+	BInput(BUILDING_STORE, RES_FARMPRODUCTS, 500);
+	BInput(BUILDING_STORE, RES_PRODUCTION, 5);
+	BOutput(BUILDING_STORE, RES_RETFOOD, 500);
 
 	DefB(BUILDING_HOUR, "Harbour", Vec2i(2,2), false, "models/harbour2/harbour2", Vec3f(100,100,100), Vec3f(0,0,0), "models/harbour2/harbour2", Vec3f(100,100,100), Vec3f(0,0,0), FOUNDATION_COASTAL, RES_NONE);
 	BConMat(BUILDING_HOUR, RES_MINERALS, 5);
@@ -367,6 +369,8 @@ void Queue()
 	BConMat(BUILDING_MINE, RES_MINERALS, 5);
 	BConMat(BUILDING_MINE, RES_LABOUR, 10);
 	BInput(BUILDING_MINE, RES_ENERGY, 5);
+	BOutput(BUILDING_MINE, RES_MINERALS, 5000);
+	BOutput(BUILDING_MINE, RES_URANIUM, 500);
 
 	DefB(BUILDING_GASSTATION, "Gas Station", Vec2i(1,1), true, "models/gasstation2/gasstation2.ms3d", Vec3f(1,1,1)/80.0f*TILE_SIZE, Vec3f(0,0,0), "models/gasstation2/gasstation2.ms3d", Vec3f(1,1,1)/80.0f*TILE_SIZE, Vec3f(0,0,0), FOUNDATION_LAND, RES_NONE);
 	BConMat(BUILDING_GASSTATION, RES_MINERALS, 5);

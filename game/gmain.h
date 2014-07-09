@@ -8,7 +8,6 @@
 #define CONFIGFILE			"config.ini"
 #define TITLE				"Corporation-States"
 #define SERVER_ADDR			"corpstates.com"
-#define CYCLE_FRAMES		(DRAW_FRAME_RATE*60)
 
 //#define TRUCK_DEBUG
 //#define TRUCK_DEBUG2

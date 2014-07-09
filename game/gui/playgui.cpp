@@ -578,7 +578,7 @@ void FillPlayGUI()
 	g_viewportT[VIEWPORT_ENTVIEW] = ViewportT(Vec3f(0, MAX_DISTANCE/2, 0), Vec3f(0, 1, 0), "EntView", false);
 
 	//for(int i=0; i<25; i++)
-	//Sleep(1000);
+	//Sleep(6000);
 
 	gui->add(new ViewLayer(gui, "play gui"));
 	ViewLayer* playguiview = (ViewLayer*)gui->get("play gui");

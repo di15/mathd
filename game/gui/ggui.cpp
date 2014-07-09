@@ -299,7 +299,7 @@ void Click_NewGame()
 	CheckGLError(__FILE__, __LINE__);
 
 	for(int i=0; i<10; i++)
-		for(int j=0; j<20; j++)
+		for(int j=0; j<10; j++)
 		{
 
 			Vec3i cmpos((g_hmap.m_widthx+4)*TILE_SIZE/2 + (i+2)*PATHNODE_SIZE, 0, g_hmap.m_widthz*TILE_SIZE/2 + (j+2)*PATHNODE_SIZE);
@@ -569,7 +569,7 @@ void EdPlaceBuilding()
 	Vec2i tilepos (intersection.x/TILE_SIZE, intersection.z/TILE_SIZE);
 
 	if(CheckCanPlace(type, tilepos))
-		PlaceBuilding(type, tilepos, true, -1);
+		PlaceBuilding(type, tilepos, true, -1, NULL);
 #if 0
 	g_hmap.setheight( intersection.x / TILE_SIZE, intersection.z / TILE_SIZE, 0);
 	g_hmap.remesh();
@@ -625,7 +625,7 @@ void MouseLUp()
 		{
 			if(py->canplace)
 			{
-				PlaceBuilding(py->build, Vec2i(py->vdrag[0].x/TILE_SIZE, py->vdrag[0].z/TILE_SIZE), false, g_localP);
+				PlaceBuilding(py->build, Vec2i(py->vdrag[0].x/TILE_SIZE, py->vdrag[0].z/TILE_SIZE), false, g_localP, NULL);
 			}
 			else
 			{

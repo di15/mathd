@@ -73,14 +73,46 @@ int CalcSup(int rtype)
 	}
 }
 
-#define MAX_REQ		50
+#define MAX_REQ		1000
 
 void AddReq(DemTree* dm, std::list<DemNode*>* nodes, DemNode* parent, int rtype, int ramt, int depth)
 {
+#ifdef DEBUG
+	if(ramt <= 0)
+	{
+		g_log<<"0 req: "<<g_resource[rtype].name<<" "<<ramt<<std::endl;
+		g_log.flush();
+
+		return;
+	}
+
+	g_log<<"demand "<<rtype<<" ramt "<<ramt<<" depth "<<depth<<std::endl;
+	g_log.flush();
+#endif
+
 	if(depth > MAX_REQ)
 		return;
 
 	int remain = ramt;
+	
+#ifdef DEBUG
+	g_log<<"bls"<<std::endl;
+	
+	int en = 0;
+	int uran = 0;
+
+	for(auto biter = dm->supbpcopy.begin(); biter != dm->supbpcopy.end(); biter++)
+	{
+		uran += (*biter)->supplying[RES_URANIUM];
+		en += (*biter)->supplying[RES_ENERGY];
+		g_log<<"\t\tbuilding "<<g_bltype[(*biter)->btype].name<<" supplying ur"<<(*biter)->supplying[RES_URANIUM]<<" en"<<(*biter)->supplying[RES_ENERGY]<<std::endl;
+		g_log.flush();
+	}
+	
+	g_log<<"/bls uran = "<<uran<<std::endl;
+	g_log<<"/bls en = "<<en<<std::endl;
+	g_log.flush();
+#endif
 
 	for(auto biter = dm->supbpcopy.begin(); biter != dm->supbpcopy.end(); biter++)
 	{
@@ -92,12 +124,22 @@ void AddReq(DemTree* dm, std::list<DemNode*>* nodes, DemNode* parent, int rtype,
 
 		int capleft = bt->output[rtype];
 		capleft -= demb->supplying[rtype];
+		
+#ifdef DEBUG
+		g_log<<"\tcapleft "<<capleft<<std::endl;
+		g_log.flush();
+#endif
 
 		if(capleft <= 0)
 			continue;
 
 		int suphere = imin(capleft, remain);
 		remain -= suphere;
+		
+#ifdef DEBUG
+		g_log<<"\tsuphere "<<suphere<<" remain "<<remain<<std::endl;
+		g_log.flush();
+#endif
 
 		RDemNode* rdem = new RDemNode;
 		rdem->bi = (*biter)->bi;
@@ -111,22 +153,44 @@ void AddReq(DemTree* dm, std::list<DemNode*>* nodes, DemNode* parent, int rtype,
 		// TO DO: unit transport
 		nodes->push_back(rdem);
 
+		// TO DO: roads and infrastructure to suppliers
+
 		//int producing = bt->output[rtype] * demb->prodratio / RATIO_DENOM;
 		//int overprod = producing - demb->supplying[rtype] - suphere;
-
+		
 		int newprodlevel = (demb->supplying[rtype] + suphere) * RATIO_DENOM / bt->output[rtype];
+		newprodlevel = imax(1, newprodlevel);
 		demb->supplying[rtype] += suphere;
+		
+#ifdef DEBUG
+		g_log<<"suphere"<<suphere<<" of total"<<demb->supplying[rtype]<<" of remain"<<remain<<" of res "<<g_resource[rtype].name<<" newprodlevel "<<demb->prodratio<<" -> "<<newprodlevel<<std::endl;
+		g_log.flush();
+#endif
 
 		if(newprodlevel > demb->prodratio)
 		{
 			int extraprodlev = newprodlevel - demb->prodratio;
+			int oldprodratio = demb->prodratio;
+			demb->prodratio = newprodlevel;
 
 			for(int ri=0; ri<RESOURCES; ri++)
 			{
 				if(bt->input[ri] <= 0)
 					continue;
 
-				int rreq = imax(1, extraprodlev * bt->input[ri] / RATIO_DENOM);
+				//int rreq = extraprodlev * bt->input[ri] / RATIO_DENOM;
+				int oldreq = oldprodratio * bt->input[ri] / RATIO_DENOM;
+				int newreq = newprodlevel * bt->input[ri] / RATIO_DENOM;
+				int rreq = newreq - oldreq;
+
+				if(rreq <= 0)
+				{
+#ifdef DEBUG
+					g_log<<"rreq 0 at "<<__LINE__<<" = "<<rreq<<" of "<<g_resource[ri].name<<std::endl;
+					g_log.flush();
+#endif
+					continue;
+				}
 
 				AddReq(dm, &demb->proddems, demb, ri, rreq, depth+1);
 			}
@@ -135,6 +199,9 @@ void AddReq(DemTree* dm, std::list<DemNode*>* nodes, DemNode* parent, int rtype,
 		if(remain <= 0)
 			return;
 	}
+
+	if(remain <= 0)
+		return;
 
 	struct Producer
 	{
@@ -186,23 +253,34 @@ void AddReq(DemTree* dm, std::list<DemNode*>* nodes, DemNode* parent, int rtype,
 
 		dm->supbpcopy.push_back(demb);
 
+		// need to set this before req of conmat because of possible recursive loop
+
 		BuildingT* bt = &g_bltype[demb->btype];
 
-		for(int ri=0; ri<RESOURCES; ri++)
-		{
-			if(bt->conmat[ri] <= 0)
-				continue;
-
-			AddReq(dm, &demb->condems, demb, ri, bt->conmat[ri], depth+1);
-			demb->condem[ri] += bt->conmat[ri];
-		}
-
-		// TO DO: requisites for production, calc prodratio
-
-		demb->prodratio = imin(RATIO_DENOM, remain * RATIO_DENOM / bt->output[rtype]);
+		// requisites for production, calc prodratio
+		
+		demb->prodratio = remain * RATIO_DENOM / bt->output[rtype];
+		demb->prodratio = imin(RATIO_DENOM, demb->prodratio);
+		demb->prodratio = imax(1, demb->prodratio);
+		// prodratio could be modified next, we need the original value
+		int oldprodratio = demb->prodratio;
+		
+#ifdef DEBUG
+		g_log<<"\toldprodr "<<oldprodratio<<std::endl;
+		g_log.flush();
+#endif
 		
 		int prodamt = bt->output[rtype] * demb->prodratio / RATIO_DENOM;
+		prodamt = imax(1, prodamt);
 		demb->supplying[rtype] += prodamt;
+		
+#ifdef DEBUG
+		g_log<<"\tprodamt "<<prodamt<<std::endl;
+		g_log.flush();
+		
+		g_log<<"\t1. prodamt"<<prodamt<<" of total"<<demb->supplying[rtype]<<" of remain"<<remain<<" of res "<<g_resource[rtype].name<<" newprodlevel "<<oldprodratio<<" -> "<<demb->prodratio<<std::endl;
+		g_log.flush();
+#endif
 		
 		RDemNode* rdem = new RDemNode;
 		rdem->bi = -1;
@@ -216,17 +294,50 @@ void AddReq(DemTree* dm, std::list<DemNode*>* nodes, DemNode* parent, int rtype,
 		// TO DO: unit transport
 		nodes->push_back(rdem);
 
+		// TO DO: roads and infrastructure to suppliers
+
+		for(int ri=0; ri<RESOURCES; ri++)
+		{
+			if(bt->conmat[ri] <= 0)
+				continue;
+
+			AddReq(dm, &demb->condems, demb, ri, bt->conmat[ri], depth+1);
+			demb->condem[ri] += bt->conmat[ri];
+		}
+
+#ifdef DEBUG
+		g_log<<"\t2. prodamt"<<prodamt<<" of total"<<demb->supplying[rtype]<<" of remain"<<remain<<" of res "<<g_resource[rtype].name<<" newprodlevel "<<oldprodratio<<" -> "<<demb->prodratio<<std::endl;
+		g_log.flush();
+#endif
+
+		// we add prod reqs second because construction is first priority
+
 		for(int ri=0; ri<RESOURCES; ri++)
 		{
 			if(bt->input[ri] <= 0)
 				continue;
+			
+			int rreq = bt->input[ri] * oldprodratio / RATIO_DENOM;
+			rreq = imax(1, rreq);
 
-			int rreq = bt->input[ri] * demb->prodratio / RATIO_DENOM;
+			if(rreq <= 0)
+			{
+#ifdef DEBUG
+				g_log<<"rreq 0 at "<<__LINE__<<" = "<<rreq<<" of "<<g_resource[ri].name<<std::endl;
+				g_log.flush();
+#endif
+				continue;
+			}
+
 			AddReq(dm, &demb->proddems, demb, ri, rreq, depth+1);
 		}
+		
+#ifdef DEBUG
+		g_log<<"\t3. prodamt"<<prodamt<<" of total"<<demb->supplying[rtype]<<" of remain"<<remain<<" of res "<<g_resource[rtype].name<<" newprodlevel "<<oldprodratio<<" -> "<<demb->prodratio<<std::endl;
+		g_log.flush();
+#endif
 
 		remain -= prodamt;
-
 	}while(remain > 0);
 
 	// TO DO: outlets for global player cache/reserves
@@ -293,9 +404,6 @@ void BlConReq(DemTree* dm)
 	}
 }
 
-#define AVG_DIST		(TILE_SIZE*6)
-#define CYCLE_FRAMES	(SIM_FRAME_RATE*60)	
-
 void CalcDem()
 {
 	g_demtree.free();
@@ -303,7 +411,9 @@ void CalcDem()
 	BlConReq(&g_demtree);
 
 	int nlab = CountU(UNIT_LABOURER);
-
+	
+	AddReq(&g_demtree, &g_demtree.nodes, NULL, RES_HOUSING, nlab, 0);
 	AddReq(&g_demtree, &g_demtree.nodes, NULL, RES_RETFOOD, LABOURER_FOODCONSUM * CYCLE_FRAMES, 0);
+	AddReq(&g_demtree, &g_demtree.nodes, NULL, RES_ENERGY, nlab * LABOURER_ENERGYCONSUM, 0);
 }
 
