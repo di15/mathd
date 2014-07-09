@@ -86,13 +86,11 @@ void AddReq(DemTree* dm, std::list<DemNode*>* nodes, DemNode* parent, int rtype,
 	{
 		DemsAtB* demb = *biter;
 		BuildingT* bt = &g_bltype[demb->btype];
+
+		if(bt->output[rtype] <= 0)
+			continue;
+
 		int capleft = bt->output[rtype];
-
-		if(demb->bi >= 0)
-		{
-			Building* b = &g_building[demb->bi];
-		}
-
 		capleft -= demb->supplying[rtype];
 
 		if(capleft <= 0)
@@ -100,6 +98,18 @@ void AddReq(DemTree* dm, std::list<DemNode*>* nodes, DemNode* parent, int rtype,
 
 		int suphere = imin(capleft, remain);
 		remain -= suphere;
+
+		RDemNode* rdem = new RDemNode;
+		rdem->bi = (*biter)->bi;
+		rdem->btype = (*biter)->btype;
+		rdem->supbp = *biter;
+		rdem->parent = parent;
+		rdem->rtype = rtype;
+		rdem->ramt = suphere;
+		rdem->ui = -1;
+		rdem->utype = -1;
+		// TO DO: unit transport
+		nodes->push_back(rdem);
 
 		//int producing = bt->output[rtype] * demb->prodratio / RATIO_DENOM;
 		//int overprod = producing - demb->supplying[rtype] - suphere;
@@ -161,7 +171,7 @@ void AddReq(DemTree* dm, std::list<DemNode*>* nodes, DemNode* parent, int rtype,
 		return;
 
 	BuildingT* t = &g_bltype[leastplb];
-	int reqnb = imax(1, Ceili(ramt, t->output[rtype]));
+	//int reqnb = imax(1, Ceili(ramt, t->output[rtype]));
 
 	do
 	{
@@ -184,20 +194,42 @@ void AddReq(DemTree* dm, std::list<DemNode*>* nodes, DemNode* parent, int rtype,
 				continue;
 
 			AddReq(dm, &demb->condems, demb, ri, bt->conmat[ri], depth+1);
+			demb->condem[ri] += bt->conmat[ri];
 		}
 
 		// TO DO: requisites for production, calc prodratio
 
-		remain -= bt->output[rtype];
+		demb->prodratio = imin(RATIO_DENOM, remain * RATIO_DENOM / bt->output[rtype]);
+		
+		int prodamt = bt->output[rtype] * demb->prodratio / RATIO_DENOM;
+		demb->supplying[rtype] += prodamt;
+		
+		RDemNode* rdem = new RDemNode;
+		rdem->bi = -1;
+		rdem->supbp = demb;
+		rdem->btype = demb->btype;
+		rdem->parent = parent;
+		rdem->rtype = rtype;
+		rdem->ramt = prodamt;
+		rdem->ui = -1;
+		rdem->utype = -1;
+		// TO DO: unit transport
+		nodes->push_back(rdem);
+
+		for(int ri=0; ri<RESOURCES; ri++)
+		{
+			if(bt->input[ri] <= 0)
+				continue;
+
+			int rreq = bt->input[ri] * demb->prodratio / RATIO_DENOM;
+			AddReq(dm, &demb->proddems, demb, ri, rreq, depth+1);
+		}
+
+		remain -= prodamt;
+
 	}while(remain > 0);
 
-	for(int i=0; i<RESOURCES; i++)
-	{
-		int reqconmat = t->conmat[i] + t->input[i] * reqnb;
-
-		if(reqconmat > 0)
-			AddReq(i, reqconmat, depth+1);
-	}
+	// TO DO: outlets for global player cache/reserves
 }
 
 void AddBl(DemTree* dm)

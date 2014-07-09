@@ -57,7 +57,8 @@ public:
 	int bi;
 	int btype;
 	std::list<DemNode*> condems;	//construction material
-	std::list<DemNode*> proddems;	//construction material
+	std::list<DemNode*> proddems;	//production input raw materials
+	std::list<DemNode*> manufdems;	//manufacturing input raw materials
 	int prodratio;
 	int condem[RESOURCES];
 	int supplying[RESOURCES];
@@ -67,6 +68,7 @@ public:
 		demtype = DEM_BNODE;
 		prodratio = 0;
 		Zero(supplying);
+		Zero(condem);
 	}
 
 	~DemsAtB()
@@ -83,6 +85,13 @@ public:
 		{
 			delete *riter;
 			riter = proddems.erase(riter);
+		}
+
+		riter = manufdems.begin();
+		while(riter != manufdems.end())
+		{
+			delete *riter;
+			riter = manufdems.erase(riter);
 		}
 	}
 };
