@@ -555,12 +555,12 @@ void SaveBuildings(FILE *fp)
 
 		fwrite(&b->finished, sizeof(bool), 1, fp);
 
-		fwrite(&b->pownetw, sizeof(int), 1, fp);
-		fwrite(&b->crpipenetw, sizeof(int), 1, fp);
+		fwrite(&b->pownetw, sizeof(short), 1, fp);
+		fwrite(&b->crpipenetw, sizeof(short), 1, fp);
 		int nroadnetw = b->roadnetw.size();
-		fwrite(&nroadnetw, sizeof(int), 1, fp);
+		fwrite(&nroadnetw, sizeof(short), 1, fp);
 		for(auto roadnetwiter = b->roadnetw.begin(); roadnetwiter != b->roadnetw.end(); roadnetwiter++)
-			fwrite(&*roadnetwiter, sizeof(int), 1, fp);
+			fwrite(&*roadnetwiter, sizeof(short), 1, fp);
 	}
 }
 
@@ -590,14 +590,14 @@ void ReadBuildings(FILE *fp)
 
 		fread(&b->finished, sizeof(bool), 1, fp);
 
-		fread(&b->pownetw, sizeof(int), 1, fp);
-		fread(&b->crpipenetw, sizeof(int), 1, fp);
-		int nroadnetw = -1;
-		fread(&nroadnetw, sizeof(int), 1, fp);
+		fread(&b->pownetw, sizeof(short), 1, fp);
+		fread(&b->crpipenetw, sizeof(short), 1, fp);
+		short nroadnetw = -1;
+		fread(&nroadnetw, sizeof(short), 1, fp);
 		for(int i=0; i<nroadnetw; i++)
 		{
-			int roadnetw = -1;
-			fread(&roadnetw, sizeof(int), 1, fp);
+			short roadnetw = -1;
+			fread(&roadnetw, sizeof(short), 1, fp);
 			b->roadnetw.push_back(roadnetw);
 		}
 

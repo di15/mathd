@@ -9,6 +9,16 @@
 #include "selection.h"
 #include "../../libs/objectscript/objectscript.h"
 
+struct PlayerColor
+{
+	unsigned char color[3];
+	char name[32];
+};
+
+#define PLAYER_COLORS	48
+
+extern PlayerColor g_pycols[PLAYER_COLORS];
+
 class Player
 {
 public:
@@ -59,7 +69,8 @@ public:
 	~Player();
 };
 
-#define PLAYERS 32
+//#define PLAYERS 32
+#define PLAYERS ARRSZ(g_pycols)
 
 extern Player g_player[PLAYERS];
 extern int g_localP;

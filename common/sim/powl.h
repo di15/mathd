@@ -15,21 +15,9 @@
 #include "../render/model.h"
 #include "../render/vertexarray.h"
 #include "../math/vec3i.h"
+#include "infrastructure.h"
 
-class Shader;
-
-class PowlTileType
-{
-public:
-	void draw(int x, int z);
-	void Define(const char* modelfile);
-
-	int model;
-};
-
-extern PowlTileType g_powlT[CONNECTION_TYPES][2];
-
-class PowlTile
+class PowlTile : ConduitTile
 {
 public:
 	bool on;
@@ -47,6 +35,7 @@ public:
 	PowlTile();
 	~PowlTile();
 
+	char condtype();
 	int netreq(int res);
 	void destroy();
 	void allocate();
@@ -57,7 +46,7 @@ extern PowlTile* g_powl;
 extern PowlTile* g_powlplan;
 extern int g_powlcost[RESOURCES];
 
-void DefinePowl(int type, bool finished, const char* modelfile);
+void DefPowl(int type, bool finished, const char* modelfile);
 bool PowlHasRoad(int x, int z);
 void PlacePowl(int x, int z, int stateowner, bool plan=false);
 bool PowlPlaceable(int x, int z);

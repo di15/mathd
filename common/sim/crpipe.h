@@ -2,7 +2,7 @@
 //  pipeline.h
 //  corpstates
 //
-//  Created by polyf  on 2013-05-30.
+//  Created by polyf on 2013-05-30.
 //  Copyright (c) 2013 DMD 'Ware. All rights reserved.
 //
 
@@ -15,21 +15,9 @@
 #include "../render/model.h"
 #include "../render/vertexarray.h"
 #include "../math/vec3i.h"
+#include "infrastructure.h"
 
-class Shader;
-
-class CrPipeTileType
-{
-public:
-	void draw(int x, int z);
-	void Define(const char* modelfile);
-
-	int model;
-};
-
-extern CrPipeTileType g_crpipeT[CONNECTION_TYPES][2];
-
-class CrPipeTile
+class CrPipeTile : ConduitTile
 {
 public:
 	bool on;
@@ -47,6 +35,7 @@ public:
 	CrPipeTile();
 	~CrPipeTile();
 
+	char condtype();
 	int netreq(int res);
 	void destroy();
 	void allocate();
@@ -57,7 +46,7 @@ extern CrPipeTile* g_crpipe;
 extern CrPipeTile* g_crpipeplan;
 extern int g_crpipecost[RESOURCES];
 
-void DefineCrPipe(int type, bool finished, const char* modelfile);
+void DefCrPipe(int type, bool finished, const char* modelfile);
 bool CrPipeHasRoad(int x, int z);
 void PlaceCrPipe(int x, int z, int stateowner, bool plan=false);
 bool CrPipePlaceable(int x, int z);

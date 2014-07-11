@@ -13,7 +13,7 @@ int g_collidertype;
 bool g_ignored;
 
 
-bool BuildingAdjacent(int i, int j)
+bool BlAdj(int i, int j)
 {
 	Building* bi = &g_building[i];
 	Building* bj = &g_building[j];

@@ -23,10 +23,8 @@
 #include "../gui/widgets/spez/constructionview.h"
 #include "../../game/gui/gviewport.h"
 
-PowlTileType g_powlT[CONNECTION_TYPES][2];
 PowlTile* g_powl = NULL;
 PowlTile* g_powlplan = NULL;
-int g_powlcost[RESOURCES];
 
 PowlTile::PowlTile()
 {
@@ -53,16 +51,35 @@ PowlTile::~PowlTile()
 	//g_log.flush();
 }
 
-void PowlTileType::draw(int x, int z)
+char PowlTile::condtype()
 {
-	Vec3f pos = PowlPosition(x, z);
-	g_model[model].draw(0, pos, 0);
+	return CON_POWL;
 }
 
-void DefinePowl(int type, bool finished, const char* modelfile)
+int PowlTile::netreq(int res)
 {
-	PowlTileType* t = &g_powlT[type][(int)finished];
-	QueueModel(&t->model, modelfile, Vec3f(1,1,1)/16.0f*TILE_SIZE, Vec3f(0,0,0));
+	return 0;
+}
+
+void PowlTile::destroy()
+{
+}
+
+void PowlTile::allocate()
+{
+
+}
+
+bool PowlTile::checkconstruction()
+{
+
+	return false;
+}
+
+void DefPowl(int type, bool finished, const char* modelfile)
+{
+	int* tm = &g_cotype[CON_POWL].model[type][(int)finished];
+	QueueModel(tm, modelfile, Vec3f(1,1,1)/16.0f*TILE_SIZE, Vec3f(0,0,0));
 }
 
 PowlTile* PowlAt(int x, int z)
@@ -788,7 +805,7 @@ bool RePowB()
 			if(!b2->on)
 				continue;
 
-			if(!BuildingAdjacent(i, j))
+			if(!BlAdj(i, j))
 				continue;
 
 			if(b->pownetw < 0 && b2->pownetw >= 0)

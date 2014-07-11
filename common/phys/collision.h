@@ -26,7 +26,7 @@ class Unit;
 
 class Unit;
 
-bool BuildingAdjacent(int i, int j);
+bool BlAdj(int i, int j);
 
 bool PowlAdjacent(int i, int x, int z);
 bool CrPipeAdjacent(int i, int x, int z);

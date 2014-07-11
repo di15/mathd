@@ -6,7 +6,7 @@
 Resource g_resource[RESOURCES];
 int g_resEd;
 
-void DefR(int resi, const char* n, const char* depn, int iconindex, bool phys, bool cap, bool glob, float r, float g, float b, float a)
+void DefR(int resi, const char* n, const char* depn, int iconindex, bool phys, bool cap, bool glob, float r, float g, float b, float a, int conduit)
 {
 	Resource* res = &g_resource[resi];
 	res->name = n;
@@ -19,6 +19,7 @@ void DefR(int resi, const char* n, const char* depn, int iconindex, bool phys, b
 	res->rgba[1] = g;
 	res->rgba[2] = b;
 	res->rgba[3] = a;
+	res->conduit = conduit;
 }
 
 /*
@@ -26,8 +27,10 @@ Set resource array to 0.
 */
 void Zero(int *r)
 {
-	for(int i=0; i<RESOURCES; i++)
-		r[i] = 0;
+	//for(int i=0; i<RESOURCES; i++)
+	//	r[i] = 0;
+
+	memset(r, 0, sizeof(int)*RESOURCES);
 }
 
 /*

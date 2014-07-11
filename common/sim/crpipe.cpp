@@ -26,10 +26,8 @@
 #include "../gui/widgets/spez/constructionview.h"
 #include "../../game/gui/gviewport.h"
 
-CrPipeTileType g_crpipeT[CONNECTION_TYPES][2];
 CrPipeTile* g_crpipe = NULL;
 CrPipeTile* g_crpipeplan = NULL;
-int g_crpipecost[RESOURCES];
 
 CrPipeTile::CrPipeTile()
 {
@@ -56,16 +54,35 @@ CrPipeTile::~CrPipeTile()
 	//g_log.flush();
 }
 
-void CrPipeTileType::draw(int x, int z)
+char CrPipeTile::condtype()
 {
-	Vec3f pos = CrPipeDrawPos(x, z);
-	g_model[model].draw(0, pos, 0);
+	return CON_CRPIPE;
 }
 
-void DefineCrPipe(int type, bool finished, const char* modelfile)
+int CrPipeTile::netreq(int res)
 {
-	CrPipeTileType* t = &g_crpipeT[type][finished];
-	QueueModel(&t->model, modelfile, Vec3f(1,1,1)/16.0f*TILE_SIZE, Vec3f(0,0,TILE_SIZE/8));
+	return 0;
+}
+
+void CrPipeTile::destroy()
+{
+}
+
+void CrPipeTile::allocate()
+{
+
+}
+
+bool CrPipeTile::checkconstruction()
+{
+
+	return false;
+}
+
+void DefCrPipe(int type, bool finished, const char* modelfile)
+{
+	int* tm = &g_cotype[CON_CRPIPE].model[type][(int)finished];
+	QueueModel(tm, modelfile, Vec3f(1,1,1)/16.0f*TILE_SIZE, Vec3f(0,0,0));
 }
 
 CrPipeTile* CrPipeAt(int x, int z)
@@ -782,7 +799,7 @@ bool ReCrPipeB()
 			if(!ResB(j, RES_CRUDEOIL))
 				continue;
 
-			if(!BuildingAdjacent(i, j))
+			if(!BlAdj(i, j))
 				continue;
 
 			if(b->crpipenetw < 0 && b2->crpipenetw >= 0)

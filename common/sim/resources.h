@@ -15,7 +15,14 @@ public:
 	std::string name;
 	float rgba[4];
 	std::string depositn;
+	int conduit;
 };
+
+//conduit
+#define CON_NONE		-1
+#define CON_ROAD		0
+#define CON_POWL		1
+#define	CON_CRPIPE		2
 
 #define RES_NONE			-1
 #define RES_FUNDS			0
@@ -46,7 +53,7 @@ public:
 	int amt;
 };
 
-void DefR(int resi, const char* n, const char* depn, int iconindex, bool phys, bool cap, bool glob, float r, float g, float b, float a);
+void DefR(int resi, const char* n, const char* depn, int iconindex, bool phys, bool cap, bool glob, float r, float g, float b, float a, int conduit);
 void Zero(int *b);
 bool ResB(int building, int res);
 

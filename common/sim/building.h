@@ -23,8 +23,8 @@ public:
 
 	bool finished;
 
-	int pownetw;
-	int crpipenetw;
+	short pownetw;
+	short crpipenetw;
 	std::list<int> roadnetw;
 
 	int stocked[RESOURCES];

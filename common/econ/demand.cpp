@@ -75,6 +75,27 @@ int CalcSup(int rtype)
 
 #define MAX_REQ		1000
 
+/*
+Add road, powerline, and/or crude oil pipeline infrastructure between two buildings as required,
+according to the trade between the two buildings and presence or absense of a body of a water in between.
+Connect the buildings to the power and road grid, and crude oil pipeline grid if necessary.
+*/
+void AddInf(DemTree* dm, std::list<DemNode*>* nodes, DemNode* parent, DemNode* parent2, int rtype, int ramt, int depth)
+{
+	// TO DO: roads and infrastructure to suppliers
+
+	Resource* r = &g_resource[rtype];
+
+	if(r->physical)
+	{
+		std::list<RoadDem*> roads;
+	}
+	else
+	{//offsetof(Building,roadnetw);
+
+	}
+}
+
 void AddReq(DemTree* dm, std::list<DemNode*>* nodes, DemNode* parent, int rtype, int ramt, int depth)
 {
 #ifdef DEBUG
@@ -153,8 +174,6 @@ void AddReq(DemTree* dm, std::list<DemNode*>* nodes, DemNode* parent, int rtype,
 		// TO DO: unit transport
 		nodes->push_back(rdem);
 
-		// TO DO: roads and infrastructure to suppliers
-
 		//int producing = bt->output[rtype] * demb->prodratio / RATIO_DENOM;
 		//int overprod = producing - demb->supplying[rtype] - suphere;
 		
@@ -195,6 +214,8 @@ void AddReq(DemTree* dm, std::list<DemNode*>* nodes, DemNode* parent, int rtype,
 				AddReq(dm, &demb->proddems, demb, ri, rreq, depth+1);
 			}
 		}
+
+		AddInf(dm, nodes, parent, *biter, rtype, ramt, depth);
 
 		if(remain <= 0)
 			return;
@@ -336,6 +357,8 @@ void AddReq(DemTree* dm, std::list<DemNode*>* nodes, DemNode* parent, int rtype,
 		g_log<<"\t3. prodamt"<<prodamt<<" of total"<<demb->supplying[rtype]<<" of remain"<<remain<<" of res "<<g_resource[rtype].name<<" newprodlevel "<<oldprodratio<<" -> "<<demb->prodratio<<std::endl;
 		g_log.flush();
 #endif
+		
+		AddInf(dm, nodes, parent, demb, rtype, ramt, depth);
 
 		remain -= prodamt;
 	}while(remain > 0);

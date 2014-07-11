@@ -6,20 +6,10 @@
 #include "../render/vertexarray.h"
 #include "../render/model.h"
 #include "../math/vec3i.h"
+#include "infrastructure.h"
 
-class Shader;
 
-class RoadTileType
-{
-public:
-	void draw(int x, int z);
-
-	int model;
-};
-
-extern RoadTileType g_roadT[CONNECTION_TYPES][2];
-
-class RoadTile
+class RoadTile : ConduitTile
 {
 public:
 	bool on;
@@ -36,6 +26,7 @@ public:
 	RoadTile();
 	~RoadTile();
 
+	char condtype();
 	int netreq(int res);
 	void destroy();
 	void allocate();
@@ -51,7 +42,7 @@ extern RoadTile* g_road;
 extern RoadTile* g_roadplan;
 extern int g_roadcost[RESOURCES];
 
-void DefineRoad(int type, bool finished, const char* modelfile);
+void DefRoad(int type, bool finished, const char* modelfile);
 void PlaceRoad(int x, int z, int stateowner, bool plan=false);
 bool RoadPlaceable(int x, int z);
 void ReRoadNetw();

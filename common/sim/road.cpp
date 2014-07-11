@@ -28,13 +28,13 @@
 #include "../gui/widgets/spez/constructionview.h"
 #include "../../game/gui/gviewport.h"
 
-RoadTileType g_roadT[CONNECTION_TYPES][2];
 RoadTile* g_road = NULL;
 RoadTile* g_roadplan = NULL;
 int g_roadcost[RESOURCES];
 
-RoadTile::RoadTile()
+RoadTile::RoadTile() : ConduitTile()
 {
+	
 	on = false;
 	finished = false;
 	Zero(conmat);
@@ -56,16 +56,43 @@ RoadTile::~RoadTile()
 	//g_log.flush();
 }
 
-void RoadTileType::draw(int x, int z)
+char RoadTile::condtype()
 {
-	Vec3f pos = RoadPosition(x, z);
-	g_model[model].draw(0, pos, 0);
+	return CON_ROAD;
 }
 
-void DefineRoad(int type, bool finished, const char* modelfile)
+int RoadTile::netreq(int res)
 {
-	RoadTileType* t = &g_roadT[type][finished];
-	QueueModel(&t->model, modelfile, Vec3f(1,1,1)/16.0f*TILE_SIZE, Vec3f(0,0,0));
+	return 0;
+}
+
+void RoadTile::destroy()
+{
+}
+
+void RoadTile::allocate()
+{
+
+}
+
+bool RoadTile::checkconstruction()
+{
+
+	return false;
+}
+
+void RoadTile::fillcollider()
+{
+}
+
+void RoadTile::freecollider()
+{
+}
+
+void DefRoad(int type, bool finished, const char* modelfile)
+{
+	int* tm = &g_cotype[CON_ROAD].model[type][(int)finished];
+	QueueModel(tm, modelfile, Vec3f(1,1,1)/16.0f*TILE_SIZE, Vec3f(0,0,0));
 }
 
 RoadTile* RoadAt(int x, int z)
@@ -376,8 +403,8 @@ void DrawRoad(int x, int z)
 		return;
 	}
 
-	//int model = g_roadT[r->type][(int)r->finished].model;
-	int model = g_roadT[r->type][1].model;
+	int model = g_roadT[r->type][(int)r->finished].model;
+	//int model = g_roadT[r->type][1].model;
 
 	const float* owncol = g_player[r->stateowner].colorcode;
 	glUniform4f(g_shader[g_curS].m_slot[SSLOT_OWNCOLOR], owncol[0], owncol[1], owncol[2], owncol[3]);
@@ -677,7 +704,7 @@ bool ReRoadB()
 	if(!b2->on)
 	continue;
 
-	if(!BuildingAdjacent(i, j))
+	if(!BlAdj(i, j))
 	continue;
 
 	if(b->pownetw < 0 && b2->pownetw >= 0)

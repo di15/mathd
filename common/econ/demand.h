@@ -17,6 +17,9 @@
 #define DEM_RNODE		1	//	resource demand
 #define DEM_BNODE		2	//	demand at building, for building
 #define DEM_UNODE		3	//	demand for unit: worker, transport, or military
+#define DEM_ROADNODE	4	
+#define DEM_POWLNODE	5
+#define DEM_CRPIPENODE	6
 
 class DemNode
 {
@@ -41,6 +44,7 @@ public:
 	int ui;
 	DemsAtB* supbp;
 	DemsAtU* supup;
+	DemsAtU* opup;
 
 	RDemNode() : DemNode()
 	{
@@ -56,6 +60,42 @@ public:
 	}
 };
 
+class RoadDem : public DemNode
+{
+public:
+	Vec2i tpos;
+	std::list<RDemNode> condems;
+
+	RoadDem() : DemNode()
+	{
+		demtype = DEM_ROADNODE;
+	}
+};
+
+class PowlDem : public DemNode
+{
+public:
+	Vec2i tpos;
+	std::list<RDemNode> condems;
+
+	PowlDem() : DemNode()
+	{
+		demtype = DEM_POWLNODE;
+	}
+};
+
+class CrPipeDem : public DemNode
+{
+public:
+	Vec2i tpos;
+	std::list<RDemNode> condems;
+
+	CrPipeDem() : DemNode()
+	{
+		demtype = DEM_CRPIPENODE;
+	}
+};
+
 class DemsAtB : public DemNode
 {
 public:
@@ -64,6 +104,9 @@ public:
 	std::list<DemNode*> condems;	//construction material
 	std::list<DemNode*> proddems;	//production input raw materials
 	std::list<DemNode*> manufdems;	//manufacturing input raw materials
+	std::list<CrPipeDem*> crpipedems;
+	std::list<PowlDem*> powldems;
+	std::list<RoadDem*> roaddems;
 	int prodratio;
 	int condem[RESOURCES];
 	int supplying[RESOURCES];
@@ -146,6 +189,9 @@ public:
 	std::list<DemNode*> nodes;
 	std::list<DemsAtB*> supbpcopy;	//master copy, this one will be freed
 	std::list<DemsAtU*> supupcopy;	//master copy, this one will be freed
+	std::list<CrPipeDem*> crpipedems;
+	std::list<PowlDem*> powldems;
+	std::list<RoadDem*> roaddems;
 
 	void free()
 	{
@@ -168,6 +214,27 @@ public:
 		{
 			delete *riter;
 			riter = nodes.erase(riter);
+		}
+
+		auto crpipeiter = crpipedems.begin();
+		while(crpipeiter != crpipedems.end())
+		{
+			delete *crpipeiter;
+			crpipeiter = crpipedems.erase(crpipeiter);
+		}
+
+		auto powliter = powldems.begin();
+		while(powliter != powldems.end())
+		{
+			delete *powliter;
+			powliter = powldems.erase(powliter);
+		}
+
+		auto roaditer = roaddems.begin();
+		while(roaditer != roaddems.end())
+		{
+			delete *roaditer;
+			roaditer = roaddems.erase(roaditer);
 		}
 	}
 

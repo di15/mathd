@@ -248,6 +248,7 @@
     <ClCompile Include="..\common\sim\buildingtype.cpp" />
     <ClCompile Include="..\common\sim\connectable.cpp" />
     <ClCompile Include="..\common\sim\deposit.cpp" />
+    <ClCompile Include="..\common\sim\infrastructure.cpp" />
     <ClCompile Include="..\common\sim\labourer.cpp" />
     <ClCompile Include="..\common\sim\crpipe.cpp" />
     <ClCompile Include="..\common\sim\order.cpp" />
@@ -369,6 +370,7 @@
     <ClInclude Include="..\common\sim\buildingtype.h" />
     <ClInclude Include="..\common\sim\connectable.h" />
     <ClInclude Include="..\common\sim\deposit.h" />
+    <ClInclude Include="..\common\sim\infrastructure.h" />
     <ClInclude Include="..\common\sim\labourer.h" />
     <ClInclude Include="..\common\sim\crpipe.h" />
     <ClInclude Include="..\common\sim\order.h" />

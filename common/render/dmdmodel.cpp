@@ -82,8 +82,8 @@ bool LoadDMDModel(VertexArray** va, unsigned int& diffusem, unsigned int& specul
 			CreateTexture(diffusem, diffpathpng, true, true);
 		else
 			CreateTexture(diffusem, diffpath, true, true);
-		CreateTexture(specularm, specpath, true, true);
-		CreateTexture(normalm, normpath, true, true);
+		//CreateTexture(specularm, specpath, true, true);
+		//CreateTexture(normalm, normpath, true, true);
 		CreateTexture(ownerm, ownpath, true, true);
 	}
 	else
@@ -92,8 +92,8 @@ bool LoadDMDModel(VertexArray** va, unsigned int& diffusem, unsigned int& specul
 			QueueTexture(&diffusem, diffpathpng, true, true);
 		else
 			QueueTexture(&diffusem, diffpath, true, true);
-		QueueTexture(&specularm, specpath, true, true);
-		QueueTexture(&normalm, normpath, true, true);
+		//QueueTexture(&specularm, specpath, true, true);
+		//QueueTexture(&normalm, normpath, true, true);
 		QueueTexture(&ownerm, ownpath, true, true);
 	}
 
