@@ -5,6 +5,7 @@
 
 #include "connectable.h"
 #include "resources.h"
+#include "building.h"
 #include "../render/model.h"
 #include "../render/vertexarray.h"
 #include "../math/vec3i.h"
