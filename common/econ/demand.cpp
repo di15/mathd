@@ -338,8 +338,8 @@ void AddReq(DemTree* dm, std::list<DemNode*>* nodes, DemNode* parent, int rtype,
 			if(bt->input[ri] <= 0)
 				continue;
 			
-			int rreq = bt->input[ri] * oldprodratio / RATIO_DENOM;
-			rreq = imax(1, rreq);
+			int rreq = Ceili(bt->input[ri] * oldprodratio, RATIO_DENOM);
+			//rreq = imax(1, rreq);
 
 			if(rreq <= 0)
 			{

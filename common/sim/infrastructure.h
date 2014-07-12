@@ -25,12 +25,15 @@ public:
 	unsigned short maxforwincl;
 	unsigned short maxsideincl;
 	bool blconduct;
+	Vec2i physoff;
+	Vec3f drawoff;
+	ConduitTile** cotiles[2];
 
-	ConduitTile* (*get)(int tx, int tz, bool plan);
+	//ConduitTile* (*get)(int tx, int tz, bool plan);
 	void (*checkplace)(int tx, int tz);
-	Vec3f (*drawpos)(int tx, int tz);
-	Vec2i (*physpos)(int tx, int tz);
-	void (*draw)(int tx, int ty, bool plan);
+	//Vec3f (*drawpos)(int tx, int tz);
+	//Vec2i (*physpos)(int tx, int tz);
+	//void (*draw)(int tx, int ty, bool plan);
 	//void (*updplans)(char owner, Vec3f start, Vec3f end);
 	//void (*clearplans)();
 	//void (*renetw)();
@@ -42,34 +45,42 @@ public:
 	bool renetwb();
 	void mergenetw(int A, int B);
 	bool renetwtiles();
+	bool comparetiles(ConduitTile* ct, int x, int z);
+	ConduitTile* get(int tx, int tz, bool plan);
+	bool badj(int i, int x, int z);
+	bool compareb(Building* b, ConduitTile* r);
 
 	ConduitType()
 	{
 		Zero(conmat);
 		checkplace = NULL;
-		drawpos = NULL;
-		physpos = NULL;
-		draw = NULL;
+		//drawpos = NULL;
+		//physpos = NULL;
+		//draw = NULL;
 		//updplans = NULL;
 		//renetw = NULL;
 		place = NULL;
 		//clearplans = NULL;
-		get = NULL;
+		//get = NULL;
 		blconduct = false;
+		cotiles[0] = NULL;
+		cotiles[1] = NULL;
 	}
 };
 
 extern ConduitType g_cotype[CONDUITS];
 void DefCo(char ctype, unsigned short netwoff, unsigned short maxforwincl, unsigned short maxsideincl, bool blconduct, 
+		   Vec2i physoff, Vec3f drawoff, ConduitTile** cotiles, ConduitTile** coplans,
 	void (*checkplace)(int tx, int tz),
-	Vec3f (*drawpos)(int tx, int tz),
-	Vec2i (*physpos)(int tx, int tz),
+	//Vec3f (*drawpos)(int tx, int tz),
+	//Vec2i (*physpos)(int tx, int tz),
 	void (*draw)(int tx, int ty, bool plan),
 	//void (*updplans)(char owner, Vec3f start, Vec3f end),
 	//void (*clearplans)(),
 	//void (*renetw)(),
-	void (*place)(int tx, int tz, char owner, bool plan),
-	ConduitTile* (*get)(int tx, int tz, bool plan));
+	void (*place)(int tx, int tz, char owner, bool plan)
+	//ConduitTile* (*get)(int tx, int tz, bool plan)
+	);
 void CoConMat(char ctype, char rtype, short ramt);
 
 class ConduitTile
