@@ -48,7 +48,7 @@ const Vec2i offsets[DIRS] =
 	Vec2i(-1, 0) //W
 };
 
-const int stepdist[DIRS] =
+const double stepdist[DIRS] =
 {
 	PATHNODE_DIAG, //NW
 	PATHNODE_SIZE, //N
