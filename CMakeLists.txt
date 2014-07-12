@@ -85,7 +85,6 @@ ADD_EXECUTABLE(${PROJECT_NAME}
         common/phys/trace.cpp
         common/platform.cpp
         common/render/billboard.cpp
-        common/render/compilebl.cpp
         common/render/dmdmodel.cpp
         common/render/foliage.cpp
         common/render/heightmap.cpp
