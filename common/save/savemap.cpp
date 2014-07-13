@@ -46,9 +46,9 @@ void PlaceUnits()
 	pj.landborne = ut->landborne;
 	pj.seaborne = ut->seaborne;
 	pj.roaded = ut->roaded;
-	pj.ignoreb = NULL;
-	pj.ignoreu = NULL;
-	pj.thisu = NULL;
+	pj.ignoreb = 0;
+	pj.ignoreu = 0;
+	pj.thisu = 0;
 	pj.utype = UNIT_LABOURER;
 
 	for(int li=0; li<6*PLAYERS; li++)
