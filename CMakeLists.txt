@@ -77,11 +77,6 @@ ADD_EXECUTABLE(${PROJECT_NAME}
         common/math/vec3f.cpp
         common/math/vec3i.cpp
         common/math/vec4f.cpp
-        common/net/client.cpp
-        common/net/net.cpp
-        common/net/readpackets.cpp
-        common/net/sendpackets.cpp
-        common/net/server.cpp
         common/phys/collision.cpp
         common/phys/trace.cpp
         common/platform.cpp
