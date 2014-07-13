@@ -1,4 +1,3 @@
-
 #include "richtext.h"
 #include "icon.h"
 #include "../utils.h"

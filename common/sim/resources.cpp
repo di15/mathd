@@ -1,4 +1,3 @@
-
 #include "resources.h"
 #include "building.h"
 #include "buildingtype.h"

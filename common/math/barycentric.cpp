@@ -1,4 +1,3 @@
-
 #include "../platform.h"
 
 // compute the area of a triangle using Heron's formula

@@ -1,4 +1,3 @@
-
 #include "widget.h"
 #include "gui.h"
 #include "font.h"

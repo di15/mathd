@@ -1,4 +1,3 @@
-
 #include "collision.h"
 #include "../sim/building.h"
 #include "../sim/buildingtype.h"

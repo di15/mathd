@@ -1,4 +1,3 @@
-
 #include "vec3i.h"
 #include "plane2i.h"
 #include "physics.h"

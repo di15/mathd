@@ -1,4 +1,3 @@
-
 #ifndef PLANE3F_H
 #define PLANE3F_H
 

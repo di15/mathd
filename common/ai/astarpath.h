@@ -1,4 +1,3 @@
-
 #ifndef ASTARPATH_H
 #define ASTARPATH_H
 

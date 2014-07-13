@@ -1,4 +1,3 @@
-
 #include "building.h"
 #include "../math/hmapmath.h"
 #include "../render/heightmap.h"

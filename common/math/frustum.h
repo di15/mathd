@@ -1,6 +1,3 @@
-
-
-
 #ifndef _FRUSTUM_H
 #define _FRUSTUM_H
 

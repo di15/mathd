@@ -1,4 +1,3 @@
-
 #include "labourer.h"
 #include "../platform.h"
 #include "../econ/demand.h"

@@ -1,4 +1,3 @@
-
 #include "dmdmodel.h"
 #include "../texture.h"
 #include "../utils.h"

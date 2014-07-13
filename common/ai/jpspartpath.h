@@ -1,5 +1,3 @@
-
-
 #ifndef JPSPARTPATH_H
 #define JPSPARTPATH_H
 

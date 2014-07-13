@@ -1,4 +1,3 @@
-
 #ifndef CONSTRUCTIONVIEW_H
 #define CONSTRUCTIONVIEW_H
 

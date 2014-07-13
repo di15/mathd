@@ -1,4 +1,3 @@
-
 #include "road.h"
 #include "../render/heightmap.h"
 #include "player.h"

@@ -1,5 +1,3 @@
-
-
 #define SKYBOX_SIZE	100.0f
 
 #if 1   //why doesn't it clamp?

@@ -1,4 +1,3 @@
-
 #ifndef BARYCENTRIC_H
 #define BARYCENTRIC_H
 
