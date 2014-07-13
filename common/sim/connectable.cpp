@@ -9,7 +9,7 @@
 #include <stdlib.h>
 #include "connectable.h"
 
-int GetConnectionType(bool n, bool e, bool s, bool w)
+int ConnType(bool n, bool e, bool s, bool w)
 {
 	if(n && e && s && w)
 		return CONNECTION_NORTHEASTSOUTHWEST;

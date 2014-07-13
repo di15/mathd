@@ -50,29 +50,6 @@ int CountB(int btype)
 	return cnt;
 }
 
-int CalcOutlet(int rtype, int pyi)
-{
-
-}
-
-int CalcSup(int rtype)
-{
-	int supply = 0;
-
-	for(int i=0; i<PLAYERS; i++)
-	{
-
-	}
-
-	for(int i=0; i<BUILDING_TYPES; i++)
-	{
-		BuildingT* t = &g_bltype[i];
-
-		if(t->output[rtype] <= 0)
-			continue;
-	}
-}
-
 #define MAX_REQ		1000
 
 /*

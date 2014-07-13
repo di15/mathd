@@ -619,202 +619,65 @@ void ReadZoomCam(FILE *fp)
 	fread(&py->zoom, sizeof(float), 1, fp);
 }
 
-void SaveRoads(FILE* fp)
+void SaveCo(FILE* fp)
 {
-#if 0
-	bool on;
-	int type;
-	bool finished;
-	int stateowner;
-	int conmat[RESOURCES];
-	int netw;
-	VertexArray drawva;
-	int transporter[RESOURCES];
-	Vec3f drawpos;
-#endif
-
-	for(int i=0; i<g_hmap.m_widthx*g_hmap.m_widthz; i++)
+	for(char ctype=0; ctype<CONDUIT_TYPES; ctype++)
 	{
-		RoadTile* r = &g_road[i];
+		ConduitType* ct = &g_cotype[ctype];
 
-		fwrite(&r->on, sizeof(bool), 1, fp);
-
-		if(!r->on)
-			continue;
-
-		fwrite(&r->type, sizeof(int), 1, fp);
-		fwrite(&r->finished, sizeof(bool), 1, fp);
-		fwrite(&r->stateowner, sizeof(int), 1, fp);
-		fwrite(r->conmat, sizeof(int), RESOURCES, fp);
-		fwrite(&r->netw, sizeof(int), 1, fp);
-		fwrite(r->transporter, sizeof(int), RESOURCES, fp);
-		fwrite(&r->drawpos, sizeof(Vec3f), 1, fp);
-	}
-}
-
-void ReadRoads(FILE* fp)
-{
-	for(int i=0; i<g_hmap.m_widthx*g_hmap.m_widthz; i++)
-	{
-		RoadTile* r = &g_road[i];
-
-		fread(&r->on, sizeof(bool), 1, fp);
-
-		if(!r->on)
-			continue;
-
-		fread(&r->type, sizeof(int), 1, fp);
-		fread(&r->finished, sizeof(bool), 1, fp);
-		fread(&r->stateowner, sizeof(int), 1, fp);
-		fread(r->conmat, sizeof(int), RESOURCES, fp);
-		fread(&r->netw, sizeof(int), 1, fp);
-		fread(r->transporter, sizeof(int), RESOURCES, fp);
-		fread(&r->drawpos, sizeof(Vec3f), 1, fp);
-	}
-
-	for(int x=0; x<g_hmap.m_widthx; x++)
-		for(int z=0; z<g_hmap.m_widthz; z++)
+		for(int i=0; i<g_hmap.m_widthx*g_hmap.m_widthz; i++)
 		{
-			if(!RoadAt(x, z)->on)
+			ConduitTile* ctile = &ct->cotiles[(int)false][i];
+
+			fwrite(&ctile->on, sizeof(bool), 1, fp);
+
+			if(!ctile->on)
 				continue;
 
-			MeshRoad(x, z, false);
-
-			g_hmap.hidetile(x, z);
-
-			if(RoadAt(x, z)->finished)
-				RoadAt(x, z)->fillcollider();
+			fwrite(&ctile->conntype, sizeof(char), 1, fp);
+			fwrite(&ctile->finished, sizeof(bool), 1, fp);
+			fwrite(&ctile->owner, sizeof(char), 1, fp);
+			fwrite(ctile->conmat, sizeof(int), RESOURCES, fp);
+			fwrite(&ctile->netw, sizeof(short), 1, fp);
+			fwrite(ctile->transporter, sizeof(short), RESOURCES, fp);
+			fwrite(&ctile->drawpos, sizeof(Vec3f), 1, fp);
 		}
-
-	g_hmap.genvbo();
-}
-
-void SavePowls(FILE* fp)
-{
-#if 0
-	bool on;
-	int type;
-	bool finished;
-	int stateowner;
-	int conmat[RESOURCES];
-	int netw;	//power network
-	VertexArray drawva;
-	//bool inaccessible;
-	int transporter[RESOURCES];
-	Vec3f drawpos;
-#endif
-
-	for(int i=0; i<g_hmap.m_widthx*g_hmap.m_widthz; i++)
-	{
-		PowlTile* p = &g_powl[i];
-
-		fwrite(&p->on, sizeof(bool), 1, fp);
-
-		if(!p->on)
-			continue;
-
-		fwrite(&p->type, sizeof(int), 1, fp);
-		fwrite(&p->finished, sizeof(bool), 1, fp);
-		fwrite(&p->stateowner, sizeof(int), 1, fp);
-		fwrite(p->conmat, sizeof(int), RESOURCES, fp);
-		fwrite(&p->netw, sizeof(int), 1, fp);
-		fwrite(p->transporter, sizeof(int), RESOURCES, fp);
-		fwrite(&p->drawpos, sizeof(Vec3f), 1, fp);
 	}
 }
 
-void ReadPowls(FILE* fp)
+void ReadCo(FILE* fp)
 {
-	for(int i=0; i<g_hmap.m_widthx*g_hmap.m_widthz; i++)
+	for(char ctype=0; ctype<CONDUIT_TYPES; ctype++)
 	{
-		PowlTile* p = &g_powl[i];
+		ConduitType* ct = &g_cotype[ctype];
 
-		fread(&p->on, sizeof(bool), 1, fp);
-
-		if(!p->on)
-			continue;
-
-		fread(&p->type, sizeof(int), 1, fp);
-		fread(&p->finished, sizeof(bool), 1, fp);
-		fread(&p->stateowner, sizeof(int), 1, fp);
-		fread(p->conmat, sizeof(int), RESOURCES, fp);
-		fread(&p->netw, sizeof(int), 1, fp);
-		fread(p->transporter, sizeof(int), RESOURCES, fp);
-		fread(&p->drawpos, sizeof(Vec3f), 1, fp);
-	}
-
-	for(int x=0; x<g_hmap.m_widthx; x++)
-		for(int z=0; z<g_hmap.m_widthz; z++)
+		for(int i=0; i<g_hmap.m_widthx*g_hmap.m_widthz; i++)
 		{
-			if(!PowlAt(x, z)->on)
+			ConduitTile* ctile = &ct->cotiles[(int)false][i];
+
+			fread(&ctile->on, sizeof(bool), 1, fp);
+
+			if(!ctile->on)
 				continue;
 
-			MeshPowl(x, z, false);
+			fread(&ctile->conntype, sizeof(char), 1, fp);
+			fread(&ctile->finished, sizeof(bool), 1, fp);
+			fread(&ctile->owner, sizeof(char), 1, fp);
+			fread(ctile->conmat, sizeof(int), RESOURCES, fp);
+			fread(&ctile->netw, sizeof(short), 1, fp);
+			fread(ctile->transporter, sizeof(short), RESOURCES, fp);
+			fread(&ctile->drawpos, sizeof(Vec3f), 1, fp);
 		}
-}
 
-void SaveCrPipes(FILE* fp)
-{
-#if 0
-	bool on;
-	int type;
-	bool finished;
-	int stateowner;
-	int conmat[RESOURCES];
-	int netw;	//pipe network
-	VertexArray drawva;
-	//bool inaccessible;
-	int transporter[RESOURCES];
-	Vec3f drawpos;
-#endif
+		for(int x=0; x<g_hmap.m_widthx; x++)
+			for(int z=0; z<g_hmap.m_widthz; z++)
+			{
+				if(!GetCo(ctype, x, z, false)->on)
+					continue;
 
-	for(int i=0; i<g_hmap.m_widthx*g_hmap.m_widthz; i++)
-	{
-		CrPipeTile* p = &g_crpipe[i];
-
-		fwrite(&p->on, sizeof(bool), 1, fp);
-
-		if(!p->on)
-			continue;
-
-		fwrite(&p->type, sizeof(int), 1, fp);
-		fwrite(&p->finished, sizeof(bool), 1, fp);
-		fwrite(&p->stateowner, sizeof(int), 1, fp);
-		fwrite(p->conmat, sizeof(int), RESOURCES, fp);
-		fwrite(&p->netw, sizeof(int), 1, fp);
-		fwrite(p->transporter, sizeof(int), RESOURCES, fp);
-		fwrite(&p->drawpos, sizeof(Vec3f), 1, fp);
+				RemeshCo(ctype, x, z, false);
+			}
 	}
-}
-
-void ReadCrPipes(FILE* fp)
-{
-	for(int i=0; i<g_hmap.m_widthx*g_hmap.m_widthz; i++)
-	{
-		CrPipeTile* p = &g_crpipe[i];
-
-		fread(&p->on, sizeof(bool), 1, fp);
-
-		if(!p->on)
-			continue;
-
-		fread(&p->type, sizeof(int), 1, fp);
-		fread(&p->finished, sizeof(bool), 1, fp);
-		fread(&p->stateowner, sizeof(int), 1, fp);
-		fread(p->conmat, sizeof(int), RESOURCES, fp);
-		fread(&p->netw, sizeof(int), 1, fp);
-		fread(p->transporter, sizeof(int), RESOURCES, fp);
-		fread(&p->drawpos, sizeof(Vec3f), 1, fp);
-	}
-
-	for(int x=0; x<g_hmap.m_widthx; x++)
-		for(int z=0; z<g_hmap.m_widthz; z++)
-		{
-			if(!CrPipeAt(x, z)->on)
-				continue;
-
-			MeshCrPipe(x, z, false);
-		}
 }
 
 bool SaveMap(const char* fullpath)
@@ -838,9 +701,7 @@ bool SaveMap(const char* fullpath)
 	SaveFoliage(fp);
 	SaveBuildings(fp);
 	SaveUnits(fp);
-	SaveRoads(fp);
-	SavePowls(fp);
-	SaveCrPipes(fp);
+	SaveCo(fp);
 
 	fclose(fp);
 
@@ -886,11 +747,7 @@ bool LoadMap(const char* fullpath)
 	ReadFoliage(fp);
 	ReadBuildings(fp);
 	ReadUnits(fp);
-	ReadRoads(fp);
-	ReadPowls(fp);
-	ReadCrPipes(fp);
-
-	//CondenseForest(0, 0, g_hmap.m_widthx-1, g_hmap.m_widthz-1);
+	ReadCo(fp);
 
 	FillColliderGrid();
 

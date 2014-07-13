@@ -86,31 +86,31 @@ void UpdateSBuild()
 	else if(py->build == BUILDING_ROAD)
 	{
 		if(py->mousekeys[0])
-			UpdateRoadPlans(g_localP, py->vdrag[0], py->vdrag[1]);
+			UpdCoPlans(CONDUIT_ROAD, g_localP, py->vdrag[0], py->vdrag[1]);
 		else
 		{
-			ClearRoadPlans();
-			UpdateRoadPlans(g_localP, py->vdrag[0], py->vdrag[0]);
+			ClearCoPlans(CONDUIT_ROAD);
+			UpdCoPlans(CONDUIT_ROAD, g_localP, py->vdrag[0], py->vdrag[0]);
 		}
 	}
 	else if(py->build == BUILDING_POWL)
 	{
 		if(py->mousekeys[0])
-			UpdatePowlPlans(g_localP, py->vdrag[0], py->vdrag[1]);
+			UpdCoPlans(CONDUIT_POWL, g_localP, py->vdrag[0], py->vdrag[1]);
 		else
 		{
-			ClearPowlPlans();
-			UpdatePowlPlans(g_localP, py->vdrag[0], py->vdrag[0]);
+			ClearCoPlans(CONDUIT_POWL);
+			UpdCoPlans(CONDUIT_POWL, g_localP, py->vdrag[0], py->vdrag[0]);
 		}
 	}
 	else if(py->build == BUILDING_CRPIPE)
 	{
 		if(py->mousekeys[0])
-			UpdateCrPipePlans(g_localP, py->vdrag[0], py->vdrag[1]);
+			UpdCoPlans(CONDUIT_CRPIPE, g_localP, py->vdrag[0], py->vdrag[1]);
 		else
 		{
-			ClearCrPipePlans();
-			UpdateCrPipePlans(g_localP, py->vdrag[0], py->vdrag[0]);
+			ClearCoPlans(CONDUIT_CRPIPE);
+			UpdCoPlans(CONDUIT_CRPIPE, g_localP, py->vdrag[0], py->vdrag[0]);
 		}
 	}
 }
@@ -375,7 +375,7 @@ bool BuildingCollides(int type, Vec2i pos)
 
 	for(int x=tmin.x; x<=tmax.x; x++)
 		for(int z=tmin.y; z<=tmax.y; z++)
-			if(RoadAt(x, z)->on)
+			if(GetCo(CONDUIT_ROAD, x, z, false)->on)
 			{
 				g_collidertype = COLLIDER_ROAD;
 				return true;
@@ -451,7 +451,7 @@ bool PlaceBuilding(int type, Vec2i pos, bool finished, int owner, int* bid)
 	int cmmaxx = cmminx + t->widthx*TILE_SIZE;
 	int cmmaxz = cmminz + t->widthz*TILE_SIZE;
 
-	ClearFoliage(cmminx, cmminz, cmmaxx, cmmaxz);
+	ClearFol(cmminx, cmminz, cmmaxx, cmmaxz);
 #if 0
 	ClearPowerlines(cmminx, cmminz, cmmaxx, cmmaxz);
 	ClearPipelines(cmminx, cmminz, cmmaxx, cmmaxz);

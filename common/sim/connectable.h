@@ -27,7 +27,7 @@
 #define CONNECTION_NORTHEASTSOUTHWEST	15
 #define CONNECTION_TYPES				16
 
-int GetConnectionType(bool n, bool e, bool s, bool w);
+int ConnType(bool n, bool e, bool s, bool w);
 
 #define CONSTRUCTION	0
 #define FINISHED		1

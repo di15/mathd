@@ -17,36 +17,16 @@
 #define COLLIDER_NOCOAST	7
 #define COLLIDER_ROAD		8
 #define COLLIDER_OFFMAP		9
+
 extern int g_lastcollider;
 extern int g_collidertype;
 extern bool g_ignored;
 
 class Unit;
 
-
-class Unit;
-
 bool BlAdj(int i, int j);
-
-bool PowlAdjacent(int i, int x, int z);
-bool CrPipeAdjacent(int i, int x, int z);
-#if 0
-bool AnyWateri(int tx, int tz);
-bool AnyWater(float px, float pz);
-bool AtWater(float px, float pz);
-bool TileUnclimablei(int tx, int tz);
-bool TileUnclimable(float px, float pz);
-
-#endif
-
+bool CoAdj(char ctype, int i, int x, int z);
 bool CollidesWithBuildings(int minx, int minz, int maxx, int maxz, int ignore=-1);
 bool CollidesWithUnits(int minx, int minz, int maxx, int maxz, bool isunit=false, Unit* thisu=NULL, Unit* ignore=NULL);
-
-#if 0
-
-bool BuildingCollides(int type, Vec3f pos);
-bool BuildingLevel(int type, Vec3f pos);
-
-#endif
 
 #endif

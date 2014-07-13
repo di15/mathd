@@ -12,7 +12,6 @@ int g_lastcollider = -1;
 int g_collidertype;
 bool g_ignored;
 
-
 bool BlAdj(int i, int j)
 {
 	Building* bi = &g_building[i];
@@ -44,7 +43,8 @@ bool BlAdj(int i, int j)
 	return false;
 }
 
-bool PowlAdjacent(int i, int x, int z)
+// Is conduit x,z adjacent to building i?
+bool CoAdj(char ctype, int i, int x, int z)
 {
 	Building* b = &g_building[i];
 	BuildingT* t = &g_bltype[b->type];
@@ -62,39 +62,11 @@ bool PowlAdjacent(int i, int x, int z)
 	Vec2i cmmin = Vec2i(tmin.x*TILE_SIZE, tmin.y*TILE_SIZE);
 	Vec2i cmmax = Vec2i(tmax.x*TILE_SIZE, tmax.y*TILE_SIZE);
 
-	Vec3f p2 = PowlPosition(x, z);
+	ConduitType* ct = &g_cotype[ctype];
+	Vec2i ccmp2 = ct->physoff + Vec2i(x, z)*TILE_SIZE;
 
-	Vec2i cmmin2 = Vec2i(p2.x-TILE_SIZE/2, p2.y-TILE_SIZE/2);
-	Vec2i cmmax2 = Vec2i(p2.x+TILE_SIZE/2, p2.y+TILE_SIZE/2);
-
-	if(cmmax.x >= cmmin2.x && cmmax.y >= cmmin2.y && cmmin.x <= cmmax2.x && cmmin.y <= cmmax2.y)
-		return true;
-
-	return false;
-}
-
-bool CrPipeAdjacent(int i, int x, int z)
-{
-	Building* b = &g_building[i];
-	BuildingT* t = &g_bltype[b->type];
-
-	Vec2i tp = b->tilepos;
-
-	Vec2i tmin;
-	Vec2i tmax;
-
-	tmin.x = tp.x - t->widthx/2;
-	tmin.y = tp.y - t->widthz/2;
-	tmax.x = tmin.x + t->widthx;
-	tmax.y = tmin.y + t->widthz;
-
-	Vec2i cmmin = Vec2i(tmin.x*TILE_SIZE, tmin.y*TILE_SIZE);
-	Vec2i cmmax = Vec2i(tmax.x*TILE_SIZE, tmax.y*TILE_SIZE);
-
-	Vec3i p2 = CrPipePhysPos(x, z);
-
-	Vec2i cmmin2 = Vec2i(p2.x-TILE_SIZE/2, p2.y-TILE_SIZE/2);
-	Vec2i cmmax2 = Vec2i(p2.x+TILE_SIZE/2, p2.y+TILE_SIZE/2);
+	Vec2i cmmin2 = Vec2i(ccmp2.x-TILE_SIZE/2, ccmp2.y-TILE_SIZE/2);
+	Vec2i cmmax2 = Vec2i(ccmp2.x+TILE_SIZE/2, ccmp2.y+TILE_SIZE/2);
 
 	if(cmmax.x >= cmmin2.x && cmmax.y >= cmmin2.y && cmmin.x <= cmmax2.x && cmmin.y <= cmmax2.y)
 		return true;

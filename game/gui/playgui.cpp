@@ -235,7 +235,7 @@ void BuildMenu_OpenPage2()
 	bp->bottomright_button[0] = Button(bp, "name", "gui/brbut/nucpow2.png", RichText(""), RichText(""), MAINFONT8, BUTTON_CORRODE, NULL, NULL, Click_BuildButton, NULL, Over_BuildButton, Out_BuildButton, BUILDING_NUCPOW);
 	bp->bottomright_button_on[0] = true;
 
-	bp->bottomright_button[1] = Button(bp, "name", "gui/brbut/harbour2.png", RichText(""), RichText(""), MAINFONT8, BUTTON_CORRODE, NULL, NULL, Click_BuildButton, NULL, Over_BuildButton, Out_BuildButton, BUILDING_HOUR);
+	bp->bottomright_button[1] = Button(bp, "name", "gui/brbut/harbour2.png", RichText(""), RichText(""), MAINFONT8, BUTTON_CORRODE, NULL, NULL, Click_BuildButton, NULL, Over_BuildButton, Out_BuildButton, BUILDING_HARBOUR);
 	bp->bottomright_button_on[1] = true;
 
 	bp->bottomright_button[2] = Button(bp, "name", "gui/brbut/road.png", RichText(""), RichText(""), MAINFONT8, BUTTON_CORRODE, NULL, NULL, Click_BuildButton, NULL, Over_BuildButton, Out_BuildButton, BUILDING_ROAD);
@@ -323,6 +323,7 @@ void Click_MoveConstruction()
 		}
 	}
 
+#if 0
 	for(auto siter = py->sel.roads.begin(); siter != py->sel.roads.end(); siter++)
 	{
 		Vec2i tpos = *siter;
@@ -358,6 +359,7 @@ void Click_MoveConstruction()
 			totalloc += p->conmat[i];
 		}
 	}
+#endif
 
 	if(totalloc <= 0)
 	{
@@ -368,6 +370,7 @@ void Click_MoveConstruction()
 			b->on = false;
 		}
 
+#if 0
 		for(auto siter = py->sel.roads.begin(); siter != py->sel.roads.end(); siter++)
 		{
 			Vec2i tpos = *siter;
@@ -388,6 +391,7 @@ void Click_MoveConstruction()
 			CrPipeTile* p = CrPipeAt(tpos.x, tpos.y);
 			p->on = false;
 		}
+#endif
 
 		ClearSel(&py->sel);
 		gui->close("construction view");
@@ -410,6 +414,7 @@ void Click_CancelConstruction()
 		b->on = false;
 	}
 
+#if 0
 	for(auto siter = py->sel.roads.begin(); siter != py->sel.roads.end(); siter++)
 	{
 		Vec2i tpos = *siter;
@@ -430,6 +435,7 @@ void Click_CancelConstruction()
 		CrPipeTile* p = CrPipeAt(tpos.x, tpos.y);
 		p->on = false;
 	}
+#endif
 
 	ClearSel(&py->sel);
 	gui->close("construction view");
@@ -462,7 +468,8 @@ void Click_ProceedConstruction()
 
 		b->allocres();
 	}
-
+	
+#if 0
 	for(auto siter = py->sel.roads.begin(); siter != py->sel.roads.end(); siter++)
 	{
 		Vec2i tpos = *siter;
@@ -495,6 +502,7 @@ void Click_ProceedConstruction()
 
 		p->allocate();
 	}
+#endif
 
 	ClearSel(&py->sel);
 	gui->close("construction view");

@@ -1,11 +1,16 @@
 #include "sim.h"
 #include "../script/console.h"
+#include "infrastructure.h"
+#include "road.h"
+#include "building.h"
 
 long long g_simframe = 0;
 
 // Queue all the game resources and define objects
 void Queue()
 {
+	// Cursor types
+
 #if 0
 #define CU_NONE		0	//cursor off?
 #define CU_DEFAULT	1
@@ -36,6 +41,9 @@ void Queue()
 	DefS("gui/cursors/reszd2.png", &g_cursor[CU_RESZBR], 16, 16);
 	DefS("gui/cursors/default.png", &g_cursor[CU_WAIT], 16, 16);
 	DefS("gui/cursors/default.png", &g_cursor[CU_DRAG], 16, 16);
+
+
+	// Icons
 
 #if 0
 #define ICON_DOLLARS		0
@@ -106,6 +114,9 @@ void Queue()
 	DefI(ICON_WATER, "gui/icons/water.png", ":water:");
 	DefI(ICON_EXCLAMATION, "gui/icons/exclamation.png", ":exclam:");
 
+
+	// Resource types
+
 #if 0
 #define RES_NONE			-1
 #define RES_FUNDS			0
@@ -129,16 +140,19 @@ void Queue()
 
 	DefR(RES_FUNDS,			"Funds",				"",							ICON_DOLLARS,		true,	false,	false,	1.0f,1.0f,1.0f,1.0f,	CON_NONE);
 	DefR(RES_LABOUR,		"Labour",				"",							ICON_LABOUR,		true,	false,	false,	1.0f,1.0f,1.0f,1.0f,	CON_NONE);
-	DefR(RES_HOUSING,		"Housing",				"",							ICON_HOUSING,		true,	true,	false,	1.0f,1.0f,1.0f,1.0f,	CON_ROAD);
-	DefR(RES_FARMPRODUCTS,	"Farm Products",		"Fertile",					ICON_FARMPRODUCT,	true,	false,	false,	1.0f,1.0f,1.0f,1.0f,	CON_ROAD);
-	DefR(RES_PRODUCTION,	"Production",			"",							ICON_PRODUCTION,	true,	false,	false,	1.0f,1.0f,1.0f,1.0f,	CON_ROAD);
-	DefR(RES_RETFOOD,		"Retail Food",			"",							ICON_RETFOOD,		true,	false,	false,	1.0f,1.0f,1.0f,1.0f,	CON_ROAD);
-	DefR(RES_MINERALS,		"Minerals",				"Iron Ore Deposit",			ICON_IRONORE,		true,	false,	false,	1.0f,1.0f,1.0f,1.0f,	CON_ROAD);
-	DefR(RES_CRUDEOIL,		"Crude Oil",			"Oil Deposit",				ICON_CRUDEOIL,		true,	false,	false,	1.0f,1.0f,1.0f,1.0f,	CON_CRPIPE);
-	DefR(RES_WSFUEL,		"Wholesale Fuel",		"",							ICON_WSFUEL,		true,	false,	false,	1.0f,1.0f,1.0f,1.0f,	CON_ROAD);
-	DefR(RES_RETFUEL,		"Retail Fuel",			"",							ICON_RETFUEL,		true,	false,	false,	1.0f,1.0f,1.0f,1.0f,	CON_ROAD);
-	DefR(RES_ENERGY,		"Energy",				"",							ICON_ENERGY,		true,	true,	false,	1.0f,1.0f,1.0f,1.0f,	CON_POWL);
-	DefR(RES_URANIUM,		"Uranium",				"",							ICON_ENRICHEDURAN,	true,	false,	false,	1.0f,1.0f,1.0f,1.0f,	CON_ROAD);
+	DefR(RES_HOUSING,		"Housing",				"",							ICON_HOUSING,		true,	true,	false,	1.0f,1.0f,1.0f,1.0f,	CONDUIT_ROAD);
+	DefR(RES_FARMPRODUCTS,	"Farm Products",		"Fertile",					ICON_FARMPRODUCT,	true,	false,	false,	1.0f,1.0f,1.0f,1.0f,	CONDUIT_ROAD);
+	DefR(RES_PRODUCTION,	"Production",			"",							ICON_PRODUCTION,	true,	false,	false,	1.0f,1.0f,1.0f,1.0f,	CONDUIT_ROAD);
+	DefR(RES_RETFOOD,		"Retail Food",			"",							ICON_RETFOOD,		true,	false,	false,	1.0f,1.0f,1.0f,1.0f,	CONDUIT_ROAD);
+	DefR(RES_MINERALS,		"Minerals",				"Iron Ore Deposit",			ICON_IRONORE,		true,	false,	false,	1.0f,1.0f,1.0f,1.0f,	CONDUIT_ROAD);
+	DefR(RES_CRUDEOIL,		"Crude Oil",			"Oil Deposit",				ICON_CRUDEOIL,		true,	false,	false,	1.0f,1.0f,1.0f,1.0f,	CONDUIT_CRPIPE);
+	DefR(RES_WSFUEL,		"Wholesale Fuel",		"",							ICON_WSFUEL,		true,	false,	false,	1.0f,1.0f,1.0f,1.0f,	CONDUIT_ROAD);
+	DefR(RES_RETFUEL,		"Retail Fuel",			"",							ICON_RETFUEL,		true,	false,	false,	1.0f,1.0f,1.0f,1.0f,	CONDUIT_ROAD);
+	DefR(RES_ENERGY,		"Energy",				"",							ICON_ENERGY,		true,	true,	false,	1.0f,1.0f,1.0f,1.0f,	CONDUIT_POWL);
+	DefR(RES_URANIUM,		"Uranium",				"",							ICON_ENRICHEDURAN,	true,	false,	false,	1.0f,1.0f,1.0f,1.0f,	CONDUIT_ROAD);
+
+
+	// Various environment textures
 
 	QueueTexture(&g_tiletexs[TILE_SAND], "textures/terrain/default/sand.jpg", false, false);
 	QueueTexture(&g_tiletexs[TILE_GRASS], "textures/terrain/default/grass.png", false, false);
@@ -165,33 +179,11 @@ void Queue()
 	LoadParticles();
 	LoadSkyBox("textures/terrain/default/skydome");
 
-	QueueModel(&g_playerm, "models/brain/brain.ms3d", Vec3f(50, 50, 50), Vec3f(0,0,0), true);
-
-	//QueueModel(&themodel, "models/battlecomp/battlecomp.ms3d", Vec3f(0.1f,0.1f,0.1f) * 100 / 64, Vec3f(0,100,0));
-
-#if 0
-#define RES_DOLLARS			0
-#define RES_PESOS			1
-#define RES_EUROS			2
-#define RES_POUNDS			3
-#define RES_FRANCS			4
-#define RES_YENS			5
-#define RES_RUPEES			6
-#define RES_ROUBLES			7
-#endif
-
-#if 0
-	DefP(0, 1, 0, 0, 1, RichText("Player 0 (Red)"));
-	DefP(1, 0, 1, 0, 1, RichText("Player 1 (Green)"));
-	DefP(2, 0, 0, 1, 1, RichText("Player 2 (Blue)"));
-	DefP(3, 1, 0, 1, 1, RichText("Player 3 (Purple)"));
-	DefP(4, 1, 1, 0, 1, RichText("Player 4 (Yellow)"));
-	DefP(5, 0, 1, 1, 1, RichText("Player 5 (Cyan)"));
-	DefP(6, 150.0f/255.0f, 249.0f/255.0f, 123.0f/255.0f, 1, RichText("Player 6 (Light Green)"));
-	DefP(7, 3.0f/255.0f, 53.0f/255.0f, 0.0f/255.0f, 1, RichText("Player 7 (Dark Green)"));
-#endif
+	// Players
 
 #if 1
+	QueueModel(&g_playerm, "models/brain/brain.ms3d", Vec3f(50, 50, 50), Vec3f(0,0,0), true);
+
 	for(int i=0; i<PLAYERS; i++)
 	{
 		Player* p = &g_player[i];
@@ -206,50 +198,21 @@ void Queue()
 	}
 #endif
 
+	// Unit types
+
 	DefU(UNIT_ROBOSOLDIER, "models/battlecomp2011simp/battlecomp.ms3d", Vec3f(1,1,1)*182.0f/70.0f, Vec3f(0,0,0)*182.0f/70.0f, Vec3i(125, 250, 125), "Robot Soldier", 100, true, true, false, false, false, 6, true);
 	DefU(UNIT_LABOURER, "models/labourer/labourer.ms3d", Vec3f(1,1,1)*182.0f/70.0f, Vec3f(0,0,0)*182.0f/70.0f, Vec3i(125, 250, 125), "Labourer", 100, true, true, false, false, false, 6, false);
 	DefU(UNIT_TRUCK, "models/truck/truck.ms3d", Vec3f(1,1,1)*30.0f, Vec3f(0,0,0), Vec3i(125, 250, 125), "Truck", 100, true, false, true, false, false, 30, false);
+
+
+	// Foliage types
 
 	DefF(FOLIAGE_TREE1, "models/pine/pine.ms3d", Vec3f(200,200,200), Vec3f(0,0,0), Vec3i(40, 60, 500)*20);
 	DefF(FOLIAGE_TREE2, "models/pine/pine.ms3d", Vec3f(200,200,200), Vec3f(0,0,0), Vec3i(40, 60, 500)*20);
 	DefF(FOLIAGE_TREE3, "models/pine/pine.ms3d", Vec3f(200,200,200), Vec3f(0,0,0), Vec3i(40, 60, 500)*20);
 
-#if 0
-#define BUILDING_NONE			-1
-#define BUILDING_APARTMENT		0
-#define BUILDING_HOUSE			1
-#define BUILDING_STORE		2
-#define BUILDING_FARM			3
-#define BUILDING_GASSTATION		4
-#define BUILDING_BANK			5
-#define BUILDING_CARDEALERSHIP	6
-#define BUILDING_CARFACTORY		7
-#define BUILDING_MILITARYBASE	8
-#define BUILDING_TRUCKFACTORY	9
-#define BUILDING_CONCGTRFAC	10
-#define BUILDING_TANKERTRFAC	11
-#define BUILDING_CURREXCENTER	12
-#define BUILDING_COALMINE		13
-#define BUILDING_HOUR		14
-#define BUILDING_LUMBERMILL		15
-#define BUILDING_FOREQFACTORY	16
-#define BUILDING_CEMENTPLANT	17
-#define BUILDING_CHEMPLANT		18
-#define BUILDING_COALPOW		19
-#define BUILDING_ELECPLANT		20
-#define BUILDING_IRONMINE		21
-#define BUILDING_URANMINE		22
-#define BUILDING_NUCPOW			23
-#define BUILDING_OILREFINERY	24
-#define BUILDING_OILWELL		25
-#define BUILDING_RESEARCHFAC	26
-#define BUILDING_STEELMILL		27
-#define BUILDING_STONEQUARRY	28
-#define BUILDING_URANENRICHPL	29
-#define BUILDING_WATERTOWER		30
-#define BUILDING_WATERPUMPSTN	31
-#define BUILDING_OFFSHOREOILRIG	32
-#endif
+
+	// Building types
 
 	//DefB(BUILDING_APARTMENT, "Apartment Building", Vec2i(2,1), "models/apartment1/basebuilding.ms3d", Vec3f(100,100,100), Vec3f(0,0,0), "models/apartment1/basebuilding.ms3d", Vec3f(100,100,100), Vec3f(0,0,0), FOUNDATION_LAND, RES_NONE);
 	DefB(BUILDING_APARTMENT, "Apartment Building", Vec2i(2,2),  false, "models/apartment2/b1911", Vec3f(1,1,1), Vec3f(0,0,0), "models/apartment2/b1911", Vec3f(1,1,1), Vec3f(0,0,0), FOUNDATION_LAND, RES_NONE);
@@ -297,10 +260,10 @@ void Queue()
 	BInput(BUILDING_STORE, RES_PRODUCTION, 5);
 	BOutput(BUILDING_STORE, RES_RETFOOD, 500);
 
-	DefB(BUILDING_HOUR, "Harbour", Vec2i(2,2), false, "models/harbour2/harbour2", Vec3f(1,1,1), Vec3f(0,0,0), "models/harbour2/harbour2", Vec3f(1,1,1), Vec3f(0,0,0), FOUNDATION_COASTAL, RES_NONE);
-	BConMat(BUILDING_HOUR, RES_MINERALS, 5);
-	BConMat(BUILDING_HOUR, RES_LABOUR, 10);
-	BInput(BUILDING_HOUR, RES_ENERGY, 5);
+	DefB(BUILDING_HARBOUR, "Harbour", Vec2i(2,2), false, "models/harbour2/harbour2", Vec3f(1,1,1), Vec3f(0,0,0), "models/harbour2/harbour2", Vec3f(1,1,1), Vec3f(0,0,0), FOUNDATION_COASTAL, RES_NONE);
+	BConMat(BUILDING_HARBOUR, RES_MINERALS, 5);
+	BConMat(BUILDING_HARBOUR, RES_LABOUR, 10);
+	BInput(BUILDING_HARBOUR, RES_ENERGY, 5);
 
 	DefB(BUILDING_OILWELL, "Oil Well", Vec2i(1,1), false, "models/oilwell2/oilwell2", Vec3f(1,1,1), Vec3f(0,0,0), "models/oilwell2/oilwell2", Vec3f(1,1,1), Vec3f(0,0,0), FOUNDATION_LAND, RES_CRUDEOIL);
 	BConMat(BUILDING_OILWELL, RES_MINERALS, 5);
@@ -321,120 +284,125 @@ void Queue()
 	BInput(BUILDING_GASSTATION, RES_ENERGY, 5);
 	BOutput(BUILDING_GASSTATION, RES_RETFUEL, 5);
 
-	Zero(g_roadcost);
-	g_roadcost[RES_LABOUR] = 1;
-	g_roadcost[RES_MINERALS] = 1;
 
-	DefRoad(CONNECTION_NOCONNECTION, CONSTRUCTION, "models/road/1_c.ms3d");
-	DefRoad(CONNECTION_NORTH, CONSTRUCTION, "models/road/n_c.ms3d");
-	DefRoad(CONNECTION_EAST, CONSTRUCTION, "models/road/e_c.ms3d");
-	DefRoad(CONNECTION_SOUTH, CONSTRUCTION, "models/road/s_c.ms3d");
-	DefRoad(CONNECTION_WEST, CONSTRUCTION, "models/road/w_c.ms3d");
-	DefRoad(CONNECTION_NORTHEAST, CONSTRUCTION, "models/road/ne_c.ms3d");
-	DefRoad(CONNECTION_NORTHSOUTH, CONSTRUCTION, "models/road/ns_c.ms3d");
-	DefRoad(CONNECTION_EASTSOUTH, CONSTRUCTION, "models/road/es_c.ms3d");
-	DefRoad(CONNECTION_NORTHWEST, CONSTRUCTION, "models/road/nw_c.ms3d");
-	DefRoad(CONNECTION_EASTWEST, CONSTRUCTION, "models/road/ew_c.ms3d");
-	DefRoad(CONNECTION_SOUTHWEST, CONSTRUCTION, "models/road/sw_c.ms3d");
-	DefRoad(CONNECTION_EASTSOUTHWEST, CONSTRUCTION, "models/road/esw_c.ms3d");
-	DefRoad(CONNECTION_NORTHSOUTHWEST, CONSTRUCTION, "models/road/nsw_c.ms3d");
-	DefRoad(CONNECTION_NORTHEASTWEST, CONSTRUCTION, "models/road/new_c.ms3d");
-	DefRoad(CONNECTION_NORTHEASTSOUTH, CONSTRUCTION, "models/road/nes_c.ms3d");
-	DefRoad(CONNECTION_NORTHEASTSOUTHWEST, CONSTRUCTION, "models/road/nesw_c.ms3d");
-	DefRoad(CONNECTION_NOCONNECTION, FINISHED, "models/road/1.ms3d");
-	//DefRoad(CONNECTION_NOCONNECTION, FINISHED, "models/road/flat.ms3d");
-	DefRoad(CONNECTION_NORTH, FINISHED, "models/road/n.ms3d");
-	DefRoad(CONNECTION_EAST, FINISHED, "models/road/e.ms3d");
-	DefRoad(CONNECTION_SOUTH, FINISHED, "models/road/s.ms3d");
-	DefRoad(CONNECTION_WEST, FINISHED, "models/road/w.ms3d");
-	DefRoad(CONNECTION_NORTHEAST, FINISHED, "models/road/ne.ms3d");
-	DefRoad(CONNECTION_NORTHSOUTH, FINISHED, "models/road/ns.ms3d");
-	DefRoad(CONNECTION_EASTSOUTH, FINISHED, "models/road/es.ms3d");
-	DefRoad(CONNECTION_NORTHWEST, FINISHED, "models/road/nw.ms3d");
-	DefRoad(CONNECTION_EASTWEST, FINISHED, "models/road/ew.ms3d");
-	DefRoad(CONNECTION_SOUTHWEST, FINISHED, "models/road/sw.ms3d");
-	DefRoad(CONNECTION_EASTSOUTHWEST, FINISHED, "models/road/esw.ms3d");
-	DefRoad(CONNECTION_NORTHSOUTHWEST, FINISHED, "models/road/nsw.ms3d");
-	DefRoad(CONNECTION_NORTHEASTWEST, FINISHED, "models/road/new.ms3d");
-	DefRoad(CONNECTION_NORTHEASTSOUTH, FINISHED, "models/road/nes.ms3d");
-	DefRoad(CONNECTION_NORTHEASTSOUTHWEST, FINISHED, "models/road/nesw.ms3d");
+	// Conduit types
+	
+	Vec3f scale(TILE_SIZE/16.0f, TILE_SIZE/16.0f, TILE_SIZE/16.0f);
+	Vec3f trans(0,0,0);
 
-	Zero(g_powlcost);
-	g_powlcost[RES_LABOUR] = 1;
-	g_powlcost[RES_MINERALS] = 1;
+	DefCo(CONDUIT_ROAD, offsetof(Building,roadnetw), offsetof(Selection,roads), ROAD_MAX_FOREW_INCLINE, ROAD_MAX_SIDEW_INCLINE, false, false, Vec2i(TILE_SIZE/2, TILE_SIZE/2), Vec3f(TILE_SIZE/2, 0, TILE_SIZE/2));
+	CoConMat(CONDUIT_ROAD, RES_LABOUR, 1);
+	CoConMat(CONDUIT_ROAD, RES_MINERALS, 1);
+	DefConn(CONDUIT_ROAD, CONNECTION_NOCONNECTION, CONSTRUCTION, "models/road/1_c.ms3d", scale, trans);
+	DefConn(CONDUIT_ROAD, CONNECTION_NORTH, CONSTRUCTION, "models/road/n_c.ms3d", scale, trans);
+	DefConn(CONDUIT_ROAD, CONNECTION_EAST, CONSTRUCTION, "models/road/e_c.ms3d", scale, trans);
+	DefConn(CONDUIT_ROAD, CONNECTION_SOUTH, CONSTRUCTION, "models/road/s_c.ms3d", scale, trans);
+	DefConn(CONDUIT_ROAD, CONNECTION_WEST, CONSTRUCTION, "models/road/w_c.ms3d", scale, trans);
+	DefConn(CONDUIT_ROAD, CONNECTION_NORTHEAST, CONSTRUCTION, "models/road/ne_c.ms3d", scale, trans);
+	DefConn(CONDUIT_ROAD, CONNECTION_NORTHSOUTH, CONSTRUCTION, "models/road/ns_c.ms3d", scale, trans);
+	DefConn(CONDUIT_ROAD, CONNECTION_EASTSOUTH, CONSTRUCTION, "models/road/es_c.ms3d", scale, trans);
+	DefConn(CONDUIT_ROAD, CONNECTION_NORTHWEST, CONSTRUCTION, "models/road/nw_c.ms3d", scale, trans);
+	DefConn(CONDUIT_ROAD, CONNECTION_EASTWEST, CONSTRUCTION, "models/road/ew_c.ms3d", scale, trans);
+	DefConn(CONDUIT_ROAD, CONNECTION_SOUTHWEST, CONSTRUCTION, "models/road/sw_c.ms3d", scale, trans);
+	DefConn(CONDUIT_ROAD, CONNECTION_EASTSOUTHWEST, CONSTRUCTION, "models/road/esw_c.ms3d", scale, trans);
+	DefConn(CONDUIT_ROAD, CONNECTION_NORTHSOUTHWEST, CONSTRUCTION, "models/road/nsw_c.ms3d", scale, trans);
+	DefConn(CONDUIT_ROAD, CONNECTION_NORTHEASTWEST, CONSTRUCTION, "models/road/new_c.ms3d", scale, trans);
+	DefConn(CONDUIT_ROAD, CONNECTION_NORTHEASTSOUTH, CONSTRUCTION, "models/road/nes_c.ms3d", scale, trans);
+	DefConn(CONDUIT_ROAD, CONNECTION_NORTHEASTSOUTHWEST, CONSTRUCTION, "models/road/nesw_c.ms3d", scale, trans);
+	DefConn(CONDUIT_ROAD, CONNECTION_NOCONNECTION, FINISHED, "models/road/1.ms3d", scale, trans);
+	DefConn(CONDUIT_ROAD, CONNECTION_NORTH, FINISHED, "models/road/n.ms3d", scale, trans);
+	DefConn(CONDUIT_ROAD, CONNECTION_EAST, FINISHED, "models/road/e.ms3d", scale, trans);
+	DefConn(CONDUIT_ROAD, CONNECTION_SOUTH, FINISHED, "models/road/s.ms3d", scale, trans);
+	DefConn(CONDUIT_ROAD, CONNECTION_WEST, FINISHED, "models/road/w.ms3d", scale, trans);
+	DefConn(CONDUIT_ROAD, CONNECTION_NORTHEAST, FINISHED, "models/road/ne.ms3d", scale, trans);
+	DefConn(CONDUIT_ROAD, CONNECTION_NORTHSOUTH, FINISHED, "models/road/ns.ms3d", scale, trans);
+	DefConn(CONDUIT_ROAD, CONNECTION_EASTSOUTH, FINISHED, "models/road/es.ms3d", scale, trans);
+	DefConn(CONDUIT_ROAD, CONNECTION_NORTHWEST, FINISHED, "models/road/nw.ms3d", scale, trans);
+	DefConn(CONDUIT_ROAD, CONNECTION_EASTWEST, FINISHED, "models/road/ew.ms3d", scale, trans);
+	DefConn(CONDUIT_ROAD, CONNECTION_SOUTHWEST, FINISHED, "models/road/sw.ms3d", scale, trans);
+	DefConn(CONDUIT_ROAD, CONNECTION_EASTSOUTHWEST, FINISHED, "models/road/esw.ms3d", scale, trans);
+	DefConn(CONDUIT_ROAD, CONNECTION_NORTHSOUTHWEST, FINISHED, "models/road/nsw.ms3d", scale, trans);
+	DefConn(CONDUIT_ROAD, CONNECTION_NORTHEASTWEST, FINISHED, "models/road/new.ms3d", scale, trans);
+	DefConn(CONDUIT_ROAD, CONNECTION_NORTHEASTSOUTH, FINISHED, "models/road/nes.ms3d", scale, trans);
+	DefConn(CONDUIT_ROAD, CONNECTION_NORTHEASTSOUTHWEST, FINISHED, "models/road/nesw.ms3d", scale, trans);
+	
+	DefCo(CONDUIT_POWL, offsetof(Building,pownetw), offsetof(Selection,powls), TILE_SIZE*2, TILE_SIZE*2, true, true, Vec2i(0, 0), Vec3f(0, 0, 0));
+	CoConMat(CONDUIT_POWL, RES_LABOUR, 1);
+	CoConMat(CONDUIT_POWL, RES_MINERALS, 1);
+	DefConn(CONDUIT_POWL, CONNECTION_NOCONNECTION, CONSTRUCTION, "models/powl/1_c.ms3d", scale, trans);
+	DefConn(CONDUIT_POWL, CONNECTION_NORTH, CONSTRUCTION, "models/powl/n_c.ms3d", scale, trans);
+	DefConn(CONDUIT_POWL, CONNECTION_EAST, CONSTRUCTION, "models/powl/e_c.ms3d", scale, trans);
+	DefConn(CONDUIT_POWL, CONNECTION_SOUTH, CONSTRUCTION, "models/powl/s_c.ms3d", scale, trans);
+	DefConn(CONDUIT_POWL, CONNECTION_WEST, CONSTRUCTION, "models/powl/w_c.ms3d", scale, trans);
+	DefConn(CONDUIT_POWL, CONNECTION_NORTHEAST, CONSTRUCTION, "models/powl/ne_c.ms3d", scale, trans);
+	DefConn(CONDUIT_POWL, CONNECTION_NORTHSOUTH, CONSTRUCTION, "models/powl/ns_c.ms3d", scale, trans);
+	DefConn(CONDUIT_POWL, CONNECTION_EASTSOUTH, CONSTRUCTION, "models/powl/es_c.ms3d", scale, trans);
+	DefConn(CONDUIT_POWL, CONNECTION_NORTHWEST, CONSTRUCTION, "models/powl/nw_c.ms3d", scale, trans);
+	DefConn(CONDUIT_POWL, CONNECTION_EASTWEST, CONSTRUCTION, "models/powl/ew_c.ms3d", scale, trans);
+	DefConn(CONDUIT_POWL, CONNECTION_SOUTHWEST, CONSTRUCTION, "models/powl/sw_c.ms3d", scale, trans);
+	DefConn(CONDUIT_POWL, CONNECTION_EASTSOUTHWEST, CONSTRUCTION, "models/powl/esw_c.ms3d", scale, trans);
+	DefConn(CONDUIT_POWL, CONNECTION_NORTHSOUTHWEST, CONSTRUCTION, "models/powl/nsw_c.ms3d", scale, trans);
+	DefConn(CONDUIT_POWL, CONNECTION_NORTHEASTWEST, CONSTRUCTION, "models/powl/new_c.ms3d", scale, trans);
+	DefConn(CONDUIT_POWL, CONNECTION_NORTHEASTSOUTH, CONSTRUCTION, "models/powl/nes_c.ms3d", scale, trans);
+	DefConn(CONDUIT_POWL, CONNECTION_NORTHEASTSOUTHWEST, CONSTRUCTION, "models/powl/nesw_c.ms3d", scale, trans);
+	DefConn(CONDUIT_POWL, CONNECTION_NOCONNECTION, FINISHED, "models/powl/1.ms3d", scale, trans);
+	DefConn(CONDUIT_POWL, CONNECTION_NORTH, FINISHED, "models/powl/n.ms3d", scale, trans);
+	DefConn(CONDUIT_POWL, CONNECTION_EAST, FINISHED, "models/powl/e.ms3d", scale, trans);
+	DefConn(CONDUIT_POWL, CONNECTION_SOUTH, FINISHED, "models/powl/s.ms3d", scale, trans);
+	DefConn(CONDUIT_POWL, CONNECTION_WEST, FINISHED, "models/powl/w.ms3d", scale, trans);
+	DefConn(CONDUIT_POWL, CONNECTION_NORTHEAST, FINISHED, "models/powl/ne.ms3d", scale, trans);
+	DefConn(CONDUIT_POWL, CONNECTION_NORTHSOUTH, FINISHED, "models/powl/ns.ms3d", scale, trans);
+	DefConn(CONDUIT_POWL, CONNECTION_EASTSOUTH, FINISHED, "models/powl/es.ms3d", scale, trans);
+	DefConn(CONDUIT_POWL, CONNECTION_NORTHWEST, FINISHED, "models/powl/nw.ms3d", scale, trans);
+	DefConn(CONDUIT_POWL, CONNECTION_EASTWEST, FINISHED, "models/powl/ew.ms3d", scale, trans);
+	DefConn(CONDUIT_POWL, CONNECTION_SOUTHWEST, FINISHED, "models/powl/sw.ms3d", scale, trans);
+	DefConn(CONDUIT_POWL, CONNECTION_EASTSOUTHWEST, FINISHED, "models/powl/esw.ms3d", scale, trans);
+	DefConn(CONDUIT_POWL, CONNECTION_NORTHSOUTHWEST, FINISHED, "models/powl/nsw.ms3d", scale, trans);
+	DefConn(CONDUIT_POWL, CONNECTION_NORTHEASTWEST, FINISHED, "models/powl/new.ms3d", scale, trans);
+	DefConn(CONDUIT_POWL, CONNECTION_NORTHEASTSOUTH, FINISHED, "models/powl/nes.ms3d", scale, trans);
+	DefConn(CONDUIT_POWL, CONNECTION_NORTHEASTSOUTHWEST, FINISHED, "models/powl/nesw.ms3d", scale, trans);
 
-	DefPowl(CONNECTION_NOCONNECTION, CONSTRUCTION, "models/powerline/1_c.ms3d");
-	DefPowl(CONNECTION_NORTH, CONSTRUCTION, "models/powerline/n_c.ms3d");
-	DefPowl(CONNECTION_EAST, CONSTRUCTION, "models/powerline/e_c.ms3d");
-	DefPowl(CONNECTION_SOUTH, CONSTRUCTION, "models/powerline/s_c.ms3d");
-	DefPowl(CONNECTION_WEST, CONSTRUCTION, "models/powerline/w_c.ms3d");
-	DefPowl(CONNECTION_NORTHEAST, CONSTRUCTION, "models/powerline/ne_c.ms3d");
-	DefPowl(CONNECTION_NORTHSOUTH, CONSTRUCTION, "models/powerline/ns_c.ms3d");
-	DefPowl(CONNECTION_EASTSOUTH, CONSTRUCTION, "models/powerline/es_c.ms3d");
-	DefPowl(CONNECTION_NORTHWEST, CONSTRUCTION, "models/powerline/nw_c.ms3d");
-	DefPowl(CONNECTION_EASTWEST, CONSTRUCTION, "models/powerline/ew_c.ms3d");
-	DefPowl(CONNECTION_SOUTHWEST, CONSTRUCTION, "models/powerline/sw_c.ms3d");
-	DefPowl(CONNECTION_EASTSOUTHWEST, CONSTRUCTION, "models/powerline/esw_c.ms3d");
-	DefPowl(CONNECTION_NORTHSOUTHWEST, CONSTRUCTION, "models/powerline/nsw_c.ms3d");
-	DefPowl(CONNECTION_NORTHEASTWEST, CONSTRUCTION, "models/powerline/new_c.ms3d");
-	DefPowl(CONNECTION_NORTHEASTSOUTH, CONSTRUCTION, "models/powerline/nes_c.ms3d");
-	DefPowl(CONNECTION_NORTHEASTSOUTHWEST, CONSTRUCTION, "models/powerline/nesw_c.ms3d");
-	DefPowl(CONNECTION_NOCONNECTION, FINISHED, "models/powerline/1.ms3d");
-	DefPowl(CONNECTION_NORTH, FINISHED, "models/powerline/n.ms3d");
-	DefPowl(CONNECTION_EAST, FINISHED, "models/powerline/e.ms3d");
-	DefPowl(CONNECTION_SOUTH, FINISHED, "models/powerline/s.ms3d");
-	DefPowl(CONNECTION_WEST, FINISHED, "models/powerline/w.ms3d");
-	DefPowl(CONNECTION_NORTHEAST, FINISHED, "models/powerline/ne.ms3d");
-	DefPowl(CONNECTION_NORTHSOUTH, FINISHED, "models/powerline/ns.ms3d");
-	DefPowl(CONNECTION_EASTSOUTH, FINISHED, "models/powerline/es.ms3d");
-	DefPowl(CONNECTION_NORTHWEST, FINISHED, "models/powerline/nw.ms3d");
-	DefPowl(CONNECTION_EASTWEST, FINISHED, "models/powerline/ew.ms3d");
-	DefPowl(CONNECTION_SOUTHWEST, FINISHED, "models/powerline/sw.ms3d");
-	DefPowl(CONNECTION_EASTSOUTHWEST, FINISHED, "models/powerline/esw.ms3d");
-	DefPowl(CONNECTION_NORTHSOUTHWEST, FINISHED, "models/powerline/nsw.ms3d");
-	DefPowl(CONNECTION_NORTHEASTWEST, FINISHED, "models/powerline/new.ms3d");
-	DefPowl(CONNECTION_NORTHEASTSOUTH, FINISHED, "models/powerline/nes.ms3d");
-	DefPowl(CONNECTION_NORTHEASTSOUTHWEST, FINISHED, "models/powerline/nesw.ms3d");
+	trans = Vec3f(-TILE_SIZE/2, 0, TILE_SIZE/2);
+	DefCo(CONDUIT_CRPIPE, offsetof(Building,crpipenetw), offsetof(Selection,crpipes), TILE_SIZE*2, TILE_SIZE*2, true, true, Vec2i(0, 0), Vec3f(0, 0, 0));
+	CoConMat(CONDUIT_CRPIPE, RES_LABOUR, 1);
+	CoConMat(CONDUIT_CRPIPE, RES_MINERALS, 1);
+	DefConn(CONDUIT_CRPIPE, CONNECTION_NOCONNECTION, CONSTRUCTION, "models/crpipe/1_c.ms3d", scale, trans);
+	DefConn(CONDUIT_CRPIPE, CONNECTION_NORTH, CONSTRUCTION, "models/crpipe/n_c.ms3d", scale, trans);
+	DefConn(CONDUIT_CRPIPE, CONNECTION_EAST, CONSTRUCTION, "models/crpipe/e_c.ms3d", scale, trans);
+	DefConn(CONDUIT_CRPIPE, CONNECTION_SOUTH, CONSTRUCTION, "models/crpipe/s_c.ms3d", scale, trans);
+	DefConn(CONDUIT_CRPIPE, CONNECTION_WEST, CONSTRUCTION, "models/crpipe/w_c.ms3d", scale, trans);
+	DefConn(CONDUIT_CRPIPE, CONNECTION_NORTHEAST, CONSTRUCTION, "models/crpipe/ne_c.ms3d", scale, trans);
+	DefConn(CONDUIT_CRPIPE, CONNECTION_NORTHSOUTH, CONSTRUCTION, "models/crpipe/ns_c.ms3d", scale, trans);
+	DefConn(CONDUIT_CRPIPE, CONNECTION_EASTSOUTH, CONSTRUCTION, "models/crpipe/es_c.ms3d", scale, trans);
+	DefConn(CONDUIT_CRPIPE, CONNECTION_NORTHWEST, CONSTRUCTION, "models/crpipe/nw_c.ms3d", scale, trans);
+	DefConn(CONDUIT_CRPIPE, CONNECTION_EASTWEST, CONSTRUCTION, "models/crpipe/ew_c.ms3d", scale, trans);
+	DefConn(CONDUIT_CRPIPE, CONNECTION_SOUTHWEST, CONSTRUCTION, "models/crpipe/sw_c.ms3d", scale, trans);
+	DefConn(CONDUIT_CRPIPE, CONNECTION_EASTSOUTHWEST, CONSTRUCTION, "models/crpipe/esw_c.ms3d", scale, trans);
+	DefConn(CONDUIT_CRPIPE, CONNECTION_NORTHSOUTHWEST, CONSTRUCTION, "models/crpipe/nsw_c.ms3d", scale, trans);
+	DefConn(CONDUIT_CRPIPE, CONNECTION_NORTHEASTWEST, CONSTRUCTION, "models/crpipe/new_c.ms3d", scale, trans);
+	DefConn(CONDUIT_CRPIPE, CONNECTION_NORTHEASTSOUTH, CONSTRUCTION, "models/crpipe/nes_c.ms3d", scale, trans);
+	DefConn(CONDUIT_CRPIPE, CONNECTION_NORTHEASTSOUTHWEST, CONSTRUCTION, "models/crpipe/nesw_c.ms3d", scale, trans);
+	DefConn(CONDUIT_CRPIPE, CONNECTION_NOCONNECTION, FINISHED, "models/crpipe/1.ms3d", scale, trans);
+	DefConn(CONDUIT_CRPIPE, CONNECTION_NORTH, FINISHED, "models/crpipe/n.ms3d", scale, trans);
+	DefConn(CONDUIT_CRPIPE, CONNECTION_EAST, FINISHED, "models/crpipe/e.ms3d", scale, trans);
+	DefConn(CONDUIT_CRPIPE, CONNECTION_SOUTH, FINISHED, "models/crpipe/s.ms3d", scale, trans);
+	DefConn(CONDUIT_CRPIPE, CONNECTION_WEST, FINISHED, "models/crpipe/w.ms3d", scale, trans);
+	DefConn(CONDUIT_CRPIPE, CONNECTION_NORTHEAST, FINISHED, "models/crpipe/ne.ms3d", scale, trans);
+	DefConn(CONDUIT_CRPIPE, CONNECTION_NORTHSOUTH, FINISHED, "models/crpipe/ns.ms3d", scale, trans);
+	DefConn(CONDUIT_CRPIPE, CONNECTION_EASTSOUTH, FINISHED, "models/crpipe/es.ms3d", scale, trans);
+	DefConn(CONDUIT_CRPIPE, CONNECTION_NORTHWEST, FINISHED, "models/crpipe/nw.ms3d", scale, trans);
+	DefConn(CONDUIT_CRPIPE, CONNECTION_EASTWEST, FINISHED, "models/crpipe/ew.ms3d", scale, trans);
+	DefConn(CONDUIT_CRPIPE, CONNECTION_SOUTHWEST, FINISHED, "models/crpipe/sw.ms3d", scale, trans);
+	DefConn(CONDUIT_CRPIPE, CONNECTION_EASTSOUTHWEST, FINISHED, "models/crpipe/esw.ms3d", scale, trans);
+	DefConn(CONDUIT_CRPIPE, CONNECTION_NORTHSOUTHWEST, FINISHED, "models/crpipe/nsw.ms3d", scale, trans);
+	DefConn(CONDUIT_CRPIPE, CONNECTION_NORTHEASTWEST, FINISHED, "models/crpipe/new.ms3d", scale, trans);
+	DefConn(CONDUIT_CRPIPE, CONNECTION_NORTHEASTSOUTH, FINISHED, "models/crpipe/nes.ms3d", scale, trans);
+	DefConn(CONDUIT_CRPIPE, CONNECTION_NORTHEASTSOUTHWEST, FINISHED, "models/crpipe/nesw.ms3d", scale, trans);
 
-	Zero(g_crpipecost);
-	g_crpipecost[RES_LABOUR] = 1;
-	g_crpipecost[RES_MINERALS] = 1;
 
-	DefCrPipe(CONNECTION_NOCONNECTION, CONSTRUCTION, "models/crpipeline/1_c.ms3d");
-	DefCrPipe(CONNECTION_NORTH, CONSTRUCTION, "models/crpipeline/n_c.ms3d");
-	DefCrPipe(CONNECTION_EAST, CONSTRUCTION, "models/crpipeline/e_c.ms3d");
-	DefCrPipe(CONNECTION_SOUTH, CONSTRUCTION, "models/crpipeline/s_c.ms3d");
-	DefCrPipe(CONNECTION_WEST, CONSTRUCTION, "models/crpipeline/w_c.ms3d");
-	DefCrPipe(CONNECTION_NORTHEAST, CONSTRUCTION, "models/crpipeline/ne_c.ms3d");
-	DefCrPipe(CONNECTION_NORTHSOUTH, CONSTRUCTION, "models/crpipeline/ns_c.ms3d");
-	DefCrPipe(CONNECTION_EASTSOUTH, CONSTRUCTION, "models/crpipeline/es_c.ms3d");
-	DefCrPipe(CONNECTION_NORTHWEST, CONSTRUCTION, "models/crpipeline/nw_c.ms3d");
-	DefCrPipe(CONNECTION_EASTWEST, CONSTRUCTION, "models/crpipeline/ew_c.ms3d");
-	DefCrPipe(CONNECTION_SOUTHWEST, CONSTRUCTION, "models/crpipeline/sw_c.ms3d");
-	DefCrPipe(CONNECTION_EASTSOUTHWEST, CONSTRUCTION, "models/crpipeline/esw_c.ms3d");
-	DefCrPipe(CONNECTION_NORTHSOUTHWEST, CONSTRUCTION, "models/crpipeline/nsw_c.ms3d");
-	DefCrPipe(CONNECTION_NORTHEASTWEST, CONSTRUCTION, "models/crpipeline/new_c.ms3d");
-	DefCrPipe(CONNECTION_NORTHEASTSOUTH, CONSTRUCTION, "models/crpipeline/nes_c.ms3d");
-	DefCrPipe(CONNECTION_NORTHEASTSOUTHWEST, CONSTRUCTION, "models/crpipeline/nesw_c.ms3d");
-	DefCrPipe(CONNECTION_NOCONNECTION, FINISHED, "models/crpipeline/1.ms3d");
-	DefCrPipe(CONNECTION_NORTH, FINISHED, "models/crpipeline/n.ms3d");
-	DefCrPipe(CONNECTION_EAST, FINISHED, "models/crpipeline/e.ms3d");
-	DefCrPipe(CONNECTION_SOUTH, FINISHED, "models/crpipeline/s.ms3d");
-	DefCrPipe(CONNECTION_WEST, FINISHED, "models/crpipeline/w.ms3d");
-	DefCrPipe(CONNECTION_NORTHEAST, FINISHED, "models/crpipeline/ne.ms3d");
-	DefCrPipe(CONNECTION_NORTHSOUTH, FINISHED, "models/crpipeline/ns.ms3d");
-	DefCrPipe(CONNECTION_EASTSOUTH, FINISHED, "models/crpipeline/es.ms3d");
-	DefCrPipe(CONNECTION_NORTHWEST, FINISHED, "models/crpipeline/nw.ms3d");
-	DefCrPipe(CONNECTION_EASTWEST, FINISHED, "models/crpipeline/ew.ms3d");
-	DefCrPipe(CONNECTION_SOUTHWEST, FINISHED, "models/crpipeline/sw.ms3d");
-	DefCrPipe(CONNECTION_EASTSOUTHWEST, FINISHED, "models/crpipeline/esw.ms3d");
-	DefCrPipe(CONNECTION_NORTHSOUTHWEST, FINISHED, "models/crpipeline/nsw.ms3d");
-	DefCrPipe(CONNECTION_NORTHEASTWEST, FINISHED, "models/crpipeline/new.ms3d");
-	DefCrPipe(CONNECTION_NORTHEASTSOUTH, FINISHED, "models/crpipeline/nes.ms3d");
-	DefCrPipe(CONNECTION_NORTHEASTSOUTHWEST, FINISHED, "models/crpipeline/nesw.ms3d");
+	// Sounds
 
 	g_ordersnd.clear();
-
 	g_ordersnd.push_back(Sound("sounds/aaa000/gogogo.wav"));
 	g_ordersnd.push_back(Sound("sounds/aaa000/moveout2.wav"));
 	g_ordersnd.push_back(Sound("sounds/aaa000/spreadout.wav"));

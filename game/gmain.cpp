@@ -301,13 +301,13 @@ void DrawScene(Matrix projection, Matrix viewmat, Matrix modelmat, Matrix modelv
 	DrawBl();
 	StopTimer(TIMER_DRAWBL);
 	StartTimer(TIMER_DRAWROADS);
-	DrawRoads();
+	DrawCo(CONDUIT_ROAD);
 	StopTimer(TIMER_DRAWROADS);
 	StartTimer(TIMER_DRAWCRPIPES);
-	DrawCrPipes();
+	DrawCo(CONDUIT_CRPIPE);
 	StopTimer(TIMER_DRAWCRPIPES);
 	StartTimer(TIMER_DRAWPOWLS);
-	DrawPowls();
+	DrawCo(CONDUIT_POWL);
 	StopTimer(TIMER_DRAWPOWLS);
 	DrawSBuild();
 	EndS();
@@ -444,11 +444,8 @@ void DrawSceneDepth()
 	//g_hmap.draw2();
 	DrawBl();
 	CheckGLError(__FILE__, __LINE__);
-	DrawRoads();
-	CheckGLError(__FILE__, __LINE__);
-	DrawCrPipes();
-	CheckGLError(__FILE__, __LINE__);
-	DrawPowls();
+	for(char i=0; i<CONDUIT_TYPES; i++)
+		DrawCo(i);
 	CheckGLError(__FILE__, __LINE__);
 	StartTimer(TIMER_DRAWUNITSDEPTH);
 	DrawUnits();

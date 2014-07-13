@@ -35,7 +35,7 @@ public:
 	bool load(const char* relative, Vec3f scale, Vec3f translate, bool dontqueue, bool blendnorm);
 	void genvbo();
 	void delvbo();
-	void usetex();
+	void usetex() const;
 	void draw(int frame, Vec3f pos, float yaw);
 	void destroy();
 };

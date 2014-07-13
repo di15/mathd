@@ -25,7 +25,7 @@ public:
 
 	short pownetw;
 	short crpipenetw;
-	std::list<int> roadnetw;
+	std::list<short> roadnetw;
 
 	int stocked[RESOURCES];
 	int inuse[RESOURCES];

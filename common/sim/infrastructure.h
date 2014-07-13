@@ -5,15 +5,15 @@
 
 #include "connectable.h"
 #include "resources.h"
-#include "building.h"
 #include "../render/model.h"
 #include "../render/vertexarray.h"
 #include "../math/vec3i.h"
+#include "../render/heightmap.h"
 
-#define CON_ROAD	0
-#define CON_POWL	1
-#define CON_CRPIPE	2
-#define CONDUITS	3
+#define CONDUIT_ROAD	0
+#define CONDUIT_POWL	1
+#define CONDUIT_CRPIPE	2
+#define CONDUIT_TYPES	3
 
 class ConduitTile;
 
@@ -22,67 +22,37 @@ class ConduitType
 public:
 	int conmat[RESOURCES];
 	unsigned short netwoff;	//offset to network list in Building class
-	int model[CONNECTION_TYPES][2];
+	unsigned short seloff;	//offset to selection list in Selection class
+	int model[CONNECTION_TYPES][2];	//0 = not finished, 1 = finished/constructed
 	unsigned short maxforwincl;
 	unsigned short maxsideincl;
-	bool blconduct;
-	Vec2i physoff;
-	Vec3f drawoff;
-	ConduitTile** cotiles[2];
-
-	//ConduitTile* (*get)(int tx, int tz, bool plan);
-	void (*checkplace)(int tx, int tz);
-	//Vec3f (*drawpos)(int tx, int tz);
-	//Vec2i (*physpos)(int tx, int tz);
-	//void (*draw)(int tx, int ty, bool plan);
-	//void (*updplans)(char owner, Vec3f start, Vec3f end);
-	//void (*clearplans)();
-	//void (*renetw)();
-	void (*place)(int tx, int tz, char owner, bool plan);
-	void updplans(char owner, Vec3f start, Vec3f end);
-	void clearplans();
-	void renetw();
-	void resetnetw();
-	bool renetwb();
-	void mergenetw(int A, int B);
-	bool renetwtiles();
-	bool comparetiles(ConduitTile* ct, int x, int z);
-	ConduitTile* get(int tx, int tz, bool plan);
-	bool badj(int i, int x, int z);
-	bool compareb(Building* b, ConduitTile* r);
+	bool blconduct;	//do buildings conduct this resource (also act as conduit in a network?)
+	Vec2i physoff;	//offset in cm
+	Vec3f drawoff;	//offset in cm
+	ConduitTile* cotiles[2];	//0 = actual placed, 1 = plan proposed
+	bool cornerpl;	//is the conduit centered on corners or tile centers?
 
 	ConduitType()
 	{
 		Zero(conmat);
-		checkplace = NULL;
-		//drawpos = NULL;
-		//physpos = NULL;
-		//draw = NULL;
-		//updplans = NULL;
-		//renetw = NULL;
-		place = NULL;
-		//clearplans = NULL;
-		//get = NULL;
 		blconduct = false;
 		cotiles[0] = NULL;
 		cotiles[1] = NULL;
+		cornerpl = false;
+	}
+
+	~ConduitType()
+	{
+		for(int i=0; i<2; i++)
+			if(cotiles[i])
+			{
+				delete [] cotiles[i];
+				cotiles[i] = NULL;
+			}
 	}
 };
 
-extern ConduitType g_cotype[CONDUITS];
-void DefCo(char ctype, unsigned short netwoff, unsigned short maxforwincl, unsigned short maxsideincl, bool blconduct, 
-		   Vec2i physoff, Vec3f drawoff, ConduitTile** cotiles, ConduitTile** coplans,
-	void (*checkplace)(int tx, int tz),
-	//Vec3f (*drawpos)(int tx, int tz),
-	//Vec2i (*physpos)(int tx, int tz),
-	void (*draw)(int tx, int ty, bool plan),
-	//void (*updplans)(char owner, Vec3f start, Vec3f end),
-	//void (*clearplans)(),
-	//void (*renetw)(),
-	void (*place)(int tx, int tz, char owner, bool plan)
-	//ConduitTile* (*get)(int tx, int tz, bool plan)
-	);
-void CoConMat(char ctype, char rtype, short ramt);
+extern ConduitType g_cotype[CONDUIT_TYPES];
 
 class ConduitTile
 {
@@ -103,12 +73,51 @@ public:
 	~ConduitTile();
 
 	virtual char condtype();
-	virtual int netreq(int res);
-	virtual void destroy();
-	virtual void allocate();
-	virtual bool checkconstruction();
+	int netreq(int res);
+	void destroy();
+	void allocate();
+	bool checkconstruction();
 	virtual void fillcollider();
 	virtual void freecollider();
 };
+
+inline ConduitTile* GetCo(char ctype, int tx, int tz, bool plan)
+{
+	ConduitType* ct = &g_cotype[ctype];
+	ConduitTile* tilesarr = ct->cotiles[(int)plan];
+	return &tilesarr[ tx + tz*g_hmap.m_widthx ];
+}
+
+class Building;
+
+void DefCo(char ctype, 
+		   unsigned short netwoff, 
+		   unsigned short seloff, 
+		   unsigned short maxforwincl, 
+		   unsigned short maxsideincl, 
+		   bool blconduct, 
+		   bool cornerpl, 
+		   Vec2i physoff, 
+		   Vec3f drawoff);
+void CoConMat(char ctype, char rtype, short ramt);
+void UpdCoPlans(char ctype, char owner, Vec3f start, Vec3f end);
+void ClearCoPlans(char ctype);
+void ReNetw(char ctype);
+void ResetNetw(char ctype);
+bool ReNetwB(char ctype);
+void MergeNetw(char ctype, int A, int B);
+bool ReNetwTiles(char ctype);
+bool CompareCo(char ctype, ConduitTile* ctile, int tx, int tz);
+bool BAdj(char ctype, int i, int tx, int tz);
+bool CompareB(char ctype, Building* b, ConduitTile* ctile);
+bool CoLevel(char ctype, float iterx, float iterz, float testx, float testz, float dx, float dz, int i, float d, bool plantoo);
+void RemeshCo(char ctype, int tx, int tz, bool plan);
+void PlaceCo(char ctype);
+void PlaceCo(char ctype, int tx, int tz, int owner, bool plan);
+void Repossess(char ctype, int tx, int tz, int owner);
+void DrawCo(char ctype);
+void CoXZ(char ctype, ConduitTile* ctile, bool plan, int& tx, int& tz);
+void DefConn(char conduittype, char connectiontype, bool finished, const char* modelfile, const Vec3f scale, Vec3f transl);
+void PruneCo(char ctype);
 
 #endif

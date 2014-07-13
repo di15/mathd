@@ -69,6 +69,7 @@ public:
 	LoadedTex m_fulltex;
 	VertexArray m_rimva;
 	unsigned int m_vbo[VBOS];
+	unsigned int m_fullvbo[VBOS];
 
 	Heightmap()
 	{
