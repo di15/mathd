@@ -1,4 +1,3 @@
-
 #ifndef EDITBOX_H
 #define EDITBOX_H
 

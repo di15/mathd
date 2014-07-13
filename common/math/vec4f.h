@@ -1,4 +1,3 @@
-
 #ifndef VEC4F_H
 #define VEC4F_H
 

@@ -1,4 +1,3 @@
-
 #include "mempool.h"
 #include "pathnode.h"
 #include "../platform.h"

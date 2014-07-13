@@ -1,4 +1,3 @@
-
 #ifndef PLANE2I_H
 #define PLANE2I_H
 

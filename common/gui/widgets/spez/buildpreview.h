@@ -1,4 +1,3 @@
-
 #ifndef BUILDPREVIEW_H
 #define BUILDPREVIEW_H
 

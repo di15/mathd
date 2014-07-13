@@ -1,4 +1,3 @@
-
 #include "crpipe.h"
 #include "../render/heightmap.h"
 #include "../render/shader.h"

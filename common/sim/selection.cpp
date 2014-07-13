@@ -1,4 +1,3 @@
-
 #include "selection.h"
 #include "../math/matrix.h"
 #include "../window.h"

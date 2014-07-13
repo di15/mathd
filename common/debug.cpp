@@ -1,5 +1,3 @@
-
-
 #include "platform.h"
 #include "debug.h"
 #include "utils.h"

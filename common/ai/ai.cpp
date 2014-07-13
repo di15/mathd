@@ -1,4 +1,3 @@
-
 #include "../sim/player.h"
 #include "ai.h"
 #include "../econ/demand.h"

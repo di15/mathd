@@ -1,5 +1,3 @@
-
-
 #ifndef JPSPATH_H
 #define JPSPATH_H
 

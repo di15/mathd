@@ -1,5 +1,3 @@
-
-
 #ifndef INFRASTRUCTURE_H
 #define INFRASTRUCTURE_H
 

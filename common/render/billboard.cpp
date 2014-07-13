@@ -1,5 +1,3 @@
-
-
 #include "billboard.h"
 #include "../platform.h"
 #include "../math/3dmath.h"

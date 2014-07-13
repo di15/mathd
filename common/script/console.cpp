@@ -1,5 +1,3 @@
-
-
 #include "console.h"
 #include "../gui/gui.h"
 #include "../sim/player.h"

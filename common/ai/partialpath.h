@@ -1,4 +1,3 @@
-
 #ifndef PARTIALPATH_H
 #define PARTIALPATH_H
 

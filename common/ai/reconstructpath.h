@@ -1,4 +1,3 @@
-
 #ifndef RECONSTRUCTPATH_H
 #define RECONSTRUCTPATH_H
 

@@ -1,4 +1,3 @@
-
 #include "../platform.h"
 #include "../window.h"
 #include "../utils.h"

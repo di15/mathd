@@ -1,4 +1,3 @@
-
 #include "vscrollbar.h"
 #include "../../sim/player.h"
 #include "../../render/shader.h"

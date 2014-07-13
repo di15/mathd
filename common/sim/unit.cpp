@@ -1,4 +1,3 @@
-
 #include "unit.h"
 #include "../render/shader.h"
 #include "unittype.h"

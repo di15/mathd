@@ -1,4 +1,3 @@
-
 #include "pathnode.h"
 #include "collidertile.h"
 #include "../math/vec2i.h"
