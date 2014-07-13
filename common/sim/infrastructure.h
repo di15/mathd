@@ -13,7 +13,32 @@
 #define CONDUIT_CRPIPE	2
 #define CONDUIT_TYPES	3
 
-class ConduitTile;
+class ConduitTile
+{
+public:
+	bool on;
+	char conntype;
+	bool finished;
+	char owner;
+	int conmat[RESOURCES];
+	short netw;	//network
+	VertexArray drawva;
+	//bool inaccessible;
+	short transporter[RESOURCES];
+	Vec3f drawpos;
+	//int maxcost[RESOURCES];
+
+	ConduitTile();
+	~ConduitTile();
+
+	virtual char condtype();
+	int netreq(int res);
+	void destroy();
+	void allocate();
+	bool checkconstruction();
+	virtual void fillcollider();
+	virtual void freecollider();
+};
 
 class ConduitType
 {
@@ -51,33 +76,6 @@ public:
 };
 
 extern ConduitType g_cotype[CONDUIT_TYPES];
-
-class ConduitTile
-{
-public:
-	bool on;
-	char conntype;
-	bool finished;
-	char owner;
-	int conmat[RESOURCES];
-	short netw;	//network
-	VertexArray drawva;
-	//bool inaccessible;
-	short transporter[RESOURCES];
-	Vec3f drawpos;
-	//int maxcost[RESOURCES];
-
-	ConduitTile();
-	~ConduitTile();
-
-	virtual char condtype();
-	int netreq(int res);
-	void destroy();
-	void allocate();
-	bool checkconstruction();
-	virtual void fillcollider();
-	virtual void freecollider();
-};
 
 inline ConduitTile* GetCo(char ctype, int tx, int tz, bool plan)
 {
