@@ -26,19 +26,20 @@ public:
 	unsigned short maxforwincl;
 	unsigned short maxsideincl;
 	bool blconduct;
-	Vec2i physoff;
-	Vec3f drawoff;
+	Vec2i physoff;	//offset in cm
+	Vec3f drawoff;	//offset in cm
 	ConduitTile** cotiles[2];
+	bool cornerpl;
 
 	//ConduitTile* (*get)(int tx, int tz, bool plan);
-	void (*checkplace)(int tx, int tz);
+	//void (*checkplace)(int tx, int tz);
 	//Vec3f (*drawpos)(int tx, int tz);
 	//Vec2i (*physpos)(int tx, int tz);
 	//void (*draw)(int tx, int ty, bool plan);
 	//void (*updplans)(char owner, Vec3f start, Vec3f end);
 	//void (*clearplans)();
 	//void (*renetw)();
-	void (*place)(int tx, int tz, char owner, bool plan);
+	//void (*place)(int tx, int tz, char owner, bool plan);
 	void updplans(char owner, Vec3f start, Vec3f end);
 	void clearplans();
 	void renetw();
@@ -50,37 +51,41 @@ public:
 	ConduitTile* get(int tx, int tz, bool plan);
 	bool badj(int i, int x, int z);
 	bool compareb(Building* b, ConduitTile* r);
-	bool tilelevel(float iterx, float iterz, float testx, float testz, float dx, float dz, int i, float d, ConduitTile* (*planfunc)(int x, int z));
+	bool tilelevel(float iterx, float iterz, float testx, float testz, float dx, float dz, int i, float d, bool plantoo);
+	void remesh(int x, int z, bool plan);
+	void place();
+	void place(int x, int z, int owner, bool plan);
 
 	ConduitType()
 	{
 		Zero(conmat);
-		checkplace = NULL;
+		//checkplace = NULL;
 		//drawpos = NULL;
 		//physpos = NULL;
 		//draw = NULL;
 		//updplans = NULL;
 		//renetw = NULL;
-		place = NULL;
+		//place = NULL;
 		//clearplans = NULL;
 		//get = NULL;
 		blconduct = false;
 		cotiles[0] = NULL;
 		cotiles[1] = NULL;
+		cornerpl = false;
 	}
 };
 
 extern ConduitType g_cotype[CONDUITS];
 void DefCo(char ctype, unsigned short netwoff, unsigned short maxforwincl, unsigned short maxsideincl, bool blconduct, 
-		   Vec2i physoff, Vec3f drawoff, ConduitTile** cotiles, ConduitTile** coplans,
-	void (*checkplace)(int tx, int tz),
+		   bool cornerpl, Vec2i physoff, Vec3f drawoff, ConduitTile** cotiles, ConduitTile** coplans
+	//void (*checkplace)(int tx, int tz),
 	//Vec3f (*drawpos)(int tx, int tz),
 	//Vec2i (*physpos)(int tx, int tz),
-	void (*draw)(int tx, int ty, bool plan),
+	//void (*draw)(int tx, int ty, bool plan),
 	//void (*updplans)(char owner, Vec3f start, Vec3f end),
 	//void (*clearplans)(),
 	//void (*renetw)(),
-	void (*place)(int tx, int tz, char owner, bool plan)
+	//void (*place)(int tx, int tz, char owner, bool plan)
 	//ConduitTile* (*get)(int tx, int tz, bool plan)
 	);
 void CoConMat(char ctype, char rtype, short ramt);

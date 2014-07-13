@@ -82,7 +82,7 @@ bool CrPipeTile::checkconstruction()
 void DefCrPipe(int type, bool finished, const char* modelfile)
 {
 	int* tm = &g_cotype[CON_CRPIPE].model[type][(int)finished];
-	QueueModel(tm, modelfile, Vec3f(1,1,1)/16.0f*TILE_SIZE, Vec3f(0,0,0));
+	QueueModel(tm, modelfile, Vec3f(1,1,1)/16.0f*TILE_SIZE, Vec3f(-TILE_SIZE/2,0,TILE_SIZE/2));
 }
 
 CrPipeTile* CrPipeAt(int x, int z)
