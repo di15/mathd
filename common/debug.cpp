@@ -146,7 +146,7 @@ void WriteProfiles(int in, int layer)
 		g_profF.flush();
 }
 
-void DefTimer(int id, int inside, char* name)
+void DefTimer(int id, int inside, const char* name)
 {
 	g_profile[id].inside = inside;
 	strcpy(g_profile[id].name, name);
