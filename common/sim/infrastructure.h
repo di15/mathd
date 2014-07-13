@@ -49,6 +49,7 @@ public:
 	ConduitTile* get(int tx, int tz, bool plan);
 	bool badj(int i, int x, int z);
 	bool compareb(Building* b, ConduitTile* r);
+	bool tilelevel(float iterx, float iterz, float testx, float testz, float dx, float dz, int i, float d, ConduitTile* (*planfunc)(int x, int z));
 
 	ConduitType()
 	{

@@ -349,6 +349,168 @@ void ConduitType::renetw()
 #endif
 }
 
+bool ConduitType::tilelevel(float iterx, float iterz, float testx, float testz, float dx, float dz, int i, float d, ConduitTile* (*planfunc)(int x, int z))
+{
+	//return true;
+
+	bool n = false, e = false, s = false, w = false;
+	int ix, iz;
+
+	if(i > 0)
+	{
+		float x = iterx - dx;
+		float z = iterz - dz;
+
+		ix = x;
+		iz = z;
+
+		if(ix == testx)
+		{
+			if(iz == testz+1)	n = true;
+			else if(iz == testz-1)	s = true;
+		}
+		else if(iz == testz)
+		{
+			if(ix == testx+1)	w = true;
+			else if(ix == testx-1)	e = true;
+		}
+
+		float prevx = x - dx;
+		float prevz = z - dz;
+
+		if((int)x != prevx && (int)z != prevz)
+		{
+			ix = prevx;
+
+			if(ix == testx)
+			{
+				if(iz == testz+1)	n = true;
+				else if(iz == testz-1)	s = true;
+			}
+			else if(iz == testz)
+			{
+				if(ix == testx+1)	w = true;
+				else if(ix == testx-1)	e = true;
+			}
+		}
+	}
+
+	if(i < d)
+	{
+		float x = iterx + dx;
+		float z = iterz + dz;
+
+		ix = x;
+		iz = z;
+
+		if(ix == testx)
+		{
+			if(iz == testz+1)	n = true;
+			else if(iz == testz-1)	s = true;
+		}
+		else if(iz == testz)
+		{
+			if(ix == testx+1)	w = true;
+			else if(ix == testx-1)	e = true;
+		}
+
+		if(i > 0)
+		{
+			float prevx = x - dx;
+			float prevz = z - dz;
+
+			if((int)x != prevx && (int)z != prevz)
+			{
+				ix = prevx;
+
+				if(ix == testx)
+				{
+					if(iz == testz+1)	n = true;
+					else if(iz == testz-1)	s = true;
+				}
+				else if(iz == testz)
+				{
+					if(ix == testx+1)	w = true;
+					else if(ix == testx-1)	e = true;
+				}
+			}
+		}
+	}
+
+	ix = testx;
+	iz = testz;
+
+	if(g_hmap.getheight(ix, iz) <= WATER_LEVEL)		return false;
+	if(g_hmap.getheight(ix+1, iz) <= WATER_LEVEL)	return false;
+	if(g_hmap.getheight(ix, iz+1) <= WATER_LEVEL)	return false;
+	if(g_hmap.getheight(ix+1, iz+1) <= WATER_LEVEL)	return false;
+
+	if(ix > 0)
+	{
+		if(RoadAt(ix-1, iz)->on)	w = true;
+		//if(RoadPlanAt(ix-1, iz)->on)	w = true;
+		if(planfunc != NULL)
+			if(planfunc(ix-1, iz)->on) w = true;
+	}
+
+	if(ix < g_hmap.m_widthx-1)
+	{
+		if(RoadAt(ix+1, iz)->on)	e = true;
+		//if(RoadPlanAt(ix+1, iz)->on)	e = true;
+		if(planfunc != NULL)
+			if(planfunc(ix+1, iz)->on) w = true;
+	}
+
+	if(iz > 0)
+	{
+		if(RoadAt(ix, iz-1)->on)	s = true;
+		//if(RoadPlanAt(ix, iz-1)->on)	s = true;
+		if(planfunc != NULL)
+			if(planfunc(ix, iz-1)->on) w = true;
+	}
+
+	if(iz < g_hmap.m_widthz-1)
+	{
+		if(RoadAt(ix, iz+1)->on)	n = true;
+		//if(RoadPlanAt(ix, iz+1)->on)	n = true;
+		if(planfunc != NULL)
+			if(planfunc(ix, iz+1)->on) w = true;
+	}
+#if 0
+	g_log<<"level? ix"<<ix<<","<<iz<<endl;
+	g_log.flush();
+#endif
+	if((n && e && s && w) || (n && e && s && !w) || (n && e && !s && w) || (n && e && !s && !w) || (n && !e && s && w)
+			|| (n && !e && !s && w) || (!n && e && s && !w) || (!n && !e && s && w) || (!n && !e && !s && !w) || (!n && e && s && w))
+	{
+		float compare = g_hmap.getheight(ix, iz);
+		if(fabs(g_hmap.getheight(ix+1, iz) - compare) > ROAD_MAX_SIDEW_INCLINE)	return false;
+		if(fabs(g_hmap.getheight(ix, iz+1) - compare) > ROAD_MAX_SIDEW_INCLINE)	return false;
+		if(fabs(g_hmap.getheight(ix+1, iz+1) - compare) > ROAD_MAX_SIDEW_INCLINE)	return false;
+	}
+	else if((n && !e && s && !w) || (n && !e && !s && !w) || (!n && !e && s && !w))
+	{
+		if(fabs(g_hmap.getheight(ix, iz) - g_hmap.getheight(ix+1, iz)) > ROAD_MAX_SIDEW_INCLINE)	return false;
+		if(fabs(g_hmap.getheight(ix, iz+1) - g_hmap.getheight(ix+1, iz+1)) > ROAD_MAX_SIDEW_INCLINE)	return false;
+		if(fabs(g_hmap.getheight(ix, iz) - g_hmap.getheight(ix, iz+1)) > ROAD_MAX_FOREW_INCLINE)	return false;
+		if(fabs(g_hmap.getheight(ix+1, iz) - g_hmap.getheight(ix+1, iz+1)) > ROAD_MAX_FOREW_INCLINE)	return false;
+	}
+	else if((!n && e && !s && w) || (!n && e && !s && !w) || (!n && !e && !s && w))
+	{
+		if(fabs(g_hmap.getheight(ix, iz) - g_hmap.getheight(ix+1, iz)) > ROAD_MAX_FOREW_INCLINE)	return false;
+		if(fabs(g_hmap.getheight(ix, iz+1) - g_hmap.getheight(ix+1, iz+1)) > ROAD_MAX_FOREW_INCLINE)	return false;
+		if(fabs(g_hmap.getheight(ix, iz) - g_hmap.getheight(ix, iz+1)) > ROAD_MAX_SIDEW_INCLINE)	return false;
+		if(fabs(g_hmap.getheight(ix+1, iz) - g_hmap.getheight(ix+1, iz+1)) > ROAD_MAX_SIDEW_INCLINE)	return false;
+	}
+
+#if 0
+	g_log<<"level yes! ix"<<ix<<","<<iz<<endl;
+	g_log.flush();
+#endif
+
+	return true;
+}
+
 
 void ConduitType::updplans(char owner, Vec3f start, Vec3f end)
 {
