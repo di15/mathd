@@ -348,7 +348,7 @@ void Click_NewGame()
 	}
 
 #if 0
-	PlaceBuilding(BUILDING_HOUR, Vec2i(g_hmap.m_widthx/2-1, g_hmap.m_widthz/2-3), true, 0);
+	PlaceBuilding(BUILDING_HARBOUR, Vec2i(g_hmap.m_widthx/2-1, g_hmap.m_widthz/2-3), true, 0);
 	PlaceBuilding(BUILDING_APARTMENT, Vec2i(g_hmap.m_widthx/2+2, g_hmap.m_widthz/2-2), true, 0);
 	PlaceBuilding(BUILDING_APARTMENT, Vec2i(g_hmap.m_widthx/2+4, g_hmap.m_widthz/2-3), true, 0);
 	PlaceBuilding(BUILDING_APARTMENT, Vec2i(g_hmap.m_widthx/2+6, g_hmap.m_widthz/2-3), true, 0);
@@ -603,11 +603,11 @@ void MouseLUp()
 		else if(edtool == EDTOOL_DELETEOBJECTS)
 			EdDeleteObject();
 		else if(edtool == EDTOOL_PLACEROADS)
-			PlaceRoad();
+			PlaceCo(CONDUIT_ROAD);
 		else if(edtool == EDTOOL_PLACECRUDEPIPES)
-			PlaceCrPipe();
+			PlaceCo(CONDUIT_CRPIPE);
 		else if(edtool == EDTOOL_PLACEPOWERLINES)
-			PlacePowl();
+			PlaceCo(CONDUIT_POWL);
 	}
 	else if(g_mode == APPMODE_PLAY)
 	{
@@ -635,17 +635,17 @@ void MouseLUp()
 		}
 		else if(py->build == BUILDING_ROAD)
 		{
-			PlaceRoad();
+			PlaceCo(CONDUIT_ROAD);
 			py->build = -1;
 		}
 		else if(py->build == BUILDING_POWL)
 		{
-			PlacePowl();
+			PlaceCo(CONDUIT_POWL);
 			py->build = -1;
 		}
 		else if(py->build == BUILDING_CRPIPE)
 		{
-			PlaceCrPipe();
+			PlaceCo(CONDUIT_CRPIPE);
 			py->build = -1;
 		}
 	}
@@ -710,7 +710,7 @@ void UpdateRoadPlans()
 
 	py->vdrag[1] = intersection;
 
-	UpdateRoadPlans(0, py->vdrag[0], py->vdrag[1]);
+	UpdCoPlans(CONDUIT_ROAD, 0, py->vdrag[0], py->vdrag[1]);
 }
 
 void UpdateCrPipePlans()
@@ -737,7 +737,7 @@ void UpdateCrPipePlans()
 
 	py->vdrag[1] = intersection;
 
-	UpdateCrPipePlans(0, py->vdrag[0], py->vdrag[1]);
+	UpdCoPlans(CONDUIT_CRPIPE, 0, py->vdrag[0], py->vdrag[1]);
 }
 
 void UpdatePowlPlans()
@@ -764,7 +764,7 @@ void UpdatePowlPlans()
 
 	py->vdrag[1] = intersection;
 
-	UpdatePowlPlans(0, py->vdrag[0], py->vdrag[1]);
+	UpdCoPlans(CONDUIT_POWL, 0, py->vdrag[0], py->vdrag[1]);
 }
 
 void MouseMove()

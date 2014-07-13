@@ -622,6 +622,7 @@ void AfterSel(Selection* s)
 		}
 	}
 
+#if 0
 	for(auto seliter = s->powls.begin(); seliter != s->powls.end(); seliter++)
 	{
 		PowlTile* p = PowlAt(seliter->x, seliter->y);
@@ -655,6 +656,7 @@ void AfterSel(Selection* s)
 			break;
 		}
 	}
+#endif
 
 	if(haveconstr)
 	{

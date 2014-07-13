@@ -22,6 +22,7 @@
 #include "pathdebug.h"
 #include "pathjob.h"
 #include "../debug.h"
+#include "../sim/infrastructure.h"
 
 ColliderTile *g_collidertile = NULL;
 
@@ -156,10 +157,10 @@ void FillColliderGrid()
 			int tx = cmx/TILE_SIZE;
 			int tz = cmz/TILE_SIZE;
 
-			RoadTile* r = RoadAt(tx, tz);
+			ConduitTile* r = GetCo(CONDUIT_ROAD, tx, tz, false);
 
 			//if(r->on /* && r->finished */ )
-			if(r->on && r->finished )
+			if(r->on && r->finished)
 			{
 				//cell->hasroad = true;
 				cell->flags |= FLAG_HASROAD;

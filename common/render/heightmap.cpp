@@ -39,20 +39,13 @@ void AllocGrid(int wx, int wz)
 {
 	g_log<<"allocating class arrays "<<wx<<","<<wz<<endl;
 	g_log.flush();
-
-	g_road = new RoadTile [ (wx * wz) ];
-	g_roadplan = new RoadTile [ (wx * wz) ];
-	g_powl = new PowlTile [ (wx * wz) ];
-	g_powlplan = new PowlTile [ (wx * wz) ];
-	g_crpipe = new CrPipeTile[ (wx * wz) ];
-	g_crpipeplan = new CrPipeTile[ (wx * wz) ];
-
-	if(!g_road) OutOfMem(__FILE__, __LINE__);
-	if(!g_roadplan) OutOfMem(__FILE__, __LINE__);
-	if(!g_powl) OutOfMem(__FILE__, __LINE__);
-	if(!g_powlplan) OutOfMem(__FILE__, __LINE__);
-	if(!g_crpipe) OutOfMem(__FILE__, __LINE__);
-	if(!g_crpipeplan) OutOfMem(__FILE__, __LINE__);
+	
+	if( !(g_cotype[CONDUIT_ROAD].cotiles[0] = new RoadTile [ (wx * wz) ]) ) OutOfMem(__FILE__, __LINE__);
+	if( !(g_cotype[CONDUIT_ROAD].cotiles[1] = new RoadTile [ (wx * wz) ]) ) OutOfMem(__FILE__, __LINE__);
+	if( !(g_cotype[CONDUIT_POWL].cotiles[0] = new PowlTile [ (wx * wz) ]) ) OutOfMem(__FILE__, __LINE__);
+	if( !(g_cotype[CONDUIT_POWL].cotiles[1] = new PowlTile [ (wx * wz) ]) ) OutOfMem(__FILE__, __LINE__);
+	if( !(g_cotype[CONDUIT_CRPIPE].cotiles[0] = new CrPipeTile [ (wx * wz) ]) ) OutOfMem(__FILE__, __LINE__);
+	if( !(g_cotype[CONDUIT_CRPIPE].cotiles[1] = new CrPipeTile [ (wx * wz) ]) ) OutOfMem(__FILE__, __LINE__);
 }
 
 /*
@@ -110,34 +103,23 @@ void Heightmap::allocate(int wx, int wz)
 
 void FreeGrid()
 {
-	if(g_road)
+	for(char ctype=0; ctype<CONDUIT_TYPES; ctype++)
 	{
-		delete [] g_road;
-		g_road = NULL;
-	}
+		ConduitType* ct = &g_cotype[ctype];
+		ConduitTile*& actual = ct->cotiles[(int)false];
+		ConduitTile*& planned = ct->cotiles[(int)true];
 
-	if(g_roadplan)
-	{
-		delete [] g_roadplan;
-		g_roadplan = NULL;
-	}
+		if(planned)
+		{
+			delete [] planned;
+			planned = NULL;
+		}
 
-	if(g_powl)
-	{
-		delete [] g_powl;
-		g_powl = NULL;
-	}
-
-	if(g_crpipeplan)
-	{
-		delete [] g_crpipeplan;
-		g_crpipeplan = NULL;
-	}
-
-	if(g_crpipe)
-	{
-		delete [] g_crpipe;
-		g_crpipe = NULL;
+		if(actual)
+		{
+			delete [] actual;
+			actual = NULL;
+		}
 	}
 }
 
@@ -242,7 +224,7 @@ float Heightmap::accheight(int x, int z)
 	g_log<<"y = "<<y<<endl;
 #endif
 
-	if(RoadAt(tx, tz)->on)
+	if(GetCo(CONDUIT_ROAD, tx, tz, false)->on)
 		y += TILE_SIZE/30;
 
 	return y;

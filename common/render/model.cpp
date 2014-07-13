@@ -136,7 +136,7 @@ void DrawVA(VertexArray* va, Vec3f pos)
 	glDrawArrays(GL_TRIANGLES, 0, va->numverts);
 }
 
-void Model::usetex()
+void Model::usetex() const
 {
 	Shader* s = &g_shader[g_curS];
 

@@ -122,6 +122,7 @@ void ConstructionView::regen(Selection* sel)
 		py->bptype = b->type;
 		maxcost = b->maxcost;
 	}
+#if 0
 	else if(sel->roads.size() > 0)
 	{
 		py->bptype = BUILDING_ROAD;
@@ -149,6 +150,7 @@ void ConstructionView::regen(Selection* sel)
 		CrPipeTile* crpipe = CrPipeAt(xz.x, xz.y);
 		maxcost = crpipe->maxcost;
 	}
+#endif
 
 	reqrows.clear();
 

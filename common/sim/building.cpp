@@ -165,11 +165,8 @@ bool Building::checkconstruction()
 #endif
 
 	if(haveall && !finished)
-	{
-		RePow();
-		ReCrPipe();
-		ReRoadNetw();
-	}
+		for(char ctype=0; ctype<CONDUIT_TYPES; ctype++)
+			ReNetw(ctype);
 
 	//if(owner == g_localP)
 	//	OnFinishedB(type);

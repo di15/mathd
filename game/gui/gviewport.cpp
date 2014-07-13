@@ -29,6 +29,7 @@
 #include "../../common/sim/unittype.h"
 #include "../../common/sim/player.h"
 #include "../../common/debug.h"
+#include "../../common/sim/infrastructure.h"
 
 ViewportT g_viewportT[VIEWPORT_TYPES];
 Viewport g_viewport[4];
@@ -317,15 +318,18 @@ void DrawPreview(Matrix projection, Matrix viewmat, Matrix modelmat, Matrix mode
 	}
 	else if(py->bptype == BUILDING_ROAD)
 	{
-		m = &g_model[g_roadT[CONNECTION_EASTWEST][1].model];
+		ConduitType* ct = &g_cotype[CONDUIT_ROAD];
+		m = &g_model[ct->model[CONNECTION_EASTWEST][1]];
 	}
 	else if(py->bptype == BUILDING_POWL)
 	{
-		m = &g_model[g_powlT[CONNECTION_EASTWEST][1].model];
+		ConduitType* ct = &g_cotype[CONDUIT_POWL];
+		m = &g_model[ct->model[CONNECTION_EASTWEST][1]];
 	}
 	else if(py->bptype == BUILDING_CRPIPE)
 	{
-		m = &g_model[g_crpipeT[CONNECTION_EASTWEST][1].model];
+		ConduitType* ct = &g_cotype[CONDUIT_CRPIPE];
+		m = &g_model[ct->model[CONNECTION_EASTWEST][1]];
 	}
 
 	if(!m)
@@ -401,15 +405,18 @@ void DrawPreviewDepth()
 	}
 	else if(py->bptype == BUILDING_ROAD)
 	{
-		m = &g_model[g_roadT[CONNECTION_EASTWEST][1].model];
+		ConduitType* ct = &g_cotype[CONDUIT_ROAD];
+		m = &g_model[ct->model[CONNECTION_EASTWEST][1]];
 	}
 	else if(py->bptype == BUILDING_POWL)
 	{
-		m = &g_model[g_powlT[CONNECTION_EASTWEST][1].model];
+		ConduitType* ct = &g_cotype[CONDUIT_POWL];
+		m = &g_model[ct->model[CONNECTION_EASTWEST][1]];
 	}
 	else if(py->bptype == BUILDING_CRPIPE)
 	{
-		m = &g_model[g_crpipeT[CONNECTION_EASTWEST][1].model];
+		ConduitType* ct = &g_cotype[CONDUIT_CRPIPE];
+		m = &g_model[ct->model[CONNECTION_EASTWEST][1]];
 	}
 
 	if(!m)

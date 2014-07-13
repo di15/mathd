@@ -20,9 +20,9 @@ public:
 
 //conduit
 #define CON_NONE		-1
-#define CON_ROAD		0
-#define CON_POWL		1
-#define	CON_CRPIPE		2
+#define CONDUIT_ROAD		0
+#define CONDUIT_POWL		1
+#define	CONDUIT_CRPIPE		2
 
 #define RES_NONE			-1
 #define RES_FUNDS			0

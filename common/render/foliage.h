@@ -56,7 +56,7 @@ extern Foliage g_foliage[FOLIAGES];
 void DefF(int type, const char* modelrelative, Vec3f scale, Vec3f translate, Vec3i size);
 bool PlaceFoliage(int type, Vec3i ipos);
 void DrawFoliage(Vec3f zoompos, Vec3f vertical, Vec3f horizontal);
-void ClearFoliage(int minx, int minz, int maxx, int maxz);
+void ClearFol(int minx, int minz, int maxx, int maxz);
 void FreeFoliage();
 void FillForest();
 #endif

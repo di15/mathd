@@ -181,7 +181,7 @@ bool PlaceFoliage(int type, Vec3i ipos)
 	return true;
 }
 
-void ClearFoliage(int minx, int minz, int maxx, int maxz)
+void ClearFol(int minx, int minz, int maxx, int maxz)
 {
 	for(int i=0; i<FOLIAGES; i++)
 	{
