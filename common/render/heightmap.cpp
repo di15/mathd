@@ -1304,14 +1304,19 @@ void Heightmap::genvbo()
 	delvbo();
 
 	glGenBuffersARB(VBOS, m_vbo);
-
 	glBindBufferARB(GL_ARRAY_BUFFER_ARB, m_vbo[VBO_POSITION]);
 	glBufferDataARB(GL_ARRAY_BUFFER_ARB, sizeof(Vec3f)*m_widthx*m_widthz*6, m_drawverts, GL_STATIC_DRAW_ARB);
-
 	glBindBufferARB(GL_ARRAY_BUFFER_ARB, m_vbo[VBO_TEXCOORD]);
 	glBufferDataARB(GL_ARRAY_BUFFER_ARB, sizeof(Vec2f)*m_widthx*m_widthz*6, m_texcoords0, GL_STATIC_DRAW_ARB);
-
 	glBindBufferARB(GL_ARRAY_BUFFER_ARB, m_vbo[VBO_NORMAL]);
+	glBufferDataARB(GL_ARRAY_BUFFER_ARB, sizeof(Vec3f)*m_widthx*m_widthz*6, m_normals, GL_STATIC_DRAW_ARB);
+	
+	glGenBuffersARB(VBOS, m_fullvbo);
+	glBindBufferARB(GL_ARRAY_BUFFER_ARB, m_fullvbo[VBO_POSITION]);
+	glBufferDataARB(GL_ARRAY_BUFFER_ARB, sizeof(Vec3f)*m_widthx*m_widthz*6, m_collverts, GL_STATIC_DRAW_ARB);
+	glBindBufferARB(GL_ARRAY_BUFFER_ARB, m_fullvbo[VBO_TEXCOORD]);
+	glBufferDataARB(GL_ARRAY_BUFFER_ARB, sizeof(Vec2f)*m_widthx*m_widthz*6, m_texcoords0, GL_STATIC_DRAW_ARB);
+	glBindBufferARB(GL_ARRAY_BUFFER_ARB, m_fullvbo[VBO_NORMAL]);
 	glBufferDataARB(GL_ARRAY_BUFFER_ARB, sizeof(Vec3f)*m_widthx*m_widthz*6, m_normals, GL_STATIC_DRAW_ARB);
 
 	glBindBufferARB(GL_ARRAY_BUFFER_ARB, 0);
@@ -1327,6 +1332,14 @@ void Heightmap::delvbo()
 			continue;
 		glDeleteBuffersARB(1, &m_vbo[i]);
 		m_vbo[i] = -1;
+	}
+	
+	for(int i=0; i<VBOS; i++)
+	{
+		if(m_fullvbo[i] == -1)
+			continue;
+		glDeleteBuffersARB(1, &m_fullvbo[i]);
+		m_fullvbo[i] = -1;
 	}
 }
 
@@ -1574,11 +1587,11 @@ void Heightmap::draw2()
 
 #elif 1
 
-	glBindBuffer(GL_ARRAY_BUFFER, m_vbo[VBO_POSITION]);
+	glBindBuffer(GL_ARRAY_BUFFER, m_fullvbo[VBO_POSITION]);
 	glVertexAttribPointer(s->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, 0);
-	glBindBuffer(GL_ARRAY_BUFFER, m_vbo[VBO_TEXCOORD]);
+	glBindBuffer(GL_ARRAY_BUFFER, m_fullvbo[VBO_TEXCOORD]);
 	glVertexAttribPointer(s->m_slot[SSLOT_TEXCOORD0], 2, GL_FLOAT, GL_FALSE, 0, 0);
-	glBindBuffer(GL_ARRAY_BUFFER, m_vbo[VBO_NORMAL]);
+	glBindBuffer(GL_ARRAY_BUFFER, m_fullvbo[VBO_NORMAL]);
 	glVertexAttribPointer(s->m_slot[SSLOT_NORMAL], 3, GL_FLOAT, GL_FALSE, 0, 0);
 	glDrawArrays(GL_TRIANGLES, 0, (m_widthx) * (m_widthz) * 3 * 2);
 #else
