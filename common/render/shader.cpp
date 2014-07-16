@@ -1,7 +1,3 @@
-
-
-
-
 #include "../utils.h"
 #include "shader.h"
 #include "../platform.h"

@@ -1,4 +1,3 @@
-
 #ifndef UTILS_H
 #define UTILS_H
 
@@ -39,8 +38,6 @@ void Sleep(int ms);
 
 #endif
 
-#ifdef PLATFORM_WIN
-
 inline float fmax(const float a, const float b)
 {
 	return (((a)>(b))?(a):(b));
@@ -60,8 +57,6 @@ inline int imin(const int a, const int b)
 {
 	return (((a)<(b))?(a):(b));
 }
-
-#endif
 
 //deterministic ceil
 inline int Ceili(const int num, const int denom)

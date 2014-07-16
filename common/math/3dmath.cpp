@@ -1,7 +1,3 @@
-
-
-
-
 #include "3dmath.h"
 #include "../utils.h"
 #include "physics.h"

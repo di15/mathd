@@ -1,4 +1,3 @@
-
 #include "platform.h"
 #include "ustring.h"
 #include "utils.h"

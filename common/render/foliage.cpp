@@ -1,5 +1,3 @@
-
-
 #include "../texture.h"
 #include "foliage.h"
 #include "water.h"

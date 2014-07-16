@@ -1,4 +1,3 @@
-
 #include "player.h"
 #include "resources.h"
 #include "../render/model.h"

@@ -1,4 +1,3 @@
-
 #include "build.h"
 #include "buildingtype.h"
 #include "road.h"

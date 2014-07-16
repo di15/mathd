@@ -11,26 +11,22 @@ ADD_DEFINITIONS("-std=c++0x"
     -lGLEW)
 
 ADD_EXECUTABLE(${PROJECT_NAME}
-        game/gmain.cpp
-        game/gui/editorgui.cpp
-        game/gui/ggui.cpp
-        game/gui/gviewport.cpp
-        game/gui/playgui.cpp
-        game/keymap.cpp
+        common/ai/ai.cpp
         common/ai/astarpath.cpp
         common/ai/binheap.cpp
+        common/ai/collidertile.cpp
         common/ai/jpsexpansion.cpp
         common/ai/jpspartpath.cpp
         common/ai/jpspath.cpp
         common/ai/localavoid.cpp
         common/ai/mempool.cpp
-        common/ai/collidertile.cpp
         common/ai/partialpath.cpp
         common/ai/pathdebug.cpp
         common/ai/pathjob.cpp
-        common/ai/reconstructpath.cpp
         common/ai/pathnode.cpp
+        common/ai/reconstructpath.cpp
         common/debug.cpp
+        common/econ/balance.cpp
         common/econ/demand.cpp
         common/gui/cursor.cpp
         common/gui/draw2d.cpp
@@ -74,8 +70,8 @@ ADD_EXECUTABLE(${PROJECT_NAME}
         common/math/line.cpp
         common/math/matrix.cpp
         common/math/physics.cpp
-        common/math/plane3f.cpp
         common/math/plane2i.cpp
+        common/math/plane3f.cpp
         common/math/polygon.cpp
         common/math/quaternion.cpp
         common/math/vec3f.cpp
@@ -100,13 +96,16 @@ ADD_EXECUTABLE(${PROJECT_NAME}
         common/render/vertexarray.cpp
         common/render/water.cpp
         common/save/savemap.cpp
+        common/script/console.cpp
+        common/script/script.cpp
         common/sim/build.cpp
         common/sim/building.cpp
         common/sim/buildingtype.cpp
         common/sim/connectable.cpp
-        common/sim/deposit.cpp
-        common/sim/labourer.cpp
         common/sim/crpipe.cpp
+        common/sim/deposit.cpp
+        common/sim/infrastructure.cpp
+        common/sim/labourer.cpp
         common/sim/order.cpp
         common/sim/player.cpp
         common/sim/powl.cpp
@@ -123,6 +122,12 @@ ADD_EXECUTABLE(${PROJECT_NAME}
         common/ustring.cpp
         common/utils.cpp
         common/window.cpp
+        game/gmain.cpp
+        game/gui/editorgui.cpp
+        game/gui/ggui.cpp
+        game/gui/gviewport.cpp
+        game/gui/playgui.cpp
+        game/keymap.cpp
         )
 
 INCLUDE(FindPkgConfig)

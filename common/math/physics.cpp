@@ -1,4 +1,3 @@
-
 #include "../platform.h"
 #include "physics.h"
 #include "vec3f.h"

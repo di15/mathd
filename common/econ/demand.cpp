@@ -1,4 +1,3 @@
-
 #include "demand.h"
 #include "../sim/unit.h"
 #include "../sim/building.h"

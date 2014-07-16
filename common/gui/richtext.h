@@ -1,4 +1,3 @@
-
 #ifndef RICHTEXT_H
 #define RICHTEXT_H
 

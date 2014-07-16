@@ -1,5 +1,3 @@
-
-
 #ifndef POWL_H
 #define POWL_H
 

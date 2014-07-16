@@ -1,4 +1,3 @@
-
 #include "pathjob.h"
 #include "pathnode.h"
 #include "collidertile.h"

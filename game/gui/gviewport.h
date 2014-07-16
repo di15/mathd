@@ -1,4 +1,3 @@
-
 #ifndef WEVIEWPORT_H
 #define WEVIEWPORT_H
 

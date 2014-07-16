@@ -1,4 +1,3 @@
-
 #include "collidertile.h"
 #include "../math/vec2i.h"
 #include "../math/3dmath.h"

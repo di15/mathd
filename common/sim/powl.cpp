@@ -1,5 +1,3 @@
-
-
 #include "powl.h"
 #include "../render/heightmap.h"
 #include "../math/hmapmath.h"

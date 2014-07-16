@@ -1,4 +1,3 @@
-
 #include "../render/model.h"
 #include "buildingtype.h"
 

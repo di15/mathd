@@ -1,5 +1,3 @@
-
-
 #include "infrastructure.h"
 #include "../render/heightmap.h"
 #include "building.h"

@@ -1,4 +1,3 @@
-
 #include "../render/heightmap.h"
 #include "../math/vec3f.h"
 #include "../math/polygon.h"

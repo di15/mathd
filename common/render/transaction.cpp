@@ -1,4 +1,3 @@
-
 #include "../math/matrix.h"
 #include "transaction.h"
 #include "../gui/font.h"

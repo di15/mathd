@@ -1,4 +1,3 @@
-
 #include "sprite.h"
 #include "../utils.h"
 #include "../platform.h"

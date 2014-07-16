@@ -1,4 +1,3 @@
-
 #include "../gmain.h"
 #include "../../common/gui/gui.h"
 #include "../../common/gui/widgets/windoww.h"

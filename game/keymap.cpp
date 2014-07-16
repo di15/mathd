@@ -1,6 +1,3 @@
-
-
-
 #include "gmain.h"
 #include "keymap.h"
 #include "../common/platform.h"
