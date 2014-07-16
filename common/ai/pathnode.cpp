@@ -29,6 +29,7 @@ PathNode::PathNode(int startx, int startz, int endx, int endz, int nx, int nz, P
 	//tried = false;
 }
 
+#if 0
 PathNode::PathNode(int startx, int startz, int endx, int endz, int nx, int nz, PathNode* prev, int totalD, int stepD, unsigned char expan)
 {
 	this->nx = nx;
@@ -46,6 +47,7 @@ PathNode::PathNode(int startx, int startz, int endx, int endz, int nx, int nz, P
 	//tried = false;
 	expansion = expan;
 }
+#endif
 
 PathNode* PathNodeAt(int nx, int nz)
 {

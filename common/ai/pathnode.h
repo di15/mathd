@@ -70,7 +70,7 @@ public:
 	short nx;
 	short nz;
 	int totalD;
-	unsigned char expansion;
+	//unsigned char expansion;
 	PathNode* previous;
 	//bool tried;
 	bool opened;
@@ -83,7 +83,7 @@ public:
 		closed = false;
 	};
 	PathNode(int startx, int startz, int endx, int endz, int nx, int nz, PathNode* prev, int totalD, int stepD);
-	PathNode(int startx, int startz, int endx, int endz, int nx, int nz, PathNode* prev, int totalD, int stepD, unsigned char expan);
+	//PathNode(int startx, int startz, int endx, int endz, int nx, int nz, PathNode* prev, int totalD, int stepD, unsigned char expan);
 };
 
 #pragma pack(pop)

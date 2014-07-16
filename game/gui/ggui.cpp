@@ -824,18 +824,18 @@ void FillGUI()
 	//DrawSceneFunc = DrawScene;
 	//DrawSceneDepthFunc = DrawSceneDepth;
 
-	g_log<<"2.1"<<endl;
+	g_log<<"2.1"<<std::endl;
 	g_log.flush();
 
 	for(int i=0; i<PLAYERS; i++)
 	{
-		g_log<<"2.1.1"<<endl;
+		g_log<<"2.1.1"<<std::endl;
 		g_log.flush();
 
 		Player* py = &g_player[i];
 		GUI* gui = &py->gui;
 
-		g_log<<"2.1.2"<<endl;
+		g_log<<"2.1.2"<<std::endl;
 		g_log.flush();
 
 		gui->assignkey(SDL_SCANCODE_F1, SaveScreenshot, NULL);
@@ -844,24 +844,24 @@ void FillGUI()
 		gui->assignrbutton(MouseRDown, MouseRUp);
 		gui->assignmousemove(MouseMove);
 
-		g_log<<"2.1.3"<<endl;
+		g_log<<"2.1.3"<<std::endl;
 		g_log.flush();
 	}
 
-	g_log<<"2.2"<<endl;
+	g_log<<"2.2"<<std::endl;
 	g_log.flush();
 
 	// Loading ViewLayer
 	Player* py = &g_player[g_curP];
 	GUI* gui = &py->gui;
 
-	g_log<<"2.2"<<endl;
+	g_log<<"2.2"<<std::endl;
 	g_log.flush();
 
 	gui->add(new ViewLayer(gui, "loading"));
 	ViewLayer* loadingview = (ViewLayer*)gui->get("loading");
 
-	g_log<<"2.3"<<endl;
+	g_log<<"2.3"<<std::endl;
 	g_log.flush();
 
 	loadingview->add(new Text(NULL, "status", RichText("Loading..."), MAINFONT8, Resize_LoadingStatus));
@@ -869,22 +869,22 @@ void FillGUI()
 	gui->closeall();
 	gui->open("loading");
 
-	g_log<<"2.4"<<endl;
+	g_log<<"2.4"<<std::endl;
 	g_log.flush();
 
 	FillMenuGUI();
 
-	g_log<<"2.5"<<endl;
+	g_log<<"2.5"<<std::endl;
 	g_log.flush();
 
 	FillEditorGUI();
 
-	g_log<<"2.6"<<endl;
+	g_log<<"2.6"<<std::endl;
 	g_log.flush();
 
 	FillPlayGUI();
 
-	g_log<<"2.7"<<endl;
+	g_log<<"2.7"<<std::endl;
 	g_log.flush();
 
 	FillConsole();

@@ -173,8 +173,8 @@ bool DrawNextFrame(int desiredFrameRate)
 
 bool InitWindow()
 {
-	g_log<<"Renderer1: "<<(char*)glGetString(GL_RENDERER)<<endl;
-	g_log<<"GL_VERSION1 = "<<(char*)glGetString(GL_VERSION)<<endl;
+	g_log<<"Renderer1: "<<(char*)glGetString(GL_RENDERER)<<std::endl;
+	g_log<<"GL_VERSION1 = "<<(char*)glGetString(GL_VERSION)<<std::endl;
 	g_log.flush();
 
 	char path[MAX_PATH+1];
@@ -240,13 +240,13 @@ void DestroyWindow(const char* title)
 bool MakeWindow(const char* title)
 {
 
-	g_log<<"samw0"<<endl;
+	g_log<<"samw0"<<std::endl;
 	g_log.flush();
 
-	//g_log<<"GL_VERSION: "<<(char*)glGetString(GL_VERSION)<<endl;
+	//g_log<<"GL_VERSION: "<<(char*)glGetString(GL_VERSION)<<std::endl;
 	//g_log.flush();
 
-	g_log<<"sa"<<endl;
+	g_log<<"sa"<<std::endl;
 	g_log.flush();
 
 	// Request compatibility because GLEW doesn't play well with core contexts.
@@ -324,7 +324,7 @@ bool MakeWindow(const char* title)
 
 	g_glcontext = SDL_GL_CreateContext(g_window);
 
-	g_log<<"GL_VERSION: "<<glGetString(GL_VERSION)<<endl;
+	g_log<<"GL_VERSION: "<<glGetString(GL_VERSION)<<std::endl;
 	g_log.flush();
 
 	if(!g_glcontext)

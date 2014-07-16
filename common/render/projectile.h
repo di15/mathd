@@ -2,8 +2,6 @@
 #include "../math/3dmath.h"
 #include "../math/vec3f.h"
 
-using namespace std;
-
 class ProjectileType
 {
 public:

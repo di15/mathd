@@ -122,10 +122,10 @@ bool MS3DModel::load(const char *relative, unsigned int& diffm, unsigned int& sp
 	char full[MAX_PATH+1];
 	FullPath(relative, full);
 
-	ifstream inputFile( full, ios::in | ios::binary );
+	std::ifstream inputFile( full, std::ios::in | std::ios::binary );
 	if ( inputFile.fail())
 	{
-		g_log << "Couldn't open the model file "<< relative << endl;
+		g_log << "Couldn't open the model file "<< relative << std::endl;
 		return false;
 	}
 
@@ -155,9 +155,9 @@ bool MS3DModel::load(const char *relative, unsigned int& diffm, unsigned int& sp
 	strncpy( m_filepath, filename, pathLength );
 	*/
 
-	inputFile.seekg( 0, ios::end );
+	inputFile.seekg( 0, std::ios::end );
 	long fileSize = inputFile.tellg();
-	inputFile.seekg( 0, ios::beg );
+	inputFile.seekg( 0, std::ios::beg );
 
 	char *pBuffer = new char[fileSize];
 	inputFile.read( pBuffer, fileSize );
@@ -169,13 +169,13 @@ bool MS3DModel::load(const char *relative, unsigned int& diffm, unsigned int& sp
 
 	if ( strncmp( pHeader->m_ID, "MS3D000000", 10 ) != 0 )
 	{
-		g_log << "Not an MS3D file "<< relative << endl;
+		g_log << "Not an MS3D file "<< relative << std::endl;
 		return false;
 	}
 
 	if ( pHeader->m_version < 3 )
 	{
-		g_log << "I know nothing about MS3D v1.2, " <<relative<< endl;
+		g_log << "I know nothing about MS3D v1.2, " <<relative<< std::endl;
 		return false;
 	}
 
@@ -323,7 +323,7 @@ bool MS3DModel::load(const char *relative, unsigned int& diffm, unsigned int& sp
 			}
 			if ( parentIndex == -1 )
 			{
-				g_log << "Unable to find parent bone in MS3D file" << endl;
+				g_log << "Unable to find parent bone in MS3D file" << std::endl;
 				return false;
 			}
 		}
@@ -511,7 +511,7 @@ void MS3DModel::genva(VertexArray** vertexArrays, Vec3f scale, Vec3f translate, 
 						/*
 						if(strstr(filepath, "flat"))
 						{
-							//g_log<<"weighsum + "<<normalweights[index][l].x<<","<<normalweights[index][l].y<<","<<normalweights[index][l].z<<endl;
+							//g_log<<"weighsum + "<<normalweights[index][l].x<<","<<normalweights[index][l].y<<","<<normalweights[index][l].z<<std::endl;
 							//g_log.flush();
 						}*/
 
@@ -520,7 +520,7 @@ void MS3DModel::genva(VertexArray** vertexArrays, Vec3f scale, Vec3f translate, 
 					/*
 					if(strstr(filepath, "flat"))
 					{
-						g_log<<"weighsum = "<<weighsum.x<<","<<weighsum.y<<","<<weighsum.z<<endl;
+						g_log<<"weighsum = "<<weighsum.x<<","<<weighsum.y<<","<<weighsum.z<<std::endl;
 						g_log.flush();
 					}*/
 

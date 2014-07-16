@@ -126,7 +126,7 @@ void DrawSBuild()
 
 	if(py->build < BUILDING_TYPES)
 	{
-		//g_log<<"dr"<<endl;
+		//g_log<<"dr"<<std::endl;
 
 		if(py->canplace)
 			glUniform4f(s->m_slot[SSLOT_COLOR], 1, 1, 1, 0.5f);
@@ -445,6 +445,8 @@ bool PlaceBuilding(int type, Vec2i pos, bool finished, int owner, int* bid)
 	Zero(b->conmat);
 	Zero(b->stocked);
 	Zero(b->maxcost);
+	Zero(b->prodprice);
+	b->propprice = 0;
 
 	int cmminx = tmin.x*TILE_SIZE;
 	int cmminz = tmin.y*TILE_SIZE;
@@ -494,7 +496,7 @@ bool PlaceBuilding(int type, Vec2i pos, bool finished, int owner, int* bid)
 
 bool PlaceAbout(int btype, Vec2i tabout, Vec2i* tpos)
 {
-	//g_log<<"PlaceBAround "<<player<<endl;
+	//g_log<<"PlaceBAround "<<player<<std::endl;
 	//g_log.flush();
     
 	BuildingT* t = &g_bltype[btype];
@@ -506,7 +508,7 @@ bool PlaceAbout(int btype, Vec2i tabout, Vec2i* tpos)
     
 	do
 	{
-		vector<Vec2i> canplace;
+		std::vector<Vec2i> canplace;
 		Vec2i ttry;
 		int tilex, tilez;
 		int left, right, top, bottom;
@@ -676,7 +678,7 @@ bool PlaceAbout(int btype, Vec2i tabout, Vec2i* tpos)
 		if(canplace.size() > 0)
 		{
 			//Chat("placing");
-			//g_log<<"placeb t="<<btype<<" "<<vTile.x<<","<<vTile.y<<","<<vTile.z<<"("<<(vTile.x/16)<<","<<(vTile.y/16)<<","<<(vTile.z/16)<<")"<<endl;
+			//g_log<<"placeb t="<<btype<<" "<<vTile.x<<","<<vTile.y<<","<<vTile.z<<"("<<(vTile.x/16)<<","<<(vTile.y/16)<<","<<(vTile.z/16)<<")"<<std::endl;
 			//g_log.flush();
 			*tpos = canplace[ rand()%canplace.size() ];
             

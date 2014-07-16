@@ -66,7 +66,7 @@ ViewportW::ViewportW(Widget* parent, const char* n, void (*reframef)(Widget* thi
 
 void ViewportW::draw()
 {
-	//g_log<<m_pos[0]<<","<<m_pos[1]<<","<<m_pos[2]<<","<<m_pos[3]<<endl;
+	//g_log<<m_pos[0]<<","<<m_pos[1]<<","<<m_pos[2]<<","<<m_pos[3]<<std::endl;
 
 	Player* py = &g_player[g_curP];
 	int w = m_pos[2] - m_pos[0];

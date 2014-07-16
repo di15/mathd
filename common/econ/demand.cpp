@@ -7,11 +7,14 @@
 #include "../utils.h"
 
 DemTree g_demtree;
+DemTree g_demtree2[PLAYERS];
 
 DemNode::DemNode()
 {
 	demtype = DEM_NODE;
 	parent = NULL;
+	bid.maxearn = 0;
+	profit = 0;
 }
 
 int CountU(int utype)
@@ -63,14 +66,20 @@ void AddInf(DemTree* dm, std::list<DemNode*>* nodes, DemNode* parent, DemNode* p
 
 	Resource* r = &g_resource[rtype];
 
-	if(r->physical)
-	{
-		std::list<RoadDem*> roads;
-	}
-	else
-	{//offsetof(Building,roadnetw);
+	if(r->conduit == CONDUIT_NONE)
+		return;
 
+	//If no supplier specified, find one or make one, and then call this function again with that supplier specified.
+	if(!parent2)
+	{
+		// TO DO: don't worry about this for now.
+		return;
 	}
+
+	char ctype = r->conduit;
+	ConduitType* ct = &g_cotype[ctype];
+
+
 }
 
 void AddReq(DemTree* dm, std::list<DemNode*>* nodes, DemNode* parent, int rtype, int ramt, int depth)
@@ -91,7 +100,8 @@ void AddReq(DemTree* dm, std::list<DemNode*>* nodes, DemNode* parent, int rtype,
 	if(depth > MAX_REQ)
 		return;
 
-	int remain = ramt;
+	int rremain = ramt;
+	//int bidremain = bid;
 	
 #ifdef DEBUG
 	g_log<<"bls"<<std::endl;
@@ -131,8 +141,8 @@ void AddReq(DemTree* dm, std::list<DemNode*>* nodes, DemNode* parent, int rtype,
 		if(capleft <= 0)
 			continue;
 
-		int suphere = imin(capleft, remain);
-		remain -= suphere;
+		int suphere = imin(capleft, rremain);
+		rremain -= suphere;
 		
 #ifdef DEBUG
 		g_log<<"\tsuphere "<<suphere<<" remain "<<remain<<std::endl;
@@ -194,11 +204,11 @@ void AddReq(DemTree* dm, std::list<DemNode*>* nodes, DemNode* parent, int rtype,
 
 		AddInf(dm, nodes, parent, *biter, rtype, ramt, depth);
 
-		if(remain <= 0)
+		if(rremain <= 0)
 			return;
 	}
 
-	if(remain <= 0)
+	if(rremain <= 0)
 		return;
 
 	struct Producer
@@ -257,7 +267,7 @@ void AddReq(DemTree* dm, std::list<DemNode*>* nodes, DemNode* parent, int rtype,
 
 		// requisites for production, calc prodratio
 		
-		demb->prodratio = remain * RATIO_DENOM / bt->output[rtype];
+		demb->prodratio = rremain * RATIO_DENOM / bt->output[rtype];
 		demb->prodratio = imin(RATIO_DENOM, demb->prodratio);
 		demb->prodratio = imax(1, demb->prodratio);
 		// prodratio could be modified next, we need the original value
@@ -337,8 +347,8 @@ void AddReq(DemTree* dm, std::list<DemNode*>* nodes, DemNode* parent, int rtype,
 		
 		AddInf(dm, nodes, parent, demb, rtype, ramt, depth);
 
-		remain -= prodamt;
-	}while(remain > 0);
+		rremain -= prodamt;
+	}while(rremain > 0);
 
 	// TO DO: outlets for global player cache/reserves
 }
@@ -404,16 +414,130 @@ void BlConReq(DemTree* dm)
 	}
 }
 
-void CalcDem()
+// Calculate demands where there is insufficient supply,
+// not where a cheaper supplier might create a profit.
+// This is player-non-specific, shared by all players.
+// No positional information is considered, no branching,
+// no bidding price information included.
+// Roads and infrastructure considered?
+void CalcDem1()
 {
 	g_demtree.free();
 	AddBl(&g_demtree);
 	BlConReq(&g_demtree);
 
 	int nlab = CountU(UNIT_LABOURER);
+
+	int labfunds = 0;
+
+	for(int i=0; i<UNITS; i++)
+	{
+		Unit* u = &g_unit[i];
+
+		if(!u->on)
+			continue;
+
+		if(u->type != UNIT_LABOURER)
+			continue;
+
+		labfunds += u->belongings[RES_FUNDS];
+	}
 	
 	AddReq(&g_demtree, &g_demtree.nodes, NULL, RES_HOUSING, nlab, 0);
 	AddReq(&g_demtree, &g_demtree.nodes, NULL, RES_RETFOOD, LABOURER_FOODCONSUM * CYCLE_FRAMES, 0);
 	AddReq(&g_demtree, &g_demtree.nodes, NULL, RES_ENERGY, nlab * LABOURER_ENERGYCONSUM, 0);
 }
 
+void LabDem(DemTree* dm, Unit* u)
+{
+	// Housing
+	RDemNode* housedem = new RDemNode;
+	if(u->home >= 0)
+	{
+		// If there's already a home,
+		// there's only an opportunity
+		// for certain lower-cost apartments 
+		// within distance.
+		Building* homeb = &g_building[u->home];
+		int homepr = homeb->prodprice[RES_HOUSING];
+		int homedist = Magnitude(homeb->tilepos * TILE_SIZE + Vec2i(TILE_SIZE/2,TILE_SIZE/2) - u->cmpos);
+
+		// As long as it's at least -1 cheaper and/or -1 units closer,
+		// it's a more preferable alternative. How to express
+		// alternatives that aren't closer but much cheaper?
+		// Figure that out using utility function?
+
+		Bid *altbid = &housedem->bid;
+		altbid->maxearn = homepr-1;
+		altbid->maxdist = homedist-1;
+		altbid->cmpos = u->cmpos;
+		altbid->tpos = u->cmpos/TILE_SIZE;
+		
+		housedem->bi = -1;
+		housedem->supbp = NULL;
+		housedem->btype = -1;
+		housedem->parent = NULL;
+		housedem->rtype = RES_HOUSING;
+		housedem->ramt = 1;
+		housedem->ui = -1;
+		housedem->utype = -1;
+		housedem->demui = u - g_unit;
+	}
+	else
+	{
+		// How to express distance-dependent
+		// cash opportunity?
+
+	}
+	dm->nodes.push_back(housedem);
+
+	// Food
+	// Which shop will the labourer shop at?
+
+
+	// Electricity
+
+
+}
+
+// 1. Opportunities where something is overpriced
+// and building a second supplier would be profitable.
+// 2. Profitability of building for primary demands (from consumers)
+// including positional information. Funnel individual demands into
+// position candidates? Also, must be within consideration of existing
+// suppliers. 
+// 3. Profitability of existing secondary etc. demands (inter-industry).
+// 4. Trucks, infrastructure.
+void CalcDem2(Player* p)
+{
+	int pi = p - g_player;
+	DemTree* dm = &g_demtree2[pi];
+
+	// Point #2 - building for primary demands
+
+	for(int i=0; i<UNITS; i++)
+	{
+		Unit* u = &g_unit[i];
+
+		if(!u->on)
+			continue;
+
+		if(u->type != UNIT_LABOURER)
+			continue;
+
+		LabDem(dm, u);
+	}
+
+	// A thought about funneling point demands
+	// to choose an optimal building location.
+	// Each point demand presents a radius in which
+	// a supplier would be effective. The intersection
+	// of these circles brings the most profit.
+	// It is necessary to figure out the minimum 
+	// earning which would be necessary to be worthy
+	// of constructing the building. 
+	// This gives the minimum earning combination
+	// of intersections necessary. 
+	// The best opportunity though is the one with
+	// the highest earning combination.
+}

@@ -45,15 +45,15 @@ bool LoadDMDModel(VertexArray** va, unsigned int& diffusem, unsigned int& specul
 		(*va)->vertices[i] = (*va)->vertices[i] * scale + translate;
 
 #if 0
-	g_log<<"numv "<<numv<<endl;
+	g_log<<"numv "<<numv<<std::endl;
 
 	for(int i=0; i<numv; i++)
 	{
-		g_log<<"\t"<<(*va)[0].vertices[i].x<<","<<(*va)[0].vertices[i].y<<","<<(*va)[0].vertices[i].z<<endl;
+		g_log<<"\t"<<(*va)[0].vertices[i].x<<","<<(*va)[0].vertices[i].y<<","<<(*va)[0].vertices[i].z<<std::endl;
 	}
 #endif
 
-	g_log<<relative<<endl;
+	g_log<<relative<<std::endl;
 
 	char diffpath[MAX_PATH+1];
 	char diffpathpng[MAX_PATH+1];

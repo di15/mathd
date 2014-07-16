@@ -611,7 +611,7 @@ bool ViewportLDown(int which, int relx, int rely, int width, int height)
 
 	ViewportT* t = &g_viewportT[v->m_type];
 
-	//g_log<<"vp["<<which<<"] l down"<<endl;
+	//g_log<<"vp["<<which<<"] l down"<<std::endl;
 	//g_log.flush();
 
 	float aspect = fabsf((float)width / (float)height);

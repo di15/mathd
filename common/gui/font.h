@@ -5,8 +5,6 @@
 
 #include "../platform.h"
 
-using namespace std;
-
 #define MAX_CHARS	256
 #define CODE_POINTS	110000
 

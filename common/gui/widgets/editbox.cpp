@@ -101,7 +101,7 @@ void EditBox::draw()
 	RichText val = drawvalue();
 
 	//if(m_opened)
-	//	g_log<<"op m_caret="<<m_caret<<endl;
+	//	g_log<<"op m_caret="<<m_caret<<std::endl;
 
 	DrawShadowedTextF(m_font, m_pos[0]+m_scroll[0], m_pos[1], m_pos[0], m_pos[1], m_pos[2], m_pos[3], &val, NULL, m_opened ? m_caret : -1);
 
@@ -116,7 +116,7 @@ void EditBox::draw()
 void EditBox::frameupd()
 {
 #ifdef MOUSESC_DEBUG
-	g_log<<"editbox frameup"<<endl;
+	g_log<<"editbox frameup"<<std::endl;
 	g_log.flush();
 #endif
 
@@ -127,7 +127,7 @@ void EditBox::frameupd()
 		bool movedcar = false;
 
 #ifdef MOUSESC_DEBUG
-		g_log<<"ldown frameup"<<endl;
+		g_log<<"ldown frameup"<<std::endl;
 		g_log.flush();
 #endif
 
@@ -180,7 +180,7 @@ void EditBox::frameupd()
 void EditBox::inev(InEv* ev)
 {
 //#ifdef MOUSESC_DEBUG
-	//g_log<<"editbox mousemove"<<endl;
+	//g_log<<"editbox mousemove"<<std::endl;
 	//g_log.flush();
 //#endif
 
@@ -199,14 +199,14 @@ void EditBox::inev(InEv* ev)
 				{
 					m_highl[0] = m_caret;
 					m_highl[1] = newcaret;
-					//g_log<<"hihgl "<<m_highl[0]<<"->"<<m_highl[1]<<endl;
+					//g_log<<"hihgl "<<m_highl[0]<<"->"<<m_highl[1]<<std::endl;
 					//g_log.flush();
 				}
 				else
 				{
 					m_highl[0] = newcaret;
 					m_highl[1] = m_caret;
-					//g_log<<"hihgl "<<m_highl[0]<<"->"<<m_highl[1]<<endl;
+					//g_log<<"hihgl "<<m_highl[0]<<"->"<<m_highl[1]<<std::endl;
 					//g_log.flush();
 				}
 
@@ -317,7 +317,7 @@ void EditBox::inev(InEv* ev)
 			RichText val = drawvalue();
 			int endx = EndX(&val, m_caret, m_font, m_pos[0]+m_scroll[0], m_pos[1]);
 
-			//g_log<<"left endx = "<<endx<<"/"<<m_pos[0]<<endl;
+			//g_log<<"left endx = "<<endx<<"/"<<m_pos[0]<<std::endl;
 			//g_log.flush();
 
 			if(endx <= m_pos[0])
@@ -350,7 +350,7 @@ void EditBox::inev(InEv* ev)
 		{
 			len = m_value.texlen();
 
-			//g_log<<"vk del"<<endl;
+			//g_log<<"vk del"<<std::endl;
 			//g_log.flush();
 
 			if((m_highl[1] <= 0 || m_highl[0] == m_highl[1]) && m_caret >= len || len <= 0)
@@ -383,7 +383,7 @@ void EditBox::inev(InEv* ev)
 		 {
 		 len = m_value.texlen();
 
-		 g_log<<"vk del"<<endl;
+		 g_log<<"vk del"<<std::endl;
 		 g_log.flush();
 
 		 if((m_highl[1] <= 0 || m_highl[0] == m_highl[1]) && m_caret >= len || len <= 0)
@@ -448,7 +448,7 @@ void EditBox::inev(InEv* ev)
 		if(m_caret > len)
 			m_caret = len;
 
-		//g_log<<"vk "<<ev->key<<endl;
+		//g_log<<"vk "<<ev->key<<std::endl;
 		//g_log.flush();
 
 
@@ -461,7 +461,7 @@ void EditBox::inev(InEv* ev)
 #endif
 
 #ifdef PASTE_DEBUG
-			g_log<<"charin "<<(char)ev->key<<" ("<<ev->key<<")"<<endl;
+			g_log<<"charin "<<(char)ev->key<<" ("<<ev->key<<")"<<std::endl;
 		g_log.flush();
 #endif
 
@@ -631,10 +631,10 @@ bool EditBox::delprev()
 		RichText after = m_value.substr(m_caret, len-m_caret);
 		m_value = before + after;
 
-		//g_log<<"before newval="<<before.rawstr()<<" texlen="<<before.texlen()<<endl;
-		//g_log<<"after="<<after.rawstr()<<" texlen="<<after.texlen()<<endl;
-		//g_log<<"ba newval="<<m_value.rawstr()<<" texlen="<<(before + after).texlen()<<endl;
-		//g_log<<"newval="<<m_value.rawstr()<<" texlen="<<m_value.texlen()<<endl;
+		//g_log<<"before newval="<<before.rawstr()<<" texlen="<<before.texlen()<<std::endl;
+		//g_log<<"after="<<after.rawstr()<<" texlen="<<after.texlen()<<std::endl;
+		//g_log<<"ba newval="<<m_value.rawstr()<<" texlen="<<(before + after).texlen()<<std::endl;
+		//g_log<<"newval="<<m_value.rawstr()<<" texlen="<<m_value.texlen()<<std::endl;
 
 		m_caret--;
 	}
@@ -655,7 +655,7 @@ bool EditBox::delprev()
 void EditBox::copyval()
 {
 #ifdef PASTE_DEBUG
-	g_log<<"copy vkc"<<endl;
+	g_log<<"copy vkc"<<std::endl;
 	g_log.flush();
 #endif
 
@@ -694,31 +694,31 @@ void EditBox::pasteval()
 {
 #ifdef PLATFORM_WIN
 #ifdef PASTE_DEBUG
-	g_log<<"paste"<<endl;
+	g_log<<"paste"<<std::endl;
 #endif
 	OpenClipboard(NULL);
 
 #ifdef PASTE_DEBUG
-	g_log<<"paste1"<<endl;
+	g_log<<"paste1"<<std::endl;
 #endif
 	HANDLE clip0 = GetClipboardData(CF_TEXT);
 
 #ifdef PASTE_DEBUG
-	g_log<<"paste2"<<endl;
+	g_log<<"paste2"<<std::endl;
 #endif
 	//HANDLE h = GlobalLock(clip0);
 	//placestr((char*)clip0);
 	char* str = (char*)GlobalLock(clip0);
 #ifdef PASTE_DEBUG
-	g_log<<"paste3"<<endl;
-	g_log<<str<<endl;
+	g_log<<"paste3"<<std::endl;
+	g_log<<str<<std::endl;
 #endif
 
 	//placestr(str);
 
 #ifdef PASTE_DEBUG
 	g_log<<"place str ";
-	g_log<<str<<endl;
+	g_log<<str<<std::endl;
 	g_log.flush();
 	g_log.flush();
 #endif

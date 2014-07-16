@@ -294,7 +294,7 @@ float Highest(int minx, int minz, int maxx, int maxz)
 		for(int z=minz; z<=maxz; z++)
 		{
 #if 0
-			g_log<<"x,z"<<x<<","<<z<<endl;
+			g_log<<"x,z"<<x<<","<<z<<std::endl;
 			g_log.flush();
 #endif
 
@@ -313,7 +313,7 @@ float Lowest(int minx, int minz, int maxx, int maxz)
 		for(int z=minz; z<=maxz; z++)
 		{
 #if 0
-			g_log<<"x,z"<<x<<","<<z<<endl;
+			g_log<<"x,z"<<x<<","<<z<<std::endl;
 			g_log.flush();
 #endif
 
@@ -340,7 +340,7 @@ bool TileUnclimablei(int tx, int tz)
 	if(fabs(maxh - minh) > MAX_CLIMB_INCLINE)
 	{
 #if 0
-		g_log<<tx<<","<<tz<<" ("<<g_hmap.m_widthx<<","<<g_hmap.m_widthz<<" incline "<<fabs(maxh - minh)<<endl;
+		g_log<<tx<<","<<tz<<" ("<<g_hmap.m_widthx<<","<<g_hmap.m_widthz<<" incline "<<fabs(maxh - minh)<<std::endl;
 		g_log.flush();
 #endif
 #if 0

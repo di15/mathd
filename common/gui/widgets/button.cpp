@@ -223,7 +223,7 @@ void Button::draw()
 	}
 
 	//if(_stricmp(m_name.c_str(), "choose texture") == 0)
-	//	g_log<<"draw choose texture"<<endl;
+	//	g_log<<"draw choose texture"<<std::endl;
 }
 
 void Button::drawover()

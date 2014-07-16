@@ -96,14 +96,14 @@ void TextArea::inev(InEv* ev)
 			{
 				m_highl[0] = m_caret;
 				m_highl[1] = newcaret;
-				//g_log<<"hihgl "<<m_highl[0]<<"->"<<m_highl[1]<<endl;
+				//g_log<<"hihgl "<<m_highl[0]<<"->"<<m_highl[1]<<std::endl;
 				//g_log.flush();
 			}
 			else
 			{
 				m_highl[0] = newcaret;
 				m_highl[1] = m_caret;
-				//g_log<<"hihgl "<<m_highl[0]<<"->"<<m_highl[1]<<endl;
+				//g_log<<"hihgl "<<m_highl[0]<<"->"<<m_highl[1]<<std::endl;
 				//g_log.flush();
 			}
 
@@ -284,7 +284,7 @@ void TextArea::inev(InEv* ev)
 		{
 
 #ifdef PASTE_DEBUG
-			g_log<<"charin "<<(char)k<<" ("<<k<<")"<<endl;
+			g_log<<"charin "<<(char)k<<" ("<<k<<")"<<std::endl;
 			g_log.flush();
 #endif
 
@@ -460,7 +460,7 @@ bool TextArea::delprev()
 void TextArea::copyval()
 {
 #ifdef PASTE_DEBUG
-	g_log<<"copy vkc"<<endl;
+	g_log<<"copy vkc"<<std::endl;
 	g_log.flush();
 #endif
 
@@ -499,31 +499,31 @@ void TextArea::pasteval()
 {
 #ifdef PLATFORM_WIN
 #ifdef PASTE_DEBUG
-	g_log<<"paste"<<endl;
+	g_log<<"paste"<<std::endl;
 #endif
 	OpenClipboard(NULL);
 
 #ifdef PASTE_DEBUG
-	g_log<<"paste1"<<endl;
+	g_log<<"paste1"<<std::endl;
 #endif
 	HANDLE clip0 = GetClipboardData(CF_TEXT);
 
 #ifdef PASTE_DEBUG
-	g_log<<"paste2"<<endl;
+	g_log<<"paste2"<<std::endl;
 #endif
 	//HANDLE h = GlobalLock(clip0);
 	//placestr((char*)clip0);
 	char* str = (char*)GlobalLock(clip0);
 #ifdef PASTE_DEBUG
-	g_log<<"paste3"<<endl;
-	g_log<<str<<endl;
+	g_log<<"paste3"<<std::endl;
+	g_log<<str<<std::endl;
 #endif
 
 	placestr(str);
 
 #ifdef PASTE_DEBUG
 	g_log<<"place str ";
-	g_log<<str<<endl;
+	g_log<<str<<std::endl;
 	g_log.flush();
 	g_log.flush();
 #endif

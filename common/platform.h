@@ -54,6 +54,7 @@
 #include <fstream>
 #include <iostream>
 #include <math.h>
+#include <stdint.h>
 
 #ifdef PLATFORM_WIN
 #include <jpeglib.h>

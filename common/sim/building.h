@@ -38,6 +38,9 @@ public:
 	int maxcost[RESOURCES];
 	bool inoperation;
 
+	int prodprice[RESOURCES];	//price of produced goods
+	int propprice;	//price of this property
+
 	void destroy();
 	void fillcollider();
 	void freecollider();

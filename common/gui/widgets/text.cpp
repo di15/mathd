@@ -22,14 +22,14 @@ void Text::draw()
 	//float color[] = {0.8f, 0.8f, 0.8f, 1.0f};
 	//DrawShadowedText(font, pos[0], pos[1], text.c_str(), color);
 
-	//g_log<<"draw text "<<m_text.rawstr().c_str()<<" (shadow: "<<m_shadow<<")"<<endl;
+	//g_log<<"draw text "<<m_text.rawstr().c_str()<<" (shadow: "<<m_shadow<<")"<<std::endl;
 	//g_log.flush();
 
 	if(m_shadow)
 	{
 
 #ifdef DEBUG
-	g_log<<"text "<<__FILE__<<" "<<__LINE__<<endl;
+	g_log<<"text "<<__FILE__<<" "<<__LINE__<<std::endl;
     g_log.flush();
 #endif
 #if 1
@@ -41,7 +41,7 @@ void Text::draw()
 	else
 	{
 #ifdef DEBUG
-	g_log<<"text "<<__FILE__<<" "<<__LINE__<<endl;
+	g_log<<"text "<<__FILE__<<" "<<__LINE__<<std::endl;
     g_log.flush();
 #endif
 

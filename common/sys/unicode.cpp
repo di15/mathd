@@ -3,7 +3,7 @@
 #include "../utils.h"
 
 
-#define ERR(x) {g_log<<x<<endl; g_log.flush(); exit(1);}
+#define ERR(x) {g_log<<x<<std::endl; g_log.flush(); exit(1);}
 
 // http://foolab.org/node/773
 #if 0
@@ -123,7 +123,7 @@ unsigned int *ToUTF32(const unsigned char *utf8, int len)
 	unsigned int *r = result;
 	if (!result)
 	{
-		ERR("Ran out of memory!");
+		OutOfMem(__FILE__, __LINE__);
 	}
 	while (*p)
 	{
@@ -144,7 +144,7 @@ unsigned int *ToUTF32(const unsigned char *utf8, int len)
 			ch = *p;
 			break;
 		default:
-			g_log<<"Len: "<<l<<endl;
+			g_log<<"Len: "<<l<<std::endl;
 		}
 		++p;
 		int y;
@@ -257,5 +257,5 @@ void print_char(int pos, int len, unsigned int ch)
 		utf8[i] = ((char*)&ch)[i];
 	utf8[4] = 0;
 	//printf("Character: %i\tLength: %i\tUTF-32(hex): %lx\tUTF-32(dec): %li\n", pos, len, ch, ch);
-	g_log<<"Character: "<<pos<<"\tLength: "<<len<<"\tUTF-8: "<<utf8<<"\tUTF-32(dec): "<<ch<<endl;
+	g_log<<"Character: "<<pos<<"\tLength: "<<len<<"\tUTF-8: "<<utf8<<"\tUTF-32(dec): "<<ch<<std::endl;
 }

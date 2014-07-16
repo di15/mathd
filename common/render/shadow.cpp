@@ -308,8 +308,8 @@ void RenderToShadowMap(Matrix projection, Matrix viewmat, Matrix modelmat, Vec3f
     //return;
 
 #if 0
-    g_log<<"lposd "<<g_lightpos.x<<","<<g_lightpos.y<<","<<g_lightpos.z<<endl;
-    g_log<<"leyed "<<g_lighteye.x<<","<<g_lighteye.y<<","<<g_lighteye.z<<endl;
+    g_log<<"lposd "<<g_lightpos.x<<","<<g_lightpos.y<<","<<g_lightpos.z<<std::endl;
+    g_log<<"leyed "<<g_lighteye.x<<","<<g_lighteye.y<<","<<g_lighteye.z<<std::endl;
 #endif
 
     //g_lighteye = Vec3f(0,0,0);
@@ -410,7 +410,7 @@ void UseShadow(int shader, Matrix projection, Matrix viewmat, Matrix modelmat, M
     //glUniform1f(s->m_slot[SSLOT_MAXELEV], g_maxelev);
 
 #if 0
-    g_log<<"sun "<<lightdir[0]<<","<<lightdir[1]<<","<<lightdir[2]<<endl;
+    g_log<<"sun "<<lightdir[0]<<","<<lightdir[1]<<","<<lightdir[2]<<std::endl;
 #endif
 }
 
@@ -467,16 +467,16 @@ void RenderShadowedScene(Matrix projection, Matrix viewmat, Matrix modelmat, Mat
     //lightdir[1] = g_lighteye.y - g_lightpos.y;
     //lightdir[2] = g_lighteye.z - g_lightpos.z;
 #if 0
-    g_log<<"lpos "<<g_lightpos.x<<","<<g_lightpos.y<<","<<g_lightpos.z<<endl;
-    g_log<<"leye "<<g_lighteye.x<<","<<g_lighteye.y<<","<<g_lighteye.z<<endl;
+    g_log<<"lpos "<<g_lightpos.x<<","<<g_lightpos.y<<","<<g_lightpos.z<<std::endl;
+    g_log<<"leye "<<g_lighteye.x<<","<<g_lighteye.y<<","<<g_lighteye.z<<std::endl;
 #endif
     lightdir = g_lightpos - g_lighteye;
 #if 0
-    g_log<<"sun pres "<<lightdir.x<<","<<lightdir.y<<","<<lightdir.z<<endl;
+    g_log<<"sun pres "<<lightdir.x<<","<<lightdir.y<<","<<lightdir.z<<std::endl;
 #endif
     lightdir = Normalize(lightdir);
 #if 0
-    g_log<<"sun norm "<<lightdir.x<<","<<lightdir.y<<","<<lightdir.z<<endl;
+    g_log<<"sun norm "<<lightdir.x<<","<<lightdir.y<<","<<lightdir.z<<std::endl;
 #endif
 
     if(drawscenefunc != NULL)

@@ -41,10 +41,10 @@ bool UnitCollides(Unit* u)
 
 	if(u == g_pathunit)
 	{
-		g_log<<"================================"<<endl;
-		g_log<<"unit "<<(int)(u - g_unit)<<" move simframe "<<g_simframe<<endl;
-		g_log<<"cm pos = "<<u->cmpos.x<<","<<u->cmpos.y<<endl;
-		g_log<<"cm rect = ("<<minx<<","<<minz<<")->("<<maxx<<","<<maxz<<")"<<endl;
+		g_log<<"================================"<<std::endl;
+		g_log<<"unit "<<(int)(u - g_unit)<<" move simframe "<<g_simframe<<std::endl;
+		g_log<<"cm pos = "<<u->cmpos.x<<","<<u->cmpos.y<<std::endl;
+		g_log<<"cm rect = ("<<minx<<","<<minz<<")->("<<maxx<<","<<maxz<<")"<<std::endl;
 
 		int cposx = u->cmpos.x / PATHNODE_SIZE;
 		int cposz = u->cmpos.y / PATHNODE_SIZE;
@@ -53,8 +53,8 @@ bool UnitCollides(Unit* u)
 		int cmaxx = maxx / PATHNODE_SIZE;
 		int cmaxz = maxz / PATHNODE_SIZE;
 
-		g_log<<"pathcell rect: ("<<cminx<<","<<cminz<<")->("<<cmaxx<<","<<cmaxz<<")"<<endl;
-		g_log<<"pathcell pos: ("<<cposx<<","<<cposz<<")"<<endl;
+		g_log<<"pathcell rect: ("<<cminx<<","<<cminz<<")->("<<cmaxx<<","<<cmaxz<<")"<<std::endl;
+		g_log<<"pathcell pos: ("<<cposx<<","<<cposz<<")"<<std::endl;
 
 		g_log.flush();
 	}
@@ -96,10 +96,10 @@ bool UnitCollides(Unit* u)
 
 		if(u == g_pathunit)
 		{
-			g_log<<"collision with unit "<<i<<endl;
+			g_log<<"collision with unit "<<i<<std::endl;
 
-			g_log<<"\tcm pos = "<<u2->cmpos.x<<","<<u2->cmpos.y<<endl;
-			g_log<<"\tcm rect = ("<<minx2<<","<<minz2<<")->("<<maxx2<<","<<maxz2<<")"<<endl;
+			g_log<<"\tcm pos = "<<u2->cmpos.x<<","<<u2->cmpos.y<<std::endl;
+			g_log<<"\tcm rect = ("<<minx2<<","<<minz2<<")->("<<maxx2<<","<<maxz2<<")"<<std::endl;
 
 			int cposx = u->cmpos.x / PATHNODE_SIZE;
 			int cposz = u->cmpos.y / PATHNODE_SIZE;
@@ -108,10 +108,10 @@ bool UnitCollides(Unit* u)
 			int cmaxx = maxx / PATHNODE_SIZE;
 			int cmaxz = maxz / PATHNODE_SIZE;
 
-			g_log<<"\tpathcell rect: ("<<cminx<<","<<cminz<<")->("<<cmaxx<<","<<cmaxz<<")"<<endl;
-			g_log<<"\tpathcell pos: ("<<cposx<<","<<cposz<<")"<<endl;
+			g_log<<"\tpathcell rect: ("<<cminx<<","<<cminz<<")->("<<cmaxx<<","<<cmaxz<<")"<<std::endl;
+			g_log<<"\tpathcell pos: ("<<cposx<<","<<cposz<<")"<<std::endl;
 
-			g_log<<"-----------------------------------------"<<endl;
+			g_log<<"-----------------------------------------"<<std::endl;
 
 			g_log.flush();
 		}
@@ -148,8 +148,8 @@ bool UnitCollides(Unit* u)
 				if(minx <= maxx2 && minz <= maxz2 && maxx >= minx2 && maxz >= minz2)
 				{
 #if 0
-					g_log<<"collides at cell ("<<(minx/PATHNODE_SIZE)<<","<<(minz/PATHNODE_SIZE)<<")->("<<(maxx/PATHNODE_SIZE)<<","<<(maxz/PATHNODE_SIZE)<<")"<<endl;
-					g_log<<"subgoal = "<<(u->subgoal.x/PATHNODE_SIZE)<<","<<(u->subgoal.y/PATHNODE_SIZE)<<endl;
+					g_log<<"collides at cell ("<<(minx/PATHNODE_SIZE)<<","<<(minz/PATHNODE_SIZE)<<")->("<<(maxx/PATHNODE_SIZE)<<","<<(maxz/PATHNODE_SIZE)<<")"<<std::endl;
+					g_log<<"subgoal = "<<(u->subgoal.x/PATHNODE_SIZE)<<","<<(u->subgoal.y/PATHNODE_SIZE)<<std::endl;
 					g_log.flush();
 #endif
 
@@ -184,8 +184,8 @@ bool UnitCollides(Unit* u)
 
 	if(u == g_pathunit)
 	{
-		g_log<<"no collision"<<endl;
-		g_log<<"-----------------------------------------"<<endl;
+		g_log<<"no collision"<<std::endl;
+		g_log<<"-----------------------------------------"<<std::endl;
 		g_log.flush();
 	}
 

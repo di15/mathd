@@ -173,6 +173,7 @@
     <ClCompile Include="..\common\debug.cpp" />
     <ClCompile Include="..\common\econ\balance.cpp" />
     <ClCompile Include="..\common\econ\demand.cpp" />
+    <ClCompile Include="..\common\econ\utility.cpp" />
     <ClCompile Include="..\common\gui\cursor.cpp" />
     <ClCompile Include="..\common\gui\draw2d.cpp" />
     <ClCompile Include="..\common\gui\font.cpp" />
@@ -210,6 +211,7 @@
     <ClCompile Include="..\common\math\brush.cpp" />
     <ClCompile Include="..\common\math\camera.cpp" />
     <ClCompile Include="..\common\math\edge.cpp" />
+    <ClCompile Include="..\common\math\fixmath.cpp" />
     <ClCompile Include="..\common\math\frustum.cpp" />
     <ClCompile Include="..\common\math\hmapmath.cpp" />
     <ClCompile Include="..\common\math\line.cpp" />
@@ -292,6 +294,7 @@
     <ClInclude Include="..\common\debug.h" />
     <ClInclude Include="..\common\econ\balance.h" />
     <ClInclude Include="..\common\econ\demand.h" />
+    <ClInclude Include="..\common\econ\utility.h" />
     <ClInclude Include="..\common\gui\cursor.h" />
     <ClInclude Include="..\common\gui\draw2d.h" />
     <ClInclude Include="..\common\gui\font.h" />
@@ -329,6 +332,7 @@
     <ClInclude Include="..\common\math\brush.h" />
     <ClInclude Include="..\common\math\camera.h" />
     <ClInclude Include="..\common\math\edge.h" />
+    <ClInclude Include="..\common\math\fixmath.h" />
     <ClInclude Include="..\common\math\frustum.h" />
     <ClInclude Include="..\common\math\hmapmath.h" />
     <ClInclude Include="..\common\math\line.h" />

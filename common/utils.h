@@ -4,13 +4,11 @@
 
 #include "platform.h"
 
-using namespace std;
-
 #define CORRECT_SLASH '/'
 
 #define ARRSZ(a)	(sizeof(a)/sizeof(a[0]))
 
-extern ofstream g_log;
+extern std::ofstream g_log;
 
 const std::string DateTime();
 const std::string FileDateTime();

@@ -33,7 +33,7 @@ void SaveScreenshot()
 	char fullpath[MAX_PATH+1];
 	FullPath(relative, fullpath);
 
-	g_log<<"Writing screenshot "<<fullpath<<endl;
+	g_log<<"Writing screenshot "<<fullpath<<std::endl;
 	g_log.flush();
 
 	SaveJPEG(fullpath, &screenshot, 0.9f);

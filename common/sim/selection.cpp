@@ -186,7 +186,7 @@ void DrawSel(Matrix* projection, Matrix* modelmat, Matrix* viewmat)
 
 		//Vec3f p = c->m_pos + Vec3f(0, t->vmin.y, 0) + Vec3f(0, 1.0f, 0);
 
-		const float r = t->size.x * 0.5f;
+		const float r = t->size.x * 1.0f;
 
 #if 0
 		float y1 = Bilerp(&g_hmap, p.x + r, p.z - r);

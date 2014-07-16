@@ -481,7 +481,7 @@ void Draw()
 	StopTimer(TIMER_DRAWSETUP);
 
 #ifdef DEBUG
-	g_log<<"draw "<<__FILE__<<" "<<__LINE__<<endl;
+	g_log<<"draw "<<__FILE__<<" "<<__LINE__<<std::endl;
 	g_log.flush();
 #endif
 
@@ -544,7 +544,7 @@ void Draw()
 #endif
 
 #ifdef DEBUG
-	g_log<<"draw "<<__FILE__<<" "<<__LINE__<<endl;
+	g_log<<"draw "<<__FILE__<<" "<<__LINE__<<std::endl;
 	g_log.flush();
 #endif
 
@@ -552,7 +552,7 @@ void Draw()
 	gui->frameupd();
 
 #ifdef DEBUG
-	g_log<<"draw "<<__FILE__<<" "<<__LINE__<<endl;
+	g_log<<"draw "<<__FILE__<<" "<<__LINE__<<std::endl;
 	g_log.flush();
 #endif
 
@@ -592,7 +592,7 @@ void Draw()
 #endif
 
 #ifdef DEBUG
-	g_log<<"draw "<<__FILE__<<" "<<__LINE__<<endl;
+	g_log<<"draw "<<__FILE__<<" "<<__LINE__<<std::endl;
 	g_log.flush();
 #endif
 
@@ -608,7 +608,7 @@ void Draw()
 #endif
 
 #ifdef DEBUG
-	g_log<<"draw "<<__FILE__<<" "<<__LINE__<<endl;
+	g_log<<"draw "<<__FILE__<<" "<<__LINE__<<std::endl;
 	g_log.flush();
 #endif
 
@@ -758,7 +758,7 @@ void LoadConfig()
 	char cfgfull[MAX_PATH+1];
 	FullPath(CONFIGFILE, cfgfull);
 
-	ifstream f(cfgfull);
+	std::ifstream f(cfgfull);
 
 	if(!f)
 		return;
@@ -920,7 +920,7 @@ void EventLoop()
 				{
 					g_log<<"[#"<<(unsigned int)(unsigned char)e.text.text[i]<<"]";
 				}
-				g_log<<endl;
+				g_log<<std::endl;
 				g_log.flush();
 
 				gui->inev(&ev);
@@ -937,10 +937,10 @@ void EventLoop()
 				{
 					g_log<<"[#"<<(unsigned int)(unsigned char)e.text.text[i]<<"]";
 				}
-				g_log<<endl;
+				g_log<<std::endl;
 				g_log.flush();
 
-				g_log<<"texted: cursor:"<<ev.cursor<<" sellen:"<<ev.sellen<<endl;
+				g_log<<"texted: cursor:"<<ev.cursor<<" sellen:"<<ev.sellen<<std::endl;
 				g_log.flush();
 
 				gui->inev(&ev);
@@ -1090,7 +1090,7 @@ void EventLoop()
 			StartTimer(TIMER_DRAW);
 
 #ifdef DEBUG
-			g_log<<"main "<<__FILE__<<" "<<__LINE__<<endl;
+			g_log<<"main "<<__FILE__<<" "<<__LINE__<<std::endl;
 			g_log.flush();
 #endif
 			CalcDrawRate();
@@ -1098,7 +1098,7 @@ void EventLoop()
 			CheckGLError(__FILE__, __LINE__);
 
 #ifdef DEBUG
-			g_log<<"main "<<__FILE__<<" "<<__LINE__<<endl;
+			g_log<<"main "<<__FILE__<<" "<<__LINE__<<std::endl;
 			g_log.flush();
 #endif
 
@@ -1108,12 +1108,12 @@ void EventLoop()
 			if(g_mode == APPMODE_PLAY || g_mode == APPMODE_EDITOR)
 			{
 #ifdef DEBUG
-				g_log<<"main "<<__FILE__<<" "<<__LINE__<<endl;
+				g_log<<"main "<<__FILE__<<" "<<__LINE__<<std::endl;
 				g_log.flush();
 #endif
 				Scroll();
 #ifdef DEBUG
-				g_log<<"main "<<__FILE__<<" "<<__LINE__<<endl;
+				g_log<<"main "<<__FILE__<<" "<<__LINE__<<std::endl;
 				g_log.flush();
 #endif
 				UpdateResTicker();
@@ -1127,7 +1127,7 @@ void EventLoop()
 			StartTimer(TIMER_UPDATE);
 
 #ifdef DEBUG
-			g_log<<"main "<<__FILE__<<" "<<__LINE__<<endl;
+			g_log<<"main "<<__FILE__<<" "<<__LINE__<<std::endl;
 			g_log.flush();
 #endif
 			CalcUpdRate();
@@ -1146,34 +1146,34 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 int main(int argc, char* argv[])
 #endif
 {
-	g_log << "Log start"    << endl; /* TODO, include date */
-	g_log << "Init: "       << endl;
-	g_log.flush();
+	//g_log << "Log start"    << std::endl; /* TODO, include date */
+	//g_log << "Init: "       << std::endl;
+	//g_log.flush();
 
 	Init();
 
-	g_log << "MakeWindow: " << endl;
+	g_log << "MakeWindow: " << std::endl;
 	g_log.flush();
 
 	MakeWindow(TITLE);
 
-	g_log << "FillGUI: "    << endl;
+	g_log << "FillGUI: "    << std::endl;
 	g_log.flush();
 
 	FillGUI();
 	
-	g_log << "Queue: "      << endl;
+	g_log << "Queue: "      << std::endl;
 	g_log.flush();
 
 	SDL_ShowCursor(false);
 	Queue();
 
-	g_log << "EventLoop: "  << endl;
+	g_log << "EventLoop: "  << std::endl;
 	g_log.flush();
 
 	EventLoop();
 
-	g_log << "Deinit: "     << endl;
+	g_log << "Deinit: "     << std::endl;
 	g_log.flush();
 
 	Deinit();

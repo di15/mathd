@@ -55,7 +55,7 @@ inline Vec2i PathNodePos(int cmposx, int cmposz)
 
 void FreePathGrid()
 {
-	g_log<<"free path gr"<<endl;
+	g_log<<"free path gr"<<std::endl;
 
 	if(g_collidertile)
 	{
@@ -81,7 +81,7 @@ void AllocPathGrid(int cmwx, int cmwz)
 	g_pathdim.y = cmwz / PATHNODE_SIZE;
 	g_collidertile = new ColliderTile [ g_pathdim.x * g_pathdim.y ];
 
-	g_log<<"path gr allc "<<g_pathdim.x<<","<<g_pathdim.y<<endl;
+	g_log<<"path gr allc "<<g_pathdim.x<<","<<g_pathdim.y<<std::endl;
 
 	int cwx = g_pathdim.x;
 	int cwz = g_pathdim.y;
@@ -112,7 +112,7 @@ void FillColliderGrid()
 	const int cwx = g_pathdim.x;
 	const int cwz = g_pathdim.y;
 
-	//g_log<<"path gr "<<cwx<<","<<cwz<<endl;
+	//g_log<<"path gr "<<cwx<<","<<cwz<<std::endl;
 
 	for(int x=0; x<cwx; x++)
 		for(int z=0; z<cwz; z++)
@@ -121,14 +121,14 @@ void FillColliderGrid()
 			int cmz = z*PATHNODE_SIZE + PATHNODE_SIZE/2;
 			ColliderTile* cell = ColliderTileAt(x, z);
 
-			//g_log<<"cell "<<x<<","<<z<<" cmpos="<<cmx<<","<<cmz<<" y="<<g_hmap.accheight(cmx, cmz)<<endl;
+			//g_log<<"cell "<<x<<","<<z<<" cmpos="<<cmx<<","<<cmz<<" y="<<g_hmap.accheight(cmx, cmz)<<std::endl;
 
 			if(AtLand(cmx, cmz))
 			{
 				//cell->hasland = true;
 				cell->flags |= FLAG_HASLAND;
-				//g_log<<"land "<<(cmx/TILE_SIZE)<<","<<(cmz/TILE_SIZE)<<" flag="<<(cell->flags & FLAG_HASLAND)<<"="<<(unsigned int)cell->flags<<endl;
-				//g_log<<"land"<<endl;
+				//g_log<<"land "<<(cmx/TILE_SIZE)<<","<<(cmz/TILE_SIZE)<<" flag="<<(cell->flags & FLAG_HASLAND)<<"="<<(unsigned int)cell->flags<<std::endl;
+				//g_log<<"land"<<std::endl;
 			}
 			else
 			{
@@ -368,25 +368,25 @@ bool Walkable2(PathJob* pj, int cmposx, int cmposz)
 #if 1
 	if(cell->flags & FLAG_ABRUPT)
 	{
-		//g_log<<"abrupt"<<endl;
+		//g_log<<"abrupt"<<std::endl;
 		return false;
 	}
 
 	if(pj->roaded && !(cell->flags & FLAG_HASROAD))
 	{
-		//g_log<<"!road"<<endl;
+		//g_log<<"!road"<<std::endl;
 		return false;
 	}
 
 	if(pj->landborne && !(cell->flags & FLAG_HASLAND))
 	{
-		//g_log<<"!land flag="<<(cell->flags & FLAG_HASLAND)<<"="<<(unsigned int)cell->flags<<endl;
+		//g_log<<"!land flag="<<(cell->flags & FLAG_HASLAND)<<"="<<(unsigned int)cell->flags<<std::endl;
 		return false;
 	}
 
 	if(pj->seaborne && (cell->flags & FLAG_HASLAND))
 	{
-		//g_log<<"!sea"<<endl;
+		//g_log<<"!sea"<<std::endl;
 		return false;
 	}
 #endif
@@ -432,7 +432,7 @@ bool Walkable2(PathJob* pj, int cmposx, int cmposz)
 
 				if(cmminx <= maxx2 && cmminz <= maxz2 && cmmaxx >= minx2 && cmmaxz >= minz2)
 				{
-					//g_log<<"bld"<<endl;
+					//g_log<<"bld"<<std::endl;
 					return false;
 				}
 			}
@@ -458,7 +458,7 @@ bool Walkable2(PathJob* pj, int cmposx, int cmposz)
 
 					if(cmmaxx >= cmminx2 && cmmaxz >= cmminz2 && cmminx <= cmmaxx2 && cmminz <= cmmaxz2)
 					{
-						//g_log<<"u"<<endl;
+						//g_log<<"u"<<std::endl;
 						return false;
 					}
 #else

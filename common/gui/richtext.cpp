@@ -9,7 +9,7 @@
 RichTextP::RichTextP()
 {
 #ifdef USTR_DEBUG
-	g_log<<"RichTextP::RichTextP()"<<endl;
+	g_log<<"RichTextP::RichTextP()"<<std::endl;
 	g_log.flush();
 #endif
 }
@@ -18,7 +18,7 @@ RichTextP::RichTextP(const RichTextP& original)
 {
 
 #ifdef USTR_DEBUG
-	g_log<<"RichTextP::RichTextP(const RichTextP& original)"<<endl;
+	g_log<<"RichTextP::RichTextP(const RichTextP& original)"<<std::endl;
 	g_log.flush();
 #endif
 
@@ -31,7 +31,7 @@ RichTextP::RichTextP(const char* cstr)
 	m_text = UString(cstr);
 
 #ifdef USTR_DEBUG
-	g_log<<"RichTextP::RichTextP(const char* cstr) end '"<<m_text.rawstr()<<"'"<<endl;
+	g_log<<"RichTextP::RichTextP(const char* cstr) end '"<<m_text.rawstr()<<"'"<<std::endl;
 	g_log.flush();
 #endif
 }
@@ -58,7 +58,7 @@ RichTextP::RichTextP(int type, int subtype)
 RichTextP& RichTextP::operator=(const RichTextP &original)
 {
 #ifdef USTR_DEBUG
-	g_log<<"RichTextP& RichTextP::operator=(const RichTextP &original)"<<endl;
+	g_log<<"RichTextP& RichTextP::operator=(const RichTextP &original)"<<std::endl;
 	g_log.flush();
 #endif
 
@@ -96,7 +96,7 @@ std::string RichTextP::texval() const
 	{
 #if 0
 //#ifdef USTR_DEBUG
-		g_log<<"\tstring RichTextP::texval() const..."<<endl;
+		g_log<<"\tstring RichTextP::texval() const..."<<std::endl;
 		g_log.flush();
 #endif
 
@@ -104,7 +104,7 @@ std::string RichTextP::texval() const
 
 #if 0
 //#ifdef USTR_DEBUG
-		g_log<<"\tstring RichTextP::texval() const = "<<m_text.rawstr()<<endl;
+		g_log<<"\tstring RichTextP::texval() const = "<<m_text.rawstr()<<std::endl;
 		g_log.flush();
 #endif
 	}
@@ -143,7 +143,7 @@ RichText::RichText(const RichText& original)
 RichText::RichText(const char* cstr)
 {
 #ifdef USTR_DEBUG
-	g_log<<"RichText::RichText(const char* cstr)"<<endl;
+	g_log<<"RichText::RichText(const char* cstr)"<<std::endl;
 	g_log.flush();
 #endif
 
@@ -158,11 +158,11 @@ RichText& RichText::operator=(const RichText &original)
 	g_log.flush();
 	g_log<<"from: ";
 	g_log.flush();
-	g_log<<rawstr()<<endl;
+	g_log<<rawstr()<<std::endl;
 	g_log.flush();
 	g_log<<"to: ";
 	g_log.flush();
-	g_log<<original.rawstr()<<endl;
+	g_log<<original.rawstr()<<std::endl;
 	g_log.flush();
 #endif
 
@@ -227,13 +227,13 @@ RichText RichText::operator+(const RichText &other)
 
 		combined.m_part.push_back(*i);
 
-		//g_log<<"combined1 rawstr = "<<combined.rawstr()<<endl;
+		//g_log<<"combined1 rawstr = "<<combined.rawstr()<<std::endl;
 	}
 
 	if(twopart.texlen() > 0 && havecombomid)
 		combined.m_part.push_back(twopart);
 
-	//g_log<<"combined2 rawstr = "<<combined.rawstr()<<endl;
+	//g_log<<"combined2 rawstr = "<<combined.rawstr()<<std::endl;
 
 	for(auto i=other.m_part.begin(); i!=other.m_part.end(); i++)
 	{
@@ -245,7 +245,7 @@ RichText RichText::operator+(const RichText &other)
 
 		combined.m_part.push_back(*i);
 
-		//g_log<<"combined3 rawstr = "<<combined.rawstr()<<endl;
+		//g_log<<"combined3 rawstr = "<<combined.rawstr()<<std::endl;
 	}
 
 	return combined;
@@ -300,16 +300,16 @@ std::string RichText::rawstr() const
 
 #ifdef USTR_DEBUG
 	//int parti = 0;
-	//g_log<<"std::string RichText::rawstr() const before loop..."<<parti<<endl;
+	//g_log<<"std::string RichText::rawstr() const before loop..."<<parti<<std::endl;
 	//g_log.flush();
 #endif
 
 	for(auto i=m_part.begin(); i!=m_part.end(); i++)
 	{
 #ifdef USTR_DEBUG
-		//g_log<<"std::string RichText::rawstr() const parti="<<parti<<endl;
+		//g_log<<"std::string RichText::rawstr() const parti="<<parti<<std::endl;
 		//g_log.flush();
-		//g_log<<"\tstring RichText::rawstr() const = "<<i->texval()<<endl;
+		//g_log<<"\tstring RichText::rawstr() const = "<<i->texval()<<std::endl;
 		//g_log.flush();
 		//parti++;
 #endif
@@ -381,7 +381,7 @@ RichText ParseTags(RichText original, int* caret)
 #ifdef USTR_DEBUG
 	parsedepth ++;
 
-	g_log<<"ParseTags #"<<parsedepth<<endl;
+	g_log<<"ParseTags #"<<parsedepth<<std::endl;
 	g_log.flush();
 
 	//if(parsedepth > 10)
@@ -403,7 +403,7 @@ RichText ParseTags(RichText original, int* caret)
 					continue;
 
 #ifdef USTR_DEBUG
-				g_log<<"ParseTags found tag \""<<icon->m_tag.rawstr()<<"\" in \""<<i->m_text.rawstr()<<"\""<<endl;
+				g_log<<"ParseTags found tag \""<<icon->m_tag.rawstr()<<"\" in \""<<i->m_text.rawstr()<<"\""<<std::endl;
 				g_log.flush();
 #endif
 
@@ -412,14 +412,14 @@ RichText ParseTags(RichText original, int* caret)
 					RichTextP before = i->substr(0, firstof);
 
 #ifdef USTR_DEBUG
-					g_log<<"ParseTags before str at "<<firstof<<" \""<<before.m_text.rawstr()<<"\""<<endl;
+					g_log<<"ParseTags before str at "<<firstof<<" \""<<before.m_text.rawstr()<<"\""<<std::endl;
 					g_log.flush();
 #endif
 
 					parsed = parsed + RichText(before);
 
 #ifdef USTR_DEBUG
-					g_log<<"\tparsed now = \""<<parsed.rawstr()<<"\""<<endl;
+					g_log<<"\tparsed now = \""<<parsed.rawstr()<<"\""<<std::endl;
 					g_log.flush();
 #endif
 				}
@@ -431,7 +431,7 @@ RichText ParseTags(RichText original, int* caret)
 				int partlen =  i->m_text.m_length;
 
 #ifdef USTR_DEBUG
-				g_log<<"\tparsed now = \""<<parsed.rawstr()<<"\""<<endl;
+				g_log<<"\tparsed now = \""<<parsed.rawstr()<<"\""<<std::endl;
 				g_log.flush();
 #endif
 
@@ -440,14 +440,14 @@ RichText ParseTags(RichText original, int* caret)
 					RichTextP after = i->substr(firstof+taglen, partlen-(firstof+taglen));
 
 #ifdef USTR_DEBUG
-					g_log<<"ParseTags after str at "<<(firstof+taglen)<<" \""<<after.m_text.rawstr()<<"\""<<endl;
+					g_log<<"ParseTags after str at "<<(firstof+taglen)<<" \""<<after.m_text.rawstr()<<"\""<<std::endl;
 					g_log.flush();
 #endif
 
 					parsed = parsed + RichText(after);
 
 #ifdef USTR_DEBUG
-					g_log<<"\tparsed now = \""<<parsed.rawstr()<<"\""<<endl;
+					g_log<<"\tparsed now = \""<<parsed.rawstr()<<"\""<<std::endl;
 					g_log.flush();
 #endif
 				}
@@ -484,7 +484,7 @@ RichText ParseTags(RichText original, int* caret)
 	if(!changed)
 	{
 #ifdef USTR_DEBUG
-		g_log<<"ParseTags final = "<<original.rawstr()<<endl;
+		g_log<<"ParseTags final = "<<original.rawstr()<<std::endl;
 		g_log.flush();
 #endif
 		return original;

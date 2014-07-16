@@ -71,7 +71,7 @@ void NewTransx(Vec3f pos, const RichText* rtext)
 #if 0
 	auto titer = g_transx.rbegin();
 
-	g_log<<"raw str = "<<titer->rtext.rawstr()<<endl;
+	g_log<<"raw str = "<<titer->rtext.rawstr()<<std::endl;
 	g_log.flush();
 #endif
 }

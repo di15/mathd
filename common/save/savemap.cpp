@@ -67,11 +67,11 @@ void PlaceUnits()
 			if(Walkable2(&pj, cmpos.x, cmpos.y))
 			{
 				PlaceUnit(UNIT_LABOURER, Vec3i(cmpos.x, g_hmap.accheight(cmpos.x, cmpos.y), cmpos.y), -1);
-				//g_log<<"placed "<<li<<" at"<<tpos.x<<","<<tpos.y<<endl;
+				//g_log<<"placed "<<li<<" at"<<tpos.x<<","<<tpos.y<<std::endl;
 				break;
 			}
 			//else
-			//g_log<<"not placed at"<<tpos.x<<","<<tpos.y<<endl;
+			//g_log<<"not placed at"<<tpos.x<<","<<tpos.y<<std::endl;
 		}
 	}
 }

@@ -17,7 +17,7 @@
 #include "../game/gmain.h"
 
 Timer g_profile[TIMERS];
-ofstream g_profF;
+std::ofstream g_profF;
 
 void StartTimer(int id)
 {
@@ -39,7 +39,7 @@ void StopTimer(int id)
 #ifdef DEBUG
 	if(id == TIMER_UPDATE)
 	{
-		g_log<<endl<<"upd el = "<<GetTickCount()<<" - "<<g_profile[id].starttick<<endl<<endl;
+		g_log<<std::endl<<"upd el = "<<GetTickCount()<<" - "<<g_profile[id].starttick<<std::endl<<std::endl;
 	}
 #endif
 
@@ -50,7 +50,7 @@ void StopTimer(int id)
 #ifdef DEBUG
 	if(id == TIMER_UPDATE)
 	{
-		g_log<<endl<<"upd el"<<elapsed<<" tot"<<g_profile[id].lastframeelapsed<<" avg"<<g_profile[id].averagems<<endl<<endl;
+		g_log<<std::endl<<"upd el"<<elapsed<<" tot"<<g_profile[id].lastframeelapsed<<" avg"<<g_profile[id].averagems<<std::endl<<std::endl;
 	}
 #endif
 
@@ -60,7 +60,7 @@ void StopTimer(int id)
 #ifdef DEBUG
 		if(id == TIMER_UPDATE)
 		{
-			g_log<<endl<<"upd ( (double)"<<g_profile[id].lastframeelapsed<<" + "<<g_profile[id].averagems<<"*(double)"<<g_profile[id].frames<<" ) / (double)("<<g_profile[id].frames<<"+1); = ";
+			g_log<<std::endl<<"upd ( (double)"<<g_profile[id].lastframeelapsed<<" + "<<g_profile[id].averagems<<"*(double)"<<g_profile[id].frames<<" ) / (double)("<<g_profile[id].frames<<"+1); = ";
 		}
 #endif
 
@@ -75,11 +75,11 @@ void StopTimer(int id)
 #ifdef DEBUG
 		if(id == TIMER_UPDATE)
 		{
-			g_log<<g_profile[id].averagems<<endl<<endl;
+			g_log<<g_profile[id].averagems<<std::endl<<std::endl;
 		}
 #endif
 
-		//g_log<<g_profile[id].name<<" "<<g_profile[id].averagems<<"ms"<<endl;
+		//g_log<<g_profile[id].name<<" "<<g_profile[id].averagems<<"ms"<<std::endl;
 	}
 	if(id == TIMER_FRAME)
 		g_profile[id].lastframe++;
@@ -96,7 +96,7 @@ void WriteProfiles(int in, int layer)
 	{
 		char fullpath[MAX_PATH+1];
 		FullPath("profiles.txt", fullpath);
-		g_profF.open(fullpath, ios_base::out);
+		g_profF.open(fullpath, std::ios_base::out);
 		parentavgms = g_profile[TIMER_FRAME].averagems;
 	}
 	else
@@ -131,7 +131,7 @@ void WriteProfiles(int in, int layer)
 		for(int k=0; k<layer; k++)
 			g_profF<<"\t";
 
-		g_profF<<g_profile[j].name<<"\t...\t"<<g_profile[j].averagems<<"ms per frame, "<<percentage<<"% of this level's total"<<endl;
+		g_profF<<g_profile[j].name<<"\t...\t"<<g_profile[j].averagems<<"ms per frame, "<<percentage<<"% of this level's total"<<std::endl;
 
 		WriteProfiles(j, layer+1);
 	}
@@ -141,7 +141,7 @@ void WriteProfiles(int in, int layer)
 		for(int k=0; k<layer; k++)
 			g_profF<<"\t";
 
-		g_profF<<"level total sum: "<<totalms<<" ms per frame, that means "<<totalofparentpct<<"% of this parent's duration underwent profiling"<<endl;
+		g_profF<<"level total sum: "<<totalms<<" ms per frame, that means "<<totalofparentpct<<"% of this parent's duration underwent profiling"<<std::endl;
 	}
 
 	if(in == -1)
@@ -207,7 +207,7 @@ void CheckNum(const char* num)
 	g_log<<": ";
 	g_log.flush();
 
-	g_log<<tl->m_text.rawstr()<<endl;
+	g_log<<tl->m_text.rawstr()<<std::endl;
 	g_log.flush();
 }
 
@@ -218,12 +218,12 @@ void LastNum(const char* l)
 #if 1
 	char fullpath[MAX_PATH+1];
 	FullPath("last.txt", fullpath);
-	ofstream last;
-	last.open(fullpath, ios_base::out);
+	std::ofstream last;
+	last.open(fullpath, std::ios_base::out);
 	last<<l;
 	last.flush();
 #else
-	g_log<<l<<endl;
+	g_log<<l<<std::endl;
 	g_log.flush();
 #endif
 }
@@ -239,13 +239,13 @@ void CheckGLError(const char* file, int line)
 	if(error == GL_NO_ERROR)
 		return;
 
-	g_log<<"GL Error #"<<error<<" in "<<file<<" on line "<<line<<" using shader #"<<g_curS<<endl;
+	g_log<<"GL Error #"<<error<<" in "<<file<<" on line "<<line<<" using shader #"<<g_curS<<std::endl;
 }
 #endif
 
 void LogRich(const RichText* rt)
 {
-	g_log<<"RichText: "<<endl;
+	g_log<<"RichText: "<<std::endl;
 
 	for(auto rtiter = rt->m_part.begin(); rtiter != rt->m_part.end(); rtiter++)
 	{
@@ -264,7 +264,7 @@ void LogRich(const RichText* rt)
 		}
 	}
 
-	g_log<<endl;
+	g_log<<std::endl;
 	g_log.flush();
 }
 
@@ -276,23 +276,23 @@ void UDebug(int i)
 	Unit* u = &g_unit[i];
 	UnitT* t = &g_unitType[u->type];
 
-	g_log<<"UNIT DEBUG: "<<t->name<<" ("<<i<<")"<<endl;
-	g_log<<"path size: "<<u->path.size()<<endl;
+	g_log<<"UNIT DEBUG: "<<t->name<<" ("<<i<<")"<<std::endl;
+	g_log<<"path size: "<<u->path.size()<<std::endl;
 
 	if(u->collidesfast())
 	{
-		g_log<<"COLLIDES: type:"<<g_collidertype<<" ID:"<<g_lastcollider<<endl;
+		g_log<<"COLLIDES: type:"<<g_collidertype<<" ID:"<<g_lastcollider<<std::endl;
 
 		if(g_collidertype == COLLIDER_BUILDING)
 		{
 			Building* b = &g_building[g_lastcollider];
 			BuildingT* bt = &g_bltype[b->type];
 
-			g_log<<"COLLIDER B: "<<bt->name<<endl;
+			g_log<<"COLLIDER B: "<<bt->name<<std::endl;
 
 			if(u->confirmcollision(g_collidertype, g_lastcollider))
 			{
-				g_log<<"CONFIRMED COLLISION"<<endl;
+				g_log<<"CONFIRMED COLLISION"<<std::endl;
 
 				Vec3f p = u->camera.Position();
 				Vec3f p2 = b->pos;
@@ -301,7 +301,7 @@ void UDebug(int i)
 				float hwx = bt->widthX*TILE_SIZE/2.0f;
 				float hwz = bt->widthZ*TILE_SIZE/2.0f;
 
-				g_log<<"COLLISION DX,DZ: "<<(fabs(p2.x-p.x)-r-hwx)<<","<<(fabs(p2.z-p.z)-r-hwz)<<endl;
+				g_log<<"COLLISION DX,DZ: "<<(fabs(p2.x-p.x)-r-hwx)<<","<<(fabs(p2.z-p.z)-r-hwz)<<std::endl;
 			}
 		}
 	}

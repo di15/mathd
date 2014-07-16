@@ -135,7 +135,7 @@ void DrawGlyph()
 		UseFontTex();
 		glUniform4f(g_shader[g_curS].m_slot[SSLOT_COLOR], currcolor[0], currcolor[1], currcolor[2], currcolor[3]);
 
-		//g_log<<"color[3] = "<<currcolor[3]<<endl;
+		//g_log<<"color[3] = "<<currcolor[3]<<std::endl;
 	}
 	else if(g_rtextp->m_type == RICHTEXT_TEXT)
 	{
@@ -171,7 +171,7 @@ void DrawGlyphF()
 		UseFontTex();
 		glUniform4f(g_shader[g_curS].m_slot[SSLOT_COLOR], currcolor[0], currcolor[1], currcolor[2], currcolor[3]);
 
-		//g_log<<"color[3] = "<<currcolor[3]<<endl;
+		//g_log<<"color[3] = "<<currcolor[3]<<std::endl;
 	}
 	else if(g_rtextp->m_type == RICHTEXT_TEXT)
 	{
@@ -397,8 +397,8 @@ void LoadFont(int id, const char* fontfile)
 	FILE* fp = fopen(fullfontpath, "rb");
 	if(!fp)
 	{
-		g_log<<"Error loading font "<<fontfile<<endl;
-		g_log<<"Full path: "<<fullfontpath<<endl;
+		g_log<<"Error loading font "<<fontfile<<std::endl;
+		g_log<<"Full path: "<<fullfontpath<<std::endl;
 		return;
 	}
 
@@ -453,7 +453,7 @@ void LoadFont(int id, const char* fontfile)
 	f->gheight = f->glyph['A'].origsize[1];
 
 	delete [] file;
-	g_log<<fontfile<<".fnt"<<endl;
+	g_log<<fontfile<<".fnt"<<std::endl;
 }
 
 void DrawGlyph(float left, float top, float right, float bottom, float texleft, float textop, float texright, float texbottom)
@@ -471,7 +471,7 @@ void DrawGlyph(float left, float top, float right, float bottom, float texleft, 
 	};
 
 #ifdef DEBUG
-	g_log<<"draw glyph: "<<texleft<<","<<textop<<","<<texright<<","<<texbottom<<endl;
+	g_log<<"draw glyph: "<<texleft<<","<<textop<<","<<texright<<","<<texbottom<<std::endl;
     g_log.flush();
 #endif
 	
@@ -592,7 +592,7 @@ void DrawGlyphF(float left, float top, float right, float bottom, float texleft,
 #endif
 
 #ifdef DEBUG
-	g_log<<"text "<<__FILE__<<" "<<__LINE__<<endl;
+	g_log<<"text "<<__FILE__<<" "<<__LINE__<<std::endl;
     g_log.flush();
 #endif
 
@@ -686,7 +686,7 @@ void DrawLineF(int caret)
 			DrawCaretF();
 
 #ifdef DEBUG
-	g_log<<"text "<<__FILE__<<" "<<__LINE__<<endl;
+	g_log<<"text "<<__FILE__<<" "<<__LINE__<<std::endl;
     g_log.flush();
 #endif
 
@@ -793,7 +793,7 @@ void DrawShadowedTextF(int fnt, float startx, float starty, float framex1, float
 	StartTextF(text, fnt, py->currw*2, py->currh*2, 0, startx, framex1, framey1, framex2, framey2);
 
 #ifdef DEBUG
-	g_log<<"text "<<__FILE__<<" "<<__LINE__<<endl;
+	g_log<<"text "<<__FILE__<<" "<<__LINE__<<std::endl;
     g_log.flush();
 #endif
 
@@ -801,7 +801,7 @@ void DrawShadowedTextF(int fnt, float startx, float starty, float framex1, float
 	TextLayer(startx+1, starty);
 
 #ifdef DEBUG
-	g_log<<"text "<<__FILE__<<" "<<__LINE__<<endl;
+	g_log<<"text "<<__FILE__<<" "<<__LINE__<<std::endl;
     g_log.flush();
 #endif
 
@@ -1175,8 +1175,8 @@ int EndX(const RichText* text, int lastc, int fnt, float startx, float starty)
 	StartText(text, fnt, py->currw*100, py->currh*100, 0, startx);
 	TextLayer(startx, starty);
 
-	//g_log<<"size = "<<size<<endl;
-	//g_log<<"lastc = "<<lastc<<endl;
+	//g_log<<"size = "<<size<<std::endl;
+	//g_log<<"lastc = "<<lastc<<std::endl;
 
 	int highx = startx;
 
@@ -1185,7 +1185,7 @@ int EndX(const RichText* text, int lastc, int fnt, float startx, float starty)
 		if(i == nextlb)
 			NextLineBreak();
 
-		//g_log<<"g_str[i] = "<<g_str[i]<<endl;
+		//g_log<<"g_str[i] = "<<g_str[i]<<std::endl;
 		AdvanceGlyph();
 
 		if(x > highx)

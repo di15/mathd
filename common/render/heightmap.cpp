@@ -37,7 +37,7 @@ unsigned int g_rimtexs[TEX_TYPES];
 
 void AllocGrid(int wx, int wz)
 {
-	g_log<<"allocating class arrays "<<wx<<","<<wz<<endl;
+	g_log<<"allocating class arrays "<<wx<<","<<wz<<std::endl;
 	g_log.flush();
 	
 	if( !(g_cotype[CONDUIT_ROAD].cotiles[0] = new RoadTile [ (wx * wz) ]) ) OutOfMem(__FILE__, __LINE__);
@@ -79,7 +79,7 @@ void Heightmap::allocate(int wx, int wz)
 	if(!m_triconfig) OutOfMem(__FILE__, __LINE__);
 	if(!m_tridivider) OutOfMem(__FILE__, __LINE__);
 
-	//g_log<<"setting heights to 0"<<endl;
+	//g_log<<"setting heights to 0"<<std::endl;
 	//g_log.flush();
 
 	// Set to initial height.
@@ -128,12 +128,12 @@ void Heightmap::destroy()
 	if(m_widthx <= 0 || m_widthz <= 0)
 		return;
 
-	g_log<<"deleting [] g_open"<<endl;
+	g_log<<"deleting [] g_open"<<std::endl;
 	g_log.flush();
 	/*
 		delete [] g_open;
 
-		g_log<<"deleting [] g_road"<<endl;
+		g_log<<"deleting [] g_road"<<std::endl;
 		g_log.flush();
 		*/
 
@@ -205,23 +205,23 @@ float Heightmap::accheight(int x, int z)
 	Vec3f trinorm = Normal(tri);
 
 #if 0
-	g_log<<"trinorm = "<<trinorm.x<<","<<trinorm.y<<","<<trinorm.z<<endl;
+	g_log<<"trinorm = "<<trinorm.x<<","<<trinorm.y<<","<<trinorm.z<<std::endl;
 #endif
 
 	MakePlane(&plane.m_normal, &plane.m_d, tri[0], trinorm);
 
 #if 0
-	g_log<<"tri0 = "<<tri[0].x<<","<<tri[0].y<<","<<tri[0].z<<endl;
-	g_log<<"tri1 = "<<tri[1].x<<","<<tri[1].y<<","<<tri[1].z<<endl;
-	g_log<<"tri2 = "<<tri[2].x<<","<<tri[2].y<<","<<tri[2].z<<endl;
+	g_log<<"tri0 = "<<tri[0].x<<","<<tri[0].y<<","<<tri[0].z<<std::endl;
+	g_log<<"tri1 = "<<tri[1].x<<","<<tri[1].y<<","<<tri[1].z<<std::endl;
+	g_log<<"tri2 = "<<tri[2].x<<","<<tri[2].y<<","<<tri[2].z<<std::endl;
 #endif
 
 	float y = - ( x*plane.m_normal.x + z*plane.m_normal.z + plane.m_d ) / plane.m_normal.y;
 
 #if 0
-	g_log<<"- ( "<<x<<"*"<<plane.m_normal.x<<" + "<<z<<"*"<<plane.m_normal.z<<" + "<<plane.m_d<<" ) / "<<plane.m_normal.y<<" = "<<endl;
+	g_log<<"- ( "<<x<<"*"<<plane.m_normal.x<<" + "<<z<<"*"<<plane.m_normal.z<<" + "<<plane.m_d<<" ) / "<<plane.m_normal.y<<" = "<<std::endl;
 
-	g_log<<"y = "<<y<<endl;
+	g_log<<"y = "<<y<<std::endl;
 #endif
 
 	if(GetCo(CONDUIT_ROAD, tx, tz, false)->on)

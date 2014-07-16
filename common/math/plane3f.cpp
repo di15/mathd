@@ -42,7 +42,7 @@ Vec3f PointOnPlane(Plane3f p)
 	//z = -D/C	if(C != 0)
 
 #ifdef PLANE_DEBUG
-	g_log<<"point on plane ("<<p.m_normal.x<<","<<p.m_normal.y<<","<<p.m_normal.z<<"),"<<p.m_d<<endl;
+	g_log<<"point on plane ("<<p.m_normal.x<<","<<p.m_normal.y<<","<<p.m_normal.z<<"),"<<p.m_d<<std::endl;
 	g_log.flush();
 #endif
 

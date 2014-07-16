@@ -140,16 +140,16 @@ void Heap::print()
 		cout << *pos << " ";
 		++pos;
 	}
-	cout << endl;
+	cout << std::endl;
 }
 #endif
 
 void Heap::heapifyup(int index)
 {
-	//cout << "index=" << index << endl;
-	//cout << "parent(index)=" << parent(index) << endl;
-	//cout << "heap[parent(index)]=" << heap[parent(index)] << endl;
-	//cout << "heap[index]=" << heap[index] << endl;
+	//cout << "index=" << index << std::endl;
+	//cout << "parent(index)=" << parent(index) << std::endl;
+	//cout << "heap[parent(index)]=" << heap[parent(index)] << std::endl;
+	//cout << "heap[index]=" << heap[index] << std::endl;
 	while ( ( index > 0 ) && ( parent(index) >= 0 ) &&
 			( heap[parent(index)]->F > heap[index]->F ) )
 	{
@@ -162,9 +162,9 @@ void Heap::heapifyup(int index)
 
 void Heap::heapifydown(int index)
 {
-	//cout << "index=" << index << endl;
-	//cout << "left(index)=" << left(index) << endl;
-	//cout << "right(index)=" << right(index) << endl;
+	//cout << "index=" << index << std::endl;
+	//cout << "left(index)=" << left(index) << std::endl;
+	//cout << "right(index)=" << right(index) << std::endl;
 	int child = left(index);
 	if ( ( child > 0 ) && ( right(index) > 0 ) &&
 			( heap[child]->F > heap[right(index)]->F ) )
@@ -239,7 +239,7 @@ int main()
 	// Get priority element from the heap
 	int heapSize = myheap->size();
 	for ( int i = 0; i < heapSize; i++ )
-		cout << "Get std::min element = " << myheap->deletemin() << endl;
+		cout << "Get std::min element = " << myheap->deletemin() << std::endl;
 
 	// Cleanup
 	delete myheap;

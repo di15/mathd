@@ -27,7 +27,7 @@ GLint Shader::getattrib(const char* strVariable)
 	if(!m_program)
 		return -1;
 
-	g_log<<glGetAttribLocation(m_program, strVariable)<<endl;
+	g_log<<glGetAttribLocation(m_program, strVariable)<<std::endl;
 
 	return glGetAttribLocation(m_program, strVariable);
 }
@@ -35,13 +35,13 @@ GLint Shader::getattrib(const char* strVariable)
 void Shader::mapuniform(int slot, const char* variable)
 {
 	m_slot[slot] = getuniform(variable);
-	//g_log<<"\tmap uniform "<<variable<<" = "<<(int)m_slot[slot]<<endl;
+	//g_log<<"\tmap uniform "<<variable<<" = "<<(int)m_slot[slot]<<std::endl;
 }
 
 void Shader::mapattrib(int slot, const char* variable)
 {
 	m_slot[slot] = getattrib(variable);
-	//g_log<<"\tmap attrib "<<variable<<" = "<<(int)m_slot[slot]<<endl;
+	//g_log<<"\tmap attrib "<<variable<<" = "<<(int)m_slot[slot]<<std::endl;
 }
 
 void GetGLVersion(int* major, int* minor)
@@ -87,8 +87,8 @@ void InitGLSL()
 		return;
 	}
 
-	g_log<<"Renderer: "<<(char*)glGetString(GL_RENDERER)<<endl;
-	g_log<<"GL_VERSION = "<<(char*)glGetString(GL_VERSION)<<endl;
+	g_log<<"Renderer: "<<(char*)glGetString(GL_RENDERER)<<std::endl;
+	g_log<<"GL_VERSION = "<<(char*)glGetString(GL_VERSION)<<std::endl;
 
 	if( !GLEW_VERSION_3_0 )
 	{
@@ -100,7 +100,7 @@ void InitGLSL()
 #if 1
 	char* szGLExtensions = (char*)glGetString(GL_EXTENSIONS);
 
-	g_log<<szGLExtensions<<endl;
+	g_log<<szGLExtensions<<std::endl;
 	g_log.flush();
 
 	if(!strstr(szGLExtensions, "GL_ARB_debug_output"))
@@ -163,11 +163,11 @@ void InitGLSL()
 
 std::string LoadTextFile(char* strFile)
 {
-	ifstream fin(strFile);
+	std::ifstream fin(strFile);
 
 	if(!fin)
 	{
-		g_log<<"Failed to load file "<<strFile<<endl;
+		g_log<<"Failed to load file "<<strFile<<std::endl;
 		return "";
 	}
 
@@ -218,7 +218,7 @@ void LoadShader(int shader, char* strVertex, char* strFragment, bool hastexcoord
 		}
 
 		glGetShaderInfoLog(s->m_vertshader, logLength, &logLength, log);
-		g_log<<"Shader "<<strVertex<<" compile log: "<<endl<<log<<endl;
+		g_log<<"Shader "<<strVertex<<" compile log: "<<std::endl<<log<<std::endl;
 		free(log);
 	}
 
@@ -235,7 +235,7 @@ void LoadShader(int shader, char* strVertex, char* strFragment, bool hastexcoord
 		}
 
 		glGetShaderInfoLog(s->m_fragshader, logLength, &logLength, log);
-		g_log<<"Shader "<<strFragment<<" compile log: "<<endl<<log<<endl;
+		g_log<<"Shader "<<strFragment<<" compile log: "<<std::endl<<log<<std::endl;
 		free(log);
 	}
 
@@ -246,7 +246,7 @@ void LoadShader(int shader, char* strVertex, char* strFragment, bool hastexcoord
 
 	//glUseProgramObject(s->m_program);
 
-	//g_log<<"shader "<<strVertex<<","<<strFragment<<endl;
+	//g_log<<"shader "<<strVertex<<","<<strFragment<<std::endl;
 
 	g_log<<"Program "<<strVertex<<" / "<<strFragment<<" :";
 
@@ -255,7 +255,7 @@ void LoadShader(int shader, char* strVertex, char* strFragment, bool hastexcoord
 	{
 		GLchar* log = (GLchar*)malloc(logLength);
 		glGetProgramInfoLog(s->m_program, logLength, &logLength, log);
-		g_log<<"Program link log:"<<endl<<log<<endl;
+		g_log<<"Program link log:"<<std::endl<<log<<std::endl;
 		free(log);
 	}
 
@@ -263,14 +263,14 @@ void LoadShader(int shader, char* strVertex, char* strFragment, bool hastexcoord
 	glGetProgramiv(s->m_program, GL_LINK_STATUS, &status);
 	if (status == 0)
 	{
-		g_log<<"link status 0"<<endl;
+		g_log<<"link status 0"<<std::endl;
 	}
 	else
 	{
-		g_log<<"link status ok"<<endl;
+		g_log<<"link status ok"<<std::endl;
 	}
 
-	g_log<<endl<<endl;
+	g_log<<std::endl<<std::endl;
 
 
 	s->mapattrib(SSLOT_POSITION, "position");

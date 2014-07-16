@@ -154,7 +154,7 @@ void Click_BuildButton(int bwhat)
 {
 	Player* py = &g_player[g_curP];
 	py->build = bwhat;
-	//g_log<<"b "<<py->build<<endl;
+	//g_log<<"b "<<py->build<<std::endl;
 	Out_BuildButton();
 }
 

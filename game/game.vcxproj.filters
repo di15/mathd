@@ -416,6 +416,12 @@
     <ClCompile Include="..\common\sim\infrastructure.cpp">
       <Filter>Source Files\common\sim</Filter>
     </ClCompile>
+    <ClCompile Include="..\common\math\fixmath.cpp">
+      <Filter>Source Files\common\math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\econ\utility.cpp">
+      <Filter>Source Files\common\econ</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="gmain.h">
@@ -780,6 +786,12 @@
     </ClInclude>
     <ClInclude Include="..\common\sim\infrastructure.h">
       <Filter>Source Files\common\sim</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\math\fixmath.h">
+      <Filter>Source Files\common\math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\econ\utility.h">
+      <Filter>Source Files\common\econ</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

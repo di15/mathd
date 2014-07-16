@@ -56,7 +56,7 @@ void DrawSkyBox(Vec3f pos)
 
 	Shader* s = &g_shader[g_curS];
 
-	//g_log<<"mm"<<s->m_slot[SSLOT_MODELMAT]<<endl;
+	//g_log<<"mm"<<s->m_slot[SSLOT_MODELMAT]<<std::endl;
 #if 1
 	Matrix modelmat;
 	modelmat.translation((const float*)&pos);
@@ -113,7 +113,7 @@ void DrawSkyBox(Vec3f pos)
 
 	glVertexAttribPointer(s->m_slot[SSLOT_TEXCOORD0], 2, GL_FLOAT, GL_FALSE, sizeof(float)*5, &vright[0]);
 
-	//g_log<<"tci"<<s->m_slot[SSLOT_TEXCOORD0]<<endl;
+	//g_log<<"tci"<<s->m_slot[SSLOT_TEXCOORD0]<<std::endl;
 
 	CheckGLError(__FILE__, __LINE__);
 

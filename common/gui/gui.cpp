@@ -30,7 +30,7 @@ void GUI::draw()
 	for(auto i=m_subwidg.begin(); i!=m_subwidg.end(); i++)
 	{
 #ifdef DEBUG
-	g_log<<"draw "<<(*i)->m_name<<" "<<__FILE__<<" "<<__LINE__<<endl;
+	g_log<<"draw "<<(*i)->m_name<<" "<<__FILE__<<" "<<__LINE__<<std::endl;
     g_log.flush();
 #endif
 
@@ -138,12 +138,12 @@ void Status(const char* status, bool logthis)
 {
 	if(logthis)
 	{
-		g_log<<status<<endl;
+		g_log<<status<<std::endl;
 		g_log.flush();
 	}
 
 #if 1
-	g_log<<status<<endl;
+	g_log<<status<<std::endl;
 	g_log.flush();
 #endif
 	/*

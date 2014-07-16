@@ -22,10 +22,10 @@ UString::~UString()
 		g_log.flush();
 	}
 
-	g_log<<endl;
+	g_log<<std::endl;
 	g_log.flush();
 
-	//g_log<<"'"<<rawstr()<<"'"<<endl;
+	//g_log<<"'"<<rawstr()<<"'"<<std::endl;
 	//g_log.flush();
 #endif
 
@@ -44,7 +44,7 @@ UString::UString(const UString& original)
 UString::UString(const char* cstr)
 {
 #ifdef USTR_DEBUG
-	g_log<<"UString::UString(const char* cstr)"<<endl;
+	g_log<<"UString::UString(const char* cstr)"<<std::endl;
 	g_log.flush();
 #endif
 
@@ -83,7 +83,7 @@ UString::UString(unsigned int* k)
 UString& UString::operator=(const UString& original)
 {
 #ifdef USTR_DEBUG
-	g_log<<"UString= ["<<rawstr()<<"] => ["<<original.rawstr()<<"]"<<endl;
+	g_log<<"UString= ["<<rawstr()<<"] => ["<<original.rawstr()<<"]"<<std::endl;
 	g_log.flush();
 #endif
 
@@ -133,7 +133,7 @@ UString UString::substr(int start, int len) const
 	newstr.m_data[len] = 0;
 
 #ifdef USTR_DEBUG
-	g_log<<"USt substr :: "<<newstr.rawstr()<<endl;
+	g_log<<"USt substr :: "<<newstr.rawstr()<<std::endl;
 	g_log.flush();
 #endif
 
@@ -168,10 +168,10 @@ std::string UString::rawstr() const
 
 //#ifdef USTR_DEBUG
 #if 0
-	g_log<<"\t\tstring UString::rawstr() const..."<<endl;
+	g_log<<"\t\tstring UString::rawstr() const..."<<std::endl;
 	g_log.flush();
 
-	g_log<<"\t\t\t"<<endl;
+	g_log<<"\t\t\t"<<std::endl;
 	g_log.flush();
 
 	for(int i=0; i<m_length; i++)

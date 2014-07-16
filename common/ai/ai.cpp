@@ -11,13 +11,10 @@ void UpdateAI()
 {
 	static long long lastthink = -CYCLE_FRAMES;
 
-	if(g_simframe - lastthink >= CYCLE_FRAMES/30)
-	{
-		lastthink = g_simframe;
-		CalcDem();
-	}
-	else
+	if(g_simframe - lastthink < CYCLE_FRAMES/30)
 		return;
+
+	CalcDem1();
 
 	for(int i=0; i<PLAYERS; i++)
 	{
@@ -31,6 +28,9 @@ void UpdateAI()
 
 		UpdateAI(p);
 	}
+
+	if(g_simframe - lastthink >= CYCLE_FRAMES/30)
+		lastthink = g_simframe;
 }
 
 void Build(Player* p)

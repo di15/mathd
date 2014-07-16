@@ -173,7 +173,7 @@ void MapKeys()
 
 		if(key == -1)
 		{
-			g_log<<"Unknown input: "<<keystr<<endl;
+			g_log<<"Unknown input: "<<keystr<<std::endl;
 			continue;
 		}
 
@@ -183,7 +183,7 @@ void MapKeys()
 		else if(stricmp(actstr, "Right();") == 0)			{	down = &Right;			up = NULL;			}
 		else if(stricmp(actstr, "Back();") == 0)			{	down = &Back;			up = NULL;			}
 
-		if(down == NULL)		g_log<<"Unknown action: "<<actstr<<endl;
+		if(down == NULL)		g_log<<"Unknown action: "<<actstr<<std::endl;
 		else if(key == -2)		AssignLButton(down, up);
 		else					AssignKey(key, down, up);
 	}

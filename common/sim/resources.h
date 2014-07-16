@@ -19,7 +19,7 @@ public:
 };
 
 //conduit
-#define CON_NONE		-1
+#define CONDUIT_NONE		-1
 #define CONDUIT_ROAD		0
 #define CONDUIT_POWL		1
 #define	CONDUIT_CRPIPE		2

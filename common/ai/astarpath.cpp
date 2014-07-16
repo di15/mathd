@@ -40,26 +40,26 @@ void AStarPath(int utype, int umode, int cmstartx, int cmstartz, int target, int
 	pj->path = path;
 	pj->subgoal = subgoal;
 
-	short thisuindex = -1;
+	short thisui = -1;
 
 	if(thisu)
-		thisuindex = thisu - g_unit;
+		thisui = thisu - g_unit;
 
-	pj->thisu = thisuindex;
+	pj->thisu = thisui;
 
-	short ignoreuindex = -1;
+	short ignoreui = -1;
 
 	if(ignoreu)
-		ignoreuindex = ignoreu - g_unit;
+		ignoreui = ignoreu - g_unit;
 
-	pj->ignoreu = ignoreuindex;
+	pj->ignoreu = ignoreui;
 
-	short ignorebindex = -1;
+	short ignoreui = -1;
 
 	if(ignoreb)
-		ignorebindex = ignoreb - g_building;
+		ignorebi = ignoreb - g_building;
 
-	pj->ignoreb = ignorebindex;
+	pj->ignoreb = ignorebi;
 	pj->cmgoalx = (cmgoalminx+cmgoalmaxx)/2;
 	pj->cmgoalz = (cmgoalminz+cmgoalmaxz)/2;
 	pj->ngoalx = pj->cmgoalx / PATHNODE_SIZE;

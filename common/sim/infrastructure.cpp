@@ -532,7 +532,7 @@ bool CoLevel(char ctype, float iterx, float iterz, float testx, float testz, flo
 			if(GetCo(ctype, ix, iz+1, true)->on) n = true;
 	}
 #if 0
-	g_log<<"level? ix"<<ix<<","<<iz<<endl;
+	g_log<<"level? ix"<<ix<<","<<iz<<std::endl;
 	g_log.flush();
 #endif
 
@@ -567,7 +567,7 @@ bool CoLevel(char ctype, float iterx, float iterz, float testx, float testz, flo
 	}
 
 #if 0
-	g_log<<"level yes! ix"<<ix<<","<<iz<<endl;
+	g_log<<"level yes! ix"<<ix<<","<<iz<<std::endl;
 	g_log.flush();
 #endif
 
@@ -581,7 +581,7 @@ void RemeshCo(char ctype, int tx, int tz, bool plan)
 	if(!ctile->on)
 		return;
 #if 0
-	g_log<<"mesh on "<<x<<","<<z<<endl;
+	g_log<<"mesh on "<<x<<","<<z<<std::endl;
 	g_log.flush();
 #endif
 
@@ -634,7 +634,7 @@ void RemeshCo(char ctype, int tx, int tz, bool plan)
 		cva->normals[i+2] = Normal(&cva->vertices[i]);
 	}
 
-	//g_log<<"done meshroad"<<endl;
+	//g_log<<"done meshroad"<<std::endl;
 	//g_log.flush();
 
 	cva->genvbo();
@@ -651,7 +651,7 @@ void UpdCoPlans(char ctype, char owner, Vec3f start, Vec3f end)
 	int z2 = Clipi(end.z/TILE_SIZE, 0, g_hmap.m_widthz-1);
 
 #if 0
-	g_log<<"road plan "<<x1<<","<<z1<<"->"<<x2<<","<<z2<<endl;
+	g_log<<"road plan "<<x1<<","<<z1<<"->"<<x2<<","<<z2<<std::endl;
 	g_log.flush();
 #endif
 	
@@ -680,7 +680,7 @@ void UpdCoPlans(char ctype, char owner, Vec3f start, Vec3f end)
 		if(CoLevel(ctype, x, z, x, z, dx, dz, i, d, true))
 		{
 #if 0
-			g_log<<"place road urp "<<x<<","<<z<<endl;
+			g_log<<"place road urp "<<x<<","<<z<<std::endl;
 			g_log.flush();
 #endif
 			PlaceCo(ctype, x, z, owner, true);
@@ -696,7 +696,7 @@ void UpdCoPlans(char ctype, char owner, Vec3f start, Vec3f end)
 		prevz = z;
 
 #if 0
-		g_log<<"place road "<<x<<","<<z<<endl;
+		g_log<<"place road "<<x<<","<<z<<std::endl;
 		g_log.flush();
 #endif
 	}
@@ -739,7 +739,7 @@ bool CoPlaceable(int ctype, int x, int z)
 
 		Resource* r = &g_resource[ri];
 
-		if(r->conduit == CON_NONE)
+		if(r->conduit == CONDUIT_NONE)
 			continue;
 
 		if(r->conduit == ctype)
@@ -1066,7 +1066,7 @@ ConduitTile::~ConduitTile()
 
 char ConduitTile::condtype()
 {
-	return CON_NONE;
+	return CONDUIT_NONE;
 }
 
 int ConduitTile::netreq(int res)

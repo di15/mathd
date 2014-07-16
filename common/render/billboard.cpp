@@ -237,7 +237,7 @@ void DrawBillboards()
 
 		glDrawArrays(GL_TRIANGLES, 0, 6);
 
-		//g_log<<"draw"<<endl;
+		//g_log<<"draw"<<std::endl;
 	}
 
 	//glEnable(GL_CULL_FACE);

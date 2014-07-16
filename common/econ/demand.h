@@ -8,10 +8,20 @@
 #include "../sim/unittype.h"
 #include "../sim/buildingtype.h"
 #include "../sim/build.h"
+#include "../sim/player.h"
 
 #define RATIO_DENOM		100000
 #define AVG_DIST		(TILE_SIZE*6)
 #define CYCLE_FRAMES	(SIM_FRAME_RATE*60)	
+
+class Bid
+{
+public:
+	int maxearn;
+	Vec2i tpos;
+	Vec2i cmpos;
+	int maxdist;
+};
 
 #define DEM_NODE		0	//	unknown node
 #define DEM_RNODE		1	//	resource demand
@@ -26,6 +36,8 @@ class DemNode
 public:
 	int demtype;
 	DemNode* parent;
+	Bid bid;	//reflects the maximum possible gouging price
+	int profit;
 
 	DemNode();
 };
@@ -42,6 +54,7 @@ public:
 	int bi;
 	int utype;
 	int ui;
+	int demui;
 	DemsAtB* supbp;
 	DemsAtU* supup;
 	DemsAtU* opup;
@@ -57,6 +70,7 @@ public:
 		ui = -1;
 		supbp = NULL;
 		supup = NULL;
+		demui = -1;
 	}
 };
 
@@ -189,9 +203,7 @@ public:
 	std::list<DemNode*> nodes;
 	std::list<DemsAtB*> supbpcopy;	//master copy, this one will be freed
 	std::list<DemsAtU*> supupcopy;	//master copy, this one will be freed
-	std::list<CrPipeDem*> crpipedems;
-	std::list<PowlDem*> powldems;
-	std::list<RoadDem*> roaddems;
+	std::list<DemNode*> codems[CONDUIT_TYPES];
 
 	void free()
 	{
@@ -216,25 +228,14 @@ public:
 			riter = nodes.erase(riter);
 		}
 
-		auto crpipeiter = crpipedems.begin();
-		while(crpipeiter != crpipedems.end())
+		for(int i=0; i<CONDUIT_TYPES; i++)
 		{
-			delete *crpipeiter;
-			crpipeiter = crpipedems.erase(crpipeiter);
-		}
-
-		auto powliter = powldems.begin();
-		while(powliter != powldems.end())
-		{
-			delete *powliter;
-			powliter = powldems.erase(powliter);
-		}
-
-		auto roaditer = roaddems.begin();
-		while(roaditer != roaddems.end())
-		{
-			delete *roaditer;
-			roaditer = roaddems.erase(roaditer);
+			auto coiter = codems[i].begin();
+			while(coiter != codems[i].end())
+			{
+				delete *coiter;
+				coiter = codems[i].erase(coiter);
+			}
 		}
 	}
 
@@ -245,7 +246,9 @@ public:
 };
 
 extern DemTree g_demtree;
+extern DemTree g_demtree2[PLAYERS];
 
-void CalcDem();
+void CalcDem1();
+void CalcDem2(Player* p);
 
 #endif

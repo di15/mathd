@@ -2,7 +2,7 @@
 #include "platform.h"
 #include "window.h"
 
-ofstream g_log;
+std::ofstream g_log;
 
 const std::string DateTime()
 {
@@ -39,9 +39,9 @@ void OpenLog(const char* filename, int version)
 {
 	char fullpath[MAX_PATH+1];
 	FullPath(filename, fullpath);
-	g_log.open(fullpath, ios_base::out);
-	g_log<<DateTime()<<endl;
-	g_log<<"Version "<<version<<endl<<endl;
+	g_log.open(fullpath, std::ios_base::out);
+	g_log<<DateTime()<<std::endl;
+	g_log<<"Version "<<version<<std::endl<<std::endl;
 	g_log.flush();
 }
 
@@ -55,8 +55,8 @@ std::string MakePathRelative(const char* full)
 	ExePath(exepath);
 	CorrectSlashes(exepath);
 
-	//g_log<<"exepath: "<<exepath<<endl;
-	//g_log<<"fulpath: "<<full<<endl;
+	//g_log<<"exepath: "<<exepath<<std::endl;
+	//g_log<<"fulpath: "<<full<<std::endl;
 
 	std::string::size_type pos = full2.find(exepath, 0);
 
@@ -65,11 +65,11 @@ std::string MakePathRelative(const char* full)
 		return full2;
 	}
 
-	//g_log<<"posposp: "<<pos<<endl;
+	//g_log<<"posposp: "<<pos<<std::endl;
 
 	std::string sub = std::string( full2 ).substr(strlen(exepath)+1, strlen(full)-strlen(exepath)-1);
 
-	//g_log<<"subpath: "<<sub<<endl;
+	//g_log<<"subpath: "<<sub<<std::endl;
 
 	return sub;
 }
@@ -183,7 +183,7 @@ float StrToFloat(const char *s)
 		return 1.0f;
 
 	float x;
-	istringstream iss(s);
+	std::istringstream iss(s);
 	iss >> x;
 
 	if(_isnan(x))
@@ -195,7 +195,7 @@ float StrToFloat(const char *s)
 int HexToInt(const char* s)
 {
 	int x;
-	stringstream ss;
+	std::stringstream ss;
 	ss << std::hex << s;
 	ss >> x;
 	return x;
@@ -204,7 +204,7 @@ int HexToInt(const char* s)
 int StrToInt(const char *s)
 {
 	int x;
-	istringstream iss(s);
+	std::istringstream iss(s);
 	iss >> x;
 	return x;
 }
