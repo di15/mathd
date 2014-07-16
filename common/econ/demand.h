@@ -16,7 +16,8 @@
 class Bid
 {
 public:
-	int maxearn;
+	int minbid;
+	int maxbid;
 	Vec2i tpos;
 	Vec2i cmpos;
 	int maxdist;

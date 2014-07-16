@@ -12,7 +12,7 @@ DemNode::DemNode()
 {
 	demtype = DEM_NODE;
 	parent = NULL;
-	bid.maxearn = 0;
+	bid.maxbid = 0;
 	profit = 0;
 }
 
@@ -447,7 +447,8 @@ void CalcDem1()
 	AddReq(&g_demtree, &g_demtree.nodes, NULL, RES_ENERGY, nlab * LABOURER_ENERGYCONSUM, 0);
 }
 
-void LabDem(DemTree* dm, Unit* u)
+// Housing demand
+void LabDemH(DemTree* dm, Unit* u, int* fundsleft)
 {
 	// Housing
 	RDemNode* housedem = new RDemNode;
@@ -464,39 +465,143 @@ void LabDem(DemTree* dm, Unit* u)
 		// As long as it's at least -1 cheaper and/or -1 units closer,
 		// it's a more preferable alternative. How to express
 		// alternatives that aren't closer but much cheaper?
-		// Figure that out using utility function?
+		// Figure that out as needed using utility function?
 
 		Bid *altbid = &housedem->bid;
-		altbid->maxearn = homepr-1;
+		altbid->maxbid = homepr-1;
 		altbid->maxdist = homedist-1;
 		altbid->cmpos = u->cmpos;
 		altbid->tpos = u->cmpos/TILE_SIZE;
-		
-		housedem->bi = -1;
-		housedem->supbp = NULL;
-		housedem->btype = -1;
-		housedem->parent = NULL;
-		housedem->rtype = RES_HOUSING;
-		housedem->ramt = 1;
-		housedem->ui = -1;
-		housedem->utype = -1;
-		housedem->demui = u - g_unit;
+
+		*fundsleft -= homepr-1;
 	}
 	else
 	{
 		// How to express distance-dependent
 		// cash opportunity?
+		
+		Bid *altbid = &housedem->bid;
+		altbid->maxbid = *fundsleft;	//willingness to spend all funds
+		altbid->maxdist = -1;	//negative distance to indicate willingness to travel any distance
+		altbid->cmpos = u->cmpos;
+		altbid->tpos = u->cmpos/TILE_SIZE;
 
+		//Don't subtract anything from fundsleft yet, purely speculative
 	}
+	housedem->bi = -1;
+	housedem->supbp = NULL;
+	housedem->btype = -1;
+	housedem->parent = NULL;
+	housedem->rtype = RES_HOUSING;
+	housedem->ramt = 1;
+	housedem->ui = -1;
+	housedem->utype = -1;
+	housedem->demui = u - g_unit;
 	dm->nodes.push_back(housedem);
+}
 
+// Food demand
+void LabDemF(DemTree* dm, Unit* u, int* fundsleft)
+{
 	// Food
 	// Which shop will the labourer shop at?
+	// There might be more than one, if
+	// supplies are limited or if money is still
+	// left over.
+	std::list<RDemNode> alts;
+	//int fundsleft = u->belongings[RES_FUNDS];
+	int fundsleft2 = *fundsleft;	//fundsleft2 includes subtractions from speculative, non-existent food suppliers, which isn't supposed to be subtracted from real funds
+	int reqfood = CYCLE_FRAMES * LABOURER_FOODCONSUM;
+
+	bool changed = false;
+	
+	// If there are alternatives/competitors
+	do
+	{
+		RDemNode best;
+		best.bi = -1;
+
+		for(int bi=0; bi<BUILDINGS; bi++)
+		{
+			Building* b = &g_building[bi];
+
+			if(!b->on)
+				continue;
+
+			BuildingT* bt = &g_bltype[b->type];
+
+			if(bt->output[RES_RETFOOD] <= 0)
+				continue;
+
+			bool found = false;
+
+			for(auto altiter=alts.begin(); altiter!=alts.end(); altiter++)
+			{
+				if(altiter->bi == bi)
+				{
+					found = true;
+					break;
+				}
+			}
+
+			if(found)
+				continue;
+
+			int marginpr = b->prodprice[RES_RETFOOD];
+			int stockqty = b->stocked[RES_RETFOOD];
+			int reqqty = imin(stockqty, reqfood);
+			int affordqty = imin(reqqty, fundsleft2 / marginpr);
+			stockqty -= affordqty;
+			int luxuryqty = imin(stockqty, fundsleft2 / marginpr);
+			stockqty -= luxuryqty;
+
+			if(affordqty + luxuryqty <= 0)
+				continue;
+
+			changed = true;
+
+			best.bi = bi;
+			best.btype = b->type;
+			best.rtype = RES_RETFOOD;
+			best.ramt = affordqty + luxuryqty;
+			best.bid.minbid = affordqty * marginpr;
+			best.bid.maxbid = (affordqty + luxuryqty) * marginpr;
+			best.bid.tpos = b->tilepos;
+			best.bid.cmpos = b->tilepos * TILE_SIZE + Vec2i(TILE_SIZE/2, TILE_SIZE/2);
+
+			// TO DO: mark building consumption, so that other lab's consumption goes elsewhere
+		}
+
+		if(best.bi < 0)
+			break;
+		
+		alts.push_back(best);
+		*fundsleft -= best.bid.minbid;
+		fundsleft2 -= best.bid.maxbid;
+		
+		//Just need to be as good or better than the last competitor.
+		//Thought: but then that might not get all of the potential market.
+		//So what to do?
+		//Answer for now: it's probably not likely that more than one
+		//shop will be required, so just get the last one.
+		//Better answer: actually, the different "layers" can be
+		//segmented, to create a demand for each with the associated
+		//market/bid/cash.
 
 
+	}while(changed && fundsleft2 > 0);
+
+	if(fundsleft2 <= 0)
+		return;
+
+	// If there is any money not spend on available food
+	//TODO ...
+}
+
+// Electricity demand
+void LabDemE(DemTree* dm, Unit* u)
+{
 	// Electricity
-
-
 }
 
 // 1. Opportunities where something is overpriced
@@ -523,8 +628,10 @@ void CalcDem2(Player* p)
 
 		if(u->type != UNIT_LABOURER)
 			continue;
-
-		LabDem(dm, u);
+		
+		LabDemF(dm, u);
+		LabDemH(dm, u);
+		LabDemE(dm, u);
 	}
 
 	// A thought about funneling point demands
