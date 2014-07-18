@@ -41,27 +41,9 @@ void JPSPartPath(int utype, int umode, int cmstartx, int cmstartz, int target, i
 	pj->targtype = targtype;
 	pj->path = path;
 	pj->subgoal = subgoal;
-
-	short thisui = -1;
-
-	if(thisu)
-		thisui = thisu - g_unit;
-
-	pj->thisu = thisui;
-
-	short ignoreui = -1;
-
-	if(ignoreu)
-		ignoreui = ignoreu - g_unit;
-
-	pj->ignoreu = ignoreui;
-
-	short ignorebi = -1;
-
-	if(ignoreb)
-		ignorebi = ignoreb - g_building;
-
-	pj->ignoreb = ignorebi;
+	pj->thisu = thisu ? thisu - g_unit : -1;
+	pj->ignoreu = ignoreu ? ignoreu - g_unit : -1;
+	pj->ignoreb = ignoreb ? ignoreb - g_building : -1;
 	pj->cmgoalx = (cmgoalminx+cmgoalmaxx)/2;
 	pj->cmgoalz = (cmgoalminz+cmgoalmaxz)/2;
 	pj->ngoalx = pj->cmgoalx / PATHNODE_SIZE;

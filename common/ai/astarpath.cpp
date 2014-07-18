@@ -38,27 +38,9 @@ void AStarPath(int utype, int umode, int cmstartx, int cmstartz, int target, int
 	pj->targtype = targtype;
 	pj->path = path;
 	pj->subgoal = subgoal;
-
-	short thisui = -1;
-
-	if(thisu)
-		thisui = thisu - g_unit;
-
-	pj->thisu = thisui;
-
-	short ignoreui = -1;
-
-	if(ignoreu)
-		ignoreui = ignoreu - g_unit;
-
-	pj->ignoreu = ignoreui;
-
-	short ignoreui = -1;
-
-	if(ignoreb)
-		ignorebi = ignoreb - g_building;
-
-	pj->ignoreb = ignorebi;
+	pj->thisu = thisu ? thisu - g_unit : -1;
+	pj->ignoreu = ignoreu ? ignoreu - g_unit : -1;
+	pj->ignoreb = ignoreb ? ignoreb - g_building : -1;
 	pj->cmgoalx = (cmgoalminx+cmgoalmaxx)/2;
 	pj->cmgoalz = (cmgoalminz+cmgoalmaxz)/2;
 	pj->ngoalx = pj->cmgoalx / PATHNODE_SIZE;
@@ -99,25 +81,25 @@ void IdentifySuccessors_A(PathJob* pj, PathNode* node)
 	if(node->previous)
 		runningD = node->previous->totalD;
 
-	bool standable[DIRS];
+	bool stand[DIRS];
 
-	for(int i=0; i<DIRS; i++)
-		standable[i] = Standable(pj, npos.x + offsets[i].x, npos.y + offsets[i].y);
+	for(char i=0; i<DIRS; i++)
+		stand[i] = Standable(pj, npos.x + offsets[i].x, npos.y + offsets[i].y);
 
-	bool passable[DIRS];
+	bool pass[DIRS];
 
-	passable[DIR_NW] = standable[DIR_NW] && standable[DIR_N] && standable[DIR_W];
-	passable[DIR_N] = standable[DIR_N];
-	passable[DIR_NE] = standable[DIR_NE] && standable[DIR_N] && standable[DIR_E];
-	passable[DIR_E] = standable[DIR_E];
-	passable[DIR_SE] = standable[DIR_SE] && standable[DIR_S] && standable[DIR_E];
-	passable[DIR_S] = standable[DIR_S];
-	passable[DIR_SW] = standable[DIR_SW] && standable[DIR_S] && standable[DIR_W];
-	passable[DIR_W] = standable[DIR_W];
+	pass[DIR_NW] = stand[DIR_NW] && stand[DIR_N] && stand[DIR_W];
+	pass[DIR_N] = stand[DIR_N];
+	pass[DIR_NE] = stand[DIR_NE] && stand[DIR_N] && stand[DIR_E];
+	pass[DIR_E] = stand[DIR_E];
+	pass[DIR_SE] = stand[DIR_SE] && stand[DIR_S] && stand[DIR_E];
+	pass[DIR_S] = stand[DIR_S];
+	pass[DIR_SW] = stand[DIR_SW] && stand[DIR_S] && stand[DIR_W];
+	pass[DIR_W] = stand[DIR_W];
 
-	for(int i=0; i<DIRS; i++)
+	for(char i=0; i<DIRS; i++)
 	{
-		if(!passable[i])
+		if(!pass[i])
 			continue;
 
 		int newD = runningD + stepdist[i];

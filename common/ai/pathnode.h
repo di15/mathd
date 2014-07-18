@@ -48,16 +48,16 @@ const Vec2i offsets[DIRS] =
 	Vec2i(-1, 0) //W
 };
 
-const double stepdist[DIRS] =
+const int stepdist[DIRS] =
 {
-	PATHNODE_DIAG, //NW
-	PATHNODE_SIZE, //N
-	PATHNODE_DIAG, //NE
-	PATHNODE_SIZE, //E
-	PATHNODE_DIAG, //SE
-	PATHNODE_SIZE, //S
-	PATHNODE_DIAG, //SW
-	PATHNODE_SIZE //W
+	(int)PATHNODE_DIAG, //NW
+	(int)PATHNODE_SIZE, //N
+	(int)PATHNODE_DIAG, //NE
+	(int)PATHNODE_SIZE, //E
+	(int)PATHNODE_DIAG, //SE
+	(int)PATHNODE_SIZE, //S
+	(int)PATHNODE_DIAG, //SW
+	(int)PATHNODE_SIZE //W
 };
 
 // byte-align structures
