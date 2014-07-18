@@ -11,7 +11,7 @@ int HUtil(int price, int cmdist)
 // food utility evaluation
 int FUtil(int price, int cmdist)
 {
-	return 0;
+	return 100000000 / price / cmdist;
 }
 
 // electricity utility evaluation

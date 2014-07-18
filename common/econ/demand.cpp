@@ -4,6 +4,7 @@
 #include "../sim/sim.h"
 #include "../sim/labourer.h"
 #include "../utils.h"
+#include "utility.h"
 
 DemTree g_demtree;
 DemTree g_demtree2[PLAYERS];
@@ -500,7 +501,7 @@ void LabDemH(DemTree* dm, Unit* u, int* fundsleft)
 	dm->nodes.push_back(housedem);
 }
 
-// Food demand
+// Food demand, bare necessity
 void LabDemF(DemTree* dm, Unit* u, int* fundsleft)
 {
 	// Food
@@ -508,7 +509,7 @@ void LabDemF(DemTree* dm, Unit* u, int* fundsleft)
 	// There might be more than one, if
 	// supplies are limited or if money is still
 	// left over.
-	std::list<RDemNode> alts;
+	std::list<RDemNode> alts;	//alternatives
 	//int fundsleft = u->belongings[RES_FUNDS];
 	int fundsleft2 = *fundsleft;	//fundsleft2 includes subtractions from speculative, non-existent food suppliers, which isn't supposed to be subtracted from real funds
 	int reqfood = CYCLE_FRAMES * LABOURER_FOODCONSUM;
@@ -518,11 +519,16 @@ void LabDemF(DemTree* dm, Unit* u, int* fundsleft)
 	// If there are alternatives/competitors
 	do
 	{
+		DemsAtB* bestdemb = NULL;
 		RDemNode best;
 		best.bi = -1;
+		changed = false;
+		int bestutil = -1;
 
-		for(int bi=0; bi<BUILDINGS; bi++)
+		//for(int bi=0; bi<BUILDINGS; bi++)
+		for(auto biter=dm->supbpcopy.begin(); biter!=dm->supbpcopy.end(); biter++)
 		{
+			int bi = (*biter)->bi;
 			Building* b = &g_building[bi];
 
 			if(!b->on)
@@ -548,14 +554,25 @@ void LabDemF(DemTree* dm, Unit* u, int* fundsleft)
 				continue;
 
 			int marginpr = b->prodprice[RES_RETFOOD];
-			int stockqty = b->stocked[RES_RETFOOD];
+			int stockqty = b->stocked[RES_RETFOOD] - (*biter)->supplying[RES_RETFOOD];
+			
+			if(stockqty <= 0)
+				continue;
+
+			int cmdist = Magnitude(b->tilepos * TILE_SIZE + Vec2i(TILE_SIZE/2, TILE_SIZE/2) - u->cmpos);
+			int thisutil = FUtil(marginpr, cmdist);
+
+			if(thisutil <= bestutil && bestutil >= 0)
+				continue;
+
+			bestutil = thisutil;
+
 			int reqqty = imin(stockqty, reqfood);
 			int affordqty = imin(reqqty, fundsleft2 / marginpr);
 			stockqty -= affordqty;
-			int luxuryqty = imin(stockqty, fundsleft2 / marginpr);
-			stockqty -= luxuryqty;
+			reqfood -= affordqty;
 
-			if(affordqty + luxuryqty <= 0)
+			if(affordqty <= 0)
 				continue;
 
 			changed = true;
@@ -563,21 +580,24 @@ void LabDemF(DemTree* dm, Unit* u, int* fundsleft)
 			best.bi = bi;
 			best.btype = b->type;
 			best.rtype = RES_RETFOOD;
-			best.ramt = affordqty + luxuryqty;
+			best.ramt = affordqty;
 			best.bid.minbid = affordqty * marginpr;
-			best.bid.maxbid = (affordqty + luxuryqty) * marginpr;
+			best.bid.maxbid = affordqty * marginpr;
 			best.bid.tpos = b->tilepos;
 			best.bid.cmpos = b->tilepos * TILE_SIZE + Vec2i(TILE_SIZE/2, TILE_SIZE/2);
 
-			// TO DO: mark building consumption, so that other lab's consumption goes elsewhere
+			bestdemb = *biter;
 		}
 
 		if(best.bi < 0)
 			break;
 		
 		alts.push_back(best);
-		*fundsleft -= best.bid.minbid;
+		*fundsleft -= best.bid.maxbid;
 		fundsleft2 -= best.bid.maxbid;
+		
+		// mark building consumption, so that other lab's consumption goes elsewhere
+		bestdemb->supplying[RES_RETFOOD] += best.ramt;
 		
 		//Just need to be as good or better than the last competitor.
 		//Thought: but then that might not get all of the potential market.
@@ -588,20 +608,300 @@ void LabDemF(DemTree* dm, Unit* u, int* fundsleft)
 		//segmented, to create a demand for each with the associated
 		//market/bid/cash.
 
+		RDemNode* rdem = new RDemNode;
+		*rdem = best;
+		dm->nodes.push_back(rdem);
+
+	}while(changed && fundsleft2 > 0);
+
+	//Note: if there is no more money, yet still a requirement
+	//for more food, then food is too expensive to be afforded
+	//and something is wrong. 
+	//Create demand for cheap food?
+	if(fundsleft2 <= 0)
+		return;
+
+	// If reqfood > 0 still
+	if(reqfood > 0)
+	{
+		RDemNode* demremain = new RDemNode;
+		demremain->bi = -1;
+		demremain->btype = -1;
+		demremain->rtype = RES_RETFOOD;
+		demremain->ramt = reqfood;
+		demremain->bid.minbid = fundsleft2;
+		demremain->bid.maxbid = fundsleft2;
+		demremain->bid.tpos = u->cmpos / TILE_SIZE;
+		demremain->bid.cmpos = u->cmpos;
+		dm->nodes.push_back(demremain);
+	}
+
+	// If there is any money not spent on available food
+	// Possible demand for more food (luxury) in LabDemF2();
+}
+
+// Food demand, luxury
+void LabDemF2(DemTree* dm, Unit* u, int* fundsleft)
+{
+	// Food
+	// Which shop will the labourer shop at?
+	// There might be more than one, if
+	// supplies are limited or if money is still
+	// left over.
+	std::list<RDemNode> alts;	//alternatives
+	//int fundsleft = u->belongings[RES_FUNDS];
+	int fundsleft2 = *fundsleft;	//fundsleft2 includes subtractions from speculative, non-existent food suppliers, which isn't supposed to be subtracted from real funds
+
+	bool changed = false;
+	
+	// If there are alternatives/competitors
+	do
+	{
+		DemsAtB* bestdemb = NULL;
+		RDemNode best;
+		best.bi = -1;
+		changed = false;
+		int bestutil = -1;
+
+		//for(int bi=0; bi<BUILDINGS; bi++)
+		for(auto biter=dm->supbpcopy.begin(); biter!=dm->supbpcopy.end(); biter++)
+		{
+			int bi = (*biter)->bi;
+			Building* b = &g_building[bi];
+
+			if(!b->on)
+				continue;
+
+			BuildingT* bt = &g_bltype[b->type];
+
+			if(bt->output[RES_RETFOOD] <= 0)
+				continue;
+
+			bool found = false;
+
+			for(auto altiter=alts.begin(); altiter!=alts.end(); altiter++)
+			{
+				if(altiter->bi == bi)
+				{
+					found = true;
+					break;
+				}
+			}
+
+			if(found)
+				continue;
+
+			int marginpr = b->prodprice[RES_RETFOOD];
+			int stockqty = b->stocked[RES_RETFOOD] - (*biter)->supplying[RES_RETFOOD];
+
+			if(stockqty <= 0)
+				continue;
+
+			int cmdist = Magnitude(b->tilepos * TILE_SIZE + Vec2i(TILE_SIZE/2, TILE_SIZE/2) - u->cmpos);
+			int thisutil = FUtil(marginpr, cmdist);
+
+			if(thisutil <= bestutil && bestutil >= 0)
+				continue;
+
+			bestutil = thisutil;
+
+			int luxuryqty = imin(stockqty, fundsleft2 / marginpr);
+			stockqty -= luxuryqty;
+
+			if(luxuryqty <= 0)
+				continue;
+
+			changed = true;
+
+			best.bi = bi;
+			best.btype = b->type;
+			best.rtype = RES_RETFOOD;
+			best.ramt = luxuryqty;
+			best.bid.minbid = 0;
+			best.bid.maxbid = luxuryqty * marginpr;
+			best.bid.tpos = b->tilepos;
+			best.bid.cmpos = b->tilepos * TILE_SIZE + Vec2i(TILE_SIZE/2, TILE_SIZE/2);
+
+			bestdemb = *biter;
+		}
+
+		if(best.bi < 0)
+			break;
+		
+		alts.push_back(best);
+		*fundsleft -= best.bid.maxbid;
+		fundsleft2 -= best.bid.maxbid;
+		
+		// mark building consumption, so that other lab's consumption goes elsewhere
+		bestdemb->supplying[RES_RETFOOD] += best.ramt;
+		
+		//Just need to be as good or better than the last competitor.
+		//Thought: but then that might not get all of the potential market.
+		//So what to do?
+		//Answer for now: it's probably not likely that more than one
+		//shop will be required, so just get the last one.
+		//Better answer: actually, the different "layers" can be
+		//segmented, to create a demand for each with the associated
+		//market/bid/cash.
+
+		RDemNode* rdem = new RDemNode;
+		*rdem = best;
+		dm->nodes.push_back(rdem);
 
 	}while(changed && fundsleft2 > 0);
 
 	if(fundsleft2 <= 0)
 		return;
 
-	// If there is any money not spend on available food
-	//TODO ...
+	// If there is any money not spent on available food
+	// Possible demand for more food (luxury) in LabDemF2();
+
+	RDemNode* demremain = new RDemNode;
+	demremain->bi = -1;
+	demremain->btype = -1;
+	demremain->rtype = RES_RETFOOD;
+	demremain->ramt = 1;	//should really be unspecified amount, but it might as well be 1 because labourer is willing to spend all his remaining luxury money on 1
+	demremain->bid.minbid = 0;
+	demremain->bid.maxbid = fundsleft2;
+	demremain->bid.tpos = u->cmpos / TILE_SIZE;
+	demremain->bid.cmpos = u->cmpos;
+	dm->nodes.push_back(demremain);
 }
 
-// Electricity demand
-void LabDemE(DemTree* dm, Unit* u)
+// Electricity demand, bare necessity
+void LabDemE(DemTree* dm, Unit* u, int* fundsleft)
 {
 	// Electricity
+	// Which provider will the labourer get energy from?
+	// There might be more than one, if
+	// supplies are limited or if money is still
+	// left over.
+	std::list<RDemNode> alts;	//alternatives
+	//int fundsleft = u->belongings[RES_FUNDS];
+	int fundsleft2 = *fundsleft;	//fundsleft2 includes subtractions from speculative, non-existent food suppliers, which isn't supposed to be subtracted from real funds
+	int reqelec = LABOURER_ENERGYCONSUM;
+
+	bool changed = false;
+	
+	// If there are alternatives/competitors
+	do
+	{
+		DemsAtB* bestdemb = NULL;
+		RDemNode best;
+		best.bi = -1;
+		changed = false;
+		int bestutil = -1;
+
+		//for(int bi=0; bi<BUILDINGS; bi++)
+		for(auto biter=dm->supbpcopy.begin(); biter!=dm->supbpcopy.end(); biter++)
+		{
+			int bi = (*biter)->bi;
+			Building* b = &g_building[bi];
+
+			if(!b->on)
+				continue;
+
+			BuildingT* bt = &g_bltype[b->type];
+
+			if(bt->output[RES_ENERGY] <= 0)
+				continue;
+
+			bool found = false;
+
+			for(auto altiter=alts.begin(); altiter!=alts.end(); altiter++)
+			{
+				if(altiter->bi == bi)
+				{
+					found = true;
+					break;
+				}
+			}
+
+			if(found)
+				continue;
+
+			int marginpr = b->prodprice[RES_ENERGY];
+			int stockqty = b->stocked[RES_ENERGY] - (*biter)->supplying[RES_ENERGY];
+			
+			//int cmdist = Magnitude(b->tilepos * TILE_SIZE + Vec2i(TILE_SIZE/2, TILE_SIZE/2) - u->cmpos);
+			int thisutil = EUtil(marginpr);
+
+			if(thisutil <= bestutil && bestutil >= 0)
+				continue;
+
+			bestutil = thisutil;
+
+			int reqqty = imin(stockqty, reqelec);
+			int affordqty = imin(reqqty, fundsleft2 / marginpr);
+			stockqty -= affordqty;
+			reqelec -= affordqty;
+
+			if(affordqty <= 0)
+				continue;
+
+			changed = true;
+
+			best.bi = bi;
+			best.btype = b->type;
+			best.rtype = RES_ENERGY;
+			best.ramt = affordqty;
+			best.bid.minbid = affordqty * marginpr;
+			best.bid.maxbid = affordqty * marginpr;
+			best.bid.tpos = b->tilepos;
+			best.bid.cmpos = b->tilepos * TILE_SIZE + Vec2i(TILE_SIZE/2, TILE_SIZE/2);
+
+			bestdemb = *biter;
+		}
+
+		if(best.bi < 0)
+			break;
+		
+		alts.push_back(best);
+		*fundsleft -= best.bid.maxbid;
+		fundsleft2 -= best.bid.maxbid;
+		
+		// mark building consumption, so that other lab's consumption goes elsewhere
+		bestdemb->supplying[RES_RETFOOD] += best.ramt;
+		
+		//Just need to be as good or better than the last competitor.
+		//Thought: but then that might not get all of the potential market.
+		//So what to do?
+		//Answer for now: it's probably not likely that more than one
+		//shop will be required, so just get the last one.
+		//Better answer: actually, the different "layers" can be
+		//segmented, to create a demand for each with the associated
+		//market/bid/cash.
+
+		RDemNode* rdem = new RDemNode;
+		*rdem = best;
+		dm->nodes.push_back(rdem);
+
+	}while(changed && fundsleft2 > 0);
+
+	//Note: if there is no more money, yet still a requirement
+	//for more electricity, then electricity or other necessities are
+	//too expensive to be afforded and something is wrong. 
+	//Create demand for cheap food/electricity/housing?
+	if(fundsleft2 <= 0)
+		return;
+
+	// If reqelec > 0 still
+	if(reqelec > 0)
+	{
+		RDemNode* demremain = new RDemNode;
+		demremain->bi = -1;
+		demremain->btype = -1;
+		demremain->rtype = RES_ENERGY;
+		demremain->ramt = reqelec;
+		demremain->bid.minbid = fundsleft2;
+		demremain->bid.maxbid = fundsleft2;
+		demremain->bid.tpos = u->cmpos / TILE_SIZE;
+		demremain->bid.cmpos = u->cmpos;
+		dm->nodes.push_back(demremain);
+	}
+
+	// If there is any money not spent on available electricity
+	// Possible demand for more electricity (luxury) in LabDemE2();
 }
 
 // 1. Opportunities where something is overpriced
@@ -617,6 +917,8 @@ void CalcDem2(Player* p)
 	int pi = p - g_player;
 	DemTree* dm = &g_demtree2[pi];
 
+	AddBl(dm);
+
 	// Point #2 - building for primary demands
 
 	for(int i=0; i<UNITS; i++)
@@ -628,10 +930,13 @@ void CalcDem2(Player* p)
 
 		if(u->type != UNIT_LABOURER)
 			continue;
+
+		int fundsleft = u->belongings[RES_FUNDS];
 		
-		LabDemF(dm, u);
-		LabDemH(dm, u);
-		LabDemE(dm, u);
+		LabDemF(dm, u, &fundsleft);
+		LabDemH(dm, u, &fundsleft);
+		LabDemE(dm, u, &fundsleft);
+		LabDemF2(dm, u, &fundsleft);
 	}
 
 	// A thought about funneling point demands
@@ -646,4 +951,6 @@ void CalcDem2(Player* p)
 	// of intersections necessary. 
 	// The best opportunity though is the one with
 	// the highest earning combination.
+
+
 }
