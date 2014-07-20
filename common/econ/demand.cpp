@@ -452,7 +452,7 @@ void CalcDem1()
 void LabDemH(DemTree* dm, Unit* u, int* fundsleft)
 {
 	// Housing
-	RDemNode* housedem = new RDemNode;
+	RDemNode* homedem = new RDemNode;
 	if(u->home >= 0)
 	{
 		// If there's already a home,
@@ -468,37 +468,110 @@ void LabDemH(DemTree* dm, Unit* u, int* fundsleft)
 		// alternatives that aren't closer but much cheaper?
 		// Figure that out as needed using utility function?
 
-		Bid *altbid = &housedem->bid;
-		altbid->maxbid = homepr-1;
-		altbid->maxdist = homedist-1;
+		Bid *altbid = &homedem->bid;
+		altbid->maxbid = homepr;
+		altbid->maxdist = homedist;
 		altbid->cmpos = u->cmpos;
 		altbid->tpos = u->cmpos/TILE_SIZE;
+		altbid->minutil = -1;	//any util
 
-		*fundsleft -= homepr-1;
+		*fundsleft -= homepr;
 	}
 	else
 	{
-		// How to express distance-dependent
-		// cash opportunity?
-		
-		Bid *altbid = &housedem->bid;
-		altbid->maxbid = *fundsleft;	//willingness to spend all funds
-		altbid->maxdist = -1;	//negative distance to indicate willingness to travel any distance
-		altbid->cmpos = u->cmpos;
-		altbid->tpos = u->cmpos/TILE_SIZE;
+		// If there are alternatives/competitors
+		DemsAtB* bestdemb = NULL;
+		RDemNode best;
+		best.bi = -1;
+		int bestutil = -1;
 
-		//Don't subtract anything from fundsleft yet, purely speculative
+		//for(int bi=0; bi<BUILDINGS; bi++)
+		for(auto biter=dm->supbpcopy.begin(); biter!=dm->supbpcopy.end(); biter++)
+		{
+			int bi = (*biter)->bi;
+			Building* b = &g_building[bi];
+
+			if(!b->on)
+				continue;
+
+			BuildingT* bt = &g_bltype[b->type];
+
+			if(bt->output[RES_HOUSING] <= 0)
+				continue;
+			
+			int stockqty = b->stocked[RES_HOUSING] - (*biter)->supplying[RES_HOUSING];
+			
+			if(stockqty <= 0)
+				continue;
+
+			int marginpr = b->prodprice[RES_HOUSING];
+
+			if(marginpr > *fundsleft)
+				continue;
+
+			int cmdist = Magnitude(b->tilepos * TILE_SIZE + Vec2i(TILE_SIZE/2, TILE_SIZE/2) - u->cmpos);
+			int thisutil = PhUtil(marginpr, cmdist);
+
+			if(thisutil <= bestutil && bestutil >= 0)
+				continue;
+
+			bestutil = thisutil;
+
+			best.bi = bi;
+			best.btype = b->type;
+			best.rtype = RES_HOUSING;
+			best.ramt = 1;
+			best.bid.minbid = 1 * marginpr;
+			best.bid.maxbid = 1 * marginpr;
+			best.bid.tpos = b->tilepos;
+			best.bid.cmpos = b->tilepos * TILE_SIZE + Vec2i(TILE_SIZE/2, TILE_SIZE/2);
+			best.bid.maxdist = cmdist;
+			best.bid.minutil = thisutil;
+
+			bestdemb = *biter;
+		}
+
+		if(best.bi < 0)
+		{
+			// How to express distance-dependent
+			// cash opportunity?
+		
+			Bid *altbid = &homedem->bid;
+			altbid->maxbid = *fundsleft;	//willingness to spend all funds
+			altbid->maxdist = -1;	//negative distance to indicate willingness to travel any distance
+			altbid->cmpos = u->cmpos;
+			altbid->tpos = u->cmpos/TILE_SIZE;
+			altbid->minutil = -1;	//any util
+		}
+		else
+		{
+			// mark building consumption, so that other lab's consumption goes elsewhere
+			bestdemb->supplying[RES_HOUSING] += best.ramt;
+		
+			//Just need to be as good or better than the last competitor.
+			//Thought: but then that might not get all of the potential market.
+			//So what to do?
+			//Answer for now: it's probably not likely that more than one
+			//shop will be required, so just get the last one.
+			//Better answer: actually, the different "layers" can be
+			//segmented, to create a demand for each with the associated
+			//market/bid/cash.
+
+			*homedem = best;
+
+			//Don't subtract anything from fundsleft yet, purely speculative
+		}
 	}
-	housedem->bi = -1;
-	housedem->supbp = NULL;
-	housedem->btype = -1;
-	housedem->parent = NULL;
-	housedem->rtype = RES_HOUSING;
-	housedem->ramt = 1;
-	housedem->ui = -1;
-	housedem->utype = -1;
-	housedem->demui = u - g_unit;
-	dm->nodes.push_back(housedem);
+	homedem->bi = -1;
+	homedem->supbp = NULL;
+	homedem->btype = -1;
+	homedem->parent = NULL;
+	homedem->rtype = RES_HOUSING;
+	homedem->ramt = 1;
+	homedem->ui = -1;
+	homedem->utype = -1;
+	homedem->demui = u - g_unit;
+	dm->nodes.push_back(homedem);
 }
 
 // Food demand, bare necessity
@@ -560,7 +633,7 @@ void LabDemF(DemTree* dm, Unit* u, int* fundsleft)
 				continue;
 
 			int cmdist = Magnitude(b->tilepos * TILE_SIZE + Vec2i(TILE_SIZE/2, TILE_SIZE/2) - u->cmpos);
-			int thisutil = FUtil(marginpr, cmdist);
+			int thisutil = PhUtil(marginpr, cmdist);
 
 			if(thisutil <= bestutil && bestutil >= 0)
 				continue;
@@ -585,6 +658,8 @@ void LabDemF(DemTree* dm, Unit* u, int* fundsleft)
 			best.bid.maxbid = affordqty * marginpr;
 			best.bid.tpos = b->tilepos;
 			best.bid.cmpos = b->tilepos * TILE_SIZE + Vec2i(TILE_SIZE/2, TILE_SIZE/2);
+			best.bid.maxdist = cmdist;
+			best.bid.minutil = thisutil;
 
 			bestdemb = *biter;
 		}
@@ -633,6 +708,8 @@ void LabDemF(DemTree* dm, Unit* u, int* fundsleft)
 		demremain->bid.maxbid = fundsleft2;
 		demremain->bid.tpos = u->cmpos / TILE_SIZE;
 		demremain->bid.cmpos = u->cmpos;
+		demremain->bid.maxdist = -1;	//any distance
+		demremain->bid.minutil = -1;	//any util
 		dm->nodes.push_back(demremain);
 	}
 
@@ -698,7 +775,7 @@ void LabDemF2(DemTree* dm, Unit* u, int* fundsleft)
 				continue;
 
 			int cmdist = Magnitude(b->tilepos * TILE_SIZE + Vec2i(TILE_SIZE/2, TILE_SIZE/2) - u->cmpos);
-			int thisutil = FUtil(marginpr, cmdist);
+			int thisutil = PhUtil(marginpr, cmdist);
 
 			if(thisutil <= bestutil && bestutil >= 0)
 				continue;
@@ -721,6 +798,8 @@ void LabDemF2(DemTree* dm, Unit* u, int* fundsleft)
 			best.bid.maxbid = luxuryqty * marginpr;
 			best.bid.tpos = b->tilepos;
 			best.bid.cmpos = b->tilepos * TILE_SIZE + Vec2i(TILE_SIZE/2, TILE_SIZE/2);
+			best.bid.maxdist = cmdist;
+			best.bid.minutil = thisutil;
 
 			bestdemb = *biter;
 		}
@@ -765,6 +844,8 @@ void LabDemF2(DemTree* dm, Unit* u, int* fundsleft)
 	demremain->bid.maxbid = fundsleft2;
 	demremain->bid.tpos = u->cmpos / TILE_SIZE;
 	demremain->bid.cmpos = u->cmpos;
+	demremain->bid.maxdist = -1;	//any distance
+	demremain->bid.minutil = -1;	//any util
 	dm->nodes.push_back(demremain);
 }
 
@@ -824,7 +905,7 @@ void LabDemE(DemTree* dm, Unit* u, int* fundsleft)
 			int stockqty = b->stocked[RES_ENERGY] - (*biter)->supplying[RES_ENERGY];
 			
 			//int cmdist = Magnitude(b->tilepos * TILE_SIZE + Vec2i(TILE_SIZE/2, TILE_SIZE/2) - u->cmpos);
-			int thisutil = EUtil(marginpr);
+			int thisutil = GlUtil(marginpr);
 
 			if(thisutil <= bestutil && bestutil >= 0)
 				continue;
@@ -849,6 +930,8 @@ void LabDemE(DemTree* dm, Unit* u, int* fundsleft)
 			best.bid.maxbid = affordqty * marginpr;
 			best.bid.tpos = b->tilepos;
 			best.bid.cmpos = b->tilepos * TILE_SIZE + Vec2i(TILE_SIZE/2, TILE_SIZE/2);
+			best.bid.maxdist = -1;	//any distance
+			best.bid.minutil = thisutil;
 
 			bestdemb = *biter;
 		}
@@ -897,11 +980,109 @@ void LabDemE(DemTree* dm, Unit* u, int* fundsleft)
 		demremain->bid.maxbid = fundsleft2;
 		demremain->bid.tpos = u->cmpos / TILE_SIZE;
 		demremain->bid.cmpos = u->cmpos;
+		demremain->bid.maxdist = -1;	//any distance
+		demremain->bid.minutil = -1;	//any util
 		dm->nodes.push_back(demremain);
 	}
 
 	// If there is any money not spent on available electricity
 	// Possible demand for more electricity (luxury) in LabDemE2();
+}
+
+/*
+For each resource demand,
+for each building that supplies that resource,
+plot the maximum revenue obtainable at each
+tile for that building, consider the cost
+of connecting roads and infrastructure,
+and choose which is most profitable.
+*/
+void TryBl(DemTree* dm, Player* p)
+{
+	//For resources that must be transported physically
+	for(int ri=0; ri<RESOURCES; ri++)
+	{
+		Resource* r = &g_resource[ri];
+
+		if(!r->physical)
+			continue;
+
+		RDemNode* tiles = new RDemNode[ g_hmap.m_widthx * g_hmap.m_widthz ];
+
+		for(int z=0; z<g_hmap.m_widthz; z++)
+			for(int x=0; x<g_hmap.m_widthx; x++)
+			{
+				RDemNode* pt = &tiles[ z*g_hmap.m_widthx + x ];
+				std::list<RDemNode> rdems;
+
+				for(auto diter=dm->nodes.begin(); diter!=dm->nodes.end(); diter++)
+				{
+					DemNode* dn = *diter;
+
+					if(dn->demtype != DEM_RNODE)
+						continue;
+
+					RDemNode* rdn = (RDemNode*)dn;
+
+					if(rdn->rtype != ri)
+						continue;
+
+					int requtil = rdn->bid.minutil+1;
+					int cmdist = Magnitude(Vec2i(x,z)*TILE_SIZE + Vec2i(TILE_SIZE,TILE_SIZE)/2 - rdn->bid.cmpos);
+					int maxpr = InvPhUtilP(requtil, cmdist);
+
+					while(PhUtil(maxpr, cmdist) < requtil)
+						maxpr--;
+
+					if(maxpr <= 0)
+						continue;
+
+					int maxrev = maxpr * rdn->ramt;
+
+					if(rdn->bid.minutil < 0)
+						maxrev = imin(maxrev, rdn->bid.maxbid);	//unecessary? might be necessary if minutil is -1 (any util) and there's only a budget constraint
+
+					RDemNode proj;	//projected revenue
+					proj.ramt = rdn->ramt;
+					proj.bid.marginpr = maxpr;
+					proj.bid.maxbid = maxrev;
+					proj.bid.minbid = maxrev;
+					rdems.push_back(proj);
+				}
+
+				if(rdems.size() <= 0)
+					continue;
+
+				int bestpr = -1;
+				int bestrev = -1;
+				bool newpr = false;
+
+				//try all the price levels from smallest to greatest
+				do
+				{
+					//while there's another possible price, see if it will generate more total revenue
+					for(auto diter=rdems.begin(); diter!=rdems.end(); diter++)
+					{
+
+					}
+
+				}while(newpr);
+
+				//TODO: evalute max projected revenue at tile
+			}
+
+		// TODO ...
+
+		delete [] tiles;
+	}
+	
+
+	//For non-physical res suppliers, distance
+	//to clients doesn't matter, and only distance of
+	//its suppliers and road+infrastructure costs
+	//matter.
+
+	//TODO: ...
 }
 
 // 1. Opportunities where something is overpriced
@@ -939,6 +1120,9 @@ void CalcDem2(Player* p)
 		LabDemF2(dm, u, &fundsleft);
 	}
 
+	// To do: inter-industry demand
+	// TODO :...
+
 	// A thought about funneling point demands
 	// to choose an optimal building location.
 	// Each point demand presents a radius in which
@@ -952,5 +1136,5 @@ void CalcDem2(Player* p)
 	// The best opportunity though is the one with
 	// the highest earning combination.
 
-
+	TryBl(dm, p);
 }

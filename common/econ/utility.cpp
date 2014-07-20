@@ -2,32 +2,37 @@
 
 #include "utility.h"
 
-// housing utility evaluation
-int HUtil(int price, int cmdist)
-{
-	return 0;
-}
-
-// food utility evaluation
-int FUtil(int price, int cmdist)
+// food/housing/physical res utility evaluation
+int PhUtil(int price, int cmdist)
 {
 	return 100000000 / price / cmdist;
 }
 
 // electricity utility evaluation
-int EUtil(int price)
+int GlUtil(int price)
 {
-	return 0;
+	return 100000000 / price;
 }
 
-// inverse utility - solve for distance based on utility and price
-int InvHUtilD(int util, int price)
+// inverse phys utility - solve for distance based on utility and price
+int InvPhUtilD(int util, int price)
 {
-	return 0;
+	
+	//util = 100000000 / price / cmdist;
+	//util / 100000000 = 1 / price / cmdist;
+	//util * price / 100000000 = 1 / cmdist;
+	//100000000 / (util * price) = cmdist;
+
+	return 100000000 / (util * price);
 }
 
-// inverse utility - solve for price based on utility and distance
-int InvHUtilP(int util, int cmdist)
+// inverse phys utility - solve for price based on utility and distance
+int InvPhUtilP(int util, int cmdist)
 {
-	return 0;
+	return 100000000 / (util * cmdist);
+}
+
+int InvGlUtilP(int util)
+{
+	return 100000000 / util;
 }

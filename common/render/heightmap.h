@@ -62,11 +62,9 @@ public:
 	Vec3f *m_collverts;
 	Vec2f *m_texcoords0;
 	Vec3f *m_normals;
-	int *m_countryowner;
 	bool *m_triconfig;
 	Plane3f *m_tridivider;
 	float m_tilescale;
-	LoadedTex m_fulltex;
 	VertexArray m_rimva;
 	unsigned int m_vbo[VBOS];
 	unsigned int m_fullvbo[VBOS];
@@ -75,7 +73,6 @@ public:
 	{
 		m_widthx = 0;
 		m_widthz = 0;
-		m_fulltex.data = NULL;
 		for(int i=0; i<VBOS; i++)
 			m_vbo[i] = -1;
 	}

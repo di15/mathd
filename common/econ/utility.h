@@ -3,10 +3,10 @@
 #ifndef UTILITY_H
 #define UTILITY_H
 
-int HUtil(int price, int cmdist);
-int FUtil(int price, int cmdist);
-int EUtil(int price);
-int InvHUtilD(int util, int price);
-int InvHUtilP(int util, int cmdist);
+int PhUtil(int price, int cmdist);
+int GlUtil(int price);
+int InvPhUtilD(int util, int price);
+int InvPhUtilP(int util, int cmdist);
+int InvGlUtilP(int util);
 
 #endif

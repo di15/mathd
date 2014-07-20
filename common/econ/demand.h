@@ -21,6 +21,17 @@ public:
 	Vec2i tpos;
 	Vec2i cmpos;
 	int maxdist;
+	int minutil;
+	int marginpr;
+
+	Bid()
+	{
+		minbid = 0;
+		maxbid = 0;
+		maxdist = -1;
+		minutil = -1;
+		marginpr = -1;
+	}
 };
 
 #define DEM_NODE		0	//	unknown node
