@@ -13,6 +13,21 @@
 #define AVG_DIST		(TILE_SIZE*6)
 #define CYCLE_FRAMES	(SIM_FRAME_RATE*60)	
 
+class CostCompo
+{
+public:
+	int margcost;	//marginal cost
+	int fixcost;	//fixed cost
+	int ramt;
+
+	CostCompo()
+	{
+		margcost = 0;
+		fixcost = 0;
+		ramt = 0;
+	}
+};
+
 class Bid
 {
 public:
@@ -23,6 +38,7 @@ public:
 	int maxdist;
 	int minutil;
 	int marginpr;
+	std::list<CostCompo> costcompo;	//cost composition for different sources
 
 	Bid()
 	{
@@ -214,7 +230,7 @@ public:
 	std::list<DemNode*> nodes;
 	std::list<DemsAtB*> supbpcopy;	//master copy, this one will be freed
 	std::list<DemsAtU*> supupcopy;	//master copy, this one will be freed
-	std::list<DemNode*> codems[CONDUIT_TYPES];
+	std::list<DemNode*> codems[CONDUIT_TYPES];	//conduit placements
 
 	void free()
 	{

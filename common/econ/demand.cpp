@@ -493,6 +493,9 @@ void LabDemH(DemTree* dm, Unit* u, int* fundsleft)
 
 			if(!b->on)
 				continue;
+			
+			if(!b->finished)
+				continue;
 
 			BuildingT* bt = &g_bltype[b->type];
 
@@ -605,6 +608,9 @@ void LabDemF(DemTree* dm, Unit* u, int* fundsleft)
 			Building* b = &g_building[bi];
 
 			if(!b->on)
+				continue;
+
+			if(!b->finished)
 				continue;
 
 			BuildingT* bt = &g_bltype[b->type];
@@ -749,6 +755,9 @@ void LabDemF2(DemTree* dm, Unit* u, int* fundsleft)
 			if(!b->on)
 				continue;
 
+			if(!b->finished)
+				continue;
+
 			BuildingT* bt = &g_bltype[b->type];
 
 			if(bt->output[RES_RETFOOD] <= 0)
@@ -881,6 +890,9 @@ void LabDemE(DemTree* dm, Unit* u, int* fundsleft)
 
 			if(!b->on)
 				continue;
+			
+			if(!b->finished)
+				continue;
 
 			BuildingT* bt = &g_bltype[b->type];
 
@@ -989,6 +1001,282 @@ void LabDemE(DemTree* dm, Unit* u, int* fundsleft)
 	// Possible demand for more electricity (luxury) in LabDemE2();
 }
 
+//See how much construction of bl, roads+infrastructure will cost, if location is suitable
+//If it is, all the proposed construction will be added to the demtree
+bool TryBl(DemTree* dm, Player* p, int* concost)
+{
+
+	return false;
+}
+
+//Duplicate demb's of demtree, without dem lists yet
+void DupDemB(DemTree* orig, DemTree* copy)
+{
+#if 0
+	int bi;
+	int btype;
+	std::list<DemNode*> condems;	//construction material
+	std::list<DemNode*> proddems;	//production input raw materials
+	std::list<DemNode*> manufdems;	//manufacturing input raw materials
+	std::list<CrPipeDem*> crpipedems;
+	std::list<PowlDem*> powldems;
+	std::list<RoadDem*> roaddems;
+	int prodratio;
+	int condem[RESOURCES];
+	int supplying[RESOURCES];
+#endif
+
+	for(auto diter=orig->supbpcopy.begin(); diter!=orig->supbpcopy.end(); diter++)
+	{
+		DemsAtB* newdem = new DemsAtB;
+
+		//TODO
+
+		orig->supbpcopy.push_back(newdem);
+	}
+}
+
+//Duplicate dem nodes, but don't link yet
+void DupRDem(DemTree* orig, DemTree* copy)
+{
+
+}
+
+//Link dem nodes
+void LinkDem(DemTree* orig, DemTree* copy)
+{
+}
+
+//Duplicate demtree
+void DupDT(DemTree* orig, DemTree* copy)
+{
+#if 0
+	std::list<DemNode*> nodes;
+	std::list<DemsAtB*> supbpcopy;	//master copy, this one will be freed
+	std::list<DemsAtU*> supupcopy;	//master copy, this one will be freed
+	std::list<DemNode*> codems[CONDUIT_TYPES];	//conduit placements
+#endif
+
+	DupDemB(orig, copy);
+	// TODO:
+	//DupDemU(orig, copy);
+	//DupDemCo(orig, copy);
+	DupRDem(orig, copy);
+	LinkDem(orig, copy);
+}
+
+/*
+Determine cost composition for proposed building production, so don't create r dems
+Almost estimate transportation
+Roads and infrastructure might not be present yet, so just ignore that, as long as they're on the same island
+*/
+void DetCompo(Player* p, int btype, int rtype, int ramt, Vec2i tpos, Bid* bid)
+{
+
+}
+
+
+/*
+Based on the dems in the tree, find the best price for this tile and res, if a profit can be generated
+*/
+void TileDem(DemTree* dm, Player* p, int ri, RDemNode* pt, int x, int z)
+{
+	std::list<RDemNode> rdems;
+
+	for(auto diter=dm->nodes.begin(); diter!=dm->nodes.end(); diter++)
+	{
+		DemNode* dn = *diter;
+
+		if(dn->demtype != DEM_RNODE)
+			continue;
+
+		RDemNode* rdn = (RDemNode*)dn;
+
+		if(rdn->rtype != ri)
+			continue;
+
+		int requtil = rdn->bid.minutil+1;
+		int cmdist = Magnitude(Vec2i(x,z)*TILE_SIZE + Vec2i(TILE_SIZE,TILE_SIZE)/2 - rdn->bid.cmpos);
+		int maxpr = InvPhUtilP(requtil, cmdist);
+
+		while(PhUtil(maxpr, cmdist) < requtil)
+			maxpr--;
+
+		if(maxpr <= 0)
+			continue;
+
+		int maxrev = maxpr * rdn->ramt;
+
+		if(rdn->bid.minutil < 0)
+			maxrev = imin(maxrev, rdn->bid.maxbid);	//unecessary? might be necessary if minutil is -1 (any util) and there's only a budget constraint
+
+		RDemNode proj;	//projected revenue
+		proj.ramt = rdn->ramt;
+		proj.bid.marginpr = maxpr;
+		proj.bid.maxbid = maxrev;
+		proj.bid.minbid = maxrev;
+
+		int bestprofit = -1;
+		int bestbtype = -1;
+
+		//TODO: variable cost of resource production and raw input transport
+		//Try for all supporting bltypes
+		for(int btype=0; btype<BUILDING_TYPES; btype++)
+		{
+			BuildingT* bt = &g_bltype[btype];
+
+			if(bt->output[ri] <= 0)
+				continue;
+
+			RDemNode testproj = proj;
+			DetCompo(p, btype, ri, proj.ramt, Vec2i(x,z), &testproj.bid);
+
+			int maxrev = 0;
+
+			Bid* bid = &testproj.bid;
+			auto& costco = bid->costcompo;
+			int bprofit = 0;
+
+			for(auto citer=costco.begin(); citer!=costco.end(); citer++)
+			{
+				int subprofit = maxpr * citer->ramt - (citer->fixcost + citer->margcost * citer->ramt);
+
+				if(subprofit > 0)
+					bprofit += subprofit;
+			}
+
+			if(bprofit > bestprofit || bestprofit < 0)
+			{
+				bestprofit = bprofit;
+				bestbtype = btype;
+			}
+		}
+
+		if(bestbtype >= 0)
+		{
+			proj.btype = bestbtype;
+			rdems.push_back(proj);
+		}
+	}
+
+	if(rdems.size() <= 0)
+		return;
+
+	int bestprc = -1;
+	int bestprofit = -1;
+	int prevprc = -1;
+
+	//evalute max projected revenue at tile
+	//try all the price levels from smallest to greatest
+	while(true)
+	{
+		int leastnext = prevprc;
+
+		//while there's another possible price, see if it will generate more total revenue
+		for(auto diter=rdems.begin(); diter!=rdems.end(); diter++)
+			if((diter->bid.marginpr < leastnext && diter->bid.marginpr > prevprc) || leastnext < 0)
+				leastnext = diter->bid.marginpr;
+
+		if(leastnext == prevprc)
+			break;
+
+		prevprc = leastnext;
+
+		//see how much profit this price level will generate
+		int curprofit = 0;
+
+		for(auto diter=rdems.begin(); diter!=rdems.end(); diter++)
+			if(diter->bid.marginpr >= leastnext)
+			{
+				//find max profit based on cost composition and price
+
+				//curprofit += diter->ramt * leastnext;
+
+				Bid* bid = &diter->bid;
+				auto& costco = bid->costcompo;
+
+				for(auto citer=costco.begin(); citer!=costco.end(); citer++)
+				{
+					int subprofit = leastnext * citer->ramt - (citer->fixcost + citer->margcost * citer->ramt);
+
+					if(subprofit > 0)
+						curprofit += subprofit;
+				}
+			}
+
+			if(curprofit > bestprofit)
+			{
+				bestprofit = curprofit;
+				bestprc = leastnext;
+			}
+	}
+
+	//if no profit can be generated
+	if(bestprofit <= 0)
+		return;
+
+	pt->bid.maxbid = bestprofit;
+	pt->bid.marginpr = bestprc;
+}
+
+/*
+Check which spots will generate profit for this res and given tile prices and info
+*/
+void BlSpots(DemTree* dm, Player* p, int ri, RDemNode* tiles)
+{
+	//go through all locations, evalute road+infrastructure costs, and check best location, if it will generate profit
+	int bestprofit = -1;
+	Vec2i besttile;
+	DemTree bestdm;
+
+	for(int z=0; z<g_hmap.m_widthz; z++)
+		for(int x=0; x<g_hmap.m_widthx; x++)
+		{
+			RDemNode* pt = &tiles[ z*g_hmap.m_widthx + x ];
+			int profit = pt->bid.maxbid;
+
+			// TODO: plot roads and infrastructure costs
+			//...
+
+			DemTree prop;	//proposed
+			DupDT(dm, &prop);
+			int concost = 0;
+
+			if(!TryBl(&prop, p, &concost))
+				continue;
+
+			profit -= concost;
+
+			Bid* bid = &pt->bid;
+			auto& costco = bid->costcompo;
+
+			for(auto citer=costco.begin(); citer!=costco.end(); citer++)
+			{
+				int subprofit = bid->marginpr * citer->ramt - (citer->fixcost + citer->margcost * citer->ramt);
+
+				if(subprofit > 0)
+					profit += subprofit;
+			}
+
+			if(profit > bestprofit || bestprofit < 0)
+			{
+				bestprofit = profit;
+				besttile = Vec2i(x,z);
+				bestdm.free();
+				DupDT(&prop, &bestdm);
+			}
+		}
+
+	if(bestprofit > 0)
+	{
+		//check if profit is enough to justify construction
+
+		//if true
+		dm->free();
+		DupDT(&bestdm, dm);
+	}
+}
+
 /*
 For each resource demand,
 for each building that supplies that resource,
@@ -1013,63 +1301,10 @@ void TryBl(DemTree* dm, Player* p)
 			for(int x=0; x<g_hmap.m_widthx; x++)
 			{
 				RDemNode* pt = &tiles[ z*g_hmap.m_widthx + x ];
-				std::list<RDemNode> rdems;
-
-				for(auto diter=dm->nodes.begin(); diter!=dm->nodes.end(); diter++)
-				{
-					DemNode* dn = *diter;
-
-					if(dn->demtype != DEM_RNODE)
-						continue;
-
-					RDemNode* rdn = (RDemNode*)dn;
-
-					if(rdn->rtype != ri)
-						continue;
-
-					int requtil = rdn->bid.minutil+1;
-					int cmdist = Magnitude(Vec2i(x,z)*TILE_SIZE + Vec2i(TILE_SIZE,TILE_SIZE)/2 - rdn->bid.cmpos);
-					int maxpr = InvPhUtilP(requtil, cmdist);
-
-					while(PhUtil(maxpr, cmdist) < requtil)
-						maxpr--;
-
-					if(maxpr <= 0)
-						continue;
-
-					int maxrev = maxpr * rdn->ramt;
-
-					if(rdn->bid.minutil < 0)
-						maxrev = imin(maxrev, rdn->bid.maxbid);	//unecessary? might be necessary if minutil is -1 (any util) and there's only a budget constraint
-
-					RDemNode proj;	//projected revenue
-					proj.ramt = rdn->ramt;
-					proj.bid.marginpr = maxpr;
-					proj.bid.maxbid = maxrev;
-					proj.bid.minbid = maxrev;
-					rdems.push_back(proj);
-				}
-
-				if(rdems.size() <= 0)
-					continue;
-
-				int bestpr = -1;
-				int bestrev = -1;
-				bool newpr = false;
-
-				//try all the price levels from smallest to greatest
-				do
-				{
-					//while there's another possible price, see if it will generate more total revenue
-					for(auto diter=rdems.begin(); diter!=rdems.end(); diter++)
-					{
-
-					}
-
-				}while(newpr);
-
-				//TODO: evalute max projected revenue at tile
+				TileDem(dm, p, ri, pt, x, z);
 			}
+
+		BlSpots(dm, p, ri, tiles);
 
 		// TODO ...
 
