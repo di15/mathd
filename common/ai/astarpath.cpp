@@ -121,9 +121,7 @@ void IdentifySuccessors_A(PathJob* pj, PathNode* node)
 				nextn->opened = true;
 			}
 			else
-			{
 				g_openlist.heapify(nextn);
-			}
 		}
 	}
 }

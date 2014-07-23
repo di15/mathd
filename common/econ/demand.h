@@ -231,6 +231,7 @@ public:
 	std::list<DemsAtB*> supbpcopy;	//master copy, this one will be freed
 	std::list<DemsAtU*> supupcopy;	//master copy, this one will be freed
 	std::list<DemNode*> codems[CONDUIT_TYPES];	//conduit placements
+	int pyrsup[PLAYERS][RESOURCES];	//player global res supplying
 
 	void free()
 	{
@@ -264,6 +265,14 @@ public:
 				coiter = codems[i].erase(coiter);
 			}
 		}
+
+		for(int i=0; i<PLAYERS; i++)
+			Zero(pyrsup[i]);
+	}
+
+	DemTree()
+	{
+		free();
 	}
 
 	~DemTree()

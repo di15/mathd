@@ -494,8 +494,8 @@ void LabDemH(DemTree* dm, Unit* u, int* fundsleft)
 			if(!b->on)
 				continue;
 			
-			if(!b->finished)
-				continue;
+			//if(!b->finished)
+			//	continue;
 
 			BuildingT* bt = &g_bltype[b->type];
 
@@ -610,8 +610,8 @@ void LabDemF(DemTree* dm, Unit* u, int* fundsleft)
 			if(!b->on)
 				continue;
 
-			if(!b->finished)
-				continue;
+			//if(!b->finished)
+			//	continue;
 
 			BuildingT* bt = &g_bltype[b->type];
 
@@ -755,8 +755,8 @@ void LabDemF2(DemTree* dm, Unit* u, int* fundsleft)
 			if(!b->on)
 				continue;
 
-			if(!b->finished)
-				continue;
+			//if(!b->finished)
+			//	continue;
 
 			BuildingT* bt = &g_bltype[b->type];
 
@@ -891,8 +891,8 @@ void LabDemE(DemTree* dm, Unit* u, int* fundsleft)
 			if(!b->on)
 				continue;
 			
-			if(!b->finished)
-				continue;
+			//if(!b->finished)
+			//	continue;
 
 			BuildingT* bt = &g_bltype[b->type];
 
@@ -1066,15 +1066,156 @@ void DupDT(DemTree* orig, DemTree* copy)
 }
 
 /*
-Determine cost composition for proposed building production, so don't create r dems
-Almost estimate transportation
-Roads and infrastructure might not be present yet, so just ignore that, as long as they're on the same island
+Hypothetical transport cost, create demand for insufficient transports
 */
-void DetCompo(Player* p, int btype, int rtype, int ramt, Vec2i tpos, Bid* bid)
+void TranspCost(DemTree* dm, Player* p, Vec2i tfrom, Vec2i tto)
 {
 
 }
 
+/*
+Hypothetical costs
+*/
+void CheapSup(DemTree* dm, Player* p, int rtype, int ramt, Vec2i tpos, std::list<CostCompo>& costco)
+{
+	Resource* r = &g_resource[rtype];
+
+	std::list<int> usedbi;
+
+	int remain = ramt;
+
+	while(remain > 0)
+	{
+		int bestbi = -1;
+		int bestpr = -1;
+		DemsAtB* bestdemb = NULL;
+		int beststock = 0;
+		int bestglob = 0;
+		Player* bestpy = NULL;
+
+		for(auto dembiter=dm->supbpcopy.begin(); dembiter!=dm->supbpcopy.end(); dembiter++)
+		{
+			DemsAtB* demb = *dembiter;
+			int bi = demb->bi;
+
+			if(bi < 0)
+				continue;
+
+			Building* b = &g_building[bi];
+
+			if(!b->on)
+				continue;
+
+			//if(!b->finished)
+			//	continue;
+
+			BuildingT* bt = &g_bltype[b->type];
+
+			if(bt->output[rtype] <= 0)
+				continue;
+
+			bool found = false;
+
+			for(auto biter=usedbi.begin(); biter!=usedbi.end(); biter++)
+			{
+				biter++;
+
+				if(*biter == bi)
+				{
+					found = true;
+					break;
+				}
+			}
+
+			if(found)
+				continue;
+
+			if(bestbi >= 0 && bestpr < b->prodprice[rtype])
+				continue;
+
+			int stockqty = bt->output[rtype] - demb->supplying[rtype];
+			//int stockqty = b->stocked[rtype] - demb->supplying[rtype];
+
+			int pi = b->owner;
+			Player* p = &g_player[pi];
+			int globqty = p->global[rtype] - dm->pyrsup[pi][rtype];
+
+			if(stockqty + globqty < 0)
+				continue;
+
+			int transpcost = 0;
+
+			if(r->physical)
+			{
+		
+			}
+			else
+			{
+			}
+
+			bestbi = bi;
+			bestpr = b->prodprice[rtype];
+			bestdemb = demb;
+			beststock = stockqty;
+			bestpy = p;
+			bestglob = globqty;
+		}
+
+		if(bestbi < 0)
+			break;
+
+		int globconsum = imin(remain, bestglob);
+
+		if(globconsum > 0)
+		{
+			remain -= globconsum;
+			int pi = bestpy - g_player;
+			dm->pyrsup[pi][rtype] += globconsum;
+		}
+
+		int locconsum = imin(remain, beststock);
+
+		if(locconsum > 0)
+		{
+			remain -= locconsum;
+			bestdemb->supplying[rtype] += locconsum;
+		}
+
+		Building* b = &g_building[bestbi];
+
+		CostCompo cc;
+		cc.margcost = b->prodprice[rtype];
+		cc.ramt = globconsum + locconsum;
+	}
+}
+
+/*
+Determine cost composition for proposed building production, so don't create r dems
+Also estimate transportation
+Roads and infrastructure might not be present yet, so just ignore that, as long as they're on the same island
+If not, maybe create demand for overseas transport?
+If no trucks are present, create demand?
+*/
+void DetCompo(DemTree* dm, Player* p, int btype, int rtype, int ramt, Vec2i tpos, Bid* bid)
+{
+	BuildingT* bt = &g_bltype[btype];
+
+	int prodlevel = Ceili(RATIO_DENOM * ramt, bt->output[rtype]);
+
+	Vec2i cmpos = tpos * TILE_SIZE + Vec2i(TILE_SIZE,TILE_SIZE)/2;
+
+	std::list<CostCompo> rcostco[RESOURCES];
+
+	for(int ri=0; ri<RESOURCES; ri++)
+	{
+		if(bt->input[ri] <= 0)
+			continue;
+
+		CheapSup(dm, p, ri, Ceili(prodlevel * bt->input[ri], RATIO_DENOM), tpos, rcostco[ri]);
+	}
+
+	//combine the res compos into one costcompo
+}
 
 /*
 Based on the dems in the tree, find the best price for this tile and res, if a profit can be generated
@@ -1098,6 +1239,9 @@ void TileDem(DemTree* dm, Player* p, int ri, RDemNode* pt, int x, int z)
 		int requtil = rdn->bid.minutil+1;
 		int cmdist = Magnitude(Vec2i(x,z)*TILE_SIZE + Vec2i(TILE_SIZE,TILE_SIZE)/2 - rdn->bid.cmpos);
 		int maxpr = InvPhUtilP(requtil, cmdist);
+
+		if(requtil >= MAX_UTIL)
+			continue;
 
 		while(PhUtil(maxpr, cmdist) < requtil)
 			maxpr--;
@@ -1129,7 +1273,7 @@ void TileDem(DemTree* dm, Player* p, int ri, RDemNode* pt, int x, int z)
 				continue;
 
 			RDemNode testproj = proj;
-			DetCompo(p, btype, ri, proj.ramt, Vec2i(x,z), &testproj.bid);
+			DetCompo(dm, p, btype, ri, proj.ramt, Vec2i(x,z), &testproj.bid);
 
 			int maxrev = 0;
 
@@ -1201,14 +1345,16 @@ void TileDem(DemTree* dm, Player* p, int ri, RDemNode* pt, int x, int z)
 
 					if(subprofit > 0)
 						curprofit += subprofit;
+					else
+						break;	//can't proceed any further, because future composition might be dependent on fixed cost from previous, etc.
 				}
 			}
 
-			if(curprofit > bestprofit)
-			{
-				bestprofit = curprofit;
-				bestprc = leastnext;
-			}
+		if(curprofit > bestprofit)
+		{
+			bestprofit = curprofit;
+			bestprc = leastnext;
+		}
 	}
 
 	//if no profit can be generated
@@ -1222,7 +1368,7 @@ void TileDem(DemTree* dm, Player* p, int ri, RDemNode* pt, int x, int z)
 /*
 Check which spots will generate profit for this res and given tile prices and info
 */
-void BlSpots(DemTree* dm, Player* p, int ri, RDemNode* tiles)
+void BlSpots(DemTree* dm, Player* p, int ri, RDemNode* tiles, int* fixcost, int* recurprofit)
 {
 	//go through all locations, evalute road+infrastructure costs, and check best location, if it will generate profit
 	int bestprofit = -1;
@@ -1256,6 +1402,8 @@ void BlSpots(DemTree* dm, Player* p, int ri, RDemNode* tiles)
 
 				if(subprofit > 0)
 					profit += subprofit;
+				else
+					break;	//future ramt's might depend on fixed cost of previous
 			}
 
 			if(profit > bestprofit || bestprofit < 0)
@@ -1274,6 +1422,7 @@ void BlSpots(DemTree* dm, Player* p, int ri, RDemNode* tiles)
 		//if true
 		dm->free();
 		DupDT(&bestdm, dm);
+		*recurprofit = bestprofit;
 	}
 }
 
@@ -1287,6 +1436,10 @@ and choose which is most profitable.
 */
 void TryBl(DemTree* dm, Player* p)
 {
+	DemTree bestbldm;
+	int bestfixc = -1;
+	int bestrecurpro = -1;
+
 	//For resources that must be transported physically
 	for(int ri=0; ri<RESOURCES; ri++)
 	{
@@ -1295,16 +1448,29 @@ void TryBl(DemTree* dm, Player* p)
 		if(!r->physical)
 			continue;
 
+		DemTree thisdm;
+		DupDT(dm, &thisdm);
+
 		RDemNode* tiles = new RDemNode[ g_hmap.m_widthx * g_hmap.m_widthz ];
 
 		for(int z=0; z<g_hmap.m_widthz; z++)
 			for(int x=0; x<g_hmap.m_widthx; x++)
 			{
 				RDemNode* pt = &tiles[ z*g_hmap.m_widthx + x ];
-				TileDem(dm, p, ri, pt, x, z);
+				TileDem(&thisdm, p, ri, pt, x, z);
 			}
 
-		BlSpots(dm, p, ri, tiles);
+		int fixcost = 0;
+		int recurprofit = 0;
+		BlSpots(&thisdm, p, ri, tiles, &fixcost, &recurprofit);
+
+		if(bestrecurpro < 0 || recurprofit > bestrecurpro)
+		{
+			bestfixc = fixcost;
+			bestrecurpro = recurprofit;
+			bestbldm.free();
+			DupDT(&thisdm, &bestbldm);
+		}
 
 		// TODO ...
 
@@ -1318,6 +1484,8 @@ void TryBl(DemTree* dm, Player* p)
 	//matter.
 
 	//TODO: ...
+
+	DupDT(&bestbldm, dm);
 }
 
 // 1. Opportunities where something is overpriced

@@ -2,8 +2,6 @@
 
 #include "utility.h"
 
-#define MAX_UTIL	100000000
-
 // food/housing/physical res utility evaluation
 int PhUtil(int price, int cmdist)
 {
