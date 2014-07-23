@@ -18,12 +18,14 @@ class CostCompo
 public:
 	int margcost;	//marginal cost
 	int fixcost;	//fixed cost
+	int transpcost;	//transportation cost
 	int ramt;
 
 	CostCompo()
 	{
 		margcost = 0;
 		fixcost = 0;
+		transpcost = 0;
 		ramt = 0;
 	}
 };
