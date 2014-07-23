@@ -1078,6 +1078,7 @@ void TranspCost(DemTree* dm, Player* p, Vec2i tfrom, Vec2i tto)
 
 /*
 Hypothetical costs of inputs and transport
+Add calculated demands
 */
 void CheckSups(DemTree* dm, Player* p, int rtype, int ramt, Vec2i tpos, std::list<CostCompo>& costco)
 {
@@ -1199,7 +1200,7 @@ Roads and infrastructure might not be present yet, so just ignore that, as long 
 If not, maybe create demand for overseas transport?
 If no trucks are present, create demand?
 */
-void CheckBlType(DemTree* dm, Player* p, int btype, int rtype, int ramt, Vec2i tpos, Bid* bid, int* fixc, int* recurp, int* blmaxr)
+void CheckBlType(DemTree* dm, Player* p, int btype, int rtype, int ramt, Vec2i tpos, Bid* bid, int* blmaxr)
 {
 	BuildingT* bt = &g_bltype[btype];
 
@@ -1226,35 +1227,144 @@ void CheckBlType(DemTree* dm, Player* p, int btype, int rtype, int ramt, Vec2i t
 	}
 
 	//combine the res compos into one costcompo
+
+	std::list<CostCompo>::iterator rcoiter[RESOURCES];
+
+	for(int ri=0; ri<RESOURCES; ri++)
+	{
+		if(bt->input[ri] <= 0)
+			continue;
+
+		rcoiter[ri] = rcostco[ri].begin();
+	}
+
+	int stepcounted[RESOURCES];
+	Zero(stepcounted);
+
+	int remain = ramt;
+
+	while(remain > 0)
+	{
+		int prodstep[RESOURCES];
+		int stepleft[RESOURCES];
+		int ramt[RESOURCES];
+		Zero(prodstep);
+		Zero(stepleft);
+		Zero(ramt);
+
+		for(int ri=0; ri<RESOURCES; ri++)
+		{
+			if(bt->input[ri] <= 0)
+				continue;
+
+			auto& rco = rcoiter[ri];
+			stepleft[ri] = rco->ramt - stepcounted[ri];
+			prodstep[ri] = stepleft[ri] * RATIO_DENOM / bt->input[ri];
+		}
+		
+		int minstepr = -1;
+
+		for(int ri=0; ri<RESOURCES; ri++)
+		{
+			if(bt->input[ri] <= 0)
+				continue;
+
+			if(minstepr < 0 || prodstep[ri] < prodstep[minstepr])
+				minstepr = ri;
+		}
+
+		if(minstepr < 0)
+			break;
+
+		if(stepleft[minstepr] <= 0)
+		{
+			stepcounted[minstepr] = 0;
+
+			auto& rco = rcoiter[minstepr];
+
+			if(rco == rcostco[minstepr].end())
+				break;
+
+			rco++;
+			
+			if(rco == rcostco[minstepr].end())
+				break;
+
+			continue;
+		}
+
+		CostCompo nextco;
+		nextco.fixcost = 0;
+		nextco.transpcost = 0;
+
+		//count fixed/transport cost if it hasn't already been counted
+		for(int ri=0; ri<RESOURCES; ri++)
+		{
+			if(bt->input[ri] <= 0)
+				continue;
+
+			if(stepcounted[ri] > 0)
+				continue;
+			
+			nextco.fixcost += rcoiter[ri]->fixcost;
+			nextco.transpcost += rcoiter[ri]->transpcost;
+		}
+
+		int minstep = prodstep[minstepr];
+		nextco.ramt = bt->output[rtype] * prodstep[minstepr] / RATIO_DENOM;
+		nextco.margcost = 0;
+
+		for(int ri=0; ri<RESOURCES; ri++)
+		{
+			if(bt->input[ri] <= 0)
+				continue;
+			
+			//int rstep = Ceili(minstep * bt->input[ri], RATIO_DENOM);
+			int rstep = minstep * bt->input[ri] / RATIO_DENOM;
+			rstep = imin(rstep, stepleft[ri]);
+			stepcounted[ri] += rstep;
+			nextco.margcost += rcoiter[ri]->margcost * rstep;
+		}
+
+		bid->costcompo.push_back(nextco);
+	}
 }
 
 //max profit
 int MaxPro(std::list<CostCompo>& costco, int pricelevel, int demramt, int* proramt)
 {
-	int profit = 0;
-	int curprofit = 0;
+	int bestprofit = -1;
+	int bestramt = 0;
 	//*ramt = 0;
-	int curramt = 0;
 
 	// if we must begin from the beginning of costco, and end at any point after,
 	//what is the maximum profit we can reach?
-	for(auto citer=costco.begin(); citer!=costco.end(); citer++)
-	{
-		int subprofit = pricelevel * citer->ramt - (citer->fixcost + citer->margcost * citer->ramt);
 
-		if(subprofit > 0)
+	int bestlim = -1;
+	int currlim = costco.size();
+
+	while(currlim >= 0)
+	{
+		int curprofit = 0;
+		int curramt = 0;
+		int i = 0;
+		for(auto citer=costco.begin(); citer!=costco.end() && i<currlim; citer++, i++)
 		{
+			int subprofit = pricelevel * citer->ramt - (citer->fixcost + citer->margcost * citer->ramt);
+
 			curprofit += subprofit;
 			curramt += citer->ramt;
 		}
-		else
-			break;	//can't proceed any further, because following composition might be dependent on fixed cost from previous, etc.
-		//???? no?
-		//TO DO:
+
+		if(bestprofit < 0 || curprofit > bestprofit)
+		{
+			bestprofit = curprofit;
+			bestramt = curramt;
+		}
 	}
 
-	*proramt += curramt;
-	return curprofit;
+	*proramt += bestramt;
+	return bestprofit;
 }
 
 /*
@@ -1317,11 +1427,10 @@ void CheckBlTile(DemTree* dm, Player* p, int ri, RDemNode* pt, int x, int z, int
 	if(rdems.size() <= 0)
 		return;
 
-	int bestrecur = 0;
 	int bestbtype = -1;
-	int bestfix = -1;
-	Bid bestbid;
+	//int bestfix = -1;
 	int bestmaxr = maxramt;
+	int bestprofit = -1;
 
 	//TODO: variable cost of resource production and raw input transport
 	//Try for all supporting bltypes
@@ -1332,87 +1441,82 @@ void CheckBlTile(DemTree* dm, Player* p, int ri, RDemNode* pt, int x, int z, int
 		if(bt->output[ri] <= 0)
 			continue;
 
-		Bid bltypebid;
-		int bltyfix = 0;
-		int bltyrecur = 0;
+		DemTree bldm;
+		DupDT(dm, &bldm);
+
+		Bid bltybid;
 		int blmaxr = maxramt;
-		CheckBlType(dm, p, btype, ri, maxramt, Vec2i(x,z), &bltypebid, &bltyfix, &bltyrecur, &blmaxr);
+		CheckBlType(&bldm, p, btype, ri, maxramt, Vec2i(x,z), &bltybid, &blmaxr);
 
-		if(bltyrecur > bestrecur || bestbtype < 0)
+		//int bltyfix = 0;
+		//int bltyrecur = 0;
+		//int bestprc = -1;
+		int prevprc = -1;
+		bool dupdm = false;
+
+		//evalute max projected revenue at tile and bltype
+		//try all the price levels from smallest to greatest
+		while(true)
 		{
-			bestrecur = bltyrecur;
-			bestfix = bltyfix;
-			bestbtype = btype;
-			//proj.bid.costcompo = bltypebid.costcompo;
-			bestbid.costcompo = bltypebid.costcompo;
-			bestmaxr = blmaxr;
-		}
-	}
+			int leastnext = prevprc;
 
-	if(bestbtype < 0)
-		return;
+			//while there's another possible price, see if it will generate more total revenue
 
-	int bestprc = -1;
-	int bestprofit = -1;
-	int prevprc = -1;
+			for(auto diter=rdems.begin(); diter!=rdems.end(); diter++)
+				if((diter->bid.marginpr < leastnext && diter->bid.marginpr > prevprc) || leastnext < 0)
+					leastnext = diter->bid.marginpr;
 
-	//evalute max projected revenue at tile
-	//try all the price levels from smallest to greatest
-	while(true)
-	{
-		int leastnext = prevprc;
+			if(leastnext == prevprc)
+				break;
 
-		//while there's another possible price, see if it will generate more total revenue
+			prevprc = leastnext;
 
-		for(auto diter=rdems.begin(); diter!=rdems.end(); diter++)
-			if((diter->bid.marginpr < leastnext && diter->bid.marginpr > prevprc) || leastnext < 0)
-				leastnext = diter->bid.marginpr;
-
-		if(leastnext == prevprc)
-			break;
-
-		prevprc = leastnext;
-
-		//see how much profit this price level will generate
+			//see how much profit this price level will generate
 		
-		int demramt = 0;	//how much will be demanded at this price level
+			int demramt = 0;	//how much will be demanded at this price level
 
-		for(auto diter=rdems.begin(); diter!=rdems.end(); diter++)
-			if(diter->bid.marginpr >= leastnext)
-				//curprofit += diter->ramt * leastnext;
-				demramt += diter->ramt;
+			for(auto diter=rdems.begin(); diter!=rdems.end(); diter++)
+				if(diter->bid.marginpr >= leastnext)
+					//curprofit += diter->ramt * leastnext;
+					demramt += diter->ramt;
 
-		//if demanded exceeds bl's max out
-		if(demramt > bestmaxr)
-			demramt = bestmaxr;
+			//if demanded exceeds bl's max out
+			if(demramt > blmaxr)
+				demramt = blmaxr;
 
-		int proramt = 0;	//how much is most profitable to produce in this case
-		Bid* bid = &bestbid;
+			int proramt = 0;	//how much is most profitable to produce in this case
+			Bid* bid = &bltybid;
 
-		//find max profit based on cost composition and price
-		int curprofit = MaxPro(bid->costcompo, leastnext, demramt, &proramt);
+			//find max profit based on cost composition and price
+			int curprofit = MaxPro(bid->costcompo, leastnext, demramt, &proramt);
 
-		int ofmax = Ceili(demramt * RATIO_DENOM, bestmaxr);	//how much of max demanded is
-		curprofit += ofmax * bestrecur / RATIO_DENOM;	//bl recurring costs, scaled to demanded qty
+			//int ofmax = Ceili(proramt * RATIO_DENOM, bestmaxr);	//how much of max demanded is
+			//curprofit += ofmax * bestrecur / RATIO_DENOM;	//bl recurring costs, scaled to demanded qty
 
-		if(curprofit > bestprofit)
-		{
+			if(curprofit <= bestprofit && bestbtype >= 0)
+				continue;
+
 			bestprofit = curprofit;
-			bestprc = leastnext;
-			*fixc = 0;
+			*fixc = 0;	//TO DO: cost of building roads, infrast etc.
 			*recurp = bestprofit;
+			bestbtype = btype;
+			bestmaxr = blmaxr;
+
+			pt->bid.maxbid = bestprofit;
+			pt->bid.marginpr = leastnext;
+			pt->bid.tpos = Vec2i(x,z);
+			pt->btype = bestbtype;
+			pt->bid.costcompo = bltybid.costcompo;
+
+			dupdm = true;	//expensive op
 		}
+
+		if(!dupdm)
+			continue;
+
+		dm->free();
+		DupDT(&bldm, dm);
 	}
-
-	//if no profit can be generated
-	if(bestprofit <= 0)
-		return;
-
-	pt->bid.maxbid = bestprofit;
-	pt->bid.marginpr = bestprc;
-	pt->bid.tpos = Vec2i(x,z);
-	pt->btype = bestbtype;
-	pt->bid.costcompo = bestbid.costcompo;
 }
 
 /*
