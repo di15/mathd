@@ -1392,12 +1392,15 @@ void CheckBlTile(DemTree* dm, Player* p, int ri, RDemNode* pt, int x, int z, int
 		//find max profit based on cost composition and price
 		int curprofit = MaxPro(bid->costcompo, leastnext, demramt, &proramt);
 
-		curprofit += bestrecur;	//bl recurring costs
+		int ofmax = Ceili(demramt * RATIO_DENOM, bestmaxr);	//how much of max demanded is
+		curprofit += ofmax * bestrecur / RATIO_DENOM;	//bl recurring costs, scaled to demanded qty
 
 		if(curprofit > bestprofit)
 		{
 			bestprofit = curprofit;
 			bestprc = leastnext;
+			*fixc = 0;
+			*recurp = bestprofit;
 		}
 	}
 
@@ -1409,6 +1412,7 @@ void CheckBlTile(DemTree* dm, Player* p, int ri, RDemNode* pt, int x, int z, int
 	pt->bid.marginpr = bestprc;
 	pt->bid.tpos = Vec2i(x,z);
 	pt->btype = bestbtype;
+	pt->bid.costcompo = bestbid.costcompo;
 }
 
 /*
