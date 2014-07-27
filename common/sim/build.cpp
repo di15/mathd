@@ -494,7 +494,8 @@ bool PlaceBuilding(int type, Vec2i pos, bool finished, int owner, int* bid)
 	return true;
 }
 
-bool PlaceBAbout(int btype, Vec2i tabout, Vec2i* tpos)
+//find to place building about certain tile
+bool PlaceBAb(int btype, Vec2i tabout, Vec2i* tplace)
 {
 	//g_log<<"PlaceBAround "<<player<<std::endl;
 	//g_log.flush();
@@ -517,7 +518,7 @@ bool PlaceBAbout(int btype, Vec2i tabout, Vec2i* tpos)
 		right = tabout.x + shell;
 		bottom = tabout.y + shell;
 
-		canplace.reserve( (right-left)*2 + (bottom-top)*2 - 4 );
+		canplace.reserve( (right-left)*2/TILE_SIZE + (bottom-top)*2/TILE_SIZE - 4 );
         
 		tilez = top;
 		for(tilex=left; tilex<right; tilex++)
@@ -681,7 +682,7 @@ bool PlaceBAbout(int btype, Vec2i tabout, Vec2i* tpos)
 			//g_log<<"placeb t="<<btype<<" "<<vTile.x<<","<<vTile.y<<","<<vTile.z<<"("<<(vTile.x/16)<<","<<(vTile.y/16)<<","<<(vTile.z/16)<<")"<<std::endl;
 			//g_log.flush();
 			//*tpos = canplace[ rand()%canplace.size() ];
-            *tpos = canplace[ 0 ];
+            *tplace = canplace[ 0 ];
 
 			return true;
 		}
@@ -696,7 +697,8 @@ bool PlaceBAbout(int btype, Vec2i tabout, Vec2i* tpos)
 	return false;
 }
 
-bool PlaceUAbout(int utype, Vec2i cmabout, Vec2i* cmpos)
+//find to place unit about certain position
+bool PlaceUAb(int utype, Vec2i cmabout, Vec2i* cmplace)
 {
 	//g_log<<"PlaceBAround "<<player<<std::endl;
 	//g_log.flush();
@@ -719,7 +721,7 @@ bool PlaceUAbout(int utype, Vec2i cmabout, Vec2i* cmpos)
 		right = cmabout.x + shell;
 		bottom = cmabout.y + shell;
 
-		canplace.reserve( (right-left)*2 + (bottom-top)*2 - 4 );
+		canplace.reserve( (right-left)*2/t->size.x + (bottom-top)*2/t->size.z - 4 );
         
 		tilez = top;
 		for(tilex=left; tilex<right; tilex++)
@@ -840,7 +842,7 @@ bool PlaceUAbout(int utype, Vec2i cmabout, Vec2i* cmpos)
 			//g_log<<"placeb t="<<btype<<" "<<vTile.x<<","<<vTile.y<<","<<vTile.z<<"("<<(vTile.x/16)<<","<<(vTile.y/16)<<","<<(vTile.z/16)<<")"<<std::endl;
 			//g_log.flush();
 			//*tpos = canplace[ rand()%canplace.size() ];
-            *cmpos = canplace[ 0 ];
+            *cmplace = canplace[ 0 ];
 
 			return true;
 		}

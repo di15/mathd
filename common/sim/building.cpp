@@ -21,11 +21,19 @@
 #include "../../game/gmain.h"
 #include "../render/shadow.h"
 #include "../math/frustum.h"
+#include "unit.h"
+#include "labourer.h"
 
 Building g_building[BUILDINGS];
 
 void Building::destroy()
 {
+	while(occupier.size() > 0)
+		Evict(&g_unit[*occupier.begin()]);
+
+	while(worker.size() > 0)
+		ResetMode(&g_unit[*worker.begin()]);
+
 	on = false;
 }
 

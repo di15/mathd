@@ -5,6 +5,7 @@
 #include "../sim/build.h"
 #include "../sim/building.h"
 #include "../gui/cursor.h"
+#include "../script/console.h"
 
 PlayerColor g_pycols[PLAYER_COLORS] =
 {
@@ -108,4 +109,35 @@ void DrawPy()
 	Model* m = &g_model[g_playerm];
 
 	m->draw(0, Vec3f(TILE_SIZE*10, TILE_SIZE*5, TILE_SIZE*10), 30);
+}
+
+void Bankrupt(int player, const char* reason)
+{
+	Player* p = &g_player[player];
+    
+	if(player == g_localP)
+	{
+		RichText lm(UString("You've gone bankrupt"));
+		SubmitConsole(&lm);
+	}
+	else //if(p->activity != ACTIVITY_NONE)
+	{
+		//LogTransx(player, 0.0f, "BANKRUPT");
+        
+		char msg[256];
+		sprintf(msg, "%s has gone bankrupt", g_player[player].name.rawstr());
+        
+		char add[64];
+        
+		if(reason[0] != '\0')
+			sprintf(add, " (reason: %s).", reason);
+		else
+			sprintf(add, ".");
+        
+		strcat(msg, add);
+		
+		RichText lm;
+		lm.m_part.push_back(RichTextP(UString(msg)));
+		SubmitConsole(&lm);
+	}
 }

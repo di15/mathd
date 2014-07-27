@@ -46,7 +46,7 @@ void Build(Player* p)
 
 		Vec2i tpos;
 
-		if(!PlaceBAbout(btype, Vec2i(g_hmap.m_widthx/2, g_hmap.m_widthz/2), &tpos))
+		if(!PlaceBAb(btype, Vec2i(g_hmap.m_widthx/2, g_hmap.m_widthz/2), &tpos))
 			continue;
 
 		PlaceBuilding(btype, tpos, false, pyid, &demb->bi);

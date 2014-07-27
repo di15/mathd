@@ -79,5 +79,6 @@ extern int g_playerm;
 
 void DefP(int ID, float red, float green, float blue, float alpha, RichText name);
 void DrawPy();
+void Bankrupt(int player, const char* reason);
 
 #endif

@@ -40,6 +40,9 @@ public:
 	int prodprice[RESOURCES];	//price of produced goods
 	int propprice;	//price of this property
 
+	std::list<int> occupier;
+	std::list<int> worker;
+
 	void destroy();
 	void fillcollider();
 	void freecollider();

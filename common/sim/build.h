@@ -13,7 +13,7 @@ void UpdateSBuild();
 bool CheckCanPlace(int type, Vec2i pos);
 void DrawBReason(Matrix* mvp, float width, float height, bool persp);
 bool PlaceBuilding(int type, Vec2i pos, bool finished, int owner, int* bid);
-bool PlaceBAbout(int btype, Vec2i tabout, Vec2i* tpos);
-bool PlaceUAbout(int utype, Vec2i cmabout, Vec2i* tpos);
+bool PlaceBAb(int btype, Vec2i tabout, Vec2i* tplace);
+bool PlaceUAb(int utype, Vec2i cmabout, Vec2i* cmplace);
 
 #endif

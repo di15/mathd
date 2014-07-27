@@ -26,6 +26,15 @@ extern long long g_simframe;
 
 #define SIM_FRAME_RATE		30
 
+#define STARTING_RETFOOD		9000	//lasts for 5 minutes
+#define STARTING_LABOUR			1000	//lasts for 33.333 seconds
+#define LABOURER_FOODCONSUM		1
+#define LABOURER_ENERGYCONSUM	3
+#define DRIVE_WORK_DELAY		(SIM_FRAME_RATE*60)	//in sim frames
+#define WORK_DELAY				(SIM_FRAME_RATE*1)	//in sim frames
+#define LOOKJOB_DELAY_MAX		(SIM_FRAME_RATE*5)
+#define FUEL_DISTANCE			(TILE_SIZE)		//(TILE_SIZE*2.0f)
+
 void Queue();
 
 #endif

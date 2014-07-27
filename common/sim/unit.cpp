@@ -300,7 +300,7 @@ void ResetMode(Unit* u)
 	else if(u->type == UNIT_TRUCK)
 	{
 #if 0
-		if(u->mode == UMODE_GOINGTOSUPPLIER
+		if(u->mode == UMODE_GOSUP
            //|| mode == GOINGTOREFUEL
            //|| mode == GOINGTODEMANDERB || mode == GOINGTODEMROAD || mode == GOINGTODEMPIPE || mode == GOINGTODEMPOWL
            )

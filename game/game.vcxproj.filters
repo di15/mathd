@@ -428,6 +428,9 @@
     <ClCompile Include="..\common\path\trip.cpp">
       <Filter>Source Files\common\path</Filter>
     </ClCompile>
+    <ClCompile Include="..\common\sim\job.cpp">
+      <Filter>Source Files\common\sim</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="gmain.h">
@@ -801,6 +804,9 @@
     </ClInclude>
     <ClInclude Include="..\common\path\trip.h">
       <Filter>Source Files\common\path</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\sim\job.h">
+      <Filter>Source Files\common\sim</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
