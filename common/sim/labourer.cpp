@@ -33,6 +33,67 @@ bool FindJob(Unit* u)
 	return false;
 }
 
+// go to construction job
+void GoToCstJob(Unit* u)
+{
+}
+
+// do construction job
+void DoCstJob(Unit* u)
+{
+}
+
+// go to building job
+void GoToBlJob(Unit* u)
+{
+}
+
+// do building job
+void DoBlJob(Unit* u)
+{
+}
+
+// go to conduit (construction) job
+void GoToCdJob(Unit* u)
+{
+}
+
+// do conduit (construction) job
+void DoCdJob(Unit* u)
+{
+}
+
+// go shop
+void GoShop(Unit* u)
+{
+}
+
+// go rest
+void GoRest(Unit* u)
+{
+}
+
+// do shop
+void DoShop(Unit* u)
+{
+}
+
+// do rest
+void DoRest(Unit* u)
+{
+}
+
+// go to transport for drive job
+void GoToTra(Unit* u)
+{
+}
+
+// do transport drive job
+void DoDrTra(Unit* u)
+{
+}
+
+
 void UpdLab(Unit* u)
 {
 	u->belongings[RES_RETFOOD] -= LABOURER_FOODCONSUM;
@@ -104,7 +165,7 @@ void UpdLab(Unit* u)
 			 }*/
 				if(!FindJob(u))
 				{
-					if(rand()%(FRAME_RATE*2) == 1)
+					//if(rand()%(FRAME_RATE*2) == 1)
 					{
 						//move randomly?
 						//goal = camera.Position() + Vec3f(rand()%TILE_SIZE - TILE_SIZE/2, 0, rand()%TILE_SIZE - TILE_SIZE/2);
@@ -137,22 +198,18 @@ void UpdLab(Unit* u)
 #define UMODE_ATDEMCD				20	//at demander conduit
 #endif
 
-	case GOINGTOCONJOB:		GoToConJob();		break;
-	case CONJOB:			DoConJob();			break;
-	case GOINGTONORMJOB:	GoToNormJob();		break;
-	case NORMJOB:			DoNormJob();		break;
-	case GOINGTOROADJOB:	GoToRoadJob();		break;
-	case ROADJOB:			DoRoadJob();		break;
-	case GOINGTOPOWLJOB:	GoToPowerlineJob();	break;
-	case POWLJOB:			DoPowerlineJob();	break;
-	case GOINGTOPIPEJOB:	GoToPipelineJob();	break;
-	case PIPEJOB:			DoPipelineJob();	break;
-	case GOINGTOSHOP:		GoShop();			break;
-	case GOINGTOREST:		GoRest();			break;
-	case SHOPPING:			DoShop();			break;
-	case RESTING:			DoRest();			break;
-	case GOINGTOTRUCK:		GoToTruck();		break;
-	case DRIVING:			DoDrive();			break;
+	case UMODE_GOINGTOCSTJOB:		GoToCstJob(u);		break;
+	case UMODE_CSTJOB:				DoCstJob(u);		break;
+	case UMODE_GOINGTOBLJOB:		GoToBlJob(u);		break;
+	case UMODE_BLJOB:				DoBlJob(u);			break;
+	case UMODE_GOINGTOCDJOB:		GoToCdJob(u);		break;
+	case UMODE_CDJOB:				DoCdJob(u);			break;
+	case UMODE_GOINGTOSHOP:			GoShop(u);			break;
+	case UMODE_GOINGTOREST:			GoRest(u);			break;
+	case UMODE_SHOPPING:			DoShop(u);			break;
+	case UMODE_RESTING:				DoRest(u);			break;
+	case UMODE_GOINGTOTRANSP:		GoToTra(u);			break;
+	case UMODE_TRANSPDRV:			DoDrTra(u);			break;
 	default: break;
 	}
 }
