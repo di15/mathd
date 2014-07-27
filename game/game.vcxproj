@@ -157,19 +157,6 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\common\ai\ai.cpp" />
-    <ClCompile Include="..\common\ai\astarpath.cpp" />
-    <ClCompile Include="..\common\ai\binheap.cpp" />
-    <ClCompile Include="..\common\ai\jpsexpansion.cpp" />
-    <ClCompile Include="..\common\ai\jpspartpath.cpp" />
-    <ClCompile Include="..\common\ai\jpspath.cpp" />
-    <ClCompile Include="..\common\ai\localavoid.cpp" />
-    <ClCompile Include="..\common\ai\mempool.cpp" />
-    <ClCompile Include="..\common\ai\collidertile.cpp" />
-    <ClCompile Include="..\common\ai\partialpath.cpp" />
-    <ClCompile Include="..\common\ai\pathdebug.cpp" />
-    <ClCompile Include="..\common\ai\pathjob.cpp" />
-    <ClCompile Include="..\common\ai\reconstructpath.cpp" />
-    <ClCompile Include="..\common\ai\pathnode.cpp" />
     <ClCompile Include="..\common\debug.cpp" />
     <ClCompile Include="..\common\econ\balance.cpp" />
     <ClCompile Include="..\common\econ\demand.cpp" />
@@ -224,6 +211,20 @@
     <ClCompile Include="..\common\math\vec3f.cpp" />
     <ClCompile Include="..\common\math\vec3i.cpp" />
     <ClCompile Include="..\common\math\vec4f.cpp" />
+    <ClCompile Include="..\common\path\astarpath.cpp" />
+    <ClCompile Include="..\common\path\binheap.cpp" />
+    <ClCompile Include="..\common\path\collidertile.cpp" />
+    <ClCompile Include="..\common\path\jpsexpansion.cpp" />
+    <ClCompile Include="..\common\path\jpspartpath.cpp" />
+    <ClCompile Include="..\common\path\jpspath.cpp" />
+    <ClCompile Include="..\common\path\localavoid.cpp" />
+    <ClCompile Include="..\common\path\mempool.cpp" />
+    <ClCompile Include="..\common\path\partialpath.cpp" />
+    <ClCompile Include="..\common\path\pathdebug.cpp" />
+    <ClCompile Include="..\common\path\pathjob.cpp" />
+    <ClCompile Include="..\common\path\pathnode.cpp" />
+    <ClCompile Include="..\common\path\reconstructpath.cpp" />
+    <ClCompile Include="..\common\path\trip.cpp" />
     <ClCompile Include="..\common\phys\collision.cpp" />
     <ClCompile Include="..\common\phys\trace.cpp" />
     <ClCompile Include="..\common\platform.cpp" />
@@ -278,19 +279,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\common\ai\ai.h" />
-    <ClInclude Include="..\common\ai\astarpath.h" />
-    <ClInclude Include="..\common\ai\binheap.h" />
-    <ClInclude Include="..\common\ai\jpsexpansion.h" />
-    <ClInclude Include="..\common\ai\jpspartpath.h" />
-    <ClInclude Include="..\common\ai\jpspath.h" />
-    <ClInclude Include="..\common\ai\localavoid.h" />
-    <ClInclude Include="..\common\ai\mempool.h" />
-    <ClInclude Include="..\common\ai\collidertile.h" />
-    <ClInclude Include="..\common\ai\partialpath.h" />
-    <ClInclude Include="..\common\ai\pathdebug.h" />
-    <ClInclude Include="..\common\ai\pathjob.h" />
-    <ClInclude Include="..\common\ai\reconstructpath.h" />
-    <ClInclude Include="..\common\ai\pathnode.h" />
     <ClInclude Include="..\common\debug.h" />
     <ClInclude Include="..\common\econ\balance.h" />
     <ClInclude Include="..\common\econ\demand.h" />
@@ -348,6 +336,20 @@
     <ClInclude Include="..\common\math\vec3f.h" />
     <ClInclude Include="..\common\math\vec3i.h" />
     <ClInclude Include="..\common\math\vec4f.h" />
+    <ClInclude Include="..\common\path\astarpath.h" />
+    <ClInclude Include="..\common\path\binheap.h" />
+    <ClInclude Include="..\common\path\collidertile.h" />
+    <ClInclude Include="..\common\path\jpsexpansion.h" />
+    <ClInclude Include="..\common\path\jpspartpath.h" />
+    <ClInclude Include="..\common\path\jpspath.h" />
+    <ClInclude Include="..\common\path\localavoid.h" />
+    <ClInclude Include="..\common\path\mempool.h" />
+    <ClInclude Include="..\common\path\partialpath.h" />
+    <ClInclude Include="..\common\path\pathdebug.h" />
+    <ClInclude Include="..\common\path\pathjob.h" />
+    <ClInclude Include="..\common\path\pathnode.h" />
+    <ClInclude Include="..\common\path\reconstructpath.h" />
+    <ClInclude Include="..\common\path\trip.h" />
     <ClInclude Include="..\common\phys\collision.h" />
     <ClInclude Include="..\common\phys\trace.h" />
     <ClInclude Include="..\common\platform.h" />

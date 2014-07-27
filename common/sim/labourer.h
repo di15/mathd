@@ -8,6 +8,6 @@
 #define LABOURER_FOODCONSUM		1
 #define LABOURER_ENERGYCONSUM	3
 
-void UpdateLabourer(Unit* u);
+void UpdLab(Unit* u);
 
 #endif

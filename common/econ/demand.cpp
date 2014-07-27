@@ -1095,7 +1095,6 @@ void CheckSups(DemTree* dm, Player* p, int rtype, int ramt, Vec2i tpos, std::lis
 		DemsAtB* bestdemb = NULL;
 		int beststock = 0;
 		int bestglob = 0;
-		Player* bestpy = NULL;
 
 		for(auto dembiter=dm->supbpcopy.begin(); dembiter!=dm->supbpcopy.end(); dembiter++)
 		{
@@ -1161,7 +1160,6 @@ void CheckSups(DemTree* dm, Player* p, int rtype, int ramt, Vec2i tpos, std::lis
 			bestpr = b->prodprice[rtype];
 			bestdemb = demb;
 			beststock = stockqty;
-			bestpy = p;
 			bestglob = globqty;
 		}
 
@@ -1173,7 +1171,8 @@ void CheckSups(DemTree* dm, Player* p, int rtype, int ramt, Vec2i tpos, std::lis
 		if(globconsum > 0)
 		{
 			remain -= globconsum;
-			int pi = bestpy - g_player;
+			Building* b = &g_building[bestdemb->bi];
+			int pi = b->owner;
 			dm->pyrsup[pi][rtype] += globconsum;
 		}
 
@@ -1245,13 +1244,12 @@ void CheckBlType(DemTree* dm, Player* p, int btype, int rtype, int ramt, Vec2i t
 
 	while(remain > 0)
 	{
-		int prodstep[RESOURCES];
-		int stepleft[RESOURCES];
-		int ramt[RESOURCES];
+		int prodstep[RESOURCES];	//production level based on stepleft and bl's output cap
+		int stepleft[RESOURCES];	//how much is still left in this step of the list
 		Zero(prodstep);
 		Zero(stepleft);
-		Zero(ramt);
 
+		//determine how much is left in each step and the production level it would be equivalent to
 		for(int ri=0; ri<RESOURCES; ri++)
 		{
 			if(bt->input[ri] <= 0)
@@ -1262,6 +1260,8 @@ void CheckBlType(DemTree* dm, Player* p, int btype, int rtype, int ramt, Vec2i t
 			prodstep[ri] = stepleft[ri] * RATIO_DENOM / bt->input[ri];
 		}
 		
+		//find the lowest production level
+
 		int minstepr = -1;
 
 		for(int ri=0; ri<RESOURCES; ri++)
@@ -1273,20 +1273,24 @@ void CheckBlType(DemTree* dm, Player* p, int btype, int rtype, int ramt, Vec2i t
 				minstepr = ri;
 		}
 
+		//if there's no such resource, there's something wrong
 		if(minstepr < 0)
 			break;
 
+		//if we're at the end of the step, advance to next in list
 		if(stepleft[minstepr] <= 0)
 		{
 			stepcounted[minstepr] = 0;
 
 			auto& rco = rcoiter[minstepr];
 
+			//if at end
 			if(rco == rcostco[minstepr].end())
 				break;
 
 			rco++;
 			
+			//if at end
 			if(rco == rcostco[minstepr].end())
 				break;
 
@@ -1343,7 +1347,7 @@ int MaxPro(std::list<CostCompo>& costco, int pricelevel, int demramt, int* prora
 	int bestlim = -1;
 	int currlim = costco.size();
 
-	while(currlim >= 0)
+	while(currlim >= 1)
 	{
 		int curprofit = 0;
 		int curramt = 0;
@@ -1356,11 +1360,14 @@ int MaxPro(std::list<CostCompo>& costco, int pricelevel, int demramt, int* prora
 			curramt += citer->ramt;
 		}
 
-		if(bestprofit < 0 || curprofit > bestprofit)
+		if(bestlim < 0 || curprofit > bestprofit)
 		{
 			bestprofit = curprofit;
 			bestramt = curramt;
+			bestlim = currlim;
 		}
+
+		currlim--;
 	}
 
 	*proramt += bestramt;
@@ -1460,7 +1467,7 @@ void CheckBlTile(DemTree* dm, Player* p, int ri, RDemNode* pt, int x, int z, int
 		{
 			int leastnext = prevprc;
 
-			//while there's another possible price, see if it will generate more total revenue
+			//while there's another possible price, see if it will generate more total profit
 
 			for(auto diter=rdems.begin(); diter!=rdems.end(); diter++)
 				if((diter->bid.marginpr < leastnext && diter->bid.marginpr > prevprc) || leastnext < 0)

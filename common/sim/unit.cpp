@@ -197,7 +197,7 @@ bool Unit::hidden() const
 	return false;
 }
 
-void AnimateUnit(Unit* u)
+void AnimUnit(Unit* u)
 {
 	UnitT* t = &g_utype[u->type];
 
@@ -216,14 +216,13 @@ void AnimateUnit(Unit* u)
 void UpdateAI(Unit* u)
 {
 	if(u->type == UNIT_LABOURER)
-		UpdateLabourer(u);
+		UpdLab(u);
 }
 
 void UpdUnits()
 {
 	for(int i = 0; i < UNITS; i++)
 	{
-
 		StartTimer(TIMER_UPDUONCHECK);
 
 		Unit* u = &g_unit[i];
@@ -243,7 +242,7 @@ void UpdUnits()
 		MoveUnit(u);
 		StopTimer(TIMER_MOVEUNIT);
 		StartTimer(TIMER_ANIMUNIT);
-		AnimateUnit(u);
+		AnimUnit(u);
 		StopTimer(TIMER_ANIMUNIT);
 	}
 }

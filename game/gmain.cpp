@@ -189,7 +189,7 @@ bool UpdNextFrame(int desiredFrameRate)
 	return false;*/
 }
 
-void UpdateGameState()
+void UpdSimState()
 {
 	g_simframe ++;
 
@@ -198,7 +198,7 @@ void UpdateGameState()
 	UpdUnits();
 	StopTimer(TIMER_UPDATEUNITS);
 	StartTimer(TIMER_UPDATEBUILDINGS);
-	UpdateBuildings();
+	UpdBls();
 	StopTimer(TIMER_UPDATEBUILDINGS);
 }
 
@@ -220,7 +220,7 @@ void Update()
 	else if(g_mode == APPMODE_RELOADING)
 		UpdateReloading();
 	else if(g_mode == APPMODE_PLAY)
-		UpdateGameState();
+		UpdSimState();
 	else if(g_mode == APPMODE_EDITOR)
 		UpdateEditor();
 }

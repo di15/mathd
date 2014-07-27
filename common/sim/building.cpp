@@ -257,7 +257,7 @@ void DrawBl()
 	}
 }
 
-void UpdateBuildings()
+void UpdBls()
 {
 #if 0
 	static float completion = 2.0f;

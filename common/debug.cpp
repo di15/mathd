@@ -167,7 +167,7 @@ void InitProfiles()
 	DefTimer(TIMER_UPDUNITAI, TIMER_UPDATEUNITS, "Upd Unit AI");
 	DefTimer(TIMER_MOVEUNIT, TIMER_UPDATEUNITS, "Move Unit");
 	DefTimer(TIMER_ANIMUNIT, TIMER_UPDATEUNITS, "Anim Unit");
-	DefTimer(TIMER_UPDATEBUILDINGS, TIMER_UPDATE, "UpdateBuildings();");
+	DefTimer(TIMER_UPDATEBUILDINGS, TIMER_UPDATE, "UpdBls();");
 	DefTimer(TIMER_DRAWBL, TIMER_DRAW, "DrawBuildings();");
 	DefTimer(TIMER_DRAWUNITS, TIMER_DRAW, "DrawUnits();");
 	DefTimer(TIMER_DRAWRIM, TIMER_DRAW, "DrawRim();");

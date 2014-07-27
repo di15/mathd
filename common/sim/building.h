@@ -57,7 +57,7 @@ extern Building g_building[BUILDINGS];
 int NewBuilding();
 void FreeBuildings();
 void DrawBl();
-void UpdateBuildings();
+void UpdBls();
 void StageCopyVA(VertexArray* to, VertexArray* from, float completion);
 void HeightCopyVA(VertexArray* to, VertexArray* from, float completion);
 void HugTerrain(VertexArray* va, Vec3f pos);
