@@ -19,9 +19,9 @@
 #include "../render/water.h"
 #include "../sim/player.h"
 #include "../sim/selection.h"
-#include "../ai/collidertile.h"
+#include "../path/collidertile.h"
 #include "../ai/pathjob.h"
-#include "../ai/pathnode.h"
+#include "../path/pathnode.h"
 #include "../debug.h"
 
 float ConvertHeight(unsigned char brightness)

@@ -342,7 +342,7 @@ void Model::delvbo()
 		m_va[i].delvbo();
 }
 
-bool PlayAnimation(float& frame, int first, int last, bool loop, float rate)
+bool PlayAni(float& frame, int first, int last, bool loop, float rate)
 {
 	if(frame < first || frame > last+1)
 	{
@@ -366,7 +366,7 @@ bool PlayAnimation(float& frame, int first, int last, bool loop, float rate)
 }
 
 //Play animation backwards
-bool PlayAnimationB(float& frame, int first, int last, bool loop, float rate)
+bool PlayAniB(float& frame, int first, int last, bool loop, float rate)
 {
 	if(frame < first-1 || frame > last)
 	{

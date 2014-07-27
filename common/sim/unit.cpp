@@ -11,6 +11,7 @@
 #include "labourer.h"
 #include "../debug.h"
 #include "../math/frustum.h"
+#include "building.h"
 
 Unit g_unit[UNITS];
 
@@ -75,7 +76,8 @@ int NewUnit()
 	return -1;
 }
 
-void StartingBelongings(Unit* u)
+// starting belongings for labourer
+void StartBel(Unit* u)
 {
 	Zero(u->belongings);
 	u->car = -1;
@@ -93,12 +95,15 @@ void StartingBelongings(Unit* u)
 	}
 }
 
-bool PlaceUnit(int type, Vec3i cmpos, int owner)
+bool PlaceUnit(int type, Vec2i cmpos, int owner, int *reti)
 {
 	int i = NewUnit();
 
 	if(i < 0)
 		return false;
+
+	if(reti)
+		*reti = i;
 
 #if 0
 	bool on;
@@ -150,17 +155,17 @@ bool PlaceUnit(int type, Vec3i cmpos, int owner)
 
 	u->on = true;
 	u->type = type;
-	u->cmpos = Vec2i(cmpos.x, cmpos.z);
-	u->drawpos = Vec3f(cmpos.x, cmpos.y, cmpos.z);
+	u->cmpos = cmpos;
+	u->drawpos = Vec3f(cmpos.x, g_hmap.accheight(cmpos.x, cmpos.y), cmpos.y);
 	u->owner = owner;
 	u->path.clear();
-	u->goal = Vec2i(cmpos.x, cmpos.z);
+	u->goal = cmpos;
 	u->target = -1;
 	u->target2 = -1;
 	u->targetu = false;
 	u->underorder = false;
 	u->fuelstation = -1;
-	StartingBelongings(u);
+	StartBel(u);
 	u->hp = t->starthp;
 	u->passive = false;
 	u->prevpos = u->cmpos;
@@ -178,6 +183,10 @@ bool PlaceUnit(int type, Vec3i cmpos, int owner)
 	u->pathdelay = 0;
 	u->lastpath = g_simframe;
 
+	u->cdtype = CONDUIT_NONE;
+	u->driver = -1;
+	u->framesleft = 0;
+
 	u->fillcollider();
 
 	return true;
@@ -194,6 +203,24 @@ void FreeUnits()
 
 bool Unit::hidden() const
 {
+#if 0
+	if(mode == NORMJOB)
+		return true;
+	if(mode == CONJOB)
+		return true;
+	if(mode == PIPEJOB)
+		return true;
+	if(mode == ROADJOB)
+		return true;
+	if(mode == POWLJOB)
+		return true;
+	if(mode == DRIVING)
+		return true;
+	if(mode == RESTING)
+		return true;
+	if(mode == SHOPPING)
+		return true;
+#endif
 	return false;
 }
 
@@ -209,7 +236,7 @@ void AnimUnit(Unit* u)
 			return;
 		}
 
-		PlayAnimation(u->frame[BODY_LOWER], 0, 29, true, 1.0f);
+		PlayAni(u->frame[BODY_LOWER], 0, 29, true, 1.0f);
 	}
 }
 
@@ -246,3 +273,89 @@ void UpdUnits()
 		StopTimer(TIMER_ANIMUNIT);
 	}
 }
+
+void ResetPath(Unit* u)
+{
+	u->path.clear();
+}
+
+void ResetGoal(Unit* u)
+{
+	u->goal = u->subgoal = u->cmpos;
+	ResetPath(u);
+}
+
+void ResetMode(Unit* u)
+{
+	//LastNum("resetmode 1");
+	if(u->type == UNIT_LABOURER)
+	{
+        //LastNum("resetmode 1a");
+		//if(u->mode == UMODE_BLJOB)
+		//	g_building[target].RemoveWorker(this);
+        
+		//if(hidden())
+		//	relocate();
+	}
+	else if(u->type == UNIT_TRUCK)
+	{
+#if 0
+		if(u->mode == UMODE_GOINGTOSUPPLIER
+           //|| mode == GOINGTOREFUEL
+           //|| mode == GOINGTODEMANDERB || mode == GOINGTODEMROAD || mode == GOINGTODEMPIPE || mode == GOINGTODEMPOWL
+           )
+		{
+			if(u->supplier >= 0)
+			{
+				Building* b = &g_building[u->supplier];
+				b->transporter[u->transportRes] = -1;
+			}
+		}
+		if((mode == GOINGTOSUPPLIER || mode == GOINGTODEMANDERB) && targtype == GOINGTODEMANDERB)
+		{
+			if(target >= 0)
+			{
+				CBuilding* b = &g_building[target];
+				b->transporter[transportRes] = -1;
+			}
+		}
+		else if((mode == GOINGTOSUPPLIER || mode == GOINGTODEMROAD) && targtype == GOINGTODEMROAD)
+		{
+			RoadAt(target, target2)->transporter[transportRes] = -1;
+		}
+		else if((mode == GOINGTOSUPPLIER || mode == GOINGTODEMPOWL) && targtype == GOINGTODEMPOWL)
+		{
+			PowlAt(target, target2)->transporter[transportRes] = -1;
+		}
+		else if((mode == GOINGTOSUPPLIER || mode == GOINGTODEMPIPE) && targtype == GOINGTODEMPIPE)
+		{
+			PipeAt(target, target2)->transporter[transportRes] = -1;
+		}
+#endif
+		u->targtype = TARG_NONE;
+        
+		if(u->driver >= 0)
+		{
+            //LastNum("resetmode 1b");
+			//g_unit[u->driver].Disembark();
+			u->driver = -1;
+		}
+	}
+    
+	//LastNum("resetmode 2");
+    
+	//transportAmt = 0;
+	u->target = u->target2 = -1;
+	u->supplier = -1;
+	u->mode = UMODE_NONE;
+	ResetGoal(u);
+    
+	//LastNum("resetmode 3");
+}
+
+void ResetTarget(Unit* u)
+{
+	u->target = -1;
+	ResetMode(u);
+}
+

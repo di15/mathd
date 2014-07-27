@@ -4,6 +4,6 @@
 class Unit;
 
 void MoveUnit(Unit* u);
-bool UnitCollides(Unit* u);
+bool UnitCollides(Unit* u, Vec2i cmpos, int utype);
 
 #endif

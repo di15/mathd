@@ -3,29 +3,164 @@
 #include "../econ/demand.h"
 #include "unittype.h"
 #include "player.h"
+#include "building.h"
+#include "../econ/utility.h"
+#include "../script/console.h"
 
 bool NeedFood(Unit* u)
 {
+	if(u->belongings[RES_RETFOOD] < STARTING_RETFOOD/2)
+		return true;
+
 	return false;
 }
 
 bool FindFood(Unit* u)
 {
-	return false;
+	Vec2i bcmpos;
+	int bestbi = -1;
+	int bestutil = -1;
+
+	for(int bi=0; bi<BUILDINGS; bi++)
+	{
+		Building* b = &g_building[bi];
+
+		if(!b->on)
+			continue;
+
+		if(!b->finished)
+			continue;
+
+		BuildingT* bt = &g_bltype[b->type];
+
+		if(bt->output[RES_RETFOOD] <= 0)
+			continue;
+
+		Player* py = &g_player[b->owner];
+
+		if(b->stocked[RES_RETFOOD] + py->global[RES_RETFOOD] <= 0)
+			continue;
+
+		if(b->prodprice[RES_RETFOOD] > u->belongings[RES_FUNDS])
+			continue;
+
+		if(u->home >= 0)
+		{
+			Building* hm = &g_building[u->home];
+			if(u->belongings[RES_FUNDS] <= hm->prodprice[RES_HOUSING])
+				return false;
+		}
+
+		bcmpos = b->tilepos * TILE_SIZE + Vec2i(TILE_SIZE,TILE_SIZE)/2;
+		//thisutil = Magnitude(pos - camera.Position()) * p->price[CONSUMERGOODS];
+		int cmdist = Magnitude(bcmpos - u->cmpos);
+		int thisutil = PhUtil(b->prodprice[RES_RETFOOD], cmdist);
+
+		if(bestutil > thisutil && bestbi >= 0)
+			continue;
+
+		bestbi = bi;
+		bestutil = thisutil;
+	}
+
+	if(bestbi < 0)
+		return false;
+
+	ResetGoal(u);
+	u->target = bestbi;
+	u->mode = UMODE_GOINGTOSHOP;
+	Building* b = &g_building[u->target];
+	u->goal = b->tilepos * TILE_SIZE + Vec2i(TILE_SIZE,TILE_SIZE)/2;
+
+	//Pathfind();
+	//float pathlen = pathlength();
+	//g_log<<"found food path length = "<<pathlen<<" ("<<(pathlen/TILE_SIZE)<<" tiles)"<<endl;
+	//g_log.flush();
+
+	return true;
 }
 
 bool NeedRest(Unit* u)
 {
+	if(u->belongings[RES_LABOUR] <= 0)
+		return true;
+
 	return false;
 }
 
 void GoHome(Unit* u)
 {
+	ResetGoal(u);
+	u->target = u->home;
+	u->mode = UMODE_GOINGTOREST;
+	Building* b = &g_building[u->target];
+	u->goal = b->tilepos * TILE_SIZE + Vec2i(TILE_SIZE,TILE_SIZE)/2;
+    
+	//Pathfind();
+	//float pathlen = pathlength();
+	//g_log<<"go home path length = "<<pathlen<<" ("<<(pathlen/TILE_SIZE)<<" tiles)"<<endl;
+	//g_log.flush();
 }
 
 bool FindRest(Unit* u)
 {
-	return false;
+	Vec2i bcmpos;
+	int bestbi = -1;
+	int bestutil = -1;
+
+	for(int bi=0; bi<BUILDINGS; bi++)
+	{
+		Building* b = &g_building[bi];
+
+		if(!b->on)
+			continue;
+
+		if(!b->finished)
+			continue;
+
+		BuildingT* bt = &g_bltype[b->type];
+
+		if(bt->output[RES_HOUSING] <= 0)
+			continue;
+
+		//if(b->stocked[RES_HOUSING] <= 0)
+		//	continue;
+
+		if(bt->output[RES_HOUSING] - b->inuse[RES_HOUSING] <= 0)
+			continue;
+
+		if(b->prodprice[RES_HOUSING] > u->belongings[RES_FUNDS])
+			continue;
+
+		bcmpos = b->tilepos * TILE_SIZE + Vec2i(TILE_SIZE,TILE_SIZE)/2;
+		//thisutil = Magnitude(pos - camera.Position()) * p->price[CONSUMERGOODS];
+		int cmdist = Magnitude(bcmpos - u->cmpos);
+		int thisutil = PhUtil(b->prodprice[RES_HOUSING], cmdist);
+
+		if(bestutil > thisutil && bestbi >= 0)
+			continue;
+
+		bestbi = bi;
+		bestutil = thisutil;
+	}
+
+	if(bestbi < 0)
+		return false;
+
+	ResetGoal(u);
+	u->target = bestbi;
+	u->mode = UMODE_GOINGTOREST;
+	Building* b = &g_building[u->target];
+	u->goal = b->tilepos * TILE_SIZE + Vec2i(TILE_SIZE,TILE_SIZE)/2;
+	u->home = u->target;
+	//g_building[target].addoccupier(this);
+
+	//Pathfind();
+	//float pathlen = pathlength();
+	//g_log<<"found food path length = "<<pathlen<<" ("<<(pathlen/TILE_SIZE)<<" tiles)"<<endl;
+	//g_log.flush();
+
+	return true;
 }
 
 bool FindJob(Unit* u)
@@ -34,7 +169,7 @@ bool FindJob(Unit* u)
 }
 
 // go to construction job
-void GoToCstJob(Unit* u)
+void GoCstJob(Unit* u)
 {
 }
 
@@ -44,7 +179,7 @@ void DoCstJob(Unit* u)
 }
 
 // go to building job
-void GoToBlJob(Unit* u)
+void GoBlJob(Unit* u)
 {
 }
 
@@ -54,7 +189,7 @@ void DoBlJob(Unit* u)
 }
 
 // go to conduit (construction) job
-void GoToCdJob(Unit* u)
+void GoCdJob(Unit* u)
 {
 }
 
@@ -73,9 +208,128 @@ void GoRest(Unit* u)
 {
 }
 
+// check shop availability
+bool CheckShopAvail(Unit* u)
+{
+	Building* b = &g_building[u->target];
+	Player* p = &g_player[b->owner];
+    
+	if(!b->on)
+		return false;
+    
+	if(!b->finished)
+		return false;
+    
+	if(b->stocked[RES_RETFOOD] + p->global[RES_RETFOOD] <= 0)
+		return false;
+    
+	if(b->prodprice[RES_RETFOOD] > u->belongings[RES_FUNDS])
+		return false;
+    
+	if(u->belongings[RES_RETFOOD] >= STARTING_RETFOOD*2)
+		return false;
+    
+	if(u->home >= 0)
+	{
+		Building* hm = &g_building[u->home];
+		if(u->belongings[RES_FUNDS] <= hm->prodprice[RES_HOUSING])
+			return false;
+	}
+    
+	return true;
+}
+
+// check if labourer has enough food to multiply
+void CheckMul(Unit* u)
+{
+	if(u->belongings[RES_RETFOOD] < STARTING_RETFOOD*2)
+		return;
+    
+#if 0
+	int i = NewUnit();
+	if(i < 0)
+		return;
+    
+	CUnit* u = &g_unit[i];
+	u->on = true;
+	u->type = LABOURER;
+	u->home = -1;
+    
+	CUnitType* t = &g_unitType[LABOURER];
+    
+	PlaceUAround(u, camera.Position().x-t->radius, camera.Position().z-t->radius, camera.Position().x+t->radius, camera.Position().z+t->radius, false);
+    
+	u->ResetLabourer();
+	u->fuel = MULTIPLY_FUEL/2.0f;
+	fuel -= MULTIPLY_FUEL/2.0f;
+#endif
+
+	Vec2i cmpos;
+
+	if(!PlaceUAbout(UNIT_LABOURER, u->cmpos, &cmpos))
+		return;
+
+	int ui = -1;
+
+	if(!PlaceUnit(UNIT_LABOURER, cmpos, -1, &ui))
+		return;
+
+	Unit* u2 = &g_unit[ui];
+	StartBel(u2);
+
+	u->belongings[RES_RETFOOD] -= STARTING_RETFOOD;
+
+	RichText gr(UString("Growth!"));
+	SubmitConsole(&gr);
+}
+
 // do shop
 void DoShop(Unit* u)
 {
+	if(!CheckShopAvail(u))
+	{
+		CheckMul(u);
+		ResetMode(u);
+		return;
+	}
+
+	//if(GetTickCount() - last < WORK_DELAY)
+	//	return;
+
+	if(u->framesleft > 0)
+	{
+		u->framesleft --;
+		return;
+	}
+
+	//last = GetTickCount();
+	framesleft = WORK_DELAY/1000.0f * FRAME_RATE;
+
+	CBuilding* b = &g_building[target];
+	CPlayer* p = &g_player[b->owner];
+
+	if(p->global[CONSUMERGOODS] > 0.0f)
+		p->global[CONSUMERGOODS] -= 1.0f;
+	else
+	{
+		b->stock[CONSUMERGOODS] -= 1.0f;
+		p->local[CONSUMERGOODS] -= 1.0f;
+	}
+
+	fuel += 1.0f;
+	p->global[CURRENC] += p->price[CONSUMERGOODS];
+	currency -= p->price[CONSUMERGOODS];
+	b->recenth.consumed[CONSUMERGOODS] += 1.0f;
+
+	//char msg[128];
+	//sprintf(msg, "shopping");
+	//LogTransx(b->owner, p->price[CONSUMERGOODS], msg);
+
+	//b->Emit(SMILEY);
+#ifdef LOCAL_TRANSX
+	if(b->owner == g_localP)
+#endif
+		NewTransx(b->pos, CURRENC, p->price[CONSUMERGOODS], CONSUMERGOODS, -1);
 }
 
 // do rest
@@ -198,11 +452,11 @@ void UpdLab(Unit* u)
 #define UMODE_ATDEMCD				20	//at demander conduit
 #endif
 
-	case UMODE_GOINGTOCSTJOB:		GoToCstJob(u);		break;
+	case UMODE_GOINGTOCSTJOB:		GoCstJob(u);		break;
 	case UMODE_CSTJOB:				DoCstJob(u);		break;
-	case UMODE_GOINGTOBLJOB:		GoToBlJob(u);		break;
+	case UMODE_GOINGTOBLJOB:		GoBlJob(u);		break;
 	case UMODE_BLJOB:				DoBlJob(u);			break;
-	case UMODE_GOINGTOCDJOB:		GoToCdJob(u);		break;
+	case UMODE_GOINGTOCDJOB:		GoCdJob(u);		break;
 	case UMODE_CDJOB:				DoCdJob(u);			break;
 	case UMODE_GOINGTOSHOP:			GoShop(u);			break;
 	case UMODE_GOINGTOREST:			GoRest(u);			break;

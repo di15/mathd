@@ -19,7 +19,7 @@
 #include "../sim/powl.h"
 #include "../sim/crpipe.h"
 #include "../math/plane3f.h"
-#include "../ai/collidertile.h"
+#include "../path/collidertile.h"
 #include "foliage.h"
 #include "../save/savemap.h"
 #include "../texture.h"

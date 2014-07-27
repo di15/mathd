@@ -1,4 +1,4 @@
-#include "../ai/collidertile.h"
+#include "../path/collidertile.h"
 #include "../math/vec2i.h"
 #include "../math/3dmath.h"
 #include "../sim/unit.h"
@@ -18,7 +18,7 @@
 #include "collision.h"
 #include "../math/vec2i.h"
 #include "../math/plane2i.h"
-#include "../ai/pathnode.h"
+#include "../path/pathnode.h"
 
 #define EPSILON_I		1
 

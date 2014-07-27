@@ -63,10 +63,12 @@ public:
 
 	bool threadwait;
 
-	std::list<Demand*> demands;
-
 	// used for debugging - don't save to file
 	bool collided;
+
+	unsigned char cdtype;	//conduit type for mode (going to construction)
+	int driver;
+	short framesleft;
 
 	Unit();
 	virtual ~Unit();
@@ -103,9 +105,19 @@ extern Unit g_unit[UNITS];
 #define UMODE_GOINGTODEMCD			19	//going to demander conduit
 #define UMODE_ATDEMCD				20	//at demander conduit
 
+#define TARG_NONE		0
+#define TARG_BL			1	//building
+#define TARG_U			2	//unit
+#define TARG_CD			3	//conduit
+
 void DrawUnits();
-bool PlaceUnit(int type, Vec3i cmpos, int owner);
+bool PlaceUnit(int type, Vec2i cmpos, int owner, int *reti);
 void FreeUnits();
 void UpdUnits();
+void ResetPath(Unit* u);
+void ResetGoal(Unit* u);
+void ResetMode(Unit* u);
+void ResetTarget(Unit* u);
+void StartBel(Unit* u);
 
 #endif

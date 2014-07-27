@@ -58,8 +58,8 @@ bool Load1Model();
 void DrawVA(VertexArray* va, Vec3f pos);
 void BeginVertexArrays();
 void EndVertexArrays();
-bool PlayAnimation(float& frame, int first, int last, bool loop, float rate);
-bool PlayAnimationB(float& frame, int first, int last, bool loop, float rate);	//Play animation backwards
+bool PlayAni(float& frame, int first, int last, bool loop, float rate);
+bool PlayAniB(float& frame, int first, int last, bool loop, float rate);	//Play animation backwards
 void FreeModels();
 int LoadModel(const char* relative, Vec3f scale, Vec3f translate, bool dontqueue, bool blendnorm);
 

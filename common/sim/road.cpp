@@ -13,8 +13,8 @@
 #include "../math/polygon.h"
 #include "../../game/gui/ggui.h"
 #include "../utils.h"
-#include "../ai/pathnode.h"
-#include "../ai/collidertile.h"
+#include "../path/pathnode.h"
+#include "../path/collidertile.h"
 
 char RoadTile::condtype()
 {

@@ -25,6 +25,7 @@
 #include "../gui/widget.h"
 #include "../gui/widgets/spez/constructionview.h"
 #include "../render/foliage.h"
+#include "unitmove.h"
 
 void UpdateSBuild()
 {
@@ -493,7 +494,7 @@ bool PlaceBuilding(int type, Vec2i pos, bool finished, int owner, int* bid)
 	return true;
 }
 
-bool PlaceAbout(int btype, Vec2i tabout, Vec2i* tpos)
+bool PlaceBAbout(int btype, Vec2i tabout, Vec2i* tpos)
 {
 	//g_log<<"PlaceBAround "<<player<<std::endl;
 	//g_log.flush();
@@ -679,8 +680,168 @@ bool PlaceAbout(int btype, Vec2i tabout, Vec2i* tpos)
 			//Chat("placing");
 			//g_log<<"placeb t="<<btype<<" "<<vTile.x<<","<<vTile.y<<","<<vTile.z<<"("<<(vTile.x/16)<<","<<(vTile.y/16)<<","<<(vTile.z/16)<<")"<<std::endl;
 			//g_log.flush();
-			*tpos = canplace[ rand()%canplace.size() ];
+			//*tpos = canplace[ rand()%canplace.size() ];
+            *tpos = canplace[ 0 ];
+
+			return true;
+		}
+        
+		//char msg[128];
+		//sprintf(msg, "shell %d", shell);
+		//Chat(msg);
+        
+		shell++;
+	}while(shell < g_hmap.m_widthx || shell < g_hmap.m_widthz);
+    
+	return false;
+}
+
+bool PlaceUAbout(int utype, Vec2i cmabout, Vec2i* cmpos)
+{
+	//g_log<<"PlaceBAround "<<player<<std::endl;
+	//g_log.flush();
+    
+	UnitT* t = &g_utype[utype];
+	int shell = 1;
+    
+	//char msg[128];
+	//sprintf(msg, "place b a %f,%f,%f", vAround.x/16, vAround.y/16, vAround.z/16);
+	//Chat(msg);
+    
+	do
+	{
+		std::vector<Vec2i> canplace;
+		Vec2i cmtry;
+		int tilex, tilez;
+		int left, right, top, bottom;
+		left = cmabout.x - shell;
+		top = cmabout.y - shell;
+		right = cmabout.x + shell;
+		bottom = cmabout.y + shell;
+
+		canplace.reserve( (right-left)*2 + (bottom-top)*2 - 4 );
+        
+		tilez = top;
+		for(tilex=left; tilex<right; tilex++)
+		{
+			cmtry = Vec2i(tilex, tilez);
+
+			int cmstartx = cmtry.x - t->size.x/2;
+			int cmendx = cmstartx + t->size.x - 1;
+			int cmstartz = cmtry.y - t->size.z/2;
+			int cmendz = cmstartz + t->size.z - 1;
             
+			if(cmstartx < 0)
+				continue;
+			else if(cmendx >= g_hmap.m_widthx * TILE_SIZE)
+				continue;
+			if(cmstartz < 0)
+				continue;
+			else if(cmendz >= g_hmap.m_widthz * TILE_SIZE)
+				continue;
+            
+			//char msg[128];
+			//sprintf(msg, "check %d,%d,%d,%d", startx, startz, endx, endz);
+			//Chat(msg);
+            
+			//if(!CheckCanPlace(btype, cmtry))
+			if(UnitCollides(NULL, cmtry, utype))
+				continue;
+			canplace.push_back(cmtry);
+		}
+        
+		tilex = right;
+		for(tilez=top; tilez<bottom; tilez++)
+		{
+			cmtry = Vec2i(tilex, tilez);
+
+			int cmstartx = cmtry.x - t->size.x/2;
+			int cmendx = cmstartx + t->size.x - 1;
+			int cmstartz = cmtry.y - t->size.z/2;
+			int cmendz = cmstartz + t->size.z - 1;
+			
+			if(cmstartx < 0)
+				continue;
+			else if(cmendx >= g_hmap.m_widthx * TILE_SIZE)
+				continue;
+			if(cmstartz < 0)
+				continue;
+			else if(cmendz >= g_hmap.m_widthz * TILE_SIZE)
+				continue;
+            
+			//char msg[128];
+			//sprintf(msg, "check %d,%d,%d,%d", startx, startz, endx, endz);
+			//Chat(msg);
+            
+			if(UnitCollides(NULL, cmtry, utype))
+				continue;
+			canplace.push_back(cmtry);
+		}
+        
+		tilez = bottom;
+		for(tilex=right; tilex>left; tilex--)
+		{
+			cmtry = Vec2i(tilex, tilez);
+
+			int cmstartx = cmtry.x - t->size.x/2;
+			int cmendx = cmstartx + t->size.x - 1;
+			int cmstartz = cmtry.y - t->size.z/2;
+			int cmendz = cmstartz + t->size.z - 1;
+			
+			if(cmstartx < 0)
+				continue;
+			else if(cmendx >= g_hmap.m_widthx * TILE_SIZE)
+				continue;
+			if(cmstartz < 0)
+				continue;
+			else if(cmendz >= g_hmap.m_widthz * TILE_SIZE)
+				continue;
+            
+			//char msg[128];
+			//sprintf(msg, "check %d,%d,%d,%d", startx, startz, endx, endz);
+			//Chat(msg);
+            
+			if(UnitCollides(NULL, cmtry, utype))
+				continue;
+			canplace.push_back(cmtry);
+		}
+        
+		tilex = left;
+		for(tilez=bottom; tilez>top; tilez--)
+		{
+			cmtry = Vec2i(tilex, tilez);
+
+			int cmstartx = cmtry.x - t->size.x/2;
+			int cmendx = cmstartx + t->size.x - 1;
+			int cmstartz = cmtry.y - t->size.z/2;
+			int cmendz = cmstartz + t->size.z - 1;
+			
+			if(cmstartx < 0)
+				continue;
+			else if(cmendx >= g_hmap.m_widthx * TILE_SIZE)
+				continue;
+			if(cmstartz < 0)
+				continue;
+			else if(cmendz >= g_hmap.m_widthz * TILE_SIZE)
+				continue;
+            
+			//char msg[128];
+			//sprintf(msg, "check %d,%d,%d,%d", startx, startz, endx, endz);
+			//Chat(msg);
+            
+			if(UnitCollides(NULL, cmtry, utype))
+				continue;
+			canplace.push_back(cmtry);
+		}
+        
+		if(canplace.size() > 0)
+		{
+			//Chat("placing");
+			//g_log<<"placeb t="<<btype<<" "<<vTile.x<<","<<vTile.y<<","<<vTile.z<<"("<<(vTile.x/16)<<","<<(vTile.y/16)<<","<<(vTile.z/16)<<")"<<std::endl;
+			//g_log.flush();
+			//*tpos = canplace[ rand()%canplace.size() ];
+            *cmpos = canplace[ 0 ];
+
 			return true;
 		}
         

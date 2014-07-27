@@ -8,7 +8,7 @@
 #include "../math/vec3f.h"
 #include "../utils.h"
 #include "../debug.h"
-#include "../ai/pathdebug.h"
+#include "../path/pathdebug.h"
 #include "shadow.h"
 
 unsigned int g_front;

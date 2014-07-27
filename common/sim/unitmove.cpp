@@ -11,25 +11,25 @@
 #include "sim.h"
 #include "../phys/trace.h"
 #include "../phys/collision.h"
-#include "../ai/collidertile.h"
-#include "../ai/pathdebug.h"
+#include "../path/collidertile.h"
+#include "../path/pathdebug.h"
 #include "../sim/buildingtype.h"
 #include "../sim/building.h"
-#include "../ai/jpspath.h"
-#include "../ai/jpspartpath.h"
-#include "../ai/pathnode.h"
-#include "../ai/partialpath.h"
+#include "../path/jpspath.h"
+#include "../path/jpspartpath.h"
+#include "../path/pathnode.h"
+#include "../path/partialpath.h"
 
-bool UnitCollides(Unit* u)
+bool UnitCollides(Unit* u, Vec2i cmpos, int utype)
 {
-	UnitT* t = &g_utype[u->type];
-	int minx = u->cmpos.x - t->size.x/2;
-	int minz = u->cmpos.y - t->size.z/2;
+	UnitT* t = &g_utype[utype];
+	int minx = cmpos.x - t->size.x/2;
+	int minz = cmpos.y - t->size.z/2;
 	int maxx = minx + t->size.x - 1;
 	int maxz = minz + t->size.z - 1;
 
-	int cx = u->cmpos.x / PATHNODE_SIZE;
-	int cz = u->cmpos.y / PATHNODE_SIZE;
+	int cx = cmpos.x / PATHNODE_SIZE;
+	int cz = cmpos.y / PATHNODE_SIZE;
 
 	ColliderTile* cell = ColliderTileAt(cx, cz);
 
@@ -46,8 +46,8 @@ bool UnitCollides(Unit* u)
 		g_log<<"cm pos = "<<u->cmpos.x<<","<<u->cmpos.y<<std::endl;
 		g_log<<"cm rect = ("<<minx<<","<<minz<<")->("<<maxx<<","<<maxz<<")"<<std::endl;
 
-		int cposx = u->cmpos.x / PATHNODE_SIZE;
-		int cposz = u->cmpos.y / PATHNODE_SIZE;
+		int cposx = cmpos.x / PATHNODE_SIZE;
+		int cposz = cmpos.y / PATHNODE_SIZE;
 		int cminx = minx / PATHNODE_SIZE;
 		int cminz = minz / PATHNODE_SIZE;
 		int cmaxx = maxx / PATHNODE_SIZE;
