@@ -343,34 +343,112 @@ void DoBlJob(Unit* u)
 	py->global[RES_FUNDS] -= b->opwage;
 	u->belongings[RES_FUNDS] += b->opwage;
     
+	if(!b->tryprod())
+	{
 #if 0
 	//b->Emit(HAMMER);
 #ifdef LOCAL_TRANSX
-	if(b->owner == g_localP)
+		if(b->owner == g_localP)
 #endif
-		NewTransx(b->pos, LABOUR, 1, CURRENC, -p->wage[b->type]);
+			NewTransx(b->pos, LABOUR, 1, CURRENC, -p->wage[b->type]);
 #endif
-
-	b->tryprod();
+	}
 
 	//char msg[128];
 	//sprintf(msg, "job %s", g_buildingType[b->type].name);
 	//LogTransx(b->owner, -p->wage[b->type], msg);
 }
 
+// check conduit construction job availability
+bool CanCstCd(Unit* u)
+{   
+	if(u->belongings[RES_LABOUR] <= 0)
+		return false;
+ 
+	ConduitTile* ctile = GetCo(u->cdtype, u->target, u->target2, false);
+	Player* py = &g_player[ctile->owner];
+
+	if(ctile->finished)
+		return false;
+    
+	ConduitType* ct = &g_cotype[u->cdtype];
+
+	if(ctile->conmat[RES_LABOUR] >= ct->conmat[RES_LABOUR])
+		return false;
+    
+	if(py->global[RES_FUNDS] < ctile->conwage)
+	{
+		Bankrupt(ctile->owner, "conduit construction");
+		return false;
+	}
+    
+	return true;
+}
+
 // go to conduit (construction) job
 void GoCdJob(Unit* u)
 {
+	if(!CanCstCd(u))
+	{
+		ResetMode(u);
+		return;
+	}
+
+	if(CheckIfArrived())
+		OnArrived();
 }
 
 // do conduit (construction) job
 void DoCdJob(Unit* u)
 {
+	if(!CanCstCd(u))
+	{
+		ResetMode(u);
+		return;
+	}
+    
+	//if(GetTickCount() - last < WORK_DELAY)
+	//	return;
+    
+	if(u->framesleft > 0)
+	{
+		u->framesleft --;
+		return;
+	}
+    
+	//last = GetTickCount();
+	u->framesleft = WORK_DELAY;
+	ConduitTile* ctile = GetCo(u->cdtype, u->target, u->target2, false);
+	Player* py = &g_player[ctile->owner];
+    
+	ctile->conmat[RES_LABOUR] += 1;
+	u->belongings[RES_LABOUR] -= 1;
+    
+	py->global[RES_FUNDS] -= ctile->conwage;
+	u->belongings[RES_FUNDS] += ctile->conwage;
+    
+#if 0
+	//r->Emit(HAMMER);
+#ifdef LOCAL_TRANSX
+	if(r->owner == g_localP)
+#endif
+		NewTransx(RoadPosition(target, target2), CURRENC, -p->conwage);
+    //NewTransx(RoadPosition(target, target2), LABOUR, 1, CURRENC, -p->conwage);
+#endif
+
+	ctile->checkconstruction();
+    
+	//LogTransx(r->owner, -p->conwage, "road job");
 }
 
 // go shop
 void GoShop(Unit* u)
 {
+	if(!CanShop(u))
+	{
+		ResetMode(u);
+		return;
+	}
 }
 
 // check apartment availabillity
@@ -607,11 +685,6 @@ void DoRest(Unit* u)
 	u->belongings[RES_LABOUR] += 1;
 }
 
-// go to transport for drive job
-void GoToTra(Unit* u)
-{
-}
-
 // check transport vehicle availability
 bool CanDrTra(Unit* op)
 {
@@ -641,6 +714,19 @@ bool CanDrTra(Unit* op)
 	}
 
 	return true;
+}
+
+// go to transport for drive job
+void GoToTra(Unit* u)
+{
+	if(!CanDrTra(u))
+	{
+		ResetMode(u);
+		return;
+	}
+    
+	if(CheckIfArrived())
+		OnArrived();
 }
 
 //driver labourer to disembark driven transport vehicle

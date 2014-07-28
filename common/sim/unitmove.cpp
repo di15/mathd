@@ -334,3 +334,193 @@ void MoveUnit(Unit* u)
 	u->drawpos.z = u->cmpos.y;
 	u->drawpos.y = g_hmap.accheight(u->cmpos.x, u->cmpos.y);
 }
+
+bool CUnit::CheckIfArrived()
+{
+	CBuilding* b;
+	CBuildingType* bt;
+	float hwx, hwz;
+	Vec3f p;
+	float r = g_unitType[type].radius;
+	CUnit* u;
+	CUnitType* ut;
+	float r2;
+    
+#ifdef PATH_DEBUG
+	int uID = UnitID(this);
+    
+	if(uID == 5)
+	{
+		g_log<<"7 checkifarrived"<<endl;
+	}
+#endif
+    
+	switch(mode)
+	{
+        case GOINGTONORMJOB:
+        case GOINGTOCONJOB:
+        case GOINGTOSHOP:
+        case GOINGTOREST:
+        case GOINGTODEMANDERB:
+            b = &g_building[target];
+            bt = &g_buildingType[b->type];
+            p = b->pos;
+            hwx = bt->widthX*TILE_SIZE/2;
+            hwz = bt->widthZ*TILE_SIZE/2;
+            if(fabs(p.x-camera.Position().x) <= hwx+r && fabs(p.z-camera.Position().z) <= hwz+r)
+                return true;
+            break;
+        case GOINGTOROADJOB:
+        case GOINGTODEMROAD:
+            r2 = TILE_SIZE;
+            p = RoadPosition(target, target2);
+            if(fabs(p.x-camera.Position().x) <= r2+r && fabs(p.z-camera.Position().z) <= r2+r)
+                return true;
+            break;
+        case GOINGTOPIPEJOB:
+        case GOINGTODEMPIPE:
+            r2 = TILE_SIZE/2;
+            p = PipelinePhysPos(target, target2);
+            if(fabs(p.x-camera.Position().x) <= r2+r && fabs(p.z-camera.Position().z) <= r2+r)
+                return true;
+            break;
+        case GOINGTOPOWLJOB:
+        case GOINGTODEMPOWL:
+            r2 = TILE_SIZE/2;
+            p = PowerlinePosition(target, target2);
+            if(fabs(p.x-camera.Position().x) <= r2+r && fabs(p.z-camera.Position().z) <= r2+r)
+                return true;
+#ifdef PATH_DEBUG
+            if(uID == 5)
+            {
+                g_log<<"7 checkifarrived dx,dz: "<<(fabs(p.x-camera.Position().x)-r2-r)<<","<<(fabs(p.z-camera.Position().z)-r2-r)<<endl;
+            }
+#endif
+            break;
+        case GOINGTOSUPPLIER:
+            b = &g_building[supplier];
+            bt = &g_buildingType[b->type];
+            p = b->pos;
+            hwx = bt->widthX*TILE_SIZE/2;
+            hwz = bt->widthZ*TILE_SIZE/2;
+            if(fabs(p.x-camera.Position().x) <= hwx+r && fabs(p.z-camera.Position().z) <= hwz+r)
+                return true;
+            break;
+        case GOINGTOREFUEL:
+            b = &g_building[fuelStation];
+            bt = &g_buildingType[b->type];
+            p = b->pos;
+            hwx = bt->widthX*TILE_SIZE/2;
+            hwz = bt->widthZ*TILE_SIZE/2;
+            if(fabs(p.x-camera.Position().x) <= hwx+r && fabs(p.z-camera.Position().z) <= hwz+r)
+                return true;
+            break;/*
+                   case GOINGTOROADJOB:
+                   p = RoadPosition(target, target2);
+                   hwx = TILE_SIZE/2;
+                   hwz = TILE_SIZE/2;
+                   if(fabs(p.x-camera.Position().x) < hwx+r && fabs(p.z-camera.Position().z) < hwz+r)
+                   return true;
+                   break;
+                   case GOINGTOPOWLJOB:
+                   p = PowerlinePosition(target, target2);
+                   hwx = TILE_SIZE/2;
+                   hwz = TILE_SIZE/2;
+                   if(fabs(p.x-camera.Position().x) < hwx+r && fabs(p.z-camera.Position().z) < hwz+r)
+                   return true;
+                   break;
+                   case GOINGTOPIPEJOB:
+                   p = PipelinePhysPos(target, target2);
+                   hwx = TILE_SIZE/2;
+                   hwz = TILE_SIZE/2;
+                   if(fabs(p.x-camera.Position().x) < hwx+r && fabs(p.z-camera.Position().z) < hwz+r)
+                   return true;
+                   break;*/
+        case GOINGTOTRUCK:
+            u = &g_unit[target];
+            ut = &g_unitType[u->type];
+            p = u->camera.Position();
+            r2 = ut->radius;
+            if(fabs(p.x-camera.Position().x) <= r2+r && fabs(p.z-camera.Position().z) <= r2+r)
+            {
+#ifdef PATH_DEBUG
+                if(uID == 5)
+                    g_log<<"ARRIVED"<<endl;
+#endif
+                return true;
+            }
+#ifdef PATH_DEBUG
+            if(uID == 5)
+            {
+                g_log<<"7 checkifarrived truck dx,dz: "<<(fabs(p.x-camera.Position().x)-r2-r)<<","<<(fabs(p.z-camera.Position().z)-r2-r)<<endl;
+            }
+#endif
+            break;
+        default: break;
+	};
+    
+	return false;
+}
+
+void CUnit::OnArrived()
+{
+	switch(mode)
+	{
+        case GOINGTONORMJOB:		mode = NORMJOB;		freecollidercells();	ResetGoal();	g_building[target].addoccupier(this);		break;
+        case GOINGTOCONJOB:			mode = CONJOB;		freecollidercells();	ResetGoal();	break;
+        case GOINGTOROADJOB:		mode = ROADJOB;		freecollidercells();	ResetGoal();	break;
+        case GOINGTOPOWLJOB:		mode = POWLJOB;		freecollidercells();	ResetGoal();	break;
+        case GOINGTOPIPEJOB:		mode = PIPEJOB;		freecollidercells();	ResetGoal();	break;
+        case GOINGTOSHOP:			mode = SHOPPING;	freecollidercells();	ResetGoal();	break;
+        case GOINGTOREST:			mode = RESTING;		freecollidercells();	ResetGoal();	break;
+        case GOINGTOTRUCK:			ArrivedAtTruck();	freecollidercells();	ResetGoal();	break;
+        case GOINGTODEMANDERB:
+            if(driver >= 0)
+                g_unit[driver].Disembark();
+            driver = -1;
+            mode = ATDEMANDERB;
+            ResetGoal();
+            break;
+        case GOINGTODEMROAD:
+            if(driver >= 0)
+                g_unit[driver].Disembark();
+            driver = -1;
+            mode = ATDEMROAD;
+            ResetGoal();
+            break;
+        case GOINGTODEMPOWL:
+            if(driver >= 0)
+                g_unit[driver].Disembark();
+            driver = -1;
+            mode = ATDEMPOWL;
+            ResetGoal();
+            break;
+        case GOINGTODEMPIPE:
+            if(driver >= 0)
+                g_unit[driver].Disembark();
+            driver = -1;
+            mode = ATDEMPIPE;
+            ResetGoal();
+            break;
+        case GOINGTOSUPPLIER:
+            if(driver >= 0)
+                g_unit[driver].Disembark();
+            driver = -1;
+            mode = ATSUPPLIER;
+            ResetGoal();
+            break;
+        case GOINGTOREFUEL:
+            if(driver >= 0)
+                g_unit[driver].Disembark();
+            driver = -1;
+            mode = REFUELING;
+            ResetGoal();
+            break;
+        default: break;
+	};
+    
+	//if(type == TRUCK && UnitSelected(this))
+	//	RedoLeftPanel();
+    
+	RecheckSelection();
+}
