@@ -16,7 +16,7 @@ bool FindJob(Unit* u)
 	if(u->frameslookjobago < LOOKJOB_DELAY_MAX)
 		return false;
 
-	bool pathed = false;
+	//bool pathed = false;
 
 	int bestjobtype = UMODE_NONE;
 	int besttarget = -1;
@@ -155,8 +155,8 @@ bool FindJob(Unit* u)
 
 		BuildingT* bt = &g_bltype[b->type];
 
-		if(b->worker.size() > 0)
-			continue;
+		//if(b->worker.size() > 0)
+		//	continue;
 
 		//if(b->stock[LABOUR] >= t->input[LABOUR])
 		//	continue;

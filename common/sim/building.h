@@ -53,6 +53,8 @@ public:
 	bool excin(int rtype);	//excess input resource right now?
 	bool metout();	//met production target for now?
 	int stillreq(int rtype);	//how much of an input is still required to meet production target
+	bool hasworker(int ui);
+	bool tryprod();
 
 	void destroy();
 	void fillcollider();

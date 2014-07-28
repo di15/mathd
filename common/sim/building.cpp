@@ -114,6 +114,120 @@ bool Building::metout()
 	return false;
 }
 
+bool Building::hasworker(int ui)
+{
+	for(auto witer=worker.begin(); witer!=worker.end(); witer++)
+		if(*witer == ui)
+			return true;
+
+	return false;
+}
+
+//try to produce if a minimum bundle of resources is had
+bool Building::tryprod()
+{
+	//TO DO: produce, update cymet
+
+	int minr = -1;
+	int minamt = -1;
+
+	BuildingT* bt = &g_bltype[type];
+
+	for(int ri=0; ri<RESOURCES; ri++)
+	{
+		if(bt->input[ri] <= 0)
+			continue;
+
+		if(minr >= 0 && bt->input[ri] >= minamt)
+			continue;
+
+		minr = ri;
+		minamt = bt->input[ri];
+	}
+
+	if(minr < 0)
+		return true;
+
+	int total[RESOURCES];
+	Zero(total);
+	Player* py = &g_player[owner];
+
+	for(int ri=0; ri<RESOURCES; ri++)
+	{
+		Resource* r = &g_resource[ri];
+
+		total[ri] += stocked[ri];
+
+		if(r->physical)
+			total[ri] += py->global[ri];
+	}
+
+	for(auto csiter=capsup.begin(); csiter!=capsup.end(); csiter++)
+	{
+		CapSup* cs = &*csiter;
+		total[cs->rtype] += cs->amt;
+	}
+
+	int minbund[RESOURCES];
+	Zero(minbund);
+	
+	int minlevel = total[minr] * RATIO_DENOM / bt->input[minr];
+
+	for(int ri=0; ri<RESOURCES; ri++)
+	{
+		minbund[ri] = bt->input[ri] * minlevel / RATIO_DENOM;
+
+		if(minbund[ri] < total[ri])
+			return false;
+	}
+
+	//enough to produce, go ahead
+
+	cymet += minlevel;
+
+	//create output resources
+	for(int ri=0; ri<RESOURCES; ri++)
+	{
+		Resource* r = &g_resource[ri];
+
+		if(r->capacity)
+		{
+			//TO DO: check
+			continue;
+		}
+
+		stocked[ri] += bt->output[ri] * minlevel / RATIO_DENOM;
+
+		//TO DO: capacity, what if not enough supplied
+	}
+
+	//subtract used raw inputs
+	for(int ri=0; ri<RESOURCES; ri++)
+	{
+		Resource* r = &g_resource[ri];
+
+		int take = minbund[ri];
+
+		if(r->physical)
+		{
+			int takeg = imin(take, py->global[ri]);
+			py->global[ri] -= takeg;
+			take -= takeg;
+		}
+
+		int takel = imin(take, stocked[ri]);
+		py->local[ri] -= takel;
+		stocked[ri] -= takel;
+		take -= takel;
+	}
+
+	//TO DO: capacity resources like electricity have to be handled completely differently
+	//amount input depends on required output, depends on duration of cycle, must be upward limited by max gen capacity of that res for that bl type
+	//so lower bound of cycle at 60 sec, and upper bound? for those bl's that output capacity? or just disallow change cycle delay for those types of bl's?
+
+	return true;
+}
+
 void FreeBls()
 {
 	for(int i=0; i<BUILDINGS; i++)

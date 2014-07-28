@@ -165,24 +165,197 @@ bool FindRest(Unit* u)
 	return true;
 }
 
+// check building construction availability
+bool CanCstBl(Unit* u)
+{   
+	if(u->belongings[RES_LABOUR] <= 0)
+		return false;
+
+	Building* b = &g_building[u->target];
+	BuildingT* bt = &g_bltype[b->type];
+	Player* py = &g_player[b->owner];
+
+	if(!b->on)
+		return false;
+
+	if(b->finished)
+		return false;
+
+	if(b->conmat[RES_LABOUR] >= bt->conmat[RES_LABOUR])
+		return false;
+
+	if(py->global[RES_FUNDS] < b->conwage)
+	{
+		char reason[32];
+		sprintf(reason, "%s construction", bt->name);
+		Bankrupt(b->owner, reason);
+		return false;
+	}
+
+	return true;
+}
+
 // go to construction job
 void GoCstJob(Unit* u)
 {
+	if(!CanCstBl(u))
+	{
+		ResetMode(u);
+		return;
+	}
 }
 
 // do construction job
 void DoCstJob(Unit* u)
 {
+	if(!CanCstBl(u))
+	{
+		ResetMode(u);
+		return;
+	}
+
+	//if(GetTickCount() - last < WORK_DELAY)
+	//	return;
+
+	if(u->framesleft > 0)
+	{
+		u->framesleft --;
+		return;
+	}
+
+	//last = GetTickCount();
+	u->framesleft = WORK_DELAY;
+
+	Building* b = &g_building[u->target];
+	Player* py = &g_player[b->owner];
+
+	b->conmat[RES_LABOUR] += 1;
+	u->belongings[RES_LABOUR] -= 1;
+
+	py->global[RES_FUNDS] -= b->conwage;
+	u->belongings[RES_FUNDS] += b->conwage;
+
+#if 0
+	//b->Emit(HAMMER);
+#ifdef LOCAL_TRANSX
+	if(b->owner == g_localP)
+#endif
+		NewTransx(b->pos, LABOUR, 1, CURRENC, -p->conwage);
+#endif
+
+	b->checkconstruction();
+
+	//char msg[128];
+	//sprintf(msg, "construction %s", g_buildingType[b->type].name);
+	//LogTransx(b->owner, -p->conwage, msg);
+}
+
+// check target building's job availability
+bool CanBlJob(Unit* u)
+{
+	//CBuildingType* t = &g_buildingType[b->type];
+
+	if(u->belongings[RES_LABOUR] <= 0)
+		return false;
+	
+	Building* b = &g_building[u->target];
+
+	if(!b->on)
+		return false;
+
+	if(!b->finished)
+		return false;
+
+	//LastNum("checknorm1");
+
+	//if(b->worker.size() > 0)
+	//	continue;
+
+	//if(b->stock[LABOUR] >= t->input[LABOUR])
+	//	continue;
+
+	if(b->metout())
+		return false;
+
+	if(b->excin(RES_LABOUR))
+		return false;
+
+	//LastNum("checknorm3");
+
+	//if(b->occupier.size() > 0 && !b->hasworker(u - g_unit))
+	//	return false;
+
+	Player* py = &g_player[b->owner];
+
+	if(py->global[RES_FUNDS] < b->opwage)
+	{
+		char reason[64];
+		sprintf(reason, "%s expenses", g_bltype[b->type].name);
+		Bankrupt(b->owner, reason);
+		return false;
+	}
+
+	return true;
 }
 
 // go to building job
 void GoBlJob(Unit* u)
 {
+	//LastNum("gotonormjob1");
+	if(!CanBlJob(u))
+	{
+		//LastNum("gotonormjob2!");
+		ResetMode(u);
+		//LastNum("gotonormjob3!");
+		return;
+	}
 }
 
 // do building job
 void DoBlJob(Unit* u)
 {
+	//LastNum("gotonormjob1");
+	if(!CanBlJob(u))
+	{
+		//LastNum("gotonormjob2!");
+		ResetMode(u);
+		//LastNum("gotonormjob3!");
+		return;
+	}
+    
+	//if(GetTickCount() - last < WORK_DELAY)
+	//	return;
+    
+	if(u->framesleft > 0)
+	{
+		u->framesleft --;
+		return;
+	}
+    
+	//last = GetTickCount();
+	u->framesleft = WORK_DELAY;
+	Building* b = &g_building[u->target];
+	Player* py = &g_player[b->owner];
+    
+	b->stocked[RES_LABOUR] += 1;
+	u->belongings[RES_LABOUR] -= 1;
+    
+	py->global[RES_FUNDS] -= b->opwage;
+	u->belongings[RES_FUNDS] += b->opwage;
+    
+#if 0
+	//b->Emit(HAMMER);
+#ifdef LOCAL_TRANSX
+	if(b->owner == g_localP)
+#endif
+		NewTransx(b->pos, LABOUR, 1, CURRENC, -p->wage[b->type]);
+#endif
+
+	b->tryprod();
+
+	//char msg[128];
+	//sprintf(msg, "job %s", g_buildingType[b->type].name);
+	//LogTransx(b->owner, -p->wage[b->type], msg);
 }
 
 // go to conduit (construction) job
@@ -205,32 +378,32 @@ bool CanRest(Unit* u, bool* eviction)
 {
 	if(u->home < 0)
 		return false;
-    
+
 	Building* b = &g_building[u->target];
 	Player* p = &g_player[b->owner];
 	*eviction = false;
-    
+
 	if(!b->on)
 		return false;
-    
+
 	if(!b->finished)
 		return false;
-    
+
 	//if(b->stock[HOUSING] + p->global[HOUSING] <= 0.0f)
 	//	return false;
-    
+
 	if(b->prodprice[RES_HOUSING] > u->belongings[RES_FUNDS])
 	{
-        //char msg[128];
-        //sprintf(msg, "eviction %f < %f", currency, p->price[HOUSING]);
-        //LogTransx(b->owner, 0.0f, msg);
+		//char msg[128];
+		//sprintf(msg, "eviction %f < %f", currency, p->price[HOUSING]);
+		//LogTransx(b->owner, 0.0f, msg);
 		*eviction = true;
 		return false;
 	}
-    
+
 	if(u->belongings[RES_LABOUR] >= STARTING_LABOUR)
 		return false;
-    
+
 	return true;
 }
 
@@ -238,9 +411,9 @@ void Evict(Unit* u)
 {
 	if(u->home < 0)
 		return;
-    
+
 	Building* b = &g_building[u->home];
-    
+
 	int ui = u - g_unit;
 
 	for(auto uiter = b->occupier.begin(); uiter != b->occupier.end(); uiter++)
@@ -251,7 +424,7 @@ void Evict(Unit* u)
 			break;
 		}
 	}
-    
+
 	u->home = -1;
 }
 
@@ -423,13 +596,13 @@ void DoRest(Unit* u)
 		ResetMode(u);
 		return;
 	}
-    
+
 	if(u->framesleft > 0)
 	{
 		u->framesleft --;
 		return;
 	}
-    
+
 	u->framesleft = WORK_DELAY;
 	u->belongings[RES_LABOUR] += 1;
 }
@@ -458,7 +631,7 @@ bool CanDrTra(Unit* op)
 
 	if(op->belongings[RES_LABOUR] <= 0)
 		return false;
-	
+
 	Player* p = &g_player[tr->owner];
 
 	if(p->global[RES_FUNDS] < tr->transpwage)
