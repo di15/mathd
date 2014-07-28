@@ -49,7 +49,7 @@ void Build(Player* p)
 		if(!PlaceBAb(btype, Vec2i(g_hmap.m_widthx/2, g_hmap.m_widthz/2), &tpos))
 			continue;
 
-		PlaceBuilding(btype, tpos, false, pyid, &demb->bi);
+		PlaceBl(btype, tpos, false, pyid, &demb->bi);
 
 		return;
 	}

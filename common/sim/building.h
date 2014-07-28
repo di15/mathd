@@ -42,6 +42,17 @@ public:
 
 	std::list<int> occupier;
 	std::list<int> worker;
+	int conwage;
+	int opwage;
+	int cydelay;	//the frame delay between production cycles, when production target is renewed
+	int prodlevel;	//production target level of max RATIO_DENOM
+	int cymet;	//used to keep track of what was produced this cycle, out of max of prodlevel
+	int lastcy;	//last simframe of last production cycle
+	std::list<CapSup> capsup;	//capacity suppliers 
+
+	bool excin(int rtype);	//excess input resource right now?
+	bool metout();	//met production target for now?
+	int stillreq(int rtype);	//how much of an input is still required to meet production target
 
 	void destroy();
 	void fillcollider();
@@ -57,8 +68,8 @@ public:
 
 extern Building g_building[BUILDINGS];
 
-int NewBuilding();
-void FreeBuildings();
+int NewBl();
+void FreeBls();
 void DrawBl();
 void UpdBls();
 void StageCopyVA(VertexArray* to, VertexArray* from, float completion);

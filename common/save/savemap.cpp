@@ -20,7 +20,7 @@
 #include "../sim/player.h"
 #include "../sim/selection.h"
 #include "../path/collidertile.h"
-#include "../ai/pathjob.h"
+#include "../path/pathjob.h"
 #include "../path/pathnode.h"
 #include "../debug.h"
 
@@ -66,7 +66,7 @@ void PlaceUnits()
 
 			if(Walkable2(&pj, cmpos.x, cmpos.y))
 			{
-				PlaceUnit(UNIT_LABOURER, Vec3i(cmpos.x, g_hmap.accheight(cmpos.x, cmpos.y), cmpos.y), -1);
+				PlaceUnit(UNIT_LABOURER, cmpos, -1, NULL);
 				//g_log<<"placed "<<li<<" at"<<tpos.x<<","<<tpos.y<<std::endl;
 				break;
 			}
@@ -191,7 +191,7 @@ void FreeMap()
 	FreeGrid();
 	FreeUnits();
 	FreeFoliage();
-	FreeBuildings();
+	FreeBls();
 	FreeDeposits();
 	Player* py = &g_player[g_curP];
 	py->sel.clear();
@@ -203,7 +203,7 @@ void SaveHeightmap(FILE *fp)
 	fwrite(&g_hmap.m_widthz, sizeof(int), 1, fp);
 
 	fwrite(g_hmap.m_heightpoints, sizeof(float), (g_hmap.m_widthx+1)*(g_hmap.m_widthz+1), fp);
-	fwrite(g_hmap.m_countryowner, sizeof(int), g_hmap.m_widthx*g_hmap.m_widthz, fp);
+	//fwrite(g_hmap.m_countryowner, sizeof(int), g_hmap.m_widthx*g_hmap.m_widthz, fp);
 }
 
 void ReadHeightmap(FILE *fp)
@@ -221,7 +221,7 @@ void ReadHeightmap(FILE *fp)
 #endif
 
 	fread(g_hmap.m_heightpoints, sizeof(float), (g_hmap.m_widthx+1)*(g_hmap.m_widthz+1), fp);
-	fread(g_hmap.m_countryowner, sizeof(int), g_hmap.m_widthx*g_hmap.m_widthz, fp);
+	//fread(g_hmap.m_countryowner, sizeof(int), g_hmap.m_widthx*g_hmap.m_widthz, fp);
 
 #if 0
 	for(int x=0; x<widthx+1; x++)

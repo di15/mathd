@@ -27,6 +27,7 @@ public:
 	short transporter[RESOURCES];
 	Vec3f drawpos;
 	//int maxcost[RESOURCES];
+	int conwage;
 
 	ConduitTile();
 	~ConduitTile();

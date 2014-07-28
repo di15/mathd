@@ -59,3 +59,14 @@ int InvGlUtilP(int util)
 
 	return MAX_UTIL / util;
 }
+
+int JobUtil(int wage, int cmdist, int workdelay)
+{
+	if(wage <= 0)
+		return 0;
+
+	if(cmdist <= 0)
+		return MAX_UTIL;
+
+	return MAX_UTIL * wage / cmdist / workdelay;
+}

@@ -302,13 +302,14 @@ void Click_NewGame()
 		for(int j=0; j<10; j++)
 		{
 
-			Vec3i cmpos((g_hmap.m_widthx+4)*TILE_SIZE/2 + (i+2)*PATHNODE_SIZE, 0, g_hmap.m_widthz*TILE_SIZE/2 + (j+2)*PATHNODE_SIZE);
-			cmpos.y = g_hmap.accheight(cmpos.x, cmpos.z);
+			//Vec3i cmpos((g_hmap.m_widthx+4)*TILE_SIZE/2 + (i+2)*PATHNODE_SIZE, 0, g_hmap.m_widthz*TILE_SIZE/2 + (j+2)*PATHNODE_SIZE);
+			//cmpos.y = g_hmap.accheight(cmpos.x, cmpos.z);
+			Vec2i cmpos((g_hmap.m_widthx+4)*TILE_SIZE/2 + (i+2)*PATHNODE_SIZE, g_hmap.m_widthz*TILE_SIZE/2 + (j+2)*PATHNODE_SIZE);
 
 			//if(rand()%2 == 1)
 			//	PlaceUnit(UNIT_ROBOSOLDIER, cmpos, 0);
 			//else
-				PlaceUnit(UNIT_LABOURER, cmpos, 0);
+				PlaceUnit(UNIT_LABOURER, cmpos, -1, NULL);
 		}
 
 	CheckGLError(__FILE__, __LINE__);
@@ -348,10 +349,10 @@ void Click_NewGame()
 	}
 
 #if 0
-	PlaceBuilding(BUILDING_HARBOUR, Vec2i(g_hmap.m_widthx/2-1, g_hmap.m_widthz/2-3), true, 0);
-	PlaceBuilding(BUILDING_APARTMENT, Vec2i(g_hmap.m_widthx/2+2, g_hmap.m_widthz/2-2), true, 0);
-	PlaceBuilding(BUILDING_APARTMENT, Vec2i(g_hmap.m_widthx/2+4, g_hmap.m_widthz/2-3), true, 0);
-	PlaceBuilding(BUILDING_APARTMENT, Vec2i(g_hmap.m_widthx/2+6, g_hmap.m_widthz/2-3), true, 0);
+	PlaceBl(BUILDING_HARBOUR, Vec2i(g_hmap.m_widthx/2-1, g_hmap.m_widthz/2-3), true, 0);
+	PlaceBl(BUILDING_APARTMENT, Vec2i(g_hmap.m_widthx/2+2, g_hmap.m_widthz/2-2), true, 0);
+	PlaceBl(BUILDING_APARTMENT, Vec2i(g_hmap.m_widthx/2+4, g_hmap.m_widthz/2-3), true, 0);
+	PlaceBl(BUILDING_APARTMENT, Vec2i(g_hmap.m_widthx/2+6, g_hmap.m_widthz/2-3), true, 0);
 	PlaceRoad(g_hmap.m_widthx/2+1, g_hmap.m_widthz/2-1, 1, false);
 	PlaceRoad(g_hmap.m_widthx/2+2, g_hmap.m_widthz/2-1, 1, false);
 	PlaceRoad(g_hmap.m_widthx/2+3, g_hmap.m_widthz/2-1, 1, false);
@@ -368,9 +369,9 @@ void Click_NewGame()
 	PlaceRoad(g_hmap.m_widthx/2+8, g_hmap.m_widthz/2-2, 1, false);
 	PlaceRoad(g_hmap.m_widthx/2+9, g_hmap.m_widthz/2-2, 1, false);
 	PlaceRoad(g_hmap.m_widthx/2+10, g_hmap.m_widthz/2-2, 1, false);
-	PlaceBuilding(BUILDING_FACTORY, Vec2i(g_hmap.m_widthx/2+9, g_hmap.m_widthz/2-3), true, 0);
-	PlaceBuilding(BUILDING_REFINERY, Vec2i(g_hmap.m_widthx/2+11, g_hmap.m_widthz/2-3), true, 0);
-	PlaceBuilding(BUILDING_NUCPOW, Vec2i(g_hmap.m_widthx/2+13, g_hmap.m_widthz/2-3), true, 0);
+	PlaceBl(BUILDING_FACTORY, Vec2i(g_hmap.m_widthx/2+9, g_hmap.m_widthz/2-3), true, 0);
+	PlaceBl(BUILDING_REFINERY, Vec2i(g_hmap.m_widthx/2+11, g_hmap.m_widthz/2-3), true, 0);
+	PlaceBl(BUILDING_NUCPOW, Vec2i(g_hmap.m_widthx/2+13, g_hmap.m_widthz/2-3), true, 0);
 	PlaceRoad(g_hmap.m_widthx/2+11, g_hmap.m_widthz/2-2, 1, false);
 	PlaceRoad(g_hmap.m_widthx/2+12, g_hmap.m_widthz/2-2, 1, false);
 	PlaceRoad(g_hmap.m_widthx/2+13, g_hmap.m_widthz/2-2, 1, false);
@@ -381,19 +382,19 @@ void Click_NewGame()
 	PlaceRoad(g_hmap.m_widthx/2+14, g_hmap.m_widthz/2-6, 1, false);
 	PlaceRoad(g_hmap.m_widthx/2+14, g_hmap.m_widthz/2-7, 1, false);
 	PlaceRoad(g_hmap.m_widthx/2+15, g_hmap.m_widthz/2-2, 1, false);
-	PlaceBuilding(BUILDING_FARM, Vec2i(g_hmap.m_widthx/2+6, g_hmap.m_widthz/2-0), true, 0);
+	PlaceBl(BUILDING_FARM, Vec2i(g_hmap.m_widthx/2+6, g_hmap.m_widthz/2-0), true, 0);
 	PlaceRoad(g_hmap.m_widthx/2+10, g_hmap.m_widthz/2-1, 1, false);
 	PlaceRoad(g_hmap.m_widthx/2+10, g_hmap.m_widthz/2-0, 1, false);
 	PlaceRoad(g_hmap.m_widthx/2+10, g_hmap.m_widthz/2+1, 1, false);
-	PlaceBuilding(BUILDING_STORE, Vec2i(g_hmap.m_widthx/2+9, g_hmap.m_widthz/2-1), true, 0);
-	PlaceBuilding(BUILDING_OILWELL, Vec2i(g_hmap.m_widthx/2+9, g_hmap.m_widthz/2-0), true, 0);
-	PlaceBuilding(BUILDING_MINE, Vec2i(g_hmap.m_widthx/2+11, g_hmap.m_widthz/2-0), true, 0);
-	PlaceBuilding(BUILDING_MINE, Vec2i(g_hmap.m_widthx/2+12, g_hmap.m_widthz/2-0), true, 0);
+	PlaceBl(BUILDING_STORE, Vec2i(g_hmap.m_widthx/2+9, g_hmap.m_widthz/2-1), true, 0);
+	PlaceBl(BUILDING_OILWELL, Vec2i(g_hmap.m_widthx/2+9, g_hmap.m_widthz/2-0), true, 0);
+	PlaceBl(BUILDING_MINE, Vec2i(g_hmap.m_widthx/2+11, g_hmap.m_widthz/2-0), true, 0);
+	PlaceBl(BUILDING_MINE, Vec2i(g_hmap.m_widthx/2+12, g_hmap.m_widthz/2-0), true, 0);
 	PlaceRoad(g_hmap.m_widthx/2+13, g_hmap.m_widthz/2-1, 1, false);
 	PlaceRoad(g_hmap.m_widthx/2+13, g_hmap.m_widthz/2-0, 1, false);
 	PlaceRoad(g_hmap.m_widthx/2+13, g_hmap.m_widthz/2+1, 1, false);
 	CheckGLError(__FILE__, __LINE__);
-	PlaceBuilding(BUILDING_GASSTATION, Vec2i(g_hmap.m_widthx/2+14, g_hmap.m_widthz/2-1), true, 0);
+	PlaceBl(BUILDING_GASSTATION, Vec2i(g_hmap.m_widthx/2+14, g_hmap.m_widthz/2-1), true, 0);
 	g_hmap.genvbo();
 #endif
 
@@ -533,7 +534,7 @@ void EdPlaceUnit()
 	int company = GetPlaceUnitCompany();
 
 	//PlaceUnit(type, Vec3i(intersection.x, intersection.y, intersection.z), country, company, -1);
-	PlaceUnit(type, Vec3i(intersection.x, intersection.y, intersection.z), country);
+	PlaceUnit(type, Vec2i(intersection.x, intersection.z), country, NULL);
 #if 0
 	g_hmap.setheight( intersection.x / TILE_SIZE, intersection.z / TILE_SIZE, 0);
 	g_hmap.remesh();
@@ -569,7 +570,7 @@ void EdPlaceBuilding()
 	Vec2i tilepos (intersection.x/TILE_SIZE, intersection.z/TILE_SIZE);
 
 	if(CheckCanPlace(type, tilepos))
-		PlaceBuilding(type, tilepos, true, -1, NULL);
+		PlaceBl(type, tilepos, true, -1, NULL);
 #if 0
 	g_hmap.setheight( intersection.x / TILE_SIZE, intersection.z / TILE_SIZE, 0);
 	g_hmap.remesh();
@@ -625,7 +626,7 @@ void MouseLUp()
 		{
 			if(py->canplace)
 			{
-				PlaceBuilding(py->build, Vec2i(py->vdrag[0].x/TILE_SIZE, py->vdrag[0].z/TILE_SIZE), false, g_localP, NULL);
+				PlaceBl(py->build, Vec2i(py->vdrag[0].x/TILE_SIZE, py->vdrag[0].z/TILE_SIZE), false, g_localP, NULL);
 			}
 			else
 			{

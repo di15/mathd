@@ -242,6 +242,8 @@ void AnimUnit(Unit* u)
 
 void UpdateAI(Unit* u)
 {
+	return;
+
 	if(u->type == UNIT_LABOURER)
 		UpdLab(u);
 }

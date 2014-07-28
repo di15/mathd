@@ -309,7 +309,7 @@ void MoveUnit(Unit* u)
 		u->cmpos = u->cmpos + scaleddir;
 
 #if 1
-		if(UnitCollides(u))
+		if(UnitCollides(u, u->cmpos, u->type))
 #else
 		if(Trace(u->type, u->mode, u->prevpos, u->cmpos, u, NULL, NULL) != COLLIDER_NONE)
 #endif
@@ -326,7 +326,7 @@ void MoveUnit(Unit* u)
 #endif
 	}
 
-	if(UnitCollides(u))
+	if(UnitCollides(u, u->cmpos, u->type))
 		u->collided = true;
 
 	u->fillcollider();

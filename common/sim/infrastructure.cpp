@@ -913,6 +913,7 @@ void PlaceCo(char ctype, int tx, int tz, int owner, bool plan)
 	ctile->on = true;
 	ctile->owner = owner;
 	//Zero(ctile->maxcost);
+	ctile->conwage = 0;
 
 	ConduitType* ct = &g_cotype[ctype];
 

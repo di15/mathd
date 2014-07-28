@@ -10,5 +10,6 @@ int GlUtil(int price);
 int InvPhUtilD(int util, int price);
 int InvPhUtilP(int util, int cmdist);
 int InvGlUtilP(int util);
+int JobUtil(int wage, int cmdist, int workdelay);
 
 #endif

@@ -7,6 +7,7 @@
 #include "../econ/utility.h"
 #include "../script/console.h"
 #include "sim.h"
+#include "job.h"
 
 bool NeedFood(Unit* u)
 {
@@ -397,11 +398,13 @@ void DoShop(Unit* u)
 	//sprintf(msg, "shopping");
 	//LogTransx(b->owner, p->price[CONSUMERGOODS], msg);
 
+#if 0
 	//b->Emit(SMILEY);
 #ifdef LOCAL_TRANSX
 	if(b->owner == g_localP)
 #endif
 		NewTransx(b->pos, CURRENC, p->price[CONSUMERGOODS], CONSUMERGOODS, -1);
+#endif
 }
 
 // do rest
@@ -588,10 +591,13 @@ void DoDrTra(Unit* op)
 
 	//LogTransx(truck->owner, -p->truckwage, "driver wage");
 
+#if 0
 #ifdef LOCAL_TRANSX
 	if(truck->owner == g_localP)
 #endif
 		NewTransx(truck->camera.Position(), CURRENC, -p->truckwage);
+#endif
+
 	/*
 	if(uID == 2)
 	{

@@ -42,6 +42,11 @@ class Basket
 {
 public:
 	int r[RESOURCES];
+
+	int& operator[](const int i)
+	{
+		return r[i];
+	}
 };
 
 class Bundle
@@ -49,6 +54,15 @@ class Bundle
 public:
 	unsigned char res;
 	int amt;
+};
+
+//capacity supply (e.g. electricity, water pressure)
+class CapSup
+{
+public:
+	unsigned char rtype;
+	int amt;
+	int src;
 };
 
 void DefR(int resi, const char* n, const char* depn, int iconindex, bool phys, bool cap, bool glob, float r, float g, float b, float a, int conduit);

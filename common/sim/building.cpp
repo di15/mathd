@@ -23,6 +23,7 @@
 #include "../math/frustum.h"
 #include "unit.h"
 #include "labourer.h"
+#include "../econ/demand.h"
 
 Building g_building[BUILDINGS];
 
@@ -47,7 +48,73 @@ Building::~Building()
 	destroy();
 }
 
-void FreeBuildings()
+int Building::stillreq(int rtype)
+{
+	int prodleft = prodlevel - cymet;
+
+	if(prodleft <= 0)
+		return 0;
+	
+	BuildingT* bt = &g_bltype[type];
+
+#if 0
+	int lowr = -1;
+	int lowamt = -1;
+
+	for(int ri=0; ri<RESOURCES; ri++)
+	{
+		if(bt->input[ri] <= 0)
+			continue;
+
+		if(lowr >= 0 && lowamt <= bt->input[ri])
+			continue;
+
+		lowr = ri;
+		lowamt = bt->input[ri];
+	}
+
+	if(lowr < 0)
+		return 0;
+#endif
+
+	int netreq = Ceili(bt->input[rtype] * prodleft, RATIO_DENOM);
+	netreq -= stocked[rtype];
+
+	Resource* r = &g_resource[rtype];
+	Player* py = &g_player[owner];
+
+	if(r->physical)
+		netreq -= py->global[rtype];
+
+	return netreq;
+}
+
+bool Building::excin(int rtype)
+{
+	//CBuildingType* bt = &g_buildingType[type];
+	Player* py = &g_player[owner];
+
+	int got = stocked[rtype];
+
+	if(rtype != RES_LABOUR && g_resource[rtype].physical)
+		got += py->global[rtype];
+
+	//if(got >= prodquota * bt->input[res])
+	if(got >= stillreq(rtype))
+		return true;
+
+	return false;
+}
+
+bool Building::metout()
+{
+	if(cymet >= prodlevel)
+		return true;
+
+	return false;
+}
+
+void FreeBls()
 {
 	for(int i=0; i<BUILDINGS; i++)
 	{
@@ -56,7 +123,7 @@ void FreeBuildings()
 	}
 }
 
-int NewBuilding()
+int NewBl()
 {
 	for(int i=0; i<BUILDINGS; i++)
 		if(!g_building[i].on)
@@ -122,9 +189,9 @@ void Building::allocres()
 
 	if(transx.m_part.size() > 0
 #ifdef LOCAL_TRANSX
-			&& owner == g_localP
+		&& owner == g_localP
 #endif
-	  )
+		)
 		NewTransx(drawpos, &transx);
 
 	checkconstruction();
@@ -162,27 +229,27 @@ bool Building::checkconstruction()
 		}
 
 #if 0
-	if(owner == g_localP)
-	{
-		char msg[128];
-		sprintf(msg, "%s construction complete.", t->name);
-		Chat(msg);
-		ConCom();
-	}
+		if(owner == g_localP)
+		{
+			char msg[128];
+			sprintf(msg, "%s construction complete.", t->name);
+			Chat(msg);
+			ConCom();
+		}
 #endif
 
-	if(haveall && !finished)
-		for(char ctype=0; ctype<CONDUIT_TYPES; ctype++)
-			ReNetw(ctype);
+		if(haveall && !finished)
+			for(char ctype=0; ctype<CONDUIT_TYPES; ctype++)
+				ReNetw(ctype);
 
-	//if(owner == g_localP)
-	//	OnFinishedB(type);
+		//if(owner == g_localP)
+		//	OnFinishedB(type);
 
-	finished = haveall;
+		finished = haveall;
 
-	remesh();
+		remesh();
 
-	return finished;
+		return finished;
 }
 
 void DrawBl()
@@ -226,9 +293,9 @@ void DrawBl()
 
 		Matrix modelview;
 #ifdef SPECBUMPSHADOW
-   	 modelview.set(g_camview.m_matrix);
+		modelview.set(g_camview.m_matrix);
 #endif
-    	modelview.postmult(modelmat);
+		modelview.postmult(modelmat);
 		glUniformMatrix4fv(s->m_slot[SSLOT_MODELVIEW], 1, 0, modelview.m_matrix);
 
 		Matrix mvp;
@@ -390,19 +457,19 @@ void StageCopyVA(VertexArray* to, VertexArray* from, float completion)
 #if 0
 #if 0
 				void barycent(double x0, double y0, double z0, double x1, double y1, double z1, double x2, double y2, double z2,
-							  double vx, double vy, double vz,
-							  double *u, double *v, double *w)
+					double vx, double vy, double vz,
+					double *u, double *v, double *w)
 #endif
 
-				double ratio0 = 0;
+					double ratio0 = 0;
 				double ratio1 = 0;
 				double ratio2 = 0;
 
 				barycent(prevt[0].x, prevt[0].y, prevt[0].z,
-						 prevt[1].x, prevt[1].y, prevt[1].z,
-						 prevt[2].x, prevt[2].y, prevt[2].z,
-						 to->vertices[v].x, to->vertices[v].y, to->vertices[v].z,
-						 &ratio0, &ratio1, &ratio2);
+					prevt[1].x, prevt[1].y, prevt[1].z,
+					prevt[2].x, prevt[2].y, prevt[2].z,
+					to->vertices[v].x, to->vertices[v].y, to->vertices[v].z,
+					&ratio0, &ratio1, &ratio2);
 
 				to->texcoords[v].x = ratio0 * prevc[0].x + ratio1 * prevc[1].x + ratio2 * prevc[2].x;
 				to->texcoords[v].y = ratio0 * prevc[0].y + ratio1 * prevc[1].y + ratio2 * prevc[2].y;
@@ -477,22 +544,22 @@ void Explode(Building* b)
 		EmitParticle(PARTICLE_FIREBALL2, p + b->drawpos);
 	}
 	/*
-	 for(int i=0; i<5; i++)
-	 {
-	 p.x = hwx * (float)(rand()%1000 - 500)/500.0f;
-	 p.y = 8;
-	 p.z = hwz * (float)(rand()%1000 - 500)/500.0f;
-	 EmitParticle(SMOKE, p + pos);
-	 }
+	for(int i=0; i<5; i++)
+	{
+	p.x = hwx * (float)(rand()%1000 - 500)/500.0f;
+	p.y = 8;
+	p.z = hwz * (float)(rand()%1000 - 500)/500.0f;
+	EmitParticle(SMOKE, p + pos);
+	}
 
-	 for(int i=0; i<5; i++)
-	 {
-	 p.x = hwx * (float)(rand()%1000 - 500)/500.0f;
-	 p.y = 8;
-	 p.z = hwz * (float)(rand()%1000 - 500)/500.0f;
-	 EmitParticle(SMOKE2, p + pos);
-	 }
-	 */
+	for(int i=0; i<5; i++)
+	{
+	p.x = hwx * (float)(rand()%1000 - 500)/500.0f;
+	p.y = 8;
+	p.z = hwz * (float)(rand()%1000 - 500)/500.0f;
+	EmitParticle(SMOKE2, p + pos);
+	}
+	*/
 	for(int i=0; i<20; i++)
 	{
 		p.x = hwx * (float)(rand()%1000 - 500)/500.0f;

@@ -81,7 +81,7 @@ void UpdateSBuild()
 			py->canplace = false;
 			py->bpcol = g_collidertype;
 		}
-		//PlaceBuilding(type, tilepos, true, -1, -1, -1);
+		//PlaceBl(type, tilepos, true, -1, -1, -1);
 	}
 	else if(py->build == BUILDING_ROAD)
 	{
@@ -401,9 +401,9 @@ bool CheckCanPlace(int type, Vec2i pos)
 	return true;
 }
 
-bool PlaceBuilding(int type, Vec2i pos, bool finished, int owner, int* bid)
+bool PlaceBl(int type, Vec2i pos, bool finished, int owner, int* bid)
 {
-	int i = NewBuilding();
+	int i = NewBl();
 
 	if(bid)
 		*bid = i;
@@ -447,6 +447,16 @@ bool PlaceBuilding(int type, Vec2i pos, bool finished, int owner, int* bid)
 	Zero(b->maxcost);
 	Zero(b->prodprice);
 	b->propprice = 0;
+	
+	b->occupier.clear();
+	b->worker.clear();
+	b->conwage = 0;
+	b->opwage = 0;
+	b->cydelay = SIM_FRAME_RATE * 60;
+	b->cymet = 0;
+	b->lastcy = g_simframe;
+	b->prodlevel = RATIO_DENOM;
+	b->capsup.clear();
 
 	int cmminx = tmin.x*TILE_SIZE;
 	int cmminz = tmin.y*TILE_SIZE;
@@ -518,7 +528,7 @@ bool PlaceBAb(int btype, Vec2i tabout, Vec2i* tplace)
 		right = tabout.x + shell;
 		bottom = tabout.y + shell;
 
-		canplace.reserve( (right-left)*2/TILE_SIZE + (bottom-top)*2/TILE_SIZE - 4 );
+		canplace.reserve( (right-left)*2/TILE_SIZE + (bottom-top)*2/TILE_SIZE );
         
 		tilez = top;
 		for(tilex=left; tilex<right; tilex++)
@@ -721,7 +731,7 @@ bool PlaceUAb(int utype, Vec2i cmabout, Vec2i* cmplace)
 		right = cmabout.x + shell;
 		bottom = cmabout.y + shell;
 
-		canplace.reserve( (right-left)*2/t->size.x + (bottom-top)*2/t->size.z - 4 );
+		canplace.reserve( (right-left)*2/t->size.x + (bottom-top)*2/t->size.z );
         
 		tilez = top;
 		for(tilex=left; tilex<right; tilex++)

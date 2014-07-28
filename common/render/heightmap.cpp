@@ -66,7 +66,7 @@ void Heightmap::allocate(int wx, int wz)
 	m_collverts = new Vec3f [ numverts ];
 	m_normals = new Vec3f [ numverts ];
 	m_texcoords0 = new Vec2f [ numverts ];
-	m_countryowner = new int [ wx * wz ];
+	//m_countryowner = new int [ wx * wz ];
 	m_triconfig = new bool [ wx * wz ];
 	m_tridivider = new Plane3f [ wx * wz ];
 
@@ -75,7 +75,7 @@ void Heightmap::allocate(int wx, int wz)
 	if(!m_collverts) OutOfMem(__FILE__, __LINE__);
 	if(!m_normals) OutOfMem(__FILE__, __LINE__);
 	if(!m_texcoords0) OutOfMem(__FILE__, __LINE__);
-	if(!m_countryowner) OutOfMem(__FILE__, __LINE__);
+	//if(!m_countryowner) OutOfMem(__FILE__, __LINE__);
 	if(!m_triconfig) OutOfMem(__FILE__, __LINE__);
 	if(!m_tridivider) OutOfMem(__FILE__, __LINE__);
 
@@ -87,13 +87,6 @@ void Heightmap::allocate(int wx, int wz)
 		for(int z=0; z<=wz; z++)
 			//m_heightpoints[ z*(wx+1) + x ] = rand()%1000;
 			m_heightpoints[ z*(wx+1) + x ] = 0;
-
-	// Set to no country owner.
-	for(int x=0; x<wx; x++)
-		for(int z=0; z<wz; z++)
-		{
-			m_countryowner[ z*wx + x ] = -1;
-		}
 
 	remesh(1);
 	//retexture();
@@ -142,12 +135,9 @@ void Heightmap::destroy()
 	delete [] m_collverts;
 	delete [] m_normals;
 	delete [] m_texcoords0;
-	delete [] m_countryowner;
+	//delete [] m_countryowner;
 
 	delvbo();
-
-	if(m_fulltex.data)
-		free(m_fulltex.data);
 
 	m_widthx = 0;
 	m_widthz = 0;
@@ -276,12 +266,6 @@ float Heightmap::accheight2(int x, int z)
 	float y = - ( x*plane.m_normal.x + z*plane.m_normal.z + plane.m_d ) / plane.m_normal.y;
 
 	return y;
-}
-
-
-int &Heightmap::getcountry(int x, int z)
-{
-	return m_countryowner[ m_widthx*z + x ];
 }
 
 Vec3f *Heightmap::getdrawtileverts(int x, int z)
