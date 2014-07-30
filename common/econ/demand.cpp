@@ -1036,11 +1036,19 @@ void DupDemB(DemTree* orig, DemTree* copy)
 	int condem[RESOURCES];
 	int supplying[RESOURCES];
 #endif
+#if 0	//DemNode
+	DemNode* parent;
+	Bid bid;	//reflects the maximum possible gouging price
+	int profit;
+#endif
 
 	for(auto diter=orig->supbpcopy.begin(); diter!=orig->supbpcopy.end(); diter++)
 	{
 		DemsAtB* olddem = *diter;
 		DemsAtB* newdem = new DemsAtB;
+
+		newdem->bid = olddem->bid;
+		newdem->profit = olddem->profit;
 
 		newdem->bi = olddem->bi;
 		newdem->btype = olddem->btype;
@@ -1055,22 +1063,82 @@ void DupDemB(DemTree* orig, DemTree* copy)
 	}
 }
 
+
+//Duplicate demb's of demtree, without dem lists yet
+void DupDemU(DemTree* orig, DemTree* copy)
+{
+//DemsAtU
+#if 0
+	int ui;
+	int utype;
+	std::list<RDemNode*> manufdems;
+	std::list<RDemNode*> consumdems;
+	DemsAtU* opup;	//operator/driver
+	int prodratio;
+	int timeused;
+	int totaldem[RESOURCES];
+#endif
+#if 0	//DemNode
+	DemNode* parent;
+	Bid bid;	//reflects the maximum possible gouging price
+	int profit;
+#endif
+
+	for(auto diter=orig->supupcopy.begin(); diter!=orig->supupcopy.end(); diter++)
+	{
+		DemsAtU* olddem = *diter;
+		DemsAtU* newdem = new DemsAtU;
+
+		newdem->bid = olddem->bid;
+		newdem->profit = olddem->profit;
+
+		newdem->ui = olddem->ui;
+		newdem->utype = olddem->utype;
+		newdem->prodratio = olddem->prodratio;
+		newdem->timeused = olddem->timeused;
+		for(int ri=0; ri<RESOURCES; ri++)
+		{
+			newdem->totaldem[ri] = olddem->totaldem[ri];
+		}
+
+		copy->supupcopy.push_back(newdem);
+	}
+}
+
+//Duplicate demb's of demtree, without dem lists yet
+void DupDemCo(DemTree* orig, DemTree* copy)
+{
+//CdDem
+#if 0
+	int cdtype;
+	Vec2i tpos;
+	std::list<RDemNode*> condems;
+#endif
+
+#if 0	//DemNode
+	DemNode* parent;
+	Bid bid;	//reflects the maximum possible gouging price
+	int profit;
+#endif
+
+	for(auto diter=orig->supupcopy.begin(); diter!=orig->supupcopy.end(); diter++)
+	{
+		CdDem* olddem = *diter;
+		CdDem* newdem = new CdDem;
+
+		newdem->bid = olddem->bid;
+		newdem->profit = olddem->profit;
+
+		newdem->cdtype = olddem->cdtype;
+		newdem->tpos = olddem->tpos;
+
+		copy->supupcopy.push_back(newdem);
+	}
+}
+
 //Duplicate dem nodes, but don't link yet
 void DupRDem(DemTree* orig, DemTree* copy, DemNode* onode, std::list<DemNode*>& olist, std::list<DemNode*>& clist)
 {
-// DemsAtB
-#if 0
-	int bi;
-	int btype;
-	std::list<DemNode*> condems;	//construction material
-	std::list<DemNode*> proddems;	//production input raw materials
-	std::list<DemNode*> manufdems;	//manufacturing input raw materials
-	std::list<CdDem*> cddems[CONDUIT_TYPES];
-	int prodratio;
-	int condem[RESOURCES];
-	int supplying[RESOURCES];
-#endif
-
 	//original node to which olist belongs to
 	if(onode)
 	{
@@ -1090,6 +1158,12 @@ void DupRDem(DemTree* orig, DemTree* copy, DemNode* onode, std::list<DemNode*>& 
 	DemsAtU* opup;
 #endif
 
+#if 0	//DemNode
+	DemNode* parent;
+	Bid bid;	//reflects the maximum possible gouging price
+	int profit;
+#endif
+
 	for(auto diter=olist.begin(); diter!=olist.end(); diter++)
 	{
 		DemNode* olddem = *diter;
@@ -1099,6 +1173,9 @@ void DupRDem(DemTree* orig, DemTree* copy, DemNode* onode, std::list<DemNode*>& 
 
 		RDemNode* oldrdem = (RDemNode*)olddem;
 		RDemNode* newrdem = new RDemNode;
+
+		newrdem->bid = oldrdem->bid;
+		newrdem->profit = oldrdem->profit;
 
 		newrdem->rtype = oldrdem->rtype;
 		newrdem->ramt = oldrdem->ramt;
@@ -1113,8 +1190,80 @@ void DupRDem(DemTree* orig, DemTree* copy, DemNode* onode, std::list<DemNode*>& 
 }
 
 //Link dem nodes
-void LinkDem(DemTree* orig, DemTree* copy)
+void LinkDemB(DemTree* orig, DemTree* copy)
 {
+#if 0	//DemNode
+	DemNode* parent;
+	Bid bid;	//reflects the maximum possible gouging price
+	int profit;
+#endif
+#if 0
+	int bi;
+	int btype;
+	std::list<RDemNode*> condems;	//construction material
+	std::list<RDemNode*> proddems;	//production input raw materials
+	std::list<RDemNode*> manufdems;	//manufacturing input raw materials
+	std::list<CdDem*> cddems[CONDUIT_TYPES];
+	int prodratio;
+	int condem[RESOURCES];
+	int supplying[RESOURCES];
+#endif
+}
+
+//Link dem nodes
+void LinkDemU(DemTree* orig, DemTree* copy)
+{
+#if 0	//DemNode
+	DemNode* parent;
+	Bid bid;	//reflects the maximum possible gouging price
+	int profit;
+#endif
+#if 0
+	int ui;
+	int utype;
+	std::list<RDemNode*> manufdems;
+	std::list<RDemNode*> consumdems;
+	DemsAtU* opup;	//operator/driver
+	int prodratio;
+	int timeused;
+	int totaldem[RESOURCES];
+#endif
+}
+//Link dem nodes
+void LinkDemCo(DemTree* orig, DemTree* copy)
+{
+#if 0	//DemNode
+	DemNode* parent;
+	Bid bid;	//reflects the maximum possible gouging price
+	int profit;
+#endif
+#if 0
+	int cdtype;
+	Vec2i tpos;
+	std::list<RDemNode*> condems;
+#endif
+}
+
+//Link dem nodes
+void LinkDemR(DemTree* orig, DemTree* copy)
+{
+#if 0	//DemNode
+	DemNode* parent;
+	Bid bid;	//reflects the maximum possible gouging price
+	int profit;
+#endif
+#if 0
+	int rtype;
+	int ramt;
+	int btype;
+	int bi;
+	int utype;
+	int ui;
+	int demui;
+	DemsAtB* supbp;
+	DemsAtU* supup;
+	DemsAtU* opup;
+#endif
 }
 
 //Duplicate demtree
@@ -1125,14 +1274,23 @@ void DupDT(DemTree* orig, DemTree* copy)
 	std::list<DemsAtB*> supbpcopy;	//master copy, this one will be freed
 	std::list<DemsAtU*> supupcopy;	//master copy, this one will be freed
 	std::list<DemNode*> codems[CONDUIT_TYPES];	//conduit placements
+	std::list<RDemNode*> rdemcopy;	//master copy, this one will be freed
+	int pyrsup[PLAYERS][RESOURCES];	//player global res supplying
 #endif
 
 	DupDemB(orig, copy);
-	// TODO:
-	//DupDemU(orig, copy);
-	//DupDemCo(orig, copy);
-	DupRDem(orig, copy, NULL, orig->nodes, copy->nodes);
-	LinkDem(orig, copy);
+	DupDemU(orig, copy);
+	DupDemCo(orig, copy);
+	DupRDem(orig, copy, NULL, orig->rdemcopy, copy->rdemcopy);
+	LinkDemB(orig, copy);
+	LinkDemU(orig, copy);
+	LinkDemCo(orig, copy);
+	LinkDemR(orig, copy);
+
+	for(int ri=0; ri<RESOURCES; ri++)
+	{
+		copy->pyrsup[ri] = orig->pyrsup[ri];
+	}
 }
 
 /*

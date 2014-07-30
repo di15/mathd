@@ -103,12 +103,14 @@ public:
 class CdDem : public DemNode
 {
 public:
+	int cdtype;
 	Vec2i tpos;
 	std::list<RDemNode*> condems;
 
 	CdDem() : DemNode()
 	{
 		demtype = DEM_CDNODE;
+
 	}
 };
 
