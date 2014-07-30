@@ -331,7 +331,7 @@ void Click_NewGame()
 		p->global[RES_WSFUEL] = 4000;
 		p->global[RES_URANIUM] = 4000;
 
-#if 0	
+#if 0
 #define RES_FUNDS			0
 #define RES_LABOUR			1
 #define RES_HOUSING			2
@@ -634,19 +634,10 @@ void MouseLUp()
 
 			py->build = -1;
 		}
-		else if(py->build == BUILDING_ROAD)
+		else if(py->build >= BUILDING_TYPES && py->build < BUILDING_TYPES+CONDUIT_TYPES)
 		{
-			PlaceCo(CONDUIT_ROAD);
-			py->build = -1;
-		}
-		else if(py->build == BUILDING_POWL)
-		{
-			PlaceCo(CONDUIT_POWL);
-			py->build = -1;
-		}
-		else if(py->build == BUILDING_CRPIPE)
-		{
-			PlaceCo(CONDUIT_CRPIPE);
+			//g_log<<"place r"<<std::endl;
+			PlaceCo(py->build - BUILDING_TYPES);
 			py->build = -1;
 		}
 	}

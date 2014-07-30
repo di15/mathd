@@ -73,7 +73,7 @@ bool ReNetwB(char ctype)
 		return false;
 
 	bool change = false;
-	
+
 	Building* b;
 	Building* b2;
 
@@ -94,7 +94,7 @@ bool ReNetwB(char ctype)
 
 			if(!BlAdj(i, j))
 				continue;
-			
+
 			short& netw2 = *(short*)(((char*)b2)+ct->netwoff);
 
 			if(netw < 0 && netw2 >= 0)
@@ -133,7 +133,7 @@ void MergeNetw(char ctype, int A, int B)
 
 			if(!b->on)
 				continue;
-		
+
 			short& netw = *(short*)(((char*)b)+ct->netwoff);
 
 			if(netw == maxi)
@@ -230,7 +230,7 @@ bool BAdj(char ctype, int i, int tx, int tz)
 	ConduitType* ct = &g_cotype[ctype];
 	//Vec3i p2 = RoadPhysPos(x, z);
 	Vec2i ccmp = Vec2i(tx, tz)*TILE_SIZE + ct->physoff;
-	
+
 	//Conduit min/max positions
 	const int hwx2 = TILE_SIZE/2;
 	const int hwz2 = TILE_SIZE/2;
@@ -378,7 +378,7 @@ void ReNetw(char ctype)
 #endif
 }
 
-// Is the tile level for a conduit? Take into account the direction which the conduit is leading and coming from 
+// Is the tile level for a conduit? Take into account the direction which the conduit is leading and coming from
 // (e.g., forward incline may be greater than sideways incline).
 bool CoLevel(char ctype, float iterx, float iterz, float testx, float testz, float dx, float dz, int i, float d, bool plantoo)
 {
@@ -652,7 +652,7 @@ void UpdCoPlans(char ctype, char owner, Vec3f start, Vec3f end)
 	g_log<<"road plan "<<x1<<","<<z1<<"->"<<x2<<","<<z2<<std::endl;
 	g_log.flush();
 #endif
-	
+
 	//PlacePowl(x1, z1, stateowner, true);
 	//PlacePowl(x2, z2, stateowner, true);
 
@@ -721,12 +721,17 @@ bool CoPlaceable(int ctype, int x, int z)
 {
 	ConduitType* ct = &g_cotype[ctype];
 	Vec2i cmpos = Vec2i(x, z) * TILE_SIZE + ct->physoff;
-	
+
 	if(TileUnclimable(cmpos.x, cmpos.y))
 		return false;
 
+	int cmminx = cmpos.x - TILE_SIZE/2;
+	int cmminz = cmpos.y - TILE_SIZE/2;
+	int cmmaxx = cmminx + TILE_SIZE;
+	int cmmaxz = cmminz + TILE_SIZE;
+
 	// Make sure construction resources can be transported
-	// to this conduit tile/corner. E.g., powerlines and 
+	// to this conduit tile/corner. E.g., powerlines and
 	// above-ground pipelines need to be road-accessible.
 
 #if 1	//Doesn't work yet?
@@ -746,51 +751,93 @@ bool CoPlaceable(int ctype, int x, int z)
 		char reqctype = r->conduit;
 		ConduitType* reqct = &g_cotype[reqctype];
 
-		Vec2i tpos = cmpos / TILE_SIZE;
+		Vec2i reqctiles[8];
+		reqctiles[0] = Vec2i(cmminx,cmminz)/TILE_SIZE;
+		reqctiles[1] = Vec2i(cmmaxx,cmminz)/TILE_SIZE;
+		reqctiles[2] = Vec2i(cmmaxx,cmmaxz)/TILE_SIZE;
+		reqctiles[3] = Vec2i(cmminx,cmmaxz)/TILE_SIZE;
+		reqctiles[4] = Vec2i(cmminx-1,cmminz-1)/TILE_SIZE;
+		reqctiles[5] = Vec2i(cmmaxx+1,cmminz-1)/TILE_SIZE;
+		reqctiles[6] = Vec2i(cmmaxx+1,cmmaxz+1)/TILE_SIZE;
+		reqctiles[7] = Vec2i(cmminx-1,cmmaxz+1)/TILE_SIZE;
 
-		int cmminx;
-		int cmminz;
-		int cmmaxx;
-		int cmmaxz;
-		int cmminx2;
-		int cmminz2;
-		int cmmaxx2;
-		int cmmaxz2;
+		//NOTE: this won't work for non-corner-placed to non-corner-placed requisite conduits
+		//For that, you need to also check all 8 tiles around. Currently it just checks 4, and perhaps some additional.
 
-		cmminx = tpos.x * TILE_SIZE + reqct->physoff.x - TILE_SIZE/2;
-		cmminz = tpos.y * TILE_SIZE + reqct->physoff.y - TILE_SIZE/2;
-		cmmaxx = cmminx + TILE_SIZE;
-		cmmaxz = cmminz + TILE_SIZE;
-		cmminx2 = cmmaxx;
-		cmminz2 = cmmaxz;
-		cmmaxx2 = cmminx2 + TILE_SIZE;
-		cmmaxz2 = cmminz2 + TILE_SIZE;
-		
+		bool found = false;
+
+		for(int ti=0; ti<8; ti++)
+		{
+			Vec2i tpos = reqctiles[ti];
+
+			if(tpos.x < 0)
+				continue;
+			if(tpos.y < 0)
+				continue;
+			if(tpos.x >= g_hmap.m_widthx)
+				continue;
+			if(tpos.y >= g_hmap.m_widthz)
+				continue;
+
+			ConduitTile* reqc = GetCo(reqctype, tpos.x, tpos.y, false);
+
+			if(!reqc->on)
+				continue;
+			//if(!reqc->finished)
+			//	continue;
+
+			Vec2i cmpos2 = Vec2i(x, z) * TILE_SIZE + reqct->physoff;
+
+			int cmminx2 = cmpos2.x - TILE_SIZE/2;
+			int cmminz2 = cmpos2.y - TILE_SIZE/2;
+			int cmmaxx2 = cmminx2 + TILE_SIZE;
+			int cmmaxz2 = cmminz2 + TILE_SIZE;
+
+			if(cmminx > cmmaxx2)
+				continue;
+
+			if(cmminz > cmmaxz2)
+				continue;
+
+			if(cmmaxx < cmminx2)
+				continue;
+
+			if(cmmaxz < cmminz2)
+				continue;
+
+			found = true;
+		}
+
+		if(!found)
+			return false;
+
+#if 0
 		cmminx -= 1;
 		cmminz -= 1;
 		cmminx2 -= 1;
 		cmminz2 -= 1;
 
-		if(GetCo(reqctype, tpos.x, tpos.y, false)->on)
-			continue;
+		//if(GetCo(reqctype, tpos.x, tpos.y, false)->on)
+		//	continue;
 
 		if(tpos.x-1 >= 0 && tpos.y-1 >= 0 && GetCo(reqctype, tpos.x-1, tpos.y-1, false)->on)
 			if(cmmaxx >= cmpos.x && cmmaxz >= cmpos.y && cmminx <= cmpos.x && cmminz <= cmpos.y)
 				continue;
-		
+
 		if(tpos.x+1 < g_hmap.m_widthx && tpos.y-1 >= 0 && GetCo(reqctype, tpos.x+1, tpos.y-1, false)->on)
 			if(cmmaxx2 >= cmpos.x && cmmaxz >= cmpos.y && cmminx2 <= cmpos.x && cmminz <= cmpos.y)
 				continue;
-		
+
 		if(tpos.x+1 < g_hmap.m_widthx && tpos.y+1 < g_hmap.m_widthz && GetCo(reqctype, tpos.x+1, tpos.y+1, false)->on)
 			if(cmmaxx2 >= cmpos.x && cmmaxz2 >= cmpos.y && cmminx2 <= cmpos.x && cmminz2 <= cmpos.y)
 				continue;
-		
+
 		if(tpos.x-1 >= 0 && tpos.y+1 < g_hmap.m_widthz && GetCo(reqctype, tpos.x-1, tpos.y+1, false)->on)
 			if(cmmaxx >= cmpos.x && cmmaxz2 >= cmpos.y && cmminx <= cmpos.x && cmminz2 <= cmpos.y)
 				continue;
 
 		return false;
+#endif
 	}
 #endif
 
@@ -1015,7 +1062,7 @@ void DrawCo(char ctype)
 
 			const float* owncol = g_player[ctile->owner].colorcode;
 			glUniform4f(s->m_slot[SSLOT_OWNCOLOR], owncol[0], owncol[1], owncol[2], owncol[3]);
-			
+
 			const int mi = ct->model[ctile->conntype][(int)ctile->finished];
 			const Model* m = &g_model[mi];
 			m->usetex();
@@ -1038,7 +1085,7 @@ void DrawCo(char ctype)
 
 			const float* owncol = g_player[ctile->owner].colorcode;
 			glUniform4f(s->m_slot[SSLOT_OWNCOLOR], owncol[0], owncol[1], owncol[2], owncol[3]);
-			
+
 			const int mi = ct->model[ctile->conntype][(int)ctile->finished];
 			const Model* m = &g_model[mi];
 			m->usetex();
@@ -1181,14 +1228,14 @@ void DefConn(char conduittype, char connectiontype, bool finished, const char* m
 	QueueModel(tm, modelfile, scale, transl);
 }
 
-void DefCo(char ctype, 
-		   unsigned short netwoff, 
-		   unsigned short seloff, 
-		   unsigned short maxforwincl, 
-		   unsigned short maxsideincl, 
-		   bool blconduct, 
-		   bool cornerpl, 
-		   Vec2i physoff, 
+void DefCo(char ctype,
+		   unsigned short netwoff,
+		   unsigned short seloff,
+		   unsigned short maxforwincl,
+		   unsigned short maxsideincl,
+		   bool blconduct,
+		   bool cornerpl,
+		   Vec2i physoff,
 		   Vec3f drawoff)
 {
 	ConduitType* ct = &g_cotype[ctype];

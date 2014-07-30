@@ -114,7 +114,7 @@ void DrawPy()
 void Bankrupt(int player, const char* reason)
 {
 	Player* p = &g_player[player];
-    
+
 	if(player == g_localP)
 	{
 		RichText lm(UString("You've gone bankrupt"));
@@ -123,19 +123,19 @@ void Bankrupt(int player, const char* reason)
 	else //if(p->activity != ACTIVITY_NONE)
 	{
 		//LogTransx(player, 0.0f, "BANKRUPT");
-        
+
 		char msg[256];
-		sprintf(msg, "%s has gone bankrupt", g_player[player].name.rawstr());
-        
+		sprintf(msg, "%s has gone bankrupt", g_player[player].name.rawstr().c_str());
+
 		char add[64];
-        
+
 		if(reason[0] != '\0')
 			sprintf(add, " (reason: %s).", reason);
 		else
 			sprintf(add, ".");
-        
+
 		strcat(msg, add);
-		
+
 		RichText lm;
 		lm.m_part.push_back(RichTextP(UString(msg)));
 		SubmitConsole(&lm);

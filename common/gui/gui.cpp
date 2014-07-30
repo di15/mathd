@@ -86,6 +86,8 @@ void GUI::inev(InEv* ev)
 
 	if(!ev->intercepted)
 	{
+		//if(ev->type == INEV_MOUSEUP && ev->key == MOUSE_LEFT) g_log<<"mouse up l"<<std::endl;
+
 		if(ev->type == INEV_MOUSEMOVE && mousemovefunc) mousemovefunc();
 		else if(ev->type == INEV_MOUSEDOWN && ev->key == MOUSE_LEFT && lbuttondownfunc) lbuttondownfunc();
 		else if(ev->type == INEV_MOUSEUP && ev->key == MOUSE_LEFT && lbuttonupfunc) lbuttonupfunc();
