@@ -8,6 +8,7 @@
 #include "../script/console.h"
 #include "sim.h"
 #include "job.h"
+#include "unitmove.h"
 
 bool NeedFood(Unit* u)
 {
@@ -394,8 +395,8 @@ void GoCdJob(Unit* u)
 		return;
 	}
 
-	if(CheckIfArrived())
-		OnArrived();
+	if(CheckIfArrived(u))
+		OnArrived(u);
 }
 
 // do conduit (construction) job
@@ -439,6 +440,37 @@ void DoCdJob(Unit* u)
 	ctile->checkconstruction();
     
 	//LogTransx(r->owner, -p->conwage, "road job");
+}
+
+// check shop availability
+bool CanShop(Unit* u)
+{
+	Building* b = &g_building[u->target];
+	Player* p = &g_player[b->owner];
+
+	if(!b->on)
+		return false;
+
+	if(!b->finished)
+		return false;
+
+	if(b->stocked[RES_RETFOOD] + p->global[RES_RETFOOD] <= 0)
+		return false;
+
+	if(b->prodprice[RES_RETFOOD] > u->belongings[RES_FUNDS])
+		return false;
+
+	if(u->belongings[RES_RETFOOD] >= STARTING_RETFOOD*2)
+		return false;
+
+	if(u->home >= 0)
+	{
+		Building* hm = &g_building[u->home];
+		if(u->belongings[RES_FUNDS] <= hm->prodprice[RES_HOUSING])
+			return false;
+	}
+
+	return true;
 }
 
 // go shop
@@ -530,37 +562,6 @@ void GoRest(Unit* u)
 	Chat(msg);
 	ResetMode();
 	}*/
-}
-
-// check shop availability
-bool CanShop(Unit* u)
-{
-	Building* b = &g_building[u->target];
-	Player* p = &g_player[b->owner];
-
-	if(!b->on)
-		return false;
-
-	if(!b->finished)
-		return false;
-
-	if(b->stocked[RES_RETFOOD] + p->global[RES_RETFOOD] <= 0)
-		return false;
-
-	if(b->prodprice[RES_RETFOOD] > u->belongings[RES_FUNDS])
-		return false;
-
-	if(u->belongings[RES_RETFOOD] >= STARTING_RETFOOD*2)
-		return false;
-
-	if(u->home >= 0)
-	{
-		Building* hm = &g_building[u->home];
-		if(u->belongings[RES_FUNDS] <= hm->prodprice[RES_HOUSING])
-			return false;
-	}
-
-	return true;
 }
 
 // check if labourer has enough food to multiply
@@ -725,8 +726,8 @@ void GoToTra(Unit* u)
 		return;
 	}
     
-	if(CheckIfArrived())
-		OnArrived();
+	if(CheckIfArrived(u))
+		OnArrived(u);
 }
 
 //driver labourer to disembark driven transport vehicle

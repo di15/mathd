@@ -69,6 +69,7 @@ public:
 #define BUILDINGS	256
 
 extern Building g_building[BUILDINGS];
+class Unit;
 
 int NewBl();
 void FreeBls();
@@ -79,5 +80,6 @@ void HeightCopyVA(VertexArray* to, VertexArray* from, float completion);
 void HugTerrain(VertexArray* va, Vec3f pos);
 void Explode(Building* b);
 float CompletPct(int* cost, int* current);
+void RemWorker(Unit* w);
 
 #endif

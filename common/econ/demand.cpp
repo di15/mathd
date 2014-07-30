@@ -5,6 +5,7 @@
 #include "../sim/labourer.h"
 #include "../utils.h"
 #include "utility.h"
+#include "../math/fixmath.h"
 
 DemTree g_demtree;
 DemTree g_demtree2[PLAYERS];
@@ -1021,9 +1022,7 @@ void DupDemB(DemTree* orig, DemTree* copy)
 	std::list<DemNode*> condems;	//construction material
 	std::list<DemNode*> proddems;	//production input raw materials
 	std::list<DemNode*> manufdems;	//manufacturing input raw materials
-	std::list<CrPipeDem*> crpipedems;
-	std::list<PowlDem*> powldems;
-	std::list<RoadDem*> roaddems;
+	std::list<CdDem*> cddems[CONDUIT_TYPES];
 	int prodratio;
 	int condem[RESOURCES];
 	int supplying[RESOURCES];
@@ -1031,18 +1030,78 @@ void DupDemB(DemTree* orig, DemTree* copy)
 
 	for(auto diter=orig->supbpcopy.begin(); diter!=orig->supbpcopy.end(); diter++)
 	{
+		DemsAtB* olddem = *diter;
 		DemsAtB* newdem = new DemsAtB;
 
-		//TODO
+		newdem->bi = olddem->bi;
+		newdem->btype = olddem->btype;
+		newdem->prodratio = olddem->prodratio;
+		for(int ri=0; ri<RESOURCES; ri++)
+		{
+			newdem->condem[ri] = olddem->condem[ri];
+			newdem->supplying[ri] = olddem->supplying[ri];
+		}
 
-		orig->supbpcopy.push_back(newdem);
+		copy->supbpcopy.push_back(newdem);
 	}
 }
 
 //Duplicate dem nodes, but don't link yet
-void DupRDem(DemTree* orig, DemTree* copy)
+void DupRDem(DemTree* orig, DemTree* copy, DemNode* opar, DemNode* cpar)
 {
+//	RDemNode
+#if 0
+	int rtype;
+	int ramt;
+	int btype;
+	int bi;
+	int utype;
+	int ui;
+	int demui;
+	DemsAtB* supbp;
+	DemsAtU* supup;
+	DemsAtU* opup;
+#endif
 
+// DemsAtB
+#if 0
+	int bi;
+	int btype;
+	std::list<DemNode*> condems;	//construction material
+	std::list<DemNode*> proddems;	//production input raw materials
+	std::list<DemNode*> manufdems;	//manufacturing input raw materials
+	std::list<CdDem*> cddems[CONDUIT_TYPES];
+	int prodratio;
+	int condem[RESOURCES];
+	int supplying[RESOURCES];
+#endif
+
+	auto diter = orig->nodes.begin();
+
+	if(opar)
+		diter = 
+
+	for(auto diter=orig->supbpcopy.begin(); diter!=orig->supbpcopy.end(); diter++)
+	{
+		DemNode* olddem = *diter;
+		DemNode* newdem = new DemNode;
+
+		//TODO
+		newdem->bi = olddem->bi;
+		newdem->btype = olddem->btype;
+		newdem->prodratio = olddem->prodratio;
+		for(int ri=0; ri<RESOURCES; ri++)
+		{
+			newdem->condem[ri] = olddem->condem[ri];
+			newdem->supplying[ri] = olddem->supplying[ri];
+		}
+
+		//copy->supbpcopy.push_back(newdem);
+		if(!cpar)
+			copy->nodes.push_back(newdem);
+		else
+
+	}
 }
 
 //Link dem nodes
@@ -1064,7 +1123,7 @@ void DupDT(DemTree* orig, DemTree* copy)
 	// TODO:
 	//DupDemU(orig, copy);
 	//DupDemCo(orig, copy);
-	DupRDem(orig, copy);
+	DupRDem(orig, copy, NULL, NULL);
 	LinkDem(orig, copy);
 }
 
@@ -1601,6 +1660,8 @@ void CalcDem2(Player* p)
 {
 	int pi = p - g_player;
 	DemTree* dm = &g_demtree2[pi];
+
+	dm->free();
 
 	AddBl(dm);
 

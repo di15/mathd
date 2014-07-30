@@ -24,6 +24,7 @@
 #include "unit.h"
 #include "labourer.h"
 #include "../econ/demand.h"
+#include "../math/fixmath.h"
 
 Building g_building[BUILDINGS];
 
@@ -226,6 +227,20 @@ bool Building::tryprod()
 	//so lower bound of cycle at 60 sec, and upper bound? for those bl's that output capacity? or just disallow change cycle delay for those types of bl's?
 
 	return true;
+}
+
+void RemWorker(Unit* w)
+{
+	Building* b = &g_building[w->target];
+
+	int ui = w - g_unit;
+
+	for(auto witer=b->worker.begin(); witer!=b->worker.end(); witer++)
+		if(*witer == ui)
+		{
+			b->worker.erase(witer);
+			return;
+		}
 }
 
 void FreeBls()

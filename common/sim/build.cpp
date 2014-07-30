@@ -26,6 +26,8 @@
 #include "../gui/widgets/spez/constructionview.h"
 #include "../render/foliage.h"
 #include "unitmove.h"
+#include "sim.h"
+#include "../math/fixmath.h"
 
 void UpdateSBuild()
 {
@@ -350,15 +352,15 @@ bool Offmap(int minx, int minz, int maxx, int maxz)
 	return false;
 }
 
-bool BuildingCollides(int type, Vec2i pos)
+bool BuildingCollides(int type, Vec2i tpos)
 {
 	BuildingT* t = &g_bltype[type];
 
 	Vec2i tmin;
 	Vec2i tmax;
 
-	tmin.x = pos.x - t->widthx/2;
-	tmin.y = pos.y - t->widthz/2;
+	tmin.x = tpos.x - t->widthx/2;
+	tmin.y = tpos.y - t->widthz/2;
 	tmax.x = tmin.x + t->widthx - 1;
 	tmax.y = tmin.y + t->widthz - 1;
 

@@ -85,13 +85,24 @@ bool CollidesWithBuildings(int minx, int minz, int maxx, int maxz, int ignore)
 			continue;
 
 		BuildingT* t = &g_bltype[ b->type ];
+		
+		Vec2i tmin;
+		Vec2i tmax;
 
-		int minx2 = (b->tilepos.x - t->widthx/2)*TILE_SIZE;
-		int minz2 = (b->tilepos.y - t->widthz/2)*TILE_SIZE;
-		int maxx2 = minx2 + t->widthx*TILE_SIZE - 1;
-		int maxz2 = minz2 + t->widthz*TILE_SIZE - 1;
+		tmin.x = b->tilepos.x - t->widthx/2;
+		tmin.y = b->tilepos.y - t->widthz/2;
+		tmax.x = tmin.x + t->widthx - 1;
+		tmax.y = tmin.y + t->widthz - 1;
 
-		if(maxx >= minx2 && maxz >= minz2 && minx <= maxx2 && minz <= maxz2)
+		Vec2i cmmin2;
+		Vec2i cmmax2;
+
+		cmmin2.x = tmin.x * TILE_SIZE;
+		cmmin2.y = tmin.y * TILE_SIZE;
+		cmmax2.x = cmmin2.x + t->widthx*TILE_SIZE - 1;
+		cmmax2.y = cmmin2.y + t->widthz*TILE_SIZE - 1;
+
+		if(maxx >= cmmin2.x && maxz >= cmmin2.y && minx <= cmmax2.x && minz <= cmmax2.y)
 		{
 			if(i == ignore)
 			{

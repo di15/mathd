@@ -250,7 +250,7 @@ void Queue()
 	BConMat(BUILDING_FARM, RES_MINERALS, 5);
 	BConMat(BUILDING_FARM, RES_LABOUR, 10);
 	BInput(BUILDING_FARM, RES_ENERGY, 5);
-	BOutput(BUILDING_FARM, RES_FARMPRODUCTS, 15);
+	BOutput(BUILDING_FARM, RES_FARMPRODUCTS, 60);
 
 	DefB(BUILDING_STORE, "Store", Vec2i(2,1), true, "models/store1/hugterr.ms3d", Vec3f(100,100,100), Vec3f(0,0,0), "models/store1/hugterr.ms3d", Vec3f(100,100,100), Vec3f(0,0,0), FOUNDATION_LAND, RES_NONE);
 	BConMat(BUILDING_STORE, RES_MINERALS, 5);

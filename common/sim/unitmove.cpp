@@ -19,6 +19,7 @@
 #include "../path/jpspartpath.h"
 #include "../path/pathnode.h"
 #include "../path/partialpath.h"
+#include "labourer.h"
 
 bool UnitCollides(Unit* u, Vec2i cmpos, int utype)
 {
@@ -182,14 +183,14 @@ bool UnitCollides(Unit* u, Vec2i cmpos, int utype)
 #endif
 
 
-	if(u == g_pathunit)
-	{
-		g_log<<"no collision"<<std::endl;
-		g_log<<"-----------------------------------------"<<std::endl;
-		g_log.flush();
-	}
+		if(u == g_pathunit)
+		{
+			g_log<<"no collision"<<std::endl;
+			g_log<<"-----------------------------------------"<<std::endl;
+			g_log.flush();
+		}
 
-	return false;
+		return false;
 }
 
 void MoveUnit(Unit* u)
@@ -225,19 +226,19 @@ void MoveUnit(Unit* u)
 			int nodesdist = Magnitude( u->goal - u->cmpos ) / PATHNODE_SIZE;
 #if 1
 			PartialPath(u->type, u->mode,
-						u->cmpos.x, u->cmpos.y, u->target, u->target2, u->targtype, &u->path, &u->subgoal,
-						u, NULL, NULL,
-						u->goal.x, u->goal.y,
-						u->goal.x, u->goal.y, u->goal.x, u->goal.y,
-						nodesdist*10);
+				u->cmpos.x, u->cmpos.y, u->target, u->target2, u->targtype, &u->path, &u->subgoal,
+				u, NULL, NULL,
+				u->goal.x, u->goal.y,
+				u->goal.x, u->goal.y, u->goal.x, u->goal.y,
+				nodesdist*10);
 			//TILE_SIZE*4/PATHNODE_SIZE);
 #else
 			JPSPartPath(u->type, u->mode,
-						u->cmpos.x, u->cmpos.y, u->target, u->target2, u->targtype, &u->path, &u->subgoal,
-						u, NULL, NULL,
-						u->goal.x, u->goal.y,
-						u->goal.x, u->goal.y, u->goal.x, u->goal.y,
-						nodesdist*4);
+				u->cmpos.x, u->cmpos.y, u->target, u->target2, u->targtype, &u->path, &u->subgoal,
+				u, NULL, NULL,
+				u->goal.x, u->goal.y,
+				u->goal.x, u->goal.y, u->goal.x, u->goal.y,
+				nodesdist*4);
 #endif
 
 #if 0
@@ -250,19 +251,19 @@ void MoveUnit(Unit* u)
 		{
 #if 0
 			if(!FullPath(0,
-						 u->type, u->mode,
-						 u->cmpos.x, u->cmpos.y, u->target, u->target, u->target2, u->path, u->subgoal,
-						 u, NULL, NULL,
-						 u->goal.x, u->goal.y,
-						 u->goal.x, u->goal.y, u->goal.x, u->goal.y))
+				u->type, u->mode,
+				u->cmpos.x, u->cmpos.y, u->target, u->target, u->target2, u->path, u->subgoal,
+				u, NULL, NULL,
+				u->goal.x, u->goal.y,
+				u->goal.x, u->goal.y, u->goal.x, u->goal.y))
 #endif
 
 				JPSPath(
-					u->type, u->mode,
-					u->cmpos.x, u->cmpos.y, u->target, u->target2, u->targtype, &u->path, &u->subgoal,
-					u, NULL, NULL,
-					u->goal.x, u->goal.y,
-					u->goal.x, u->goal.y, u->goal.x, u->goal.y);
+				u->type, u->mode,
+				u->cmpos.x, u->cmpos.y, u->target, u->target2, u->targtype, &u->path, &u->subgoal,
+				u, NULL, NULL,
+				u->goal.x, u->goal.y,
+				u->goal.x, u->goal.y, u->goal.x, u->goal.y);
 		}
 
 		return;
@@ -314,11 +315,18 @@ void MoveUnit(Unit* u)
 		if(Trace(u->type, u->mode, u->prevpos, u->cmpos, u, NULL, NULL) != COLLIDER_NONE)
 #endif
 		{
+			bool ar = CheckIfArrived(u);
+
 			u->collided = true;
 			u->cmpos = u->prevpos;
 			u->path.clear();
 			u->subgoal = u->cmpos;
 			u->fillcollider();
+			ResetPath(u);
+
+			if(ar)
+				OnArrived(u);
+
 			return;
 		}
 #if 0
@@ -326,8 +334,8 @@ void MoveUnit(Unit* u)
 #endif
 	}
 
-	if(UnitCollides(u, u->cmpos, u->type))
-		u->collided = true;
+	//if(UnitCollides(u, u->cmpos, u->type))
+	//	u->collided = true;
 
 	u->fillcollider();
 	u->drawpos.x = u->cmpos.x;
@@ -335,192 +343,184 @@ void MoveUnit(Unit* u)
 	u->drawpos.y = g_hmap.accheight(u->cmpos.x, u->cmpos.y);
 }
 
-bool CUnit::CheckIfArrived()
+bool CheckIfArrived(Unit* u)
 {
-	CBuilding* b;
-	CBuildingType* bt;
-	float hwx, hwz;
-	Vec3f p;
-	float r = g_unitType[type].radius;
-	CUnit* u;
-	CUnitType* ut;
-	float r2;
-    
-#ifdef PATH_DEBUG
-	int uID = UnitID(this);
-    
-	if(uID == 5)
+	UnitT* ut = &g_utype[u->type];
+
+	int ucmminx = u->cmpos.x - ut->size.x/2;
+	int ucmminz = u->cmpos.y - ut->size.z/2;
+	int ucmmaxx = ucmminx + ut->size.x - 1;
+	int ucmmaxz = ucmminz + ut->size.z - 1;
+
+	Building* b;
+	BuildingT* bt;
+	ConduitType* ct;
+	ConduitTile* ctile;
+	Unit* u2;
+	UnitT* u2t;
+
+	int btminx;
+	int btminz;
+	int btmaxx;
+	int btmaxz;
+	int bcmminx;
+	int bcmminz;
+	int bcmmaxx;
+	int bcmmaxz;
+	int ccmposx;
+	int ccmposz;
+	int ccmminx;
+	int ccmminz;
+	int ccmmaxx;
+	int ccmmaxz;
+	int u2cmminx;
+	int u2cmminz;
+	int u2cmmaxx;
+	int u2cmmaxz;
+
+	switch(u->mode)
 	{
-		g_log<<"7 checkifarrived"<<endl;
-	}
-#endif
-    
-	switch(mode)
-	{
-        case GOINGTONORMJOB:
-        case GOINGTOCONJOB:
-        case GOINGTOSHOP:
-        case GOINGTOREST:
-        case GOINGTODEMANDERB:
-            b = &g_building[target];
-            bt = &g_buildingType[b->type];
-            p = b->pos;
-            hwx = bt->widthX*TILE_SIZE/2;
-            hwz = bt->widthZ*TILE_SIZE/2;
-            if(fabs(p.x-camera.Position().x) <= hwx+r && fabs(p.z-camera.Position().z) <= hwz+r)
-                return true;
-            break;
-        case GOINGTOROADJOB:
-        case GOINGTODEMROAD:
-            r2 = TILE_SIZE;
-            p = RoadPosition(target, target2);
-            if(fabs(p.x-camera.Position().x) <= r2+r && fabs(p.z-camera.Position().z) <= r2+r)
-                return true;
-            break;
-        case GOINGTOPIPEJOB:
-        case GOINGTODEMPIPE:
-            r2 = TILE_SIZE/2;
-            p = PipelinePhysPos(target, target2);
-            if(fabs(p.x-camera.Position().x) <= r2+r && fabs(p.z-camera.Position().z) <= r2+r)
-                return true;
-            break;
-        case GOINGTOPOWLJOB:
-        case GOINGTODEMPOWL:
-            r2 = TILE_SIZE/2;
-            p = PowerlinePosition(target, target2);
-            if(fabs(p.x-camera.Position().x) <= r2+r && fabs(p.z-camera.Position().z) <= r2+r)
-                return true;
-#ifdef PATH_DEBUG
-            if(uID == 5)
-            {
-                g_log<<"7 checkifarrived dx,dz: "<<(fabs(p.x-camera.Position().x)-r2-r)<<","<<(fabs(p.z-camera.Position().z)-r2-r)<<endl;
-            }
-#endif
-            break;
-        case GOINGTOSUPPLIER:
-            b = &g_building[supplier];
-            bt = &g_buildingType[b->type];
-            p = b->pos;
-            hwx = bt->widthX*TILE_SIZE/2;
-            hwz = bt->widthZ*TILE_SIZE/2;
-            if(fabs(p.x-camera.Position().x) <= hwx+r && fabs(p.z-camera.Position().z) <= hwz+r)
-                return true;
-            break;
-        case GOINGTOREFUEL:
-            b = &g_building[fuelStation];
-            bt = &g_buildingType[b->type];
-            p = b->pos;
-            hwx = bt->widthX*TILE_SIZE/2;
-            hwz = bt->widthZ*TILE_SIZE/2;
-            if(fabs(p.x-camera.Position().x) <= hwx+r && fabs(p.z-camera.Position().z) <= hwz+r)
-                return true;
-            break;/*
-                   case GOINGTOROADJOB:
-                   p = RoadPosition(target, target2);
-                   hwx = TILE_SIZE/2;
-                   hwz = TILE_SIZE/2;
-                   if(fabs(p.x-camera.Position().x) < hwx+r && fabs(p.z-camera.Position().z) < hwz+r)
-                   return true;
-                   break;
-                   case GOINGTOPOWLJOB:
-                   p = PowerlinePosition(target, target2);
-                   hwx = TILE_SIZE/2;
-                   hwz = TILE_SIZE/2;
-                   if(fabs(p.x-camera.Position().x) < hwx+r && fabs(p.z-camera.Position().z) < hwz+r)
-                   return true;
-                   break;
-                   case GOINGTOPIPEJOB:
-                   p = PipelinePhysPos(target, target2);
-                   hwx = TILE_SIZE/2;
-                   hwz = TILE_SIZE/2;
-                   if(fabs(p.x-camera.Position().x) < hwx+r && fabs(p.z-camera.Position().z) < hwz+r)
-                   return true;
-                   break;*/
-        case GOINGTOTRUCK:
-            u = &g_unit[target];
-            ut = &g_unitType[u->type];
-            p = u->camera.Position();
-            r2 = ut->radius;
-            if(fabs(p.x-camera.Position().x) <= r2+r && fabs(p.z-camera.Position().z) <= r2+r)
-            {
-#ifdef PATH_DEBUG
-                if(uID == 5)
-                    g_log<<"ARRIVED"<<endl;
-#endif
-                return true;
-            }
-#ifdef PATH_DEBUG
-            if(uID == 5)
-            {
-                g_log<<"7 checkifarrived truck dx,dz: "<<(fabs(p.x-camera.Position().x)-r2-r)<<","<<(fabs(p.z-camera.Position().z)-r2-r)<<endl;
-            }
-#endif
-            break;
-        default: break;
+	case UMODE_GOBLJOB:
+	case UMODE_GOCSTJOB:
+	case UMODE_GOSHOP:
+	case UMODE_GOREST:
+	case UMODE_GODEMB:
+		b = &g_building[u->target];
+		bt = &g_bltype[b->type];
+
+		btminx = b->tilepos.x - bt->widthx/2;
+		btminz = b->tilepos.y - bt->widthz/2;
+		btmaxx = btminx + bt->widthx - 1;
+		btmaxz = btminz + bt->widthz - 1;
+
+		bcmminx = btminx * TILE_SIZE;
+		bcmminz = btminz * TILE_SIZE;
+		bcmmaxx = bcmminx + bt->widthx*TILE_SIZE - 1;
+		bcmmaxz = bcmminz + bt->widthz*TILE_SIZE - 1;
+
+		if(ucmminx <= bcmmaxx && ucmminz <= bcmmaxz && bcmminx <= ucmmaxx && bcmminz <= ucmmaxz)
+			return true;
+		break;
+
+	case UMODE_GOCDJOB:
+	case UMODE_GODEMCD:
+		ct = &g_cotype[u->cdtype];
+		ctile = GetCo(u->cdtype, u->target, u->target2, false);
+
+		ccmposx = u->target*TILE_SIZE + ct->physoff.x;
+		ccmposz = u->target2*TILE_SIZE + ct->physoff.y;
+
+		ccmminx = ccmposx - TILE_SIZE/2;
+		ccmminz = ccmposz - TILE_SIZE/2;
+		ccmmaxx = ccmminx + TILE_SIZE;
+		ccmmaxz = ccmminz + TILE_SIZE;
+
+		if(ucmminx <= ccmmaxx && ucmminz <= ccmmaxz && ccmminx <= ucmmaxx && ccmminz <= ucmmaxz)
+			return true;
+		break;
+
+	case UMODE_GOSUP:
+		b = &g_building[u->supplier];
+		bt = &g_bltype[b->type];
+
+		btminx = b->tilepos.x - bt->widthx/2;
+		btminz = b->tilepos.y - bt->widthz/2;
+		btmaxx = btminx + bt->widthx - 1;
+		btmaxz = btminz + bt->widthz - 1;
+
+		bcmminx = btminx * TILE_SIZE;
+		bcmminz = btminz * TILE_SIZE;
+		bcmmaxx = bcmminx + bt->widthx*TILE_SIZE - 1;
+		bcmmaxz = bcmminz + bt->widthz*TILE_SIZE - 1;
+
+		if(ucmminx <= bcmmaxx && ucmminz <= bcmmaxz && bcmminx <= ucmmaxx && bcmminz <= ucmmaxz)
+			return true;
+		break;
+
+	case UMODE_GOREFUEL:
+		b = &g_building[u->fuelstation];
+		bt = &g_bltype[b->type];
+
+		btminx = b->tilepos.x - bt->widthx/2;
+		btminz = b->tilepos.y - bt->widthz/2;
+		btmaxx = btminx + bt->widthx - 1;
+		btmaxz = btminz + bt->widthz - 1;
+
+		bcmminx = btminx * TILE_SIZE;
+		bcmminz = btminz * TILE_SIZE;
+		bcmmaxx = bcmminx + bt->widthx*TILE_SIZE - 1;
+		bcmmaxz = bcmminz + bt->widthz*TILE_SIZE - 1;
+
+		if(ucmminx <= bcmmaxx && ucmminz <= bcmmaxz && bcmminx <= ucmmaxx && bcmminz <= ucmmaxz)
+			return true;
+		break;
+
+	case UMODE_GOTRANSP:
+		u2 = &g_unit[u->target];
+		u2t = &g_utype[u2->type];
+
+		u2cmminx = u2->cmpos.x - u2t->size.x/2;
+		u2cmminz = u2->cmpos.y - u2t->size.z/2;
+		u2cmmaxx = u2cmminx + u2t->size.x - 1;
+		u2cmmaxz = u2cmminz + u2t->size.z - 1;
+
+		if(ucmminx <= u2cmmaxx && ucmminz <= u2cmmaxz && u2cmminx <= ucmmaxx && u2cmminz <= ucmmaxz)
+			return true;
+		break;
+	default: break;
 	};
-    
+
 	return false;
 }
 
-void CUnit::OnArrived()
+//arrived at transport vehicle
+void ArAtTra(Unit* u)
 {
-	switch(mode)
+}
+
+void OnArrived(Unit* u)
+{
+	switch(u->mode)
 	{
-        case GOINGTONORMJOB:		mode = NORMJOB;		freecollidercells();	ResetGoal();	g_building[target].addoccupier(this);		break;
-        case GOINGTOCONJOB:			mode = CONJOB;		freecollidercells();	ResetGoal();	break;
-        case GOINGTOROADJOB:		mode = ROADJOB;		freecollidercells();	ResetGoal();	break;
-        case GOINGTOPOWLJOB:		mode = POWLJOB;		freecollidercells();	ResetGoal();	break;
-        case GOINGTOPIPEJOB:		mode = PIPEJOB;		freecollidercells();	ResetGoal();	break;
-        case GOINGTOSHOP:			mode = SHOPPING;	freecollidercells();	ResetGoal();	break;
-        case GOINGTOREST:			mode = RESTING;		freecollidercells();	ResetGoal();	break;
-        case GOINGTOTRUCK:			ArrivedAtTruck();	freecollidercells();	ResetGoal();	break;
-        case GOINGTODEMANDERB:
-            if(driver >= 0)
-                g_unit[driver].Disembark();
-            driver = -1;
-            mode = ATDEMANDERB;
-            ResetGoal();
-            break;
-        case GOINGTODEMROAD:
-            if(driver >= 0)
-                g_unit[driver].Disembark();
-            driver = -1;
-            mode = ATDEMROAD;
-            ResetGoal();
-            break;
-        case GOINGTODEMPOWL:
-            if(driver >= 0)
-                g_unit[driver].Disembark();
-            driver = -1;
-            mode = ATDEMPOWL;
-            ResetGoal();
-            break;
-        case GOINGTODEMPIPE:
-            if(driver >= 0)
-                g_unit[driver].Disembark();
-            driver = -1;
-            mode = ATDEMPIPE;
-            ResetGoal();
-            break;
-        case GOINGTOSUPPLIER:
-            if(driver >= 0)
-                g_unit[driver].Disembark();
-            driver = -1;
-            mode = ATSUPPLIER;
-            ResetGoal();
-            break;
-        case GOINGTOREFUEL:
-            if(driver >= 0)
-                g_unit[driver].Disembark();
-            driver = -1;
-            mode = REFUELING;
-            ResetGoal();
-            break;
-        default: break;
+	case UMODE_GOBLJOB:		u->mode = UMODE_BLJOB;			u->freecollider();	ResetGoal(u);	g_building[u->target].worker.push_back(u-g_unit);		break;
+	case UMODE_GOCSTJOB:	u->mode = UMODE_CSTJOB;			u->freecollider();	ResetGoal(u);	break;
+	case UMODE_GOCDJOB:		u->mode = UMODE_CDJOB;			u->freecollider();	ResetGoal(u);	break;
+	case UMODE_GOSHOP:		u->mode = UMODE_SHOPPING;		u->freecollider();	ResetGoal(u);	break;
+	case UMODE_GOREST:		u->mode = UMODE_RESTING;		u->freecollider();	ResetGoal(u);	break;
+	case UMODE_GOTRANSP:	ArAtTra(u);						u->freecollider();	ResetGoal(u);	break;
+	case UMODE_GODEMB:
+		if(u->driver >= 0)
+			Disembark(&g_unit[u->driver]);
+		u->driver = -1;
+		u->mode = UMODE_ATDEMB;
+		ResetGoal(u);
+		break;
+	case UMODE_GODEMCD:
+		if(u->driver >= 0)
+			Disembark(&g_unit[u->driver]);
+		u->driver = -1;
+		u->mode = UMODE_ATDEMCD;
+		ResetGoal(u);
+		break;
+	case UMODE_GOSUP:
+		if(u->driver >= 0)
+			Disembark(&g_unit[u->driver]);
+		u->driver = -1;
+		u->mode = UMODE_ATSUP;
+		ResetGoal(u);
+		break;
+	case UMODE_GOREFUEL:
+		if(u->driver >= 0)
+			Disembark(&g_unit[u->driver]);
+		u->driver = -1;
+		u->mode = UMODE_REFUELING;
+		ResetGoal(u);
+		break;
+	default: break;
 	};
-    
+
 	//if(type == TRUCK && UnitSelected(this))
 	//	RedoLeftPanel();
-    
-	RecheckSelection();
+
+	///RecheckSelection();
 }

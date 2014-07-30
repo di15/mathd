@@ -5,5 +5,6 @@
 
 void UpdLab(Unit* u);
 void Evict(Unit* u);
+void Disembark(Unit* op);
 
 #endif

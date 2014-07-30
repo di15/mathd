@@ -5,6 +5,8 @@
 
 #include "../platform.h"
 
+#define RATIO_DENOM		100000
+
 //#define SMALL_ISQRT
 
 #ifdef SMALL_ISQRT

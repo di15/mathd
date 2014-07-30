@@ -9,7 +9,6 @@
 #include "../sim/build.h"
 #include "../sim/player.h"
 
-#define RATIO_DENOM		100000
 #define AVG_DIST		(TILE_SIZE*6)
 #define CYCLE_FRAMES	(SIM_FRAME_RATE*60)	
 
@@ -56,9 +55,7 @@ public:
 #define DEM_RNODE		1	//	resource demand
 #define DEM_BNODE		2	//	demand at building, for building
 #define DEM_UNODE		3	//	demand for unit: worker, transport, or military
-#define DEM_ROADNODE	4	
-#define DEM_POWLNODE	5
-#define DEM_CRPIPENODE	6
+#define DEM_CDNODE		4	//	demand for conduit: road, powerline, crude oil pipeline
 
 class DemNode
 {
@@ -103,39 +100,15 @@ public:
 	}
 };
 
-class RoadDem : public DemNode
+class CdDem : public DemNode
 {
 public:
 	Vec2i tpos;
 	std::list<RDemNode> condems;
 
-	RoadDem() : DemNode()
+	CdDem() : DemNode()
 	{
-		demtype = DEM_ROADNODE;
-	}
-};
-
-class PowlDem : public DemNode
-{
-public:
-	Vec2i tpos;
-	std::list<RDemNode> condems;
-
-	PowlDem() : DemNode()
-	{
-		demtype = DEM_POWLNODE;
-	}
-};
-
-class CrPipeDem : public DemNode
-{
-public:
-	Vec2i tpos;
-	std::list<RDemNode> condems;
-
-	CrPipeDem() : DemNode()
-	{
-		demtype = DEM_CRPIPENODE;
+		demtype = DEM_CDNODE;
 	}
 };
 
@@ -147,9 +120,7 @@ public:
 	std::list<DemNode*> condems;	//construction material
 	std::list<DemNode*> proddems;	//production input raw materials
 	std::list<DemNode*> manufdems;	//manufacturing input raw materials
-	std::list<CrPipeDem*> crpipedems;
-	std::list<PowlDem*> powldems;
-	std::list<RoadDem*> roaddems;
+	std::list<CdDem*> cddems[CONDUIT_TYPES];
 	int prodratio;
 	int condem[RESOURCES];
 	int supplying[RESOURCES];

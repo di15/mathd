@@ -12,6 +12,7 @@
 #include "../debug.h"
 #include "../math/frustum.h"
 #include "building.h"
+#include "labourer.h"
 
 Unit g_unit[UNITS];
 
@@ -293,8 +294,8 @@ void ResetMode(Unit* u)
 	if(u->type == UNIT_LABOURER)
 	{
         //LastNum("resetmode 1a");
-		//if(u->mode == UMODE_BLJOB)
-		//	g_building[target].RemoveWorker(this);
+		if(u->mode == UMODE_BLJOB)
+			RemWorker(u);
         
 		//if(hidden())
 		//	relocate();
