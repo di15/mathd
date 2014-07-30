@@ -1047,22 +1047,8 @@ void DupDemB(DemTree* orig, DemTree* copy)
 }
 
 //Duplicate dem nodes, but don't link yet
-void DupRDem(DemTree* orig, DemTree* copy, DemNode* opar, DemNode* cpar)
+void DupRDem(DemTree* orig, DemTree* copy, DemNode* onode, std::list<DemNode*>& olist, std::list<DemNode*>& clist)
 {
-//	RDemNode
-#if 0
-	int rtype;
-	int ramt;
-	int btype;
-	int bi;
-	int utype;
-	int ui;
-	int demui;
-	DemsAtB* supbp;
-	DemsAtU* supup;
-	DemsAtU* opup;
-#endif
-
 // DemsAtB
 #if 0
 	int bi;
@@ -1076,31 +1062,75 @@ void DupRDem(DemTree* orig, DemTree* copy, DemNode* opar, DemNode* cpar)
 	int supplying[RESOURCES];
 #endif
 
-	auto diter = orig->nodes.begin();
+	if(onode)
+	{
+		if(onode->demtype == DEM_BNODE)
+		{
+			DemsAtB* demb = (DemsAtB*)onode;
 
-	if(opar)
-		diter = 
+			int di = 0;
 
-	for(auto diter=orig->supbpcopy.begin(); diter!=orig->supbpcopy.end(); diter++)
+			for(auto diter=orig->supbpcopy.begin(); diter!=orig->supbpcopy.end(); diter++)
+			{
+				if(*diter == demb)
+					break;
+
+				di++;
+			}
+
+			DemsAtB* cdemb = NULL;
+
+			int di2 = 0;
+
+			for(auto diter=orig->supbpcopy.begin(); diter!=orig->supbpcopy.end(); diter++)
+			{
+				if(di2 == di)
+				{
+					cdemb = *diter;
+					break;
+				}
+				di2++;
+			}
+
+			
+
+			return;
+		}
+	}
+
+	//	RDemNode
+#if 0
+	int rtype;
+	int ramt;
+	int btype;
+	int bi;
+	int utype;
+	int ui;
+	int demui;
+	DemsAtB* supbp;
+	DemsAtU* supup;
+	DemsAtU* opup;
+#endif
+
+	for(auto diter=olist.begin(); diter!=olist.end(); diter++)
 	{
 		DemNode* olddem = *diter;
-		DemNode* newdem = new DemNode;
 
-		//TODO
-		newdem->bi = olddem->bi;
-		newdem->btype = olddem->btype;
-		newdem->prodratio = olddem->prodratio;
-		for(int ri=0; ri<RESOURCES; ri++)
-		{
-			newdem->condem[ri] = olddem->condem[ri];
-			newdem->supplying[ri] = olddem->supplying[ri];
-		}
+		if(olddem->demtype != DEM_RNODE)
+			continue;
 
-		//copy->supbpcopy.push_back(newdem);
-		if(!cpar)
-			copy->nodes.push_back(newdem);
-		else
+		RDemNode* oldrdem = (RDemNode*)olddem;
+		RDemNode* newrdem = new RDemNode;
 
+		newrdem->rtype = oldrdem->rtype;
+		newrdem->ramt = oldrdem->ramt;
+		newrdem->btype = oldrdem->btype;
+		newrdem->bi = oldrdem->bi;
+		newrdem->utype = oldrdem->utype;
+		newrdem->ui = oldrdem->ui;
+		newrdem->demui = oldrdem->demui;
+
+		clist.push_back(newrdem);
 	}
 }
 
@@ -1123,7 +1153,7 @@ void DupDT(DemTree* orig, DemTree* copy)
 	// TODO:
 	//DupDemU(orig, copy);
 	//DupDemCo(orig, copy);
-	DupRDem(orig, copy, NULL, NULL);
+	DupRDem(orig, copy, NULL, orig->nodes, copy->nodes);
 	LinkDem(orig, copy);
 }
 
