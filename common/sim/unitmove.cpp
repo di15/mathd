@@ -23,7 +23,7 @@
 
 bool UnitCollides(Unit* u, Vec2i cmpos, int utype)
 {
-	UnitT* t = &g_utype[utype];
+	UType* t = &g_utype[utype];
 	int minx = cmpos.x - t->size.x/2;
 	int minz = cmpos.y - t->size.z/2;
 	int maxx = minx + t->size.x - 1;
@@ -134,7 +134,7 @@ bool UnitCollides(Unit* u, Vec2i cmpos, int utype)
 			if(cell->building >= 0)
 			{
 				Building* b = &g_building[cell->building];
-				BuildingT* t2 = &g_bltype[b->type];
+				BlType* t2 = &g_bltype[b->type];
 
 				int tminx = b->tilepos.x - t2->widthx/2;
 				int tminz = b->tilepos.y - t2->widthz/2;
@@ -170,7 +170,7 @@ bool UnitCollides(Unit* u, Vec2i cmpos, int utype)
 				if(u2 == u)
 					continue;
 
-				UnitT* t2 = &g_utype[u2->type];
+				UType* t2 = &g_utype[u2->type];
 				int minx2 = u2->cmpos.x - t2->size.x/2;
 				int minz2 = u2->cmpos.y - t2->size.z/2;
 				int maxx2 = minx2 + t2->size.x - 1;
@@ -195,7 +195,7 @@ bool UnitCollides(Unit* u, Vec2i cmpos, int utype)
 
 void MoveUnit(Unit* u)
 {
-	UnitT* t = &g_utype[u->type];
+	UType* t = &g_utype[u->type];
 	u->prevpos = u->cmpos;
 	u->collided = false;
 
@@ -345,7 +345,7 @@ void MoveUnit(Unit* u)
 
 bool CheckIfArrived(Unit* u)
 {
-	UnitT* ut = &g_utype[u->type];
+	UType* ut = &g_utype[u->type];
 
 	int ucmminx = u->cmpos.x - ut->size.x/2;
 	int ucmminz = u->cmpos.y - ut->size.z/2;
@@ -353,11 +353,11 @@ bool CheckIfArrived(Unit* u)
 	int ucmmaxz = ucmminz + ut->size.z - 1;
 
 	Building* b;
-	BuildingT* bt;
+	BlType* bt;
 	ConduitType* ct;
 	ConduitTile* ctile;
 	Unit* u2;
-	UnitT* u2t;
+	UType* u2t;
 
 	int btminx;
 	int btminz;

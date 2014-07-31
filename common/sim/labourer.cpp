@@ -34,7 +34,7 @@ bool FindFood(Unit* u)
 		if(!b->finished)
 			continue;
 
-		BuildingT* bt = &g_bltype[b->type];
+		BlType* bt = &g_bltype[b->type];
 
 		if(bt->output[RES_RETFOOD] <= 0)
 			continue;
@@ -121,7 +121,7 @@ bool FindRest(Unit* u)
 		if(!b->finished)
 			continue;
 
-		BuildingT* bt = &g_bltype[b->type];
+		BlType* bt = &g_bltype[b->type];
 
 		if(bt->output[RES_HOUSING] <= 0)
 			continue;
@@ -168,12 +168,12 @@ bool FindRest(Unit* u)
 
 // check building construction availability
 bool CanCstBl(Unit* u)
-{   
+{
 	if(u->belongings[RES_LABOUR] <= 0)
 		return false;
 
 	Building* b = &g_building[u->target];
-	BuildingT* bt = &g_bltype[b->type];
+	BlType* bt = &g_bltype[b->type];
 	Player* py = &g_player[b->owner];
 
 	if(!b->on)
@@ -258,7 +258,7 @@ bool CanBlJob(Unit* u)
 
 	if(u->belongings[RES_LABOUR] <= 0)
 		return false;
-	
+
 	Building* b = &g_building[u->target];
 
 	if(!b->on)
@@ -323,27 +323,27 @@ void DoBlJob(Unit* u)
 		//LastNum("gotonormjob3!");
 		return;
 	}
-    
+
 	//if(GetTickCount() - last < WORK_DELAY)
 	//	return;
-    
+
 	if(u->framesleft > 0)
 	{
 		u->framesleft --;
 		return;
 	}
-    
+
 	//last = GetTickCount();
 	u->framesleft = WORK_DELAY;
 	Building* b = &g_building[u->target];
 	Player* py = &g_player[b->owner];
-    
+
 	b->stocked[RES_LABOUR] += 1;
 	u->belongings[RES_LABOUR] -= 1;
-    
+
 	py->global[RES_FUNDS] -= b->opwage;
 	u->belongings[RES_FUNDS] += b->opwage;
-    
+
 	if(!b->tryprod())
 	{
 #if 0
@@ -362,27 +362,27 @@ void DoBlJob(Unit* u)
 
 // check conduit construction job availability
 bool CanCstCd(Unit* u)
-{   
+{
 	if(u->belongings[RES_LABOUR] <= 0)
 		return false;
- 
+
 	ConduitTile* ctile = GetCo(u->cdtype, u->target, u->target2, false);
 	Player* py = &g_player[ctile->owner];
 
 	if(ctile->finished)
 		return false;
-    
+
 	ConduitType* ct = &g_cotype[u->cdtype];
 
 	if(ctile->conmat[RES_LABOUR] >= ct->conmat[RES_LABOUR])
 		return false;
-    
+
 	if(py->global[RES_FUNDS] < ctile->conwage)
 	{
 		Bankrupt(ctile->owner, "conduit construction");
 		return false;
 	}
-    
+
 	return true;
 }
 
@@ -407,27 +407,27 @@ void DoCdJob(Unit* u)
 		ResetMode(u);
 		return;
 	}
-    
+
 	//if(GetTickCount() - last < WORK_DELAY)
 	//	return;
-    
+
 	if(u->framesleft > 0)
 	{
 		u->framesleft --;
 		return;
 	}
-    
+
 	//last = GetTickCount();
 	u->framesleft = WORK_DELAY;
 	ConduitTile* ctile = GetCo(u->cdtype, u->target, u->target2, false);
 	Player* py = &g_player[ctile->owner];
-    
+
 	ctile->conmat[RES_LABOUR] += 1;
 	u->belongings[RES_LABOUR] -= 1;
-    
+
 	py->global[RES_FUNDS] -= ctile->conwage;
 	u->belongings[RES_FUNDS] += ctile->conwage;
-    
+
 #if 0
 	//r->Emit(HAMMER);
 #ifdef LOCAL_TRANSX
@@ -438,7 +438,7 @@ void DoCdJob(Unit* u)
 #endif
 
 	ctile->checkconstruction();
-    
+
 	//LogTransx(r->owner, -p->conwage, "road job");
 }
 
@@ -725,7 +725,7 @@ void GoToTra(Unit* u)
 		ResetMode(u);
 		return;
 	}
-    
+
 	if(CheckIfArrived(u))
 		OnArrived(u);
 }
@@ -745,7 +745,7 @@ void Disembark(Unit* op)
 	Unit* tr = &g_unit[op->target];
 	//camera.MoveTo( u->camera.Position() );
 	Vec2i trpos = tr->cmpos;
-	UnitT* t = &g_utype[tr->type];
+	UType* t = &g_utype[tr->type];
 	Vec2i oppos;
 	PlaceUAb(op->type, trpos, &oppos);
 	op->cmpos = oppos;

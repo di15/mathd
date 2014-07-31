@@ -217,7 +217,7 @@ bool CompareCo(char ctype, ConduitTile* ctile, int tx, int tz)
 bool BAdj(char ctype, int i, int tx, int tz)
 {
 	Building* b = &g_building[i];
-	BuildingT* bt = &g_bltype[b->type];
+	BlType* bt = &g_bltype[b->type];
 
 	Vec2i btp = b->tilepos;
 

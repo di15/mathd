@@ -10,7 +10,7 @@
 
 #define MAX_B_EMITTERS	10
 
-class BuildingT
+class BlType
 {
 public:
 	// width in tiles
@@ -35,7 +35,7 @@ public:
 
 	bool hugterr;
 
-	BuildingT();
+	BlType();
 };
 
 #define FOUNDATION_LAND			0
@@ -62,7 +62,7 @@ public:
 
 #define TOTAL_BUILDABLES		(BUILDING_TYPES+CONDUIT_TYPES)
 
-extern BuildingT g_bltype[BUILDING_TYPES];
+extern BlType g_bltype[BUILDING_TYPES];
 
 void DefB(int type, const char* name, Vec2i size, bool hugterr, const char* modelrelative, Vec3f scale, Vec3f translate, const char* cmodelrelative,  Vec3f cscale, Vec3f ctranslate, int foundation, int reqdeposit);
 void BConMat(int type, int res, int amt);

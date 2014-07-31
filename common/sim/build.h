@@ -5,7 +5,7 @@
 #include "../math/vec2i.h"
 
 class Building;
-class BuildingT;
+class BlType;
 class Matrix;
 
 void DrawSBuild();

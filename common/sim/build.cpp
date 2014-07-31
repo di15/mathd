@@ -69,7 +69,7 @@ void UpdateSBuild()
 		py->vdrag[0].x = tilepos.x * TILE_SIZE;
 		py->vdrag[0].z = tilepos.y * TILE_SIZE;
 
-		BuildingT* t = &g_bltype[py->build];
+		BlType* t = &g_bltype[py->build];
 
 		if(t->widthx%2 == 1)
 			py->vdrag[0].x += TILE_SIZE/2;
@@ -117,7 +117,7 @@ void DrawSBuild()
 		else
 			glUniform4f(s->m_slot[SSLOT_COLOR], 1, 0, 0, 0.5f);
 
-		const BuildingT* t = &g_bltype[py->build];
+		const BlType* t = &g_bltype[py->build];
 		Model* m = &g_model[ t->model ];
 		m->draw(0, py->vdrag[0], 0);
 	}
@@ -202,7 +202,7 @@ void DrawBReason(Matrix* mvp, float width, float height, bool persp)
 bool BuildingLevel(int type, Vec2i tpos)
 {
 #if 1
-	BuildingT* t = &g_bltype[type];
+	BlType* t = &g_bltype[type];
 
 	Vec2i tmin;
 	Vec2i tmax;
@@ -336,7 +336,7 @@ bool Offmap(int minx, int minz, int maxx, int maxz)
 
 bool BuildingCollides(int type, Vec2i tpos)
 {
-	BuildingT* t = &g_bltype[type];
+	BlType* t = &g_bltype[type];
 
 	Vec2i tmin;
 	Vec2i tmax;
@@ -400,7 +400,7 @@ bool PlaceBl(int type, Vec2i pos, bool finished, int owner, int* bid)
 	b->type = type;
 	b->tilepos = pos;
 
-	BuildingT* t = &g_bltype[type];
+	BlType* t = &g_bltype[type];
 
 	Vec2i tmin;
 	Vec2i tmax;
@@ -494,7 +494,7 @@ bool PlaceBAb(int btype, Vec2i tabout, Vec2i* tplace)
 	//g_log<<"PlaceBAround "<<player<<std::endl;
 	//g_log.flush();
 
-	BuildingT* t = &g_bltype[btype];
+	BlType* t = &g_bltype[btype];
 	int shell = 1;
 
 	//char msg[128];
@@ -697,7 +697,7 @@ bool PlaceUAb(int utype, Vec2i cmabout, Vec2i* cmplace)
 	//g_log<<"PlaceBAround "<<player<<std::endl;
 	//g_log.flush();
 
-	UnitT* t = &g_utype[utype];
+	UType* t = &g_utype[utype];
 	int shell = 1;
 
 	//char msg[128];

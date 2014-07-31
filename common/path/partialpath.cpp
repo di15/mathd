@@ -26,7 +26,7 @@ void PartialPath(int utype, int umode, int cmstartx, int cmstartz, int target, i
 				 int cmgoalx, int cmgoalz, int cmgoalminx, int cmgoalminz, int cmgoalmaxx, int cmgoalmaxz,
 				 int maxsearch)
 {
-	UnitT* ut = &g_utype[utype];
+	UType* ut = &g_utype[utype];
 
 	PathJob* pj = new PathJob;
 	pj->utype = utype;

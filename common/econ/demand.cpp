@@ -126,7 +126,7 @@ void AddReq(DemTree* dm, std::list<DemNode*>* nodes, DemNode* parent, int rtype,
 	for(auto biter = dm->supbpcopy.begin(); biter != dm->supbpcopy.end(); biter++)
 	{
 		DemsAtB* demb = (DemsAtB*)*biter;
-		BuildingT* bt = &g_bltype[demb->btype];
+		BlType* bt = &g_bltype[demb->btype];
 
 		if(bt->output[rtype] <= 0)
 			continue;
@@ -226,7 +226,7 @@ void AddReq(DemTree* dm, std::list<DemNode*>* nodes, DemNode* parent, int rtype,
 
 	for(int i=0; i<BUILDING_TYPES; i++)
 	{
-		BuildingT* t = &g_bltype[i];
+		BlType* t = &g_bltype[i];
 
 		if(t->output[rtype] <= 0)
 			continue;
@@ -247,7 +247,7 @@ void AddReq(DemTree* dm, std::list<DemNode*>* nodes, DemNode* parent, int rtype,
 	if(leastplb < 0)
 		return;
 
-	BuildingT* t = &g_bltype[leastplb];
+	BlType* t = &g_bltype[leastplb];
 	//int reqnb = imax(1, Ceili(ramt, t->output[rtype]));
 
 	do
@@ -265,7 +265,7 @@ void AddReq(DemTree* dm, std::list<DemNode*>* nodes, DemNode* parent, int rtype,
 
 		// need to set this before req of conmat because of possible recursive loop
 
-		BuildingT* bt = &g_bltype[demb->btype];
+		BlType* bt = &g_bltype[demb->btype];
 
 		// requisites for production, calc prodratio
 
@@ -385,7 +385,7 @@ void BlConReq(DemTree* dm)
 		DemsAtB* demb = (DemsAtB*)*biter;
 		const int bi = demb->bi;
 
-		BuildingT* bt = NULL;
+		BlType* bt = NULL;
 		int conmat[RESOURCES];
 		bool finished = false;
 
@@ -502,7 +502,7 @@ void LabDemH(DemTree* dm, Unit* u, int* fundsleft)
 			//if(!b->finished)
 			//	continue;
 
-			BuildingT* bt = &g_bltype[b->type];
+			BlType* bt = &g_bltype[b->type];
 
 			if(bt->output[RES_HOUSING] <= 0)
 				continue;
@@ -620,7 +620,7 @@ void LabDemF(DemTree* dm, Unit* u, int* fundsleft)
 			//if(!b->finished)
 			//	continue;
 
-			BuildingT* bt = &g_bltype[b->type];
+			BlType* bt = &g_bltype[b->type];
 
 			if(bt->output[RES_RETFOOD] <= 0)
 				continue;
@@ -768,7 +768,7 @@ void LabDemF2(DemTree* dm, Unit* u, int* fundsleft)
 			//if(!b->finished)
 			//	continue;
 
-			BuildingT* bt = &g_bltype[b->type];
+			BlType* bt = &g_bltype[b->type];
 
 			if(bt->output[RES_RETFOOD] <= 0)
 				continue;
@@ -907,7 +907,7 @@ void LabDemE(DemTree* dm, Unit* u, int* fundsleft)
 			//if(!b->finished)
 			//	continue;
 
-			BuildingT* bt = &g_bltype[b->type];
+			BlType* bt = &g_bltype[b->type];
 
 			if(bt->output[RES_ENERGY] <= 0)
 				continue;
@@ -1420,7 +1420,7 @@ void CheckSups(DemTree* dm, Player* p, int rtype, int ramt, Vec2i tpos, std::lis
 			//if(!b->finished)
 			//	continue;
 
-			BuildingT* bt = &g_bltype[b->type];
+			BlType* bt = &g_bltype[b->type];
 
 			if(bt->output[rtype] <= 0)
 				continue;
@@ -1509,7 +1509,7 @@ If no trucks are present, create demand?
 */
 void CheckBlType(DemTree* dm, Player* p, int btype, int rtype, int ramt, Vec2i tpos, Bid* bid, int* blmaxr)
 {
-	BuildingT* bt = &g_bltype[btype];
+	BlType* bt = &g_bltype[btype];
 
 	int prodlevel = Ceili(RATIO_DENOM * ramt, bt->output[rtype]);
 
@@ -1751,7 +1751,7 @@ void CheckBlTile(DemTree* dm, Player* p, int ri, RDemNode* pt, int x, int z, int
 	//Try for all supporting bltypes
 	for(int btype=0; btype<BUILDING_TYPES; btype++)
 	{
-		BuildingT* bt = &g_bltype[btype];
+		BlType* bt = &g_bltype[btype];
 
 		if(bt->output[ri] <= 0)
 			continue;

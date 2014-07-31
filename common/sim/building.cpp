@@ -55,8 +55,8 @@ int Building::stillreq(int rtype)
 
 	if(prodleft <= 0)
 		return 0;
-	
-	BuildingT* bt = &g_bltype[type];
+
+	BlType* bt = &g_bltype[type];
 
 #if 0
 	int lowr = -1;
@@ -132,7 +132,7 @@ bool Building::tryprod()
 	int minr = -1;
 	int minamt = -1;
 
-	BuildingT* bt = &g_bltype[type];
+	BlType* bt = &g_bltype[type];
 
 	for(int ri=0; ri<RESOURCES; ri++)
 	{
@@ -171,7 +171,7 @@ bool Building::tryprod()
 
 	int minbund[RESOURCES];
 	Zero(minbund);
-	
+
 	int minlevel = total[minr] * RATIO_DENOM / bt->input[minr];
 
 	for(int ri=0; ri<RESOURCES; ri++)
@@ -282,7 +282,7 @@ float CompletPct(int* cost, int* current)
 
 void Building::allocres()
 {
-	BuildingT* t = &g_bltype[type];
+	BlType* t = &g_bltype[type];
 	Player* py = &g_player[owner];
 
 	int alloc;
@@ -328,7 +328,7 @@ void Building::allocres()
 
 void Building::remesh()
 {
-	BuildingT* t = &g_bltype[type];
+	BlType* t = &g_bltype[type];
 
 	if(finished)
 		CopyVA(&drawva, &g_model[t->model].m_va[0]);
@@ -346,7 +346,7 @@ void Building::remesh()
 
 bool Building::checkconstruction()
 {
-	BuildingT* t = &g_bltype[type];
+	BlType* t = &g_bltype[type];
 
 	bool haveall = true;
 
@@ -393,8 +393,8 @@ void DrawBl()
 		if(!b->on)
 			continue;
 
-		const BuildingT* t = &g_bltype[b->type];
-		//const BuildingT* t = &g_bltype[BUILDING_APARTMENT];
+		const BlType* t = &g_bltype[b->type];
+		//const BlType* t = &g_bltype[BUILDING_APARTMENT];
 		Model* m = &g_model[ t->model ];
 
 		Vec3f vmin(b->drawpos.x - t->widthx*TILE_SIZE/2, b->drawpos.y, b->drawpos.z - t->widthz*TILE_SIZE/2);
@@ -511,7 +511,7 @@ void UpdBls()
 		if(!b->on)
 			continue;
 
-		BuildingT* t = &g_bltype[b->type];
+		BlType* t = &g_bltype[b->type];
 		EmitterPlace* ep;
 		ParticleT* pt;
 
@@ -652,7 +652,7 @@ void HugTerrain(VertexArray* va, Vec3f pos)
 
 void Explode(Building* b)
 {
-	BuildingT* t = &g_bltype[b->type];
+	BlType* t = &g_bltype[b->type];
 	float hwx = t->widthx*TILE_SIZE/2.0f;
 	float hwz = t->widthz*TILE_SIZE/2.0f;
 	Vec3f p;

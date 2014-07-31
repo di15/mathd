@@ -16,8 +16,8 @@ bool BlAdj(int i, int j)
 	Building* bi = &g_building[i];
 	Building* bj = &g_building[j];
 
-	BuildingT* ti = &g_bltype[bi->type];
-	BuildingT* tj = &g_bltype[bj->type];
+	BlType* ti = &g_bltype[bi->type];
+	BlType* tj = &g_bltype[bj->type];
 
 	Vec2i tpi = bi->tilepos;
 	Vec2i tpj = bj->tilepos;
@@ -46,7 +46,7 @@ bool BlAdj(int i, int j)
 bool CoAdj(char ctype, int i, int x, int z)
 {
 	Building* b = &g_building[i];
-	BuildingT* t = &g_bltype[b->type];
+	BlType* t = &g_bltype[b->type];
 
 	Vec2i tp = b->tilepos;
 
@@ -84,8 +84,8 @@ bool CollidesWithBuildings(int minx, int minz, int maxx, int maxz, int ignore)
 		if(!b->on)
 			continue;
 
-		BuildingT* t = &g_bltype[ b->type ];
-		
+		BlType* t = &g_bltype[ b->type ];
+
 		Vec2i tmin;
 		Vec2i tmax;
 
@@ -143,7 +143,7 @@ bool CollidesWithUnits(int minx, int minz, int maxx, int maxz, bool isunit, Unit
 		if(u->hidden())
 			continue;
 
-		UnitT* t = &g_utype[u->type];
+		UType* t = &g_utype[u->type];
 
 		int minx2 = u->cmpos.x - t->size.x/2;
 		int minz2 = u->cmpos.y - t->size.z/2;
@@ -183,7 +183,7 @@ bool OffMap(int minx, int minz, int maxx, int maxz)
 // TO DO: REWRITE
 bool BuildingCollides(int type, Vec3f pos)
 {
-	BuildingT* t = &g_bltype[type];
+	BlType* t = &g_bltype[type];
 
 	if(Offmap(pos.x, pos.z, t->widthX*TILE_SIZE/2, t->widthZ*TILE_SIZE/2))
 		return true;
@@ -211,7 +211,7 @@ bool BuildingCollides(int type, Vec3f pos)
 // edit: used for initial spawn of unit
 bool Unit::Collides2(bool checkroad)
 {
-	UnitT* t = &g_unitType[type];
+	UType* t = &g_unitType[type];
 	float r = t->radius;
 	Vec3f p = camera.Position();
 
@@ -250,7 +250,7 @@ bool Unit::Collides2(bool checkroad)
 
 bool Unit::confirmcollision(int ctype, int ID, float eps)
 {
-	UnitT* ut = &g_unitType[type];
+	UType* ut = &g_unitType[type];
 	//Vec3f p = camera.Position();
 	float r = ut->radius;
 	const Vec3f p = camera.Position();
@@ -258,7 +258,7 @@ bool Unit::confirmcollision(int ctype, int ID, float eps)
 	if(ctype == COLLIDER_BUILDING)
 	{
 		Building* b = &g_building[ID];
-		BuildingT* bt = &g_bltype[b->type];
+		BlType* bt = &g_bltype[b->type];
 		Vec3f p2 = b->pos;
 		float hwx = bt->widthX*TILE_SIZE/2.0;
 		float hwz = bt->widthZ*TILE_SIZE/2.0;
@@ -297,7 +297,7 @@ bool Unit::confirmcollision(int ctype, int ID, float eps)
 
 bool Unit::collidesfast(Unit* ignoreUnit, int ignoreBuilding)
 {
-	UnitT* ut = &g_unitType[type];
+	UType* ut = &g_unitType[type];
 	//Vec3f p = camera.Position();
 	float r = ut->radius;
 	const Vec3f p = camera.Position();
@@ -423,7 +423,7 @@ bool Unit::collidesfast(Unit* ignoreUnit, int ignoreBuilding)
 
 bool Unit::Collides(Unit* ignoreUnit, int ignoreBuilding)
 {
-	UnitT* t = &g_unitType[type];
+	UType* t = &g_unitType[type];
 	float r = t->radius;
 	Vec3f p = camera.Position();
 	/*
