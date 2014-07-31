@@ -125,7 +125,7 @@ void AddReq(DemTree* dm, std::list<DemNode*>* nodes, DemNode* parent, int rtype,
 
 	for(auto biter = dm->supbpcopy.begin(); biter != dm->supbpcopy.end(); biter++)
 	{
-		DemsAtB* demb = *biter;
+		DemsAtB* demb = (DemsAtB*)*biter;
 		BuildingT* bt = &g_bltype[demb->btype];
 
 		if(bt->output[rtype] <= 0)
@@ -151,9 +151,9 @@ void AddReq(DemTree* dm, std::list<DemNode*>* nodes, DemNode* parent, int rtype,
 #endif
 
 		RDemNode* rdem = new RDemNode;
-		rdem->bi = (*biter)->bi;
-		rdem->btype = (*biter)->btype;
-		rdem->supbp = *biter;
+		rdem->bi = demb->bi;
+		rdem->btype = demb->btype;
+		rdem->supbp = demb;
 		rdem->parent = parent;
 		rdem->rtype = rtype;
 		rdem->ramt = suphere;
@@ -382,7 +382,8 @@ void BlConReq(DemTree* dm)
 {
 	for(auto biter = dm->supbpcopy.begin(); biter != dm->supbpcopy.end(); biter++)
 	{
-		const int bi = (*biter)->bi;
+		DemsAtB* demb = (DemsAtB*)*biter;
+		const int bi = demb->bi;
 
 		BuildingT* bt = NULL;
 		int conmat[RESOURCES];
@@ -397,8 +398,8 @@ void BlConReq(DemTree* dm)
 		}
 		else
 		{
-			bt = &g_bltype[(*biter)->btype];
-			memcpy(conmat, (*biter)->condem, sizeof(int)*RESOURCES);
+			bt = &g_bltype[demb->btype];
+			memcpy(conmat, demb->condem, sizeof(int)*RESOURCES);
 			finished = false;
 		}
 
@@ -408,7 +409,7 @@ void BlConReq(DemTree* dm)
 			{
 				const int req = bt->conmat[i] - conmat[i];
 				if(req > 0)
-					AddReq(dm, &(*biter)->condems, *biter, i, req, 0);
+					AddReq(dm, &demb->condems, *biter, i, req, 0);
 			}
 		}
 		else
@@ -491,7 +492,8 @@ void LabDemH(DemTree* dm, Unit* u, int* fundsleft)
 		//for(int bi=0; bi<BUILDINGS; bi++)
 		for(auto biter=dm->supbpcopy.begin(); biter!=dm->supbpcopy.end(); biter++)
 		{
-			int bi = (*biter)->bi;
+			DemsAtB* demb = (DemsAtB*)*biter;
+			int bi = demb->bi;
 			Building* b = &g_building[bi];
 
 			if(!b->on)
@@ -505,7 +507,7 @@ void LabDemH(DemTree* dm, Unit* u, int* fundsleft)
 			if(bt->output[RES_HOUSING] <= 0)
 				continue;
 
-			int stockqty = b->stocked[RES_HOUSING] - (*biter)->supplying[RES_HOUSING];
+			int stockqty = b->stocked[RES_HOUSING] - demb->supplying[RES_HOUSING];
 
 			if(stockqty <= 0)
 				continue;
@@ -534,7 +536,7 @@ void LabDemH(DemTree* dm, Unit* u, int* fundsleft)
 			best.bid.maxdist = cmdist;
 			best.bid.minutil = thisutil;
 
-			bestdemb = *biter;
+			bestdemb = demb;
 		}
 
 		if(best.bi < 0)
@@ -608,7 +610,8 @@ void LabDemF(DemTree* dm, Unit* u, int* fundsleft)
 		//for(int bi=0; bi<BUILDINGS; bi++)
 		for(auto biter=dm->supbpcopy.begin(); biter!=dm->supbpcopy.end(); biter++)
 		{
-			int bi = (*biter)->bi;
+			DemsAtB* demb = (DemsAtB*)*biter;
+			int bi = demb->bi;
 			Building* b = &g_building[bi];
 
 			if(!b->on)
@@ -637,7 +640,7 @@ void LabDemF(DemTree* dm, Unit* u, int* fundsleft)
 				continue;
 
 			int marginpr = b->prodprice[RES_RETFOOD];
-			int stockqty = b->stocked[RES_RETFOOD] - (*biter)->supplying[RES_RETFOOD];
+			int stockqty = b->stocked[RES_RETFOOD] - demb->supplying[RES_RETFOOD];
 
 			if(stockqty <= 0)
 				continue;
@@ -671,7 +674,7 @@ void LabDemF(DemTree* dm, Unit* u, int* fundsleft)
 			best.bid.maxdist = cmdist;
 			best.bid.minutil = thisutil;
 
-			bestdemb = *biter;
+			bestdemb = demb;
 		}
 
 		if(best.bi < 0)
@@ -755,7 +758,8 @@ void LabDemF2(DemTree* dm, Unit* u, int* fundsleft)
 		//for(int bi=0; bi<BUILDINGS; bi++)
 		for(auto biter=dm->supbpcopy.begin(); biter!=dm->supbpcopy.end(); biter++)
 		{
-			int bi = (*biter)->bi;
+			DemsAtB* demb = (DemsAtB*)*biter;
+			int bi = demb->bi;
 			Building* b = &g_building[bi];
 
 			if(!b->on)
@@ -784,7 +788,7 @@ void LabDemF2(DemTree* dm, Unit* u, int* fundsleft)
 				continue;
 
 			int marginpr = b->prodprice[RES_RETFOOD];
-			int stockqty = b->stocked[RES_RETFOOD] - (*biter)->supplying[RES_RETFOOD];
+			int stockqty = b->stocked[RES_RETFOOD] - demb->supplying[RES_RETFOOD];
 
 			if(stockqty <= 0)
 				continue;
@@ -816,7 +820,7 @@ void LabDemF2(DemTree* dm, Unit* u, int* fundsleft)
 			best.bid.maxdist = cmdist;
 			best.bid.minutil = thisutil;
 
-			bestdemb = *biter;
+			bestdemb = demb;
 		}
 
 		if(best.bi < 0)
@@ -893,7 +897,8 @@ void LabDemE(DemTree* dm, Unit* u, int* fundsleft)
 		//for(int bi=0; bi<BUILDINGS; bi++)
 		for(auto biter=dm->supbpcopy.begin(); biter!=dm->supbpcopy.end(); biter++)
 		{
-			int bi = (*biter)->bi;
+			DemsAtB* demb = (DemsAtB*)*biter;
+			int bi = demb->bi;
 			Building* b = &g_building[bi];
 
 			if(!b->on)
@@ -922,7 +927,7 @@ void LabDemE(DemTree* dm, Unit* u, int* fundsleft)
 				continue;
 
 			int marginpr = b->prodprice[RES_ENERGY];
-			int stockqty = b->stocked[RES_ENERGY] - (*biter)->supplying[RES_ENERGY];
+			int stockqty = b->stocked[RES_ENERGY] - demb->supplying[RES_ENERGY];
 
 			//int cmdist = Magnitude(b->tilepos * TILE_SIZE + Vec2i(TILE_SIZE/2, TILE_SIZE/2) - u->cmpos);
 			int thisutil = GlUtil(marginpr);
@@ -953,7 +958,7 @@ void LabDemE(DemTree* dm, Unit* u, int* fundsleft)
 			best.bid.maxdist = -1;	//any distance
 			best.bid.minutil = thisutil;
 
-			bestdemb = *biter;
+			bestdemb = demb;
 		}
 
 		if(best.bi < 0)
@@ -1044,7 +1049,7 @@ void DupDemB(DemTree* orig, DemTree* copy)
 
 	for(auto diter=orig->supbpcopy.begin(); diter!=orig->supbpcopy.end(); diter++)
 	{
-		DemsAtB* olddem = *diter;
+		DemsAtB* olddem = (DemsAtB*)*diter;
 		DemsAtB* newdem = new DemsAtB;
 
 		newdem->bid = olddem->bid;
@@ -1086,7 +1091,7 @@ void DupDemU(DemTree* orig, DemTree* copy)
 
 	for(auto diter=orig->supupcopy.begin(); diter!=orig->supupcopy.end(); diter++)
 	{
-		DemsAtU* olddem = *diter;
+		DemsAtU* olddem = (DemsAtU*)*diter;
 		DemsAtU* newdem = new DemsAtU;
 
 		newdem->bid = olddem->bid;
@@ -1121,29 +1126,27 @@ void DupDemCo(DemTree* orig, DemTree* copy)
 	int profit;
 #endif
 
-	for(auto diter=orig->supupcopy.begin(); diter!=orig->supupcopy.end(); diter++)
+	for(int ctype=0; ctype<CONDUIT_TYPES; ctype++)
 	{
-		CdDem* olddem = *diter;
-		CdDem* newdem = new CdDem;
+		for(auto diter=orig->codems[ctype].begin(); diter!=orig->codems[ctype].end(); diter++)
+		{
+			CdDem* olddem = (CdDem*)*diter;
+			CdDem* newdem = new CdDem;
 
-		newdem->bid = olddem->bid;
-		newdem->profit = olddem->profit;
+			newdem->bid = olddem->bid;
+			newdem->profit = olddem->profit;
 
-		newdem->cdtype = olddem->cdtype;
-		newdem->tpos = olddem->tpos;
+			newdem->cdtype = olddem->cdtype;
+			newdem->tpos = olddem->tpos;
 
-		copy->supupcopy.push_back(newdem);
+			copy->codems[ctype].push_back(newdem);
+		}
 	}
 }
 
 //Duplicate dem nodes, but don't link yet
-void DupRDem(DemTree* orig, DemTree* copy, DemNode* onode, std::list<DemNode*>& olist, std::list<DemNode*>& clist)
+void DupRDem(DemTree* orig, DemTree* copy)
 {
-	//original node to which olist belongs to
-	if(onode)
-	{
-	}
-
 	//	RDemNode
 #if 0
 	int rtype;
@@ -1164,7 +1167,7 @@ void DupRDem(DemTree* orig, DemTree* copy, DemNode* onode, std::list<DemNode*>& 
 	int profit;
 #endif
 
-	for(auto diter=olist.begin(); diter!=olist.end(); diter++)
+	for(auto diter=orig->rdemcopy.begin(); diter!=orig->rdemcopy.end(); diter++)
 	{
 		DemNode* olddem = *diter;
 
@@ -1185,7 +1188,48 @@ void DupRDem(DemTree* orig, DemTree* copy, DemNode* onode, std::list<DemNode*>& 
 		newrdem->ui = oldrdem->ui;
 		newrdem->demui = oldrdem->demui;
 
-		clist.push_back(newrdem);
+		copy->rdemcopy.push_back(newrdem);
+	}
+}
+
+int DemIndex(DemNode* pdem, std::list<DemNode*>& list)
+{
+	if(!pdem)
+		return -1;
+
+	int di = 0;
+	for(auto diter=list.begin(); diter!=list.end(); diter++, di++)
+	{
+		if(*diter == pdem)
+			return di;
+	}
+
+	return -1;
+}
+
+DemNode* DemAt(std::list<DemNode*>& list, int seekdi)
+{
+	if(seekdi < 0)
+		return NULL;
+
+	int di = 0;
+	for(auto diter=list.begin(); diter!=list.end(); diter++, di++)
+	{
+		if(di == seekdi)
+			return *diter;
+	}
+
+	return NULL;
+}
+
+void LinkDems(std::list<DemNode*>& olist, std::list<DemNode*>& nlist, std::list<DemNode*>& osearch, std::list<DemNode*>& nsearch)
+{
+	for(auto oditer=olist.begin(); oditer!=olist.end(); oditer++)
+	{
+		DemNode* olddem = *oditer;
+		int cdi = DemIndex(olddem, osearch);
+		DemNode* newdem = DemAt(nsearch, cdi);
+		nlist.push_back(newdem);
 	}
 }
 
@@ -1208,6 +1252,23 @@ void LinkDemB(DemTree* orig, DemTree* copy)
 	int condem[RESOURCES];
 	int supplying[RESOURCES];
 #endif
+
+	auto oditer=orig->supbpcopy.begin();
+	auto cditer=copy->supbpcopy.begin();
+	for(;
+	oditer!=orig->supbpcopy.end() && cditer!=copy->supbpcopy.end();
+	oditer++, cditer++)
+	{
+		DemsAtB* olddem = (DemsAtB*)*oditer;
+		DemsAtB* newdem = (DemsAtB*)*cditer;
+
+		LinkDems(olddem->condems, newdem->condems, orig->rdemcopy, copy->rdemcopy);
+		LinkDems(olddem->proddems, newdem->proddems, orig->rdemcopy, copy->rdemcopy);
+		LinkDems(olddem->manufdems, newdem->manufdems, orig->rdemcopy, copy->rdemcopy);
+
+		for(int ctype=0; ctype<CONDUIT_TYPES; ctype++)
+			LinkDems(olddem->cddems[ctype], newdem->cddems[ctype], orig->rdemcopy, copy->rdemcopy);
+	}
 }
 
 //Link dem nodes
@@ -1228,6 +1289,25 @@ void LinkDemU(DemTree* orig, DemTree* copy)
 	int timeused;
 	int totaldem[RESOURCES];
 #endif
+
+#if 0
+int DemIndex(DemNode* pdem, std::list<DemNode*>& list)
+DemNode* DemAt(std::list<DemNode*>& list, int seekdi)
+#endif
+
+	auto oditer=orig->supupcopy.begin();
+	auto cditer=copy->supupcopy.begin();
+	for(;
+	oditer!=orig->supupcopy.end() && cditer!=copy->supupcopy.end();
+	oditer++, cditer++)
+	{
+		DemsAtU* olddem = (DemsAtU*)*oditer;
+		DemsAtU* newdem = (DemsAtU*)*cditer;
+
+		LinkDems(olddem->manufdems, newdem->manufdems, orig->rdemcopy, copy->rdemcopy);
+		LinkDems(olddem->consumdems, newdem->consumdems, orig->rdemcopy, copy->rdemcopy);
+		newdem->opup = DemAt(copy->supupcopy, DemIndex(olddem->opup, orig->supupcopy));
+	}
 }
 //Link dem nodes
 void LinkDemCo(DemTree* orig, DemTree* copy)
@@ -1281,15 +1361,18 @@ void DupDT(DemTree* orig, DemTree* copy)
 	DupDemB(orig, copy);
 	DupDemU(orig, copy);
 	DupDemCo(orig, copy);
-	DupRDem(orig, copy, NULL, orig->rdemcopy, copy->rdemcopy);
+	DupRDem(orig, copy);
 	LinkDemB(orig, copy);
 	LinkDemU(orig, copy);
 	LinkDemCo(orig, copy);
 	LinkDemR(orig, copy);
 
-	for(int ri=0; ri<RESOURCES; ri++)
+	for(int pi=0; pi<PLAYERS; pi++)
 	{
-		copy->pyrsup[ri] = orig->pyrsup[ri];
+		for(int ri=0; ri<RESOURCES; ri++)
+		{
+			copy->pyrsup[pi][ri] = orig->pyrsup[pi][ri];
+		}
 	}
 }
 
@@ -1323,7 +1406,7 @@ void CheckSups(DemTree* dm, Player* p, int rtype, int ramt, Vec2i tpos, std::lis
 
 		for(auto dembiter=dm->supbpcopy.begin(); dembiter!=dm->supbpcopy.end(); dembiter++)
 		{
-			DemsAtB* demb = *dembiter;
+			DemsAtB* demb = (DemsAtB*)*dembiter;
 			int bi = demb->bi;
 
 			if(bi < 0)

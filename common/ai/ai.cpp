@@ -36,7 +36,7 @@ void Build(Player* p)
 {
 	for(auto biter = g_demtree.supbpcopy.begin(); biter != g_demtree.supbpcopy.end(); biter ++)
 	{
-		DemsAtB* demb = *biter;
+		DemsAtB* demb = (DemsAtB*)*biter;
 
 		if(demb->bi >= 0)
 			continue;

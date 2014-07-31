@@ -105,7 +105,7 @@ class CdDem : public DemNode
 public:
 	int cdtype;
 	Vec2i tpos;
-	std::list<RDemNode*> condems;
+	std::list<DemNode*> condems;	// (RDemNode)
 
 	CdDem() : DemNode()
 	{
@@ -119,10 +119,10 @@ class DemsAtB : public DemNode
 public:
 	int bi;
 	int btype;
-	std::list<RDemNode*> condems;	//construction material
-	std::list<RDemNode*> proddems;	//production input raw materials
-	std::list<RDemNode*> manufdems;	//manufacturing input raw materials
-	std::list<CdDem*> cddems[CONDUIT_TYPES];
+	std::list<DemNode*> condems;	//construction material (RDemNode)
+	std::list<DemNode*> proddems;	//production input raw materials (RDemNode)
+	std::list<DemNode*> manufdems;	//manufacturing input raw materials (RDemNode)
+	std::list<DemNode*> cddems[CONDUIT_TYPES]; // (CdDem)
 	int prodratio;
 	int condem[RESOURCES];
 	int supplying[RESOURCES];
@@ -167,9 +167,9 @@ class DemsAtU : public DemNode
 public:
 	int ui;
 	int utype;
-	std::list<RDemNode*> manufdems;
-	std::list<RDemNode*> consumdems;
-	DemsAtU* opup;	//operator/driver
+	std::list<DemNode*> manufdems;	// (RDemNode)
+	std::list<DemNode*> consumdems;	// (RDemNode)
+	DemNode* opup;	//operator/driver (DemsAtU)
 	int prodratio;
 	int timeused;
 	int totaldem[RESOURCES];
@@ -207,10 +207,10 @@ class DemTree
 {
 public:
 	std::list<DemNode*> nodes;
-	std::list<DemsAtB*> supbpcopy;	//master copy, this one will be freed
-	std::list<DemsAtU*> supupcopy;	//master copy, this one will be freed
-	std::list<DemNode*> codems[CONDUIT_TYPES];	//conduit placements
-	std::list<RDemNode*> rdemcopy;	//master copy, this one will be freed
+	std::list<DemNode*> supbpcopy;	//master copy, this one will be freed (DemsAtB)
+	std::list<DemNode*> supupcopy;	//master copy, this one will be freed (DemsAtU)
+	std::list<DemNode*> codems[CONDUIT_TYPES];	//conduit placements (CdDem)
+	std::list<DemNode*> rdemcopy;	//master copy, this one will be freed (RDemNode)
 	int pyrsup[PLAYERS][RESOURCES];	//player global res supplying
 
 	void free()
