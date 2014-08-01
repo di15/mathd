@@ -14,9 +14,6 @@
 unsigned short isqrt(unsigned long a);
 
 #else
-//Reserved for future projects
-
-#include "fixmath.h"
 
 //http://stackoverflow.com/questions/4930307/fastest-way-to-get-the-integer-part-of-sqrtn
 

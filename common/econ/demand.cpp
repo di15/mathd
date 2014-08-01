@@ -61,7 +61,7 @@ Add road, powerline, and/or crude oil pipeline infrastructure between two buildi
 according to the trade between the two buildings and presence or absense of a body of a water in between.
 Connect the buildings to the power and road grid, and crude oil pipeline grid if necessary.
 */
-void AddInf(DemTree* dm, std::list<DemNode*>* nodes, DemNode* parent, DemNode* parent2, int rtype, int ramt, int depth)
+void AddInf(DemTree* dm, std::list<DemNode*>* nodes, DemNode* parent, DemNode* parent2, int rtype, int ramt, int depth, bool* success)
 {
 	// TO DO: roads and infrastructure to suppliers
 
@@ -83,7 +83,125 @@ void AddInf(DemTree* dm, std::list<DemNode*>* nodes, DemNode* parent, DemNode* p
 
 }
 
-void AddReq(DemTree* dm, std::list<DemNode*>* nodes, DemNode* parent, int rtype, int ramt, int depth)
+//best actual (not just proposed) supplier
+DemsAtB* BestAcSup(DemTree* dm, Vec2i demtpos, Vec2i dmcmpos, int rtype)
+{
+    DemsAtB* bestdemb = NULL;
+    int bestutil = -1;
+    Resource* r = &g_resource[rtype];
+
+    for(auto biter = dm->supbpcopy.begin(); biter != dm->supbpcopy.end(); biter++)
+    {
+        DemsAtB* demb = (DemsAtB*)*biter;
+        BlType* bt = &g_bltype[demb->btype];
+
+        if(bt->output[rtype] <= 0)
+            continue;
+
+        int capleft = bt->output[rtype];
+        capleft -= demb->supplying[rtype];
+
+#ifdef DEBUG
+        g_log<<"\tcapleft "<<capleft<<std::endl;
+        g_log.flush();
+#endif
+
+        if(capleft <= 0)
+            continue;
+
+        Vec2i btpos;
+        int margpr;
+
+        //proposed bl?
+        if(demb->bi < 0)
+        {
+            btpos = demb->tilepos;
+            margpr = demb->bid.marginpr;
+        }
+        //actual bl's, rather than proposed
+        else
+        {
+            Building* b = &g_building[demb->bi];
+            btpos = b->tilepos;
+            margpr = b->prodprice[rtype];
+        }
+
+        //check if distance is better or if there's no best yet
+
+        Vec2i bcmpos = btpos * TILE_SIZE + Vec2i(TILE_SIZE,TILE_SIZE)/2;
+
+        int dist = Magnitude(bcmpos - demcmpos);
+
+        //if(dist > bestdist && bestdemb)
+        //	continue;
+
+        int util = r->physical ? PhUtil(margpr, dist) : GlUtil(margpr);
+
+        if(util > bestutil && bestdemb)
+            continue;
+
+        bestdemb = demb;
+        bestutil = util;
+    }
+
+	return bestdemb;
+}
+//best proposed supplier
+DemsAtB* BestPrSup(DemTree* dm, Vec2i demtpos, Vec2i dmcmpos, int rtype)
+{
+    DemsAtB* bestdemb = NULL;
+    int bestutil = -1;
+
+    //include proposed demb's in search if all actual b's used up
+    for(auto biter = dm->supbpcopy.begin(); biter != dm->supbpcopy.end(); biter++)
+    {
+        DemsAtB* demb = (DemsAtB*)*biter;
+        BlType* bt = &g_bltype[demb->btype];
+
+        if(bt->output[rtype] <= 0)
+            continue;
+
+        int capleft = bt->output[rtype];
+        capleft -= demb->supplying[rtype];
+
+#ifdef DEBUG
+        g_log<<"\tcapleft "<<capleft<<std::endl;
+        g_log.flush();
+#endif
+
+        if(capleft <= 0)
+            continue;
+
+        //only search for proposed bl's in this loop
+        if(demb->bi >= 0)
+            continue;
+
+        //check if distance is better or if there's no best yet
+        Building* b = &g_building[demb->bi];
+
+        Vec2i btpos = b->tilepos;
+        Vec2i bcmpos = btpos * TILE_SIZE + Vec2i(TILE_SIZE,TILE_SIZE)/2;
+
+        int dist = Magnitude(bcmpos - demcmpos);
+
+        //if(dist > bestdist && bestdemb)
+        //	continue;
+
+        int margpr = b->prodprice[rtype];
+
+        int util = r->physical ? PhUtil(margpr, dist) : GlUtil(margpr);
+
+        if(util > bestutil && bestdemb)
+            continue;
+
+        bestdemb = demb;
+        bestutil = util;
+    }
+
+	return bestdemb;
+}
+
+void AddReq(DemTree* dm, Player* p, std::list<DemNode*>* nodes, DemNode* parent, int rtype, int ramt, int depth, bool* success)
 {
 #ifdef DEBUG
 	if(ramt <= 0)
@@ -100,6 +218,35 @@ void AddReq(DemTree* dm, std::list<DemNode*>* nodes, DemNode* parent, int rtype,
 
 	if(depth > MAX_REQ)
 		return;
+
+	Resource* r = &g_resource[rtype];
+
+	Vec2i demtpos = Vec2i(g_hmap.m_widthx, g_hmap.m_widthz)/2;
+	Vec2i demcmpos = demtpos * TILE_SIZE + Vec2i(TILE_SIZE,TILE_SIZE)/2;
+	DemsAtB* pardemb = NULL;
+	DemsAtU* pardemu = NULL;
+	Unit* paru = NULL;
+
+	if(parent)
+	{
+		if(parent->demtype == DEM_BNODE)
+		{
+			pardemb = (DemsAtB*)parent;
+			demtpos = pardemb->tilepos;
+			demcmpos = demtpos * TILE_SIZE + Vec2i(TILE_SIZE,TILE_SIZE)/2;
+		}
+		else if(parent->demtype == DEM_UNODE)
+		{
+			pardemu = (DemsAtU*)parent;
+
+			if(pardemu->ui >= 0)
+			{
+				paru = &g_unit[paru->ui];
+				demcmpos = paru->cmpos;
+				demtpos = demcmpos / TILE_SIZE;
+			}
+		}
+	}
 
 	int rremain = ramt;
 	//int bidremain = bid;
@@ -123,93 +270,108 @@ void AddReq(DemTree* dm, std::list<DemNode*>* nodes, DemNode* parent, int rtype,
 	g_log.flush();
 #endif
 
-	for(auto biter = dm->supbpcopy.begin(); biter != dm->supbpcopy.end(); biter++)
+	while(rremain > 0)
 	{
-		DemsAtB* demb = (DemsAtB*)*biter;
-		BlType* bt = &g_bltype[demb->btype];
+		DemsAtB* bestdemb = NULL;
+		int bestutil = -1;
 
-		if(bt->output[rtype] <= 0)
-			continue;
+		//bestac
+		bestdemb = BestAcSup(dm, demtpos, demcmpos, rtype);
 
-		int capleft = bt->output[rtype];
-		capleft -= demb->supplying[rtype];
+		//best prop
+		if(!bestdemb)
+			bestdemb = BestPrSup(dm, demtpos, demcmpos, rtype);
 
-#ifdef DEBUG
-		g_log<<"\tcapleft "<<capleft<<std::endl;
-		g_log.flush();
-#endif
-
-		if(capleft <= 0)
-			continue;
-
-		int suphere = imin(capleft, rremain);
-		rremain -= suphere;
-
-#ifdef DEBUG
-		g_log<<"\tsuphere "<<suphere<<" remain "<<remain<<std::endl;
-		g_log.flush();
-#endif
-
-		RDemNode* rdem = new RDemNode;
-		rdem->bi = demb->bi;
-		rdem->btype = demb->btype;
-		rdem->supbp = demb;
-		rdem->parent = parent;
-		rdem->rtype = rtype;
-		rdem->ramt = suphere;
-		rdem->ui = -1;
-		rdem->utype = -1;
-		// TO DO: unit transport
-		nodes->push_back(rdem);
-		dm->rdemcopy.push_back(rdem);
-
-		//int producing = bt->output[rtype] * demb->prodratio / RATIO_DENOM;
-		//int overprod = producing - demb->supplying[rtype] - suphere;
-
-		int newprodlevel = (demb->supplying[rtype] + suphere) * RATIO_DENOM / bt->output[rtype];
-		newprodlevel = imax(1, newprodlevel);
-		demb->supplying[rtype] += suphere;
-
-#ifdef DEBUG
-		g_log<<"suphere"<<suphere<<" of total"<<demb->supplying[rtype]<<" of remain"<<remain<<" of res "<<g_resource[rtype].name<<" newprodlevel "<<demb->prodratio<<" -> "<<newprodlevel<<std::endl;
-		g_log.flush();
-#endif
-
-		if(newprodlevel > demb->prodratio)
+		//if there's still no supplier, propose one to be made
+		//and set that supplier as bestdemb
+		if(!bestdemb)
 		{
-			int extraprodlev = newprodlevel - demb->prodratio;
-			int oldprodratio = demb->prodratio;
-			demb->prodratio = newprodlevel;
-
-			for(int ri=0; ri<RESOURCES; ri++)
-			{
-				if(bt->input[ri] <= 0)
-					continue;
-
-				//int rreq = extraprodlev * bt->input[ri] / RATIO_DENOM;
-				int oldreq = oldprodratio * bt->input[ri] / RATIO_DENOM;
-				int newreq = newprodlevel * bt->input[ri] / RATIO_DENOM;
-				int rreq = newreq - oldreq;
-
-				if(rreq <= 0)
-				{
-#ifdef DEBUG
-					g_log<<"rreq 0 at "<<__LINE__<<" = "<<rreq<<" of "<<g_resource[ri].name<<std::endl;
-					g_log.flush();
-#endif
-					continue;
-				}
-
-				AddReq(dm, &demb->proddems, demb, ri, rreq, depth+1);
-			}
 		}
 
-		AddInf(dm, nodes, parent, *biter, rtype, ramt, depth);
-
-		if(rremain <= 0)
+		//if no proposed bl can be placed, return
+		if(!bestdemb)
 			return;
+
+		//if bestdemb found, subtract usage, add its reqs, add conduits, etc.
+
+        DemsAtB* demb = (DemsAtB*)*biter;
+        BlType* bt = &g_bltype[demb->btype];
+
+        if(bt->output[rtype] <= 0)
+            continue;
+
+        int capleft = bt->output[rtype];
+        capleft -= demb->supplying[rtype];
+
+        int suphere = imin(capleft, rremain);
+        rremain -= suphere;
+
+#ifdef DEBUG
+        g_log<<"\tsuphere "<<suphere<<" remain "<<remain<<std::endl;
+        g_log.flush();
+#endif
+
+        RDemNode* rdem = new RDemNode;
+        rdem->bi = demb->bi;
+        rdem->btype = demb->btype;
+        rdem->supbp = demb;
+        rdem->parent = parent;
+        rdem->rtype = rtype;
+        rdem->ramt = suphere;
+        rdem->ui = -1;
+        rdem->utype = -1;
+        // TO DO: unit transport
+        nodes->push_back(rdem);
+        dm->rdemcopy.push_back(rdem);
+
+        //int producing = bt->output[rtype] * demb->prodratio / RATIO_DENOM;
+        //int overprod = producing - demb->supplying[rtype] - suphere;
+
+        int newprodlevel = (demb->supplying[rtype] + suphere) * RATIO_DENOM / bt->output[rtype];
+        newprodlevel = imax(1, newprodlevel);
+        demb->supplying[rtype] += suphere;
+
+#ifdef DEBUG
+        g_log<<"suphere"<<suphere<<" of total"<<demb->supplying[rtype]<<" of remain"<<remain<<" of res "<<g_resource[rtype].name<<" newprodlevel "<<demb->prodratio<<" -> "<<newprodlevel<<std::endl;
+        g_log.flush();
+#endif
+
+        if(newprodlevel > demb->prodratio)
+        {
+            int extraprodlev = newprodlevel - demb->prodratio;
+            int oldprodratio = demb->prodratio;
+            demb->prodratio = newprodlevel;
+
+            for(int ri=0; ri<RESOURCES; ri++)
+            {
+                if(bt->input[ri] <= 0)
+                    continue;
+
+                //int rreq = extraprodlev * bt->input[ri] / RATIO_DENOM;
+                int oldreq = oldprodratio * bt->input[ri] / RATIO_DENOM;
+                int newreq = newprodlevel * bt->input[ri] / RATIO_DENOM;
+                int rreq = newreq - oldreq;
+
+                if(rreq <= 0)
+                {
+#ifdef DEBUG
+                    g_log<<"rreq 0 at "<<__LINE__<<" = "<<rreq<<" of "<<g_resource[ri].name<<std::endl;
+                    g_log.flush();
+#endif
+                    continue;
+                }
+
+                AddReq(dm, p, &demb->proddems, demb, ri, rreq, depth+1);
+            }
+        }
+
+        AddInf(dm, nodes, parent, *biter, rtype, ramt, depth);
+
+        if(rremain <= 0)
+            return;
 	}
 
+#if 0
 	if(rremain <= 0)
 		return;
 
@@ -250,8 +412,21 @@ void AddReq(DemTree* dm, std::list<DemNode*>* nodes, DemNode* parent, int rtype,
 	BlType* t = &g_bltype[leastplb];
 	//int reqnb = imax(1, Ceili(ramt, t->output[rtype]));
 
+	//get all the req rtype supplied with proposed suppliers
 	do
 	{
+		//check all tiles,bltypes for best supplying
+
+		for(int x=0; x<g_hmap.m_widthx; x++)
+		{
+			for(int z=0; z<g_hmap.m_widthz; z++)
+			{
+
+			}
+		}
+
+		//CheckTile
+#if 0
 		DemsAtB* demb = new DemsAtB();
 
 		demb->parent = NULL;
@@ -351,7 +526,9 @@ void AddReq(DemTree* dm, std::list<DemNode*>* nodes, DemNode* parent, int rtype,
 		AddInf(dm, nodes, parent, demb, rtype, ramt, depth);
 
 		rremain -= prodamt;
+#endif
 	}while(rremain > 0);
+#endif
 
 	// TO DO: outlets for global player cache/reserves
 }
@@ -1387,8 +1564,9 @@ void TranspCost(DemTree* dm, Player* p, Vec2i tfrom, Vec2i tto)
 /*
 Hypothetical costs of inputs and transport
 Add calculated demands
+Add infrastructure roads, powerlines, etc.
 */
-void CheckSups(DemTree* dm, Player* p, int rtype, int ramt, Vec2i tpos, std::list<CostCompo>& costco)
+void CheckSups(DemTree* dm, Player* p, int rtype, int ramt, DemsAtB* demb, std::list<CostCompo>& costco)
 {
 	Resource* r = &g_resource[rtype];
 
@@ -1400,14 +1578,14 @@ void CheckSups(DemTree* dm, Player* p, int rtype, int ramt, Vec2i tpos, std::lis
 	{
 		int bestbi = -1;
 		int bestpr = -1;
-		DemsAtB* bestdemb = NULL;
+		DemsAtB* bestsupb = NULL;
 		int beststock = 0;
 		int bestglob = 0;
 
-		for(auto dembiter=dm->supbpcopy.begin(); dembiter!=dm->supbpcopy.end(); dembiter++)
+		for(auto supbiter=dm->supbpcopy.begin(); supbiter!=dm->supbpcopy.end(); supbiter++)
 		{
-			DemsAtB* demb = (DemsAtB*)*dembiter;
-			int bi = demb->bi;
+			DemsAtB* supb = (DemsAtB*)*supbiter;
+			int bi = supb->bi;
 
 			if(bi < 0)
 				continue;
@@ -1444,7 +1622,7 @@ void CheckSups(DemTree* dm, Player* p, int rtype, int ramt, Vec2i tpos, std::lis
 			if(bestbi >= 0 && bestpr < b->prodprice[rtype])
 				continue;
 
-			int stockqty = bt->output[rtype] - demb->supplying[rtype];
+			int stockqty = bt->output[rtype] - supb->supplying[rtype];
 			//int stockqty = b->stocked[rtype] - demb->supplying[rtype];
 
 			int pi = b->owner;
@@ -1466,7 +1644,7 @@ void CheckSups(DemTree* dm, Player* p, int rtype, int ramt, Vec2i tpos, std::lis
 
 			bestbi = bi;
 			bestpr = b->prodprice[rtype];
-			bestdemb = demb;
+			bestsupb = supb;
 			beststock = stockqty;
 			bestglob = globqty;
 		}
@@ -1479,7 +1657,7 @@ void CheckSups(DemTree* dm, Player* p, int rtype, int ramt, Vec2i tpos, std::lis
 		if(globconsum > 0)
 		{
 			remain -= globconsum;
-			Building* b = &g_building[bestdemb->bi];
+			Building* b = &g_building[bestsupb->bi];
 			int pi = b->owner;
 			dm->pyrsup[pi][rtype] += globconsum;
 		}
@@ -1501,10 +1679,10 @@ void CheckSups(DemTree* dm, Player* p, int rtype, int ramt, Vec2i tpos, std::lis
 }
 
 /*
-Determine cost composition for proposed building production, so don't create r dems
+Determine cost composition for proposed building production, create r dems
 Also estimate transportation
-Roads and infrastructure might not be present yet, so just ignore that, as long as they're on the same island
-If not, maybe create demand for overseas transport?
+Roads and infrastructure might not be present yet, create demand?
+If not on same island, maybe create demand for overseas transport?
 If no trucks are present, create demand?
 */
 void CheckBlType(DemTree* dm, Player* p, int btype, int rtype, int ramt, Vec2i tpos, Bid* bid, int* blmaxr)
@@ -1521,6 +1699,20 @@ void CheckBlType(DemTree* dm, Player* p, int btype, int rtype, int ramt, Vec2i t
 
 	*blmaxr = ramt;
 
+	DemsAtB* demb = new DemsAtB;
+
+	demb->parent = NULL;
+	demb->prodratio = 0;
+	Zero(demb->supplying);
+	Zero(demb->condem);
+	demb->bi = -1;
+	demb->btype = btype;
+	demb->prodratio = prodlevel;
+	demb->supplying[rtype] = ramt;
+	demb->tilepos = tpos;
+
+	dm->supbpcopy.push_back(demb);
+
 	Vec2i cmpos = tpos * TILE_SIZE + Vec2i(TILE_SIZE,TILE_SIZE)/2;
 
 	std::list<CostCompo> rcostco[RESOURCES];
@@ -1530,7 +1722,13 @@ void CheckBlType(DemTree* dm, Player* p, int btype, int rtype, int ramt, Vec2i t
 		if(bt->input[ri] <= 0)
 			continue;
 
-		CheckSups(dm, p, ri, Ceili(prodlevel * bt->input[ri], RATIO_DENOM), tpos, rcostco[ri]);
+		int reqr = Ceili(prodlevel * bt->input[ri], RATIO_DENOM);
+
+		if(reqr <= 0)
+			continue;
+
+		//CheckSups(dm, p, ri, reqr, demb, rcostco[ri]);
+		AddReq(dm, &demb->proddems, demb, ri, reqr, 0);
 	}
 
 	//combine the res compos into one costcompo
@@ -1550,6 +1748,7 @@ void CheckBlType(DemTree* dm, Player* p, int btype, int rtype, int ramt, Vec2i t
 
 	int remain = ramt;
 
+	// determine cost for building's output production
 	while(remain > 0)
 	{
 		int prodstep[RESOURCES];	//production level based on stepleft and bl's output cap
@@ -1640,6 +1839,10 @@ void CheckBlType(DemTree* dm, Player* p, int btype, int rtype, int ramt, Vec2i t
 
 		bid->costcompo.push_back(nextco);
 	}
+
+	demb->bid = *bid;
+
+	// TO DO
 }
 
 //max profit
@@ -1684,8 +1887,9 @@ int MaxPro(std::list<CostCompo>& costco, int pricelevel, int demramt, int* prora
 
 /*
 Based on the dems in the tree, find the best price for this tile and res, if a profit can be generated
+pt: tile info to return, including cost compo, bid, profit
 */
-void CheckBlTile(DemTree* dm, Player* p, int ri, RDemNode* pt, int x, int z, int* fixc, int* recurp)
+void CheckBlTile(DemTree* dm, Player* p, int ri, RDemNode* pt, int x, int z, int* fixc, int* recurp, bool* success)
 {
 	//list of demands for this res type, with max revenue and costs for this tile
 	std::list<RDemNode> rdems;

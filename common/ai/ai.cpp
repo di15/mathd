@@ -13,7 +13,7 @@ void UpdateAI()
 	if(g_simframe - lastthink < CYCLE_FRAMES/30)
 		return;
 
-	CalcDem1();
+	//CalcDem1();
 
 	for(int i=0; i<PLAYERS; i++)
 	{
