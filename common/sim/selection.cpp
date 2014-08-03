@@ -569,12 +569,12 @@ Selection SelectAreaPersp(Vec3f campos, Vec3f camside, Vec3f camup2, Vec3f viewd
 	float distBack = PlaneDistance(normalBack, backPoly[0]);
 
 	g_selfrust.construct(
-		Plane3f(normalLeft.x, normalLeft.y, normalLeft.z, distLeft),
-		Plane3f(normalRight.x, normalRight.y, normalRight.z, distRight),
-		Plane3f(normalTop.x, normalTop.y, normalTop.z, distTop),
-		Plane3f(normalBottom.x, normalBottom.y, normalBottom.z, distBottom),
-		Plane3f(normalFront.x, normalFront.y, normalFront.z, distFront),
-		Plane3f(normalBack.x, normalBack.y, normalBack.z, distBack));
+	        Plane3f(normalLeft.x, normalLeft.y, normalLeft.z, distLeft),
+	        Plane3f(normalRight.x, normalRight.y, normalRight.z, distRight),
+	        Plane3f(normalTop.x, normalTop.y, normalTop.z, distTop),
+	        Plane3f(normalBottom.x, normalBottom.y, normalBottom.z, distBottom),
+	        Plane3f(normalFront.x, normalFront.y, normalFront.z, distFront),
+	        Plane3f(normalBack.x, normalBack.y, normalBack.z, distBack));
 
 	Selection selection;
 

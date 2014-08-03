@@ -155,14 +155,14 @@ bool InterPlane(Vec3f vPoly[], Vec3f vLine[], Vec3f &vNormal, float &originDista
 	// Get the distance from point1 from the plane using: Ax + By + Cz + D = (The distance from the plane)
 
 	distance1 = ((vNormal.x * vLine[0].x)  +					// Ax +
-				 (vNormal.y * vLine[0].y)  +					// Bx +
-				 (vNormal.z * vLine[0].z)) + originDistance;	// Cz + D
+	             (vNormal.y * vLine[0].y)  +					// Bx +
+	             (vNormal.z * vLine[0].z)) + originDistance;	// Cz + D
 
 	// Get the distance from point2 from the plane using Ax + By + Cz + D = (The distance from the plane)
 
 	distance2 = ((vNormal.x * vLine[1].x)  +					// Ax +
-				 (vNormal.y * vLine[1].y)  +					// Bx +
-				 (vNormal.z * vLine[1].z)) + originDistance;	// Cz + D
+	             (vNormal.y * vLine[1].y)  +					// Bx +
+	             (vNormal.z * vLine[1].z)) + originDistance;	// Cz + D
 
 	// Now that we have 2 distances from the plane, if we times them together we either
 	// get a positive or negative number.  If it's a negative number, that means we collided!
@@ -284,8 +284,8 @@ Vec3f IntersectionPoint(Vec3f vNormal, Vec3f vLine[], double distance)
 	//    distance.  We negate the distance because we want to eventually go BACKWARDS from our point to the plane.
 	//    By doing this is will basically bring us back to the plane to find our intersection point.
 	Numerator = - (vNormal.x * vLine[0].x +		// Use the plane equation with the normal and the line
-				   vNormal.y * vLine[0].y +
-				   vNormal.z * vLine[0].z + distance);
+	               vNormal.y * vLine[0].y +
+	               vNormal.z * vLine[0].z + distance);
 
 	// 3) If we take the dot product between our line std::vector and the normal of the polygon,
 	//    this will give us the cosine of the angle between the 2 (since they are both normalized - length 1).
@@ -375,8 +375,8 @@ Matrix lookAt(Vec3f eye, Vec3f target, Vec3f up)
 */
 
 Matrix gluLookAt2(float eyex, float eyey, float eyez,
-				  float centerx, float centery, float centerz,
-				  float upx, float upy, float upz)
+                  float centerx, float centery, float centerz,
+                  float upx, float upy, float upz)
 {
 	float m[16];
 	float x[3], y[3], z[3];
@@ -466,8 +466,8 @@ Matrix gluLookAt2(float eyex, float eyey, float eyez,
 }
 
 Matrix LookAt(float eyex, float eyey, float eyez,
-				  float centerx, float centery, float centerz,
-				  float upx, float upy, float upz)
+              float centerx, float centery, float centerz,
+              float upx, float upy, float upz)
 {
 	float m[16];
 	Vec3f x, y, z;

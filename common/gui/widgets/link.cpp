@@ -81,8 +81,8 @@ void Link::inev(InEv* ev)
 	{
 		int texlen = m_text.texlen();
 		if(py->mouse.x >= m_pos[0] && py->mouse.y >= m_pos[1] &&
-				py->mouse.x <= m_pos[0]+texlen*g_font[m_font].gheight/2 &&
-				py->mouse.y <= m_pos[1]+g_font[m_font].gheight)
+		                py->mouse.x <= m_pos[0]+texlen*g_font[m_font].gheight/2 &&
+		                py->mouse.y <= m_pos[1]+g_font[m_font].gheight)
 		{
 		}
 		else
@@ -93,8 +93,8 @@ void Link::inev(InEv* ev)
 		if(!ev->intercepted)
 		{
 			if(py->mouse.x >= m_pos[0] && py->mouse.y >= m_pos[1] &&
-					py->mouse.x <= m_pos[0]+texlen*g_font[m_font].gheight/2 &&
-					py->mouse.y <= m_pos[1]+g_font[m_font].gheight)
+			                py->mouse.x <= m_pos[0]+texlen*g_font[m_font].gheight/2 &&
+			                py->mouse.y <= m_pos[1]+g_font[m_font].gheight)
 			{
 				m_over = true;
 

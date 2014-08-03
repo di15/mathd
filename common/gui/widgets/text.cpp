@@ -27,20 +27,20 @@ void Text::draw()
 	{
 
 #ifdef DEBUG
-	g_log<<"text "<<__FILE__<<" "<<__LINE__<<std::endl;
-    g_log.flush();
+		g_log<<"text "<<__FILE__<<" "<<__LINE__<<std::endl;
+		g_log.flush();
 #endif
 #if 1
 		DrawShadowedTextF(m_font, m_pos[0], m_pos[1], m_pos[0], m_pos[1], m_pos[2], m_pos[3], &m_text, m_rgba);
 #else
 		DrawShadowedText(m_font, m_pos[0], m_pos[1], &m_text, m_rgba);
 #endif
-    }
+	}
 	else
 	{
 #ifdef DEBUG
-	g_log<<"text "<<__FILE__<<" "<<__LINE__<<std::endl;
-    g_log.flush();
+		g_log<<"text "<<__FILE__<<" "<<__LINE__<<std::endl;
+		g_log.flush();
 #endif
 
 		DrawLineF(m_font, m_pos[0], m_pos[1], m_pos[0], m_pos[1], m_pos[2], m_pos[3], &m_text, m_rgba);

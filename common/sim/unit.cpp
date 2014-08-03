@@ -293,7 +293,7 @@ void ResetMode(Unit* u)
 	//LastNum("resetmode 1");
 	if(u->type == UNIT_LABOURER)
 	{
-        //LastNum("resetmode 1a");
+		//LastNum("resetmode 1a");
 		if(u->mode == UMODE_BLJOB)
 			RemWorker(u);
 
@@ -304,9 +304,9 @@ void ResetMode(Unit* u)
 	{
 #if 0
 		if(u->mode == UMODE_GOSUP
-           //|| mode == GOINGTOREFUEL
-           //|| mode == GOINGTODEMANDERB || mode == GOINGTODEMROAD || mode == GOINGTODEMPIPE || mode == GOINGTODEMPOWL
-           )
+		                //|| mode == GOINGTOREFUEL
+		                //|| mode == GOINGTODEMANDERB || mode == GOINGTODEMROAD || mode == GOINGTODEMPIPE || mode == GOINGTODEMPOWL
+		  )
 		{
 			if(u->supplier >= 0)
 			{
@@ -339,7 +339,7 @@ void ResetMode(Unit* u)
 
 		if(u->driver >= 0)
 		{
-            //LastNum("resetmode 1b");
+			//LastNum("resetmode 1b");
 			//g_unit[u->driver].Disembark();
 			u->driver = -1;
 		}

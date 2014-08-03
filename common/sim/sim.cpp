@@ -191,7 +191,7 @@ void Queue()
 
 		char name[64];
 		sprintf(name, "Player %d (%s)", i, pyc->name);
-		
+
 		DefP(i, pyc->color[0]/255.0f, pyc->color[1]/255.0f, pyc->color[2]/255.0f, 1, RichText(name));
 
 		SubmitConsole(&p->name);
@@ -286,7 +286,7 @@ void Queue()
 
 
 	// Conduit types
-	
+
 	Vec3f scale(TILE_SIZE/16.0f, TILE_SIZE/16.0f, TILE_SIZE/16.0f);
 	Vec3f trans(0,0,0);
 
@@ -325,7 +325,7 @@ void Queue()
 	DefConn(CONDUIT_ROAD, CONNECTION_NORTHEASTWEST, FINISHED, "models/road/new.ms3d", scale, trans);
 	DefConn(CONDUIT_ROAD, CONNECTION_NORTHEASTSOUTH, FINISHED, "models/road/nes.ms3d", scale, trans);
 	DefConn(CONDUIT_ROAD, CONNECTION_NORTHEASTSOUTHWEST, FINISHED, "models/road/nesw.ms3d", scale, trans);
-	
+
 	DefCo(CONDUIT_POWL, offsetof(Building,pownetw), offsetof(Selection,powls), TILE_SIZE*2, TILE_SIZE*2, true, true, Vec2i(0, 0), Vec3f(0, 0, 0));
 	CoConMat(CONDUIT_POWL, RES_LABOUR, 1);
 	CoConMat(CONDUIT_POWL, RES_MINERALS, 1);

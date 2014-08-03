@@ -54,11 +54,11 @@ float Clipf(float n, float lower, float upper);
 int Clipi(int n, int lower, int upper);
 float GetYaw(float dx, float dz);
 Matrix gluLookAt2(float eyex, float eyey, float eyez,
-				  float centerx, float centery, float centerz,
-				  float upx, float upy, float upz);
+                  float centerx, float centery, float centerz,
+                  float upx, float upy, float upz);
 Matrix LookAt(float eyex, float eyey, float eyez,
-				  float centerx, float centery, float centerz,
-				  float upx, float upy, float upz);
+              float centerx, float centery, float centerz,
+              float upx, float upy, float upz);
 Matrix PerspProj(float fov, float aspect, float znear, float zfar);
 Matrix OrthoProj(float l, float r, float t, float b, float n, float f);
 Vec4f ScreenPos(Matrix* mvp, Vec3f vec, float width, float height, bool persp);

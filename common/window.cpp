@@ -290,13 +290,13 @@ bool MakeWindow(const char* title)
 
 	// Create an application window with the following settings:
 	g_window = SDL_CreateWindow(
-				   title,                  // window title
-				   startx,           // initial x position
-				   starty,           // initial y position
-				   g_selectedRes.width,                               // width, in pixels
-				   g_selectedRes.height,                               // height, in pixels
-				   flags                  // flags - see below
-			   );
+	                   title,                  // window title
+	                   startx,           // initial x position
+	                   starty,           // initial y position
+	                   g_selectedRes.width,                               // width, in pixels
+	                   g_selectedRes.height,                               // height, in pixels
+	                   flags                  // flags - see below
+	           );
 
 	// Check that the window was successfully made
 	if (g_window == NULL)

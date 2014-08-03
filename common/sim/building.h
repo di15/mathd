@@ -48,7 +48,7 @@ public:
 	int prodlevel;	//production target level of max RATIO_DENOM
 	int cymet;	//used to keep track of what was produced this cycle, out of max of prodlevel
 	int lastcy;	//last simframe of last production cycle
-	std::list<CapSup> capsup;	//capacity suppliers 
+	std::list<CapSup> capsup;	//capacity suppliers
 
 	bool excin(int rtype);	//excess input resource right now?
 	bool metout();	//met production target for now?

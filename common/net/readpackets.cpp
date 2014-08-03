@@ -31,26 +31,26 @@
 #define REGCRASH_DBG
 
 /*
-What this function does is take a range of packet ack's (acknowledgment number for reliable UDP transmission) 
-and executes that range of buffered received packets. This is needed because packets might arrive out of order, 
+What this function does is take a range of packet ack's (acknowledgment number for reliable UDP transmission)
+and executes that range of buffered received packets. This is needed because packets might arrive out of order,
 be missing some in between, and I execute them only after a whole range up to the latest ack has been received.
 
 The out-of-order packets are stored in the g_recv vector.
 
-Notice that there is preprocessor check if we are compiling this for the master server _SERVER (because I'm 
-making this for a persistent, online world) or client. If server, there's extra parameters to match the packets 
+Notice that there is preprocessor check if we are compiling this for the master server _SERVER (because I'm
+making this for a persistent, online world) or client. If server, there's extra parameters to match the packets
 to the right client; we're only interested in processing the packet range for a certain client.
 
-Each packet goes to the PacketSwitch function, that is like a switch-table that executes the right 
-packet-execution function based on the packet type ID. The switch-table could probably be turned into 
+Each packet goes to the PacketSwitch function, that is like a switch-table that executes the right
+packet-execution function based on the packet type ID. The switch-table could probably be turned into
 an array of function pointers to improve performance, probably only slightly.
 
-The function takes a time of log(O) to execute, because it has to search through all the buffered packets 
-several times to execute them in the right order. And before that, there's a check to see if we even have 
+The function takes a time of log(O) to execute, because it has to search through all the buffered packets
+several times to execute them in the right order. And before that, there's a check to see if we even have
 the whole range of packets from the last "recvack" before calling this function.
 
-I keep a "sendack" and "recvack" for each client, for sent packets and received packets. I only update the 
-recvack up to the latest one once a continuous range has been received, with no missing packets. Recvack 
+I keep a "sendack" and "recvack" for each client, for sent packets and received packets. I only update the
+recvack up to the latest one once a continuous range has been received, with no missing packets. Recvack
 is thus the last executed received packet.
 */
 
@@ -64,7 +64,7 @@ void ParseRecieved(unsigned int first, unsigned int last)
 	PacketHeader* header;
 	unsigned int current = first;
 	unsigned int afterlast = NextAck(last);
-	
+
 	do
 	{
 		for(auto i=g_recv.begin(); i!=g_recv.end(); i++)
@@ -78,18 +78,18 @@ void ParseRecieved(unsigned int first, unsigned int last)
 #ifdef _SERVER
 			if(memcmp((void*)&p->addr, (void*)&addr, sizeof(struct sockaddr_in)) != 0)
 				continue;
-			
+
 			PacketSwitch(header->type, p->buffer, p->len, addr, c);
 #else
 			PacketSwitch(header->type, p->buffer, p->len);
 #endif
-		
+
 			p->freemem();
 			i = g_recv.erase(i);
 			current = NextAck(current);
 			break;
 		}
-	}while(current != afterlast);
+	} while(current != afterlast);
 }
 
 #ifdef _SERVER
@@ -103,7 +103,7 @@ bool Recieved(unsigned int first, unsigned int last)
 	unsigned int current = first;
 	unsigned int afterlast = NextAck(last);
 	bool missed;
-	
+
 	do
 	{
 		missed = true;
@@ -124,11 +124,11 @@ bool Recieved(unsigned int first, unsigned int last)
 			missed = false;
 			break;
 		}
-		
+
 		if(missed)
 			return false;
-	}while(current != afterlast);
-	
+	} while(current != afterlast);
+
 	return true;
 }
 
@@ -182,11 +182,11 @@ void TranslatePacket(char* buffer, int bytes, bool checkprev)
 	case PACKET_ACKNOWLEDGMENT:
 	case PACKET_REGISTRATION:
 	case PACKET_LOGIN:
-		{
-			checkprev = false;
-			break;
-		}
-#else        
+	{
+		checkprev = false;
+		break;
+	}
+#else
 	case PACKET_ACKNOWLEDGMENT:
 	case PACKET_USERNAME_EXISTS:
 	case PACKET_EMAIL_EXISTS:
@@ -197,12 +197,13 @@ void TranslatePacket(char* buffer, int bytes, bool checkprev)
 	case PACKET_REG_DB_ERROR:
 	case PACKET_REGISTRATION_DONE:
 	case PACKET_CONNECTION_RESET:
-		{
-			checkprev = false;
-			break;
-		}
+	{
+		checkprev = false;
+		break;
+	}
 #endif
-	default: break;
+	default:
+		break;
 	}
 
 #ifndef _SERVER
@@ -234,7 +235,7 @@ void TranslatePacket(char* buffer, int bytes, bool checkprev)
 			//g_log<<"ack "<<header->ack<<endl;
 			return;
 		}
-		
+
 #ifdef _SERVER
 		unsigned int next = NextAck(c->m_recvack);
 #else
@@ -269,7 +270,7 @@ void TranslatePacket(char* buffer, int bytes, bool checkprev)
 #else
 	PacketSwitch(header->type, buffer, bytes);
 #endif
-	
+
 	if(header->type != PACKET_ACKNOWLEDGMENT)
 	{
 #ifdef _SERVER
@@ -299,32 +300,69 @@ void PacketSwitch(int type, char* buffer, int bytes)
 	switch(type)
 	{
 #ifdef _SERVER
-	case PACKET_LOGIN:				ReadLoginPacket((LoginPacket*)buffer, from, c);						break;
-	case PACKET_REGISTRATION:		ReadRegistrationPacket((RegistrationPacket*)buffer, from, c);		break;
-	case PACKET_ACKNOWLEDGMENT:	ReadAcknowledgmentPacket((AcknowledgmentPacket*)buffer, from, c);	break;
+	case PACKET_LOGIN:
+		ReadLoginPacket((LoginPacket*)buffer, from, c);
+		break;
+	case PACKET_REGISTRATION:
+		ReadRegistrationPacket((RegistrationPacket*)buffer, from, c);
+		break;
+	case PACKET_ACKNOWLEDGMENT:
+		ReadAcknowledgmentPacket((AcknowledgmentPacket*)buffer, from, c);
+		break;
 #else
-	case PACKET_ACKNOWLEDGMENT:		ReadAcknowledgmentPacket((AcknowledgmentPacket*)buffer);			break;
-	case PACKET_REGISTRATION_DONE:	ReadRegisteredPacket((RegisteredPacket*)buffer);          break;
-	case PACKET_SPAWN_UNIT:			ReadSpawnUnitPacket((SpawnUnitPacket*)buffer);					break;
-	case PACKET_HEIGHT_POINT:		ReadHeightPointPacket((HeightPointPacket*)buffer);			break;
-	case PACKET_BUILDING:			ReadBuildingPacket((BuildingPacket*)buffer);				break;
-	case PACKET_GARRISON:			ReadGarrisonPacket((GarrisonPacket*)buffer);				break;
-	case PACKET_JOIN_INFO:			ReadJoinInfoPacket((JoinInfoPacket*)buffer);				break;
-	case PACKET_DONE_LOADING:		ReadDoneLoadingPacket((DoneLoadingPacket*)buffer);			break;
-		
-	case PACKET_USERNAME_EXISTS:   ReadUsernameExistsPacket((UsernameExistsPacket*)buffer);    break;
-	case PACKET_EMAIL_EXISTS:      ReadEmailExistsPacket((EmailExistsPacket*)buffer);          break;
-	case PACKET_INCORRECT_LOGIN:   ReadIncorrectLoginPacket((IncorrectLoginPacket*)buffer);    break;
-	case PACKET_INCORRECT_VERSION: ReadIncorrectVersionPacket((IncorrectVersionPacket*)buffer);    break;
-	case PACKET_LOGIN_CORRECT:     ReadLoginCorrectPacket((LoginCorrectPacket*)buffer);        break;
-	case PACKET_TOO_MANY_CLIENTS:  ReadTooManyClientsPacket((TooManyClientsPacket*)buffer);    break;
-	case PACKET_REG_DB_ERROR:      ReadRegDBErrorPacket((RegDBErrorPacket*)buffer);            break;
-	/*
-	case PACKET_CONNECTION_RESET:  ReadConnectionResetPacket((ConnectionResetPacket*)buffer);  break;
-	case PACKET_DISCONNECT:        ReadDisconnectPacket((DisconnectPacket*)buffer);            break;
-	*/
+	case PACKET_ACKNOWLEDGMENT:
+		ReadAcknowledgmentPacket((AcknowledgmentPacket*)buffer);
+		break;
+	case PACKET_REGISTRATION_DONE:
+		ReadRegisteredPacket((RegisteredPacket*)buffer);
+		break;
+	case PACKET_SPAWN_UNIT:
+		ReadSpawnUnitPacket((SpawnUnitPacket*)buffer);
+		break;
+	case PACKET_HEIGHT_POINT:
+		ReadHeightPointPacket((HeightPointPacket*)buffer);
+		break;
+	case PACKET_BUILDING:
+		ReadBuildingPacket((BuildingPacket*)buffer);
+		break;
+	case PACKET_GARRISON:
+		ReadGarrisonPacket((GarrisonPacket*)buffer);
+		break;
+	case PACKET_JOIN_INFO:
+		ReadJoinInfoPacket((JoinInfoPacket*)buffer);
+		break;
+	case PACKET_DONE_LOADING:
+		ReadDoneLoadingPacket((DoneLoadingPacket*)buffer);
+		break;
+
+	case PACKET_USERNAME_EXISTS:
+		ReadUsernameExistsPacket((UsernameExistsPacket*)buffer);
+		break;
+	case PACKET_EMAIL_EXISTS:
+		ReadEmailExistsPacket((EmailExistsPacket*)buffer);
+		break;
+	case PACKET_INCORRECT_LOGIN:
+		ReadIncorrectLoginPacket((IncorrectLoginPacket*)buffer);
+		break;
+	case PACKET_INCORRECT_VERSION:
+		ReadIncorrectVersionPacket((IncorrectVersionPacket*)buffer);
+		break;
+	case PACKET_LOGIN_CORRECT:
+		ReadLoginCorrectPacket((LoginCorrectPacket*)buffer);
+		break;
+	case PACKET_TOO_MANY_CLIENTS:
+		ReadTooManyClientsPacket((TooManyClientsPacket*)buffer);
+		break;
+	case PACKET_REG_DB_ERROR:
+		ReadRegDBErrorPacket((RegDBErrorPacket*)buffer);
+		break;
+		/*
+		case PACKET_CONNECTION_RESET:  ReadConnectionResetPacket((ConnectionResetPacket*)buffer);  break;
+		case PACKET_DISCONNECT:        ReadDisconnectPacket((DisconnectPacket*)buffer);            break;
+		*/
 #endif
-	default: break;
+	default:
+		break;
 	}
 }
 
@@ -346,7 +384,7 @@ void ReadLoginPacket(LoginPacket* p, struct sockaddr_in from, Client* c)
 		SendData((char*)&tmcp, sizeof(TooManyClientsPacket), &from, false, c);
 		return;
 	}
-	
+
 	g_log<<"rlp 2"<<endl;
 	g_log.flush();
 
@@ -365,7 +403,7 @@ void ReadLoginPacket(LoginPacket* p, struct sockaddr_in from, Client* c)
 	//Prevent buffer overrun
 	p->username[UN_LEN-1] = '\0';
 	p->password[PW_LEN-1] = '\0';
-	
+
 	char username[UN_LEN*2];
 	char crypt[CR_LEN];
 
@@ -373,7 +411,7 @@ void ReadLoginPacket(LoginPacket* p, struct sockaddr_in from, Client* c)
 	strcpy(username, p->username);
 	Hash(p->password, crypt);
 
-	
+
 	g_log<<"rlp 4"<<endl;
 	g_log.flush();
 
@@ -393,7 +431,7 @@ void ReadLoginPacket(LoginPacket* p, struct sockaddr_in from, Client* c)
 		return;
 	}
 
-	
+
 	g_log<<"rlp 5"<<endl;
 	g_log.flush();
 
@@ -403,8 +441,8 @@ void ReadLoginPacket(LoginPacket* p, struct sockaddr_in from, Client* c)
 		if(stricmp(pl->m_username, p->username) != 0)
 			DisconnectPlayer(c->m_player);
 	}
-	
-	
+
+
 	g_log<<"rlp 6"<<endl;
 	g_log.flush();
 
@@ -416,24 +454,24 @@ void ReadLoginPacket(LoginPacket* p, struct sockaddr_in from, Client* c)
 	g_player[loginpl].m_client = MatchClient(c);
 	c->m_player = loginpl;
 
-	
+
 	g_log<<"rlp 7"<<endl;
 	g_log.flush();
-	
+
 	Player* pl = &g_player[c->m_player];
 	int prevclient = PlayerClient(c->m_player);	//Is user already logged in from somewhere else?
 	if(prevclient >= 0)
 		DisconnectClient(prevclient);
 
-	
+
 	g_log<<"rlp 8"<<endl;
 	g_log.flush();
-	
+
 	LoginCorrectPacket clp;
 	clp.header.type = PACKET_LOGIN_CORRECT;
 	SendData((char*)&clp, sizeof(LoginCorrectPacket), &from, true, c);
 
-	
+
 	g_log<<"rlp 9"<<endl;
 	g_log.flush();
 
@@ -473,7 +511,7 @@ void ReadRegistrationPacket(RegistrationPacket* p, struct sockaddr_in from, Clie
 		SendData((char*)&rdbep, sizeof(RegDBErrorPacket), &from, true, c);
 		return;
 	}
-	
+
 	//char username[UN_LEN*2];
 	//char email[EM_LEN*2];
 	char crypt[CR_LEN];
@@ -513,7 +551,7 @@ void ReadRegistrationPacket(RegistrationPacket* p, struct sockaddr_in from, Clie
 		SendData((char*)&rdbep, sizeof(RegDBErrorPacket), &from, true, c);
 		return;
 	}
-	
+
 	RegisteredPacket rp;
 	rp.header.type = PACKET_REGISTRATION_DONE;
 	c->m_sendack = NextAck(c->m_sendack);
@@ -536,7 +574,7 @@ void ReadAcknowledgmentPacket(AcknowledgmentPacket* ap)
 {
 	OldPacket* p;
 	PacketHeader* header;
-	
+
 	for(auto i=g_sent.begin(); i!=g_sent.end(); i++)
 	{
 		p = &*i;
@@ -560,7 +598,7 @@ void ReadAcknowledgmentPacket(AcknowledgmentPacket* ap)
 
 #ifndef _SERVER
 void ReadRegisteredPacket(RegisteredPacket* rp)
-{	
+{
 	//void MessageBlock(const char* msg, bool show);
 	//void ShowMessageBlockContinue(bool show, void (*clickf)());
 
@@ -573,9 +611,9 @@ void ReadSpawnUnitPacket(SpawnUnitPacket* sup)
 	Planet* planet = &g_planet[sup->planetid];
 	Unit* u = &planet->m_unit[sup->uid];
 
-		/*
-struct SpawnUnitPacket
-{
+	/*
+	struct SpawnUnitPacket
+	{
 	PacketHeader header;
 	int planetid;
 	int uid;
@@ -601,8 +639,8 @@ struct SpawnUnitPacket
 	bool passive;
 	int distaccum;
 	int drivewage;
-};
-*/
+	};
+	*/
 
 	u->m_owner = sup->owner;
 	u->m_type = sup->type;
@@ -629,7 +667,7 @@ struct SpawnUnitPacket
 
 	if(u->m_owner == g_localplayer)
 		AddVis(sup->planetid, sup->uid);
-	
+
 	if(g_mode == MENU)
 	{
 		g_loadbytes += sizeof(JoinInfoPacket);
@@ -642,20 +680,20 @@ struct SpawnUnitPacket
 void ReadHeightPointPacket(HeightPointPacket* hpp)
 {
 	/*struct HeightPointPacket
-{
+	{
 	PacketHeader header;
 	int planetid;
 	int tx;
 	int tz;
 	float height;
-};*/
-	
+	};*/
+
 	Planet* p = &g_planet[hpp->planetid];
 	Heightmap* hm = &p->m_hmap;
 	hm->setheight(hpp->tx, hpp->tz, hpp->height);
 
 	g_log<<"hp "<<hpp->tx<<","<<hpp->tz<<endl;
-	
+
 	if(g_mode == MENU)
 	{
 		g_loadbytes += sizeof(JoinInfoPacket);
@@ -668,7 +706,7 @@ void ReadHeightPointPacket(HeightPointPacket* hpp)
 void ReadBuildingPacket(BuildingPacket* bp)
 {
 	/*struct BuildingPacket
-{
+	{
 	PacketHeader header;
 	int planetid;
 	int bid;
@@ -679,7 +717,7 @@ void ReadBuildingPacket(BuildingPacket* bp)
 	float yaw;
 	int conmat[RESOURCES];
 	int stock[RESOURCES];
-};*/
+	};*/
 
 	Planet* p = &g_planet[bp->planetid];
 	Building* b = &p->m_building[bp->bid];
@@ -694,7 +732,7 @@ void ReadBuildingPacket(BuildingPacket* bp)
 		b->m_stock[i] = bp->stock[i];
 	}
 	b->m_conwage = bp->conwage;
-	
+
 	if(g_mode == MENU)
 	{
 		g_loadbytes += sizeof(JoinInfoPacket);
@@ -707,13 +745,13 @@ void ReadBuildingPacket(BuildingPacket* bp)
 void ReadGarrisonPacket(GarrisonPacket* gp)
 {
 	/*
-struct GarrisonPacket
-{
+	struct GarrisonPacket
+	{
 	PacketHeader header;
 	int planetid;
 	int bid;
 	int uid;
-};*/
+	};*/
 
 	Planet* p = &g_planet[gp->planetid];
 	Building* b = &p->m_building[gp->bid];
@@ -732,12 +770,12 @@ struct GarrisonPacket
 void ReadJoinInfoPacket(JoinInfoPacket* jip)
 {
 	/*
-struct JoinInfoPacket
-{
+	struct JoinInfoPacket
+	{
 	PacketHeader header;
 	int playerid;
 	Vec2i hmapwidth[PLANETS];
-};*/
+	};*/
 
 	g_localplayer = jip->playerid;
 
@@ -746,7 +784,7 @@ struct JoinInfoPacket
 		Planet* p = &g_planet[i];
 		p->allocate(jip->hmapwidth[i].x, jip->hmapwidth[i].y);
 	}
-	
+
 	if(g_mode == MENU)
 	{
 		g_loadbytes += sizeof(JoinInfoPacket);

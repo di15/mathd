@@ -20,8 +20,8 @@ void DrawImage(unsigned int tex, float left, float top, float right, float botto
 		left, top,          texleft, textop
 	};
 
-    //glVertexPointer(2, GL_FLOAT, sizeof(float) * 4, &vertices[0]);
-    //glTexCoordPointer(2, GL_FLOAT, sizeof(float) * 4, &vertices[2]);
+	//glVertexPointer(2, GL_FLOAT, sizeof(float) * 4, &vertices[0]);
+	//glTexCoordPointer(2, GL_FLOAT, sizeof(float) * 4, &vertices[2]);
 	glVertexAttribPointer(g_shader[g_curS].m_slot[SSLOT_POSITION], 2, GL_FLOAT, GL_FALSE, sizeof(float)*4, &vertices[0]);
 	glVertexAttribPointer(g_shader[g_curS].m_slot[SSLOT_TEXCOORD0], 2, GL_FLOAT, GL_FALSE, sizeof(float)*4, &vertices[2]);
 

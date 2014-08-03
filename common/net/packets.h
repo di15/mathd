@@ -21,14 +21,14 @@ public:
 #ifdef _SERVER
 	struct sockaddr_in addr;
 #endif
-	
+
 	void freemem()
 	{
 		if(buffer != NULL)
 			delete [] buffer;
 		buffer = NULL;
 	}
-	
+
 	OldPacket()
 	{
 		buffer = NULL;

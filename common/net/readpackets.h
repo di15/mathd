@@ -38,7 +38,7 @@ void ReadEmailExistsPacket(EmailExistsPacket* eep);
 void ReadIncorrectLoginPacket(IncorrectLoginPacket* ilp);
 void ReadIncorrectVersionPacket(IncorrectVersionPacket* ivp);
 void ReadLoginCorrectPacket(LoginCorrectPacket* lcp);
-void ReadTooManyClientsPacket(TooManyClientsPacket* tmcp);  
+void ReadTooManyClientsPacket(TooManyClientsPacket* tmcp);
 void ReadRegDBErrorPacket(RegDBErrorPacket* rdbep);
 void ReadConnectionResetPacket(ConnectionResetPacket* crp);
 void ReadDisconnectPacket(DisconnectPacket* dp);

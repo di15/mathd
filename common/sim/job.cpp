@@ -54,9 +54,9 @@ bool FindJob(Unit* u)
 		//	continue;
 
 		if(u2->mode != UMODE_GOSUP &&
-			u2->mode != UMODE_GODEMB &&
-			u2->mode != UMODE_GODEMCD &&
-			u2->mode != UMODE_GOREFUEL)
+		                u2->mode != UMODE_GODEMB &&
+		                u2->mode != UMODE_GODEMCD &&
+		                u2->mode != UMODE_GOREFUEL)
 			continue;
 
 		//Chat("tj1");

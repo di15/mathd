@@ -22,9 +22,9 @@
 #include "pathdebug.h"
 
 void AStarPath(int utype, int umode, int cmstartx, int cmstartz, int target, int target2, int targtype,
-			   std::list<Vec2i> *path, Vec2i *subgoal, Unit* thisu, Unit* ignoreu, Building* ignoreb,
-			   int cmgoalx, int cmgoalz, int cmgoalminx, int cmgoalminz, int cmgoalmaxx, int cmgoalmaxz,
-			   int maxsearch)
+               std::list<Vec2i> *path, Vec2i *subgoal, Unit* thisu, Unit* ignoreu, Building* ignoreb,
+               int cmgoalx, int cmgoalz, int cmgoalminx, int cmgoalminz, int cmgoalmaxx, int cmgoalmaxz,
+               int maxsearch)
 {
 	UType* ut = &g_utype[utype];
 

@@ -39,7 +39,7 @@ void AllocGrid(int wx, int wz)
 {
 	g_log<<"allocating class arrays "<<wx<<","<<wz<<std::endl;
 	g_log.flush();
-	
+
 	if( !(g_cotype[CONDUIT_ROAD].cotiles[0] = new RoadTile [ (wx * wz) ]) ) OutOfMem(__FILE__, __LINE__);
 	if( !(g_cotype[CONDUIT_ROAD].cotiles[1] = new RoadTile [ (wx * wz) ]) ) OutOfMem(__FILE__, __LINE__);
 	if( !(g_cotype[CONDUIT_POWL].cotiles[0] = new PowlTile [ (wx * wz) ]) ) OutOfMem(__FILE__, __LINE__);
@@ -1294,7 +1294,7 @@ void Heightmap::genvbo()
 	glBufferDataARB(GL_ARRAY_BUFFER_ARB, sizeof(Vec2f)*m_widthx*m_widthz*6, m_texcoords0, GL_STATIC_DRAW_ARB);
 	glBindBufferARB(GL_ARRAY_BUFFER_ARB, m_vbo[VBO_NORMAL]);
 	glBufferDataARB(GL_ARRAY_BUFFER_ARB, sizeof(Vec3f)*m_widthx*m_widthz*6, m_normals, GL_STATIC_DRAW_ARB);
-	
+
 	glGenBuffersARB(VBOS, m_fullvbo);
 	glBindBufferARB(GL_ARRAY_BUFFER_ARB, m_fullvbo[VBO_POSITION]);
 	glBufferDataARB(GL_ARRAY_BUFFER_ARB, sizeof(Vec3f)*m_widthx*m_widthz*6, m_collverts, GL_STATIC_DRAW_ARB);
@@ -1317,7 +1317,7 @@ void Heightmap::delvbo()
 		glDeleteBuffersARB(1, &m_vbo[i]);
 		m_vbo[i] = -1;
 	}
-	
+
 	for(int i=0; i<VBOS; i++)
 	{
 		if(m_fullvbo[i] == -1)
@@ -1372,9 +1372,9 @@ void Heightmap::draw()
 	modelmat.reset();
 	Matrix modelview;
 #ifdef SPECBUMPSHADOW
-    modelview.set(g_camview.m_matrix);
+	modelview.set(g_camview.m_matrix);
 #endif
-    modelview.postmult(modelmat);
+	modelview.postmult(modelmat);
 	glUniformMatrix4fv(s->m_slot[SSLOT_MODELVIEW], 1, 0, modelview.m_matrix);
 
 	Matrix mvp;
@@ -1416,7 +1416,7 @@ void Heightmap::draw()
 	glDrawArrays(GL_TRIANGLES, 0, (m_widthx) * (m_widthz) * 3 * 2);
 
 #elif 1
-	
+
 	glBindBuffer(GL_ARRAY_BUFFER, m_vbo[VBO_POSITION]);
 	glVertexAttribPointer(s->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, 0);
 	glBindBuffer(GL_ARRAY_BUFFER, m_vbo[VBO_TEXCOORD]);
@@ -1510,9 +1510,9 @@ void Heightmap::draw2()
 	modelmat.reset();
 	Matrix modelview;
 #ifdef SPECBUMPSHADOW
-    modelview.set(g_camview.m_matrix);
+	modelview.set(g_camview.m_matrix);
 #endif
-    modelview.postmult(modelmat);
+	modelview.postmult(modelmat);
 	glUniformMatrix4fv(s->m_slot[SSLOT_MODELVIEW], 1, 0, modelview.m_matrix);
 
 	Matrix mvp;
@@ -1632,9 +1632,9 @@ void Heightmap::drawrim()
 	modelmat.reset();
 	Matrix modelview;
 #ifdef SPECBUMPSHADOW
-    modelview.set(g_camview.m_matrix);
+	modelview.set(g_camview.m_matrix);
 #endif
-    modelview.postmult(modelmat);
+	modelview.postmult(modelmat);
 	glUniformMatrix4fv(s->m_slot[SSLOT_MODELVIEW], 1, 0, modelview.m_matrix);
 
 	Matrix mvp;
@@ -1675,7 +1675,7 @@ void Heightmap::drawrim()
 	if(s->m_slot[SSLOT_NORMAL] != -1)
 		glVertexAttribPointer(s->m_slot[SSLOT_NORMAL], 3, GL_FLOAT, GL_FALSE, 0, m_rimva.normals);
 	glDrawArrays(GL_TRIANGLES, 0, m_rimva.numverts);
-	
+
 #elif 1
 	glBindBuffer(GL_ARRAY_BUFFER, m_rimva.vbo[VBO_POSITION]);
 	glVertexAttribPointer(s->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, 0);
