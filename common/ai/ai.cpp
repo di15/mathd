@@ -34,7 +34,11 @@ void UpdateAI()
 
 void Build(Player* p)
 {
-	for(auto biter = g_demtree.supbpcopy.begin(); biter != g_demtree.supbpcopy.end(); biter ++)
+	//DemTree* dm = &g_demtree;
+	int pi = p - g_player;
+	DemTree* dm = &g_demtree2[pi];
+
+	for(auto biter = dm->supbpcopy.begin(); biter != dm->supbpcopy.end(); biter ++)
 	{
 		DemsAtB* demb = (DemsAtB*)*biter;
 
@@ -65,6 +69,7 @@ void AdjustPrices(Player* p)
 
 void UpdateAI(Player* p)
 {
+	CalcDem2(p);
 	Build(p);
 	Manuf(p);
 	AdjustPrices(p);

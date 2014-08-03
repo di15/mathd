@@ -4007,12 +4007,7 @@
 	"../platform.h"
 	"../platform.h"
 
-1406718800 /home/polyfrag/Desktop/Projects/CorpStatesC/aaa004_low3d/common/sim/unittype.h
-	"../math/vec3i.h"
-	"../math/vec2i.h"
-	"../render/heightmap.h"
-	"resources.h"
-	"../math/vec3f.h"
+1406798679 /home/polyfrag/Desktop/Projects/CorpStatesC/aaa004_low3d/common/sim/unittype.h
 	"../math/vec3i.h"
 	"../math/vec2i.h"
 	"../render/heightmap.h"
@@ -4033,13 +4028,7 @@
 	"buildingtype.h"
 	"../render/vertexarray.h"
 
-1406718800 /home/polyfrag/Desktop/Projects/CorpStatesC/aaa004_low3d/common/sim/buildingtype.h
-	"../math/vec3f.h"
-	"../math/vec2i.h"
-	"resources.h"
-	"../render/billboard.h"
-	"../render/particle.h"
-	"infrastructure.h"
+1406798646 /home/polyfrag/Desktop/Projects/CorpStatesC/aaa004_low3d/common/sim/buildingtype.h
 	"../math/vec3f.h"
 	"../math/vec2i.h"
 	"resources.h"
@@ -4895,16 +4884,7 @@
 	"jpspath.h"
 	"pathjob.h"
 
-1406718799 source:/home/polyfrag/Desktop/Projects/CorpStatesC/aaa004_low3d/common/debug.cpp
-	"platform.h"
-	"debug.h"
-	"utils.h"
-	"gui/gui.h"
-	"gui/widget.h"
-	"gui/widgets/spez/constructionview.h"
-	"sim/player.h"
-	"window.h"
-	"../game/gmain.h"
+1406798679 source:/home/polyfrag/Desktop/Projects/CorpStatesC/aaa004_low3d/common/debug.cpp
 	"platform.h"
 	"debug.h"
 	"utils.h"
@@ -4949,7 +4929,7 @@
 	"utility.h"
 	"../math/fixmath.h"
 
-1406789034 /home/polyfrag/Desktop/Projects/CorpStatesC/aaa004_low3d/common/econ/demand.h
+1407050492 /home/polyfrag/Desktop/Projects/CorpStatesC/aaa004_low3d/common/econ/demand.h
 	"../math/vec2i.h"
 	"../platform.h"
 	"../sim/resources.h"
@@ -6640,9 +6620,7 @@
 	"sim.h"
 	"../math/fixmath.h"
 
-1406718800 /home/polyfrag/Desktop/Projects/CorpStatesC/aaa004_low3d/common/sim/build.h
-	"../math/vec3f.h"
-	"../math/vec2i.h"
+1407057549 /home/polyfrag/Desktop/Projects/CorpStatesC/aaa004_low3d/common/sim/build.h
 	"../math/vec3f.h"
 	"../math/vec2i.h"
 
@@ -7554,14 +7532,7 @@
 
 1406718800 /home/polyfrag/Desktop/Projects/CorpStatesC/aaa004_low3d/game/gres.h
 
-1406788464 source:/home/polyfrag/Desktop/Projects/CorpStatesC/aaa004_low3d/common/ai/ai.cpp
-	"../sim/player.h"
-	"ai.h"
-	"../econ/demand.h"
-	"../sim/building.h"
-	"../sim/buildingtype.h"
-	"../sim/build.h"
-	"../sim/sim.h"
+1407057374 source:/home/polyfrag/Desktop/Projects/CorpStatesC/aaa004_low3d/common/ai/ai.cpp
 	"../sim/player.h"
 	"ai.h"
 	"../econ/demand.h"
@@ -7590,11 +7561,8 @@
 
 1406718799 /home/polyfrag/Desktop/Projects/CorpStatesC/aaa004_low3d/common/econ/utility.h
 
-1406718799 /home/polyfrag/Desktop/Projects/CorpStatesC/aaa004_low3d/common/math/fixmath.h
+1406803325 /home/polyfrag/Desktop/Projects/CorpStatesC/aaa004_low3d/common/math/fixmath.h
 	"../platform.h"
-	"fixmath.h"
-	"../platform.h"
-	"fixmath.h"
 
 1406718799 source:/home/polyfrag/Desktop/Projects/CorpStatesC/aaa004_low3d/common/econ/utility.cpp
 	"utility.h"

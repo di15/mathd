@@ -6,6 +6,7 @@
 #include "../utils.h"
 #include "utility.h"
 #include "../math/fixmath.h"
+#include "../sim/build.h"
 
 DemTree g_demtree;
 DemTree g_demtree2[PLAYERS];
@@ -86,7 +87,7 @@ void AddInf(DemTree* dm, std::list<DemNode*>* cdarr, DemNode* parent, DemNode* p
 }
 
 //best actual (not just proposed) supplier
-DemsAtB* BestAcSup(DemTree* dm, Vec2i demtpos, Vec2i dmcmpos, int rtype)
+DemsAtB* BestAcSup(DemTree* dm, Vec2i demtpos, Vec2i demcmpos, int rtype)
 {
     DemsAtB* bestdemb = NULL;
     int bestutil = -1;
@@ -117,7 +118,7 @@ DemsAtB* BestAcSup(DemTree* dm, Vec2i demtpos, Vec2i dmcmpos, int rtype)
         //proposed bl?
         if(demb->bi < 0)
         {
-            btpos = demb->tilepos;
+            btpos = demb->bid.tpos;
             margpr = demb->bid.marginpr;
         }
         //actual bl's, rather than proposed
@@ -149,10 +150,11 @@ DemsAtB* BestAcSup(DemTree* dm, Vec2i demtpos, Vec2i dmcmpos, int rtype)
 	return bestdemb;
 }
 //best proposed supplier
-DemsAtB* BestPrSup(DemTree* dm, Vec2i demtpos, Vec2i dmcmpos, int rtype)
+DemsAtB* BestPrSup(DemTree* dm, Vec2i demtpos, Vec2i demcmpos, int rtype)
 {
     DemsAtB* bestdemb = NULL;
     int bestutil = -1;
+    Resource* r = &g_resource[rtype];
 
     //include proposed demb's in search if all actual b's used up
     for(auto biter = dm->supbpcopy.begin(); biter != dm->supbpcopy.end(); biter++)
@@ -222,6 +224,8 @@ void AddReq(DemTree* dm, Player* p, std::list<DemNode*>* nodes, DemNode* parent,
 
 	if(depth > MAX_REQ)
 		return;
+
+	*success = true;
 
 	Resource* r = &g_resource[rtype];
 
@@ -345,7 +349,7 @@ void AddReq(DemTree* dm, Player* p, std::list<DemNode*>* nodes, DemNode* parent,
 			if(demb->bi >= 0)
 			{
 				Building* b = &g_building[demb->bi];
-				marpr = b->prodprice[rtype];
+				margpr = b->prodprice[rtype];
 			}
 			//for proposed bl's
 			else
@@ -406,12 +410,17 @@ void AddReq(DemTree* dm, Player* p, std::list<DemNode*>* nodes, DemNode* parent,
 						continue;
 					}
 
-					AddReq(dm, p, &demb->proddems, demb, ri, rreq, suptpos, supcmpos, depth+1, success);
+					bool subsuccess;
+					AddReq(dm, p, &demb->proddems, demb, ri, rreq, suptpos, supcmpos, depth+1, &subsuccess);
 				}
 			}
 
+			bool subsuccess;
 			//add infrastructure to supplier
-			AddInf(dm, bestdemb->cddems, parent, bestdemb, rtype, ramt, depth, success);
+			AddInf(dm, bestdemb->cddems, parent, bestdemb, rtype, ramt, depth, &subsuccess);
+
+			//this information might be important for building placement
+			*success = subsuccess ? *success : false;
 		}
 		else	//no supplier bl found, so leave it up to the next call to CheckBl to match this rdem
 		{
@@ -675,7 +684,7 @@ void CalcDem1()
 {
 	g_demtree.free();
 	AddBl(&g_demtree);
-	BlConReq(&g_demtree);
+	BlConReq(&g_demtree, NULL);
 
 	int nlab = CountU(UNIT_LABOURER);
 
@@ -1637,6 +1646,7 @@ Hypothetical costs of inputs and transport
 Add calculated demands
 Add infrastructure roads, powerlines, etc.
 */
+#if 0
 void CheckSups(DemTree* dm, Player* p, int rtype, int ramt, DemsAtB* demb, std::list<CostCompo>& costco)
 {
 	Resource* r = &g_resource[rtype];
@@ -1748,6 +1758,7 @@ void CheckSups(DemTree* dm, Player* p, int rtype, int ramt, DemsAtB* demb, std::
 		cc.ramt = globconsum + locconsum;
 	}
 }
+#endif
 
 /*
 Determine cost composition for proposed building production, create r dems
@@ -1795,6 +1806,8 @@ void CheckBlType(DemTree* dm, Player* p, int btype, int rtype, int ramt, Vec2i t
 
 	std::list<CostCompo> rcostco[RESOURCES];
 
+	*success = true;
+
 	for(int ri=0; ri<RESOURCES; ri++)
 	{
 		if(bt->input[ri] <= 0)
@@ -1806,7 +1819,13 @@ void CheckBlType(DemTree* dm, Player* p, int btype, int rtype, int ramt, Vec2i t
 			continue;
 
 		//CheckSups(dm, p, ri, reqr, demb, rcostco[ri]);
-		AddReq(dm, &demb->proddems, demb, ri, reqr, tpos, cmpos, 0, success);
+		AddReq(dm, p, &demb->proddems, demb, ri, reqr, tpos, cmpos, 0, success);
+
+		//if there's no way to build infrastructure to suppliers
+		//then we shouldn't build this
+		//but there might be no suppliers yet, so in that case let's say we can build it
+		//if(!*success)
+		//	return;
 	}
 
 	//combine the res compos into one costcompo
@@ -1927,7 +1946,7 @@ void CheckBlType(DemTree* dm, Player* p, int btype, int rtype, int ramt, Vec2i t
 }
 
 //max profit
-int MaxPro(std::list<CostCompo>& costco, int pricelevel, int demramt, int* proramt, std::list<)
+int MaxPro(std::list<CostCompo>& costco, int pricelevel, int demramt, int* proramt)
 {
 	int bestprofit = -1;
 	int bestramt = 0;
@@ -2091,8 +2110,11 @@ void CheckBlTile(DemTree* dm, Player* p, int ri, RDemNode* pt, int x, int z, int
 
 			for(auto diter=rdems.begin(); diter!=rdems.end(); diter++)
 				if((*diter)->bid.marginpr >= leastnext)
+				{
+					RDemNode* rdem = (RDemNode*)*diter;
 					//curprofit += diter->ramt * leastnext;
-					demramt += (*diter)->ramt;
+					demramt += rdem->ramt;
+				}
 
 			//if demanded exceeds bl's max out
 			if(demramt > blmaxr)
@@ -2146,7 +2168,7 @@ void CheckBlTile(DemTree* dm, Player* p, int ri, RDemNode* pt, int x, int z, int
 
 
 
-			AddInf(&bldm, bestdemb->cddems, bestdemb, rdem, rtype, rdem->ramt, 0, success);
+			AddInf(&bldm, bestdemb->cddems, bestdemb, rdem, ri, rdem->ramt, 0, success);
 		}
 
 		//add infrastructure to supplier
@@ -2165,11 +2187,12 @@ tile for that building, consider the cost
 of connecting roads and infrastructure,
 and choose which is most profitable.
 */
-void CheckBl(DemTree* dm, Player* p, int* fixcost, int* recurprof)
+void CheckBl(DemTree* dm, Player* p, int* fixcost, int* recurprof, bool* success)
 {
 	DemTree bestbldm;
 	int bestfixc = -1;
 	int bestrecurp = -1;
+	*success = false;
 
 	//For resources that must be transported physically
 	//For non-physical res suppliers, distance
@@ -2193,7 +2216,13 @@ void CheckBl(DemTree* dm, Player* p, int* fixcost, int* recurprof)
 
 				int recurp = 0;
 				int fixc = 0;
-				CheckBlTile(&thisdm, p, ri, &tile, x, z, &fixc, &recurp);
+				bool subsuccess;
+				CheckBlTile(&thisdm, p, ri, &tile, x, z, &fixc, &recurp, &subsuccess);
+
+				if(!subsuccess)
+					continue;
+
+				*success = subsuccess ? true : *success;
 
 				if(bestrecurp < 0 || recurp > bestrecurp)
 				{
@@ -2257,6 +2286,8 @@ void CalcDem2(Player* p)
 		LabDemF2(dm, u, &fundsleft);
 	}
 
+	BlConReq(dm, p);
+
 	// To do: inter-industry demand
 	// TODO :...
 
@@ -2279,9 +2310,11 @@ void CalcDem2(Player* p)
 	DupDT(dm, &bldm);
 	int fixcost = 0;
 	int recurprof = 0;
-	CheckBl(&bldm, p, &fixcost, &recurprof);	//check if there's any profitable building opp
+	bool success;
+	CheckBl(&bldm, p, &fixcost, &recurprof, &success);	//check if there's any profitable building opp
 
-	if(recurprof > 0)
+	//if(recurprof > 0)
+	if(success)
 	{
 		dm->free();
 		DupDT(&bldm, dm);
