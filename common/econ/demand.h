@@ -76,14 +76,15 @@ class RDemNode : public DemNode
 public:
 	int rtype;
 	int ramt;
-	int btype;
-	int bi;
-	int utype;
-	int ui;
+	int btype;	//supplier?
+	int bi;	//supplier bl index?
+	int utype;	//transporter?
+	int ui;	//transporter unit index?
 	int demui;
 	DemsAtB* supbp;
 	DemsAtU* supup;
 	DemsAtU* opup;
+	std::list<DemNode*>* parlist;	//parent list, e.g., the condems of a DemsAtB
 
 	RDemNode() : DemNode()
 	{
@@ -97,6 +98,7 @@ public:
 		supbp = NULL;
 		supup = NULL;
 		demui = -1;
+		parlist = NULL;
 	}
 };
 
