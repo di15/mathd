@@ -5,26 +5,10 @@ set (CORP_VERSION_MAJOR 0)
 set (CORP_VERSION_MINOR 0)
 set (CORP_VERSION_PATCH 1)
 
-ADD_DEFINITIONS("-std=c++0x"
-    -lGL
-    -lGLU
-    -lGLEW)
+ADD_DEFINITIONS("-std=c++0x -wAll")
 
 ADD_EXECUTABLE(${PROJECT_NAME}
         common/ai/ai.cpp
-        common/ai/astarpath.cpp
-        common/ai/binheap.cpp
-        common/ai/collidertile.cpp
-        common/ai/jpsexpansion.cpp
-        common/ai/jpspartpath.cpp
-        common/ai/jpspath.cpp
-        common/ai/localavoid.cpp
-        common/ai/mempool.cpp
-        common/ai/partialpath.cpp
-        common/ai/pathdebug.cpp
-        common/ai/pathjob.cpp
-        common/ai/pathnode.cpp
-        common/ai/reconstructpath.cpp
         common/debug.cpp
         common/econ/balance.cpp
         common/econ/demand.cpp
