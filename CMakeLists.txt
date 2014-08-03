@@ -5,13 +5,14 @@ set (CORP_VERSION_MAJOR 0)
 set (CORP_VERSION_MINOR 0)
 set (CORP_VERSION_PATCH 1)
 
-ADD_DEFINITIONS("-std=c++0x -wAll")
+ADD_DEFINITIONS("-std=c++0x -Wall")
 
 ADD_EXECUTABLE(${PROJECT_NAME}
         common/ai/ai.cpp
         common/debug.cpp
         common/econ/balance.cpp
         common/econ/demand.cpp
+        common/econ/utility.cpp
         common/gui/cursor.cpp
         common/gui/draw2d.cpp
         common/gui/font.cpp
@@ -49,6 +50,7 @@ ADD_EXECUTABLE(${PROJECT_NAME}
         common/math/brush.cpp
         common/math/camera.cpp
         common/math/edge.cpp
+        common/math/fixmath.cpp
         common/math/frustum.cpp
         common/math/hmapmath.cpp
         common/math/line.cpp
@@ -61,6 +63,20 @@ ADD_EXECUTABLE(${PROJECT_NAME}
         common/math/vec3f.cpp
         common/math/vec3i.cpp
         common/math/vec4f.cpp
+        common/path/astarpath.cpp
+        common/path/binheap.cpp
+        common/path/collidertile.cpp
+        common/path/jpsexpansion.cpp
+        common/path/jpspartpath.cpp
+        common/path/jpspath.cpp
+        common/path/localavoid.cpp
+        common/path/mempool.cpp
+        common/path/partialpath.cpp
+        common/path/pathdebug.cpp
+        common/path/pathjob.cpp
+        common/path/pathnode.cpp
+        common/path/reconstructpath.cpp
+        common/path/trip.cpp
         common/phys/collision.cpp
         common/phys/trace.cpp
         common/platform.cpp
@@ -89,6 +105,7 @@ ADD_EXECUTABLE(${PROJECT_NAME}
         common/sim/crpipe.cpp
         common/sim/deposit.cpp
         common/sim/infrastructure.cpp
+        common/sim/job.cpp
         common/sim/labourer.cpp
         common/sim/order.cpp
         common/sim/player.cpp
