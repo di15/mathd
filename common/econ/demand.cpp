@@ -411,9 +411,9 @@ void AddReq(DemTree* dm, Player* p, std::list<DemNode*>* nodes, DemNode* parent,
 			}
 
 			//add infrastructure to supplier
-			AddInf(dm, bestdemb->cddems, parent, *biter, rtype, ramt, depth, success);
+			AddInf(dm, bestdemb->cddems, parent, bestdemb, rtype, ramt, depth, success);
 		}
-		else
+		else	//no supplier bl found, so leave it up to the next call to CheckBl to match this rdem
 		{
 			rdem->bi = -1;
 			rdem->btype = -1;
@@ -614,8 +614,10 @@ void AddBl(DemTree* dm)
 	}
 }
 
-void BlConReq(DemTree* dm)
+void BlConReq(DemTree* dm, Player* curp)
 {
+	bool success;
+
 	for(auto biter = dm->supbpcopy.begin(); biter != dm->supbpcopy.end(); biter++)
 	{
 		DemsAtB* demb = (DemsAtB*)*biter;
@@ -625,18 +627,25 @@ void BlConReq(DemTree* dm)
 		int conmat[RESOURCES];
 		bool finished = false;
 
+		Vec2i tpos;
+		Vec2i cmpos;
+
 		if(bi >= 0)
 		{
 			Building* b = &g_building[bi];
 			bt = &g_bltype[b->type];
 			memcpy(conmat, b->conmat, sizeof(int)*RESOURCES);
 			finished = b->finished;
+			tpos = b->tilepos;
+			cmpos = tpos * TILE_SIZE + Vec2i(TILE_SIZE,TILE_SIZE)/2;
 		}
 		else
 		{
 			bt = &g_bltype[demb->btype];
 			memcpy(conmat, demb->condem, sizeof(int)*RESOURCES);
 			finished = false;
+			tpos = demb->bid.tpos;
+			cmpos = demb->bid.cmpos;
 		}
 
 		if(!finished)
@@ -645,9 +654,10 @@ void BlConReq(DemTree* dm)
 			{
 				const int req = bt->conmat[i] - conmat[i];
 				if(req > 0)
-					AddReq(dm, &demb->condems, *biter, i, req, 0);
+					AddReq(dm, curp, &demb->condems, *biter, i, req, tpos, cmpos, 0, &success);
 			}
 		}
+		//else finished construction
 		else
 		{
 			//Don't need to do anything then
@@ -684,9 +694,9 @@ void CalcDem1()
 		labfunds += u->belongings[RES_FUNDS];
 	}
 
-	AddReq(&g_demtree, &g_demtree.nodes, NULL, RES_HOUSING, nlab, 0);
-	AddReq(&g_demtree, &g_demtree.nodes, NULL, RES_RETFOOD, LABOURER_FOODCONSUM * CYCLE_FRAMES, 0);
-	AddReq(&g_demtree, &g_demtree.nodes, NULL, RES_ENERGY, nlab * LABOURER_ENERGYCONSUM, 0);
+	//AddReq(&g_demtree, &g_demtree.nodes, NULL, RES_HOUSING, nlab, 0);
+	//AddReq(&g_demtree, &g_demtree.nodes, NULL, RES_RETFOOD, LABOURER_FOODCONSUM * CYCLE_FRAMES, 0);
+	//AddReq(&g_demtree, &g_demtree.nodes, NULL, RES_ENERGY, nlab * LABOURER_ENERGYCONSUM, 0);
 }
 
 // Housing demand
@@ -2129,6 +2139,13 @@ void CheckBlTile(DemTree* dm, Player* p, int ri, RDemNode* pt, int x, int z, int
             if(rdem->bid.marginpr < pt->bid.marginpr)
             	continue;
 
+			DemNode* pardem = rdem->parent;
+
+			if(!pardem)
+				continue;
+
+
+
 			AddInf(&bldm, bestdemb->cddems, bestdemb, rdem, rtype, rdem->ramt, 0, success);
 		}
 
@@ -2269,4 +2286,6 @@ void CalcDem2(Player* p)
 		dm->free();
 		DupDT(&bldm, dm);
 	}
+
+	//TO DO: build infrastructure demanded too
 }
