@@ -330,7 +330,7 @@ void WindowW::inev(InEv* ev)
 	if(m_ldown)
 	{
 		if(ev->type == INEV_MOUSEMOVE ||
-				( (ev->type == INEV_MOUSEDOWN || ev->type == INEV_MOUSEUP) && ev->key == MOUSE_LEFT) )
+		                ( (ev->type == INEV_MOUSEDOWN || ev->type == INEV_MOUSEUP) && ev->key == MOUSE_LEFT) )
 			ev->intercepted = true;
 
 		if(ev->type == INEV_MOUSEUP && ev->key == MOUSE_LEFT)
@@ -496,10 +496,10 @@ void WindowW::inev(InEv* ev)
 		}
 
 		if(!ev->intercepted &&
-				py->mouse.x >= m_pos[0]-64 &&
-				py->mouse.y >= m_pos[1]-64 &&
-				py->mouse.x <= m_pos[2]+64 &&
-				py->mouse.y <= m_pos[3]+64)
+		                py->mouse.x >= m_pos[0]-64 &&
+		                py->mouse.y >= m_pos[1]-64 &&
+		                py->mouse.x <= m_pos[2]+64 &&
+		                py->mouse.y <= m_pos[3]+64)
 		{
 			m_over = true;
 
@@ -530,16 +530,16 @@ void WindowW::inev(InEv* ev)
 					py->curst = CU_RESZR;
 			}
 			else if(py->mouse.x >= m_pos[0]-32 &&
-					py->mouse.x <= m_pos[2]+32)
+			                py->mouse.x <= m_pos[2]+32)
 			{
 				if(py->mouse.y <= m_pos[1]-32)
 					py->curst = CU_RESZT;
 				else if(py->mouse.y >= m_pos[3]+32)
 					py->curst = CU_RESZB;
 				else if(py->mouse.x <= m_pos[0] ||
-						py->mouse.y <= m_pos[1] ||
-						py->mouse.x >= m_pos[2] ||
-						py->mouse.y >= m_pos[3])
+				                py->mouse.y <= m_pos[1] ||
+				                py->mouse.x >= m_pos[2] ||
+				                py->mouse.y >= m_pos[3])
 					py->curst = CU_MOVE;
 				else
 					py->curst = CU_DEFAULT;

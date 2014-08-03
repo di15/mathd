@@ -324,8 +324,8 @@ bool BuildingLevel(int type, Vec2i tpos)
 bool Offmap(int minx, int minz, int maxx, int maxz)
 {
 	if(minx < 0 || minz < 0
-			|| maxx >= g_hmap.m_widthx*TILE_SIZE
-			|| maxz >= g_hmap.m_widthz*TILE_SIZE)
+	                || maxx >= g_hmap.m_widthx*TILE_SIZE
+	                || maxz >= g_hmap.m_widthz*TILE_SIZE)
 	{
 		g_collidertype = COLLIDER_OFFMAP;
 		return true;
@@ -676,7 +676,7 @@ bool PlaceBAb(int btype, Vec2i tabout, Vec2i* tplace)
 			//g_log<<"placeb t="<<btype<<" "<<vTile.x<<","<<vTile.y<<","<<vTile.z<<"("<<(vTile.x/16)<<","<<(vTile.y/16)<<","<<(vTile.z/16)<<")"<<std::endl;
 			//g_log.flush();
 			//*tpos = canplace[ rand()%canplace.size() ];
-            *tplace = canplace[ 0 ];
+			*tplace = canplace[ 0 ];
 
 			return true;
 		}
@@ -686,7 +686,7 @@ bool PlaceBAb(int btype, Vec2i tabout, Vec2i* tplace)
 		//Chat(msg);
 
 		shell++;
-	}while(shell < g_hmap.m_widthx || shell < g_hmap.m_widthz);
+	} while(shell < g_hmap.m_widthx || shell < g_hmap.m_widthz);
 
 	return false;
 }
@@ -836,7 +836,7 @@ bool PlaceUAb(int utype, Vec2i cmabout, Vec2i* cmplace)
 			//g_log<<"placeb t="<<btype<<" "<<vTile.x<<","<<vTile.y<<","<<vTile.z<<"("<<(vTile.x/16)<<","<<(vTile.y/16)<<","<<(vTile.z/16)<<")"<<std::endl;
 			//g_log.flush();
 			//*tpos = canplace[ rand()%canplace.size() ];
-            *cmplace = canplace[ 0 ];
+			*cmplace = canplace[ 0 ];
 
 			return true;
 		}
@@ -846,7 +846,7 @@ bool PlaceUAb(int utype, Vec2i cmabout, Vec2i* cmplace)
 		//Chat(msg);
 
 		shell++;
-	}while(shell < g_hmap.m_widthx || shell < g_hmap.m_widthz);
+	} while(shell < g_hmap.m_widthx || shell < g_hmap.m_widthz);
 
 	return false;
 }

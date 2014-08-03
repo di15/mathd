@@ -551,7 +551,7 @@ void MS3DModel::genva(VertexArray** vertexArrays, Vec3f scale, Vec3f translate, 
 void MS3DModel::setjointkf( int jointIndex, int keyframeIndex, float time, float *parameter, bool isRotation )
 {
 	Keyframe& keyframe = isRotation ? m_pJoints[jointIndex].m_pRotationKeyframes[keyframeIndex] :
-						 m_pJoints[jointIndex].m_pTranslationKeyframes[keyframeIndex];
+	                     m_pJoints[jointIndex].m_pTranslationKeyframes[keyframeIndex];
 
 	keyframe.m_jointIndex = jointIndex;
 	keyframe.m_time = time;

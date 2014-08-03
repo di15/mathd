@@ -183,14 +183,14 @@ bool UnitCollides(Unit* u, Vec2i cmpos, int utype)
 #endif
 
 
-		if(u == g_pathunit)
-		{
-			g_log<<"no collision"<<std::endl;
-			g_log<<"-----------------------------------------"<<std::endl;
-			g_log.flush();
-		}
+	if(u == g_pathunit)
+	{
+		g_log<<"no collision"<<std::endl;
+		g_log<<"-----------------------------------------"<<std::endl;
+		g_log.flush();
+	}
 
-		return false;
+	return false;
 }
 
 void MoveUnit(Unit* u)
@@ -226,19 +226,19 @@ void MoveUnit(Unit* u)
 			int nodesdist = Magnitude( u->goal - u->cmpos ) / PATHNODE_SIZE;
 #if 1
 			PartialPath(u->type, u->mode,
-				u->cmpos.x, u->cmpos.y, u->target, u->target2, u->targtype, &u->path, &u->subgoal,
-				u, NULL, NULL,
-				u->goal.x, u->goal.y,
-				u->goal.x, u->goal.y, u->goal.x, u->goal.y,
-				nodesdist*10);
+			            u->cmpos.x, u->cmpos.y, u->target, u->target2, u->targtype, &u->path, &u->subgoal,
+			            u, NULL, NULL,
+			            u->goal.x, u->goal.y,
+			            u->goal.x, u->goal.y, u->goal.x, u->goal.y,
+			            nodesdist*10);
 			//TILE_SIZE*4/PATHNODE_SIZE);
 #else
 			JPSPartPath(u->type, u->mode,
-				u->cmpos.x, u->cmpos.y, u->target, u->target2, u->targtype, &u->path, &u->subgoal,
-				u, NULL, NULL,
-				u->goal.x, u->goal.y,
-				u->goal.x, u->goal.y, u->goal.x, u->goal.y,
-				nodesdist*4);
+			            u->cmpos.x, u->cmpos.y, u->target, u->target2, u->targtype, &u->path, &u->subgoal,
+			            u, NULL, NULL,
+			            u->goal.x, u->goal.y,
+			            u->goal.x, u->goal.y, u->goal.x, u->goal.y,
+			            nodesdist*4);
 #endif
 
 #if 0
@@ -251,19 +251,19 @@ void MoveUnit(Unit* u)
 		{
 #if 0
 			if(!FullPath(0,
-				u->type, u->mode,
-				u->cmpos.x, u->cmpos.y, u->target, u->target, u->target2, u->path, u->subgoal,
-				u, NULL, NULL,
-				u->goal.x, u->goal.y,
-				u->goal.x, u->goal.y, u->goal.x, u->goal.y))
+			                u->type, u->mode,
+			                u->cmpos.x, u->cmpos.y, u->target, u->target, u->target2, u->path, u->subgoal,
+			                u, NULL, NULL,
+			                u->goal.x, u->goal.y,
+			                u->goal.x, u->goal.y, u->goal.x, u->goal.y))
 #endif
 
 				JPSPath(
-				u->type, u->mode,
-				u->cmpos.x, u->cmpos.y, u->target, u->target2, u->targtype, &u->path, &u->subgoal,
-				u, NULL, NULL,
-				u->goal.x, u->goal.y,
-				u->goal.x, u->goal.y, u->goal.x, u->goal.y);
+				        u->type, u->mode,
+				        u->cmpos.x, u->cmpos.y, u->target, u->target2, u->targtype, &u->path, &u->subgoal,
+				        u, NULL, NULL,
+				        u->goal.x, u->goal.y,
+				        u->goal.x, u->goal.y, u->goal.x, u->goal.y);
 		}
 
 		return;
@@ -467,7 +467,8 @@ bool CheckIfArrived(Unit* u)
 		if(ucmminx <= u2cmmaxx && ucmminz <= u2cmmaxz && u2cmminx <= ucmmaxx && u2cmminz <= ucmmaxz)
 			return true;
 		break;
-	default: break;
+	default:
+		break;
 	};
 
 	return false;
@@ -482,12 +483,37 @@ void OnArrived(Unit* u)
 {
 	switch(u->mode)
 	{
-	case UMODE_GOBLJOB:		u->mode = UMODE_BLJOB;			u->freecollider();	ResetGoal(u);	g_building[u->target].worker.push_back(u-g_unit);		break;
-	case UMODE_GOCSTJOB:	u->mode = UMODE_CSTJOB;			u->freecollider();	ResetGoal(u);	break;
-	case UMODE_GOCDJOB:		u->mode = UMODE_CDJOB;			u->freecollider();	ResetGoal(u);	break;
-	case UMODE_GOSHOP:		u->mode = UMODE_SHOPPING;		u->freecollider();	ResetGoal(u);	break;
-	case UMODE_GOREST:		u->mode = UMODE_RESTING;		u->freecollider();	ResetGoal(u);	break;
-	case UMODE_GOTRANSP:	ArAtTra(u);						u->freecollider();	ResetGoal(u);	break;
+	case UMODE_GOBLJOB:
+		u->mode = UMODE_BLJOB;
+		u->freecollider();
+		ResetGoal(u);
+		g_building[u->target].worker.push_back(u-g_unit);
+		break;
+	case UMODE_GOCSTJOB:
+		u->mode = UMODE_CSTJOB;
+		u->freecollider();
+		ResetGoal(u);
+		break;
+	case UMODE_GOCDJOB:
+		u->mode = UMODE_CDJOB;
+		u->freecollider();
+		ResetGoal(u);
+		break;
+	case UMODE_GOSHOP:
+		u->mode = UMODE_SHOPPING;
+		u->freecollider();
+		ResetGoal(u);
+		break;
+	case UMODE_GOREST:
+		u->mode = UMODE_RESTING;
+		u->freecollider();
+		ResetGoal(u);
+		break;
+	case UMODE_GOTRANSP:
+		ArAtTra(u);
+		u->freecollider();
+		ResetGoal(u);
+		break;
 	case UMODE_GODEMB:
 		if(u->driver >= 0)
 			Disembark(&g_unit[u->driver]);
@@ -516,7 +542,8 @@ void OnArrived(Unit* u)
 		u->mode = UMODE_REFUELING;
 		ResetGoal(u);
 		break;
-	default: break;
+	default:
+		break;
 	};
 
 	//if(type == TRUCK && UnitSelected(this))

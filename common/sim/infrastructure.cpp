@@ -538,7 +538,7 @@ bool CoLevel(char ctype, float iterx, float iterz, float testx, float testz, flo
 
 	// 4- or 3-way connections
 	if((n && e && s && w) || (n && e && s && !w) || (n && e && !s && w) || (n && e && !s && !w) || (n && !e && s && w)
-			|| (n && !e && !s && w) || (!n && e && s && !w) || (!n && !e && s && w) || (!n && !e && !s && !w) || (!n && e && s && w))
+	                || (n && !e && !s && w) || (!n && e && s && !w) || (!n && !e && s && w) || (!n && !e && !s && !w) || (!n && e && s && w))
 	{
 		float compare = g_hmap.getheight(ix, iz);
 		if(fabs(g_hmap.getheight(ix+1, iz) - compare) > ct->maxsideincl)	return false;
@@ -1169,7 +1169,7 @@ void ConduitTile::allocate()
 
 	if(transx[0] != '\0'
 #ifdef LOCAL_TRANSX
-			&& owner == g_localP
+	                && owner == g_localP
 #endif
 	  )
 	{
@@ -1229,14 +1229,14 @@ void DefConn(char conduittype, char connectiontype, bool finished, const char* m
 }
 
 void DefCo(char ctype,
-		   unsigned short netwoff,
-		   unsigned short seloff,
-		   unsigned short maxforwincl,
-		   unsigned short maxsideincl,
-		   bool blconduct,
-		   bool cornerpl,
-		   Vec2i physoff,
-		   Vec3f drawoff)
+           unsigned short netwoff,
+           unsigned short seloff,
+           unsigned short maxforwincl,
+           unsigned short maxsideincl,
+           bool blconduct,
+           bool cornerpl,
+           Vec2i physoff,
+           Vec3f drawoff)
 {
 	ConduitType* ct = &g_cotype[ctype];
 	ct->netwoff = netwoff;

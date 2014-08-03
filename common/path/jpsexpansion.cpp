@@ -37,9 +37,9 @@ std::list<PathNode*> GetNeighbours(PathJob* pj, PathNode* node)
 	for( int i=0; i<ARRSZ(straightoffsets); i++ )
 	{
 		PathNode* n = PathNodeAt(
-						  pos.x + straightoffsets[i].x,
-						  pos.y + straightoffsets[i].y
-					  );
+		                      pos.x + straightoffsets[i].x,
+		                      pos.y + straightoffsets[i].y
+		              );
 
 		Vec2i p = PathNodePos(n);
 
@@ -57,9 +57,9 @@ std::list<PathNode*> GetNeighbours(PathJob* pj, PathNode* node)
 	for( int i=0; i<ARRSZ(diagonaloffsets); i++ )
 	{
 		PathNode* n = PathNodeAt(
-						  pos.x + diagonaloffsets[i].x,
-						  pos.y + diagonaloffsets[i].y
-					  );
+		                      pos.x + diagonaloffsets[i].x,
+		                      pos.y + diagonaloffsets[i].y
+		              );
 
 		Vec2i p = PathNodePos(n);
 
@@ -324,7 +324,7 @@ std::list<PathNode*> FindNeighbours(PathJob* pj, PathNode* node)
 #if 0
 				// Current node is a jump point if one of his leftside/rightside neighbours ahead is forced
 				if( (Standable(pj, pos.x-delta.x, pos.y+delta.y) && !Standable(pj, pos.x-delta.x, pos.y)) ||
-						(Standable(pj, pos.x+delta.x, pos.y-delta.y) && !Standable(pj, pos.x, pos.y-delta.y)) )
+				                (Standable(pj, pos.x+delta.x, pos.y-delta.y) && !Standable(pj, pos.x, pos.y-delta.y)) )
 				{
 					return node;
 				}
@@ -340,11 +340,11 @@ std::list<PathNode*> FindNeighbours(PathJob* pj, PathNode* node)
 #if 0
 						// Current node is a jump point if one of his upside/downside neighbours is forced
 						if( (Standable(pj, pos.x+delta.x, pos.y+1) && !Standable(pj, pos.x, pos.y+1)) ||
-								(Standable(pj, pos.x+delta.x, pos.y-1) && !Standable(pj, pos.x, pos.y-1)) )
+						                (Standable(pj, pos.x+delta.x, pos.y-1) && !Standable(pj, pos.x, pos.y-1)) )
 #else
 						//polyf edit - corner fix
 						if( (Standable(pj, pos.x, pos.y+1) && !Standable(pj, pos.x-delta.x, pos.y+1)) ||
-								(Standable(pj, pos.x, pos.y-1) && !Standable(pj, pos.x-delta.x, pos.y-1)) )
+						                (Standable(pj, pos.x, pos.y-1) && !Standable(pj, pos.x-delta.x, pos.y-1)) )
 #endif
 						{
 							return node;
@@ -367,10 +367,10 @@ std::list<PathNode*> FindNeighbours(PathJob* pj, PathNode* node)
 					{
 #if 0
 						if( (Standable(pj, pos.x+1, pos.y+delta.y) && !Standable(pj, pos.x+1, pos.y)) ||
-								(Standable(pj, pos.x-1, pos.y+delta.y) && !Standable(pj, pos.x-1, pos.y)) )
+						                (Standable(pj, pos.x-1, pos.y+delta.y) && !Standable(pj, pos.x-1, pos.y)) )
 #else
 						if( (Standable(pj, pos.x+1, pos.y) && !Standable(pj, pos.x+1, pos.y-delta.y)) ||
-								(Standable(pj, pos.x-1, pos.y) && !Standable(pj, pos.x-1, pos.y-delta.y)) )
+						                (Standable(pj, pos.x-1, pos.y) && !Standable(pj, pos.x-1, pos.y-delta.y)) )
 #endif
 						{
 							return node;

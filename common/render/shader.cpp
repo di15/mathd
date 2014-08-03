@@ -186,8 +186,8 @@ void LoadShader(int shader, char* strVertex, char* strFragment, bool hastexcoord
 	if(s->m_vertshader || s->m_fragshader || s->m_program)
 		s->release();
 
-    s->m_hastexcoords = hastexcoords;
-    s->m_hasnormals = hasnormals;
+	s->m_hastexcoords = hastexcoords;
+	s->m_hasnormals = hasnormals;
 	s->m_vertshader = glCreateShader(GL_VERTEX_SHADER);
 	s->m_fragshader = glCreateShader(GL_FRAGMENT_SHADER);
 
@@ -336,7 +336,7 @@ void UseS(int shader)
 	CheckGLError(__FILE__, __LINE__);
 
 	Player* py = &g_player[g_curP];
-	
+
 	CheckGLError(__FILE__, __LINE__);
 	if(s->m_slot[SSLOT_POSITION] != -1)	glEnableVertexAttribArray(s->m_slot[SSLOT_POSITION]);
 	CheckGLError(__FILE__, __LINE__);
@@ -347,7 +347,7 @@ void UseS(int shader)
 
 	if(s->m_slot[SSLOT_MIND] != -1) glUniform1f(s->m_slot[SSLOT_MIND], MIN_DISTANCE);
 	if(s->m_slot[SSLOT_MAXD] != -1) glUniform1f(s->m_slot[SSLOT_MAXD], MAX_DISTANCE / py->zoom);
-	
+
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 }

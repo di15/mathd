@@ -130,9 +130,9 @@ void DrawFoliage(Vec3f zoompos, Vec3f vertical, Vec3f horizontal)
 
 		Matrix modelview;
 #ifdef SPECBUMPSHADOW
-   		 modelview.set(g_camview.m_matrix);
+		modelview.set(g_camview.m_matrix);
 #endif
-    	modelview.postmult(g_folmodmat[i]);
+		modelview.postmult(g_folmodmat[i]);
 		glUniformMatrix4fv(s->m_slot[SSLOT_MODELVIEW], 1, 0, modelview.m_matrix);
 
 		Matrix mvp;

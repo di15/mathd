@@ -366,17 +366,17 @@ void DrawPreview(Matrix projection, Matrix viewmat, Matrix modelmat, Matrix mode
 #endif
 	glUniformMatrix4fv(s->m_slot[SSLOT_MVP], 1, 0, mvp.m_matrix);
 
-    Matrix modelview;
+	Matrix modelview;
 #ifdef SPECBUMPSHADOW
-    modelview.set(g_camview.m_matrix);
+	modelview.set(g_camview.m_matrix);
 #endif
-    modelview.postmult(modelmat);
-    glUniformMatrix4fv(s->m_slot[SSLOT_MODELVIEW], 1, 0, modelview.m_matrix);
+	modelview.postmult(modelmat);
+	glUniformMatrix4fv(s->m_slot[SSLOT_MODELVIEW], 1, 0, modelview.m_matrix);
 
-    Transpose(modelview, modelview);
-    Inverse2(modelview, modelviewinv);
-    //Transpose(modelviewinv, modelviewinv);
-    glUniformMatrix4fv(s->m_slot[SSLOT_NORMALMAT], 1, 0, modelviewinv.m_matrix);
+	Transpose(modelview, modelview);
+	Inverse2(modelview, modelviewinv);
+	//Transpose(modelviewinv, modelviewinv);
+	glUniformMatrix4fv(s->m_slot[SSLOT_NORMALMAT], 1, 0, modelviewinv.m_matrix);
 
 	VertexArray* va = &m->m_va[frame];
 
@@ -505,25 +505,25 @@ void DrawViewport(int which, int x, int y, int width, int height)
 		mvpmat.set(projection.m_matrix);
 		mvpmat.postmult(viewmat);
 
-        //RenderToShadowMap(projection, viewmat, modelmat, c->m_view);
-        //RenderToShadowMap(projection, viewmat, modelmat, Vec3f(0,0,0));
-        Vec3f focus(0, 0, 0);
-        Vec3f vLine[2];
-        Vec3f ray = Normalize(c->m_view - posvec);
-        Vec3f onnear = posvec;	//OnNear(py->width/2, py->height/2);
+		//RenderToShadowMap(projection, viewmat, modelmat, c->m_view);
+		//RenderToShadowMap(projection, viewmat, modelmat, Vec3f(0,0,0));
+		Vec3f focus(0, 0, 0);
+		Vec3f vLine[2];
+		Vec3f ray = Normalize(c->m_view - posvec);
+		Vec3f onnear = posvec;	//OnNear(py->width/2, py->height/2);
 #if 0
-        vLine[0] = onnear;
-        vLine[1] = onnear + (ray * 100000.0f);
-        //if(!GetMapIntersection(&g_hmap, vLine, &focus))
-        if(!FastMapIntersect(&g_hmap, vLine, &focus))
-            //if(!GetMapIntersection(&g_hmap, vLine, &focus))
-            GetMapIntersection2(&g_hmap, vLine, &focus);
+		vLine[0] = onnear;
+		vLine[1] = onnear + (ray * 100000.0f);
+		//if(!GetMapIntersection(&g_hmap, vLine, &focus))
+		if(!FastMapIntersect(&g_hmap, vLine, &focus))
+			//if(!GetMapIntersection(&g_hmap, vLine, &focus))
+			GetMapIntersection2(&g_hmap, vLine, &focus);
 #endif
-        CheckGLError(__FILE__, __LINE__);
-        RenderToShadowMap(projection, viewmat, modelmat, focus, focus + g_lightoff, DrawPreviewDepth);
-        CheckGLError(__FILE__, __LINE__);
-        RenderShadowedScene(projection, viewmat, modelmat, modelview, DrawPreview);
-        CheckGLError(__FILE__, __LINE__);
+		CheckGLError(__FILE__, __LINE__);
+		RenderToShadowMap(projection, viewmat, modelmat, focus, focus + g_lightoff, DrawPreviewDepth);
+		CheckGLError(__FILE__, __LINE__);
+		RenderShadowedScene(projection, viewmat, modelmat, modelview, DrawPreview);
+		CheckGLError(__FILE__, __LINE__);
 	}
 
 	if(which == VIEWPORT_MINIMAP)

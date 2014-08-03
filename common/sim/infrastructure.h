@@ -87,15 +87,15 @@ inline ConduitTile* GetCo(char ctype, int tx, int tz, bool plan)
 
 class Building;
 
-void DefCo(char ctype, 
-		   unsigned short netwoff, 
-		   unsigned short seloff, 
-		   unsigned short maxforwincl, 
-		   unsigned short maxsideincl, 
-		   bool blconduct, 
-		   bool cornerpl, 
-		   Vec2i physoff, 
-		   Vec3f drawoff);
+void DefCo(char ctype,
+           unsigned short netwoff,
+           unsigned short seloff,
+           unsigned short maxforwincl,
+           unsigned short maxsideincl,
+           bool blconduct,
+           bool cornerpl,
+           Vec2i physoff,
+           Vec3f drawoff);
 void CoConMat(char ctype, char rtype, short ramt);
 void UpdCoPlans(char ctype, char owner, Vec3f start, Vec3f end);
 void ClearCoPlans(char ctype);

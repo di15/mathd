@@ -347,7 +347,7 @@ void DoBlJob(Unit* u)
 	if(!b->tryprod())
 	{
 #if 0
-	//b->Emit(HAMMER);
+		//b->Emit(HAMMER);
 #ifdef LOCAL_TRANSX
 		if(b->owner == g_localP)
 #endif
@@ -434,7 +434,7 @@ void DoCdJob(Unit* u)
 	if(r->owner == g_localP)
 #endif
 		NewTransx(RoadPosition(target, target2), CURRENC, -p->conwage);
-    //NewTransx(RoadPosition(target, target2), LABOUR, 1, CURRENC, -p->conwage);
+	//NewTransx(RoadPosition(target, target2), LABOUR, 1, CURRENC, -p->conwage);
 #endif
 
 	ctile->checkconstruction();
@@ -898,83 +898,108 @@ void UpdLab(Unit* u)
 	switch(u->mode)
 	{
 	case UMODE_NONE:
-		{
-			if(NeedFood(u) /* && rand()%5==1 */ && FindFood(u))
-			{/*
-			 if(uID == 2)
-			 {
-			 g_log<<"u[2]findfood"<<endl;
-			 g_log.flush();
-			 }*/
+	{
+		if(NeedFood(u) /* && rand()%5==1 */ && FindFood(u))
+		{	/*
+			if(uID == 2)
+			{
+			g_log<<"u[2]findfood"<<endl;
+			g_log.flush();
+			}*/
+		}
+		else if(NeedRest(u))
+		{	/*
+			if(uID == 2)
+			{
+			g_log<<"u[2]needrest"<<endl;
+			g_log.flush();
+			}*/
+			/*
+			if(UnitID(this) == 0)
+			{
+			g_log<<"0 needrest"<<endl;
+			g_log.flush();
 			}
-			else if(NeedRest(u))
-			{/*
-			 if(uID == 2)
-			 {
-			 g_log<<"u[2]needrest"<<endl;
-			 g_log.flush();
-			 }*/
-				/*
+			*/
+			if(u->home >= 0)
+			{	/*
 				if(UnitID(this) == 0)
 				{
-				g_log<<"0 needrest"<<endl;
+				g_log<<"home >= 0"<<endl;
 				g_log.flush();
 				}
 				*/
-				if(u->home >= 0)
-				{/*
-				 if(UnitID(this) == 0)
-				 {
-				 g_log<<"home >= 0"<<endl;
-				 g_log.flush();
-				 }
-				 */
-					//Chat("go home");
-					GoHome(u);
-				}
-				else
+				//Chat("go home");
+				GoHome(u);
+			}
+			else
+			{
+				/*
+				if(UnitID(this) == 0)
 				{
-					/*
-					if(UnitID(this) == 0)
-					{
-					g_log<<"findrest"<<endl;
-					g_log.flush();
-					}*/
+				g_log<<"findrest"<<endl;
+				g_log.flush();
+				}*/
 
-					//Chat("find rest");
-					FindRest(u);
+				//Chat("find rest");
+				FindRest(u);
+			}
+		}
+		else if(u->belongings[RES_LABOUR] > 0)
+		{	/*
+			if(uID == 2)
+			{
+			g_log<<"u[2]findjob"<<endl;
+			g_log.flush();
+			}*/
+			if(!FindJob(u))
+			{
+				//if(rand()%(FRAME_RATE*2) == 1)
+				{
+					//move randomly?
+					//goal = camera.Position() + Vec3f(rand()%TILE_SIZE - TILE_SIZE/2, 0, rand()%TILE_SIZE - TILE_SIZE/2);
 				}
 			}
-			else if(u->belongings[RES_LABOUR] > 0)
-			{/*
-			 if(uID == 2)
-			 {
-			 g_log<<"u[2]findjob"<<endl;
-			 g_log.flush();
-			 }*/
-				if(!FindJob(u))
-				{
-					//if(rand()%(FRAME_RATE*2) == 1)
-					{
-						//move randomly?
-						//goal = camera.Position() + Vec3f(rand()%TILE_SIZE - TILE_SIZE/2, 0, rand()%TILE_SIZE - TILE_SIZE/2);
-					}
-				}
-			}
-		}break;
+		}
+	} break;
 
-	case UMODE_GOCSTJOB:	GoCstJob(u);		break;
-	case UMODE_CSTJOB:		DoCstJob(u);		break;
-	case UMODE_GOBLJOB:		GoBlJob(u);			break;
-	case UMODE_BLJOB:		DoBlJob(u);			break;
-	case UMODE_GOCDJOB:		GoCdJob(u);			break;
-	case UMODE_CDJOB:		DoCdJob(u);			break;
-	case UMODE_GOSHOP:		GoShop(u);			break;
-	case UMODE_GOREST:		GoRest(u);			break;
-	case UMODE_SHOPPING:	DoShop(u);			break;
-	case UMODE_RESTING:		DoRest(u);			break;
-	case UMODE_GOTRANSP:	GoToTra(u);			break;
-	case UMODE_DRTRANSP:	DoDrTra(u);			break;
-	default: break;
+	case UMODE_GOCSTJOB:
+		GoCstJob(u);
+		break;
+	case UMODE_CSTJOB:
+		DoCstJob(u);
+		break;
+	case UMODE_GOBLJOB:
+		GoBlJob(u);
+		break;
+	case UMODE_BLJOB:
+		DoBlJob(u);
+		break;
+	case UMODE_GOCDJOB:
+		GoCdJob(u);
+		break;
+	case UMODE_CDJOB:
+		DoCdJob(u);
+		break;
+	case UMODE_GOSHOP:
+		GoShop(u);
+		break;
+	case UMODE_GOREST:
+		GoRest(u);
+		break;
+	case UMODE_SHOPPING:
+		DoShop(u);
+		break;
+	case UMODE_RESTING:
+		DoRest(u);
+		break;
+	case UMODE_GOTRANSP:
+		GoToTra(u);
+		break;
+	case UMODE_DRTRANSP:
+		DoDrTra(u);
+		break;
+	default:
+		break;
 	}
 }

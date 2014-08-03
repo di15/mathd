@@ -133,7 +133,7 @@ void VScroll::inev(InEv* ev)
 	if(m_ldown)
 	{
 		if(ev->type == INEV_MOUSEMOVE ||
-				( (ev->type == INEV_MOUSEDOWN || ev->type == INEV_MOUSEUP) && ev->key == MOUSE_LEFT) )
+		                ( (ev->type == INEV_MOUSEDOWN || ev->type == INEV_MOUSEUP) && ev->key == MOUSE_LEFT) )
 			ev->intercepted = true;
 
 		if(ev->type == INEV_MOUSEUP && ev->key == MOUSE_LEFT)
@@ -198,9 +198,9 @@ void VScroll::inev(InEv* ev)
 			m_ldown = true;
 
 			if(py->mouse.x >= m_barpos[0] &&
-					py->mouse.y >= m_barpos[1] &&
-					py->mouse.x <= m_barpos[2] &&
-					py->mouse.y <= m_barpos[3])
+			                py->mouse.y >= m_barpos[1] &&
+			                py->mouse.x <= m_barpos[2] &&
+			                py->mouse.y <= m_barpos[3])
 			{
 				m_ldownbar = true;
 				m_mousedown[0] = py->mouse.x;
@@ -219,10 +219,10 @@ void VScroll::inev(InEv* ev)
 		}
 
 		if(!ev->intercepted &&
-				py->mouse.x >= m_pos[0] &&
-				py->mouse.y >= m_pos[1] &&
-				py->mouse.x <= m_pos[2] &&
-				py->mouse.y <= m_pos[3])
+		                py->mouse.x >= m_pos[0] &&
+		                py->mouse.y >= m_pos[1] &&
+		                py->mouse.x <= m_pos[2] &&
+		                py->mouse.y <= m_pos[3])
 		{
 			m_over = true;
 

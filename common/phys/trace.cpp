@@ -23,8 +23,8 @@
 #define EPSILON_I		1
 
 bool PassUnits(Vec2i vstart, Vec2i vend,
-			   int cmminx, int cmminz, int cmmaxx, int cmmaxz,
-			   Unit* u2)
+               int cmminx, int cmminz, int cmmaxx, int cmmaxz,
+               Unit* u2)
 {
 	float startratio = -1.0f;
 	float endratio = 1.0f;
@@ -155,8 +155,8 @@ bool PassUnits(Vec2i vstart, Vec2i vend,
 }
 
 int Trace(int utype, int umode,
-		  Vec2i vstart, Vec2i vend,
-		  Unit* thisu, Unit* ignoreu, Building* ignoreb)
+          Vec2i vstart, Vec2i vend,
+          Unit* thisu, Unit* ignoreu, Building* ignoreb)
 {
 	UType* ut = &g_utype[utype];
 

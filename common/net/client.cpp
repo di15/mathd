@@ -34,7 +34,7 @@ int MatchClient(Client* c)
 	//for(int i=0; i<CLIENTS; i++)
 	//	if(&g_client[i] == c)
 	//		return i;
-	
+
 	//return -1;
 
 	return (int)(c - g_client);
@@ -48,7 +48,7 @@ int PlayerClient(int ID)
 	for(int i=0; i<PLAYERS; i++)
 	{
 		p = &g_player[i];
-		
+
 		if(!p->on)
 			continue;
 
@@ -186,7 +186,7 @@ void ClearClientPackets(Client* c)
 		pack->freemem();
 		i = g_recv.erase(i);
 	}
-	
+
 	i=g_sent.begin();
 	while(i!=g_sent.end())
 	{
@@ -216,7 +216,7 @@ void DisconnectClient(int i)
 
 	if(c->m_player >= 0)
 		DisconnectPlayer(c->m_player);
-	
+
 	c->m_on = false;
 }
 

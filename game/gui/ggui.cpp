@@ -309,7 +309,7 @@ void Click_NewGame()
 			//if(rand()%2 == 1)
 			//	PlaceUnit(UNIT_ROBOSOLDIER, cmpos, 0);
 			//else
-				PlaceUnit(UNIT_LABOURER, cmpos, -1, NULL);
+			PlaceUnit(UNIT_LABOURER, cmpos, -1, NULL);
 		}
 
 	CheckGLError(__FILE__, __LINE__);
@@ -495,8 +495,8 @@ void MouseLDown()
 		int edtool = GetEdTool();
 
 		if(edtool == EDTOOL_PLACEROADS ||
-				edtool == EDTOOL_PLACECRUDEPIPES ||
-				edtool == EDTOOL_PLACEPOWERLINES)
+		                edtool == EDTOOL_PLACECRUDEPIPES ||
+		                edtool == EDTOOL_PLACEPOWERLINES)
 		{
 			StartRoadPlacement();
 		}

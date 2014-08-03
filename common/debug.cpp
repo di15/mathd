@@ -308,6 +308,6 @@ void UDebug(int i)
 
 GLvoid APIENTRY GLMessageHandler(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, GLvoid* userParam)
 {
-   //ErrorMessage("GL Error", message);
-   g_log<<"GL Message: "<<message<<std::endl;
+	//ErrorMessage("GL Error", message);
+	g_log<<"GL Message: "<<message<<std::endl;
 }
