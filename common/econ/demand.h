@@ -250,7 +250,7 @@ public:
 		}
 #endif
 
-		for(int i=0; i<CONDUIT_TYPES; i++)
+		for(unsigned int i=0; i<CONDUIT_TYPES; i++)
 		{
 			auto coiter = codems[i].begin();
 			while(coiter != codems[i].end())
