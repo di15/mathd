@@ -1,8 +1,6 @@
 #ifndef _PARTICLE_H
 #define _PARTICLE_H
 
-#pragma warning(disable: 4018)
-
 #include "../math/3dmath.h"
 #include "../math/vec3f.h"
 #include "../utils.h"
