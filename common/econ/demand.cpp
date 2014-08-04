@@ -733,7 +733,10 @@ void LabDemH(DemTree* dm, Unit* u, int* fundsleft)
 		altbid->maxdist = homedist;
 		altbid->cmpos = u->cmpos;
 		altbid->tpos = u->cmpos/TILE_SIZE;
-		altbid->minutil = -1;	//any util
+		//altbid->minutil = -1;	//any util
+
+		int util = PhUtil(homepr, homedist);
+		altbid->minutil = util;
 
 		*fundsleft -= homepr;
 	}

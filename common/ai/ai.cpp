@@ -32,6 +32,7 @@ void UpdateAI()
 		lastthink = g_simframe;
 }
 
+//build buildings
 void Build(Player* p)
 {
 	//DemTree* dm = &g_demtree;
@@ -58,11 +59,13 @@ void Build(Player* p)
 	}
 }
 
+//manufacture units
 void Manuf(Player* p)
 {
 }
 
-void AdjustPrices(Player* p)
+//adjust prices
+void AdjPr(Player* p)
 {
 }
 
@@ -82,6 +85,6 @@ void UpdateAI(Player* p)
 
 	CalcDem2(p);
 	Build(p);
-	//Manuf(p);
-	//AdjustPrices(p);
+	Manuf(p);
+	AdjPr(p);
 }
