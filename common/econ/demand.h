@@ -12,6 +12,9 @@
 #define AVG_DIST		(TILE_SIZE*6)
 #define CYCLE_FRAMES	(SIM_FRAME_RATE*60)
 
+//debug output for demand calcs?
+#define DEBUGDEM
+
 class CostCompo
 {
 public:

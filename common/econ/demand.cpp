@@ -1898,8 +1898,10 @@ void CheckBlType(DemTree* dm, Player* p, int btype, int rtype, int ramt, Vec2i t
 	// determine cost for building's output production
 	while(remain > 0)
 	{
+#ifdef DEBUGDEM
 		g_log<<"\t\t CheckBlType remain="<<remain<<std::endl;
 		g_log.flush();
+#endif
 
 		int prodstep[RESOURCES];	//production level based on stepleft and bl's output cap
 		int stepleft[RESOURCES];	//how much is still left in this step of the list
@@ -1913,20 +1915,24 @@ void CheckBlType(DemTree* dm, Player* p, int btype, int rtype, int ramt, Vec2i t
 				continue;
 
 			auto& rco = rcoiter[ri];
-			
+
 			//if at end
 			if(rco == rcostco[ri].end())
 				break;
 
 			stepleft[ri] = rco->ramt - stepcounted[ri];
 
+#ifdef DEBUGDEM
 			g_log<<"\t\t\t ri="<<ri<<" stepleft("<<stepleft[ri]<<") = rco->ramt("<<rco->ramt<<") - stepcounted[ri]("<<stepcounted[ri]<<")"<<std::endl;
 			g_log.flush();
+#endif
 
 			prodstep[ri] = stepleft[ri] * RATIO_DENOM / bt->input[ri];
 
+#ifdef DEBUGDEM
 			g_log<<"\t\t\t ri prodstep="<<prodstep[ri]<<std::endl;
 			g_log.flush();
+#endif
 		}
 
 		//find the lowest production level
@@ -1942,8 +1948,10 @@ void CheckBlType(DemTree* dm, Player* p, int btype, int rtype, int ramt, Vec2i t
 				minstepr = ri;
 		}
 
+#ifdef DEBUGDEM
 		g_log<<"\t\t minstepr="<<minstepr<<std::endl;
 		g_log.flush();
+#endif
 
 		//if there's no such resource, there's something wrong
 		if(minstepr < 0)
@@ -2002,8 +2010,10 @@ void CheckBlType(DemTree* dm, Player* p, int btype, int rtype, int ramt, Vec2i t
 			nextco.margcost += rcoiter[ri]->margcost * rstep;
 		}
 
+#ifdef DEBUGDEM
 		g_log<<"\t\t sub="<<nextco.ramt<<" prodstep[minstepr]="<<prodstep[minstepr]<<" bt->output[rtype]="<<bt->output[rtype]<<std::endl;
 		g_log.flush();
+#endif
 
 		remain -= nextco.ramt;
 
@@ -2154,19 +2164,25 @@ void CheckBlTile(DemTree* dm, Player* p, int ri, RDemNode* pt, int x, int z, int
 		int blmaxr = maxramt;
 		DemsAtB* demb = NULL;
 
+#ifdef DEBUGDEM
 		g_log<<"\t zx "<<z<<","<<x<<" calling CheckBlType"<<std::endl;
 		g_log.flush();
+#endif
 
 		CheckBlType(&bldm, p, btype, ri, maxramt, Vec2i(x,z), &bltybid, &blmaxr, success, &demb);
 
+#ifdef DEBUGDEM
 		g_log<<"\t zx "<<z<<","<<x<<" /fini calling CheckBlType"<<std::endl;
 		g_log.flush();
+#endif
 
 		if(!*success)
 			continue;
 
+#ifdef DEBUGDEM
 		g_log<<"\t zx "<<z<<","<<x<<" /fini calling CheckBlType success"<<std::endl;
 		g_log.flush();
+#endif
 
 		//int bltyfix = 0;
 		//int bltyrecur = 0;
@@ -2186,8 +2202,10 @@ void CheckBlTile(DemTree* dm, Player* p, int ri, RDemNode* pt, int x, int z, int
 				if(leastnext < 0 || ((*diter)->bid.marginpr < leastnext && (*diter)->bid.marginpr > prevprc))
 					leastnext = (*diter)->bid.marginpr;
 
+#ifdef DEBUGDEM
 			g_log<<"\t zx "<<z<<","<<x<<" try price "<<leastnext<<" from "<<prevprc<<std::endl;
 			g_log.flush();
+#endif
 
 			if(leastnext == prevprc)
 				break;
@@ -2219,14 +2237,18 @@ void CheckBlTile(DemTree* dm, Player* p, int ri, RDemNode* pt, int x, int z, int
 			//int ofmax = Ceili(proramt * RATIO_DENOM, bestmaxr);	//how much of max demanded is
 			//curprofit += ofmax * bestrecur / RATIO_DENOM;	//bl recurring costs, scaled to demanded qty
 
+#ifdef DEBUGDEM
 			g_log<<"\t\t\t curprofit = "<<curprofit<<std::endl;
 			g_log.flush();
+#endif
 
 			if(curprofit <= bestprofit && bestbtype >= 0)
 				continue;
 
+#ifdef DEBUGDEM
 			g_log<<"\t\t\t profit success"<<std::endl;
 			g_log.flush();
+#endif
 
 			bestprofit = curprofit;
 			*fixc = 0;	//TO DO: cost of building roads, infrast etc.
@@ -2305,14 +2327,18 @@ void CheckBl(DemTree* dm, Player* p, int* fixcost, int* recurprof, bool* success
 		for(int z=0; z<g_hmap.m_widthz; z++)
 			for(int x=0; x<g_hmap.m_widthx; x++)
 			{
+#ifdef DEBUGDEM
 				g_log<<"zx "<<z<<","<<x<<std::endl;
 				g_log.flush();
+#endif
 
 				DemTree thisdm;
 				DupDT(dm, &thisdm);
 
+#ifdef DEBUGDEM
 				g_log<<"zx "<<z<<","<<x<<" /fini dupdt"<<std::endl;
 				g_log.flush();
+#endif
 
 				RDemNode tile;
 
@@ -2321,8 +2347,10 @@ void CheckBl(DemTree* dm, Player* p, int* fixcost, int* recurprof, bool* success
 				bool subsuccess;
 				CheckBlTile(&thisdm, p, ri, &tile, x, z, &fixc, &recurp, &subsuccess);
 
+#ifdef DEBUGDEM
 				g_log<<"zx "<<z<<","<<x<<" /fini CheckBlTile"<<std::endl;
 				g_log.flush();
+#endif
 
 				if(!subsuccess)
 					continue;
@@ -2331,16 +2359,20 @@ void CheckBl(DemTree* dm, Player* p, int* fixcost, int* recurprof, bool* success
 
 				if(bestrecurp < 0 || recurp > bestrecurp)
 				{
+#ifdef DEBUGDEM
 					g_log<<"zx "<<z<<","<<x<<" success dupdt"<<std::endl;
 					g_log.flush();
+#endif
 
 					bestfixc = fixc;
 					bestrecurp = recurp;
 					bestbldm.free();
 					DupDT(&thisdm, &bestbldm);
 
+#ifdef DEBUGDEM
 					g_log<<"zx "<<z<<","<<x<<" /fini success dupdt"<<std::endl;
 					g_log.flush();
+#endif
 				}
 			}
 
@@ -2436,12 +2468,22 @@ void CalcDem2(Player* p)
 	//if(recurprof > 0)
 	if(success)
 	{
-		InfoMessage("suc", "suc");
+#ifdef DEBUGDEM
+		g_log<<"suc pi "<<pi<<std::endl;
+		g_log.flush();
+		//InfoMessage("suc", "suc");
+#endif
 		dm->free();
 		DupDT(&bldm, dm);
 	}
+#ifdef DEBUGDEM
 	else
-		InfoMessage("f", "f");
+	{
+		g_log<<"fail pi "<<pi<<std::endl;
+		g_log.flush();
+		//InfoMessage("f", "f");
+	}
+#endif
 
 	//TO DO: build infrastructure demanded too
 }

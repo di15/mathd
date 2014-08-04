@@ -69,7 +69,8 @@ public:
 };
 
 //#define PLAYERS 32
-#define PLAYERS ARRSZ(g_pycols)
+//#define PLAYERS ARRSZ(g_pycols)
+#define PLAYERS	6	//small number of AI players so it doesn't freeze (as much)
 
 extern Player g_player[PLAYERS];
 extern int g_localP;

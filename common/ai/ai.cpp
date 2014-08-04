@@ -71,12 +71,14 @@ void UpdateAI(Player* p)
 	//if(p != g_player)
 	//	return;
 
+#if 0
 	static bool once = false;
 
 	if(once)
 		return;
 
 	once = true;
+#endif
 
 	CalcDem2(p);
 	Build(p);

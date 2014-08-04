@@ -4195,13 +4195,7 @@
 
 1406718800 /home/polyfrag/Desktop/Projects/CorpStatesC/aaa004_low3d/common/render/skybox.h
 
-1406718800 /home/polyfrag/Desktop/Projects/CorpStatesC/aaa004_low3d/common/sim/player.h
-	"resources.h"
-	"../gui/richtext.h"
-	"../gui/gui.h"
-	"../math/camera.h"
-	"selection.h"
-	"../../libs/objectscript/objectscript.h"
+1407135434 /home/polyfrag/Desktop/Projects/CorpStatesC/aaa004_low3d/common/sim/player.h
 	"resources.h"
 	"../gui/richtext.h"
 	"../gui/gui.h"
@@ -4911,7 +4905,7 @@
 	"../common/window.h"
 	"../common/window.h"
 
-1406789116 source:/home/polyfrag/Desktop/Projects/CorpStatesC/aaa004_low3d/common/econ/demand.cpp
+1407135217 source:/home/polyfrag/Desktop/Projects/CorpStatesC/aaa004_low3d/common/econ/demand.cpp
 	"demand.h"
 	"../sim/unit.h"
 	"../sim/building.h"
@@ -4920,8 +4914,9 @@
 	"../utils.h"
 	"utility.h"
 	"../math/fixmath.h"
+	"../sim/build.h"
 
-1407050492 /home/polyfrag/Desktop/Projects/CorpStatesC/aaa004_low3d/common/econ/demand.h
+1407135246 /home/polyfrag/Desktop/Projects/CorpStatesC/aaa004_low3d/common/econ/demand.h
 	"../math/vec2i.h"
 	"../platform.h"
 	"../sim/resources.h"
@@ -6818,7 +6813,7 @@
 	"gui/cursor.h"
 	"sim/player.h"
 
-1407126780 source:/home/polyfrag/Desktop/Projects/CorpStatesC/aaa004_low3d/game/gmain.cpp
+1407134762 source:/home/polyfrag/Desktop/Projects/CorpStatesC/aaa004_low3d/game/gmain.cpp
 	"gmain.h"
 	"../common/gui/gui.h"
 	"keymap.h"
@@ -6863,7 +6858,7 @@
 
 1406718800 /home/polyfrag/Desktop/Projects/CorpStatesC/aaa004_low3d/game/gres.h
 
-1407129114 source:/home/polyfrag/Desktop/Projects/CorpStatesC/aaa004_low3d/common/ai/ai.cpp
+1407134858 source:/home/polyfrag/Desktop/Projects/CorpStatesC/aaa004_low3d/common/ai/ai.cpp
 	"../sim/player.h"
 	"ai.h"
 	"../econ/demand.h"
