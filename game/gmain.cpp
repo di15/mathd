@@ -804,7 +804,8 @@ void SignalCallback(int signum)
 	// Cleanup and close up stuff here
 
 	// Terminate program
-	g_quit = true;
+	//g_quit = true;
+	exit(0);	//force quit NOW
 }
 
 void Init()

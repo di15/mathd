@@ -1861,11 +1861,32 @@ void CheckBlType(DemTree* dm, Player* p, int btype, int rtype, int ramt, Vec2i t
 
 	std::list<CostCompo>::iterator rcoiter[RESOURCES];
 
+	//leave it like this for now
+	//not counting fixed or transport costs
 	for(int ri=0; ri<RESOURCES; ri++)
 	{
 		if(bt->input[ri] <= 0)
 			continue;
 
+		//Each item in the list for resource type #ri indicates how much
+		//that amount of the resource will cost to obtain.
+		CostCompo rco;
+
+		rco.fixcost = 0;
+		rco.margcost = 0;
+		rco.ramt = bt->input[ri];
+		rco.transpcost = 0;
+
+		rcostco[ri].push_back(rco);
+	}
+
+	for(int ri=0; ri<RESOURCES; ri++)
+	{
+		if(bt->input[ri] <= 0)
+			continue;
+
+		//Each item in the list for resource type #ri indicates how much
+		//that amount of the resource will cost to obtain.
 		rcoiter[ri] = rcostco[ri].begin();
 	}
 
@@ -1892,8 +1913,20 @@ void CheckBlType(DemTree* dm, Player* p, int btype, int rtype, int ramt, Vec2i t
 				continue;
 
 			auto& rco = rcoiter[ri];
+			
+			//if at end
+			if(rco == rcostco[ri].end())
+				break;
+
 			stepleft[ri] = rco->ramt - stepcounted[ri];
+
+			g_log<<"\t\t\t ri="<<ri<<" stepleft("<<stepleft[ri]<<") = rco->ramt("<<rco->ramt<<") - stepcounted[ri]("<<stepcounted[ri]<<")"<<std::endl;
+			g_log.flush();
+
 			prodstep[ri] = stepleft[ri] * RATIO_DENOM / bt->input[ri];
+
+			g_log<<"\t\t\t ri prodstep="<<prodstep[ri]<<std::endl;
+			g_log.flush();
 		}
 
 		//find the lowest production level
@@ -1908,6 +1941,9 @@ void CheckBlType(DemTree* dm, Player* p, int btype, int rtype, int ramt, Vec2i t
 			if(minstepr < 0 || prodstep[ri] < prodstep[minstepr])
 				minstepr = ri;
 		}
+
+		g_log<<"\t\t minstepr="<<minstepr<<std::endl;
+		g_log.flush();
 
 		//if there's no such resource, there's something wrong
 		if(minstepr < 0)
@@ -1965,6 +2001,11 @@ void CheckBlType(DemTree* dm, Player* p, int btype, int rtype, int ramt, Vec2i t
 			stepcounted[ri] += rstep;
 			nextco.margcost += rcoiter[ri]->margcost * rstep;
 		}
+
+		g_log<<"\t\t sub="<<nextco.ramt<<" prodstep[minstepr]="<<prodstep[minstepr]<<" bt->output[rtype]="<<bt->output[rtype]<<std::endl;
+		g_log.flush();
+
+		remain -= nextco.ramt;
 
 		bid->costcompo.push_back(nextco);
 	}
@@ -2068,6 +2109,10 @@ void CheckBlTile(DemTree* dm, Player* p, int ri, RDemNode* pt, int x, int z, int
 
 		maxramt += rdn->ramt;
 
+		rdn->bid.marginpr = maxpr;
+		rdn->bid.maxbid = maxrev;
+		//rdn->bid.minbid = maxrev;
+
 #if 0
 		RDemNode proj;	//projected revenue
 		proj.ramt = rdn->ramt;
@@ -2138,7 +2183,7 @@ void CheckBlTile(DemTree* dm, Player* p, int ri, RDemNode* pt, int x, int z, int
 			//while there's another possible price, see if it will generate more total profit
 
 			for(auto diter=rdems.begin(); diter!=rdems.end(); diter++)
-				if(((*diter)->bid.marginpr < leastnext && (*diter)->bid.marginpr > prevprc) || leastnext < 0)
+				if(leastnext < 0 || ((*diter)->bid.marginpr < leastnext && (*diter)->bid.marginpr > prevprc))
 					leastnext = (*diter)->bid.marginpr;
 
 			g_log<<"\t zx "<<z<<","<<x<<" try price "<<leastnext<<" from "<<prevprc<<std::endl;
@@ -2174,8 +2219,14 @@ void CheckBlTile(DemTree* dm, Player* p, int ri, RDemNode* pt, int x, int z, int
 			//int ofmax = Ceili(proramt * RATIO_DENOM, bestmaxr);	//how much of max demanded is
 			//curprofit += ofmax * bestrecur / RATIO_DENOM;	//bl recurring costs, scaled to demanded qty
 
+			g_log<<"\t\t\t curprofit = "<<curprofit<<std::endl;
+			g_log.flush();
+
 			if(curprofit <= bestprofit && bestbtype >= 0)
 				continue;
+
+			g_log<<"\t\t\t profit success"<<std::endl;
+			g_log.flush();
 
 			bestprofit = curprofit;
 			*fixc = 0;	//TO DO: cost of building roads, infrast etc.
@@ -2380,7 +2431,7 @@ void CalcDem2(Player* p)
 
 	CheckBl(&bldm, p, &fixcost, &recurprof, &success);	//check if there's any profitable building opp
 
-	return;
+	//return;
 
 	//if(recurprof > 0)
 	if(success)
