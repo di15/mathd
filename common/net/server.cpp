@@ -70,7 +70,7 @@ void CheckFirst()
 	char query[128];
 	sprintf(query, "SELECT * FROM entities");
 	MySQLQuery();
-	
+
 	if(!MySQLFetch())
 		g_first = true;
 	else
@@ -92,7 +92,7 @@ void LoadEntities()
 		i = NewEntity();
 		e = &g_entity[i];
 		MySQLGetInt(MYSQL_ENTITIES_ID, &e->id);
-		
+
 	}
 }
 

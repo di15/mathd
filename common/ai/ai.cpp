@@ -13,7 +13,7 @@ void UpdateAI()
 	if(g_simframe - lastthink < CYCLE_FRAMES/30)
 		return;
 
-	CalcDem1();
+	//CalcDem1();
 
 	for(int i=0; i<PLAYERS; i++)
 	{
@@ -34,22 +34,25 @@ void UpdateAI()
 
 void Build(Player* p)
 {
-	for(auto biter = g_demtree.supbpcopy.begin(); biter != g_demtree.supbpcopy.end(); biter ++)
+	//DemTree* dm = &g_demtree;
+	int pi = p - g_player;
+	DemTree* dm = &g_demtree2[pi];
+
+	for(auto biter = dm->supbpcopy.begin(); biter != dm->supbpcopy.end(); biter ++)
 	{
-		DemsAtB* demb = *biter;
+		DemsAtB* demb = (DemsAtB*)*biter;
 
 		if(demb->bi >= 0)
 			continue;
 
 		int btype = demb->btype;
-		int pyid = p - g_player;
 
 		Vec2i tpos;
 
 		if(!PlaceBAb(btype, Vec2i(g_hmap.m_widthx/2, g_hmap.m_widthz/2), &tpos))
 			continue;
 
-		PlaceBl(btype, tpos, false, pyid, &demb->bi);
+		PlaceBl(btype, tpos, false, pi, &demb->bi);
 
 		return;
 	}
@@ -65,7 +68,18 @@ void AdjustPrices(Player* p)
 
 void UpdateAI(Player* p)
 {
+	//if(p != g_player)
+	//	return;
+
+	static bool once = false;
+
+	if(once)
+		return;
+
+	once = true;
+
+	CalcDem2(p);
 	Build(p);
-	Manuf(p);
-	AdjustPrices(p);
+	//Manuf(p);
+	//AdjustPrices(p);
 }

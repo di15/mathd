@@ -40,14 +40,14 @@ unsigned int PrevAck(unsigned int ack)
 	//	ack --;
 
 	ack--;
-	
+
 	return ack;
 }
 
 bool PastAck(unsigned int test, unsigned int current)
 {
-	return ((current >= test) && (current - test <= UINT_MAX/2)) 
-		|| ((test > current) && (test - current > UINT_MAX/2));
+	return ((current >= test) && (current - test <= UINT_MAX/2))
+	       || ((test > current) && (test - current > UINT_MAX/2));
 }
 
 void InitNet()
@@ -69,7 +69,7 @@ void InitNet()
 
 	int length = sizeof(struct sockaddr_in);
 
-	if(bind(g_socket, (struct sockaddr *)&g_sockaddr, length) < 0) 
+	if(bind(g_socket, (struct sockaddr *)&g_sockaddr, length) < 0)
 		g_error<<"Error binding socket errno="<<errno<<endl;
 
 	int flags = fcntl(g_socket, F_GETFL);
@@ -85,14 +85,14 @@ void InitNet()
 	WSAStartup(MAKEWORD(2, 2), &data);
 
 	g_socket = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
-	
-   struct sockaddr_in clientaddr;
-   int socklen = sizeof(struct sockaddr);
 
-   memset((char*)&clientaddr, 0, sizeof(clientaddr));
-   clientaddr.sin_family = AF_INET;
-   clientaddr.sin_addr.s_addr = INADDR_ANY;
-   clientaddr.sin_port = htons((u_short)PORT);
+	struct sockaddr_in clientaddr;
+	int socklen = sizeof(struct sockaddr);
+
+	memset((char*)&clientaddr, 0, sizeof(clientaddr));
+	clientaddr.sin_family = AF_INET;
+	clientaddr.sin_addr.s_addr = INADDR_ANY;
+	clientaddr.sin_port = htons((u_short)PORT);
 
 	struct hostent* hp = gethostbyname(SV_ADDR);
 	g_sockaddr.sin_family = AF_INET;
@@ -172,14 +172,14 @@ void NetIn()
 			TranslatePacket(buffer, bytes, true);
 #endif
 		}
-	}while(bytes > 0);
+	} while(bytes > 0);
 }
 
 void ClearPackets()
 {
 	for(auto i=g_sent.begin(); i!=g_sent.end(); i++)
 		i->freemem();
-	
+
 	for(auto i=g_recv.begin(); i!=g_recv.end(); i++)
 		i->freemem();
 }

@@ -272,7 +272,7 @@ void UDebug(int i)
 	return;
 
 	Unit* u = &g_unit[i];
-	UnitT* t = &g_unitType[u->type];
+	UType* t = &g_unitType[u->type];
 
 	g_log<<"UNIT DEBUG: "<<t->name<<" ("<<i<<")"<<std::endl;
 	g_log<<"path size: "<<u->path.size()<<std::endl;
@@ -284,7 +284,7 @@ void UDebug(int i)
 		if(g_collidertype == COLLIDER_BUILDING)
 		{
 			Building* b = &g_building[g_lastcollider];
-			BuildingT* bt = &g_bltype[b->type];
+			BlType* bt = &g_bltype[b->type];
 
 			g_log<<"COLLIDER B: "<<bt->name<<std::endl;
 
@@ -308,6 +308,6 @@ void UDebug(int i)
 
 GLvoid APIENTRY GLMessageHandler(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, GLvoid* userParam)
 {
-   //ErrorMessage("GL Error", message);
-   g_log<<"GL Message: "<<message<<std::endl;
+	//ErrorMessage("GL Error", message);
+	g_log<<"GL Message: "<<message<<std::endl;
 }

@@ -69,7 +69,7 @@ void UpdateSBuild()
 		py->vdrag[0].x = tilepos.x * TILE_SIZE;
 		py->vdrag[0].z = tilepos.y * TILE_SIZE;
 
-		BuildingT* t = &g_bltype[py->build];
+		BlType* t = &g_bltype[py->build];
 
 		if(t->widthx%2 == 1)
 			py->vdrag[0].x += TILE_SIZE/2;
@@ -85,34 +85,16 @@ void UpdateSBuild()
 		}
 		//PlaceBl(type, tilepos, true, -1, -1, -1);
 	}
-	else if(py->build == BUILDING_ROAD)
+	else if(py->build >= BUILDING_TYPES && py->build < BUILDING_TYPES+CONDUIT_TYPES)
 	{
+		int ctype = py->build - BUILDING_TYPES;
+
 		if(py->mousekeys[0])
-			UpdCoPlans(CONDUIT_ROAD, g_localP, py->vdrag[0], py->vdrag[1]);
+			UpdCoPlans(ctype, g_localP, py->vdrag[0], py->vdrag[1]);
 		else
 		{
-			ClearCoPlans(CONDUIT_ROAD);
-			UpdCoPlans(CONDUIT_ROAD, g_localP, py->vdrag[0], py->vdrag[0]);
-		}
-	}
-	else if(py->build == BUILDING_POWL)
-	{
-		if(py->mousekeys[0])
-			UpdCoPlans(CONDUIT_POWL, g_localP, py->vdrag[0], py->vdrag[1]);
-		else
-		{
-			ClearCoPlans(CONDUIT_POWL);
-			UpdCoPlans(CONDUIT_POWL, g_localP, py->vdrag[0], py->vdrag[0]);
-		}
-	}
-	else if(py->build == BUILDING_CRPIPE)
-	{
-		if(py->mousekeys[0])
-			UpdCoPlans(CONDUIT_CRPIPE, g_localP, py->vdrag[0], py->vdrag[1]);
-		else
-		{
-			ClearCoPlans(CONDUIT_CRPIPE);
-			UpdCoPlans(CONDUIT_CRPIPE, g_localP, py->vdrag[0], py->vdrag[0]);
+			ClearCoPlans(ctype);
+			UpdCoPlans(ctype, g_localP, py->vdrag[0], py->vdrag[0]);
 		}
 	}
 }
@@ -135,7 +117,7 @@ void DrawSBuild()
 		else
 			glUniform4f(s->m_slot[SSLOT_COLOR], 1, 0, 0, 0.5f);
 
-		const BuildingT* t = &g_bltype[py->build];
+		const BlType* t = &g_bltype[py->build];
 		Model* m = &g_model[ t->model ];
 		m->draw(0, py->vdrag[0], 0);
 	}
@@ -220,7 +202,7 @@ void DrawBReason(Matrix* mvp, float width, float height, bool persp)
 bool BuildingLevel(int type, Vec2i tpos)
 {
 #if 1
-	BuildingT* t = &g_bltype[type];
+	BlType* t = &g_bltype[type];
 
 	Vec2i tmin;
 	Vec2i tmax;
@@ -342,8 +324,8 @@ bool BuildingLevel(int type, Vec2i tpos)
 bool Offmap(int minx, int minz, int maxx, int maxz)
 {
 	if(minx < 0 || minz < 0
-			|| maxx >= g_hmap.m_widthx*TILE_SIZE
-			|| maxz >= g_hmap.m_widthz*TILE_SIZE)
+	                || maxx >= g_hmap.m_widthx*TILE_SIZE
+	                || maxz >= g_hmap.m_widthz*TILE_SIZE)
 	{
 		g_collidertype = COLLIDER_OFFMAP;
 		return true;
@@ -354,7 +336,7 @@ bool Offmap(int minx, int minz, int maxx, int maxz)
 
 bool BuildingCollides(int type, Vec2i tpos)
 {
-	BuildingT* t = &g_bltype[type];
+	BlType* t = &g_bltype[type];
 
 	Vec2i tmin;
 	Vec2i tmax;
@@ -418,7 +400,7 @@ bool PlaceBl(int type, Vec2i pos, bool finished, int owner, int* bid)
 	b->type = type;
 	b->tilepos = pos;
 
-	BuildingT* t = &g_bltype[type];
+	BlType* t = &g_bltype[type];
 
 	Vec2i tmin;
 	Vec2i tmax;
@@ -449,7 +431,7 @@ bool PlaceBl(int type, Vec2i pos, bool finished, int owner, int* bid)
 	Zero(b->maxcost);
 	Zero(b->prodprice);
 	b->propprice = 0;
-	
+
 	b->occupier.clear();
 	b->worker.clear();
 	b->conwage = 0;
@@ -482,7 +464,7 @@ bool PlaceBl(int type, Vec2i pos, bool finished, int owner, int* bid)
 	{
 		//b->allocres();
 		b->inoperation = false;
-		
+
 		if(!b->finished && owner == g_curP)
 		{
 			Player* py = &g_player[g_curP];
@@ -511,14 +493,14 @@ bool PlaceBAb(int btype, Vec2i tabout, Vec2i* tplace)
 {
 	//g_log<<"PlaceBAround "<<player<<std::endl;
 	//g_log.flush();
-    
-	BuildingT* t = &g_bltype[btype];
+
+	BlType* t = &g_bltype[btype];
 	int shell = 1;
-    
+
 	//char msg[128];
 	//sprintf(msg, "place b a %f,%f,%f", vAround.x/16, vAround.y/16, vAround.z/16);
 	//Chat(msg);
-    
+
 	do
 	{
 		std::vector<Vec2i> canplace;
@@ -531,7 +513,7 @@ bool PlaceBAb(int btype, Vec2i tabout, Vec2i* tplace)
 		bottom = tabout.y + shell;
 
 		canplace.reserve( (right-left)*2/TILE_SIZE + (bottom-top)*2/TILE_SIZE );
-        
+
 		tilez = top;
 		for(tilex=left; tilex<right; tilex++)
 		{
@@ -541,7 +523,7 @@ bool PlaceBAb(int btype, Vec2i tabout, Vec2i* tplace)
 			int cmendx = cmstartx + t->widthx - 1;
 			int cmstartz = ttry.y*TILE_SIZE - t->widthz/2;
 			int cmendz = cmstartz + t->widthz - 1;
-			
+
 			if(t->widthx%2 == 1)
 			{
 				cmstartx += TILE_SIZE/2;
@@ -552,7 +534,7 @@ bool PlaceBAb(int btype, Vec2i tabout, Vec2i* tplace)
 				cmstartz += TILE_SIZE/2;
 				cmendz += TILE_SIZE/2;
 			}
-            
+
 			if(cmstartx < 0)
 				continue;
 			else if(cmendx >= g_hmap.m_widthx * TILE_SIZE)
@@ -561,16 +543,16 @@ bool PlaceBAb(int btype, Vec2i tabout, Vec2i* tplace)
 				continue;
 			else if(cmendz >= g_hmap.m_widthz * TILE_SIZE)
 				continue;
-            
+
 			//char msg[128];
 			//sprintf(msg, "check %d,%d,%d,%d", startx, startz, endx, endz);
 			//Chat(msg);
-            
+
 			if(!CheckCanPlace(btype, ttry))
 				continue;
 			canplace.push_back(ttry);
 		}
-        
+
 		tilex = right;
 		for(tilez=top; tilez<bottom; tilez++)
 		{
@@ -580,7 +562,7 @@ bool PlaceBAb(int btype, Vec2i tabout, Vec2i* tplace)
 			int cmendx = cmstartx + t->widthx - 1;
 			int cmstartz = ttry.y*TILE_SIZE - t->widthz/2;
 			int cmendz = cmstartz + t->widthz - 1;
-			
+
 			if(t->widthx%2 == 1)
 			{
 				cmstartx += TILE_SIZE/2;
@@ -591,7 +573,7 @@ bool PlaceBAb(int btype, Vec2i tabout, Vec2i* tplace)
 				cmstartz += TILE_SIZE/2;
 				cmendz += TILE_SIZE/2;
 			}
-            
+
 			if(cmstartx < 0)
 				continue;
 			else if(cmendx >= g_hmap.m_widthx * TILE_SIZE)
@@ -600,16 +582,16 @@ bool PlaceBAb(int btype, Vec2i tabout, Vec2i* tplace)
 				continue;
 			else if(cmendz >= g_hmap.m_widthz * TILE_SIZE)
 				continue;
-            
+
 			//char msg[128];
 			//sprintf(msg, "check %d,%d,%d,%d", startx, startz, endx, endz);
 			//Chat(msg);
-            
+
 			if(!CheckCanPlace(btype, ttry))
 				continue;
 			canplace.push_back(ttry);
 		}
-        
+
 		tilez = bottom;
 		for(tilex=right; tilex>left; tilex--)
 		{
@@ -619,7 +601,7 @@ bool PlaceBAb(int btype, Vec2i tabout, Vec2i* tplace)
 			int cmendx = cmstartx + t->widthx - 1;
 			int cmstartz = ttry.y*TILE_SIZE - t->widthz/2;
 			int cmendz = cmstartz + t->widthz - 1;
-			
+
 			if(t->widthx%2 == 1)
 			{
 				cmstartx += TILE_SIZE/2;
@@ -630,7 +612,7 @@ bool PlaceBAb(int btype, Vec2i tabout, Vec2i* tplace)
 				cmstartz += TILE_SIZE/2;
 				cmendz += TILE_SIZE/2;
 			}
-            
+
 			if(cmstartx < 0)
 				continue;
 			else if(cmendx >= g_hmap.m_widthx * TILE_SIZE)
@@ -639,16 +621,16 @@ bool PlaceBAb(int btype, Vec2i tabout, Vec2i* tplace)
 				continue;
 			else if(cmendz >= g_hmap.m_widthz * TILE_SIZE)
 				continue;
-            
+
 			//char msg[128];
 			//sprintf(msg, "check %d,%d,%d,%d", startx, startz, endx, endz);
 			//Chat(msg);
-            
+
 			if(!CheckCanPlace(btype, ttry))
 				continue;
 			canplace.push_back(ttry);
 		}
-        
+
 		tilex = left;
 		for(tilez=bottom; tilez>top; tilez--)
 		{
@@ -658,7 +640,7 @@ bool PlaceBAb(int btype, Vec2i tabout, Vec2i* tplace)
 			int cmendx = cmstartx + t->widthx - 1;
 			int cmstartz = ttry.y*TILE_SIZE - t->widthz/2;
 			int cmendz = cmstartz + t->widthz - 1;
-			
+
 			if(t->widthx%2 == 1)
 			{
 				cmstartx += TILE_SIZE/2;
@@ -669,7 +651,7 @@ bool PlaceBAb(int btype, Vec2i tabout, Vec2i* tplace)
 				cmstartz += TILE_SIZE/2;
 				cmendz += TILE_SIZE/2;
 			}
-            
+
 			if(cmstartx < 0)
 				continue;
 			else if(cmendx >= g_hmap.m_widthx * TILE_SIZE)
@@ -678,34 +660,34 @@ bool PlaceBAb(int btype, Vec2i tabout, Vec2i* tplace)
 				continue;
 			else if(cmendz >= g_hmap.m_widthz * TILE_SIZE)
 				continue;
-            
+
 			//char msg[128];
 			//sprintf(msg, "check %d,%d,%d,%d", startx, startz, endx, endz);
 			//Chat(msg);
-            
+
 			if(!CheckCanPlace(btype, ttry))
 				continue;
 			canplace.push_back(ttry);
 		}
-        
+
 		if(canplace.size() > 0)
 		{
 			//Chat("placing");
 			//g_log<<"placeb t="<<btype<<" "<<vTile.x<<","<<vTile.y<<","<<vTile.z<<"("<<(vTile.x/16)<<","<<(vTile.y/16)<<","<<(vTile.z/16)<<")"<<std::endl;
 			//g_log.flush();
 			//*tpos = canplace[ rand()%canplace.size() ];
-            *tplace = canplace[ 0 ];
+			*tplace = canplace[ 0 ];
 
 			return true;
 		}
-        
+
 		//char msg[128];
 		//sprintf(msg, "shell %d", shell);
 		//Chat(msg);
-        
+
 		shell++;
-	}while(shell < g_hmap.m_widthx || shell < g_hmap.m_widthz);
-    
+	} while(shell < g_hmap.m_widthx || shell < g_hmap.m_widthz);
+
 	return false;
 }
 
@@ -714,14 +696,14 @@ bool PlaceUAb(int utype, Vec2i cmabout, Vec2i* cmplace)
 {
 	//g_log<<"PlaceBAround "<<player<<std::endl;
 	//g_log.flush();
-    
-	UnitT* t = &g_utype[utype];
+
+	UType* t = &g_utype[utype];
 	int shell = 1;
-    
+
 	//char msg[128];
 	//sprintf(msg, "place b a %f,%f,%f", vAround.x/16, vAround.y/16, vAround.z/16);
 	//Chat(msg);
-    
+
 	do
 	{
 		std::vector<Vec2i> canplace;
@@ -734,7 +716,7 @@ bool PlaceUAb(int utype, Vec2i cmabout, Vec2i* cmplace)
 		bottom = cmabout.y + shell;
 
 		canplace.reserve( (right-left)*2/t->size.x + (bottom-top)*2/t->size.z );
-        
+
 		tilez = top;
 		for(tilex=left; tilex<right; tilex++)
 		{
@@ -744,7 +726,7 @@ bool PlaceUAb(int utype, Vec2i cmabout, Vec2i* cmplace)
 			int cmendx = cmstartx + t->size.x - 1;
 			int cmstartz = cmtry.y - t->size.z/2;
 			int cmendz = cmstartz + t->size.z - 1;
-            
+
 			if(cmstartx < 0)
 				continue;
 			else if(cmendx >= g_hmap.m_widthx * TILE_SIZE)
@@ -753,17 +735,17 @@ bool PlaceUAb(int utype, Vec2i cmabout, Vec2i* cmplace)
 				continue;
 			else if(cmendz >= g_hmap.m_widthz * TILE_SIZE)
 				continue;
-            
+
 			//char msg[128];
 			//sprintf(msg, "check %d,%d,%d,%d", startx, startz, endx, endz);
 			//Chat(msg);
-            
+
 			//if(!CheckCanPlace(btype, cmtry))
 			if(UnitCollides(NULL, cmtry, utype))
 				continue;
 			canplace.push_back(cmtry);
 		}
-        
+
 		tilex = right;
 		for(tilez=top; tilez<bottom; tilez++)
 		{
@@ -773,7 +755,7 @@ bool PlaceUAb(int utype, Vec2i cmabout, Vec2i* cmplace)
 			int cmendx = cmstartx + t->size.x - 1;
 			int cmstartz = cmtry.y - t->size.z/2;
 			int cmendz = cmstartz + t->size.z - 1;
-			
+
 			if(cmstartx < 0)
 				continue;
 			else if(cmendx >= g_hmap.m_widthx * TILE_SIZE)
@@ -782,16 +764,16 @@ bool PlaceUAb(int utype, Vec2i cmabout, Vec2i* cmplace)
 				continue;
 			else if(cmendz >= g_hmap.m_widthz * TILE_SIZE)
 				continue;
-            
+
 			//char msg[128];
 			//sprintf(msg, "check %d,%d,%d,%d", startx, startz, endx, endz);
 			//Chat(msg);
-            
+
 			if(UnitCollides(NULL, cmtry, utype))
 				continue;
 			canplace.push_back(cmtry);
 		}
-        
+
 		tilez = bottom;
 		for(tilex=right; tilex>left; tilex--)
 		{
@@ -801,7 +783,7 @@ bool PlaceUAb(int utype, Vec2i cmabout, Vec2i* cmplace)
 			int cmendx = cmstartx + t->size.x - 1;
 			int cmstartz = cmtry.y - t->size.z/2;
 			int cmendz = cmstartz + t->size.z - 1;
-			
+
 			if(cmstartx < 0)
 				continue;
 			else if(cmendx >= g_hmap.m_widthx * TILE_SIZE)
@@ -810,16 +792,16 @@ bool PlaceUAb(int utype, Vec2i cmabout, Vec2i* cmplace)
 				continue;
 			else if(cmendz >= g_hmap.m_widthz * TILE_SIZE)
 				continue;
-            
+
 			//char msg[128];
 			//sprintf(msg, "check %d,%d,%d,%d", startx, startz, endx, endz);
 			//Chat(msg);
-            
+
 			if(UnitCollides(NULL, cmtry, utype))
 				continue;
 			canplace.push_back(cmtry);
 		}
-        
+
 		tilex = left;
 		for(tilez=bottom; tilez>top; tilez--)
 		{
@@ -829,7 +811,7 @@ bool PlaceUAb(int utype, Vec2i cmabout, Vec2i* cmplace)
 			int cmendx = cmstartx + t->size.x - 1;
 			int cmstartz = cmtry.y - t->size.z/2;
 			int cmendz = cmstartz + t->size.z - 1;
-			
+
 			if(cmstartx < 0)
 				continue;
 			else if(cmendx >= g_hmap.m_widthx * TILE_SIZE)
@@ -838,33 +820,33 @@ bool PlaceUAb(int utype, Vec2i cmabout, Vec2i* cmplace)
 				continue;
 			else if(cmendz >= g_hmap.m_widthz * TILE_SIZE)
 				continue;
-            
+
 			//char msg[128];
 			//sprintf(msg, "check %d,%d,%d,%d", startx, startz, endx, endz);
 			//Chat(msg);
-            
+
 			if(UnitCollides(NULL, cmtry, utype))
 				continue;
 			canplace.push_back(cmtry);
 		}
-        
+
 		if(canplace.size() > 0)
 		{
 			//Chat("placing");
 			//g_log<<"placeb t="<<btype<<" "<<vTile.x<<","<<vTile.y<<","<<vTile.z<<"("<<(vTile.x/16)<<","<<(vTile.y/16)<<","<<(vTile.z/16)<<")"<<std::endl;
 			//g_log.flush();
 			//*tpos = canplace[ rand()%canplace.size() ];
-            *cmplace = canplace[ 0 ];
+			*cmplace = canplace[ 0 ];
 
 			return true;
 		}
-        
+
 		//char msg[128];
 		//sprintf(msg, "shell %d", shell);
 		//Chat(msg);
-        
+
 		shell++;
-	}while(shell < g_hmap.m_widthx || shell < g_hmap.m_widthz);
-    
+	} while(shell < g_hmap.m_widthx || shell < g_hmap.m_widthz);
+
 	return false;
 }

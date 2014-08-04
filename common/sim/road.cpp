@@ -53,7 +53,7 @@ void RoadTile::freecollider()
 	RoadXZ(this, roadx, roadz);
 	Vec3f pos = RoadPosition(roadx, roadz);
 
-	//BuildingT* bt = &g_bltype[type];
+	//BlType* bt = &g_bltype[type];
 	float hwx = TILE_SIZE/2.0f;
 	float hwz = TILE_SIZE/2.0f;
 
@@ -99,7 +99,7 @@ void RoadTile::fillcollider()
 {
 	// This can only be called by an actual (non-plan) road tile,
 	// otherwise it will go out of array bounds!
-	
+
 	Vec2i t;
 	CoXZ(CONDUIT_ROAD, this, false, t.x, t.y);
 
@@ -127,7 +127,7 @@ void RoadTile::fillcollider()
 	RoadXZ(this, roadx, roadz);
 	Vec3f pos = RoadPosition(roadx, roadz);
 
-	//BuildingT* bt = &g_bltype[type];
+	//BlType* bt = &g_bltype[type];
 	float hwx = TILE_SIZE/2.0f;
 	float hwz = TILE_SIZE/2.0f;
 

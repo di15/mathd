@@ -34,7 +34,7 @@ ResTicker::ResTicker(Widget* parent, const char* n, void (*reframef)(Widget* thi
 	Image righthlineblur;
 	Image whitebg;
 #endif
-	
+
 	//restext = Text(this, "res ticker", RichText("asdadasdasads"), MAINFONT16, NULL, true, 1, 1, 1, 1);
 	restext = Text(this, "res ticker", RichText("asdadasdasads"), MAINFONT16, NULL, false, 0.2, 0.7, 0.8, 1);
 #if 0
@@ -64,7 +64,7 @@ void ResTicker::reframe()	//resized or moved
 	whitebg.m_pos[1] = m_pos[1];
 	whitebg.m_pos[2] = m_pos[2]-32;
 	whitebg.m_pos[3] = m_pos[1]+RESTICKER_HEIGHT;
-	
+
 	restext.m_pos[0] = m_pos[0]+32;
 	restext.m_pos[1] = m_pos[1];
 	restext.m_pos[2] = m_pos[2]-32;
@@ -74,7 +74,7 @@ void ResTicker::reframe()	//resized or moved
 	whitebg.m_pos[1] = m_pos[1];
 	whitebg.m_pos[2] = m_pos[2];
 	whitebg.m_pos[3] = m_pos[1]+24;
-	
+
 	restext.m_pos[0] = m_pos[0];
 	restext.m_pos[1] = m_pos[1];
 	restext.m_pos[2] = m_pos[2];

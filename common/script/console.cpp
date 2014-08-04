@@ -66,7 +66,7 @@ void SubmitConsole(RichText* rt)
 		(*witer)->m_text = (*witer2)->m_text;
 		witer = witer2;
 	}
-	
+
 	auto witer2 = witer;
 	witer2++;
 	(*witer)->m_text = ParseTags(*rt, NULL);
@@ -79,7 +79,7 @@ void Submit_Console()
 
 	gui->add(new ViewLayer(gui, "console"));
 	ViewLayer* con = (ViewLayer*)gui->get("console");
-	
+
 	EditBox* coned = (EditBox*)con->get("console");
 	SubmitConsole(&coned->m_value);
 	coned->changevalue("");

@@ -176,7 +176,7 @@ void Order(int mousex, int mousey, int viewwidth, int viewheight, Vec3f campos, 
 		int i;
 #endif
 		Unit* u;
-		UnitT* t;
+		UType* t;
 		Vec3f order = mapgoal;
 
 #if 0

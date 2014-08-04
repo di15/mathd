@@ -32,8 +32,8 @@ enum PlaneData
 void NormalizePlane(float frustum[6][4], int side)
 {
 	float magnitude = (float)sqrtf( frustum[side][A] * frustum[side][A] +
-									frustum[side][B] * frustum[side][B] +
-									frustum[side][C] * frustum[side][C] );
+	                                frustum[side][B] * frustum[side][B] +
+	                                frustum[side][C] * frustum[side][C] );
 
 	frustum[side][A] /= magnitude;
 	frustum[side][B] /= magnitude;

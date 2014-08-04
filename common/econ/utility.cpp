@@ -7,7 +7,7 @@ int PhUtil(int price, int cmdist)
 {
 	if(price <= 0)
 		return MAX_UTIL;
-	
+
 	if(cmdist <= 0)
 		return MAX_UTIL;
 
@@ -30,10 +30,10 @@ int InvPhUtilD(int util, int price)
 	//util / 100000000 = 1 / price / cmdist;
 	//util * price / 100000000 = 1 / cmdist;
 	//100000000 / (util * price) = cmdist;
-	
+
 	if(util <= 0)
 		return MAX_UTIL;
-	
+
 	if(price <= 0)
 		return MAX_UTIL;
 
@@ -45,7 +45,7 @@ int InvPhUtilP(int util, int cmdist)
 {
 	if(util <= 0)
 		return MAX_UTIL;
-	
+
 	if(cmdist <= 0)
 		return MAX_UTIL;
 

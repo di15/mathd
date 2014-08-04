@@ -53,7 +53,7 @@ void SendData(char* data, int size, struct sockaddr_in* paddr, bool reliable)
 #elif defined( _IOS )
 	// Address is NULL and the data is automatically sent to g_hostAddr by virtue of the fact that the socket is connected to that address
 	ssize_t bytes = sendto(sock, data, size, 0, NULL, 0);
-	
+
 	int err;
 	int sock;
 	socklen_t addrLen;
@@ -65,7 +65,7 @@ void SendData(char* data, int size, struct sockaddr_in* paddr, bool reliable)
 		err = EPIPE;
 	else
 		err = 0;
-	
+
 	if (err != 0)
 		NetError([NSError errorWithDomain:NSPOSIXErrorDomain code:err userInfo:nil]);
 #else
@@ -79,7 +79,7 @@ void ResendPackets()
 	long long now = GetTickCount64();
 	long long due = now - RESEND_DELAY;
 	long long expire = now - RESEND_EXPIRE;
-	
+
 	auto i=g_sent.begin();
 	while(i!=g_sent.end())
 	{
@@ -98,7 +98,7 @@ void ResendPackets()
 
 			continue;
 		}
-		
+
 #ifdef _SERVER
 		SendData(p->buffer, p->len, &p->addr, false, NULL);
 #else
@@ -110,8 +110,8 @@ void ResendPackets()
 #endif
 
 #ifdef _SERVER
-			g_log<<"resent at "<<DateTime()<<" left = "<<g_sent.size()<<endl;
-			g_log.flush();
+		g_log<<"resent at "<<DateTime()<<" left = "<<g_sent.size()<<endl;
+		g_log.flush();
 #endif
 
 		i++;
@@ -127,7 +127,7 @@ void Acknowledge(unsigned int ack)
 	AcknowledgmentPacket p;
 	p.header.type = PACKET_ACKNOWLEDGMENT;
 	p.header.ack = ack;
-	
+
 #ifdef _SERVER
 	SendData((char*)&p, sizeof(AcknowledgmentPacket), &from, false, NULL);
 #else
@@ -177,7 +177,7 @@ void JoinInfo(Client* c)
 		jip.hmapwidth[i].y = hm->m_widthz;
 	}
 	SendData((char*)&jip, sizeof(struct JoinInfoPacket), &c->m_addr, true, c);
-	
+
 	/*
 	g_log<<"ji 2"<<endl;
 	g_log.flush();
@@ -186,7 +186,7 @@ void JoinInfo(Client* c)
 	{
 		Planet* p = &g_planet[i];
 		Heightmap* hm = &p->m_hmap;
-		
+
 		for(int x=0; x<=hm->m_widthx; x++)
 			for(int z=0; z<=hm->m_widthz; z++)
 			{
@@ -199,7 +199,7 @@ void JoinInfo(Client* c)
 				SendData((char*)&hpp, sizeof(struct HeightPointPacket), &c->m_addr, true, c);
 			}
 	}
-	
+
 	g_log<<"ji 3"<<endl;
 	g_log.flush();*/
 
@@ -213,7 +213,7 @@ void JoinInfo(Client* c)
 		pcp.cam = *cam;
 		SendData((char*)&pcp, sizeof(struct PlanetCamPacket), &c->m_addr, true, c);
 	}
-	
+
 	g_log<<"ji 4"<<endl;
 	g_log.flush();
 
@@ -231,20 +231,20 @@ void JoinInfo(Client* c)
 
 			/*
 			struct BuildingPacket
-{
-	PacketHeader header;
-	int planetid;
-	int bid;
-	bool on;
-	int type;
-	int state;
-	Vec3f pos;
-	float yaw;
-	int conmat[RESOURCES];
-	int stock[RESOURCES];
-	int conwage;	//construction wage
-};
-*/		
+			{
+			PacketHeader header;
+			int planetid;
+			int bid;
+			bool on;
+			int type;
+			int state;
+			Vec3f pos;
+			float yaw;
+			int conmat[RESOURCES];
+			int stock[RESOURCES];
+			int conwage;	//construction wage
+			};
+			*/
 			BuildingPacket bp;
 			bp.header.type = PACKET_BUILDING;
 			bp.planetid = i;
@@ -263,20 +263,20 @@ void JoinInfo(Client* c)
 			SendData((char*)&bp, sizeof(struct BuildingPacket), &c->m_addr, true, c);
 
 			/*
-struct GarrisonPacket
-{
-	PacketHeader header;
-	int planetid;
-	int bid;
-	int uid;
-};
-*/
+			struct GarrisonPacket
+			{
+			PacketHeader header;
+			int planetid;
+			int bid;
+			int uid;
+			};
+			*/
 
 			for(auto k=b->m_garrison.begin(); k!=b->m_garrison.end(); k++)
 			{
-				
-	g_log<<"ji 5"<<endl;
-	g_log.flush();
+
+				g_log<<"ji 5"<<endl;
+				g_log.flush();
 
 				GarrisonPacket gp;
 				gp.header.type = PACKET_GARRISON;
@@ -288,12 +288,12 @@ struct GarrisonPacket
 		}
 	}
 
-	
+
 	g_log<<"ji 6"<<endl;
 	g_log.flush();
 
 	// send units
-	
+
 	for(int i=0; i<PLANETS; i++)
 	{
 		Planet* p = &g_planet[i];
@@ -336,14 +336,14 @@ struct GarrisonPacket
 		}
 	}
 
-	
+
 	g_log<<"ji 7"<<endl;
 	g_log.flush();
 
 	DoneLoadingPacket dlp;
 	dlp.header.type = PACKET_DONE_LOADING;
 	SendData((char*)&dlp, sizeof(struct DoneLoadingPacket), &c->m_addr, true, c);
-	
+
 	g_log<<"ji 8"<<endl;
 	g_log.flush();
 }

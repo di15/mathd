@@ -113,7 +113,7 @@ void DrawSel(Matrix* projection, Matrix* modelmat, Matrix* viewmat)
 	{
 		const int bi = *seliter;
 		const Building* b = &g_building[bi];
-		const BuildingT* t = &g_bltype[b->type];
+		const BlType* t = &g_bltype[b->type];
 
 		const int tminx = b->tilepos.x - t->widthx/2;
 		const int tminz = b->tilepos.y - t->widthz/2;
@@ -181,7 +181,7 @@ void DrawSel(Matrix* projection, Matrix* modelmat, Matrix* viewmat)
 		Unit* u = &g_unit[ *seliter ];
 		//Entity* e = g_entity[ 0 ];
 		Vec3f p = u->drawpos;
-		UnitT* t = &g_utype[ u->type ];
+		UType* t = &g_utype[ u->type ];
 
 		//Vec3f p = c->m_pos + Vec3f(0, t->vmin.y, 0) + Vec3f(0, 1.0f, 0);
 
@@ -241,7 +241,7 @@ int SelectOneBuilding(Vec3f *line)
 		if(!b->on)
 			continue;
 
-		BuildingT* t = &g_bltype[ b->type ];
+		BlType* t = &g_bltype[ b->type ];
 
 		const int tminx = b->tilepos.x - t->widthx/2;
 		const int tminz = b->tilepos.y - t->widthz/2;
@@ -324,7 +324,7 @@ int SelectOneUnit(Vec3f *line)
 		if(!u->on)
 			continue;
 
-		UnitT* t = &g_utype[ u->type ];
+		UType* t = &g_utype[ u->type ];
 
 		Vec3f normals[6];
 		float dists[6];
@@ -423,7 +423,7 @@ std::list<int> SelectAreaUnits()
 		if(!u->on)
 			continue;
 
-		UnitT* t = &g_utype[ u->type ];
+		UType* t = &g_utype[ u->type ];
 
 		Vec3f vmin = u->drawpos + Vec3f(-t->size.x/2, 0, -t->size.z/2);
 #if 1
@@ -569,12 +569,12 @@ Selection SelectAreaPersp(Vec3f campos, Vec3f camside, Vec3f camup2, Vec3f viewd
 	float distBack = PlaneDistance(normalBack, backPoly[0]);
 
 	g_selfrust.construct(
-		Plane3f(normalLeft.x, normalLeft.y, normalLeft.z, distLeft),
-		Plane3f(normalRight.x, normalRight.y, normalRight.z, distRight),
-		Plane3f(normalTop.x, normalTop.y, normalTop.z, distTop),
-		Plane3f(normalBottom.x, normalBottom.y, normalBottom.z, distBottom),
-		Plane3f(normalFront.x, normalFront.y, normalFront.z, distFront),
-		Plane3f(normalBack.x, normalBack.y, normalBack.z, distBack));
+	        Plane3f(normalLeft.x, normalLeft.y, normalLeft.z, distLeft),
+	        Plane3f(normalRight.x, normalRight.y, normalRight.z, distRight),
+	        Plane3f(normalTop.x, normalTop.y, normalTop.z, distTop),
+	        Plane3f(normalBottom.x, normalBottom.y, normalBottom.z, distBottom),
+	        Plane3f(normalFront.x, normalFront.y, normalFront.z, distFront),
+	        Plane3f(normalBack.x, normalBack.y, normalBack.z, distBack));
 
 	Selection selection;
 

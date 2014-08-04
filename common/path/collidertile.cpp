@@ -225,7 +225,7 @@ void FillColliderGrid()
 
 void Unit::fillcollider()
 {
-	UnitT* t = &g_utype[type];
+	UType* t = &g_utype[type];
 	int ui = this - g_unit;
 
 	//cm = centimeter position
@@ -258,7 +258,7 @@ void Unit::fillcollider()
 
 void Building::fillcollider()
 {
-	BuildingT* t = &g_bltype[type];
+	BlType* t = &g_bltype[type];
 	int bi = this - g_building;
 
 	//t = tile position
@@ -289,7 +289,7 @@ void Building::fillcollider()
 
 void Unit::freecollider()
 {
-	UnitT* t = &g_utype[type];
+	UType* t = &g_utype[type];
 	int ui = this - g_unit;
 
 	//cm = centimeter position
@@ -319,7 +319,7 @@ void Unit::freecollider()
 
 void Building::freecollider()
 {
-	BuildingT* t = &g_bltype[type];
+	BlType* t = &g_bltype[type];
 	int bi = this - g_building;
 
 	//t = tile position
@@ -390,7 +390,7 @@ bool Walkable2(PathJob* pj, int cmposx, int cmposz)
 	}
 #endif
 
-	UnitT* ut = &g_utype[pj->utype];
+	UType* ut = &g_utype[pj->utype];
 
 	int cmminx = cmposx - ut->size.x/2;
 	int cmminz = cmposz - ut->size.z/2;
@@ -417,7 +417,7 @@ bool Walkable2(PathJob* pj, int cmposx, int cmposz)
 			if(cell->building >= 0 && cell->building != pj->ignoreb)
 			{
 				Building* b = &g_building[cell->building];
-				BuildingT* t2 = &g_bltype[b->type];
+				BlType* t2 = &g_bltype[b->type];
 
 				int tminx = b->tilepos.x - t2->widthx/2;
 				int tminz = b->tilepos.y - t2->widthz/2;
@@ -448,7 +448,7 @@ bool Walkable2(PathJob* pj, int cmposx, int cmposz)
 				if(uindex != pj->thisu && uindex != pj->ignoreu && !u->hidden())
 				{
 #if 1
-					UnitT* t = &g_utype[u->type];
+					UType* t = &g_utype[u->type];
 
 					int cmminx2 = u->cmpos.x - t->size.x/2;
 					int cmminz2 = u->cmpos.y - t->size.z/2;
@@ -499,7 +499,7 @@ bool Standable(const PathJob* pj, const int nx, const int nz)
 	}
 #endif
 
-	const UnitT* ut = &g_utype[pj->utype];
+	const UType* ut = &g_utype[pj->utype];
 
 	const int cmposx = nx * PATHNODE_SIZE + PATHNODE_SIZE/2;
 	const int cmposz = nz * PATHNODE_SIZE + PATHNODE_SIZE/2;
@@ -530,7 +530,7 @@ bool Standable(const PathJob* pj, const int nx, const int nz)
 			{
 #if 0
 				Building* b = &g_building[cell->building];
-				BuildingT* t2 = &g_bltype[b->type];
+				BlType* t2 = &g_bltype[b->type];
 
 				int tminx = b->tilepos.x - t2->widthx/2;
 				int tminz = b->tilepos.y - t2->widthz/2;
@@ -561,7 +561,7 @@ bool Standable(const PathJob* pj, const int nx, const int nz)
 				if(uindex != pj->thisu && uindex != pj->ignoreu && !u->hidden())
 				{
 #if 0
-					UnitT* t = &g_utype[u->type];
+					UType* t = &g_utype[u->type];
 
 					int cmminx2 = u->cmpos.x - t->size.x/2;
 					int cmminz2 = u->cmpos.y - t->size.z/2;

@@ -52,7 +52,7 @@ void DrawUnits()
 		if(!u->on)
 			continue;
 
-		UnitT* t = &g_utype[u->type];
+		UType* t = &g_utype[u->type];
 
 		Vec3f vmin(u->drawpos.x - t->size.x/2, u->drawpos.y, u->drawpos.z - t->size.x/2);
 		Vec3f vmax(u->drawpos.x + t->size.x/2, u->drawpos.y + t->size.y, u->drawpos.z + t->size.x/2);
@@ -152,7 +152,7 @@ bool PlaceUnit(int type, Vec2i cmpos, int owner, int *reti)
 #endif
 
 	Unit* u = &g_unit[i];
-	UnitT* t = &g_utype[type];
+	UType* t = &g_utype[type];
 
 	u->on = true;
 	u->type = type;
@@ -227,7 +227,7 @@ bool Unit::hidden() const
 
 void AnimUnit(Unit* u)
 {
-	UnitT* t = &g_utype[u->type];
+	UType* t = &g_utype[u->type];
 
 	if(u->type == UNIT_ROBOSOLDIER || u->type == UNIT_LABOURER)
 	{
@@ -293,10 +293,10 @@ void ResetMode(Unit* u)
 	//LastNum("resetmode 1");
 	if(u->type == UNIT_LABOURER)
 	{
-        //LastNum("resetmode 1a");
+		//LastNum("resetmode 1a");
 		if(u->mode == UMODE_BLJOB)
 			RemWorker(u);
-        
+
 		//if(hidden())
 		//	relocate();
 	}
@@ -304,9 +304,9 @@ void ResetMode(Unit* u)
 	{
 #if 0
 		if(u->mode == UMODE_GOSUP
-           //|| mode == GOINGTOREFUEL
-           //|| mode == GOINGTODEMANDERB || mode == GOINGTODEMROAD || mode == GOINGTODEMPIPE || mode == GOINGTODEMPOWL
-           )
+		                //|| mode == GOINGTOREFUEL
+		                //|| mode == GOINGTODEMANDERB || mode == GOINGTODEMROAD || mode == GOINGTODEMPIPE || mode == GOINGTODEMPOWL
+		  )
 		{
 			if(u->supplier >= 0)
 			{
@@ -336,23 +336,23 @@ void ResetMode(Unit* u)
 		}
 #endif
 		u->targtype = TARG_NONE;
-        
+
 		if(u->driver >= 0)
 		{
-            //LastNum("resetmode 1b");
+			//LastNum("resetmode 1b");
 			//g_unit[u->driver].Disembark();
 			u->driver = -1;
 		}
 	}
-    
+
 	//LastNum("resetmode 2");
-    
+
 	//transportAmt = 0;
 	u->target = u->target2 = -1;
 	u->supplier = -1;
 	u->mode = UMODE_NONE;
 	ResetGoal(u);
-    
+
 	//LastNum("resetmode 3");
 }
 

@@ -743,13 +743,13 @@ void Scroll()
 	{
 #endif
 		*c = oldcam;
-	}
-	else
-	{
-		//CalcMapView();
-	}
+}
+else
+{
+	//CalcMapView();
+}
 
-	c->friction2();
+c->friction2();
 }
 
 void LoadConfig()
@@ -850,10 +850,10 @@ void EventLoop()
 {
 #if 0
 	key->keysym.scancode
-		SDLMod  e.key.keysym.mod
-		key->keysym.unicode
+	SDLMod  e.key.keysym.mod
+	key->keysym.unicode
 
-		if( mod & KMOD_NUM ) printf( "NUMLOCK " );
+	if( mod & KMOD_NUM ) printf( "NUMLOCK " );
 	if( mod & KMOD_CAPS ) printf( "CAPSLOCK " );
 	if( mod & KMOD_LCTRL ) printf( "LCTRL " );
 	if( mod & KMOD_RCTRL ) printf( "RCTRL " );
@@ -974,9 +974,9 @@ void EventLoop()
 				selection_len = event.edit.length;
 				break;
 #endif
-				//else if(e.type == SDL_BUTTONDOWN)
-				//{
-				//}
+			//else if(e.type == SDL_BUTTONDOWN)
+			//{
+			//}
 			case SDL_MOUSEWHEEL:
 				ev.type = INEV_MOUSEWHEEL;
 				ev.amount = e.wheel.y;
@@ -1160,7 +1160,7 @@ int main(int argc, char* argv[])
 	g_log.flush();
 
 	FillGUI();
-	
+
 	g_log << "Queue: "      << std::endl;
 	g_log.flush();
 

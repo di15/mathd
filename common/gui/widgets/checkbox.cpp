@@ -56,8 +56,8 @@ void CheckBox::inev(InEv* ev)
 	if(ev->type == INEV_MOUSEMOVE && !ev->intercepted)
 	{
 		if(py->mouse.x >= m_pos[0] && py->mouse.y >= m_pos[1] &&
-				py->mouse.x <= m_pos[2] &&
-				py->mouse.y <= m_pos[3])
+		                py->mouse.x <= m_pos[2] &&
+		                py->mouse.y <= m_pos[3])
 		{
 			m_over = true;
 			ev->intercepted = true;

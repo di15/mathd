@@ -154,6 +154,9 @@ void Click_BuildButton(int bwhat)
 	Player* py = &g_player[g_curP];
 	py->build = bwhat;
 	//g_log<<"b "<<py->build<<std::endl;
+	//char msg[128];
+	//sprintf(msg, "b %d", bwhat);
+	//InfoMessage("t", msg);
 	Out_BuildButton();
 }
 
@@ -467,7 +470,7 @@ void Click_ProceedConstruction()
 
 		b->allocres();
 	}
-	
+
 #if 0
 	for(auto siter = py->sel.roads.begin(); siter != py->sel.roads.end(); siter++)
 	{

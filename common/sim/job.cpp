@@ -30,7 +30,7 @@ bool FindJob(Unit* u)
 
 	//Vec3f pos = camera.Position();
 	//CResource* res;
-	UnitT* ut = &g_utype[u->type];
+	UType* ut = &g_utype[u->type];
 
 	//LastNum("before truck job");
 
@@ -53,10 +53,10 @@ bool FindJob(Unit* u)
 		//if(u->mode != AWAITINGDRIVER)
 		//	continue;
 
-		if(u2->mode != UMODE_GOSUP && 
-			u2->mode != UMODE_GODEMB && 
-			u2->mode != UMODE_GODEMCD && 
-			u2->mode != UMODE_GOREFUEL)
+		if(u2->mode != UMODE_GOSUP &&
+		                u2->mode != UMODE_GODEMB &&
+		                u2->mode != UMODE_GODEMCD &&
+		                u2->mode != UMODE_GOREFUEL)
 			continue;
 
 		//Chat("tj1");
@@ -94,7 +94,7 @@ bool FindJob(Unit* u)
 	}
 
 	//LastNum("after truck job");
-	
+
 	// Construction jobs
 	for(int i=0; i<BUILDINGS; i++)
 	{
@@ -106,7 +106,7 @@ bool FindJob(Unit* u)
 		if(b->finished)
 			continue;
 
-		BuildingT* bt = &g_bltype[b->type];
+		BlType* bt = &g_bltype[b->type];
 
 		if(b->conmat[RES_LABOUR] >= bt->conmat[RES_LABOUR])
 			continue;
@@ -120,7 +120,7 @@ bool FindJob(Unit* u)
 			Bankrupt(b->owner, reason);
 			continue;
 		}
-		
+
 		Vec2i bcmpos = b->tilepos * TILE_SIZE + Vec2i(TILE_SIZE,TILE_SIZE)/2;
 		int cmdist = Magnitude(u->cmpos - bcmpos);
 
@@ -153,7 +153,7 @@ bool FindJob(Unit* u)
 		if(!b->inoperation)
 			continue;
 
-		BuildingT* bt = &g_bltype[b->type];
+		BlType* bt = &g_bltype[b->type];
 
 		//if(b->worker.size() > 0)
 		//	continue;
@@ -176,7 +176,7 @@ bool FindJob(Unit* u)
 			Bankrupt(b->owner, reason);
 			continue;
 		}
-		
+
 		Vec2i bcmpos = b->tilepos * TILE_SIZE + Vec2i(TILE_SIZE,TILE_SIZE)/2;
 		int cmdist = Magnitude(u->cmpos - bcmpos);
 
@@ -192,7 +192,7 @@ bool FindJob(Unit* u)
 		bestutil = jobutil;
 		bestgoal = bcmpos;
 	}
-	
+
 	//LastNum("after truck job 2");
 
 	//Infrastructure construction jobs
@@ -248,7 +248,7 @@ bool FindJob(Unit* u)
 		ResetGoal(u);
 		return false;
 	}
-	
+
 	ResetMode(u);
 
 	u->mode = bestjobtype;

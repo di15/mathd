@@ -10,7 +10,7 @@
 #include "../sim/player.h"
 
 #define AVG_DIST		(TILE_SIZE*6)
-#define CYCLE_FRAMES	(SIM_FRAME_RATE*60)	
+#define CYCLE_FRAMES	(SIM_FRAME_RATE*60)
 
 class CostCompo
 {
@@ -76,14 +76,15 @@ class RDemNode : public DemNode
 public:
 	int rtype;
 	int ramt;
-	int btype;
-	int bi;
-	int utype;
-	int ui;
+	int btype;	//supplier?
+	int bi;	//supplier bl index?
+	int utype;	//transporter?
+	int ui;	//transporter unit index?
 	int demui;
 	DemsAtB* supbp;
 	DemsAtU* supup;
 	DemsAtU* opup;
+	std::list<DemNode*>* parlist;	//parent list, e.g., the condems of a DemsAtB
 
 	RDemNode() : DemNode()
 	{
@@ -97,18 +98,21 @@ public:
 		supbp = NULL;
 		supup = NULL;
 		demui = -1;
+		parlist = NULL;
 	}
 };
 
 class CdDem : public DemNode
 {
 public:
+	int cdtype;
 	Vec2i tpos;
-	std::list<RDemNode> condems;
+	std::list<DemNode*> condems;	// (RDemNode)
 
 	CdDem() : DemNode()
 	{
 		demtype = DEM_CDNODE;
+
 	}
 };
 
@@ -117,10 +121,10 @@ class DemsAtB : public DemNode
 public:
 	int bi;
 	int btype;
-	std::list<DemNode*> condems;	//construction material
-	std::list<DemNode*> proddems;	//production input raw materials
-	std::list<DemNode*> manufdems;	//manufacturing input raw materials
-	std::list<CdDem*> cddems[CONDUIT_TYPES];
+	std::list<DemNode*> condems;	//construction material (RDemNode)
+	std::list<DemNode*> proddems;	//production input raw materials (RDemNode)
+	std::list<DemNode*> manufdems;	//manufacturing input raw materials (RDemNode)
+	std::list<DemNode*> cddems[CONDUIT_TYPES]; // (CdDem)
 	int prodratio;
 	int condem[RESOURCES];
 	int supplying[RESOURCES];
@@ -135,6 +139,7 @@ public:
 
 	~DemsAtB()
 	{
+#if 0
 		auto riter = condems.begin();
 		while(riter != condems.end())
 		{
@@ -155,6 +160,7 @@ public:
 			delete *riter;
 			riter = manufdems.erase(riter);
 		}
+#endif
 	}
 };
 
@@ -163,13 +169,13 @@ class DemsAtU : public DemNode
 public:
 	int ui;
 	int utype;
-	std::list<DemNode*> manufdems;
-	std::list<DemNode*> consumdems;
-	DemsAtU* opup;	//operator/driver
+	std::list<DemNode*> manufdems;	// (RDemNode)
+	std::list<DemNode*> consumdems;	// (RDemNode)
+	DemNode* opup;	//operator/driver (DemsAtU)
 	int prodratio;
 	int timeused;
 	int totaldem[RESOURCES];
-	
+
 	DemsAtU() : DemNode()
 	{
 		demtype = DEM_UNODE;
@@ -181,19 +187,21 @@ public:
 
 	~DemsAtU()
 	{
+#if 0
 		auto riter = manufdems.begin();
 		while(riter != manufdems.end())
 		{
 			delete *riter;
 			riter = manufdems.erase(riter);
 		}
-		
+
 		riter = consumdems.begin();
 		while(riter != consumdems.end())
 		{
 			delete *riter;
 			riter = consumdems.erase(riter);
 		}
+#endif
 	}
 };
 
@@ -201,9 +209,10 @@ class DemTree
 {
 public:
 	std::list<DemNode*> nodes;
-	std::list<DemsAtB*> supbpcopy;	//master copy, this one will be freed
-	std::list<DemsAtU*> supupcopy;	//master copy, this one will be freed
-	std::list<DemNode*> codems[CONDUIT_TYPES];	//conduit placements
+	std::list<DemNode*> supbpcopy;	//master copy, this one will be freed (DemsAtB)
+	std::list<DemNode*> supupcopy;	//master copy, this one will be freed (DemsAtU)
+	std::list<DemNode*> codems[CONDUIT_TYPES];	//conduit placements (CdDem)
+	std::list<DemNode*> rdemcopy;	//master copy, this one will be freed (RDemNode)
 	int pyrsup[PLAYERS][RESOURCES];	//player global res supplying
 
 	void free()
@@ -214,20 +223,29 @@ public:
 			delete *biter;
 			biter = supbpcopy.erase(biter);
 		}
-		
+
 		auto uiter = supupcopy.begin();
 		while(uiter != supupcopy.end())
 		{
 			delete *uiter;
 			uiter = supupcopy.erase(uiter);
 		}
-		
+
+#if 0
 		auto riter = nodes.begin();
 		while(riter != nodes.end())
 		{
 			delete *riter;
 			riter = nodes.erase(riter);
 		}
+#else
+		auto riter = rdemcopy.begin();
+		while(riter != rdemcopy.end())
+		{
+			delete *riter;
+			riter = rdemcopy.erase(riter);
+		}
+#endif
 
 		for(int i=0; i<CONDUIT_TYPES; i++)
 		{

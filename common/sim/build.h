@@ -5,7 +5,7 @@
 #include "../math/vec2i.h"
 
 class Building;
-class BuildingT;
+class BlType;
 class Matrix;
 
 void DrawSBuild();
@@ -15,5 +15,6 @@ void DrawBReason(Matrix* mvp, float width, float height, bool persp);
 bool PlaceBl(int type, Vec2i pos, bool finished, int owner, int* bid);
 bool PlaceBAb(int btype, Vec2i tabout, Vec2i* tplace);
 bool PlaceUAb(int utype, Vec2i cmabout, Vec2i* cmplace);
+bool BuildingCollides(int type, Vec2i tpos);
 
 #endif

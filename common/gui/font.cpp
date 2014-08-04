@@ -470,9 +470,9 @@ void DrawGlyph(float left, float top, float right, float bottom, float texleft, 
 
 #ifdef DEBUG
 	g_log<<"draw glyph: "<<texleft<<","<<textop<<","<<texright<<","<<texbottom<<std::endl;
-    g_log.flush();
+	g_log.flush();
 #endif
-	
+
 	//glVertexPointer(2, GL_FLOAT, sizeof(float)*4, &vertices[0]);
 	//glTexCoordPointer(2, GL_FLOAT, sizeof(float)*4, &vertices[2]);
 	glVertexAttribPointer(g_shader[g_curS].m_slot[SSLOT_POSITION], 2, GL_FLOAT, GL_FALSE, sizeof(float)*4, &vertices[0]);
@@ -591,7 +591,7 @@ void DrawGlyphF(float left, float top, float right, float bottom, float texleft,
 
 #ifdef DEBUG
 	g_log<<"text "<<__FILE__<<" "<<__LINE__<<std::endl;
-    g_log.flush();
+	g_log.flush();
 #endif
 
 	float vertices[] =
@@ -684,8 +684,8 @@ void DrawLineF(int caret)
 			DrawCaretF();
 
 #ifdef DEBUG
-	g_log<<"text "<<__FILE__<<" "<<__LINE__<<std::endl;
-    g_log.flush();
+		g_log<<"text "<<__FILE__<<" "<<__LINE__<<std::endl;
+		g_log.flush();
 #endif
 
 		DrawGlyphF();
@@ -792,7 +792,7 @@ void DrawShadowedTextF(int fnt, float startx, float starty, float framex1, float
 
 #ifdef DEBUG
 	g_log<<"text "<<__FILE__<<" "<<__LINE__<<std::endl;
-    g_log.flush();
+	g_log.flush();
 #endif
 
 	UseFontTex();
@@ -800,7 +800,7 @@ void DrawShadowedTextF(int fnt, float startx, float starty, float framex1, float
 
 #ifdef DEBUG
 	g_log<<"text "<<__FILE__<<" "<<__LINE__<<std::endl;
-    g_log.flush();
+	g_log.flush();
 #endif
 
 	DrawLineF(caret);

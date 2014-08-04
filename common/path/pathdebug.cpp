@@ -140,7 +140,7 @@ void DrawGrid()
 			roadVeh = true;
 #endif
 
-		UnitT* t = &g_utype[u->type];
+		UType* t = &g_utype[u->type];
 
 		int ux = u->cmpos.x / PATHNODE_SIZE;
 		int uz = u->cmpos.y / PATHNODE_SIZE;
@@ -232,7 +232,7 @@ void DrawGrid()
 void DrawUnitSquares()
 {
 	Unit* u;
-	UnitT* t;
+	UType* t;
 	Vec3f p;
 	Shader* s = &g_shader[g_curS];
 
@@ -357,7 +357,7 @@ void DrawVelocities()
 {
 	Unit* u;
 	Vec3f p;
-	UnitT* t;
+	UType* t;
 	Shader* s = &g_shader[g_curS];
 
 	glUniform4f(s->m_slot[SSLOT_COLOR], 1, 0, 1, 1);

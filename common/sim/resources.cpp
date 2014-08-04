@@ -117,7 +117,7 @@ Does this building consume or produce res?
 bool ResB(int building, int res)
 {
 	Building* b = &g_building[building];
-	BuildingT* t = &g_bltype[b->type];
+	BlType* t = &g_bltype[b->type];
 	if(t->input[res] > 0)
 		return true;
 	if(t->output[res] > 0)

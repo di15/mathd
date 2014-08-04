@@ -7,7 +7,7 @@
 #include "resources.h"
 #include "../math/vec3f.h"
 
-class UnitT
+class UType
 {
 public:
 #if 0
@@ -34,7 +34,7 @@ public:
 #define UNIT_TRUCK			2
 #define UNIT_TYPES			3
 
-extern UnitT g_utype[UNIT_TYPES];
+extern UType g_utype[UNIT_TYPES];
 
 void DefU(int type, const char* modelrelative, Vec3f scale, Vec3f translate, Vec3i size, const char* name, int starthp, bool landborne, bool walker, bool roaded, bool seaborne, bool airborne, int cmspeed, bool military);
 

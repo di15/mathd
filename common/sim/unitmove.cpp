@@ -23,7 +23,7 @@
 
 bool UnitCollides(Unit* u, Vec2i cmpos, int utype)
 {
-	UnitT* t = &g_utype[utype];
+	UType* t = &g_utype[utype];
 	int minx = cmpos.x - t->size.x/2;
 	int minz = cmpos.y - t->size.z/2;
 	int maxx = minx + t->size.x - 1;
@@ -134,7 +134,7 @@ bool UnitCollides(Unit* u, Vec2i cmpos, int utype)
 			if(cell->building >= 0)
 			{
 				Building* b = &g_building[cell->building];
-				BuildingT* t2 = &g_bltype[b->type];
+				BlType* t2 = &g_bltype[b->type];
 
 				int tminx = b->tilepos.x - t2->widthx/2;
 				int tminz = b->tilepos.y - t2->widthz/2;
@@ -170,7 +170,7 @@ bool UnitCollides(Unit* u, Vec2i cmpos, int utype)
 				if(u2 == u)
 					continue;
 
-				UnitT* t2 = &g_utype[u2->type];
+				UType* t2 = &g_utype[u2->type];
 				int minx2 = u2->cmpos.x - t2->size.x/2;
 				int minz2 = u2->cmpos.y - t2->size.z/2;
 				int maxx2 = minx2 + t2->size.x - 1;
@@ -183,19 +183,19 @@ bool UnitCollides(Unit* u, Vec2i cmpos, int utype)
 #endif
 
 
-		if(u == g_pathunit)
-		{
-			g_log<<"no collision"<<std::endl;
-			g_log<<"-----------------------------------------"<<std::endl;
-			g_log.flush();
-		}
+	if(u == g_pathunit)
+	{
+		g_log<<"no collision"<<std::endl;
+		g_log<<"-----------------------------------------"<<std::endl;
+		g_log.flush();
+	}
 
-		return false;
+	return false;
 }
 
 void MoveUnit(Unit* u)
 {
-	UnitT* t = &g_utype[u->type];
+	UType* t = &g_utype[u->type];
 	u->prevpos = u->cmpos;
 	u->collided = false;
 
@@ -226,19 +226,19 @@ void MoveUnit(Unit* u)
 			int nodesdist = Magnitude( u->goal - u->cmpos ) / PATHNODE_SIZE;
 #if 1
 			PartialPath(u->type, u->mode,
-				u->cmpos.x, u->cmpos.y, u->target, u->target2, u->targtype, &u->path, &u->subgoal,
-				u, NULL, NULL,
-				u->goal.x, u->goal.y,
-				u->goal.x, u->goal.y, u->goal.x, u->goal.y,
-				nodesdist*10);
+			            u->cmpos.x, u->cmpos.y, u->target, u->target2, u->targtype, &u->path, &u->subgoal,
+			            u, NULL, NULL,
+			            u->goal.x, u->goal.y,
+			            u->goal.x, u->goal.y, u->goal.x, u->goal.y,
+			            nodesdist*10);
 			//TILE_SIZE*4/PATHNODE_SIZE);
 #else
 			JPSPartPath(u->type, u->mode,
-				u->cmpos.x, u->cmpos.y, u->target, u->target2, u->targtype, &u->path, &u->subgoal,
-				u, NULL, NULL,
-				u->goal.x, u->goal.y,
-				u->goal.x, u->goal.y, u->goal.x, u->goal.y,
-				nodesdist*4);
+			            u->cmpos.x, u->cmpos.y, u->target, u->target2, u->targtype, &u->path, &u->subgoal,
+			            u, NULL, NULL,
+			            u->goal.x, u->goal.y,
+			            u->goal.x, u->goal.y, u->goal.x, u->goal.y,
+			            nodesdist*4);
 #endif
 
 #if 0
@@ -251,19 +251,19 @@ void MoveUnit(Unit* u)
 		{
 #if 0
 			if(!FullPath(0,
-				u->type, u->mode,
-				u->cmpos.x, u->cmpos.y, u->target, u->target, u->target2, u->path, u->subgoal,
-				u, NULL, NULL,
-				u->goal.x, u->goal.y,
-				u->goal.x, u->goal.y, u->goal.x, u->goal.y))
+			                u->type, u->mode,
+			                u->cmpos.x, u->cmpos.y, u->target, u->target, u->target2, u->path, u->subgoal,
+			                u, NULL, NULL,
+			                u->goal.x, u->goal.y,
+			                u->goal.x, u->goal.y, u->goal.x, u->goal.y))
 #endif
 
 				JPSPath(
-				u->type, u->mode,
-				u->cmpos.x, u->cmpos.y, u->target, u->target2, u->targtype, &u->path, &u->subgoal,
-				u, NULL, NULL,
-				u->goal.x, u->goal.y,
-				u->goal.x, u->goal.y, u->goal.x, u->goal.y);
+				        u->type, u->mode,
+				        u->cmpos.x, u->cmpos.y, u->target, u->target2, u->targtype, &u->path, &u->subgoal,
+				        u, NULL, NULL,
+				        u->goal.x, u->goal.y,
+				        u->goal.x, u->goal.y, u->goal.x, u->goal.y);
 		}
 
 		return;
@@ -345,7 +345,7 @@ void MoveUnit(Unit* u)
 
 bool CheckIfArrived(Unit* u)
 {
-	UnitT* ut = &g_utype[u->type];
+	UType* ut = &g_utype[u->type];
 
 	int ucmminx = u->cmpos.x - ut->size.x/2;
 	int ucmminz = u->cmpos.y - ut->size.z/2;
@@ -353,11 +353,11 @@ bool CheckIfArrived(Unit* u)
 	int ucmmaxz = ucmminz + ut->size.z - 1;
 
 	Building* b;
-	BuildingT* bt;
+	BlType* bt;
 	ConduitType* ct;
 	ConduitTile* ctile;
 	Unit* u2;
-	UnitT* u2t;
+	UType* u2t;
 
 	int btminx;
 	int btminz;
@@ -467,7 +467,8 @@ bool CheckIfArrived(Unit* u)
 		if(ucmminx <= u2cmmaxx && ucmminz <= u2cmmaxz && u2cmminx <= ucmmaxx && u2cmminz <= ucmmaxz)
 			return true;
 		break;
-	default: break;
+	default:
+		break;
 	};
 
 	return false;
@@ -482,12 +483,37 @@ void OnArrived(Unit* u)
 {
 	switch(u->mode)
 	{
-	case UMODE_GOBLJOB:		u->mode = UMODE_BLJOB;			u->freecollider();	ResetGoal(u);	g_building[u->target].worker.push_back(u-g_unit);		break;
-	case UMODE_GOCSTJOB:	u->mode = UMODE_CSTJOB;			u->freecollider();	ResetGoal(u);	break;
-	case UMODE_GOCDJOB:		u->mode = UMODE_CDJOB;			u->freecollider();	ResetGoal(u);	break;
-	case UMODE_GOSHOP:		u->mode = UMODE_SHOPPING;		u->freecollider();	ResetGoal(u);	break;
-	case UMODE_GOREST:		u->mode = UMODE_RESTING;		u->freecollider();	ResetGoal(u);	break;
-	case UMODE_GOTRANSP:	ArAtTra(u);						u->freecollider();	ResetGoal(u);	break;
+	case UMODE_GOBLJOB:
+		u->mode = UMODE_BLJOB;
+		u->freecollider();
+		ResetGoal(u);
+		g_building[u->target].worker.push_back(u-g_unit);
+		break;
+	case UMODE_GOCSTJOB:
+		u->mode = UMODE_CSTJOB;
+		u->freecollider();
+		ResetGoal(u);
+		break;
+	case UMODE_GOCDJOB:
+		u->mode = UMODE_CDJOB;
+		u->freecollider();
+		ResetGoal(u);
+		break;
+	case UMODE_GOSHOP:
+		u->mode = UMODE_SHOPPING;
+		u->freecollider();
+		ResetGoal(u);
+		break;
+	case UMODE_GOREST:
+		u->mode = UMODE_RESTING;
+		u->freecollider();
+		ResetGoal(u);
+		break;
+	case UMODE_GOTRANSP:
+		ArAtTra(u);
+		u->freecollider();
+		ResetGoal(u);
+		break;
 	case UMODE_GODEMB:
 		if(u->driver >= 0)
 			Disembark(&g_unit[u->driver]);
@@ -516,7 +542,8 @@ void OnArrived(Unit* u)
 		u->mode = UMODE_REFUELING;
 		ResetGoal(u);
 		break;
-	default: break;
+	default:
+		break;
 	};
 
 	//if(type == TRUCK && UnitSelected(this))

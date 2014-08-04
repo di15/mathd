@@ -30,12 +30,12 @@ void GUI::draw()
 	for(auto i=m_subwidg.begin(); i!=m_subwidg.end(); i++)
 	{
 #ifdef DEBUG
-	g_log<<"draw "<<(*i)->m_name<<" "<<__FILE__<<" "<<__LINE__<<std::endl;
-    g_log.flush();
+		g_log<<"draw "<<(*i)->m_name<<" "<<__FILE__<<" "<<__LINE__<<std::endl;
+		g_log.flush();
 #endif
 
 		(*i)->draw();
-    }
+	}
 
 	CheckGLError(__FILE__, __LINE__);
 
@@ -86,6 +86,8 @@ void GUI::inev(InEv* ev)
 
 	if(!ev->intercepted)
 	{
+		//if(ev->type == INEV_MOUSEUP && ev->key == MOUSE_LEFT) g_log<<"mouse up l"<<std::endl;
+
 		if(ev->type == INEV_MOUSEMOVE && mousemovefunc) mousemovefunc();
 		else if(ev->type == INEV_MOUSEDOWN && ev->key == MOUSE_LEFT && lbuttondownfunc) lbuttondownfunc();
 		else if(ev->type == INEV_MOUSEUP && ev->key == MOUSE_LEFT && lbuttonupfunc) lbuttonupfunc();

@@ -40,7 +40,7 @@ float ConvertHeight(unsigned char brightness)
 
 void PlaceUnits()
 {
-	UnitT* ut = &g_utype[UNIT_LABOURER];
+	UType* ut = &g_utype[UNIT_LABOURER];
 	PathJob pj;
 	pj.airborne = ut->airborne;
 	pj.landborne = ut->landborne;
@@ -174,9 +174,9 @@ void LoadJPGMap(const char* relative)
 	}
 
 	c->position(
-		-1000.0f/3, 1000.0f/3 + 5000, -1000.0f/3,
-		0, 5000, 0,
-		0, 1, 0);
+	        -1000.0f/3, 1000.0f/3 + 5000, -1000.0f/3,
+	        0, 5000, 0,
+	        0, 1, 0);
 
 	c->position(1000.0f/3, 1000.0f/3, 1000.0f/3, 0, 0, 0, 0, 1, 0);
 

@@ -55,8 +55,8 @@ int Building::stillreq(int rtype)
 
 	if(prodleft <= 0)
 		return 0;
-	
-	BuildingT* bt = &g_bltype[type];
+
+	BlType* bt = &g_bltype[type];
 
 #if 0
 	int lowr = -1;
@@ -132,7 +132,7 @@ bool Building::tryprod()
 	int minr = -1;
 	int minamt = -1;
 
-	BuildingT* bt = &g_bltype[type];
+	BlType* bt = &g_bltype[type];
 
 	for(int ri=0; ri<RESOURCES; ri++)
 	{
@@ -171,7 +171,7 @@ bool Building::tryprod()
 
 	int minbund[RESOURCES];
 	Zero(minbund);
-	
+
 	int minlevel = total[minr] * RATIO_DENOM / bt->input[minr];
 
 	for(int ri=0; ri<RESOURCES; ri++)
@@ -282,7 +282,7 @@ float CompletPct(int* cost, int* current)
 
 void Building::allocres()
 {
-	BuildingT* t = &g_bltype[type];
+	BlType* t = &g_bltype[type];
 	Player* py = &g_player[owner];
 
 	int alloc;
@@ -318,9 +318,9 @@ void Building::allocres()
 
 	if(transx.m_part.size() > 0
 #ifdef LOCAL_TRANSX
-		&& owner == g_localP
+	                && owner == g_localP
 #endif
-		)
+	  )
 		NewTransx(drawpos, &transx);
 
 	checkconstruction();
@@ -328,7 +328,7 @@ void Building::allocres()
 
 void Building::remesh()
 {
-	BuildingT* t = &g_bltype[type];
+	BlType* t = &g_bltype[type];
 
 	if(finished)
 		CopyVA(&drawva, &g_model[t->model].m_va[0]);
@@ -346,7 +346,7 @@ void Building::remesh()
 
 bool Building::checkconstruction()
 {
-	BuildingT* t = &g_bltype[type];
+	BlType* t = &g_bltype[type];
 
 	bool haveall = true;
 
@@ -358,27 +358,27 @@ bool Building::checkconstruction()
 		}
 
 #if 0
-		if(owner == g_localP)
-		{
-			char msg[128];
-			sprintf(msg, "%s construction complete.", t->name);
-			Chat(msg);
-			ConCom();
-		}
+	if(owner == g_localP)
+	{
+		char msg[128];
+		sprintf(msg, "%s construction complete.", t->name);
+		Chat(msg);
+		ConCom();
+	}
 #endif
 
-		if(haveall && !finished)
-			for(char ctype=0; ctype<CONDUIT_TYPES; ctype++)
-				ReNetw(ctype);
+	if(haveall && !finished)
+		for(char ctype=0; ctype<CONDUIT_TYPES; ctype++)
+			ReNetw(ctype);
 
-		//if(owner == g_localP)
-		//	OnFinishedB(type);
+	//if(owner == g_localP)
+	//	OnFinishedB(type);
 
-		finished = haveall;
+	finished = haveall;
 
-		remesh();
+	remesh();
 
-		return finished;
+	return finished;
 }
 
 void DrawBl()
@@ -393,8 +393,8 @@ void DrawBl()
 		if(!b->on)
 			continue;
 
-		const BuildingT* t = &g_bltype[b->type];
-		//const BuildingT* t = &g_bltype[BUILDING_APARTMENT];
+		const BlType* t = &g_bltype[b->type];
+		//const BlType* t = &g_bltype[BUILDING_APARTMENT];
 		Model* m = &g_model[ t->model ];
 
 		Vec3f vmin(b->drawpos.x - t->widthx*TILE_SIZE/2, b->drawpos.y, b->drawpos.z - t->widthz*TILE_SIZE/2);
@@ -511,7 +511,7 @@ void UpdBls()
 		if(!b->on)
 			continue;
 
-		BuildingT* t = &g_bltype[b->type];
+		BlType* t = &g_bltype[b->type];
 		EmitterPlace* ep;
 		ParticleT* pt;
 
@@ -586,19 +586,19 @@ void StageCopyVA(VertexArray* to, VertexArray* from, float completion)
 #if 0
 #if 0
 				void barycent(double x0, double y0, double z0, double x1, double y1, double z1, double x2, double y2, double z2,
-					double vx, double vy, double vz,
-					double *u, double *v, double *w)
+				              double vx, double vy, double vz,
+				              double *u, double *v, double *w)
 #endif
 
-					double ratio0 = 0;
+				double ratio0 = 0;
 				double ratio1 = 0;
 				double ratio2 = 0;
 
 				barycent(prevt[0].x, prevt[0].y, prevt[0].z,
-					prevt[1].x, prevt[1].y, prevt[1].z,
-					prevt[2].x, prevt[2].y, prevt[2].z,
-					to->vertices[v].x, to->vertices[v].y, to->vertices[v].z,
-					&ratio0, &ratio1, &ratio2);
+				         prevt[1].x, prevt[1].y, prevt[1].z,
+				         prevt[2].x, prevt[2].y, prevt[2].z,
+				         to->vertices[v].x, to->vertices[v].y, to->vertices[v].z,
+				         &ratio0, &ratio1, &ratio2);
 
 				to->texcoords[v].x = ratio0 * prevc[0].x + ratio1 * prevc[1].x + ratio2 * prevc[2].x;
 				to->texcoords[v].y = ratio0 * prevc[0].y + ratio1 * prevc[1].y + ratio2 * prevc[2].y;
@@ -652,7 +652,7 @@ void HugTerrain(VertexArray* va, Vec3f pos)
 
 void Explode(Building* b)
 {
-	BuildingT* t = &g_bltype[b->type];
+	BlType* t = &g_bltype[b->type];
 	float hwx = t->widthx*TILE_SIZE/2.0f;
 	float hwz = t->widthz*TILE_SIZE/2.0f;
 	Vec3f p;

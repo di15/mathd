@@ -414,7 +414,7 @@ void DecodeJPG(jpeg_decompress_struct* cinfo, LoadedTex *pImageData)
 	{
 		// Read in the current row of pixels and increase the rowsRead count
 		rowsRead += jpeg_read_scanlines(cinfo,
-										&rowPtr[rowsRead], cinfo->output_height - rowsRead);
+		                                &rowPtr[rowsRead], cinfo->output_height - rowsRead);
 	}
 
 	// Delete the temporary row pointers
@@ -1187,7 +1187,7 @@ int SavePNG(const char* fullpath, LoadedTex* image)
 	 * in case we are using dynamically linked libraries.  REQUIRED.
 	 */
 	png_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING,
-									  (png_voidp) NULL, NULL, NULL);
+	                                  (png_voidp) NULL, NULL, NULL);
 
 	if (png_ptr == NULL)
 	{
@@ -1363,8 +1363,8 @@ int SaveBMP(const char* fullpath, LoadedTex* image)
 
 #if 0
 	for(int imageIdx = image->channels * (image->sizeX - 1);
-			imageIdx < image->sizeX * image->sizeY * image->channels;
-			imageIdx += image->channels * image->sizeX)
+	                imageIdx < image->sizeX * image->sizeY * image->channels;
+	                imageIdx += image->channels * image->sizeX)
 	{
 		image->data[imageIdx] = image->data[imageIdx-3];
 		image->data[imageIdx+1] = image->data[imageIdx-2];

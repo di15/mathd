@@ -429,7 +429,7 @@ void EditBox::inev(InEv* ev)
 	{
 		if(!m_opened)
 			return;
-		
+
 		if(changefunc3 != NULL)
 			changefunc3(ev->key, ev->scancode, false);
 
@@ -495,7 +495,7 @@ void EditBox::inev(InEv* ev)
 
 		if(changefunc2 != NULL)
 			changefunc2(m_param);
-		
+
 		if(changefunc3 != NULL)
 			changefunc3(first, 0, true);
 

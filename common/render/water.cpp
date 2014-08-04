@@ -43,9 +43,9 @@ void AllocWater(int wx, int wz)
 			g_waterverts[ z*(wx) * 6 + x * 6 + 5 ] = Vec3f(x*TILE_SIZE, WATER_LEVEL, (z+1)*TILE_SIZE);
 
 			if(g_hmap.getheight(x, z) > WATER_LEVEL &&
-					g_hmap.getheight(x+1, z) > WATER_LEVEL &&
-					g_hmap.getheight(x, z+1) > WATER_LEVEL &&
-					g_hmap.getheight(x+1, z+1) > WATER_LEVEL)
+			                g_hmap.getheight(x+1, z) > WATER_LEVEL &&
+			                g_hmap.getheight(x, z+1) > WATER_LEVEL &&
+			                g_hmap.getheight(x+1, z+1) > WATER_LEVEL)
 			{
 				g_waterverts[ z*(wx) * 6 + x * 6 + 0 ] = Vec3f(0,0,0);
 				g_waterverts[ z*(wx) * 6 + x * 6 + 1 ] = Vec3f(0,0,0);
@@ -95,7 +95,7 @@ void FreeWater()
 void DrawWater3()
 {
 	static float wavephase = 0;
-	
+
 	wavephase += g_drawfrinterval * 12.0f;
 	int iwp = (int)wavephase;
 	float rem = wavephase - (float)iwp;
@@ -132,9 +132,9 @@ void DrawWater3()
 	Matrix modelmat;
 	Matrix modelview;
 #ifdef SPECBUMPSHADOW
-    modelview.set(g_camview.m_matrix);
+	modelview.set(g_camview.m_matrix);
 #endif
-    modelview.postmult(modelmat);
+	modelview.postmult(modelmat);
 	glUniformMatrix4fv(s->m_slot[SSLOT_MODELVIEW], 1, 0, modelview.m_matrix);
 
 	Matrix mvp;
@@ -211,9 +211,9 @@ void DrawWater()
 	Matrix modelmat;
 	Matrix modelview;
 #ifdef SPECBUMPSHADOW
-    modelview.set(g_camview.m_matrix);
+	modelview.set(g_camview.m_matrix);
 #endif
-    modelview.postmult(modelmat);
+	modelview.postmult(modelmat);
 	glUniformMatrix4fv(s->m_slot[SSLOT_MODELVIEW], 1, 0, modelview.m_matrix);
 
 	Matrix mvp;
@@ -350,9 +350,9 @@ void DrawWater2()
 	Matrix modelmat;
 	Matrix modelview;
 #ifdef SPECBUMPSHADOW
-    modelview.set(g_camview.m_matrix);
+	modelview.set(g_camview.m_matrix);
 #endif
-    modelview.postmult(modelmat);
+	modelview.postmult(modelmat);
 	glUniformMatrix4fv(s->m_slot[SSLOT_MODELVIEW], 1, 0, modelview.m_matrix);
 
 	Matrix mvp;

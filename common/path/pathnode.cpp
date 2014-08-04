@@ -87,7 +87,7 @@ bool AtGoal(PathJob* pj, PathNode* node)
 	int cmposx = cpos.x * PATHNODE_SIZE + PATHNODE_SIZE/2;
 	int cmposz = cpos.y * PATHNODE_SIZE + PATHNODE_SIZE/2;
 
-	UnitT* ut = &g_utype[pj->utype];
+	UType* ut = &g_utype[pj->utype];
 
 	int cmminx = cmposx - ut->size.x/2;
 	int cmminz = cmposz - ut->size.z/2;
@@ -172,7 +172,7 @@ void SnapToNode(PathJob* pj)
 
 	if(!startnode)
 	{
-		UnitT* ut = &g_utype[pj->utype];
+		UType* ut = &g_utype[pj->utype];
 
 		{
 			int nposx = npos_nw.x;
