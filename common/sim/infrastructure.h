@@ -17,9 +17,9 @@ class ConduitTile
 {
 public:
 	bool on;
-	char conntype;
+	unsigned char conntype;
 	bool finished;
-	char owner;
+	unsigned char owner;
 	int conmat[RESOURCES];
 	short netw;	//network
 	VertexArray drawva;
@@ -32,7 +32,7 @@ public:
 	ConduitTile();
 	~ConduitTile();
 
-	virtual char condtype();
+	virtual unsigned char condtype();
 	int netreq(int res);
 	void destroy();
 	void allocate();
@@ -78,7 +78,7 @@ public:
 
 extern ConduitType g_cotype[CONDUIT_TYPES];
 
-inline ConduitTile* GetCo(char ctype, int tx, int tz, bool plan)
+inline ConduitTile* GetCo(unsigned char ctype, int tx, int tz, bool plan)
 {
 	ConduitType* ct = &g_cotype[ctype];
 	ConduitTile* tilesarr = ct->cotiles[(int)plan];
@@ -87,7 +87,7 @@ inline ConduitTile* GetCo(char ctype, int tx, int tz, bool plan)
 
 class Building;
 
-void DefCo(char ctype,
+void DefCo(unsigned char ctype,
            unsigned short netwoff,
            unsigned short seloff,
            unsigned short maxforwincl,
@@ -96,25 +96,25 @@ void DefCo(char ctype,
            bool cornerpl,
            Vec2i physoff,
            Vec3f drawoff);
-void CoConMat(char ctype, char rtype, short ramt);
-void UpdCoPlans(char ctype, char owner, Vec3f start, Vec3f end);
-void ClearCoPlans(char ctype);
-void ReNetw(char ctype);
-void ResetNetw(char ctype);
-bool ReNetwB(char ctype);
-void MergeNetw(char ctype, int A, int B);
-bool ReNetwTiles(char ctype);
-bool CompareCo(char ctype, ConduitTile* ctile, int tx, int tz);
-bool BAdj(char ctype, int i, int tx, int tz);
-bool CompareB(char ctype, Building* b, ConduitTile* ctile);
-bool CoLevel(char ctype, float iterx, float iterz, float testx, float testz, float dx, float dz, int i, float d, bool plantoo);
-void RemeshCo(char ctype, int tx, int tz, bool plan);
-void PlaceCo(char ctype);
-void PlaceCo(char ctype, int tx, int tz, int owner, bool plan);
-void Repossess(char ctype, int tx, int tz, int owner);
-void DrawCo(char ctype);
-void CoXZ(char ctype, ConduitTile* ctile, bool plan, int& tx, int& tz);
-void DefConn(char conduittype, char connectiontype, bool finished, const char* modelfile, const Vec3f scale, Vec3f transl);
-void PruneCo(char ctype);
+void CoConMat(unsigned char ctype, unsigned char rtype, short ramt);
+void UpdCoPlans(unsigned char ctype, char owner, Vec3f start, Vec3f end);
+void ClearCoPlans(unsigned char ctype);
+void ReNetw(unsigned char ctype);
+void ResetNetw(unsigned char ctype);
+bool ReNetwB(unsigned char ctype);
+void MergeNetw(unsigned char ctype, int A, int B);
+bool ReNetwTiles(unsigned char ctype);
+bool CompareCo(unsigned char ctype, ConduitTile* ctile, int tx, int tz);
+bool BAdj(unsigned char ctype, int i, int tx, int tz);
+bool CompareB(unsigned char ctype, Building* b, ConduitTile* ctile);
+bool CoLevel(unsigned char ctype, float iterx, float iterz, float testx, float testz, float dx, float dz, int i, float d, bool plantoo);
+void RemeshCo(unsigned char ctype, int tx, int tz, bool plan);
+void PlaceCo(unsigned char ctype);
+void PlaceCo(unsigned char ctype, int tx, int tz, int owner, bool plan);
+void Repossess(unsigned char ctype, int tx, int tz, int owner);
+void DrawCo(unsigned char ctype);
+void CoXZ(unsigned char ctype, ConduitTile* ctile, bool plan, int& tx, int& tz);
+void DefConn(unsigned char conduittype, unsigned char connectiontype, bool finished, const char* modelfile, const Vec3f scale, Vec3f transl);
+void PruneCo(unsigned char ctype);
 
 #endif

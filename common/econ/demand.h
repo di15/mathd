@@ -260,7 +260,7 @@ public:
 			}
 		}
 
-		for(int i=0; i<PLAYERS; i++)
+		for(unsigned int i=0; i<PLAYERS; i++)
 			Zero(pyrsup[i]);
 	}
 

@@ -15,7 +15,7 @@
 
 ConduitType g_cotype[CONDUIT_TYPES];
 
-void ClearCoPlans(char ctype)
+void ClearCoPlans(unsigned char ctype)
 {
 	//if(!get)
 	//	return;
@@ -25,7 +25,7 @@ void ClearCoPlans(char ctype)
 			GetCo(ctype, x, z, true)->on = false;
 }
 
-void ResetNetw(char ctype)
+void ResetNetw(unsigned char ctype)
 {
 	ConduitType* ct = &g_cotype[ctype];
 
@@ -65,7 +65,7 @@ void ResetNetw(char ctype)
 // If buildings conduct the resource,
 // merge the networks of touching buildings.
 // Return true if there was a change.
-bool ReNetwB(char ctype)
+bool ReNetwB(unsigned char ctype)
 {
 	ConduitType* ct = &g_cotype[ctype];
 
@@ -119,7 +119,7 @@ bool ReNetwB(char ctype)
 }
 
 // Merge two networks that have been found to be touching.
-void MergeNetw(char ctype, int A, int B)
+void MergeNetw(unsigned char ctype, int A, int B)
 {
 	int mini = imin(A, B);
 	int maxi = imax(A, B);
@@ -184,7 +184,7 @@ void MergeNetw(char ctype, int A, int B)
 		}
 }
 
-bool CompareCo(char ctype, ConduitTile* ctile, int tx, int tz)
+bool CompareCo(unsigned char ctype, ConduitTile* ctile, int tx, int tz)
 {
 	ConduitTile* ctile2 = GetCo(ctype, tx, tz, false);
 
@@ -214,7 +214,7 @@ bool CompareCo(char ctype, ConduitTile* ctile, int tx, int tz)
 }
 
 // Building adjacent?
-bool BAdj(char ctype, int i, int tx, int tz)
+bool BAdj(unsigned char ctype, int i, int tx, int tz)
 {
 	Building* b = &g_building[i];
 	BlType* bt = &g_bltype[b->type];
@@ -245,7 +245,7 @@ bool BAdj(char ctype, int i, int tx, int tz)
 	return false;
 }
 
-bool CompareB(char ctype, Building* b, ConduitTile* ctile)
+bool CompareB(unsigned char ctype, Building* b, ConduitTile* ctile)
 {
 	ConduitType* ct = &g_cotype[ctype];
 
@@ -313,7 +313,7 @@ bool CompareB(char ctype, Building* b, ConduitTile* ctile)
 
 // Called by conduit network update function.
 // Returns true if there was a change.
-bool ReNetwTiles(char ctype)
+bool ReNetwTiles(unsigned char ctype)
 {
 	bool change = false;
 
@@ -355,7 +355,7 @@ bool ReNetwTiles(char ctype)
 	return change;
 }
 
-void ReNetw(char ctype)
+void ReNetw(unsigned char ctype)
 {
 	ResetNetw(ctype);
 
@@ -380,7 +380,7 @@ void ReNetw(char ctype)
 
 // Is the tile level for a conduit? Take into account the direction which the conduit is leading and coming from
 // (e.g., forward incline may be greater than sideways incline).
-bool CoLevel(char ctype, float iterx, float iterz, float testx, float testz, float dx, float dz, int i, float d, bool plantoo)
+bool CoLevel(unsigned char ctype, float iterx, float iterz, float testx, float testz, float dx, float dz, int i, float d, bool plantoo)
 {
 	//return true;
 
@@ -572,7 +572,7 @@ bool CoLevel(char ctype, float iterx, float iterz, float testx, float testz, flo
 	return true;
 }
 
-void RemeshCo(char ctype, int tx, int tz, bool plan)
+void RemeshCo(unsigned char ctype, int tx, int tz, bool plan)
 {
 	ConduitTile* ctile = GetCo(ctype, tx, tz, plan);
 
@@ -638,7 +638,7 @@ void RemeshCo(char ctype, int tx, int tz, bool plan)
 	cva->genvbo();
 }
 
-void UpdCoPlans(char ctype, char owner, Vec3f start, Vec3f end)
+void UpdCoPlans(unsigned char ctype, char owner, Vec3f start, Vec3f end)
 {
 	ClearCoPlans(ctype);
 
@@ -710,7 +710,7 @@ void UpdCoPlans(char ctype, char owner, Vec3f start, Vec3f end)
 			RemeshCo(ctype, x, z, true);
 }
 
-void Repossess(char ctype, int tx, int tz, int owner)
+void Repossess(unsigned char ctype, int tx, int tz, int owner)
 {
 	ConduitTile* ctile = GetCo(ctype, tx, tz, false);
 	ctile->owner = owner;
@@ -890,7 +890,7 @@ bool CoPlaceable(int ctype, int x, int z)
 	return true;
 }
 
-int GetConn(char ctype, int x, int z, bool plan=false)
+int GetConn(unsigned char ctype, int x, int z, bool plan=false)
 {
 	bool n = false, e = false, s = false, w = false;
 
@@ -920,7 +920,7 @@ int GetConn(char ctype, int x, int z, bool plan=false)
 	return ConnType(n, e, s, w);
 }
 
-void ConnectCo(char ctype, int tx, int tz, bool plan)
+void ConnectCo(unsigned char ctype, int tx, int tz, bool plan)
 {
 	ConduitTile* ctile = GetCo(ctype, tx, tz, plan);
 
@@ -931,7 +931,7 @@ void ConnectCo(char ctype, int tx, int tz, bool plan)
 	RemeshCo(ctype, tx, tz, plan);
 }
 
-void ConnectCoAround(char ctype, int x, int z, bool plan)
+void ConnectCoAround(unsigned char ctype, int x, int z, bool plan)
 {
 	if(x+1 < g_hmap.m_widthx)
 		ConnectCo(ctype, x+1, z, plan);
@@ -944,7 +944,7 @@ void ConnectCoAround(char ctype, int x, int z, bool plan)
 		ConnectCo(ctype, x, z-1, plan);
 }
 
-void PlaceCo(char ctype, int tx, int tz, int owner, bool plan)
+void PlaceCo(unsigned char ctype, int tx, int tz, int owner, bool plan)
 {
 	if(!plan && GetCo(ctype, tx, tz, false)->on)
 	{
@@ -989,7 +989,7 @@ void PlaceCo(char ctype, int tx, int tz, int owner, bool plan)
 	}
 }
 
-void PlaceCo(char ctype)
+void PlaceCo(unsigned char ctype)
 {
 	Player* py = &g_player[g_curP];
 
@@ -1044,7 +1044,7 @@ void PlaceCo(char ctype)
 	}
 }
 
-void DrawCo(char ctype)
+void DrawCo(unsigned char ctype)
 {
 	//StartTimer(TIMER_DRAWROADS);
 
@@ -1110,7 +1110,7 @@ ConduitTile::~ConduitTile()
 {
 }
 
-char ConduitTile::condtype()
+unsigned char ConduitTile::condtype()
 {
 	return CONDUIT_NONE;
 }
@@ -1222,13 +1222,13 @@ void ConduitTile::freecollider()
 {
 }
 
-void DefConn(char conduittype, char connectiontype, bool finished, const char* modelfile, const Vec3f scale, Vec3f transl)
+void DefConn(unsigned char conduittype, unsigned char connectiontype, bool finished, const char* modelfile, const Vec3f scale, Vec3f transl)
 {
 	int* tm = &g_cotype[conduittype].model[connectiontype][(int)finished];
 	QueueModel(tm, modelfile, scale, transl);
 }
 
-void DefCo(char ctype,
+void DefCo(unsigned char ctype,
            unsigned short netwoff,
            unsigned short seloff,
            unsigned short maxforwincl,
@@ -1249,13 +1249,13 @@ void DefCo(char ctype,
 	ct->blconduct = blconduct;
 }
 
-void CoConMat(char ctype, char rtype, short ramt)
+void CoConMat(unsigned char ctype, unsigned char rtype, short ramt)
 {
 	ConduitType* ct = &g_cotype[ctype];
 	ct->conmat[rtype] = ramt;
 }
 
-void CoXZ(char ctype, ConduitTile* ctile, bool plan, int& tx, int& tz)
+void CoXZ(unsigned char ctype, ConduitTile* ctile, bool plan, int& tx, int& tz)
 {
 	ConduitType* ct = &g_cotype[ctype];
 	ConduitTile* tilearr = ct->cotiles[(int)plan];
@@ -1264,7 +1264,7 @@ void CoXZ(char ctype, ConduitTile* ctile, bool plan, int& tx, int& tz)
 	tx = off % g_hmap.m_widthx;
 }
 
-void PruneCo(char ctype)
+void PruneCo(unsigned char ctype)
 {
 	ConduitType* ct = &g_cotype[ctype];
 

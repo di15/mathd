@@ -80,7 +80,7 @@ void AddInf(DemTree* dm, std::list<DemNode*>* cdarr, DemNode* parent, DemNode* p
 		return;
 	}
 
-	char ctype = r->conduit;
+	unsigned char ctype = r->conduit;
 	ConduitType* ct = &g_cotype[ctype];
 
 
@@ -360,7 +360,7 @@ void AddReq(DemTree* dm, Player* p, std::list<DemNode*>* nodes, DemNode* parent,
 			}
 
 			//distance between demanding bl that called this func and supl bl (in demb)
-			int cmdist = cmdist = Magnitude(demcmpos - demb->bid.cmpos);
+			int cmdist = Magnitude(demcmpos - demb->bid.cmpos);
 
 			int util = r->physical ? PhUtil(margpr, cmdist) : GlUtil(margpr);
 			rdem->bid.minutil = util;

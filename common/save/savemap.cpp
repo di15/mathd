@@ -621,7 +621,7 @@ void ReadZoomCam(FILE *fp)
 
 void SaveCo(FILE* fp)
 {
-	for(char ctype=0; ctype<CONDUIT_TYPES; ctype++)
+	for(unsigned char ctype=0; ctype<CONDUIT_TYPES; ctype++)
 	{
 		ConduitType* ct = &g_cotype[ctype];
 
@@ -647,7 +647,7 @@ void SaveCo(FILE* fp)
 
 void ReadCo(FILE* fp)
 {
-	for(char ctype=0; ctype<CONDUIT_TYPES; ctype++)
+	for(unsigned char ctype=0; ctype<CONDUIT_TYPES; ctype++)
 	{
 		ConduitType* ct = &g_cotype[ctype];
 

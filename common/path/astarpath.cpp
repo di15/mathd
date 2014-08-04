@@ -83,7 +83,7 @@ void IdentifySuccessors_A(PathJob* pj, PathNode* node)
 
 	bool stand[DIRS];
 
-	for(char i=0; i<DIRS; i++)
+	for(unsigned char i=0; i<DIRS; i++)
 		stand[i] = Standable(pj, npos.x + offsets[i].x, npos.y + offsets[i].y);
 
 	bool pass[DIRS];
@@ -97,7 +97,7 @@ void IdentifySuccessors_A(PathJob* pj, PathNode* node)
 	pass[DIR_SW] = stand[DIR_SW] && stand[DIR_S] && stand[DIR_W];
 	pass[DIR_W] = stand[DIR_W];
 
-	for(char i=0; i<DIRS; i++)
+	for(unsigned char i=0; i<DIRS; i++)
 	{
 		if(!pass[i])
 			continue;

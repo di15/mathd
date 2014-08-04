@@ -11,7 +11,7 @@
 class PowlTile : public ConduitTile
 {
 public:
-	char condtype();
+	unsigned char condtype();
 };
 
 #endif

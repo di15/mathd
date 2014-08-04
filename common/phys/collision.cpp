@@ -43,7 +43,7 @@ bool BlAdj(int i, int j)
 }
 
 // Is conduit x,z adjacent to building i?
-bool CoAdj(char ctype, int i, int x, int z)
+bool CoAdj(unsigned char ctype, int i, int x, int z)
 {
 	Building* b = &g_building[i];
 	BlType* t = &g_bltype[b->type];

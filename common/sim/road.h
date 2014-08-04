@@ -11,7 +11,7 @@
 class RoadTile : public ConduitTile
 {
 public:
-	char condtype();
+	unsigned char condtype();
 	void fillcollider();
 	void freecollider();
 };
