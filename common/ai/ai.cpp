@@ -69,6 +69,16 @@ void AdjustPrices(Player* p)
 
 void UpdateAI(Player* p)
 {
+	if(p != g_player)
+		return;
+
+	static bool once = false;
+
+	if(once)
+		return;
+
+	once = true;
+
 	CalcDem2(p);
 	Build(p);
 	Manuf(p);

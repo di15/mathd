@@ -1579,6 +1579,21 @@ void LinkDemCo(DemTree* orig, DemTree* copy)
 	Vec2i tpos;
 	std::list<RDemNode*> condems;
 #endif
+
+	for(int ctype=0; ctype<CONDUIT_TYPES; ctype++)
+	{
+		auto oditer=orig->codems[ctype].begin();
+		auto cditer=copy->codems[ctype].begin();
+		for(;
+						oditer!=orig->codems[ctype].end() && cditer!=copy->codems[ctype].end();
+						oditer++, cditer++)
+		{
+			CdDem* olddem = (CdDem*)*oditer;
+			CdDem* newdem = (CdDem*)*cditer;
+
+			LinkDems(olddem->condems, newdem->condems, orig->rdemcopy, copy->rdemcopy);
+		}
+	}
 }
 
 //Link dem nodes
@@ -1601,6 +1616,20 @@ void LinkDemR(DemTree* orig, DemTree* copy)
 	DemsAtU* supup;
 	DemsAtU* opup;
 #endif
+
+	auto oditer=orig->supupcopy.begin();
+	auto cditer=copy->supupcopy.begin();
+	for(;
+	                oditer!=orig->supupcopy.end() && cditer!=copy->supupcopy.end();
+	                oditer++, cditer++)
+	{
+		RDemNode* olddem = (RDemNode*)*oditer;
+		RDemNode* newdem = (RDemNode*)*cditer;
+
+		newdem->supbp = DemAt(copy->supbpcopy, DemIndex(olddem->supbp, orig->supbpcopy));
+		newdem->supup = DemAt(copy->supupcopy, DemIndex(olddem->supup, orig->supupcopy));
+		newdem->opup = DemAt(copy->supupcopy, DemIndex(olddem->opup, orig->supupcopy));
+	}
 }
 
 //Duplicate demtree
