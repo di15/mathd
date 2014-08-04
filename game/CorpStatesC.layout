@@ -1,24 +1,54 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <CodeBlocks_layout_file>
 	<ActiveTarget name="Release" />
-	<File name="../common/econ/demand.h" open="1" top="0" tabpos="23" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+	<File name="gui/gviewport.cpp" open="1" top="0" tabpos="28" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="2914" topLine="206" />
+			<Cursor1 position="11001" topLine="365" />
 		</Cursor>
 	</File>
-	<File name="../common/platform.cpp" open="1" top="0" tabpos="25" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+	<File name="../common/sim/unit.cpp" open="1" top="0" tabpos="45" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="88" topLine="0" />
+			<Cursor1 position="3624" topLine="192" />
 		</Cursor>
 	</File>
-	<File name="../common/sim/unittype.cpp" open="1" top="0" tabpos="41" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+	<File name="../common/path/partialpath.cpp" open="1" top="0" tabpos="42" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="355" topLine="0" />
+			<Cursor1 position="920" topLine="0" />
 		</Cursor>
 	</File>
-	<File name="../common/sim/selection.cpp" open="1" top="0" tabpos="40" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+	<File name="../common/sim/unittype.h" open="1" top="0" tabpos="49" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="10718" topLine="388" />
+			<Cursor1 position="553" topLine="4" />
+		</Cursor>
+	</File>
+	<File name="../common/sim/order.cpp" open="1" top="0" tabpos="48" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="4672" topLine="141" />
+		</Cursor>
+	</File>
+	<File name="../common/sim/job.cpp" open="1" top="0" tabpos="38" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="620" topLine="32" />
+		</Cursor>
+	</File>
+	<File name="../common/path/astarpath.cpp" open="1" top="0" tabpos="51" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="919" topLine="0" />
+		</Cursor>
+	</File>
+	<File name="../common/render/shader.h" open="1" top="0" tabpos="8" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="2709" topLine="61" />
+		</Cursor>
+	</File>
+	<File name="../common/save/savemap.cpp" open="1" top="0" tabpos="46" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="1077" topLine="5" />
+		</Cursor>
+	</File>
+	<File name="../common/gui/widgets/button.cpp" open="1" top="0" tabpos="17" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="0" topLine="0" />
 		</Cursor>
 	</File>
 	<File name="../common/sim/build.cpp" open="1" top="0" tabpos="19" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
@@ -26,24 +56,9 @@
 			<Cursor1 position="15758" topLine="662" />
 		</Cursor>
 	</File>
-	<File name="../common/sim/build.h" open="1" top="0" tabpos="36" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+	<File name="../common/path/pathnode.cpp" open="1" top="0" tabpos="44" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="116" topLine="0" />
-		</Cursor>
-	</File>
-	<File name="../common/sim/road.cpp" open="1" top="0" tabpos="37" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="2987" topLine="92" />
-		</Cursor>
-	</File>
-	<File name="../common/econ/demand.cpp" open="1" top="0" tabpos="22" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="38557" topLine="1594" />
-		</Cursor>
-	</File>
-	<File name="../common/gui/draw2d.cpp" open="1" top="0" tabpos="9" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="789" topLine="9" />
+			<Cursor1 position="4800" topLine="137" />
 		</Cursor>
 	</File>
 	<File name="../common/debug.cpp" open="1" top="0" tabpos="2" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
@@ -51,34 +66,34 @@
 			<Cursor1 position="7265" topLine="258" />
 		</Cursor>
 	</File>
-	<File name="../common/gui/widgets/spez/bottompanel.cpp" open="1" top="0" tabpos="16" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+	<File name="../common/sim/build.h" open="1" top="0" tabpos="36" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="6085" topLine="99" />
+			<Cursor1 position="116" topLine="0" />
 		</Cursor>
 	</File>
-	<File name="../common/sim/unitmove.cpp" open="1" top="0" tabpos="35" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+	<File name="../common/phys/trace.cpp" open="1" top="0" tabpos="52" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="8216" topLine="322" />
+			<Cursor1 position="3547" topLine="123" />
 		</Cursor>
 	</File>
-	<File name="../common/render/shader.cpp" open="1" top="0" tabpos="7" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+	<File name="../common/gui/font.h" open="1" top="0" tabpos="14" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="2530" topLine="96" />
+			<Cursor1 position="1980" topLine="37" />
 		</Cursor>
 	</File>
-	<File name="../common/gui/gui.h" open="1" top="0" tabpos="21" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+	<File name="../common/path/jpspath.cpp" open="1" top="0" tabpos="47" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="1870" topLine="52" />
+			<Cursor1 position="959" topLine="0" />
 		</Cursor>
 	</File>
-	<File name="../common/econ/utility.cpp" open="1" top="0" tabpos="26" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+	<File name="../common/econ/demand.cpp" open="1" top="1" tabpos="22" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="0" topLine="0" />
+			<Cursor1 position="43283" topLine="1786" />
 		</Cursor>
 	</File>
-	<File name="../common/path/collidertile.cpp" open="1" top="0" tabpos="34" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+	<File name="gui/ggui.cpp" open="1" top="0" tabpos="20" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="12103" topLine="526" />
+			<Cursor1 position="16507" topLine="613" />
 		</Cursor>
 	</File>
 	<File name="gui/playgui.cpp" open="1" top="0" tabpos="18" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
@@ -91,84 +106,14 @@
 			<Cursor1 position="4337" topLine="72" />
 		</Cursor>
 	</File>
-	<File name="../common/sim/building.cpp" open="1" top="0" tabpos="39" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="13022" topLine="617" />
-		</Cursor>
-	</File>
-	<File name="../common/gui/font.cpp" open="1" top="0" tabpos="10" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="17935" topLine="756" />
-		</Cursor>
-	</File>
-	<File name="gui/ggui.cpp" open="1" top="0" tabpos="20" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="16507" topLine="613" />
-		</Cursor>
-	</File>
-	<File name="../common/gui/widgets/text.cpp" open="1" top="0" tabpos="12" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="764" topLine="0" />
-		</Cursor>
-	</File>
-	<File name="../common/phys/trace.cpp" open="1" top="0" tabpos="52" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="3547" topLine="123" />
-		</Cursor>
-	</File>
-	<File name="../common/sim/buildingtype.cpp" open="1" top="0" tabpos="27" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="1053" topLine="10" />
-		</Cursor>
-	</File>
-	<File name="../common/sim/unittype.h" open="1" top="0" tabpos="49" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="553" topLine="4" />
-		</Cursor>
-	</File>
-	<File name="../common/platform.h" open="1" top="0" tabpos="1" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="2500" topLine="102" />
-		</Cursor>
-	</File>
-	<File name="../common/render/shader.h" open="1" top="0" tabpos="8" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="2709" topLine="61" />
-		</Cursor>
-	</File>
-	<File name="../common/sim/labourer.cpp" open="1" top="0" tabpos="32" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="13469" topLine="710" />
-		</Cursor>
-	</File>
-	<File name="../common/sim/infrastructure.cpp" open="1" top="0" tabpos="15" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="3936" topLine="219" />
-		</Cursor>
-	</File>
 	<File name="../common/math/matrix.cpp" open="1" top="0" tabpos="6" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
 			<Cursor1 position="0" topLine="0" />
 		</Cursor>
 	</File>
-	<File name="../common/sim/resources.cpp" open="1" top="0" tabpos="30" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+	<File name="../common/path/collidertile.cpp" open="1" top="0" tabpos="34" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="2989" topLine="82" />
-		</Cursor>
-	</File>
-	<File name="../common/path/pathnode.cpp" open="1" top="0" tabpos="44" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="4800" topLine="137" />
-		</Cursor>
-	</File>
-	<File name="../common/sim/order.cpp" open="1" top="0" tabpos="48" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="4672" topLine="141" />
-		</Cursor>
-	</File>
-	<File name="../common/path/jpspartpath.cpp" open="1" top="0" tabpos="43" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="985" topLine="0" />
+			<Cursor1 position="12103" topLine="526" />
 		</Cursor>
 	</File>
 	<File name="../common/debug.h" open="1" top="0" tabpos="3" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
@@ -176,39 +121,14 @@
 			<Cursor1 position="1681" topLine="28" />
 		</Cursor>
 	</File>
-	<File name="../common/gui/widgets/button.cpp" open="1" top="0" tabpos="17" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+	<File name="../common/sim/unittype.cpp" open="1" top="0" tabpos="41" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="0" topLine="0" />
+			<Cursor1 position="355" topLine="0" />
 		</Cursor>
 	</File>
-	<File name="../common/sim/job.cpp" open="1" top="0" tabpos="38" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+	<File name="../common/sim/building.cpp" open="1" top="0" tabpos="39" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="620" topLine="32" />
-		</Cursor>
-	</File>
-	<File name="gui/gviewport.cpp" open="1" top="0" tabpos="28" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="11001" topLine="365" />
-		</Cursor>
-	</File>
-	<File name="../common/gui/gui.cpp" open="1" top="0" tabpos="11" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="2960" topLine="70" />
-		</Cursor>
-	</File>
-	<File name="../common/path/pathdebug.cpp" open="1" top="0" tabpos="50" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="8957" topLine="322" />
-		</Cursor>
-	</File>
-	<File name="../common/phys/collision.cpp" open="1" top="0" tabpos="29" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="9281" topLine="388" />
-		</Cursor>
-	</File>
-	<File name="../common/save/savemap.cpp" open="1" top="0" tabpos="46" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="1077" topLine="5" />
+			<Cursor1 position="13022" topLine="617" />
 		</Cursor>
 	</File>
 	<File name="../common/sim/buildingtype.h" open="1" top="0" tabpos="33" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
@@ -216,39 +136,14 @@
 			<Cursor1 position="1249" topLine="27" />
 		</Cursor>
 	</File>
-	<File name="../common/path/astarpath.cpp" open="1" top="0" tabpos="51" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+	<File name="../common/ai/ai.cpp" open="1" top="0" tabpos="24" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="919" topLine="0" />
+			<Cursor1 position="1185" topLine="48" />
 		</Cursor>
 	</File>
-	<File name="../common/path/jpspath.cpp" open="1" top="0" tabpos="47" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+	<File name="../common/gui/widgets/spez/bottompanel.cpp" open="1" top="0" tabpos="16" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="959" topLine="0" />
-		</Cursor>
-	</File>
-	<File name="../common/gui/font.h" open="1" top="0" tabpos="14" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="1980" topLine="37" />
-		</Cursor>
-	</File>
-	<File name="../common/sim/player.cpp" open="1" top="0" tabpos="13" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="3139" topLine="88" />
-		</Cursor>
-	</File>
-	<File name="../common/sim/unit.cpp" open="1" top="0" tabpos="45" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="3624" topLine="192" />
-		</Cursor>
-	</File>
-	<File name="gmain.cpp" open="1" top="0" tabpos="5" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="14610" topLine="528" />
-		</Cursor>
-	</File>
-	<File name="../common/ai/ai.cpp" open="1" top="1" tabpos="24" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="1201" topLine="42" />
+			<Cursor1 position="6085" topLine="99" />
 		</Cursor>
 	</File>
 	<File name="../common/window.cpp" open="1" top="0" tabpos="4" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
@@ -256,9 +151,114 @@
 			<Cursor1 position="6217" topLine="240" />
 		</Cursor>
 	</File>
-	<File name="../common/path/partialpath.cpp" open="1" top="0" tabpos="42" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+	<File name="../common/gui/gui.h" open="1" top="0" tabpos="21" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="920" topLine="0" />
+			<Cursor1 position="1870" topLine="52" />
+		</Cursor>
+	</File>
+	<File name="../common/sim/labourer.cpp" open="1" top="0" tabpos="32" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="13469" topLine="710" />
+		</Cursor>
+	</File>
+	<File name="../common/path/jpspartpath.cpp" open="1" top="0" tabpos="43" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="985" topLine="0" />
+		</Cursor>
+	</File>
+	<File name="../common/gui/font.cpp" open="1" top="0" tabpos="10" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="17935" topLine="756" />
+		</Cursor>
+	</File>
+	<File name="../common/sim/infrastructure.cpp" open="1" top="0" tabpos="15" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="3936" topLine="219" />
+		</Cursor>
+	</File>
+	<File name="../common/sim/player.cpp" open="1" top="0" tabpos="13" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="3139" topLine="88" />
+		</Cursor>
+	</File>
+	<File name="../common/path/pathdebug.cpp" open="1" top="0" tabpos="50" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="8957" topLine="322" />
+		</Cursor>
+	</File>
+	<File name="../common/render/shader.cpp" open="1" top="0" tabpos="7" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="2530" topLine="96" />
+		</Cursor>
+	</File>
+	<File name="../common/gui/gui.cpp" open="1" top="0" tabpos="11" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="2960" topLine="70" />
+		</Cursor>
+	</File>
+	<File name="../common/econ/utility.cpp" open="1" top="0" tabpos="26" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="0" topLine="0" />
+		</Cursor>
+	</File>
+	<File name="../common/platform.cpp" open="1" top="0" tabpos="25" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="88" topLine="0" />
+		</Cursor>
+	</File>
+	<File name="../common/platform.h" open="1" top="0" tabpos="1" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="2500" topLine="102" />
+		</Cursor>
+	</File>
+	<File name="../common/sim/resources.cpp" open="1" top="0" tabpos="30" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="2989" topLine="82" />
+		</Cursor>
+	</File>
+	<File name="../common/sim/road.cpp" open="1" top="0" tabpos="37" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="2987" topLine="92" />
+		</Cursor>
+	</File>
+	<File name="../common/sim/buildingtype.cpp" open="1" top="0" tabpos="27" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="1053" topLine="10" />
+		</Cursor>
+	</File>
+	<File name="../common/sim/selection.cpp" open="1" top="0" tabpos="40" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="10718" topLine="388" />
+		</Cursor>
+	</File>
+	<File name="gmain.cpp" open="1" top="0" tabpos="5" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="14610" topLine="528" />
+		</Cursor>
+	</File>
+	<File name="../common/phys/collision.cpp" open="1" top="0" tabpos="29" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="9281" topLine="388" />
+		</Cursor>
+	</File>
+	<File name="../common/gui/draw2d.cpp" open="1" top="0" tabpos="9" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="789" topLine="9" />
+		</Cursor>
+	</File>
+	<File name="../common/econ/demand.h" open="1" top="0" tabpos="23" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="2914" topLine="206" />
+		</Cursor>
+	</File>
+	<File name="../common/sim/unitmove.cpp" open="1" top="0" tabpos="35" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="8216" topLine="322" />
+		</Cursor>
+	</File>
+	<File name="../common/gui/widgets/text.cpp" open="1" top="0" tabpos="12" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="764" topLine="0" />
 		</Cursor>
 	</File>
 </CodeBlocks_layout_file>

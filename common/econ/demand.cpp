@@ -1626,9 +1626,9 @@ void LinkDemR(DemTree* orig, DemTree* copy)
 		RDemNode* olddem = (RDemNode*)*oditer;
 		RDemNode* newdem = (RDemNode*)*cditer;
 
-		newdem->supbp = DemAt(copy->supbpcopy, DemIndex(olddem->supbp, orig->supbpcopy));
-		newdem->supup = DemAt(copy->supupcopy, DemIndex(olddem->supup, orig->supupcopy));
-		newdem->opup = DemAt(copy->supupcopy, DemIndex(olddem->opup, orig->supupcopy));
+		newdem->supbp = (DemsAtB*)DemAt(copy->supbpcopy, DemIndex(olddem->supbp, orig->supbpcopy));
+		newdem->supup = (DemsAtU*)DemAt(copy->supupcopy, DemIndex(olddem->supup, orig->supupcopy));
+		newdem->opup = (DemsAtU*)DemAt(copy->supupcopy, DemIndex(olddem->opup, orig->supupcopy));
 	}
 }
 
@@ -1877,6 +1877,9 @@ void CheckBlType(DemTree* dm, Player* p, int btype, int rtype, int ramt, Vec2i t
 	// determine cost for building's output production
 	while(remain > 0)
 	{
+		g_log<<"\t\t CheckBlType remain="<<remain<<std::endl;
+		g_log.flush();
+
 		int prodstep[RESOURCES];	//production level based on stepleft and bl's output cap
 		int stepleft[RESOURCES];	//how much is still left in this step of the list
 		Zero(prodstep);
@@ -2105,10 +2108,20 @@ void CheckBlTile(DemTree* dm, Player* p, int ri, RDemNode* pt, int x, int z, int
 		Bid bltybid;
 		int blmaxr = maxramt;
 		DemsAtB* demb = NULL;
+
+		g_log<<"\t zx "<<z<<","<<x<<" calling CheckBlType"<<std::endl;
+		g_log.flush();
+
 		CheckBlType(&bldm, p, btype, ri, maxramt, Vec2i(x,z), &bltybid, &blmaxr, success, &demb);
+
+		g_log<<"\t zx "<<z<<","<<x<<" /fini calling CheckBlType"<<std::endl;
+		g_log.flush();
 
 		if(!*success)
 			continue;
+
+		g_log<<"\t zx "<<z<<","<<x<<" /fini calling CheckBlType success"<<std::endl;
+		g_log.flush();
 
 		//int bltyfix = 0;
 		//int bltyrecur = 0;
@@ -2127,6 +2140,9 @@ void CheckBlTile(DemTree* dm, Player* p, int ri, RDemNode* pt, int x, int z, int
 			for(auto diter=rdems.begin(); diter!=rdems.end(); diter++)
 				if(((*diter)->bid.marginpr < leastnext && (*diter)->bid.marginpr > prevprc) || leastnext < 0)
 					leastnext = (*diter)->bid.marginpr;
+
+			g_log<<"\t zx "<<z<<","<<x<<" try price "<<leastnext<<" from "<<prevprc<<std::endl;
+			g_log.flush();
 
 			if(leastnext == prevprc)
 				break;
@@ -2238,8 +2254,14 @@ void CheckBl(DemTree* dm, Player* p, int* fixcost, int* recurprof, bool* success
 		for(int z=0; z<g_hmap.m_widthz; z++)
 			for(int x=0; x<g_hmap.m_widthx; x++)
 			{
+				g_log<<"zx "<<z<<","<<x<<std::endl;
+				g_log.flush();
+
 				DemTree thisdm;
 				DupDT(dm, &thisdm);
+
+				g_log<<"zx "<<z<<","<<x<<" /fini dupdt"<<std::endl;
+				g_log.flush();
 
 				RDemNode tile;
 
@@ -2248,6 +2270,9 @@ void CheckBl(DemTree* dm, Player* p, int* fixcost, int* recurprof, bool* success
 				bool subsuccess;
 				CheckBlTile(&thisdm, p, ri, &tile, x, z, &fixc, &recurp, &subsuccess);
 
+				g_log<<"zx "<<z<<","<<x<<" /fini CheckBlTile"<<std::endl;
+				g_log.flush();
+
 				if(!subsuccess)
 					continue;
 
@@ -2255,10 +2280,16 @@ void CheckBl(DemTree* dm, Player* p, int* fixcost, int* recurprof, bool* success
 
 				if(bestrecurp < 0 || recurp > bestrecurp)
 				{
+					g_log<<"zx "<<z<<","<<x<<" success dupdt"<<std::endl;
+					g_log.flush();
+
 					bestfixc = fixc;
 					bestrecurp = recurp;
 					bestbldm.free();
 					DupDT(&thisdm, &bestbldm);
+
+					g_log<<"zx "<<z<<","<<x<<" /fini success dupdt"<<std::endl;
+					g_log.flush();
 				}
 			}
 
@@ -2295,6 +2326,8 @@ void CalcDem2(Player* p)
 
 	AddBl(dm);
 
+	//return;
+
 	// Point #2 - building for primary demands
 
 	for(int i=0; i<UNITS; i++)
@@ -2314,6 +2347,8 @@ void CalcDem2(Player* p)
 		LabDemE(dm, u, &fundsleft);
 		LabDemF2(dm, u, &fundsleft);
 	}
+
+	//return;
 
 	BlConReq(dm, p);
 
@@ -2340,14 +2375,22 @@ void CalcDem2(Player* p)
 	int fixcost = 0;
 	int recurprof = 0;
 	bool success;
+
+	//return;
+
 	CheckBl(&bldm, p, &fixcost, &recurprof, &success);	//check if there's any profitable building opp
+
+	return;
 
 	//if(recurprof > 0)
 	if(success)
 	{
+		InfoMessage("suc", "suc");
 		dm->free();
 		DupDT(&bldm, dm);
 	}
+	else
+		InfoMessage("f", "f");
 
 	//TO DO: build infrastructure demanded too
 }

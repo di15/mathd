@@ -46,14 +46,13 @@ void Build(Player* p)
 			continue;
 
 		int btype = demb->btype;
-		int pyid = p - g_player;
 
 		Vec2i tpos;
 
 		if(!PlaceBAb(btype, Vec2i(g_hmap.m_widthx/2, g_hmap.m_widthz/2), &tpos))
 			continue;
 
-		PlaceBl(btype, tpos, false, pyid, &demb->bi);
+		PlaceBl(btype, tpos, false, pi, &demb->bi);
 
 		return;
 	}
@@ -69,8 +68,8 @@ void AdjustPrices(Player* p)
 
 void UpdateAI(Player* p)
 {
-	if(p != g_player)
-		return;
+	//if(p != g_player)
+	//	return;
 
 	static bool once = false;
 
@@ -81,6 +80,6 @@ void UpdateAI(Player* p)
 
 	CalcDem2(p);
 	Build(p);
-	Manuf(p);
-	AdjustPrices(p);
+	//Manuf(p);
+	//AdjustPrices(p);
 }

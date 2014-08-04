@@ -3963,8 +3963,7 @@
 	"../math/vec2f.h"
 	"../math/matrix.h"
 
-1406718799 /home/polyfrag/Desktop/Projects/CorpStatesC/aaa004_low3d/common/math/3dmath.h
-	"../platform.h"
+1407126780 /home/polyfrag/Desktop/Projects/CorpStatesC/aaa004_low3d/common/math/3dmath.h
 	"../platform.h"
 
 1406718799 /home/polyfrag/Desktop/Projects/CorpStatesC/aaa004_low3d/common/math/vec3f.h
@@ -4014,13 +4013,7 @@
 	"resources.h"
 	"../math/vec3f.h"
 
-1406718800 /home/polyfrag/Desktop/Projects/CorpStatesC/aaa004_low3d/common/sim/building.h
-	"../math/vec2i.h"
-	"../math/vec3f.h"
-	"../platform.h"
-	"resources.h"
-	"buildingtype.h"
-	"../render/vertexarray.h"
+1407126780 /home/polyfrag/Desktop/Projects/CorpStatesC/aaa004_low3d/common/sim/building.h
 	"../math/vec2i.h"
 	"../math/vec3f.h"
 	"../platform.h"
@@ -4358,8 +4351,7 @@
 	"../widget.h"
 	"../widget.h"
 
-1406718799 /home/polyfrag/Desktop/Projects/CorpStatesC/aaa004_low3d/common/gui/widgets/viewportw.h
-	"../widget.h"
+1407126780 /home/polyfrag/Desktop/Projects/CorpStatesC/aaa004_low3d/common/gui/widgets/viewportw.h
 	"../widget.h"
 
 1406718799 /home/polyfrag/Desktop/Projects/CorpStatesC/aaa004_low3d/common/gui/sprite.h
@@ -4368,7 +4360,7 @@
 	"sprite.h"
 	"sprite.h"
 
-1406718800 /home/polyfrag/Desktop/Projects/CorpStatesC/aaa004_low3d/common/phys/trace.h
+1407126780 /home/polyfrag/Desktop/Projects/CorpStatesC/aaa004_low3d/common/phys/trace.h
 
 1403809155 /home/polyfrag/Desktop/Projects/CorpStatesC/aaa004_low3d/common/ai/binheap.h
 	"../platform.h"
@@ -4884,7 +4876,7 @@
 	"jpspath.h"
 	"pathjob.h"
 
-1406798679 source:/home/polyfrag/Desktop/Projects/CorpStatesC/aaa004_low3d/common/debug.cpp
+1407126780 source:/home/polyfrag/Desktop/Projects/CorpStatesC/aaa004_low3d/common/debug.cpp
 	"platform.h"
 	"debug.h"
 	"utils.h"
@@ -4942,26 +4934,12 @@
 	"cursor.h"
 	"cursor.h"
 
-1406718799 source:/home/polyfrag/Desktop/Projects/CorpStatesC/aaa004_low3d/common/gui/draw2d.cpp
-	"../platform.h"
-	"../render/shader.h"
-	"draw2d.h"
+1407126780 source:/home/polyfrag/Desktop/Projects/CorpStatesC/aaa004_low3d/common/gui/draw2d.cpp
 	"../platform.h"
 	"../render/shader.h"
 	"draw2d.h"
 
-1406718799 source:/home/polyfrag/Desktop/Projects/CorpStatesC/aaa004_low3d/common/gui/font.cpp
-	"../platform.h"
-	"font.h"
-	"../texture.h"
-	"../render/shader.h"
-	"../window.h"
-	"../utils.h"
-	"gui.h"
-	"icon.h"
-	"richtext.h"
-	"../sim/player.h"
-	"../debug.h"
+1407126780 source:/home/polyfrag/Desktop/Projects/CorpStatesC/aaa004_low3d/common/gui/font.cpp
 	"../platform.h"
 	"font.h"
 	"../texture.h"
@@ -4974,21 +4952,7 @@
 	"../sim/player.h"
 	"../debug.h"
 
-1406725577 source:/home/polyfrag/Desktop/Projects/CorpStatesC/aaa004_low3d/common/gui/gui.cpp
-	"gui.h"
-	"../render/shader.h"
-	"../texture.h"
-	"font.h"
-	"../math/3dmath.h"
-	"../platform.h"
-	"../window.h"
-	"draw2d.h"
-	"../render/shadow.h"
-	"../render/heightmap.h"
-	"../../game/gmain.h"
-	"cursor.h"
-	"../sim/player.h"
-	"../debug.h"
+1407126780 source:/home/polyfrag/Desktop/Projects/CorpStatesC/aaa004_low3d/common/gui/gui.cpp
 	"gui.h"
 	"../render/shader.h"
 	"../texture.h"
@@ -5132,54 +5096,7 @@
 	"../../sim/player.h"
 	"../../debug.h"
 
-1406718799 source:/home/polyfrag/Desktop/Projects/CorpStatesC/aaa004_low3d/common/gui/widgets/checkbox.cpp
-	"../widget.h"
-	"barbutton.h"
-	"button.h"
-	"checkbox.h"
-	"editbox.h"
-	"dropdowns.h"
-	"image.h"
-	"insdraw.h"
-	"link.h"
-	"listbox.h"
-	"text.h"
-	"textarea.h"
-	"textblock.h"
-	"touchlistener.h"
-	"../../sim/player.h"
-	"../widget.h"
-	"barbutton.h"
-	"button.h"
-	"checkbox.h"
-	"editbox.h"
-	"dropdowns.h"
-	"image.h"
-	"insdraw.h"
-	"link.h"
-	"listbox.h"
-	"text.h"
-	"textarea.h"
-	"textblock.h"
-	"touchlistener.h"
-	"../../sim/player.h"
-
-1406718799 source:/home/polyfrag/Desktop/Projects/CorpStatesC/aaa004_low3d/common/gui/widgets/dropdowns.cpp
-	"../widget.h"
-	"barbutton.h"
-	"button.h"
-	"checkbox.h"
-	"editbox.h"
-	"dropdowns.h"
-	"image.h"
-	"insdraw.h"
-	"link.h"
-	"listbox.h"
-	"text.h"
-	"textarea.h"
-	"textblock.h"
-	"touchlistener.h"
-	"../../sim/player.h"
+1407126780 source:/home/polyfrag/Desktop/Projects/CorpStatesC/aaa004_low3d/common/gui/widgets/checkbox.cpp
 	"../widget.h"
 	"barbutton.h"
 	"button.h"
@@ -5196,7 +5113,7 @@
 	"touchlistener.h"
 	"../../sim/player.h"
 
-1406718799 source:/home/polyfrag/Desktop/Projects/CorpStatesC/aaa004_low3d/common/gui/widgets/editbox.cpp
+1407126780 source:/home/polyfrag/Desktop/Projects/CorpStatesC/aaa004_low3d/common/gui/widgets/dropdowns.cpp
 	"../widget.h"
 	"barbutton.h"
 	"button.h"
@@ -5212,9 +5129,8 @@
 	"textblock.h"
 	"touchlistener.h"
 	"../../sim/player.h"
-	"../gui.h"
-	"../../sys/unicode.h"
-	"../../debug.h"
+
+1407126780 source:/home/polyfrag/Desktop/Projects/CorpStatesC/aaa004_low3d/common/gui/widgets/editbox.cpp
 	"../widget.h"
 	"barbutton.h"
 	"button.h"
@@ -5338,22 +5254,7 @@
 	"textblock.h"
 	"touchlistener.h"
 
-1406718799 source:/home/polyfrag/Desktop/Projects/CorpStatesC/aaa004_low3d/common/gui/widgets/link.cpp
-	"../widget.h"
-	"barbutton.h"
-	"button.h"
-	"checkbox.h"
-	"editbox.h"
-	"dropdowns.h"
-	"image.h"
-	"insdraw.h"
-	"link.h"
-	"listbox.h"
-	"text.h"
-	"textarea.h"
-	"textblock.h"
-	"touchlistener.h"
-	"../../sim/player.h"
+1407126780 source:/home/polyfrag/Desktop/Projects/CorpStatesC/aaa004_low3d/common/gui/widgets/link.cpp
 	"../widget.h"
 	"barbutton.h"
 	"button.h"
@@ -5370,22 +5271,7 @@
 	"touchlistener.h"
 	"../../sim/player.h"
 
-1406718799 source:/home/polyfrag/Desktop/Projects/CorpStatesC/aaa004_low3d/common/gui/widgets/listbox.cpp
-	"../widget.h"
-	"barbutton.h"
-	"button.h"
-	"checkbox.h"
-	"editbox.h"
-	"dropdowns.h"
-	"image.h"
-	"insdraw.h"
-	"link.h"
-	"listbox.h"
-	"text.h"
-	"textarea.h"
-	"textblock.h"
-	"touchlistener.h"
-	"../../sim/player.h"
+1407126780 source:/home/polyfrag/Desktop/Projects/CorpStatesC/aaa004_low3d/common/gui/widgets/listbox.cpp
 	"../widget.h"
 	"barbutton.h"
 	"button.h"
@@ -5504,32 +5390,7 @@
 	"../../widget.h"
 	"../viewportw.h"
 
-1406718799 source:/home/polyfrag/Desktop/Projects/CorpStatesC/aaa004_low3d/common/gui/widgets/spez/constructionview.cpp
-	"../../widget.h"
-	"../barbutton.h"
-	"../button.h"
-	"../checkbox.h"
-	"../editbox.h"
-	"../dropdowns.h"
-	"../image.h"
-	"../insdraw.h"
-	"../link.h"
-	"../listbox.h"
-	"../text.h"
-	"../textarea.h"
-	"../textblock.h"
-	"../touchlistener.h"
-	"../frame.h"
-	"constructionview.h"
-	"../../../platform.h"
-	"../viewportw.h"
-	"../../../../game/gui/gviewport.h"
-	"../../../sim/building.h"
-	"../../../sim/buildingtype.h"
-	"../../../sim/road.h"
-	"../../../sim/crpipe.h"
-	"../../../sim/powl.h"
-	"../../../sim/player.h"
+1406798646 source:/home/polyfrag/Desktop/Projects/CorpStatesC/aaa004_low3d/common/gui/widgets/spez/constructionview.cpp
 	"../../widget.h"
 	"../barbutton.h"
 	"../button.h"
@@ -5556,25 +5417,7 @@
 	"../../../sim/powl.h"
 	"../../../sim/player.h"
 
-1406718799 source:/home/polyfrag/Desktop/Projects/CorpStatesC/aaa004_low3d/common/gui/widgets/spez/resticker.cpp
-	"../../widget.h"
-	"../barbutton.h"
-	"../button.h"
-	"../checkbox.h"
-	"../editbox.h"
-	"../dropdowns.h"
-	"../image.h"
-	"../insdraw.h"
-	"../link.h"
-	"../listbox.h"
-	"../text.h"
-	"../textarea.h"
-	"../textblock.h"
-	"../touchlistener.h"
-	"../frame.h"
-	"resticker.h"
-	"../../../platform.h"
-	"../../../sim/player.h"
+1407126780 source:/home/polyfrag/Desktop/Projects/CorpStatesC/aaa004_low3d/common/gui/widgets/spez/resticker.cpp
 	"../../widget.h"
 	"../barbutton.h"
 	"../button.h"
@@ -5598,21 +5441,7 @@
 	"../../widget.h"
 	"../../widget.h"
 
-1406720340 source:/home/polyfrag/Desktop/Projects/CorpStatesC/aaa004_low3d/common/gui/widgets/text.cpp
-	"../widget.h"
-	"barbutton.h"
-	"button.h"
-	"checkbox.h"
-	"editbox.h"
-	"dropdowns.h"
-	"image.h"
-	"insdraw.h"
-	"link.h"
-	"listbox.h"
-	"text.h"
-	"textarea.h"
-	"textblock.h"
-	"touchlistener.h"
+1407126780 source:/home/polyfrag/Desktop/Projects/CorpStatesC/aaa004_low3d/common/gui/widgets/text.cpp
 	"../widget.h"
 	"barbutton.h"
 	"button.h"
@@ -5724,28 +5553,7 @@
 	"touchlistener.h"
 	"../../sim/player.h"
 
-1406718799 source:/home/polyfrag/Desktop/Projects/CorpStatesC/aaa004_low3d/common/gui/widgets/viewportw.cpp
-	"../widget.h"
-	"barbutton.h"
-	"button.h"
-	"checkbox.h"
-	"editbox.h"
-	"dropdowns.h"
-	"image.h"
-	"insdraw.h"
-	"link.h"
-	"listbox.h"
-	"text.h"
-	"textarea.h"
-	"textblock.h"
-	"touchlistener.h"
-	"viewportw.h"
-	"../../platform.h"
-	"../../window.h"
-	"../../render/shader.h"
-	"../gui.h"
-	"../../sim/player.h"
-	"../../debug.h"
+1407126780 source:/home/polyfrag/Desktop/Projects/CorpStatesC/aaa004_low3d/common/gui/widgets/viewportw.cpp
 	"../widget.h"
 	"barbutton.h"
 	"button.h"
@@ -5768,11 +5576,7 @@
 	"../../sim/player.h"
 	"../../debug.h"
 
-1406718799 source:/home/polyfrag/Desktop/Projects/CorpStatesC/aaa004_low3d/common/gui/widgets/vscrollbar.cpp
-	"vscrollbar.h"
-	"../../sim/player.h"
-	"../../render/shader.h"
-	"../../debug.h"
+1407126780 source:/home/polyfrag/Desktop/Projects/CorpStatesC/aaa004_low3d/common/gui/widgets/vscrollbar.cpp
 	"vscrollbar.h"
 	"../../sim/player.h"
 	"../../render/shader.h"
@@ -5786,12 +5590,7 @@
 	"image.h"
 	"../cursor.h"
 
-1406718799 source:/home/polyfrag/Desktop/Projects/CorpStatesC/aaa004_low3d/common/gui/widgets/windoww.cpp
-	"../gui.h"
-	"../../texture.h"
-	"../../sim/player.h"
-	"windoww.h"
-	"../../debug.h"
+1407126780 source:/home/polyfrag/Desktop/Projects/CorpStatesC/aaa004_low3d/common/gui/widgets/windoww.cpp
 	"../gui.h"
 	"../../texture.h"
 	"../../sim/player.h"
@@ -5808,22 +5607,7 @@
 	"../cursor.h"
 	"vscrollbar.h"
 
-1406718799 source:/home/polyfrag/Desktop/Projects/CorpStatesC/aaa004_low3d/common/math/3dmath.cpp
-	"3dmath.h"
-	"../utils.h"
-	"physics.h"
-	"../window.h"
-	"../gui/gui.h"
-	"vec3f.h"
-	"camera.h"
-	"quaternion.h"
-	"vec4f.h"
-	"matrix.h"
-	"vec3i.h"
-	"plane3f.h"
-	"../window.h"
-	"../sim/player.h"
-	"fixmath.h"
+1407126780 source:/home/polyfrag/Desktop/Projects/CorpStatesC/aaa004_low3d/common/math/3dmath.cpp
 	"3dmath.h"
 	"../utils.h"
 	"physics.h"
@@ -5850,8 +5634,7 @@
 	"vec3f.h"
 	"physics.h"
 
-1406718799 source:/home/polyfrag/Desktop/Projects/CorpStatesC/aaa004_low3d/common/math/barycentric.cpp
-	"../platform.h"
+1407126780 source:/home/polyfrag/Desktop/Projects/CorpStatesC/aaa004_low3d/common/math/barycentric.cpp
 	"../platform.h"
 
 1406718799 source:/home/polyfrag/Desktop/Projects/CorpStatesC/aaa004_low3d/common/math/brush.cpp
@@ -5912,10 +5695,7 @@
 
 1403550568 source:/home/polyfrag/Desktop/Projects/CorpStatesC/aaa004_low3d/common/math/edge.cpp
 
-1406718799 source:/home/polyfrag/Desktop/Projects/CorpStatesC/aaa004_low3d/common/math/frustum.cpp
-	"frustum.h"
-	"../utils.h"
-	"../platform.h"
+1407126780 source:/home/polyfrag/Desktop/Projects/CorpStatesC/aaa004_low3d/common/math/frustum.cpp
 	"frustum.h"
 	"../utils.h"
 	"../platform.h"
@@ -5928,17 +5708,7 @@
 	"3dmath.h"
 	"plane3f.h"
 
-1406718799 source:/home/polyfrag/Desktop/Projects/CorpStatesC/aaa004_low3d/common/math/hmapmath.cpp
-	"../render/heightmap.h"
-	"../math/vec3f.h"
-	"../math/polygon.h"
-	"../math/3dmath.h"
-	"hmapmath.h"
-	"../render/water.h"
-	"../utils.h"
-	"../phys/collision.h"
-	"../window.h"
-	"../math/camera.h"
+1407126780 source:/home/polyfrag/Desktop/Projects/CorpStatesC/aaa004_low3d/common/math/hmapmath.cpp
 	"../render/heightmap.h"
 	"../math/vec3f.h"
 	"../math/polygon.h"
@@ -6004,10 +5774,7 @@
 	"3dmath.h"
 	"../utils.h"
 
-1406718799 source:/home/polyfrag/Desktop/Projects/CorpStatesC/aaa004_low3d/common/math/polygon.cpp
-	"polygon.h"
-	"3dmath.h"
-	"../utils.h"
+1407126780 source:/home/polyfrag/Desktop/Projects/CorpStatesC/aaa004_low3d/common/math/polygon.cpp
 	"polygon.h"
 	"3dmath.h"
 	"../utils.h"
@@ -6048,15 +5815,7 @@
 	"vec4f.h"
 	"vec3f.h"
 
-1406718800 source:/home/polyfrag/Desktop/Projects/CorpStatesC/aaa004_low3d/common/phys/collision.cpp
-	"collision.h"
-	"../sim/building.h"
-	"../sim/buildingtype.h"
-	"../sim/unit.h"
-	"../sim/unittype.h"
-	"../render/heightmap.h"
-	"../sim/crpipe.h"
-	"../sim/powl.h"
+1406798679 source:/home/polyfrag/Desktop/Projects/CorpStatesC/aaa004_low3d/common/phys/collision.cpp
 	"collision.h"
 	"../sim/building.h"
 	"../sim/buildingtype.h"
@@ -6066,28 +5825,7 @@
 	"../sim/crpipe.h"
 	"../sim/powl.h"
 
-1406718800 source:/home/polyfrag/Desktop/Projects/CorpStatesC/aaa004_low3d/common/phys/trace.cpp
-	"../path/collidertile.h"
-	"../math/vec2i.h"
-	"../math/3dmath.h"
-	"../sim/unit.h"
-	"../sim/unittype.h"
-	"../sim/building.h"
-	"../sim/buildingtype.h"
-	"../render/heightmap.h"
-	"../math/hmapmath.h"
-	"collision.h"
-	"../sim/road.h"
-	"../render/water.h"
-	"../utils.h"
-	"../render/shader.h"
-	"../sim/selection.h"
-	"../sim/sim.h"
-	"../math/3dmath.h"
-	"collision.h"
-	"../math/vec2i.h"
-	"../math/plane2i.h"
-	"../path/pathnode.h"
+1407126780 source:/home/polyfrag/Desktop/Projects/CorpStatesC/aaa004_low3d/common/phys/trace.cpp
 	"../path/collidertile.h"
 	"../math/vec2i.h"
 	"../math/3dmath.h"
@@ -6176,20 +5914,7 @@
 	"vertexarray.h"
 	"vertexarray.h"
 
-1406718800 source:/home/polyfrag/Desktop/Projects/CorpStatesC/aaa004_low3d/common/render/foliage.cpp
-	"../texture.h"
-	"foliage.h"
-	"water.h"
-	"shader.h"
-	"../math/camera.h"
-	"model.h"
-	"../math/frustum.h"
-	"vertexarray.h"
-	"heightmap.h"
-	"../utils.h"
-	"../window.h"
-	"../sim/player.h"
-	"../render/shadow.h"
+1407126780 source:/home/polyfrag/Desktop/Projects/CorpStatesC/aaa004_low3d/common/render/foliage.cpp
 	"../texture.h"
 	"foliage.h"
 	"water.h"
@@ -6204,34 +5929,7 @@
 	"../sim/player.h"
 	"../render/shadow.h"
 
-1406718800 source:/home/polyfrag/Desktop/Projects/CorpStatesC/aaa004_low3d/common/render/heightmap.cpp
-	"../platform.h"
-	"heightmap.h"
-	"../render/shader.h"
-	"../render/shadow.h"
-	"../texture.h"
-	"../gui/gui.h"
-	"../gui/icon.h"
-	"../math/vec4f.h"
-	"../math/3dmath.h"
-	"../math/vec3f.h"
-	"../math/vec2f.h"
-	"../utils.h"
-	"../math/camera.h"
-	"../window.h"
-	"../math/polygon.h"
-	"../math/physics.h"
-	"../sim/road.h"
-	"../sim/powl.h"
-	"../sim/crpipe.h"
-	"../math/plane3f.h"
-	"../path/collidertile.h"
-	"foliage.h"
-	"../save/savemap.h"
-	"../texture.h"
-	"water.h"
-	"../sim/player.h"
-	"../debug.h"
+1407126780 source:/home/polyfrag/Desktop/Projects/CorpStatesC/aaa004_low3d/common/render/heightmap.cpp
 	"../platform.h"
 	"heightmap.h"
 	"../render/shader.h"
@@ -6286,18 +5984,7 @@
 	"dmdmodel.h"
 	"shadow.h"
 
-1406718800 source:/home/polyfrag/Desktop/Projects/CorpStatesC/aaa004_low3d/common/render/ms3d.cpp
-	"ms3d.h"
-	"../texture.h"
-	"../utils.h"
-	"model.h"
-	"../platform.h"
-	"../math/vec3f.h"
-	"../math/quaternion.h"
-	"../math/matrix.h"
-	"../math/3dmath.h"
-	"../math/matrix.h"
-	"vertexarray.h"
+1407126780 source:/home/polyfrag/Desktop/Projects/CorpStatesC/aaa004_low3d/common/render/ms3d.cpp
 	"ms3d.h"
 	"../texture.h"
 	"../utils.h"
@@ -6360,13 +6047,7 @@
 	"../texture.h"
 	"../sim/player.h"
 
-1406718800 source:/home/polyfrag/Desktop/Projects/CorpStatesC/aaa004_low3d/common/render/shader.cpp
-	"../utils.h"
-	"shader.h"
-	"../platform.h"
-	"../window.h"
-	"../sim/player.h"
-	"../debug.h"
+1407126780 source:/home/polyfrag/Desktop/Projects/CorpStatesC/aaa004_low3d/common/render/shader.cpp
 	"../utils.h"
 	"shader.h"
 	"../platform.h"
@@ -6374,26 +6055,7 @@
 	"../sim/player.h"
 	"../debug.h"
 
-1406718800 source:/home/polyfrag/Desktop/Projects/CorpStatesC/aaa004_low3d/common/render/shadow.cpp
-	"../utils.h"
-	"shadow.h"
-	"shader.h"
-	"../math/3dmath.h"
-	"model.h"
-	"particle.h"
-	"projectile.h"
-	"../debug.h"
-	"billboard.h"
-	"../platform.h"
-	"../window.h"
-	"../math/vec3f.h"
-	"../math/matrix.h"
-	"model.h"
-	"../sim/sim.h"
-	"model.h"
-	"../math/camera.h"
-	"../window.h"
-	"../../game/gmain.h"
+1407126780 source:/home/polyfrag/Desktop/Projects/CorpStatesC/aaa004_low3d/common/render/shadow.cpp
 	"../utils.h"
 	"shadow.h"
 	"shader.h"
@@ -6414,19 +6076,7 @@
 	"../window.h"
 	"../../game/gmain.h"
 
-1406718800 source:/home/polyfrag/Desktop/Projects/CorpStatesC/aaa004_low3d/common/render/skybox.cpp
-	"../platform.h"
-	"skybox.h"
-	"../math/3dmath.h"
-	"shader.h"
-	"../texture.h"
-	"../math/matrix.h"
-	"shader.h"
-	"../math/vec3f.h"
-	"../utils.h"
-	"../debug.h"
-	"../path/pathdebug.h"
-	"shadow.h"
+1407126780 source:/home/polyfrag/Desktop/Projects/CorpStatesC/aaa004_low3d/common/render/skybox.cpp
 	"../platform.h"
 	"skybox.h"
 	"../math/3dmath.h"
@@ -6468,17 +6118,7 @@
 	"vertexarray.h"
 	"vertexarray.h"
 
-1406718800 source:/home/polyfrag/Desktop/Projects/CorpStatesC/aaa004_low3d/common/render/water.cpp
-	"water.h"
-	"shader.h"
-	"../math/vec3f.h"
-	"../texture.h"
-	"heightmap.h"
-	"../window.h"
-	"../save/savemap.h"
-	"../sim/player.h"
-	"shadow.h"
-	"../debug.h"
+1407126780 source:/home/polyfrag/Desktop/Projects/CorpStatesC/aaa004_low3d/common/render/water.cpp
 	"water.h"
 	"shader.h"
 	"../math/vec3f.h"
@@ -6490,32 +6130,7 @@
 	"shadow.h"
 	"../debug.h"
 
-1406718800 source:/home/polyfrag/Desktop/Projects/CorpStatesC/aaa004_low3d/common/save/savemap.cpp
-	"../render/heightmap.h"
-	"../texture.h"
-	"../utils.h"
-	"../math/vec3f.h"
-	"../window.h"
-	"../math/camera.h"
-	"../sim/unit.h"
-	"../sim/unittype.h"
-	"../math/hmapmath.h"
-	"../render/foliage.h"
-	"../sim/unit.h"
-	"../render/foliage.h"
-	"savemap.h"
-	"../sim/building.h"
-	"../sim/road.h"
-	"../sim/powl.h"
-	"../sim/crpipe.h"
-	"../sim/deposit.h"
-	"../render/water.h"
-	"../sim/player.h"
-	"../sim/selection.h"
-	"../path/collidertile.h"
-	"../path/pathjob.h"
-	"../path/pathnode.h"
-	"../debug.h"
+1407126780 source:/home/polyfrag/Desktop/Projects/CorpStatesC/aaa004_low3d/common/save/savemap.cpp
 	"../render/heightmap.h"
 	"../texture.h"
 	"../utils.h"
@@ -6558,37 +6173,7 @@
 	"../platform.h"
 	"../platform.h"
 
-1406725790 source:/home/polyfrag/Desktop/Projects/CorpStatesC/aaa004_low3d/common/sim/build.cpp
-	"build.h"
-	"buildingtype.h"
-	"road.h"
-	"powl.h"
-	"crpipe.h"
-	"../render/shader.h"
-	"../platform.h"
-	"../window.h"
-	"../math/camera.h"
-	"../render/heightmap.h"
-	"../math/hmapmath.h"
-	"building.h"
-	"../utils.h"
-	"unittype.h"
-	"unit.h"
-	"../render/water.h"
-	"../phys/collision.h"
-	"../gui/richtext.h"
-	"../gui/font.h"
-	"../math/vec4f.h"
-	"../gui/icon.h"
-	"player.h"
-	"../../game/gmain.h"
-	"../gui/gui.h"
-	"../gui/widget.h"
-	"../gui/widgets/spez/constructionview.h"
-	"../render/foliage.h"
-	"unitmove.h"
-	"sim.h"
-	"../math/fixmath.h"
+1407126780 source:/home/polyfrag/Desktop/Projects/CorpStatesC/aaa004_low3d/common/sim/build.cpp
 	"build.h"
 	"buildingtype.h"
 	"road.h"
@@ -6624,34 +6209,7 @@
 	"../math/vec3f.h"
 	"../math/vec2i.h"
 
-1406718800 source:/home/polyfrag/Desktop/Projects/CorpStatesC/aaa004_low3d/common/sim/building.cpp
-	"building.h"
-	"../math/hmapmath.h"
-	"../render/heightmap.h"
-	"buildingtype.h"
-	"../render/model.h"
-	"../render/foliage.h"
-	"../phys/collision.h"
-	"../render/water.h"
-	"../render/shader.h"
-	"../math/barycentric.h"
-	"../math/physics.h"
-	"player.h"
-	"../render/transaction.h"
-	"selection.h"
-	"../gui/gui.h"
-	"../gui/widget.h"
-	"../gui/widgets/spez/constructionview.h"
-	"powl.h"
-	"road.h"
-	"crpipe.h"
-	"../../game/gmain.h"
-	"../render/shadow.h"
-	"../math/frustum.h"
-	"unit.h"
-	"labourer.h"
-	"../econ/demand.h"
-	"../math/fixmath.h"
+1407126780 source:/home/polyfrag/Desktop/Projects/CorpStatesC/aaa004_low3d/common/sim/building.cpp
 	"building.h"
 	"../math/hmapmath.h"
 	"../render/heightmap.h"
@@ -6680,11 +6238,9 @@
 	"../econ/demand.h"
 	"../math/fixmath.h"
 
-1406718799 /home/polyfrag/Desktop/Projects/CorpStatesC/aaa004_low3d/common/math/barycentric.h
+1407126780 /home/polyfrag/Desktop/Projects/CorpStatesC/aaa004_low3d/common/math/barycentric.h
 
-1406718800 source:/home/polyfrag/Desktop/Projects/CorpStatesC/aaa004_low3d/common/sim/buildingtype.cpp
-	"../render/model.h"
-	"buildingtype.h"
+1406798646 source:/home/polyfrag/Desktop/Projects/CorpStatesC/aaa004_low3d/common/sim/buildingtype.cpp
 	"../render/model.h"
 	"buildingtype.h"
 
@@ -6752,18 +6308,7 @@
 	"../math/vec4f.h"
 	"player.h"
 
-1406718800 source:/home/polyfrag/Desktop/Projects/CorpStatesC/aaa004_low3d/common/sim/labourer.cpp
-	"labourer.h"
-	"../platform.h"
-	"../econ/demand.h"
-	"unittype.h"
-	"player.h"
-	"building.h"
-	"../econ/utility.h"
-	"../script/console.h"
-	"sim.h"
-	"job.h"
-	"unitmove.h"
+1407126780 source:/home/polyfrag/Desktop/Projects/CorpStatesC/aaa004_low3d/common/sim/labourer.cpp
 	"labourer.h"
 	"../platform.h"
 	"../econ/demand.h"
@@ -6780,22 +6325,7 @@
 	"unit.h"
 	"unit.h"
 
-1406718800 source:/home/polyfrag/Desktop/Projects/CorpStatesC/aaa004_low3d/common/sim/order.cpp
-	"order.h"
-	"../render/shader.h"
-	"selection.h"
-	"unit.h"
-	"unittype.h"
-	"../render/heightmap.h"
-	"sim.h"
-	"../window.h"
-	"../texture.h"
-	"../utils.h"
-	"../math/matrix.h"
-	"../math/hmapmath.h"
-	"../sound/sound.h"
-	"player.h"
-	"../render/shadow.h"
+1406798679 source:/home/polyfrag/Desktop/Projects/CorpStatesC/aaa004_low3d/common/sim/order.cpp
 	"order.h"
 	"../render/shader.h"
 	"selection.h"
@@ -6860,32 +6390,12 @@
 	"../../game/gmain.h"
 	"building.h"
 
-1406718800 source:/home/polyfrag/Desktop/Projects/CorpStatesC/aaa004_low3d/common/sim/resources.cpp
-	"resources.h"
-	"building.h"
-	"buildingtype.h"
+1406798646 source:/home/polyfrag/Desktop/Projects/CorpStatesC/aaa004_low3d/common/sim/resources.cpp
 	"resources.h"
 	"building.h"
 	"buildingtype.h"
 
-1406718800 source:/home/polyfrag/Desktop/Projects/CorpStatesC/aaa004_low3d/common/sim/road.cpp
-	"road.h"
-	"../render/heightmap.h"
-	"player.h"
-	"../render/shader.h"
-	"../math/hmapmath.h"
-	"../render/foliage.h"
-	"../phys/collision.h"
-	"../math/3dmath.h"
-	"building.h"
-	"buildingtype.h"
-	"../../game/gmain.h"
-	"../render/water.h"
-	"../math/polygon.h"
-	"../../game/gui/ggui.h"
-	"../utils.h"
-	"../path/pathnode.h"
-	"../path/collidertile.h"
+1406798646 source:/home/polyfrag/Desktop/Projects/CorpStatesC/aaa004_low3d/common/sim/road.cpp
 	"road.h"
 	"../render/heightmap.h"
 	"player.h"
@@ -6904,29 +6414,7 @@
 	"../path/pathnode.h"
 	"../path/collidertile.h"
 
-1406718800 source:/home/polyfrag/Desktop/Projects/CorpStatesC/aaa004_low3d/common/sim/selection.cpp
-	"selection.h"
-	"../math/matrix.h"
-	"../window.h"
-	"../math/plane3f.h"
-	"../math/frustum.h"
-	"../math/brush.h"
-	"unittype.h"
-	"unit.h"
-	"buildingtype.h"
-	"building.h"
-	"../render/shader.h"
-	"../texture.h"
-	"../math/hmapmath.h"
-	"../utils.h"
-	"../../game/gmain.h"
-	"build.h"
-	"player.h"
-	"../gui/widgets/spez/constructionview.h"
-	"../gui/gui.h"
-	"powl.h"
-	"crpipe.h"
-	"road.h"
+1407126780 source:/home/polyfrag/Desktop/Projects/CorpStatesC/aaa004_low3d/common/sim/selection.cpp
 	"selection.h"
 	"../math/matrix.h"
 	"../window.h"
@@ -6950,34 +6438,14 @@
 	"crpipe.h"
 	"road.h"
 
-1406718800 source:/home/polyfrag/Desktop/Projects/CorpStatesC/aaa004_low3d/common/sim/sim.cpp
-	"sim.h"
-	"../script/console.h"
-	"infrastructure.h"
-	"road.h"
-	"building.h"
+1407126780 source:/home/polyfrag/Desktop/Projects/CorpStatesC/aaa004_low3d/common/sim/sim.cpp
 	"sim.h"
 	"../script/console.h"
 	"infrastructure.h"
 	"road.h"
 	"building.h"
 
-1406718800 source:/home/polyfrag/Desktop/Projects/CorpStatesC/aaa004_low3d/common/sim/unit.cpp
-	"unit.h"
-	"../render/shader.h"
-	"unittype.h"
-	"../texture.h"
-	"../utils.h"
-	"player.h"
-	"../render/model.h"
-	"../math/hmapmath.h"
-	"unitmove.h"
-	"sim.h"
-	"labourer.h"
-	"../debug.h"
-	"../math/frustum.h"
-	"building.h"
-	"labourer.h"
+1407126780 source:/home/polyfrag/Desktop/Projects/CorpStatesC/aaa004_low3d/common/sim/unit.cpp
 	"unit.h"
 	"../render/shader.h"
 	"unittype.h"
@@ -6996,29 +6464,7 @@
 
 1406718800 /home/polyfrag/Desktop/Projects/CorpStatesC/aaa004_low3d/common/sim/unitmove.h
 
-1406718800 source:/home/polyfrag/Desktop/Projects/CorpStatesC/aaa004_low3d/common/sim/unitmove.cpp
-	"unit.h"
-	"../render/shader.h"
-	"unittype.h"
-	"../texture.h"
-	"../utils.h"
-	"player.h"
-	"../render/model.h"
-	"../math/hmapmath.h"
-	"unitmove.h"
-	"../render/transaction.h"
-	"sim.h"
-	"../phys/trace.h"
-	"../phys/collision.h"
-	"../path/collidertile.h"
-	"../path/pathdebug.h"
-	"../sim/buildingtype.h"
-	"../sim/building.h"
-	"../path/jpspath.h"
-	"../path/jpspartpath.h"
-	"../path/pathnode.h"
-	"../path/partialpath.h"
-	"labourer.h"
+1407126780 source:/home/polyfrag/Desktop/Projects/CorpStatesC/aaa004_low3d/common/sim/unitmove.cpp
 	"unit.h"
 	"../render/shader.h"
 	"unittype.h"
@@ -7056,11 +6502,7 @@
 	"../math/vec2i.h"
 	"../platform.h"
 
-1406718800 source:/home/polyfrag/Desktop/Projects/CorpStatesC/aaa004_low3d/common/sim/unittype.cpp
-	"unittype.h"
-	"../texture.h"
-	"resources.h"
-	"../render/model.h"
+1406798679 source:/home/polyfrag/Desktop/Projects/CorpStatesC/aaa004_low3d/common/sim/unittype.cpp
 	"unittype.h"
 	"../texture.h"
 	"resources.h"
@@ -7078,13 +6520,7 @@
 	"unicode.h"
 	"../utils.h"
 
-1406718800 source:/home/polyfrag/Desktop/Projects/CorpStatesC/aaa004_low3d/common/texture.cpp
-	"platform.h"
-	"texture.h"
-	"render/model.h"
-	"gui/gui.h"
-	"utils.h"
-	"debug.h"
+1407126780 source:/home/polyfrag/Desktop/Projects/CorpStatesC/aaa004_low3d/common/texture.cpp
 	"platform.h"
 	"texture.h"
 	"render/model.h"
@@ -7238,35 +6674,7 @@
 	"../../common/platform.h"
 	"../../common/platform.h"
 
-1406725707 source:/home/polyfrag/Desktop/Projects/CorpStatesC/aaa004_low3d/game/gui/ggui.cpp
-	"../gmain.h"
-	"../../common/gui/gui.h"
-	"../keymap.h"
-	"../../common/render/heightmap.h"
-	"../../common/math/hmapmath.h"
-	"../../common/math/camera.h"
-	"../../common/render/shadow.h"
-	"../../common/render/screenshot.h"
-	"../../common/save/savemap.h"
-	"editorgui.h"
-	"playgui.h"
-	"../../common/sim/unit.h"
-	"../../common/sim/unittype.h"
-	"../../common/sim/building.h"
-	"../../common/sim/buildingtype.h"
-	"../../common/sim/selection.h"
-	"../../common/sim/road.h"
-	"../../common/sim/powl.h"
-	"../../common/sim/crpipe.h"
-	"../../common/render/water.h"
-	"../../common/sim/order.h"
-	"../../common/path/pathdebug.h"
-	"../../common/path/pathnode.h"
-	"../../common/sim/build.h"
-	"../../common/sim/player.h"
-	"../../common/gui/widgets/windoww.h"
-	"../../common/debug.h"
-	"../../common/script/console.h"
+1407126780 source:/home/polyfrag/Desktop/Projects/CorpStatesC/aaa004_low3d/game/gui/ggui.cpp
 	"../gmain.h"
 	"../../common/gui/gui.h"
 	"../keymap.h"
@@ -7298,34 +6706,7 @@
 
 1406718800 /home/polyfrag/Desktop/Projects/CorpStatesC/aaa004_low3d/game/gui/playgui.h
 
-1406718800 source:/home/polyfrag/Desktop/Projects/CorpStatesC/aaa004_low3d/game/gui/gviewport.cpp
-	"../../common/render/shader.h"
-	"../../common/gui/gui.h"
-	"../../common/math/3dmath.h"
-	"../../common/window.h"
-	"../../common/platform.h"
-	"../../common/gui/font.h"
-	"../../common/math/camera.h"
-	"../../common/math/matrix.h"
-	"../../common/render/shadow.h"
-	"../../common/render/heightmap.h"
-	"../../common/math/vec4f.h"
-	"../../common/math/brush.h"
-	"../../common/math/frustum.h"
-	"../../common/sim/sim.h"
-	"gviewport.h"
-	"../../common/math/hmapmath.h"
-	"../../common/render/water.h"
-	"../../common/save/savemap.h"
-	"../../common/gui/widgets/spez/bottompanel.h"
-	"../../common/sim/buildingtype.h"
-	"../../common/sim/road.h"
-	"../../common/sim/powl.h"
-	"../../common/sim/crpipe.h"
-	"../../common/sim/unittype.h"
-	"../../common/sim/player.h"
-	"../../common/debug.h"
-	"../../common/sim/infrastructure.h"
+1407126780 source:/home/polyfrag/Desktop/Projects/CorpStatesC/aaa004_low3d/game/gui/gviewport.cpp
 	"../../common/render/shader.h"
 	"../../common/gui/gui.h"
 	"../../common/math/3dmath.h"
@@ -7426,16 +6807,7 @@
 	"../common/sim/player.h"
 	"../common/script/console.h"
 
-1406718800 source:/home/polyfrag/Desktop/Projects/CorpStatesC/aaa004_low3d/common/window.cpp
-	"window.h"
-	"texture.h"
-	"render/shader.h"
-	"gui/gui.h"
-	"gui/font.h"
-	"render/shadow.h"
-	"math/3dmath.h"
-	"gui/cursor.h"
-	"sim/player.h"
+1407126780 source:/home/polyfrag/Desktop/Projects/CorpStatesC/aaa004_low3d/common/window.cpp
 	"window.h"
 	"texture.h"
 	"render/shader.h"
@@ -7446,48 +6818,7 @@
 	"gui/cursor.h"
 	"sim/player.h"
 
-1406718800 source:/home/polyfrag/Desktop/Projects/CorpStatesC/aaa004_low3d/game/gmain.cpp
-	"gmain.h"
-	"../common/gui/gui.h"
-	"keymap.h"
-	"../common/render/shader.h"
-	"gres.h"
-	"../common/gui/font.h"
-	"../common/texture.h"
-	"../common/render/model.h"
-	"../common/math/frustum.h"
-	"gui/ggui.h"
-	"../common/gui/gui.h"
-	"../common/debug.h"
-	"../common/render/heightmap.h"
-	"../common/math/camera.h"
-	"../common/render/shadow.h"
-	"../common/window.h"
-	"../common/utils.h"
-	"../common/sim/sim.h"
-	"../common/math/hmapmath.h"
-	"../common/sim/unit.h"
-	"../common/sim/building.h"
-	"../common/sim/build.h"
-	"../common/sim/buildingtype.h"
-	"../common/render/foliage.h"
-	"../common/render/water.h"
-	"../common/sim/road.h"
-	"../common/sim/crpipe.h"
-	"../common/sim/powl.h"
-	"../common/sim/deposit.h"
-	"../common/sim/selection.h"
-	"../common/sim/player.h"
-	"../common/sim/order.h"
-	"../common/render/transaction.h"
-	"../common/path/collidertile.h"
-	"../common/path/pathdebug.h"
-	"gui/playgui.h"
-	"../common/gui/widgets/spez/bottompanel.h"
-	"../common/texture.h"
-	"../common/render/skybox.h"
-	"../common/script/script.h"
-	"../common/ai/ai.h"
+1407126780 source:/home/polyfrag/Desktop/Projects/CorpStatesC/aaa004_low3d/game/gmain.cpp
 	"gmain.h"
 	"../common/gui/gui.h"
 	"keymap.h"
@@ -7532,7 +6863,7 @@
 
 1406718800 /home/polyfrag/Desktop/Projects/CorpStatesC/aaa004_low3d/game/gres.h
 
-1407057374 source:/home/polyfrag/Desktop/Projects/CorpStatesC/aaa004_low3d/common/ai/ai.cpp
+1407129114 source:/home/polyfrag/Desktop/Projects/CorpStatesC/aaa004_low3d/common/ai/ai.cpp
 	"../sim/player.h"
 	"ai.h"
 	"../econ/demand.h"
@@ -7543,13 +6874,7 @@
 
 1406718799 /home/polyfrag/Desktop/Projects/CorpStatesC/aaa004_low3d/common/ai/ai.h
 
-1406718800 /home/polyfrag/Desktop/Projects/CorpStatesC/aaa004_low3d/common/sim/infrastructure.h
-	"connectable.h"
-	"resources.h"
-	"../render/model.h"
-	"../render/vertexarray.h"
-	"../math/vec3i.h"
-	"../render/heightmap.h"
+1407126780 /home/polyfrag/Desktop/Projects/CorpStatesC/aaa004_low3d/common/sim/infrastructure.h
 	"connectable.h"
 	"resources.h"
 	"../render/model.h"
@@ -7561,40 +6886,16 @@
 
 1406718799 /home/polyfrag/Desktop/Projects/CorpStatesC/aaa004_low3d/common/econ/utility.h
 
-1406803325 /home/polyfrag/Desktop/Projects/CorpStatesC/aaa004_low3d/common/math/fixmath.h
+1407126780 /home/polyfrag/Desktop/Projects/CorpStatesC/aaa004_low3d/common/math/fixmath.h
 	"../platform.h"
 
-1406718799 source:/home/polyfrag/Desktop/Projects/CorpStatesC/aaa004_low3d/common/econ/utility.cpp
-	"utility.h"
+1407126780 source:/home/polyfrag/Desktop/Projects/CorpStatesC/aaa004_low3d/common/econ/utility.cpp
 	"utility.h"
 
-1406718799 source:/home/polyfrag/Desktop/Projects/CorpStatesC/aaa004_low3d/common/math/fixmath.cpp
-	"fixmath.h"
+1407126780 source:/home/polyfrag/Desktop/Projects/CorpStatesC/aaa004_low3d/common/math/fixmath.cpp
 	"fixmath.h"
 
-1406718800 source:/home/polyfrag/Desktop/Projects/CorpStatesC/aaa004_low3d/common/path/astarpath.cpp
-	"pathnode.h"
-	"collidertile.h"
-	"../math/vec2i.h"
-	"../math/3dmath.h"
-	"../sim/unit.h"
-	"../sim/unittype.h"
-	"../sim/building.h"
-	"../sim/buildingtype.h"
-	"../render/heightmap.h"
-	"../math/hmapmath.h"
-	"../phys/collision.h"
-	"../sim/road.h"
-	"../render/water.h"
-	"../utils.h"
-	"../render/shader.h"
-	"../sim/selection.h"
-	"../sim/sim.h"
-	"../phys/trace.h"
-	"binheap.h"
-	"astarpath.h"
-	"reconstructpath.h"
-	"pathdebug.h"
+1407126780 source:/home/polyfrag/Desktop/Projects/CorpStatesC/aaa004_low3d/common/path/astarpath.cpp
 	"pathnode.h"
 	"collidertile.h"
 	"../math/vec2i.h"
@@ -7636,13 +6937,7 @@
 	"../platform.h"
 	"../platform.h"
 
-1406718800 /home/polyfrag/Desktop/Projects/CorpStatesC/aaa004_low3d/common/path/astarpath.h
-	"../math/vec3i.h"
-	"../math/vec2i.h"
-	"../render/heightmap.h"
-	"../math/vec3f.h"
-	"../math/vec2i.h"
-	"../platform.h"
+1407126780 /home/polyfrag/Desktop/Projects/CorpStatesC/aaa004_low3d/common/path/astarpath.h
 	"../math/vec3i.h"
 	"../math/vec2i.h"
 	"../render/heightmap.h"
@@ -7666,39 +6961,12 @@
 
 1406718800 /home/polyfrag/Desktop/Projects/CorpStatesC/aaa004_low3d/common/path/pathdebug.h
 
-1406718800 source:/home/polyfrag/Desktop/Projects/CorpStatesC/aaa004_low3d/common/path/binheap.cpp
-	"binheap.h"
-	"pathnode.h"
-	"../utils.h"
+1407126780 source:/home/polyfrag/Desktop/Projects/CorpStatesC/aaa004_low3d/common/path/binheap.cpp
 	"binheap.h"
 	"pathnode.h"
 	"../utils.h"
 
-1406718800 source:/home/polyfrag/Desktop/Projects/CorpStatesC/aaa004_low3d/common/path/collidertile.cpp
-	"collidertile.h"
-	"../math/vec2i.h"
-	"../math/3dmath.h"
-	"../sim/unit.h"
-	"../sim/unittype.h"
-	"../sim/building.h"
-	"../sim/buildingtype.h"
-	"../render/heightmap.h"
-	"../math/hmapmath.h"
-	"../phys/collision.h"
-	"../sim/road.h"
-	"../render/water.h"
-	"../utils.h"
-	"../render/shader.h"
-	"../sim/selection.h"
-	"../sim/sim.h"
-	"../phys/trace.h"
-	"binheap.h"
-	"pathnode.h"
-	"../math/vec2i.h"
-	"pathdebug.h"
-	"pathjob.h"
-	"../debug.h"
-	"../sim/infrastructure.h"
+1406798679 source:/home/polyfrag/Desktop/Projects/CorpStatesC/aaa004_low3d/common/path/collidertile.cpp
 	"collidertile.h"
 	"../math/vec2i.h"
 	"../math/3dmath.h"
@@ -7724,33 +6992,7 @@
 	"../debug.h"
 	"../sim/infrastructure.h"
 
-1406718800 source:/home/polyfrag/Desktop/Projects/CorpStatesC/aaa004_low3d/common/path/jpsexpansion.cpp
-	"pathnode.h"
-	"collidertile.h"
-	"../math/vec2i.h"
-	"../math/3dmath.h"
-	"../sim/unit.h"
-	"../sim/unittype.h"
-	"../sim/building.h"
-	"../sim/buildingtype.h"
-	"../render/heightmap.h"
-	"../math/hmapmath.h"
-	"../phys/collision.h"
-	"../sim/road.h"
-	"../render/water.h"
-	"../utils.h"
-	"../render/shader.h"
-	"../sim/selection.h"
-	"../sim/sim.h"
-	"../phys/trace.h"
-	"binheap.h"
-	"jpspath.h"
-	"reconstructpath.h"
-	"pathdebug.h"
-	"jpsexpansion.h"
-	"pathjob.h"
-	"../utils.h"
-	"../debug.h"
+1407126780 source:/home/polyfrag/Desktop/Projects/CorpStatesC/aaa004_low3d/common/path/jpsexpansion.cpp
 	"pathnode.h"
 	"collidertile.h"
 	"../math/vec2i.h"
@@ -7778,13 +7020,7 @@
 	"../utils.h"
 	"../debug.h"
 
-1406718800 /home/polyfrag/Desktop/Projects/CorpStatesC/aaa004_low3d/common/path/jpspath.h
-	"../math/vec3i.h"
-	"../math/vec2i.h"
-	"../render/heightmap.h"
-	"../math/vec3f.h"
-	"../math/vec2i.h"
-	"../platform.h"
+1407126780 /home/polyfrag/Desktop/Projects/CorpStatesC/aaa004_low3d/common/path/jpspath.h
 	"../math/vec3i.h"
 	"../math/vec2i.h"
 	"../render/heightmap.h"
@@ -7806,31 +7042,7 @@
 	"../math/vec2i.h"
 	"../platform.h"
 
-1406718800 source:/home/polyfrag/Desktop/Projects/CorpStatesC/aaa004_low3d/common/path/jpspartpath.cpp
-	"pathnode.h"
-	"collidertile.h"
-	"../math/vec2i.h"
-	"../math/3dmath.h"
-	"../sim/unit.h"
-	"../sim/unittype.h"
-	"../sim/building.h"
-	"../sim/buildingtype.h"
-	"../render/heightmap.h"
-	"../math/hmapmath.h"
-	"../phys/collision.h"
-	"../sim/road.h"
-	"../render/water.h"
-	"../utils.h"
-	"../render/shader.h"
-	"../sim/selection.h"
-	"../sim/sim.h"
-	"../phys/trace.h"
-	"binheap.h"
-	"jpspath.h"
-	"reconstructpath.h"
-	"pathdebug.h"
-	"jpsexpansion.h"
-	"pathjob.h"
+1407126780 source:/home/polyfrag/Desktop/Projects/CorpStatesC/aaa004_low3d/common/path/jpspartpath.cpp
 	"pathnode.h"
 	"collidertile.h"
 	"../math/vec2i.h"
@@ -7856,31 +7068,7 @@
 	"jpsexpansion.h"
 	"pathjob.h"
 
-1406718800 source:/home/polyfrag/Desktop/Projects/CorpStatesC/aaa004_low3d/common/path/jpspath.cpp
-	"pathnode.h"
-	"collidertile.h"
-	"../math/vec2i.h"
-	"../math/3dmath.h"
-	"../sim/unit.h"
-	"../sim/unittype.h"
-	"../sim/building.h"
-	"../sim/buildingtype.h"
-	"../render/heightmap.h"
-	"../math/hmapmath.h"
-	"../phys/collision.h"
-	"../sim/road.h"
-	"../render/water.h"
-	"../utils.h"
-	"../render/shader.h"
-	"../sim/selection.h"
-	"../sim/sim.h"
-	"../phys/trace.h"
-	"binheap.h"
-	"jpspath.h"
-	"reconstructpath.h"
-	"pathdebug.h"
-	"jpsexpansion.h"
-	"pathjob.h"
+1407126780 source:/home/polyfrag/Desktop/Projects/CorpStatesC/aaa004_low3d/common/path/jpspath.cpp
 	"pathnode.h"
 	"collidertile.h"
 	"../math/vec2i.h"
@@ -7920,29 +7108,7 @@
 
 1406718800 /home/polyfrag/Desktop/Projects/CorpStatesC/aaa004_low3d/common/path/mempool.h
 
-1406718800 source:/home/polyfrag/Desktop/Projects/CorpStatesC/aaa004_low3d/common/path/partialpath.cpp
-	"pathnode.h"
-	"collidertile.h"
-	"../math/vec2i.h"
-	"../math/3dmath.h"
-	"../sim/unit.h"
-	"../sim/unittype.h"
-	"../sim/building.h"
-	"../sim/buildingtype.h"
-	"../render/heightmap.h"
-	"../math/hmapmath.h"
-	"../phys/collision.h"
-	"../sim/road.h"
-	"../render/water.h"
-	"../utils.h"
-	"../render/shader.h"
-	"../sim/selection.h"
-	"../sim/sim.h"
-	"../phys/trace.h"
-	"binheap.h"
-	"partialpath.h"
-	"reconstructpath.h"
-	"pathdebug.h"
+1407126780 source:/home/polyfrag/Desktop/Projects/CorpStatesC/aaa004_low3d/common/path/partialpath.cpp
 	"pathnode.h"
 	"collidertile.h"
 	"../math/vec2i.h"
@@ -7966,13 +7132,7 @@
 	"reconstructpath.h"
 	"pathdebug.h"
 
-1406718800 /home/polyfrag/Desktop/Projects/CorpStatesC/aaa004_low3d/common/path/partialpath.h
-	"../math/vec3i.h"
-	"../math/vec2i.h"
-	"../render/heightmap.h"
-	"../math/vec3f.h"
-	"../math/vec2i.h"
-	"../platform.h"
+1407126780 /home/polyfrag/Desktop/Projects/CorpStatesC/aaa004_low3d/common/path/partialpath.h
 	"../math/vec3i.h"
 	"../math/vec2i.h"
 	"../render/heightmap.h"
@@ -7980,30 +7140,7 @@
 	"../math/vec2i.h"
 	"../platform.h"
 
-1406718800 source:/home/polyfrag/Desktop/Projects/CorpStatesC/aaa004_low3d/common/path/pathdebug.cpp
-	"pathnode.h"
-	"collidertile.h"
-	"../math/vec2i.h"
-	"../math/3dmath.h"
-	"../sim/unit.h"
-	"../sim/unittype.h"
-	"../sim/building.h"
-	"../sim/buildingtype.h"
-	"../render/heightmap.h"
-	"../math/hmapmath.h"
-	"../phys/collision.h"
-	"../sim/road.h"
-	"../render/water.h"
-	"../utils.h"
-	"../render/shader.h"
-	"../sim/selection.h"
-	"../sim/sim.h"
-	"../phys/trace.h"
-	"binheap.h"
-	"jpspath.h"
-	"pathnode.h"
-	"../render/shader.h"
-	"../sim/player.h"
+1406798679 source:/home/polyfrag/Desktop/Projects/CorpStatesC/aaa004_low3d/common/path/pathdebug.cpp
 	"pathnode.h"
 	"collidertile.h"
 	"../math/vec2i.h"
@@ -8082,15 +7219,7 @@
 	"../window.h"
 	"partialpath.h"
 
-1406718800 source:/home/polyfrag/Desktop/Projects/CorpStatesC/aaa004_low3d/common/path/pathnode.cpp
-	"pathnode.h"
-	"../math/vec2i.h"
-	"../math/3dmath.h"
-	"pathjob.h"
-	"../sim/unittype.h"
-	"collidertile.h"
-	"binheap.h"
-	"../utils.h"
+1406798679 source:/home/polyfrag/Desktop/Projects/CorpStatesC/aaa004_low3d/common/path/pathnode.cpp
 	"pathnode.h"
 	"../math/vec2i.h"
 	"../math/3dmath.h"
@@ -8146,10 +7275,7 @@
 
 1406718800 source:/home/polyfrag/Desktop/Projects/CorpStatesC/aaa004_low3d/common/path/trip.cpp
 
-1406718800 source:/home/polyfrag/Desktop/Projects/CorpStatesC/aaa004_low3d/common/script/console.cpp
-	"console.h"
-	"../gui/gui.h"
-	"../sim/player.h"
+1407126780 source:/home/polyfrag/Desktop/Projects/CorpStatesC/aaa004_low3d/common/script/console.cpp
 	"console.h"
 	"../gui/gui.h"
 	"../sim/player.h"
@@ -8160,21 +7286,7 @@
 	"../gui/widgets/text.h"
 	"../gui/widgets/editbox.h"
 
-1406724592 source:/home/polyfrag/Desktop/Projects/CorpStatesC/aaa004_low3d/common/sim/infrastructure.cpp
-	"infrastructure.h"
-	"../render/heightmap.h"
-	"building.h"
-	"../phys/collision.h"
-	"../render/water.h"
-	"player.h"
-	"../sim/selection.h"
-	"../gui/gui.h"
-	"../gui/widgets/spez/constructionview.h"
-	"../../game/gui/gviewport.h"
-	"../../game/gmain.h"
-	"../../game/gui/ggui.h"
-	"../math/hmapmath.h"
-	"../render/foliage.h"
+1407126780 source:/home/polyfrag/Desktop/Projects/CorpStatesC/aaa004_low3d/common/sim/infrastructure.cpp
 	"infrastructure.h"
 	"../render/heightmap.h"
 	"building.h"
@@ -8190,13 +7302,7 @@
 	"../math/hmapmath.h"
 	"../render/foliage.h"
 
-1406718800 source:/home/polyfrag/Desktop/Projects/CorpStatesC/aaa004_low3d/common/sim/job.cpp
-	"job.h"
-	"building.h"
-	"infrastructure.h"
-	"unittype.h"
-	"sim.h"
-	"../econ/utility.h"
+1407126780 source:/home/polyfrag/Desktop/Projects/CorpStatesC/aaa004_low3d/common/sim/job.cpp
 	"job.h"
 	"building.h"
 	"infrastructure.h"
@@ -8208,13 +7314,7 @@
 	"labourer.h"
 	"labourer.h"
 
-1406718800 /home/polyfrag/Desktop/Projects/CorpStatesC/aaa004_low3d/common/path/jpspartpath.h
-	"../math/vec3i.h"
-	"../math/vec2i.h"
-	"../render/heightmap.h"
-	"../math/vec3f.h"
-	"../math/vec2i.h"
-	"../platform.h"
+1407126780 /home/polyfrag/Desktop/Projects/CorpStatesC/aaa004_low3d/common/path/jpspartpath.h
 	"../math/vec3i.h"
 	"../math/vec2i.h"
 	"../render/heightmap.h"
