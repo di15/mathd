@@ -5,9 +5,25 @@
 #include "../sim/buildingtype.h"
 #include "../sim/build.h"
 #include "../sim/sim.h"
+#include "../econ/utility.h"
 
 void UpdateAI()
 {
+#if 0
+	for(int i=0; i<PLAYERS; i++)
+	{
+		Player* p = &g_player[i];
+
+		if(!p->on)
+			continue;
+
+		if(!p->ai)
+			continue;
+
+		AdjPr(p);
+	}
+#endif
+
 	static long long lastthink = -CYCLE_FRAMES;
 
 	if(g_simframe - lastthink < CYCLE_FRAMES/30)
@@ -64,9 +80,176 @@ void Manuf(Player* p)
 {
 }
 
+//adjust prices at building
+void AdjPr(Building* b)
+{
+	int pi = b->owner;
+	Player* p = &g_player[pi];
+	DemTree* dm = &g_demtree2[pi];
+	BlType* bt = &g_bltype[b->type];
+
+	//for each output resource adjust price
+	for(int ri=0; ri<RESOURCES; ri++)
+	{
+		if(bt->output[ri] <= 0)
+			continue;
+
+		Resource* r = &g_resource[ri];
+		std::list<DemNode*> rdems;
+
+		int maxramt = 0;
+
+		for(auto diter=dm->rdemcopy.begin(); diter!=dm->rdemcopy.end(); diter++)
+		{
+			RDemNode* rdem = (RDemNode*)*diter;
+
+			if(rdem->rtype != ri)
+				continue;
+
+			rdems.push_back(rdem);
+			maxramt += rdem->ramt;
+
+			int cmdist = -1;
+			Vec2i demcmpos;
+			Vec2i supcmpos;
+
+			bool havedem = false;
+			bool havesup = false;
+
+			//does this rdem have a supplier bl?
+			if(rdem->bi >= 0)
+			{
+				Building* b = &g_building[rdem->bi];
+				supcmpos = b->tilepos * TILE_SIZE + Vec2i(TILE_SIZE,TILE_SIZE)/2;
+				havesup = true;
+			}
+
+			DemNode* pardem = rdem->parent;
+			havedem = DemCmPos(pardem, &demcmpos);
+
+			if(havedem && havesup)
+				cmdist = Magnitude(demcmpos - supcmpos);
+			else
+				cmdist = MAX_UTIL;	//willingness to go anywhere
+
+			//we need price in this case
+			//we have a given building that we're optimizing, so distance is given
+
+			int margpr = r->physical ? InvPhUtilP(rdem->bid.minutil, cmdist) : InvGlUtilP(rdem->bid.minutil);
+
+			//if there's no utility limit and only a limit on price
+			if(rdem->bid.minutil < 0)
+				margpr = rdem->bid.maxbid;
+
+#if 1
+			if(ri == RES_HOUSING)
+			{
+				char msg[128];
+				sprintf(msg, "p%d b%d margpr%d minutil%d cmdist%d", pi, b-g_building, margpr, rdem->bid.minutil, cmdist);
+				InfoMessage("r", msg);
+			}
+#endif
+
+			rdem->bid.marginpr = margpr;
+		}
+
+		Bid bid;
+
+		CombCo(b->type, &bid, ri, maxramt);
+
+		int prevprc = -1;
+		bool dupdm = false;
+		int bestprofit = -1;
+		int bestmaxr = -1;
+		int bestprc = -1;
+		int blmaxr = bt->output[ri];
+
+		//evalute max projected revenue at tile and bltype
+		//try all the price levels from smallest to greatest
+		while(true)
+		{
+			int leastnext = prevprc;
+
+			//while there's another possible price, see if it will generate more total profit
+
+			for(auto diter=rdems.begin(); diter!=rdems.end(); diter++)
+				if(leastnext < 0 || ((*diter)->bid.marginpr < leastnext && (*diter)->bid.marginpr > prevprc))
+					leastnext = (*diter)->bid.marginpr;
+
+			if(leastnext == prevprc)
+				break;
+
+			prevprc = leastnext;
+
+			//see how much profit this price level will generate
+
+			int demramt = 0;	//how much will be demanded at this price level
+
+			for(auto diter=rdems.begin(); diter!=rdems.end(); diter++)
+				if((*diter)->bid.marginpr >= leastnext)
+				{
+					RDemNode* rdem = (RDemNode*)*diter;
+					//curprofit += diter->ramt * leastnext;
+					demramt += rdem->ramt;
+				}
+
+			//if demanded exceeds bl's max out
+			if(demramt > blmaxr)
+				demramt = blmaxr;
+
+			int proramt = 0;	//how much is most profitable to produce in this case
+
+			//find max profit based on cost composition and price
+			int curprofit = MaxPro(bid.costcompo, leastnext, demramt, &proramt);
+
+			//int ofmax = Ceili(proramt * RATIO_DENOM, bestmaxr);	//how much of max demanded is
+			//curprofit += ofmax * bestrecur / RATIO_DENOM;	//bl recurring costs, scaled to demanded qty
+
+			if(curprofit <= bestprofit)
+				continue;
+
+			bestprofit = curprofit;
+			bestmaxr = blmaxr;
+			bestprc = leastnext;
+		}
+
+		if(bestprofit <= 0)
+		{
+			b->prodprice[ri] = 1;
+			continue;
+		}
+
+		b->prodprice[ri] = bestprc;
+
+#if 1
+		if(ri == RES_HOUSING)
+		{
+			char msg[128];
+			int bi = b - g_building;
+			sprintf(msg, "adjpr b%d to$%d", bi, bestprc);
+			InfoMessage("info", msg);
+		}
+#endif
+	}
+}
+
 //adjust prices
 void AdjPr(Player* p)
 {
+	int pi = p - g_player;
+
+	for(int bi=0; bi<BUILDINGS; bi++)
+	{
+		Building* b = &g_building[bi];
+
+		if(!b->on)
+			continue;
+
+		if(b->owner != pi)
+			continue;
+
+		AdjPr(b);
+	}
 }
 
 void UpdateAI(Player* p)

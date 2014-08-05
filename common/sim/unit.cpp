@@ -86,7 +86,7 @@ void StartBel(Unit* u)
 
 	if(u->type == UNIT_LABOURER)
 	{
-		if(u->owner >= 0)
+		//if(u->owner >= 0)
 		{
 			u->belongings[ RES_FUNDS ] = 100;
 		}
@@ -166,6 +166,7 @@ bool PlaceUnit(int type, Vec2i cmpos, int owner, int *reti)
 	u->targetu = false;
 	u->underorder = false;
 	u->fuelstation = -1;
+	u->home = -1;
 	StartBel(u);
 	u->hp = t->starthp;
 	u->passive = false;

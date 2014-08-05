@@ -5,5 +5,6 @@ class Player;
 
 void UpdateAI();
 void UpdateAI(Player* p);
+void AdjPr(Player* p);
 
 #endif

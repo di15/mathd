@@ -13,7 +13,7 @@
 #define CYCLE_FRAMES	(SIM_FRAME_RATE*60)
 
 //debug output for demand calcs?
-#define DEBUGDEM
+//#define DEBUGDEM
 
 class CostCompo
 {
@@ -280,5 +280,8 @@ extern DemTree g_demtree2[PLAYERS];
 
 void CalcDem1();
 void CalcDem2(Player* p);
+void CombCo(int btype, Bid* bid, int rtype, int ramt);
+int MaxPro(std::list<CostCompo>& costco, int pricelevel, int demramt, int* proramt);
+bool DemCmPos(DemNode* pardem, Vec2i* demcmpos);
 
 #endif
