@@ -26,6 +26,7 @@
 //#define MAX_ZOOM		0.7f
 #define MAX_ZOOM		0.1f
 #define INI_ZOOM			MIN_ZOOM
+//#define INI_ZOOM			0.05f
 
 extern double g_drawfrinterval;
 extern bool g_quit;

@@ -68,6 +68,14 @@ void Build(Player* p)
 
 		if(!PlaceBAb(btype, Vec2i(g_hmap.m_widthx/2, g_hmap.m_widthz/2), &tpos))
 			continue;
+		
+#if 1
+		{
+			char msg[256];
+			sprintf(msg, "placebl p%d margpr%d profit%d minutil%d", pi, demb->bid.marginpr, demb->bid.maxbid, demb->bid.minutil);
+			InfoMessage("r", msg);
+		}
+#endif
 
 		PlaceBl(btype, tpos, false, pi, &demb->bi);
 
@@ -87,6 +95,7 @@ void AdjPr(Building* b)
 	Player* p = &g_player[pi];
 	DemTree* dm = &g_demtree2[pi];
 	BlType* bt = &g_bltype[b->type];
+	Vec2i supcmpos = b->tilepos * TILE_SIZE + Vec2i(TILE_SIZE,TILE_SIZE)/2;
 
 	//for each output resource adjust price
 	for(int ri=0; ri<RESOURCES; ri++)
@@ -111,23 +120,29 @@ void AdjPr(Building* b)
 
 			int cmdist = -1;
 			Vec2i demcmpos;
-			Vec2i supcmpos;
+			//Vec2i supcmpos;
 
 			bool havedem = false;
-			bool havesup = false;
+			//bool havesup = false;
 
+#if 0
 			//does this rdem have a supplier bl?
 			if(rdem->bi >= 0)
 			{
-				Building* b = &g_building[rdem->bi];
-				supcmpos = b->tilepos * TILE_SIZE + Vec2i(TILE_SIZE,TILE_SIZE)/2;
+				Building* b2 = &g_building[rdem->bi];
+				supcmpos = b2->tilepos * TILE_SIZE + Vec2i(TILE_SIZE,TILE_SIZE)/2;
 				havesup = true;
 			}
+			else
+			{
+
+			}
+#endif
 
 			DemNode* pardem = rdem->parent;
 			havedem = DemCmPos(pardem, &demcmpos);
 
-			if(havedem && havesup)
+			if(havedem /* && havesup */)
 				cmdist = Magnitude(demcmpos - supcmpos);
 			else
 				cmdist = MAX_UTIL;	//willingness to go anywhere
@@ -142,10 +157,11 @@ void AdjPr(Building* b)
 				margpr = rdem->bid.maxbid;
 
 #if 1
-			if(ri == RES_HOUSING)
+			//if(ri == RES_HOUSING)
+			//if(ri == RES_RETFOOD)
 			{
-				char msg[128];
-				sprintf(msg, "p%d b%d margpr%d minutil%d cmdist%d", pi, b-g_building, margpr, rdem->bid.minutil, cmdist);
+				char msg[256];
+				sprintf(msg, "p%d %s b%d margpr%d minutil%d cmdist%d", pi, g_resource[ri].name.c_str(), b-g_building, margpr, rdem->bid.minutil, cmdist);
 				InfoMessage("r", msg);
 			}
 #endif
@@ -163,12 +179,14 @@ void AdjPr(Building* b)
 		int bestmaxr = -1;
 		int bestprc = -1;
 		int blmaxr = bt->output[ri];
+		int maxrev = 0;
 
 		//evalute max projected revenue at tile and bltype
 		//try all the price levels from smallest to greatest
 		while(true)
 		{
 			int leastnext = prevprc;
+			maxrev = 0;
 
 			//while there's another possible price, see if it will generate more total profit
 
@@ -191,6 +209,7 @@ void AdjPr(Building* b)
 					RDemNode* rdem = (RDemNode*)*diter;
 					//curprofit += diter->ramt * leastnext;
 					demramt += rdem->ramt;
+					maxrev += rdem->bid.maxbid;
 				}
 
 			//if demanded exceeds bl's max out
@@ -208,6 +227,9 @@ void AdjPr(Building* b)
 			if(curprofit <= bestprofit)
 				continue;
 
+			if(curprofit > maxrev)
+				curprofit = maxrev;
+
 			bestprofit = curprofit;
 			bestmaxr = blmaxr;
 			bestprc = leastnext;
@@ -222,11 +244,13 @@ void AdjPr(Building* b)
 		b->prodprice[ri] = bestprc;
 
 #if 1
-		if(ri == RES_HOUSING)
+		//if(ri == RES_HOUSING)
+		//if(ri == RES_RETFOOD)
 		{
 			char msg[128];
 			int bi = b - g_building;
-			sprintf(msg, "adjpr b%d to$%d", bi, bestprc);
+
+			sprintf(msg, "adjpr %s b%d to$%d", g_resource[ri].name.c_str(), bi, bestprc);
 			InfoMessage("info", msg);
 		}
 #endif

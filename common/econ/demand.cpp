@@ -7,6 +7,7 @@
 #include "utility.h"
 #include "../math/fixmath.h"
 #include "../sim/build.h"
+#include "../debug.h"
 
 DemTree g_demtree;
 DemTree g_demtree2[PLAYERS];
@@ -55,7 +56,7 @@ int CountB(int btype)
 	return cnt;
 }
 
-#define MAX_REQ		1000
+#define MAX_REQ		10
 
 /*
 Add road, powerline, and/or crude oil pipeline infrastructure between two buildings as required,
@@ -149,6 +150,7 @@ DemsAtB* BestAcSup(DemTree* dm, Vec2i demtpos, Vec2i demcmpos, int rtype)
 
 	return bestdemb;
 }
+
 //best proposed supplier
 DemsAtB* BestPrSup(DemTree* dm, Vec2i demtpos, Vec2i demcmpos, int rtype)
 {
@@ -311,6 +313,7 @@ void AddReq(DemTree* dm, Player* p, std::list<DemNode*>* nodes, DemNode* parent,
 
 
 		RDemNode* rdem = new RDemNode;
+		if(!rdem) OutOfMem(__FILE__, __LINE__);
 		rdem->parent = parent;
 		rdem->rtype = rtype;
 		rdem->ui = -1;
@@ -448,6 +451,7 @@ void AddBl(DemTree* dm)
 			continue;
 
 		DemsAtB* demb = new DemsAtB();
+		if(!demb) OutOfMem(__FILE__, __LINE__);
 
 		demb->parent = NULL;
 		demb->prodratio = 0;
@@ -476,6 +480,7 @@ void AddU(DemTree* dm, Unit* u, DemsAtU** retdemu)
 #endif
 
 	DemsAtU* demu = new DemsAtU;
+	if(!demu) OutOfMem(__FILE__, __LINE__);
 
 	demu->ui = u - g_unit;
 	demu->utype = u->type;
@@ -574,6 +579,7 @@ void LabDemH(DemTree* dm, Unit* u, int* fundsleft, DemsAtU* pardemu)
 {
 	// Housing
 	RDemNode* homedem = new RDemNode;
+	if(!homedem) OutOfMem(__FILE__, __LINE__);
 	if(u->home >= 0)
 	{
 		// If there's already a home,
@@ -733,7 +739,7 @@ void LabDemH(DemTree* dm, Unit* u, int* fundsleft, DemsAtU* pardemu)
 	homedem->ui = -1;
 	homedem->utype = -1;
 	homedem->demui = u - g_unit;
-	dm->nodes.push_back(homedem);
+	//dm->nodes.push_back(homedem);
 	dm->rdemcopy.push_back(homedem);
 }
 
@@ -841,8 +847,9 @@ void LabDemF(DemTree* dm, Unit* u, int* fundsleft, DemsAtU* pardemu)
 			best.btype = bt - g_bltype;
 			best.rtype = RES_RETFOOD;
 			best.ramt = affordqty;
-			best.bid.minbid = affordqty * marginpr;
-			best.bid.maxbid = affordqty * marginpr;
+			int maxrev = imin(fundsleft2, affordqty * marginpr);
+			best.bid.minbid = maxrev;
+			best.bid.maxbid = maxrev;
 			best.bid.tpos = btpos;
 			best.bid.cmpos = bcmpos;
 			best.bid.maxdist = cmdist;
@@ -871,9 +878,10 @@ void LabDemF(DemTree* dm, Unit* u, int* fundsleft, DemsAtU* pardemu)
 		//market/bid/cash.
 
 		RDemNode* rdem = new RDemNode;
+		if(!rdem) OutOfMem(__FILE__, __LINE__);
 		*rdem = best;
 		rdem->parent = pardemu;
-		dm->nodes.push_back(rdem);
+		//dm->nodes.push_back(rdem);
 		dm->rdemcopy.push_back(rdem);
 
 	} while(changed && fundsleft2 > 0);
@@ -889,6 +897,7 @@ void LabDemF(DemTree* dm, Unit* u, int* fundsleft, DemsAtU* pardemu)
 	if(reqfood > 0)
 	{
 		RDemNode* demremain = new RDemNode;
+		if(!demremain) OutOfMem(__FILE__, __LINE__);
 		demremain->parent = pardemu;
 		demremain->bi = -1;
 		demremain->btype = -1;
@@ -900,7 +909,7 @@ void LabDemF(DemTree* dm, Unit* u, int* fundsleft, DemsAtU* pardemu)
 		demremain->bid.cmpos = u->cmpos;
 		demremain->bid.maxdist = -1;	//any distance
 		demremain->bid.minutil = -1;	//any util
-		dm->nodes.push_back(demremain);
+		//dm->nodes.push_back(demremain);
 		dm->rdemcopy.push_back(demremain);
 	}
 
@@ -1010,7 +1019,8 @@ void LabDemF2(DemTree* dm, Unit* u, int* fundsleft, DemsAtU* pardemu)
 			best.rtype = RES_RETFOOD;
 			best.ramt = luxuryqty;
 			best.bid.minbid = 0;
-			best.bid.maxbid = luxuryqty * marginpr;
+			int maxrev = imin(fundsleft2, luxuryqty * marginpr);
+			best.bid.maxbid = maxrev;
 			best.bid.tpos = btpos;
 			best.bid.cmpos = bcmpos;
 			best.bid.maxdist = cmdist;
@@ -1039,9 +1049,10 @@ void LabDemF2(DemTree* dm, Unit* u, int* fundsleft, DemsAtU* pardemu)
 		//market/bid/cash.
 
 		RDemNode* rdem = new RDemNode;
+		if(!rdem) OutOfMem(__FILE__, __LINE__);
 		*rdem = best;
 		rdem->parent = pardemu;
-		dm->nodes.push_back(rdem);
+		//dm->nodes.push_back(rdem);
 		dm->rdemcopy.push_back(rdem);
 
 	} while(changed && fundsleft2 > 0);
@@ -1053,6 +1064,7 @@ void LabDemF2(DemTree* dm, Unit* u, int* fundsleft, DemsAtU* pardemu)
 	// Possible demand for more food (luxury) in LabDemF2();
 
 	RDemNode* demremain = new RDemNode;
+	if(!demremain) OutOfMem(__FILE__, __LINE__);
 	demremain->parent = pardemu;
 	demremain->bi = -1;
 	demremain->btype = -1;
@@ -1064,7 +1076,7 @@ void LabDemF2(DemTree* dm, Unit* u, int* fundsleft, DemsAtU* pardemu)
 	demremain->bid.cmpos = u->cmpos;
 	demremain->bid.maxdist = -1;	//any distance
 	demremain->bid.minutil = -1;	//any util
-	dm->nodes.push_back(demremain);
+	//dm->nodes.push_back(demremain);
 	dm->rdemcopy.push_back(demremain);
 }
 
@@ -1169,8 +1181,9 @@ void LabDemE(DemTree* dm, Unit* u, int* fundsleft, DemsAtU* pardemu)
 			best.btype = bt - g_bltype;
 			best.rtype = RES_ENERGY;
 			best.ramt = affordqty;
-			best.bid.minbid = affordqty * marginpr;
-			best.bid.maxbid = affordqty * marginpr;
+			int maxrev = imin(fundsleft2, affordqty * marginpr);
+			best.bid.minbid = maxrev;
+			best.bid.maxbid = maxrev;
 			best.bid.tpos = btpos;
 			best.bid.cmpos = bcmpos;
 			best.bid.maxdist = -1;	//any distance
@@ -1199,9 +1212,10 @@ void LabDemE(DemTree* dm, Unit* u, int* fundsleft, DemsAtU* pardemu)
 		//market/bid/cash.
 
 		RDemNode* rdem = new RDemNode;
+		if(!rdem) OutOfMem(__FILE__, __LINE__);
 		*rdem = best;
 		rdem->parent = pardemu;
-		dm->nodes.push_back(rdem);
+		//dm->nodes.push_back(rdem);
 		dm->rdemcopy.push_back(rdem);
 
 	} while(changed && fundsleft2 > 0);
@@ -1217,6 +1231,7 @@ void LabDemE(DemTree* dm, Unit* u, int* fundsleft, DemsAtU* pardemu)
 	if(reqelec > 0)
 	{
 		RDemNode* demremain = new RDemNode;
+		if(!demremain) OutOfMem(__FILE__, __LINE__);
 		demremain->parent = pardemu;
 		demremain->bi = -1;
 		demremain->btype = -1;
@@ -1228,7 +1243,7 @@ void LabDemE(DemTree* dm, Unit* u, int* fundsleft, DemsAtU* pardemu)
 		demremain->bid.cmpos = u->cmpos;
 		demremain->bid.maxdist = -1;	//any distance
 		demremain->bid.minutil = -1;	//any util
-		dm->nodes.push_back(demremain);
+		//dm->nodes.push_back(demremain);
 		dm->rdemcopy.push_back(demremain);
 	}
 
@@ -1271,6 +1286,7 @@ void DupDemB(DemTree* orig, DemTree* copy)
 	{
 		DemsAtB* olddem = (DemsAtB*)*diter;
 		DemsAtB* newdem = new DemsAtB;
+		if(!newdem) OutOfMem(__FILE__, __LINE__);
 
 		newdem->bid = olddem->bid;
 		newdem->profit = olddem->profit;
@@ -1313,6 +1329,7 @@ void DupDemU(DemTree* orig, DemTree* copy)
 	{
 		DemsAtU* olddem = (DemsAtU*)*diter;
 		DemsAtU* newdem = new DemsAtU;
+		if(!newdem) OutOfMem(__FILE__, __LINE__);
 
 		newdem->bid = olddem->bid;
 		newdem->profit = olddem->profit;
@@ -1352,6 +1369,7 @@ void DupDemCo(DemTree* orig, DemTree* copy)
 		{
 			CdDem* olddem = (CdDem*)*diter;
 			CdDem* newdem = new CdDem;
+			if(!newdem) OutOfMem(__FILE__, __LINE__);
 
 			newdem->bid = olddem->bid;
 			newdem->profit = olddem->profit;
@@ -1396,6 +1414,7 @@ void DupRDem(DemTree* orig, DemTree* copy)
 
 		RDemNode* oldrdem = (RDemNode*)olddem;
 		RDemNode* newrdem = new RDemNode;
+		if(!newrdem) OutOfMem(__FILE__, __LINE__);
 
 		newrdem->bid = oldrdem->bid;
 		newrdem->profit = oldrdem->profit;
@@ -1562,6 +1581,9 @@ void LinkDemU(DemTree* orig, DemTree* copy)
 		DemsAtU* olddem = (DemsAtU*)*oditer;
 		DemsAtU* newdem = (DemsAtU*)*cditer;
 
+		//g_log<<"oldcd"<<olddem->consumdems.size()<<" newcd"<<newdem->consumdems.size()<<std::endl;
+		//g_log.flush();
+
 		LinkPar(orig, copy, olddem, newdem);
 		LinkDems(olddem->manufdems, newdem->manufdems, orig->rdemcopy, copy->rdemcopy);
 		LinkDems(olddem->consumdems, newdem->consumdems, orig->rdemcopy, copy->rdemcopy);
@@ -1636,6 +1658,11 @@ void LinkDemR(DemTree* orig, DemTree* copy)
 	}
 }
 
+void LinkNodes(DemTree* orig, DemTree* copy)
+{
+	
+}
+
 //Duplicate demtree
 void DupDT(DemTree* orig, DemTree* copy)
 {
@@ -1648,6 +1675,17 @@ void DupDT(DemTree* orig, DemTree* copy)
 	int pyrsup[PLAYERS][RESOURCES];	//player global res supplying
 #endif
 
+	char msg[128];
+	char msg2[128];
+
+#if 0
+	sprintf(msg, "orig %db %du %dr %dc", (int)orig->supbpcopy.size(), (int)orig->supupcopy.size(), (int)orig->rdemcopy.size(), (int)(orig->codems[0].size()+orig->codems[1].size()+orig->codems[2].size()));
+	sprintf(msg2, "copy %db %du %dr %dc", (int)copy->supbpcopy.size(), (int)copy->supupcopy.size(), (int)copy->rdemcopy.size(), (int)(copy->codems[0].size()+copy->codems[1].size()+copy->codems[2].size()));
+	g_log<<msg<<std::endl;
+	g_log<<msg2<<std::endl;
+	g_log.flush();
+#endif
+
 	DupDemB(orig, copy);
 	DupDemU(orig, copy);
 	DupDemCo(orig, copy);
@@ -1656,6 +1694,7 @@ void DupDT(DemTree* orig, DemTree* copy)
 	LinkDemU(orig, copy);
 	LinkDemCo(orig, copy);
 	LinkDemR(orig, copy);
+	LinkNodes(orig, copy);
 
 	for(int pi=0; pi<PLAYERS; pi++)
 	{
@@ -1873,6 +1912,7 @@ void CheckBlType(DemTree* dm, Player* p, int btype, int rtype, int ramt, Vec2i t
 	*blmaxr = ramt;
 
 	DemsAtB* demb = new DemsAtB;
+	if(!demb) OutOfMem(__FILE__, __LINE__);
 
 	demb->parent = NULL;
 	demb->prodratio = 0;
@@ -1983,6 +2023,7 @@ void CheckBlTile(DemTree* dm, Player* p, int ri, RDemNode* pt, int x, int z, int
 	//list of r demands for this res type, with max revenue and costs for this tile
 	std::list<DemNode*> rdems;	//RDemNode*
 	int maxramt = 0;
+	int totalmaxrev = 0;
 	Resource* r = &g_resource[ri];
 
 	for(auto diter=dm->rdemcopy.begin(); diter!=dm->rdemcopy.end(); diter++)
@@ -2025,6 +2066,14 @@ void CheckBlTile(DemTree* dm, Player* p, int ri, RDemNode* pt, int x, int z, int
 		sprintf(msg, "maxpr%d requtil%d", maxpr, requtil);
 		InfoMessage("sea", msg);
 #endif
+		
+#if 1
+		if(ri == RES_HOUSING)
+		{
+			g_log<<"housing rdn->ramt="<<rdn->ramt<<" maxpr="<<maxpr<<" maxbid="<<rdn->bid.maxbid<<" rdn->bid.minutil="<<rdn->bid.minutil<<std::endl;
+			g_log.flush();
+		}
+#endif
 
 		if(maxpr <= 0)
 			continue;
@@ -2037,7 +2086,19 @@ void CheckBlTile(DemTree* dm, Player* p, int ri, RDemNode* pt, int x, int z, int
 			maxpr = maxrev;
 		}
 
+#if 1
+		if(ri == RES_HOUSING)
+		{
+			g_log<<"housing maxpr="<<maxpr<<std::endl;
+			g_log.flush();
+		}
+#endif
+
+		if(maxpr <= 0)
+			continue;
+
 		maxramt += rdn->ramt;
+		totalmaxrev += rdn->bid.maxbid;
 
 		rdn->bid.marginpr = maxpr;
 		rdn->bid.maxbid = maxrev;
@@ -2067,6 +2128,7 @@ void CheckBlTile(DemTree* dm, Player* p, int ri, RDemNode* pt, int x, int z, int
 	int bestmaxr = maxramt;
 	int bestprofit = -1;
 	DemsAtB* bestdemb = NULL;
+	DemTree bestbldm;
 
 	//TODO: variable cost of resource production and raw input transport
 	//Try for all supporting bltypes
@@ -2085,14 +2147,14 @@ void CheckBlTile(DemTree* dm, Player* p, int ri, RDemNode* pt, int x, int z, int
 		DemsAtB* demb = NULL;
 
 #ifdef DEBUGDEM
-		g_log<<"\t zx "<<z<<","<<x<<" calling CheckBlType"<<std::endl;
+		g_log<<"\t zx "<<z<<","<<x<<" calling CheckBlType "<<bt->name<<std::endl;
 		g_log.flush();
 #endif
 
 		CheckBlType(&bldm, p, btype, ri, maxramt, Vec2i(x,z), &bltybid, &blmaxr, success, &demb);
 
 #ifdef DEBUGDEM
-		g_log<<"\t zx "<<z<<","<<x<<" /fini calling CheckBlType"<<std::endl;
+		g_log<<"\t zx "<<z<<","<<x<<" /fini calling CheckBlType"<<bt->name<<std::endl;
 		g_log.flush();
 #endif
 
@@ -2100,7 +2162,7 @@ void CheckBlTile(DemTree* dm, Player* p, int ri, RDemNode* pt, int x, int z, int
 			continue;
 
 #ifdef DEBUGDEM
-		g_log<<"\t zx "<<z<<","<<x<<" /fini calling CheckBlType success"<<std::endl;
+		g_log<<"\t zx "<<z<<","<<x<<" /fini calling CheckBlType success "<<bt->name<<std::endl;
 		g_log.flush();
 #endif
 
@@ -2187,11 +2249,20 @@ void CheckBlTile(DemTree* dm, Player* p, int ri, RDemNode* pt, int x, int z, int
 
 			bestdemb = demb;
 
+			demb->bid.marginpr = leastnext;
+			demb->bid.maxbid = bestprofit;
+			demb->bid.costcompo = bltybid.costcompo;
+
 			dupdm = true;	//expensive op
 		}
 
 		if(!dupdm)
 			continue;
+
+		if(*recurp > totalmaxrev)
+			*recurp = totalmaxrev;
+
+		*success = true;
 
 		//TO DO: AddInf to all r dems of costcompo
 		//need way to identify bl pos from rdem
@@ -2207,17 +2278,23 @@ void CheckBlTile(DemTree* dm, Player* p, int ri, RDemNode* pt, int x, int z, int
 			if(!pardem)
 				continue;
 
+			//NOTE: need to get equivalent rdem from copied DemTree, NOT original
 
-
-			AddInf(&bldm, bestdemb->cddems, bestdemb, rdem, ri, rdem->ramt, 0, success);
+			//AddInf(&bldm, bestdemb->cddems, bestdemb, rdem, ri, rdem->ramt, 0, success);
 		}
 
 		//add infrastructure to supplier
 		//AddInf(dm, nodes, parent, *biter, rtype, ramt, depth, success);
 
-		dm->free();
-		DupDT(&bldm, dm);
+		bestbldm.free();
+		DupDT(&bldm, &bestbldm);
 	}
+
+	if(bestbtype < 0)
+		return;
+
+	dm->free();
+	DupDT(&bestbldm, dm);
 }
 
 /*
@@ -2250,9 +2327,21 @@ void CheckBl(DemTree* dm, Player* p, int* fixcost, int* recurprof, bool* success
 		for(int z=0; z<g_hmap.m_widthz; z++)
 			for(int x=0; x<g_hmap.m_widthx; x++)
 			{
+				char msg[128];
+				sprintf(msg, "\t\t1\tstart %x,%d", x,z);
+				CheckMem(__FILE__, __LINE__, "\t\t1\t");
 #ifdef DEBUGDEM
 				g_log<<"zx "<<z<<","<<x<<std::endl;
 				g_log.flush();
+#endif
+
+#if 0
+				char msg[1024];
+				int cds = 0;
+				for(int ctype=0; ctype<CONDUIT_TYPES; ctype++)
+					cds += dm->codems[ctype].size();
+				sprintf(msg, "r%d b%d u%d c%d", (int)dm->rdemcopy.size(), (int)dm->supbpcopy.size(), (int)dm->supupcopy.size(), cds);
+				LastNum(msg);
 #endif
 
 				DemTree thisdm;
@@ -2278,18 +2367,21 @@ void CheckBl(DemTree* dm, Player* p, int* fixcost, int* recurprof, bool* success
 				if(!subsuccess)
 					continue;
 
-				*success = subsuccess ? true : *success;
-
-				if(bestrecurp < 0 || recurp > bestrecurp)
+				if((bestrecurp < 0 || recurp > bestrecurp) && recurp > 0)
 				{
+					*success = subsuccess ? true : *success;
+
 #ifdef DEBUGDEM
-					g_log<<"zx "<<z<<","<<x<<" success dupdt"<<std::endl;
+					BlType* bt = &g_bltype[((DemsAtB*)(*thisdm.supbpcopy.rbegin()))->btype];
+					g_log<<"zx "<<z<<","<<x<<" success dupdt"<<bt->name<<std::endl;
 					g_log.flush();
 #endif
 
 					bestfixc = fixc;
 					bestrecurp = recurp;
+					CheckMem(__FILE__, __LINE__, "\t\t1\t");
 					bestbldm.free();
+					CheckMem(__FILE__, __LINE__, "\t\t\t2\t");
 					DupDT(&thisdm, &bestbldm);
 
 #ifdef DEBUGDEM
@@ -2297,6 +2389,10 @@ void CheckBl(DemTree* dm, Player* p, int* fixcost, int* recurprof, bool* success
 					g_log.flush();
 #endif
 				}
+				
+				char msg2[128];
+				sprintf(msg2, "\t\t1\tend%x,%d", x,z);
+				CheckMem(__FILE__, __LINE__, "\t\t2\t");
 			}
 
 		// TODO ...
@@ -2304,6 +2400,11 @@ void CheckBl(DemTree* dm, Player* p, int* fixcost, int* recurprof, bool* success
 	}
 
 	//TODO: ...
+
+#ifdef DEBUGDEM
+	g_log<<"bestrecurp = "<<bestrecurp<<std::endl;
+	g_log.flush();
+#endif
 
 	//if no profit can be made
 	if(bestrecurp <= 0)
@@ -2449,7 +2550,9 @@ void CalcDem2(Player* p)
 
 	//return;
 
+	CheckMem(__FILE__, __LINE__, "1\t");
 	CheckBl(&bldm, p, &fixcost, &recurprof, &success);	//check if there's any profitable building opp
+	CheckMem(__FILE__, __LINE__, "\t2\t");
 
 	//return;
 
@@ -2457,7 +2560,8 @@ void CalcDem2(Player* p)
 	if(success)
 	{
 #ifdef DEBUGDEM
-		g_log<<"suc pi "<<pi<<std::endl;
+		BlType* bt = &g_bltype[((DemsAtB*)(*bldm.supbpcopy.rbegin()))->btype];
+		g_log<<"suc pi "<<pi<<" "<<bt->name<<std::endl;
 		g_log.flush();
 		//InfoMessage("suc", "suc");
 #endif

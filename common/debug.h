@@ -73,9 +73,15 @@ void InitProfiles();
 void LogRich(const RichText* rt);
 void CheckNum(const char* num);
 void LastNum(const char* l);
+void CheckMem(const char* file, int line, const char* sep);
 
 #ifdef GLDEBUG
 void CheckGLError(const char* file, int line);
+#endif
+
+//#define MEMDEBUG
+#ifndef MEMDEBUG
+#define CheckMem(a,b,c) (void)0
 #endif
 
 GLvoid APIENTRY GLMessageHandler(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, GLvoid* userParam);

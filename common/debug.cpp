@@ -211,7 +211,7 @@ void CheckNum(const char* num)
 
 void LastNum(const char* l)
 {
-	return;
+	//return;
 
 #if 1
 	char fullpath[MAX_PATH+1];
@@ -303,6 +303,27 @@ void UDebug(int i)
 			}
 		}
 	}
+}
+#endif
+
+#ifdef PLATFORM_WIN
+#include <windows.h>
+#include <Psapi.h>
+
+#pragma comment(lib, "Psapi.lib")
+#endif
+
+#ifdef MEMDEBUG
+void CheckMem(const char* file, int line, const char* sep)
+{
+	return;
+#ifdef PLATFORM_WIN
+	PROCESS_MEMORY_COUNTERS info = {0};
+	DWORD cb;
+	bool b = GetProcessMemoryInfo(GetCurrentProcess(), &info, sizeof(info));
+	g_log<<sep<<" "<<file<<" line"<<line<<" (?"<<b<<")info.WorkingSetSize: "<<info.WorkingSetSize<<"B / "<<(info.WorkingSetSize/1024)<<"KB "<<(info.WorkingSetSize/1024/1024)<<"MB "<<(info.WorkingSetSize/1024/1024/1024)<<"GB "<<std::endl;
+	g_log.flush();
+#endif
 }
 #endif
 

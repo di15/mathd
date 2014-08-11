@@ -8,12 +8,13 @@
 #include "../sim/buildingtype.h"
 #include "../sim/build.h"
 #include "../sim/player.h"
+#include "../debug.h"
 
 #define AVG_DIST		(TILE_SIZE*6)
 #define CYCLE_FRAMES	(SIM_FRAME_RATE*60)
 
 //debug output for demand calcs?
-//#define DEBUGDEM
+#define DEBUGDEM
 
 class CostCompo
 {
@@ -69,6 +70,9 @@ public:
 	int profit;
 
 	DemNode();
+	virtual ~DemNode()
+	{
+	}
 };
 
 class DemsAtB;
@@ -103,6 +107,10 @@ public:
 		demui = -1;
 		parlist = NULL;
 	}
+
+	virtual ~RDemNode()
+	{
+	}
 };
 
 class CdDem : public DemNode
@@ -116,6 +124,10 @@ public:
 	{
 		demtype = DEM_CDNODE;
 
+	}
+
+	virtual ~CdDem()
+	{
 	}
 };
 
@@ -140,7 +152,7 @@ public:
 		Zero(condem);
 	}
 
-	~DemsAtB()
+	virtual ~DemsAtB()
 	{
 #if 0
 		auto riter = condems.begin();
@@ -188,7 +200,7 @@ public:
 		timeused = 0;
 	}
 
-	~DemsAtU()
+	virtual ~DemsAtU()
 	{
 #if 0
 		auto riter = manufdems.begin();
@@ -211,7 +223,7 @@ public:
 class DemTree
 {
 public:
-	std::list<DemNode*> nodes;
+	//std::list<DemNode*> nodes;
 	std::list<DemNode*> supbpcopy;	//master copy, this one will be freed (DemsAtB)
 	std::list<DemNode*> supupcopy;	//master copy, this one will be freed (DemsAtU)
 	std::list<DemNode*> codems[CONDUIT_TYPES];	//conduit placements (CdDem)
@@ -220,10 +232,33 @@ public:
 
 	void free()
 	{
+#if 0
+		int* testi = new int;
+		CheckMem(__FILE__, __LINE__, "\t\t\t1\ttest0");
+		delete testi;
+		CheckMem(__FILE__, __LINE__, "\t\t\t\t2\ttest0");
+#endif
+
+#if 0
+		DemNode* testn = new DemNode;
+		CheckMem(__FILE__, __LINE__, "\t\t\t1\ttest1");
+		delete testn;
+		CheckMem(__FILE__, __LINE__, "\t\t\t\t2\ttest1");
+#endif
+
+#if 0
+		DemNode* testn2 = new RDemNode;
+		CheckMem(__FILE__, __LINE__, "\t\t\t1\ttest2");
+		delete testn2;
+		CheckMem(__FILE__, __LINE__, "\t\t\t\t2\ttest2");
+#endif
+
 		auto biter = supbpcopy.begin();
 		while(biter != supbpcopy.end())
 		{
+			CheckMem(__FILE__, __LINE__, "\t\t\t1\tfreeb");
 			delete *biter;
+			CheckMem(__FILE__, __LINE__, "\t\t\t\t2\tfreeb");
 			biter = supbpcopy.erase(biter);
 		}
 
@@ -245,7 +280,9 @@ public:
 		auto riter = rdemcopy.begin();
 		while(riter != rdemcopy.end())
 		{
+			CheckMem(__FILE__, __LINE__, "\t\t\t1\tfreer");
 			delete *riter;
+			CheckMem(__FILE__, __LINE__, "\t\t\t\t2\tfreer");
 			riter = rdemcopy.erase(riter);
 		}
 #endif
@@ -266,7 +303,9 @@ public:
 
 	DemTree()
 	{
-		free();
+		for(int i=0; i<PLAYERS; i++)
+			Zero(pyrsup[i]);
+		//free();
 	}
 
 	~DemTree()
