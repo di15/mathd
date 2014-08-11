@@ -86,12 +86,21 @@ void InitGLSL()
 	g_log<<"Renderer: "<<(char*)glGetString(GL_RENDERER)<<std::endl;
 	g_log<<"GL_VERSION = "<<(char*)glGetString(GL_VERSION)<<std::endl;
 
+#if 1
 	if( !GLEW_VERSION_3_0 )
 	{
 		ErrorMessage("Error", "OpenGL 3.0 not supported!\n" );
 		g_quit = true;
 		return;
 	}
+#else
+	if( !GLEW_VERSION_3_0 )
+	{
+		ErrorMessage("Error", "OpenGL 1.4 not supported!\n" );
+		g_quit = true;
+		return;
+	}
+#endif
 
 #if 1
 	char* szGLExtensions = (char*)glGetString(GL_EXTENSIONS);
@@ -334,9 +343,11 @@ void UseS(int shader)
 	//glUseProgramObject(g_shader[shader].m_program);
 	glUseProgram(s->m_program);
 	CheckGLError(__FILE__, __LINE__);
-
+	
 	Player* py = &g_player[g_curP];
 
+#if 1
+	//opengl 3 way
 	CheckGLError(__FILE__, __LINE__);
 	if(s->m_slot[SSLOT_POSITION] != -1)	glEnableVertexAttribArray(s->m_slot[SSLOT_POSITION]);
 	CheckGLError(__FILE__, __LINE__);
@@ -344,6 +355,12 @@ void UseS(int shader)
 	CheckGLError(__FILE__, __LINE__);
 	if(s->m_slot[SSLOT_NORMAL] != -1)	glEnableVertexAttribArray(s->m_slot[SSLOT_NORMAL]);
 	CheckGLError(__FILE__, __LINE__);
+#else
+	//opengl 1.4 way
+	if(s->m_hasverts)	glEnableClientState(GL_VERTEX_ARRAY);
+	if(s->m_hastexcoords)	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+	if(s->m_hasnormals)	glEnableClientState(GL_NORMAL_ARRAY);
+#endif
 
 	if(s->m_slot[SSLOT_MIND] != -1) glUniform1f(s->m_slot[SSLOT_MIND], MIN_DISTANCE);
 	if(s->m_slot[SSLOT_MAXD] != -1) glUniform1f(s->m_slot[SSLOT_MAXD], MAX_DISTANCE / py->zoom);
@@ -361,6 +378,8 @@ void EndS()
 
 	Shader* s = &g_shader[g_curS];
 
+#if 1
+	//opengl 3 way
 	CheckGLError(__FILE__, __LINE__);
 	if(s->m_slot[SSLOT_POSITION] != -1)	glDisableVertexAttribArray(s->m_slot[SSLOT_POSITION]);
 	CheckGLError(__FILE__, __LINE__);
@@ -368,9 +387,12 @@ void EndS()
 	CheckGLError(__FILE__, __LINE__);
 	if(s->m_slot[SSLOT_NORMAL] != -1)	glDisableVertexAttribArray(s->m_slot[SSLOT_NORMAL]);
 	CheckGLError(__FILE__, __LINE__);
-
-	//glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-	//glDisableClientState(GL_NORMAL_ARRAY);
+#else
+	//opengl 1.4 way
+	glDisableClientState(GL_VERTEX_ARRAY);
+	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+	glDisableClientState(GL_NORMAL_ARRAY);
+#endif
 
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);

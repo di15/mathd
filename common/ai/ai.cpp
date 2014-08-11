@@ -8,9 +8,13 @@
 #include "../econ/utility.h"
 #include "../sim/unit.h"
 
+//#define AI_FRAMES	CYCLE_FRAMES/30
+//#define AI_FRAMES	CYCLE_FRAMES
+#define AI_FRAMES	1
+
 void UpdateAI()
 {
-#if 1
+#if 0
 	for(int i=0; i<PLAYERS; i++)
 	{
 		Player* p = &g_player[i];
@@ -20,14 +24,15 @@ void UpdateAI()
 
 		if(!p->ai)
 			continue;
-
+		
+		CalcDem2(p);
 		AdjPr(p);
 	}
 #endif
 
-	static long long lastthink = -CYCLE_FRAMES;
+	static long long lastthink = -AI_FRAMES;
 
-	if(g_simframe - lastthink < CYCLE_FRAMES/30)
+	if(g_simframe - lastthink < AI_FRAMES)
 		return;
 
 	//CalcDem1();
@@ -45,12 +50,12 @@ void UpdateAI()
 		UpdateAI(p);
 	}
 
-	if(g_simframe - lastthink >= CYCLE_FRAMES/30)
+	if(g_simframe - lastthink >= AI_FRAMES)
 		lastthink = g_simframe;
 }
 
 //build buildings
-void Build(Player* p)
+bool Build(Player* p)
 {
 	//DemTree* dm = &g_demtree;
 	int pi = p - g_player;
@@ -70,22 +75,59 @@ void Build(Player* p)
 		if(!PlaceBAb(btype, Vec2i(g_hmap.m_widthx/2, g_hmap.m_widthz/2), &tpos))
 			continue;
 		
-#if 1
+#if 0
 		{
 			char msg[256];
 			int cmdist = -1;
 			Vec2i demcmpos = g_unit[0].cmpos;
 			Vec2i supcmpos = tpos * TILE_SIZE + Vec2i(TILE_SIZE,TILE_SIZE)/2;
 			cmdist = Magnitude(demcmpos - supcmpos);
-			sprintf(msg, "placebl p%d margpr%d profit%d minutil%d cmdist%d", pi, demb->bid.marginpr, demb->bid.maxbid, demb->bid.minutil, cmdist);
+			sprintf(msg, "placebl p%d bt:%s margpr%d profit%d minutil%d cmdist%d", pi, g_bltype[btype].name, demb->bid.marginpr, demb->bid.maxbid, demb->bid.minutil, cmdist);
 			InfoMessage("r", msg);
 		}
 #endif
 
-		PlaceBl(btype, tpos, false, pi, &demb->bi);
+		if(!PlaceBl(btype, tpos, false, pi, &demb->bi))
+			continue;
 
-		return;
+		Building* b = &g_building[demb->bi];
+		AdjPr(b);
+#if 1
+		//react to new price
+
+		for(int i=pi+1; i<PLAYERS; i++)
+		{
+			Player* p2 = &g_player[i];
+
+			if(!p2->on)
+				continue;
+
+			if(!p2->ai)
+				continue;
+		
+			CalcDem2(p2);
+			AdjPr(p2);
+		}
+
+		for(int i=0; i<imin(pi+1,PLAYERS); i++)
+		{
+			Player* p2 = &g_player[i];
+
+			if(!p2->on)
+				continue;
+
+			if(!p2->ai)
+				continue;
+		
+			CalcDem2(p2);
+			AdjPr(p2);
+		}
+#endif
+
+		return true;
 	}
+
+	return false;
 }
 
 //manufacture units
@@ -152,7 +194,15 @@ void AdjPr(Building* b)
 			else
 				cmdist = MAX_UTIL;	//willingness to go anywhere
 
-			int requtil = rdem->bid.minutil;
+			int requtil = rdem->bid.minutil < 0 ? -1 : rdem->bid.minutil + 1;
+
+			//if this is owned by the same player, we don't want to decrease price to compete
+			if(rdem->bi >= 0)
+			{
+				Building* b2 = &g_building[rdem->bi];
+				if(b2->owner == pi)
+					requtil = rdem->bid.minutil;
+			}
 
 			//we need price in this case
 			//we have a given building that we're optimizing, so distance is given
@@ -160,14 +210,34 @@ void AdjPr(Building* b)
 			int margpr = 0;
 
 			//if there's no utility limit and only a limit on price
-			if(rdem->bid.minutil < 0)
+			if(requtil < 0)
 			{
 				margpr = rdem->bid.maxbid;
+				
+#if 0
+				//if(ri == RES_HOUSING)
+				//if(ri == RES_RETFOOD)
+				{
+					char msg[256];
+					sprintf(msg, "adjpr?1 from$%d p%d %s b%d margpr%d minutil%d ramt%d cmdist%d", b->prodprice[ri], pi, g_resource[ri].name.c_str(), b-g_building, margpr, requtil, rdem->ramt, cmdist);
+					InfoMessage("ap1", msg);
+				}
+#endif
 			}
 			else
 			{
 				margpr = r->physical ? InvPhUtilP(requtil, cmdist) : InvGlUtilP(requtil);
 				
+#if 0
+				//if(ri == RES_HOUSING)
+				//if(ri == RES_RETFOOD)
+				{
+					char msg[256];
+					sprintf(msg, "adjpr?2 from$%d p%d %s b%d margpr%d minutil%d ramt%d cmdist%d", b->prodprice[ri], pi, g_resource[ri].name.c_str(), b-g_building, margpr, requtil, rdem->ramt, cmdist);
+					InfoMessage("ap2", msg);
+				}
+#endif
+
 				if(margpr <= 0)
 					continue;
 
@@ -182,13 +252,13 @@ void AdjPr(Building* b)
 					margpr = rdem->bid.maxbid;
 			}
 
-#if 1
+#if 0
 			//if(ri == RES_HOUSING)
 			//if(ri == RES_RETFOOD)
 			{
 				char msg[256];
 				sprintf(msg, "p%d %s b%d margpr%d minutil%d ramt%d cmdist%d", pi, g_resource[ri].name.c_str(), b-g_building, margpr, rdem->bid.minutil, rdem->ramt, cmdist);
-				InfoMessage("r", msg);
+				InfoMessage("ap3", msg);
 			}
 #endif
 
@@ -268,16 +338,14 @@ void AdjPr(Building* b)
 			continue;
 		}
 
-		b->prodprice[ri] = bestprc;
-
-#if 1
+#if 0
 		//if(ri == RES_HOUSING)
 		//if(ri == RES_RETFOOD)
 		{
 			char msg[1280];
 			int bi = b - g_building;
 
-			sprintf(msg, "adjpr %s b%d to$%d", g_resource[ri].name.c_str(), bi, bestprc);
+			sprintf(msg, "adjpr %s b%d to$%d from$%d", g_resource[ri].name.c_str(), bi, bestprc, b->prodprice[ri]);
 			
 			for(int bi=0; bi<BUILDINGS; bi++)
 			{
@@ -299,6 +367,8 @@ void AdjPr(Building* b)
 			InfoMessage("info", msg);
 		}
 #endif
+
+		b->prodprice[ri] = bestprc;
 	}
 }
 
@@ -336,7 +406,8 @@ void UpdateAI(Player* p)
 #endif
 
 	CalcDem2(p);
-	Build(p);
+	if(Build(p))
+		return;
 	Manuf(p);
 	AdjPr(p);
 }

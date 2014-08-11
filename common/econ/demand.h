@@ -40,9 +40,11 @@ public:
 	int maxbid;
 	Vec2i tpos;
 	Vec2i cmpos;
+	//maxdist and marginpr depend on minutil.
+	//maxdist and marginpr are adjusted by user; don't rely on them.
+	int marginpr;
 	int maxdist;
 	int minutil;
-	int marginpr;
 	std::list<CostCompo> costcompo;	//cost composition for different sources
 
 	Bid()

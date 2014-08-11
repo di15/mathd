@@ -601,6 +601,7 @@ void LabDemH(DemTree* dm, Unit* u, int* fundsleft, DemsAtU* pardemu)
 		Bid *altbid = &homedem->bid;
 		altbid->maxbid = homepr;
 		altbid->maxdist = homedist;
+		altbid->marginpr = homepr;
 		altbid->cmpos = u->cmpos;
 		altbid->tpos = u->cmpos/TILE_SIZE;
 		//altbid->minutil = -1;	//any util
@@ -663,22 +664,11 @@ void LabDemH(DemTree* dm, Unit* u, int* fundsleft, DemsAtU* pardemu)
 			if(stockqty <= 0)
 				continue;
 
-#if 0
-			char msg2[128];
-			sprintf(msg2, "fundsleft%d margpr%d", *fundsleft, marginpr);
-			InfoMessage("funds b", msg2);
-#endif
-
 			if(marginpr > *fundsleft)
 				continue;
 
 			int cmdist = Magnitude(bcmpos - u->cmpos);
 			int thisutil = PhUtil(marginpr, cmdist);
-#if 1
-			char msg[128];
-			sprintf(msg, "thisu%d margpr%d", thisutil, marginpr);
-			InfoMessage("util b", msg);
-#endif
 
 			if(thisutil <= bestutil && bestutil >= 0)
 				continue;
@@ -691,6 +681,7 @@ void LabDemH(DemTree* dm, Unit* u, int* fundsleft, DemsAtU* pardemu)
 			bestr.ramt = 1;
 			bestr.bid.minbid = 1 * marginpr;
 			bestr.bid.maxbid = 1 * marginpr;
+			bestr.bid.marginpr = marginpr;
 			bestr.bid.tpos = btpos;
 			bestr.bid.cmpos = bcmpos;
 			bestr.bid.maxdist = cmdist;
@@ -713,8 +704,6 @@ void LabDemH(DemTree* dm, Unit* u, int* fundsleft, DemsAtU* pardemu)
 		}
 		else
 		{
-			InfoMessage("found bestdemb", "found bestdemb");
-
 			// mark building consumption, so that other lab's consumption goes elsewhere
 			bestdemb->supplying[RES_HOUSING] += bestr.ramt;
 
@@ -839,16 +828,11 @@ void LabDemF(DemTree* dm, Unit* u, int* fundsleft, DemsAtU* pardemu)
 			if(thisutil <= bestutil && bestutil >= 0)
 				continue;
 
-#if 0
-			if(thisutil <= 0)
-			{
-				InfoMessage("blah", "thisutil <= 0");
-			}
-#endif
-
 			bestutil = thisutil;
 
 			int reqqty = imin(stockqty, reqfood);
+			// TO DO: get rid of all division-by-zero using marginpr everywhere
+			// When building is first placed, it has marginpr=0
 			int affordqty = imin(reqqty, fundsleft2 / marginpr);
 			stockqty -= affordqty;
 			//reqfood -= affordqty;
@@ -867,6 +851,7 @@ void LabDemF(DemTree* dm, Unit* u, int* fundsleft, DemsAtU* pardemu)
 			int maxrev = imin(fundsleft2, affordqty * marginpr);
 			best.bid.minbid = maxrev;
 			best.bid.maxbid = maxrev;
+			best.bid.marginpr = marginpr;
 			best.bid.tpos = btpos;
 			best.bid.cmpos = bcmpos;
 			best.bid.maxdist = cmdist;
@@ -903,7 +888,7 @@ void LabDemF(DemTree* dm, Unit* u, int* fundsleft, DemsAtU* pardemu)
 		//dm->nodes.push_back(rdem);
 		dm->rdemcopy.push_back(rdem);
 
-#if 1
+#if 0
 		//if(ri == RES_HOUSING)
 		//if(ri == RES_RETFOOD)
 		{
@@ -950,12 +935,22 @@ void LabDemF(DemTree* dm, Unit* u, int* fundsleft, DemsAtU* pardemu)
 		demremain->ramt = reqfood;
 		demremain->bid.minbid = fundsleft2;
 		demremain->bid.maxbid = fundsleft2;
+		demremain->bid.marginpr = -1;
 		demremain->bid.tpos = u->cmpos / TILE_SIZE;
 		demremain->bid.cmpos = u->cmpos;
 		demremain->bid.maxdist = -1;	//any distance
 		demremain->bid.minutil = -1;	//any util
 		//dm->nodes.push_back(demremain);
 		dm->rdemcopy.push_back(demremain);
+
+#if 0
+			//if(thisutil <= 0)
+			{
+				char msg[128];
+				sprintf(msg, "reqfood remain %d util<=0 fundsleft2=%d", reqfood, fundsleft2);
+				InfoMessage("blah", msg);
+			}
+#endif
 
 		*fundsleft -= fundsleft2;
 	}
@@ -1071,6 +1066,7 @@ void LabDemF2(DemTree* dm, Unit* u, int* fundsleft, DemsAtU* pardemu)
 			best.bid.minbid = 0;
 			int maxrev = imin(fundsleft2, luxuryqty * marginpr);
 			best.bid.maxbid = maxrev;
+			best.bid.marginpr = marginpr;
 			best.bid.tpos = btpos;
 			best.bid.cmpos = bcmpos;
 			best.bid.maxdist = cmdist;
@@ -1125,6 +1121,7 @@ void LabDemF2(DemTree* dm, Unit* u, int* fundsleft, DemsAtU* pardemu)
 	demremain->ramt = 1;	//should really be unspecified amount, but it might as well be 1 because labourer is willing to spend all his remaining luxury money on 1
 	demremain->bid.minbid = 0;
 	demremain->bid.maxbid = fundsleft2;
+	demremain->bid.marginpr = -1;
 	demremain->bid.tpos = u->cmpos / TILE_SIZE;
 	demremain->bid.cmpos = u->cmpos;
 	demremain->bid.maxdist = -1;	//any distance
@@ -1245,6 +1242,7 @@ void LabDemE(DemTree* dm, Unit* u, int* fundsleft, DemsAtU* pardemu)
 			int maxrev = imin(fundsleft2, affordqty * marginpr);
 			best.bid.minbid = maxrev;
 			best.bid.maxbid = maxrev;
+			best.bid.marginpr = marginpr;
 			best.bid.tpos = btpos;
 			best.bid.cmpos = bcmpos;
 			best.bid.maxdist = -1;	//any distance
@@ -1306,6 +1304,7 @@ void LabDemE(DemTree* dm, Unit* u, int* fundsleft, DemsAtU* pardemu)
 		demremain->ramt = reqelec;
 		demremain->bid.minbid = fundsleft2;
 		demremain->bid.maxbid = fundsleft2;
+		demremain->bid.marginpr = -1;
 		demremain->bid.tpos = u->cmpos / TILE_SIZE;
 		demremain->bid.cmpos = u->cmpos;
 		demremain->bid.maxdist = -1;	//any distance
@@ -2147,7 +2146,18 @@ void CheckBlTile(DemTree* dm, Player* p, int ri, RDemNode* pt, int x, int z, int
 		}
 
 		//int requtil = rdn->bid.minutil+1;
-		int requtil = rdn->bid.minutil;
+		//int requtil = rdn->bid.minutil;
+		int requtil = rdn->bid.minutil < 0 ? -1 : rdn->bid.minutil + 1;
+
+#if 0
+		//if this is owned by the same player, we don't want to decrease price to compete
+		if(rdn->bi >= 0)
+		{
+			Building* b2 = &g_building[rdn->bi];
+			if(b2->owner == pi)
+				requtil = rdn->bid.minutil;
+		}
+#endif
 
 		if(requtil >= MAX_UTIL)
 			continue;
@@ -2658,6 +2668,17 @@ void CalcDem2(Player* p)
 		LabDemE(dm, u, &fundsleft, demu);
 		LabDemF2(dm, u, &fundsleft, demu);
 	}
+
+#if 0
+	RDemNode* rd = (RDemNode*)*dm->rdemcopy.begin();
+	char msg[128];
+	sprintf(msg, "cd2 first r:%s bi%d ramt%d minutil%d maxbid%d margpr%d", g_resource[rd->rtype].name.c_str(), rd->bi, rd->ramt, rd->bid.minutil, rd->bid.marginpr);
+	InfoMessage("calcdem2 f", msg);
+
+	rd = (RDemNode*)*dm->rdemcopy.rbegin();
+	sprintf(msg, "cd2 last r:%s bi%d ramt%d minutil%d maxbid%d margpr%d", g_resource[rd->rtype].name.c_str(), rd->bi, rd->ramt, rd->bid.minutil, rd->bid.marginpr);
+	InfoMessage("calcdem2 l", msg);
+#endif
 
 	//return;
 
