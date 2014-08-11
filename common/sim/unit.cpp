@@ -13,6 +13,7 @@
 #include "../math/frustum.h"
 #include "building.h"
 #include "labourer.h"
+#include "../econ/demand.h"
 
 Unit g_unit[UNITS];
 
@@ -88,7 +89,9 @@ void StartBel(Unit* u)
 	{
 		//if(u->owner >= 0)
 		{
-			u->belongings[ RES_FUNDS ] = 100;
+			//u->belongings[ RES_FUNDS ] = 100;
+			//u->belongings[ RES_FUNDS ] = CYCLE_FRAMES * LABOURER_FOODCONSUM * 30;
+			u->belongings[ RES_FUNDS ] = CYCLE_FRAMES/SIM_FRAME_RATE * LABOURER_FOODCONSUM * 10;
 		}
 
 		u->belongings[ RES_RETFOOD ] = STARTING_RETFOOD;
@@ -166,7 +169,7 @@ bool PlaceUnit(int type, Vec2i cmpos, int owner, int *reti)
 	u->targetu = false;
 	u->underorder = false;
 	u->fuelstation = -1;
-	u->home = -1;
+	//u->home = -1;
 	StartBel(u);
 	u->hp = t->starthp;
 	u->passive = false;
@@ -187,7 +190,8 @@ bool PlaceUnit(int type, Vec2i cmpos, int owner, int *reti)
 
 	u->cdtype = CONDUIT_NONE;
 	u->driver = -1;
-	u->framesleft = 0;
+	//u->framesleft = 0;
+	u->cyframes = 0;
 
 	u->fillcollider();
 

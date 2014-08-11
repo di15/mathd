@@ -217,15 +217,16 @@ void DoCstJob(Unit* u)
 
 	//if(GetTickCount() - last < WORK_DELAY)
 	//	return;
-
-	if(u->framesleft > 0)
+	
+	//if(u->framesleft > 0)
+	if(u->cyframes > 0)
 	{
-		u->framesleft --;
+		//u->framesleft --;
 		return;
 	}
 
 	//last = GetTickCount();
-	u->framesleft = WORK_DELAY;
+	//u->framesleft = WORK_DELAY;
 
 	Building* b = &g_building[u->target];
 	Player* py = &g_player[b->owner];
@@ -327,14 +328,10 @@ void DoBlJob(Unit* u)
 	//if(GetTickCount() - last < WORK_DELAY)
 	//	return;
 
-	if(u->framesleft > 0)
-	{
-		u->framesleft --;
+	if(u->cyframes > 0)
 		return;
-	}
 
 	//last = GetTickCount();
-	u->framesleft = WORK_DELAY;
 	Building* b = &g_building[u->target];
 	Player* py = &g_player[b->owner];
 
@@ -411,14 +408,10 @@ void DoCdJob(Unit* u)
 	//if(GetTickCount() - last < WORK_DELAY)
 	//	return;
 
-	if(u->framesleft > 0)
-	{
-		u->framesleft --;
+	if(u->cyframes > 0)
 		return;
-	}
 
 	//last = GetTickCount();
-	u->framesleft = WORK_DELAY;
 	ConduitTile* ctile = GetCo(u->cdtype, u->target, u->target2, false);
 	Player* py = &g_player[ctile->owner];
 
@@ -621,14 +614,10 @@ void DoShop(Unit* u)
 	//if(GetTickCount() - last < WORK_DELAY)
 	//	return;
 
-	if(u->framesleft > 0)
-	{
-		u->framesleft --;
+	if(u->cyframes > 0)
 		return;
-	}
 
 	//last = GetTickCount();
-	u->framesleft = WORK_DELAY;
 
 	Building* b = &g_building[u->target];
 	Player* p = &g_player[b->owner];
@@ -676,13 +665,9 @@ void DoRest(Unit* u)
 		return;
 	}
 
-	if(u->framesleft > 0)
-	{
-		u->framesleft --;
+	if(u->cyframes > 0)
 		return;
-	}
 
-	u->framesleft = WORK_DELAY;
 	u->belongings[RES_LABOUR] += 1;
 }
 
@@ -832,14 +817,11 @@ void DoDrTra(Unit* op)
 	}
 	}*/
 
-	if(op->framesleft > 0)
-	{
-		op->framesleft --;
+	if(op->cyframes > 0)
 		return;
-	}
 
 	//last = GetTickCount();
-	op->framesleft = DRIVE_WORK_DELAY;
+	//op->framesleft = DRIVE_WORK_DELAY;
 
 	Unit* tr = &g_unit[op->target];
 	Player* py = &g_player[tr->owner];
@@ -886,6 +868,10 @@ void UpdLab(Unit* u)
 {
 	u->belongings[RES_RETFOOD] -= LABOURER_FOODCONSUM;
 	u->frameslookjobago ++;
+	u->cyframes--;
+
+	if(u->cyframes < 0)
+		u->cyframes = WORK_DELAY;
 
 	if(u->belongings[RES_RETFOOD] <= 0)
 	{

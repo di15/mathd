@@ -26,10 +26,11 @@ extern long long g_simframe;
 
 #define SIM_FRAME_RATE		30
 
-#define STARTING_RETFOOD		9000	//lasts for 5 minutes
 #define STARTING_LABOUR			1000	//lasts for 33.333 seconds
 #define LABOURER_FOODCONSUM		1
 #define LABOURER_ENERGYCONSUM	3
+//#define STARTING_RETFOOD		9000	//lasts for 5 minutes
+#define STARTING_RETFOOD		(5* CYCLE_FRAMES/SIM_FRAME_RATE * LABOURER_FOODCONSUM)	//lasts for 5 minutes
 #define DRIVE_WORK_DELAY		(SIM_FRAME_RATE*60)	//in sim frames
 #define WORK_DELAY				(SIM_FRAME_RATE*1)	//in sim frames
 #define LOOKJOB_DELAY_MAX		(SIM_FRAME_RATE*5)

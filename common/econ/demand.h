@@ -320,7 +320,7 @@ extern DemTree g_demtree2[PLAYERS];
 void CalcDem1();
 void CalcDem2(Player* p);
 void CombCo(int btype, Bid* bid, int rtype, int ramt);
-int MaxPro(std::list<CostCompo>& costco, int pricelevel, int demramt, int* proramt);
+bool MaxPro(std::list<CostCompo>& costco, int pricelevel, int demramt, int* proramt, int maxbudget, int* bestrev, int* bestprofit);
 bool DemCmPos(DemNode* pardem, Vec2i* demcmpos);
 
 #endif

@@ -68,7 +68,8 @@ public:
 
 	unsigned char cdtype;	//conduit type for mode (going to construction)
 	int driver;
-	short framesleft;
+	//short framesleft;
+	short cyframes;	//cycle frames (unit cycle of consumption and work)
 	int transpwage;	//transport driver wage
 
 	Unit();

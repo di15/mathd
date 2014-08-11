@@ -577,6 +577,9 @@ void CalcDem1()
 // Housing demand
 void LabDemH(DemTree* dm, Unit* u, int* fundsleft, DemsAtU* pardemu)
 {
+	if(*fundsleft <= 0)
+		return;
+
 	// Housing
 	RDemNode* homedem = new RDemNode;
 	if(!homedem) OutOfMem(__FILE__, __LINE__);
@@ -754,7 +757,11 @@ void LabDemF(DemTree* dm, Unit* u, int* fundsleft, DemsAtU* pardemu)
 	std::list<RDemNode> alts;	//alternatives
 	//int fundsleft = u->belongings[RES_FUNDS];
 	int fundsleft2 = *fundsleft;	//fundsleft2 includes subtractions from speculative, non-existent food suppliers, which isn't supposed to be subtracted from real funds
-	int reqfood = CYCLE_FRAMES * LABOURER_FOODCONSUM;
+	//int reqfood = CYCLE_FRAMES * LABOURER_FOODCONSUM;
+	int reqfood = CYCLE_FRAMES/SIM_FRAME_RATE * LABOURER_FOODCONSUM;
+
+	if(*fundsleft <= 0)
+		return;
 
 	bool changed = false;
 
@@ -766,6 +773,7 @@ void LabDemF(DemTree* dm, Unit* u, int* fundsleft, DemsAtU* pardemu)
 		best.bi = -1;
 		changed = false;
 		int bestutil = -1;
+		int bestaffordqty = 0;
 
 		//for(int bi=0; bi<BUILDINGS; bi++)
 		for(auto biter=dm->supbpcopy.begin(); biter!=dm->supbpcopy.end(); biter++)
@@ -831,17 +839,26 @@ void LabDemF(DemTree* dm, Unit* u, int* fundsleft, DemsAtU* pardemu)
 			if(thisutil <= bestutil && bestutil >= 0)
 				continue;
 
+#if 0
+			if(thisutil <= 0)
+			{
+				InfoMessage("blah", "thisutil <= 0");
+			}
+#endif
+
 			bestutil = thisutil;
 
 			int reqqty = imin(stockqty, reqfood);
 			int affordqty = imin(reqqty, fundsleft2 / marginpr);
 			stockqty -= affordqty;
-			reqfood -= affordqty;
+			//reqfood -= affordqty;
 
 			if(affordqty <= 0)
 				continue;
 
 			changed = true;
+
+			bestaffordqty = affordqty;
 
 			best.bi = bi;
 			best.btype = bt - g_bltype;
@@ -860,6 +877,8 @@ void LabDemF(DemTree* dm, Unit* u, int* fundsleft, DemsAtU* pardemu)
 
 		if(!bestdemb)
 			break;
+
+		reqfood -= bestaffordqty;
 
 		alts.push_back(best);
 		*fundsleft -= best.bid.maxbid;
@@ -884,7 +903,33 @@ void LabDemF(DemTree* dm, Unit* u, int* fundsleft, DemsAtU* pardemu)
 		//dm->nodes.push_back(rdem);
 		dm->rdemcopy.push_back(rdem);
 
+#if 1
+		//if(ri == RES_HOUSING)
+		//if(ri == RES_RETFOOD)
+		{
+			int pi = -1;
+			int ri = RES_RETFOOD;
+			int bi = rdem->bi;
+			char msg[512];
+			int margpr = rdem->bid.marginpr;
+			int cmdist = -1;
+
+			if(bi >= 0)
+			{
+				Building* b = &g_building[bi];
+				pi = b->owner;
+				margpr = b->prodprice[ri];
+			}
+			
+			sprintf(msg, "found food p%d %s b%d margpr%d minutil%d ramt%d cmdist%d", pi, g_resource[ri].name.c_str(), bi, margpr, rdem->bid.minutil, rdem->ramt, cmdist);
+			InfoMessage("ff", msg);
+		}
+#endif
+
 	} while(changed && fundsleft2 > 0);
+
+	//I now see that fundsleft has to be subtracted too
+	*fundsleft = fundsleft2;
 
 	//Note: if there is no more money, yet still a requirement
 	//for more food, then food is too expensive to be afforded
@@ -911,6 +956,8 @@ void LabDemF(DemTree* dm, Unit* u, int* fundsleft, DemsAtU* pardemu)
 		demremain->bid.minutil = -1;	//any util
 		//dm->nodes.push_back(demremain);
 		dm->rdemcopy.push_back(demremain);
+
+		*fundsleft -= fundsleft2;
 	}
 
 	// If there is any money not spent on available food
@@ -928,6 +975,9 @@ void LabDemF2(DemTree* dm, Unit* u, int* fundsleft, DemsAtU* pardemu)
 	std::list<RDemNode> alts;	//alternatives
 	//int fundsleft = u->belongings[RES_FUNDS];
 	int fundsleft2 = *fundsleft;	//fundsleft2 includes subtractions from speculative, non-existent food suppliers, which isn't supposed to be subtracted from real funds
+
+	if(*fundsleft <= 0)
+		return;
 
 	bool changed = false;
 
@@ -1057,6 +1107,9 @@ void LabDemF2(DemTree* dm, Unit* u, int* fundsleft, DemsAtU* pardemu)
 
 	} while(changed && fundsleft2 > 0);
 
+	//I now see that fundsleft has to be subtracted too
+	*fundsleft = fundsleft2;
+
 	if(fundsleft2 <= 0)
 		return;
 
@@ -1078,6 +1131,8 @@ void LabDemF2(DemTree* dm, Unit* u, int* fundsleft, DemsAtU* pardemu)
 	demremain->bid.minutil = -1;	//any util
 	//dm->nodes.push_back(demremain);
 	dm->rdemcopy.push_back(demremain);
+
+	*fundsleft -= fundsleft2;
 }
 
 // Electricity demand, bare necessity
@@ -1093,6 +1148,9 @@ void LabDemE(DemTree* dm, Unit* u, int* fundsleft, DemsAtU* pardemu)
 	int fundsleft2 = *fundsleft;	//fundsleft2 includes subtractions from speculative, non-existent food suppliers, which isn't supposed to be subtracted from real funds
 	int reqelec = LABOURER_ENERGYCONSUM;
 
+	if(*fundsleft <= 0)
+		return;
+
 	bool changed = false;
 
 	// If there are alternatives/competitors
@@ -1103,6 +1161,7 @@ void LabDemE(DemTree* dm, Unit* u, int* fundsleft, DemsAtU* pardemu)
 		best.bi = -1;
 		changed = false;
 		int bestutil = -1;
+		int bestaffordqty = 0;
 
 		//for(int bi=0; bi<BUILDINGS; bi++)
 		for(auto biter=dm->supbpcopy.begin(); biter!=dm->supbpcopy.end(); biter++)
@@ -1170,12 +1229,14 @@ void LabDemE(DemTree* dm, Unit* u, int* fundsleft, DemsAtU* pardemu)
 			int reqqty = imin(stockqty, reqelec);
 			int affordqty = imin(reqqty, fundsleft2 / marginpr);
 			stockqty -= affordqty;
-			reqelec -= affordqty;
+			//reqelec -= affordqty;
 
 			if(affordqty <= 0)
 				continue;
 
 			changed = true;
+
+			bestaffordqty = affordqty;
 
 			best.bi = bi;
 			best.btype = bt - g_bltype;
@@ -1194,6 +1255,8 @@ void LabDemE(DemTree* dm, Unit* u, int* fundsleft, DemsAtU* pardemu)
 
 		if(!bestdemb)
 			break;
+
+		reqelec -= bestaffordqty;
 
 		alts.push_back(best);
 		*fundsleft -= best.bid.maxbid;
@@ -1220,6 +1283,10 @@ void LabDemE(DemTree* dm, Unit* u, int* fundsleft, DemsAtU* pardemu)
 
 	} while(changed && fundsleft2 > 0);
 
+	
+	//I now see that fundsleft has to be subtracted too
+	*fundsleft = fundsleft2;
+
 	//Note: if there is no more money, yet still a requirement
 	//for more electricity, then electricity or other necessities are
 	//too expensive to be afforded and something is wrong.
@@ -1245,6 +1312,8 @@ void LabDemE(DemTree* dm, Unit* u, int* fundsleft, DemsAtU* pardemu)
 		demremain->bid.minutil = -1;	//any util
 		//dm->nodes.push_back(demremain);
 		dm->rdemcopy.push_back(demremain);
+
+		*fundsleft -= fundsleft2;
 	}
 
 	// If there is any money not spent on available electricity
@@ -1793,7 +1862,7 @@ void CombCo(int btype, Bid* bid, int rtype, int ramt)
 			prodstep[ri] = stepleft[ri] * RATIO_DENOM / bt->input[ri];
 
 #ifdef DEBUGDEM
-			g_log<<"\t\t\t ri prodstep="<<prodstep[ri]<<std::endl;
+			g_log<<"\t\t\t ri prodstep="<<prodstep[ri]<<" bt->input[ri]="<<bt->input[ri]<<std::endl;
 			g_log.flush();
 #endif
 		}
@@ -1963,9 +2032,11 @@ void CheckBlType(DemTree* dm, Player* p, int btype, int rtype, int ramt, Vec2i t
 }
 
 //max profit
-int MaxPro(std::list<CostCompo>& costco, int pricelevel, int demramt, int* proramt)
+bool MaxPro(std::list<CostCompo>& costco, int pricelevel, int demramt, int* proramt, int maxbudget, int* bestrev, int* bestprofit)
 {
-	int bestprofit = -1;
+	//int bestprofit = -1;
+	*bestprofit = -1;
+	*bestrev = -1;
 	int bestramt = 0;
 	//*ramt = 0;
 
@@ -1984,13 +2055,31 @@ int MaxPro(std::list<CostCompo>& costco, int pricelevel, int demramt, int* prora
 
 	while(currlim >= 1)
 	{
+		int currev = 0;
 		int curprofit = 0;
 		int curramt = 0;
 		int i = 0;
 		for(auto citer=costco.begin(); citer!=costco.end() && i<currlim; citer++, i++)
 		{
 			int subprofit = pricelevel * citer->ramt - (citer->fixcost + citer->margcost * citer->ramt);
+			int subrevenue = pricelevel * citer->ramt;
 
+			if(currev + subrevenue >= maxbudget)
+			{
+				//budget left
+				int budgleft = maxbudget - currev;
+				int inchmore = budgleft / pricelevel;	//how much more ramt?
+				
+				subprofit = pricelevel * inchmore - (citer->fixcost + citer->margcost * citer->ramt);
+				subrevenue = pricelevel * inchmore;
+
+				currev += subrevenue;
+				curprofit += subprofit;
+				curramt += inchmore;
+				break;
+			}
+
+			currev += subrevenue;
 			curprofit += subprofit;
 			curramt += citer->ramt;
 		}
@@ -2000,9 +2089,10 @@ int MaxPro(std::list<CostCompo>& costco, int pricelevel, int demramt, int* prora
 	g_log.flush();
 #endif
 
-		if(bestlim < 0 || curprofit > bestprofit)
+		if(bestlim < 0 || curprofit > *bestprofit)
 		{
-			bestprofit = curprofit;
+			*bestprofit = curprofit;
+			*bestrev = currev;
 			bestramt = curramt;
 			bestlim = currlim;
 		}
@@ -2011,7 +2101,7 @@ int MaxPro(std::list<CostCompo>& costco, int pricelevel, int demramt, int* prora
 	}
 
 	*proramt += bestramt;
-	return bestprofit;
+	return *bestprofit > 0;
 }
 
 /*
@@ -2023,8 +2113,10 @@ void CheckBlTile(DemTree* dm, Player* p, int ri, RDemNode* pt, int x, int z, int
 	//list of r demands for this res type, with max revenue and costs for this tile
 	std::list<DemNode*> rdems;	//RDemNode*
 	int maxramt = 0;
-	int totalmaxrev = 0;
+	int maxbudg = 0;	//max budget of consumer(s)
 	Resource* r = &g_resource[ri];
+
+	std::list<RDemNode*> rdns;
 
 	for(auto diter=dm->rdemcopy.begin(); diter!=dm->rdemcopy.end(); diter++)
 	{
@@ -2041,6 +2133,18 @@ void CheckBlTile(DemTree* dm, Player* p, int ri, RDemNode* pt, int x, int z, int
 		//if(rdn->bi >= 0)
 		//	continue;	//already supplied?
 		//actually, no, we might be a competitor
+		//actually, it only matters if it's supplied 
+		//by the same player, otherwise it's a competitor.
+		if(rdn->bi >= 0)
+		{
+			Building* b = &g_building[rdn->bi];
+			Player* p2 = &g_player[b->owner];
+
+			//if it's owned by us, we don't want to compete with it.
+			//it's better than to just adjust the price instead of wasting on another building.
+			if(p2 == p)
+				continue;
+		}
 
 		//int requtil = rdn->bid.minutil+1;
 		int requtil = rdn->bid.minutil;
@@ -2056,10 +2160,30 @@ void CheckBlTile(DemTree* dm, Player* p, int ri, RDemNode* pt, int x, int z, int
 			continue;
 
 		int cmdist = Magnitude(Vec2i(x,z)*TILE_SIZE + Vec2i(TILE_SIZE,TILE_SIZE)/2 - demcmpos);
-		int maxpr = r->physical ? InvPhUtilP(requtil, cmdist) : InvGlUtilP(requtil);
+		int maxpr = 0;
+		int maxrev = 0;
+		
+		//unecessary? might be necessary if minutil is -1 (any util) and there's only a budget constraint
+		if(requtil < 0)
+		{
+			maxrev = rdn->bid.maxbid;
+			maxpr = maxrev;
+		}
+		else
+		{
+			maxpr = r->physical ? InvPhUtilP(requtil, cmdist) : InvGlUtilP(requtil);
+			
+			if(maxpr <= 0)
+				continue;
 
-		while((r->physical ? PhUtil(maxpr, cmdist) : GlUtil(maxpr)) < requtil)
-			maxpr--;
+			while((r->physical ? PhUtil(maxpr, cmdist) : GlUtil(maxpr)) < requtil)
+				maxpr--;
+			
+			if(maxpr <= 0)
+				continue;
+
+			maxrev = maxpr * rdn->ramt;
+		}
 
 #if 0
 		char msg[128];
@@ -2068,23 +2192,12 @@ void CheckBlTile(DemTree* dm, Player* p, int ri, RDemNode* pt, int x, int z, int
 #endif
 		
 #if 1
-		if(ri == RES_HOUSING)
+		//if(ri == RES_HOUSING)
 		{
-			g_log<<"housing rdn->ramt="<<rdn->ramt<<" maxpr="<<maxpr<<" maxbid="<<rdn->bid.maxbid<<" rdn->bid.minutil="<<rdn->bid.minutil<<std::endl;
+			g_log<<"dem "<<g_resource[ri].name<<" rdn->ramt="<<rdn->ramt<<" maxpr="<<maxpr<<" maxbid="<<rdn->bid.maxbid<<" rdn->bid.minutil="<<rdn->bid.minutil<<std::endl;
 			g_log.flush();
 		}
 #endif
-
-		if(maxpr <= 0)
-			continue;
-
-		int maxrev = maxpr * rdn->ramt;
-
-		if(rdn->bid.minutil < 0)
-		{
-			maxrev = imin(maxrev, rdn->bid.maxbid);	//unecessary? might be necessary if minutil is -1 (any util) and there's only a budget constraint
-			maxpr = maxrev;
-		}
 
 #if 1
 		if(ri == RES_HOUSING)
@@ -2098,7 +2211,28 @@ void CheckBlTile(DemTree* dm, Player* p, int ri, RDemNode* pt, int x, int z, int
 			continue;
 
 		maxramt += rdn->ramt;
-		totalmaxrev += rdn->bid.maxbid;
+		maxbudg += rdn->bid.maxbid;
+
+		rdns.push_back(rdn);
+
+#if 0
+		if(totalmaxrev > 100)
+		{
+			g_log<<"totalmaxrev > 100 = "<<totalmaxrev<<" rdn->bid.maxbid="<<rdn->bid.maxbid<<std::endl;
+
+			for(auto rditer=rdns.begin(); rditer!=rdns.end(); rditer++)
+			{
+				RDemNode* rd = *rditer;
+				Vec2i pardempos;
+				if(DemCmPos(rd->parent, &pardempos))
+					g_log<<"\tpardempos = "<<pardempos.x<<","<<pardempos.y<<std::endl;
+				else
+					g_log<<"\t?pos"<<std::endl;
+			}
+
+			g_log.flush();
+		}
+#endif
 
 		rdn->bid.marginpr = maxpr;
 		rdn->bid.maxbid = maxrev;
@@ -2213,8 +2347,10 @@ void CheckBlTile(DemTree* dm, Player* p, int ri, RDemNode* pt, int x, int z, int
 			int proramt = 0;	//how much is most profitable to produce in this case
 			Bid* bid = &bltybid;
 
+			int currev;
+			int curprofit;
 			//find max profit based on cost composition and price
-			int curprofit = MaxPro(bid->costcompo, leastnext, demramt, &proramt);
+			MaxPro(bid->costcompo, leastnext, demramt, &proramt, maxbudg, &currev, &curprofit);
 
 			//int ofmax = Ceili(proramt * RATIO_DENOM, bestmaxr);	//how much of max demanded is
 			//curprofit += ofmax * bestrecur / RATIO_DENOM;	//bl recurring costs, scaled to demanded qty
@@ -2223,6 +2359,9 @@ void CheckBlTile(DemTree* dm, Player* p, int ri, RDemNode* pt, int x, int z, int
 			g_log<<"\t\t\t curprofit = "<<curprofit<<" proramt="<<proramt<<" demramt="<<demramt<<std::endl;
 			g_log.flush();
 #endif
+
+			//if(curprofit > maxbudg)
+			//	curprofit = maxbudg;
 
 			if(curprofit <= 0)
 				continue;
@@ -2259,8 +2398,8 @@ void CheckBlTile(DemTree* dm, Player* p, int ri, RDemNode* pt, int x, int z, int
 		if(!dupdm)
 			continue;
 
-		if(*recurp > totalmaxrev)
-			*recurp = totalmaxrev;
+		//if(*recurp > totalmaxrev)
+		//	*recurp = totalmaxrev;
 
 		*success = true;
 

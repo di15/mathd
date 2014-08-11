@@ -6,10 +6,11 @@
 #include "../sim/build.h"
 #include "../sim/sim.h"
 #include "../econ/utility.h"
+#include "../sim/unit.h"
 
 void UpdateAI()
 {
-#if 0
+#if 1
 	for(int i=0; i<PLAYERS; i++)
 	{
 		Player* p = &g_player[i];
@@ -72,7 +73,11 @@ void Build(Player* p)
 #if 1
 		{
 			char msg[256];
-			sprintf(msg, "placebl p%d margpr%d profit%d minutil%d", pi, demb->bid.marginpr, demb->bid.maxbid, demb->bid.minutil);
+			int cmdist = -1;
+			Vec2i demcmpos = g_unit[0].cmpos;
+			Vec2i supcmpos = tpos * TILE_SIZE + Vec2i(TILE_SIZE,TILE_SIZE)/2;
+			cmdist = Magnitude(demcmpos - supcmpos);
+			sprintf(msg, "placebl p%d margpr%d profit%d minutil%d cmdist%d", pi, demb->bid.marginpr, demb->bid.maxbid, demb->bid.minutil, cmdist);
 			InfoMessage("r", msg);
 		}
 #endif
@@ -147,21 +152,42 @@ void AdjPr(Building* b)
 			else
 				cmdist = MAX_UTIL;	//willingness to go anywhere
 
+			int requtil = rdem->bid.minutil;
+
 			//we need price in this case
 			//we have a given building that we're optimizing, so distance is given
 
-			int margpr = r->physical ? InvPhUtilP(rdem->bid.minutil, cmdist) : InvGlUtilP(rdem->bid.minutil);
+			int margpr = 0;
 
 			//if there's no utility limit and only a limit on price
 			if(rdem->bid.minutil < 0)
+			{
 				margpr = rdem->bid.maxbid;
+			}
+			else
+			{
+				margpr = r->physical ? InvPhUtilP(requtil, cmdist) : InvGlUtilP(requtil);
+				
+				if(margpr <= 0)
+					continue;
+
+				while((r->physical ? PhUtil(margpr, cmdist) : GlUtil(margpr)) < requtil)
+					margpr--;
+			
+				if(margpr <= 0)
+					continue;
+				
+				//also, need to stay within budget, otherwise this generates wildly large prices
+				if(margpr > rdem->bid.maxbid)
+					margpr = rdem->bid.maxbid;
+			}
 
 #if 1
 			//if(ri == RES_HOUSING)
 			//if(ri == RES_RETFOOD)
 			{
 				char msg[256];
-				sprintf(msg, "p%d %s b%d margpr%d minutil%d cmdist%d", pi, g_resource[ri].name.c_str(), b-g_building, margpr, rdem->bid.minutil, cmdist);
+				sprintf(msg, "p%d %s b%d margpr%d minutil%d ramt%d cmdist%d", pi, g_resource[ri].name.c_str(), b-g_building, margpr, rdem->bid.minutil, rdem->ramt, cmdist);
 				InfoMessage("r", msg);
 			}
 #endif
@@ -179,14 +205,14 @@ void AdjPr(Building* b)
 		int bestmaxr = -1;
 		int bestprc = -1;
 		int blmaxr = bt->output[ri];
-		int maxrev = 0;
+		int maxbudg = 0;	//max consumer budget
 
 		//evalute max projected revenue at tile and bltype
 		//try all the price levels from smallest to greatest
 		while(true)
 		{
 			int leastnext = prevprc;
-			maxrev = 0;
+			maxbudg = 0;
 
 			//while there's another possible price, see if it will generate more total profit
 
@@ -209,7 +235,7 @@ void AdjPr(Building* b)
 					RDemNode* rdem = (RDemNode*)*diter;
 					//curprofit += diter->ramt * leastnext;
 					demramt += rdem->ramt;
-					maxrev += rdem->bid.maxbid;
+					maxbudg += rdem->bid.maxbid;
 				}
 
 			//if demanded exceeds bl's max out
@@ -217,9 +243,10 @@ void AdjPr(Building* b)
 				demramt = blmaxr;
 
 			int proramt = 0;	//how much is most profitable to produce in this case
-
+			int curprofit;
+			int currev;
 			//find max profit based on cost composition and price
-			int curprofit = MaxPro(bid.costcompo, leastnext, demramt, &proramt);
+			MaxPro(bid.costcompo, leastnext, demramt, &proramt, maxbudg, &currev, &curprofit);
 
 			//int ofmax = Ceili(proramt * RATIO_DENOM, bestmaxr);	//how much of max demanded is
 			//curprofit += ofmax * bestrecur / RATIO_DENOM;	//bl recurring costs, scaled to demanded qty
@@ -227,8 +254,8 @@ void AdjPr(Building* b)
 			if(curprofit <= bestprofit)
 				continue;
 
-			if(curprofit > maxrev)
-				curprofit = maxrev;
+			//if(curprofit > maxbudg)
+			//	curprofit = maxbudg;
 
 			bestprofit = curprofit;
 			bestmaxr = blmaxr;
@@ -247,10 +274,28 @@ void AdjPr(Building* b)
 		//if(ri == RES_HOUSING)
 		//if(ri == RES_RETFOOD)
 		{
-			char msg[128];
+			char msg[1280];
 			int bi = b - g_building;
 
 			sprintf(msg, "adjpr %s b%d to$%d", g_resource[ri].name.c_str(), bi, bestprc);
+			
+			for(int bi=0; bi<BUILDINGS; bi++)
+			{
+				Building* b2 = &g_building[bi];
+
+				if(!b2->on)
+					continue;
+
+				BlType* b2t = &g_bltype[b2->type];
+
+				if(b2t->output[ri] <= 0)
+					continue;
+
+				char submsg[128];
+				sprintf(submsg, "\n p%d b%d pr$%d", b2->owner, bi, b2->prodprice[ri]);
+				strcat(msg, submsg);
+			}
+
 			InfoMessage("info", msg);
 		}
 #endif
