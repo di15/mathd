@@ -93,6 +93,28 @@ bool Build(Player* p)
 #if 1
 		BlType* bt = &g_bltype[btype];
 		g_log<<"place opp "<<bt->name<<" capitalization $"<<demb->bid.maxbid<<std::endl;
+
+		int crtype = -1;
+
+		for(int ri=0; ri<RESOURCES; ri++)
+		{
+			if(bt->output[ri] <= 0)
+				continue;
+
+			crtype = ri;
+			break;
+		}
+
+		for(auto riter=dm->rdemcopy.begin(); riter!=dm->rdemcopy.end(); riter++)
+		{
+			RDemNode* rdem = (RDemNode*)*riter;
+
+			if(rdem->rtype != crtype)
+				continue;
+
+			g_log<<"\t constr "<<g_resource[crtype].name.c_str()<<" dem minutil="<<rdem->bid.minutil<<"  maxbid="<<rdem->bid.maxbid<<std::endl;
+		}
+
 		g_log.flush();
 #endif
 

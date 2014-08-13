@@ -298,10 +298,10 @@ void Click_NewGame()
 
 	CheckGLError(__FILE__, __LINE__);
 
-	//for(int i=0; i<10; i++)
-		//for(int j=0; j<10; j++)
-	for(int i=0; i<1; i++)
-		for(int j=0; j<1; j++)
+	for(int i=0; i<10; i++)
+		for(int j=0; j<10; j++)
+	//for(int i=0; i<1; i++)
+		//for(int j=0; j<1; j++)
 		{
 
 			//Vec3i cmpos((g_hmap.m_widthx+4)*TILE_SIZE/2 + (i+2)*PATHNODE_SIZE, 0, g_hmap.m_widthz*TILE_SIZE/2 + (j+2)*PATHNODE_SIZE);
