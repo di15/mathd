@@ -297,9 +297,11 @@ void Click_NewGame()
 #endif
 
 	CheckGLError(__FILE__, __LINE__);
-
+	
 	for(int i=0; i<10; i++)
 		for(int j=0; j<10; j++)
+	//for(int i=0; i<15; i++)
+	//	for(int j=0; j<1; j++)
 	//for(int i=0; i<1; i++)
 		//for(int j=0; j<1; j++)
 		{

@@ -90,7 +90,7 @@ bool Build(Player* p)
 		if(!PlaceBl(btype, tpos, false, pi, &demb->bi))
 			continue;
 
-#if 1
+#if 0
 		BlType* bt = &g_bltype[btype];
 		g_log<<"place opp "<<bt->name<<" capitalization $"<<demb->bid.maxbid<<std::endl;
 
@@ -112,8 +112,33 @@ bool Build(Player* p)
 			if(rdem->rtype != crtype)
 				continue;
 
-			g_log<<"\t constr "<<g_resource[crtype].name.c_str()<<" dem minutil="<<rdem->bid.minutil<<"  maxbid="<<rdem->bid.maxbid<<std::endl;
+			g_log<<"\t constr "<<g_resource[crtype].name.c_str()<<" dem minutil="<<rdem->bid.minutil<<"  maxbid="<<rdem->bid.maxbid<<" rdem->ramt="<<rdem->ramt<<std::endl;
+
+			if(rdem->parent)
+			{
+				g_log<<"\t\t parenttype="<<rdem->parent->demtype<<std::endl;
+			}
 		}
+
+		g_log<<"housing capit"<<std::endl;
+		int htotal = 0;
+		for(auto riter=dm->rdemcopy.begin(); riter!=dm->rdemcopy.end(); riter++)
+		{
+			RDemNode* rdem = (RDemNode*)*riter;
+
+			if(rdem->rtype != RES_HOUSING)
+				continue;
+
+			htotal += rdem->bid.maxbid;
+
+			g_log<<"\t housing "<<g_resource[RES_HOUSING].name.c_str()<<" dem minutil="<<rdem->bid.minutil<<"  maxbid="<<rdem->bid.maxbid<<" rdem->ramt="<<rdem->ramt<<std::endl;
+
+			if(rdem->parent)
+			{
+				g_log<<"\t\t parenttype="<<rdem->parent->demtype<<std::endl;
+			}
+		}
+		g_log<<"\t housing maxbid="<<htotal<<std::endl;
 
 		g_log.flush();
 #endif
@@ -240,7 +265,8 @@ bool AdjPr(Building* b)
 			{
 				Building* b2 = &g_building[rdem->bi];
 				if(b2->owner == pi)
-					requtil = rdem->bid.minutil;
+					//requtil = rdem->bid.minutil;
+					continue;
 			}
 
 			//we need price in this case
@@ -378,8 +404,9 @@ bool AdjPr(Building* b)
 		}
 
 #if 0
-		//if(ri == RES_HOUSING)
+		if(ri == RES_HOUSING)
 		//if(ri == RES_RETFOOD)
+		//if(ri == RES_ENERGY)
 		{
 			char msg[1280];
 			int bi = b - g_building;

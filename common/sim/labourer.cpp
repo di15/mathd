@@ -866,6 +866,8 @@ void DoDrTra(Unit* op)
 
 void UpdLab(Unit* u)
 {
+	return;	//do nothing for now
+
 	u->belongings[RES_RETFOOD] -= LABOURER_FOODCONSUM;
 	u->frameslookjobago ++;
 	u->cyframes--;

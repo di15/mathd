@@ -4,7 +4,9 @@
 #define UTILITY_H
 
 //#define MAX_UTIL	1000000000	//possible overflow?
-#define MAX_UTIL	50000
+//make sure this value is bigger than any combined obtainable revenue of building from labourer spending
+//edit: and multiplied by distance?
+#define MAX_UTIL	200000000
 
 int PhUtil(int price, int cmdist);
 int GlUtil(int price);
