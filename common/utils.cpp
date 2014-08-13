@@ -39,6 +39,7 @@ void OpenLog(const char* filename, int version)
 {
 	char fullpath[MAX_PATH+1];
 	FullPath(filename, fullpath);
+	g_log.close();
 	g_log.open(fullpath, std::ios_base::out);
 	g_log<<DateTime()<<std::endl;
 	g_log<<"Version "<<version<<std::endl<<std::endl;

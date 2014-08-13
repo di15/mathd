@@ -90,38 +90,54 @@ bool Build(Player* p)
 		if(!PlaceBl(btype, tpos, false, pi, &demb->bi))
 			continue;
 
+#if 1
+		BlType* bt = &g_bltype[btype];
+		g_log<<"place opp "<<bt->name<<" capitalization $"<<demb->bid.maxbid<<std::endl;
+		g_log.flush();
+#endif
+
 		Building* b = &g_building[demb->bi];
 		AdjPr(b);
 #if 1
 		//react to new price
 
-		for(int i=pi+1; i<PLAYERS; i++)
+		bool chpr;
+		int nch = 0;
+
+		do
 		{
-			Player* p2 = &g_player[i];
+			chpr = false;
 
-			if(!p2->on)
-				continue;
+			for(int i=pi+1; i<PLAYERS; i++)
+			{
+				Player* p2 = &g_player[i];
 
-			if(!p2->ai)
-				continue;
+				if(!p2->on)
+					continue;
+
+				if(!p2->ai)
+					continue;
 		
-			CalcDem2(p2);
-			AdjPr(p2);
-		}
+				CalcDem2(p2, false);
+				chpr = AdjPr(p2) ? true : chpr;
+			}
 
-		for(int i=0; i<imin(pi+1,PLAYERS); i++)
-		{
-			Player* p2 = &g_player[i];
+			for(int i=0; i<imin(pi+1,PLAYERS); i++)
+			{
+				Player* p2 = &g_player[i];
 
-			if(!p2->on)
-				continue;
+				if(!p2->on)
+					continue;
 
-			if(!p2->ai)
-				continue;
+				if(!p2->ai)
+					continue;
 		
-			CalcDem2(p2);
-			AdjPr(p2);
-		}
+				CalcDem2(p2, false);
+				chpr = AdjPr(p2) ? true : chpr;
+			}
+
+			nch++;
+		}while(chpr /* && nch < 5 */);
 #endif
 
 		return true;
@@ -136,13 +152,14 @@ void Manuf(Player* p)
 }
 
 //adjust prices at building
-void AdjPr(Building* b)
+bool AdjPr(Building* b)
 {
 	int pi = b->owner;
 	Player* p = &g_player[pi];
 	DemTree* dm = &g_demtree2[pi];
 	BlType* bt = &g_bltype[b->type];
 	Vec2i supcmpos = b->tilepos * TILE_SIZE + Vec2i(TILE_SIZE,TILE_SIZE)/2;
+	bool change = false;
 
 	//for each output resource adjust price
 	for(int ri=0; ri<RESOURCES; ri++)
@@ -364,18 +381,28 @@ void AdjPr(Building* b)
 				strcat(msg, submsg);
 			}
 
-			InfoMessage("info", msg);
+			//InfoMessage("info", msg);
+			g_log<<"----"<<std::endl<<msg<<std::endl;
+			g_log.flush();
 		}
 #endif
 
+		if(b->prodprice[ri] == bestprc)
+			continue;
+
 		b->prodprice[ri] = bestprc;
+
+		change = true;
 	}
+
+	return change;
 }
 
 //adjust prices
-void AdjPr(Player* p)
+bool AdjPr(Player* p)
 {
 	int pi = p - g_player;
+	bool change = false;
 
 	for(int bi=0; bi<BUILDINGS; bi++)
 	{
@@ -387,8 +414,10 @@ void AdjPr(Player* p)
 		if(b->owner != pi)
 			continue;
 
-		AdjPr(b);
+		change = AdjPr(b) ? true : change;
 	}
+
+	return change;
 }
 
 void UpdateAI(Player* p)
@@ -404,10 +433,43 @@ void UpdateAI(Player* p)
 
 	once = true;
 #endif
+	
+#if 0
+	//OpenLog("log.txt", 123);
+	g_log<<"a p "<<(int)(p-g_player)<<std::endl;
+	g_log.flush();
+#endif
 
-	CalcDem2(p);
+	CalcDem2(p, true);
+	
+#if 0
+	//OpenLog("log.txt", 123);
+	g_log<<"b p "<<(int)(p-g_player)<<std::endl;
+	g_log.flush();
+#endif
+
 	if(Build(p))
 		return;
+	
+#if 0
+	//OpenLog("log.txt", 123);
+	g_log<<"c p "<<(int)(p-g_player)<<std::endl;
+	g_log.flush();
+#endif
+
 	Manuf(p);
+	
+#if 0
+	//OpenLog("log.txt", 123);
+	g_log<<"d p "<<(int)(p-g_player)<<std::endl;
+	g_log.flush();
+#endif
+
 	AdjPr(p);
+	
+#if 0
+	//OpenLog("log.txt", 123);
+	g_log<<"e p "<<(int)(p-g_player)<<std::endl;
+	g_log.flush();
+#endif
 }

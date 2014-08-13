@@ -3,7 +3,8 @@
 #ifndef UTILITY_H
 #define UTILITY_H
 
-#define MAX_UTIL	1000000000
+//#define MAX_UTIL	1000000000	//possible overflow?
+#define MAX_UTIL	50000
 
 int PhUtil(int price, int cmdist);
 int GlUtil(int price);
