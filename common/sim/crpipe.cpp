@@ -13,7 +13,7 @@
 #include "../../game/gmain.h"
 #include "../../game/gui/ggui.h"
 
-char CrPipeTile::condtype()
+unsigned char CrPipeTile::condtype()
 {
 	return CONDUIT_CRPIPE;
 }

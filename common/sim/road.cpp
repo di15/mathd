@@ -16,7 +16,7 @@
 #include "../path/pathnode.h"
 #include "../path/collidertile.h"
 
-char RoadTile::condtype()
+unsigned char RoadTile::condtype()
 {
 	return CONDUIT_ROAD;
 }

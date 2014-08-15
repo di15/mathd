@@ -81,7 +81,7 @@ void AddInf(DemTree* dm, std::list<DemNode*>* cdarr, DemNode* parent, DemNode* p
 		return;
 	}
 
-	char ctype = r->conduit;
+	unsigned char ctype = r->conduit;
 	ConduitType* ct = &g_cotype[ctype];
 
 
@@ -810,7 +810,7 @@ void LabDemH(DemTree* dm, Unit* u, int* fundsleft, DemsAtU* pardemu)
 	rdem->utype = -1;
 	rdem->demui = u - g_unit;
 	//dm->nodes.push_back(rdem);
-	
+
 	if(!bestdemb)
 		dm->rdemcopy.push_back(rdem);
 	else
@@ -992,7 +992,7 @@ void LabDemF(DemTree* dm, Unit* u, int* fundsleft, DemsAtU* pardemu)
 				pi = b->owner;
 				margpr = b->prodprice[ri];
 			}
-			
+
 			sprintf(msg, "found food p%d %s b%d margpr%d minutil%d ramt%d cmdist%d", pi, g_resource[ri].name.c_str(), bi, margpr, rdem->bid.minutil, rdem->ramt, cmdist);
 			InfoMessage("ff", msg);
 		}
@@ -1218,7 +1218,7 @@ void LabDemF3(DemTree* dm, Unit* u, int* fundsleft, DemsAtU* pardemu)
 				pi = b->owner;
 				margpr = b->prodprice[ri];
 			}
-			
+
 			sprintf(msg, "found food p%d %s b%d margpr%d minutil%d ramt%d cmdist%d", pi, g_resource[ri].name.c_str(), bi, margpr, rdem->bid.minutil, rdem->ramt, cmdist);
 			InfoMessage("ff", msg);
 		}
@@ -1544,7 +1544,7 @@ void LabDemE(DemTree* dm, Unit* u, int* fundsleft, DemsAtU* pardemu)
 
 			if(affordqty <= 0)
 				continue;
-			
+
 			bestutil = thisutil;
 
 			changed = true;
@@ -1600,7 +1600,7 @@ void LabDemE(DemTree* dm, Unit* u, int* fundsleft, DemsAtU* pardemu)
 
 	} while(changed && fundsleft2 > 0 && reqelec > 0);
 
-	
+
 	//I now see that fundsleft has to be subtracted too
 	*fundsleft = fundsleft2;
 
@@ -2047,7 +2047,7 @@ void LinkDemR(DemTree* orig, DemTree* copy)
 
 void LinkNodes(DemTree* orig, DemTree* copy)
 {
-	
+
 }
 
 //Duplicate demtree
@@ -2401,7 +2401,7 @@ bool MaxPro(std::list<CostCompo>& costco, int pricelevel, int demramt, int* pror
 				//budget left
 				int budgleft = maxbudget - currev;
 				int inchmore = budgleft / pricelevel;	//how much more ramt?
-				
+
 				subprofit = pricelevel * inchmore - (citer->fixcost + citer->margcost * citer->ramt);
 				subrevenue = pricelevel * inchmore;
 
@@ -2465,7 +2465,7 @@ void CheckBlTile(DemTree* dm, Player* p, int ri, RDemNode* pt, int x, int z, int
 		//if(rdn->bi >= 0)
 		//	continue;	//already supplied?
 		//actually, no, we might be a competitor
-		//actually, it only matters if it's supplied 
+		//actually, it only matters if it's supplied
 		//by the same player, otherwise it's a competitor.
 		if(rdn->bi >= 0)
 		{
@@ -2505,7 +2505,7 @@ void CheckBlTile(DemTree* dm, Player* p, int ri, RDemNode* pt, int x, int z, int
 		int cmdist = Magnitude(Vec2i(x,z)*TILE_SIZE + Vec2i(TILE_SIZE,TILE_SIZE)/2 - demcmpos);
 		int maxpr = 0;
 		int maxrev = 0;
-		
+
 		//unecessary? might be necessary if minutil is -1 (any util) and there's only a budget constraint
 		if(requtil < 0)
 		{
@@ -2515,13 +2515,13 @@ void CheckBlTile(DemTree* dm, Player* p, int ri, RDemNode* pt, int x, int z, int
 		else
 		{
 			maxpr = r->physical ? InvPhUtilP(requtil, cmdist) : InvGlUtilP(requtil);
-			
+
 			if(maxpr <= 0)
 				continue;
 
 			while((r->physical ? PhUtil(maxpr, cmdist) : GlUtil(maxpr)) < requtil)
 				maxpr--;
-			
+
 			if(maxpr <= 0)
 				continue;
 
@@ -2533,7 +2533,7 @@ void CheckBlTile(DemTree* dm, Player* p, int ri, RDemNode* pt, int x, int z, int
 		sprintf(msg, "maxpr%d requtil%d", maxpr, requtil);
 		InfoMessage("sea", msg);
 #endif
-		
+
 #if 0
 		if(ri == RES_HOUSING)
 		{
@@ -2880,7 +2880,7 @@ void CheckBl(DemTree* dm, Player* p, int* fixcost, int* recurprof, bool* success
 					g_log.flush();
 #endif
 				}
-				
+
 				char msg2[128];
 				sprintf(msg2, "\t\t1\tend%x,%d", x,z);
 				CheckMem(__FILE__, __LINE__, "\t\t2\t");
@@ -3007,10 +3007,10 @@ void CalcDem2(Player* p, bool blopp)
 		DemsAtU* demu = NULL;
 
 		AddU(dm, u, &demu);
-		
+
 		LabDemH(dm, u, &fundsleft, demu);
 		LabDemF(dm, u, &fundsleft, demu);
-		
+
 		if(u->home < 0)
 			continue;
 

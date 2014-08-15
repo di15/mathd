@@ -10,7 +10,7 @@
 #include "../../game/gmain.h"
 #include "building.h"
 
-char PowlTile::condtype()
+unsigned char PowlTile::condtype()
 {
 	return CONDUIT_POWL;
 }

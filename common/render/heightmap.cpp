@@ -96,7 +96,7 @@ void Heightmap::allocate(int wx, int wz)
 
 void FreeGrid()
 {
-	for(char ctype=0; ctype<CONDUIT_TYPES; ctype++)
+	for(unsigned char ctype=0; ctype<CONDUIT_TYPES; ctype++)
 	{
 		ConduitType* ct = &g_cotype[ctype];
 		ConduitTile*& actual = ct->cotiles[(int)false];
