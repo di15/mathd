@@ -283,7 +283,7 @@ void Resize_WinText(Widget* thisw)
 void Click_NewGame()
 {
 	CheckGLError(__FILE__, __LINE__);
-#if 0
+#if 1
 	//LoadJPGMap("heightmaps/heightmap0e2s.jpg");
 	//LoadJPGMap("heightmaps/heightmap0e2.jpg");
 	LoadJPGMap("heightmaps/heightmap0e.jpg");
