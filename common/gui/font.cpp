@@ -658,7 +658,7 @@ void HighlGlyphF(float left, float top, float right, float bottom)
 	};
 
 	//glVertexAttribPointer(g_shader[SHADER_ORTHO].m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, &vertices[0]);
-	glVertexPointer(3, GL_FLOAT, sizeof(float)*4, &vertices[0]);
+	glVertexPointer(3, GL_FLOAT, 0, &vertices[0]);
 
 	glDrawArrays(GL_TRIANGLES, 0, 6);
 }
