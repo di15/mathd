@@ -1418,11 +1418,14 @@ void Heightmap::draw()
 #elif 1
 
 	glBindBuffer(GL_ARRAY_BUFFER, m_vbo[VBO_POSITION]);
-	glVertexAttribPointer(s->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, 0);
+	//glVertexAttribPointer(s->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, 0);
+	glVertexPointer(3, GL_FLOAT, 0, 0);
 	glBindBuffer(GL_ARRAY_BUFFER, m_vbo[VBO_TEXCOORD]);
-	glVertexAttribPointer(s->m_slot[SSLOT_TEXCOORD0], 2, GL_FLOAT, GL_FALSE, 0, 0);
+	//glVertexAttribPointer(s->m_slot[SSLOT_TEXCOORD0], 2, GL_FLOAT, GL_FALSE, 0, 0);
+	glTexCoordPointer(2, GL_FLOAT, 0, 0);
 	glBindBuffer(GL_ARRAY_BUFFER, m_vbo[VBO_NORMAL]);
-	glVertexAttribPointer(s->m_slot[SSLOT_NORMAL], 3, GL_FLOAT, GL_FALSE, 0, 0);
+	//glVertexAttribPointer(s->m_slot[SSLOT_NORMAL], 3, GL_FLOAT, GL_FALSE, 0, 0);
+	glNormalPointer(GL_FLOAT, 0, 0);
 	glDrawArrays(GL_TRIANGLES, 0, (m_widthx) * (m_widthz) * 3 * 2);
 
 #else
@@ -1572,11 +1575,14 @@ void Heightmap::draw2()
 #elif 1
 
 	glBindBuffer(GL_ARRAY_BUFFER, m_fullvbo[VBO_POSITION]);
-	glVertexAttribPointer(s->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, 0);
+	//glVertexAttribPointer(s->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, 0);
+	glVertexPointer(3, GL_FLOAT, 0, 0);
 	glBindBuffer(GL_ARRAY_BUFFER, m_fullvbo[VBO_TEXCOORD]);
-	glVertexAttribPointer(s->m_slot[SSLOT_TEXCOORD0], 2, GL_FLOAT, GL_FALSE, 0, 0);
+	//glVertexAttribPointer(s->m_slot[SSLOT_TEXCOORD0], 2, GL_FLOAT, GL_FALSE, 0, 0);
+	glTexCoordPointer(2, GL_FLOAT, 0, 0);
 	glBindBuffer(GL_ARRAY_BUFFER, m_fullvbo[VBO_NORMAL]);
-	glVertexAttribPointer(s->m_slot[SSLOT_NORMAL], 3, GL_FLOAT, GL_FALSE, 0, 0);
+	//glVertexAttribPointer(s->m_slot[SSLOT_NORMAL], 3, GL_FLOAT, GL_FALSE, 0, 0);
+	glNormalPointer(GL_FLOAT, 0, 0);
 	glDrawArrays(GL_TRIANGLES, 0, (m_widthx) * (m_widthz) * 3 * 2);
 #else
 	int tilescale = m_tilescale;
@@ -1678,11 +1684,14 @@ void Heightmap::drawrim()
 
 #elif 1
 	glBindBuffer(GL_ARRAY_BUFFER, m_rimva.vbo[VBO_POSITION]);
-	glVertexAttribPointer(s->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, 0);
+	//glVertexAttribPointer(s->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, 0);
+	glVertexPointer(3, GL_FLOAT, 0, 0);
 	glBindBuffer(GL_ARRAY_BUFFER, m_rimva.vbo[VBO_TEXCOORD]);
-	glVertexAttribPointer(s->m_slot[SSLOT_TEXCOORD0], 2, GL_FLOAT, GL_FALSE, 0, 0);
+	//glVertexAttribPointer(s->m_slot[SSLOT_TEXCOORD0], 2, GL_FLOAT, GL_FALSE, 0, 0);
+	glTexCoordPointer(2, GL_FLOAT, 0, 0);
 	glBindBuffer(GL_ARRAY_BUFFER, m_rimva.vbo[VBO_NORMAL]);
-	glVertexAttribPointer(s->m_slot[SSLOT_NORMAL], 3, GL_FLOAT, GL_FALSE, 0, 0);
+	//glVertexAttribPointer(s->m_slot[SSLOT_NORMAL], 3, GL_FLOAT, GL_FALSE, 0, 0);
+	glNormalPointer(GL_FLOAT, 0, 0);
 	glDrawArrays(GL_TRIANGLES, 0, m_rimva.numverts);
 #else
 	int tilescale = m_tilescale;

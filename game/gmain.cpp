@@ -623,7 +623,7 @@ bool OverMinimap()
 
 void Scroll()
 {
-	return;	//disable for now
+	//return;	//disable for now
 
 	Player* py = &g_player[g_curP];
 	Camera* c = &py->camera;

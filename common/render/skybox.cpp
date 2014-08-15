@@ -107,11 +107,13 @@ void DrawSkyBox(Vec3f pos)
 	};
 //typedef void (GLAPIENTRY * PFNGLVERTEXATTRIBPOINTERPROC) (GLuint index, GLint size, GLenum type, GLboolean normalized, GLsizei stride, const GLvoid* pointer);
 
-	glVertexAttribPointer(s->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, sizeof(float)*5, &vright[2]);
+	//glVertexAttribPointer(s->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, sizeof(float)*5, &vright[2]);
+	glVertexPointer(3, GL_FLOAT, sizeof(float)*5, &vright[2]);
 
 	CheckGLError(__FILE__, __LINE__);
 
-	glVertexAttribPointer(s->m_slot[SSLOT_TEXCOORD0], 2, GL_FLOAT, GL_FALSE, sizeof(float)*5, &vright[0]);
+	//glVertexAttribPointer(s->m_slot[SSLOT_TEXCOORD0], 2, GL_FLOAT, GL_FALSE, sizeof(float)*5, &vright[0]);
+	glTexCoordPointer(2, GL_FLOAT, sizeof(float)*5, &vright[0]);
 
 	//g_log<<"tci"<<s->m_slot[SSLOT_TEXCOORD0]<<std::endl;
 
@@ -137,8 +139,10 @@ void DrawSkyBox(Vec3f pos)
 		SKY_TEX_1, SKY_TEX_0, -SKYBOX_SIZE, SKYBOX_SIZE, SKYBOX_SIZE
 	};
 
-	glVertexAttribPointer(s->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, sizeof(float)*5, &vleft[2]);
-	glVertexAttribPointer(s->m_slot[SSLOT_TEXCOORD0], 2, GL_FLOAT, GL_FALSE, sizeof(float)*5, &vleft[0]);
+	//glVertexAttribPointer(s->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, sizeof(float)*5, &vleft[2]);
+	glVertexPointer(3, GL_FLOAT, sizeof(float)*5, &vleft[2]);
+	//glVertexAttribPointer(s->m_slot[SSLOT_TEXCOORD0], 2, GL_FLOAT, GL_FALSE, sizeof(float)*5, &vleft[0]);
+	glTexCoordPointer(2, GL_FLOAT, sizeof(float)*5, &vleft[0]);
 	glDrawArrays(GL_TRIANGLES, 0, 6);
 
 	CheckGLError(__FILE__, __LINE__);
@@ -159,8 +163,10 @@ void DrawSkyBox(Vec3f pos)
 		SKY_TEX_0, SKY_TEX_0, SKYBOX_SIZE, SKYBOX_SIZE, -SKYBOX_SIZE
 	};
 
-	glVertexAttribPointer(s->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, sizeof(float)*5, &vfront[2]);
-	glVertexAttribPointer(s->m_slot[SSLOT_TEXCOORD0], 2, GL_FLOAT, GL_FALSE, sizeof(float)*5, &vfront[0]);
+	//glVertexAttribPointer(s->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, sizeof(float)*5, &vfront[2]);
+	glVertexPointer(3, GL_FLOAT, sizeof(float)*5, &vfront[2]);
+	//glVertexAttribPointer(s->m_slot[SSLOT_TEXCOORD0], 2, GL_FLOAT, GL_FALSE, sizeof(float)*5, &vfront[0]);
+	glTexCoordPointer(2, GL_FLOAT, sizeof(float)*5, &vfront[0]);
 	glDrawArrays(GL_TRIANGLES, 0, 6);
 
 	// back
@@ -178,8 +184,10 @@ void DrawSkyBox(Vec3f pos)
 		SKY_TEX_1, SKY_TEX_0, -SKYBOX_SIZE, SKYBOX_SIZE, -SKYBOX_SIZE
 	};
 
-	glVertexAttribPointer(s->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, sizeof(float)*5, &vback[2]);
-	glVertexAttribPointer(s->m_slot[SSLOT_TEXCOORD0], 2, GL_FLOAT, GL_FALSE, sizeof(float)*5, &vback[0]);
+	//glVertexAttribPointer(s->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, sizeof(float)*5, &vback[2]);
+	glVertexPointer(3, GL_FLOAT, sizeof(float)*5, &vback[2]);
+	//glVertexAttribPointer(s->m_slot[SSLOT_TEXCOORD0], 2, GL_FLOAT, GL_FALSE, sizeof(float)*5, &vback[0]);
+	glTexCoordPointer(2, GL_FLOAT, sizeof(float)*5, &vback[0]);
 	glDrawArrays(GL_TRIANGLES, 0, 6);
 
 	// bottom
@@ -197,8 +205,10 @@ void DrawSkyBox(Vec3f pos)
 		SKY_TEX_1, SKY_TEX_0, SKYBOX_SIZE, -SKYBOX_SIZE, -SKYBOX_SIZE
 	};
 
-	glVertexAttribPointer(s->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, sizeof(float)*5, &vbottom[2]);
-	glVertexAttribPointer(s->m_slot[SSLOT_TEXCOORD0], 2, GL_FLOAT, GL_FALSE, sizeof(float)*5, &vbottom[0]);
+	//glVertexAttribPointer(s->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, sizeof(float)*5, &vbottom[2]);
+	glVertexPointer(3, GL_FLOAT, sizeof(float)*5, &vbottom[2]);
+	//glVertexAttribPointer(s->m_slot[SSLOT_TEXCOORD0], 2, GL_FLOAT, GL_FALSE, sizeof(float)*5, &vbottom[0]);
+	glTexCoordPointer(2, GL_FLOAT, sizeof(float)*5, &vbottom[0]);
 	glDrawArrays(GL_TRIANGLES, 0, 6);
 
 	// top
@@ -216,8 +226,10 @@ void DrawSkyBox(Vec3f pos)
 		SKY_TOP_1, SKY_TOP_1, SKYBOX_SIZE, SKYBOX_SIZE, -SKYBOX_SIZE
 	};
 
-	glVertexAttribPointer(s->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, sizeof(float)*5, &vtop[2]);
-	glVertexAttribPointer(s->m_slot[SSLOT_TEXCOORD0], 2, GL_FLOAT, GL_FALSE, sizeof(float)*5, &vtop[0]);
+	//glVertexAttribPointer(s->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, sizeof(float)*5, &vtop[2]);
+	glVertexPointer(3, GL_FLOAT, sizeof(float)*5, &vtop[2]);
+	//glVertexAttribPointer(s->m_slot[SSLOT_TEXCOORD0], 2, GL_FLOAT, GL_FALSE, sizeof(float)*5, &vtop[0]);
+	glTexCoordPointer(2, GL_FLOAT, sizeof(float)*5, &vtop[0]);
 	glDrawArrays(GL_TRIANGLES, 0, 6);
 
 	//DrawGrid();

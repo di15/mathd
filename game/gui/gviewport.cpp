@@ -221,7 +221,8 @@ void DrawMMFrust()
 		interTopLeft.x, interTopLeft.z,0
 	};
 
-	glVertexAttribPointer(g_shader[SHADER_COLOR2D].m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, &vertices[0]);
+	//glVertexAttribPointer(g_shader[SHADER_COLOR2D].m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, &vertices[0]);
+	glVertexPointer(3, GL_FLOAT, 0, &vertices[0]);
 
 	glDrawArrays(GL_LINE_STRIP, 0, 5);
 }
@@ -382,9 +383,12 @@ void DrawPreview(Matrix projection, Matrix viewmat, Matrix modelmat, Matrix mode
 
 	m->usetex();
 
-	glVertexAttribPointer(s->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, va->vertices);
-	glVertexAttribPointer(s->m_slot[SSLOT_TEXCOORD0], 2, GL_FLOAT, GL_FALSE, 0, va->texcoords);
-	glVertexAttribPointer(s->m_slot[SSLOT_NORMAL], 3, GL_FLOAT, GL_FALSE, 0, va->normals);
+	//glVertexAttribPointer(s->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, va->vertices);
+	glVertexPointer(3, GL_FLOAT, 0, va->vertices);
+	//glVertexAttribPointer(s->m_slot[SSLOT_TEXCOORD0], 2, GL_FLOAT, GL_FALSE, 0, va->texcoords);
+	glTexCoordPointer(2, GL_FLOAT, 0, va->texcoords);
+	//glVertexAttribPointer(s->m_slot[SSLOT_NORMAL], 3, GL_FLOAT, GL_FALSE, 0, va->normals);
+	glNormalPointer(GL_FLOAT, 0, va->normals);
 
 	glDrawArrays(GL_TRIANGLES, 0, va->numverts);
 	EndS();
@@ -454,8 +458,10 @@ void DrawPreviewDepth()
 
 	m->usetex();
 
-	glVertexAttribPointer(s->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, va->vertices);
-	glVertexAttribPointer(s->m_slot[SSLOT_TEXCOORD0], 2, GL_FLOAT, GL_FALSE, 0, va->texcoords);
+	//glVertexAttribPointer(s->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, va->vertices);
+	glVertexPointer(3, GL_FLOAT, 0, va->vertices);
+	//glVertexAttribPointer(s->m_slot[SSLOT_TEXCOORD0], 2, GL_FLOAT, GL_FALSE, 0, va->texcoords);
+	glTexCoordPointer(2, GL_FLOAT, 0, va->texcoords);
 	//glVertexAttribPointer(s->m_slot[SSLOT_NORMAL], 3, GL_FLOAT, GL_FALSE, 0, va->normals);
 
 	glDrawArrays(GL_TRIANGLES, 0, va->numverts);
@@ -519,8 +525,9 @@ void DrawViewport(int which, int x, int y, int width, int height)
 			//if(!GetMapIntersection(&g_hmap, vLine, &focus))
 			GetMapIntersection2(&g_hmap, vLine, &focus);
 #endif
+
 		CheckGLError(__FILE__, __LINE__);
-		RenderToShadowMap(projection, viewmat, modelmat, focus, focus + g_lightoff, DrawPreviewDepth);
+		//RenderToShadowMap(projection, viewmat, modelmat, focus, focus + g_lightoff, DrawPreviewDepth);
 		CheckGLError(__FILE__, __LINE__);
 		RenderShadowedScene(projection, viewmat, modelmat, modelview, DrawPreview);
 		CheckGLError(__FILE__, __LINE__);
@@ -570,7 +577,7 @@ void DrawViewport(int which, int x, int y, int width, int height)
 				GetMapIntersection2(&g_hmap, vLine, &focus);
 #endif
 			CheckGLError(__FILE__, __LINE__);
-			RenderToShadowMap(projection, viewmat, modelmat, focus, focus + g_lightoff / MIN_ZOOM, DrawMinimapDepth);
+			//RenderToShadowMap(projection, viewmat, modelmat, focus, focus + g_lightoff / MIN_ZOOM, DrawMinimapDepth);
 			CheckGLError(__FILE__, __LINE__);
 			RenderShadowedScene(projection, viewmat, modelmat, modelview, DrawMinimap);
 			CheckGLError(__FILE__, __LINE__);

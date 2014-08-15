@@ -280,7 +280,7 @@ void LoadShader(int shader, char* strVertex, char* strFragment, bool hastexcoord
 	}
 	else
 	{
-		g_log<<"link status ok"<<std::endl;
+		g_log<<"link status ok, program="<<s->m_program<<std::endl;
 	}
 
 	g_log<<std::endl<<std::endl;
@@ -351,10 +351,10 @@ void UseS(int shader)
 	//glUseProgramObject(g_shader[shader].m_program);
 	glUseProgram(s->m_program);
 	CheckGLError(__FILE__, __LINE__);
-	
+
 	Player* py = &g_player[g_curP];
 
-#if 1
+#if 0
 	//opengl 3 way
 	CheckGLError(__FILE__, __LINE__);
 	if(s->m_slot[SSLOT_POSITION] != -1)	glEnableVertexAttribArray(s->m_slot[SSLOT_POSITION]);
@@ -365,7 +365,7 @@ void UseS(int shader)
 	CheckGLError(__FILE__, __LINE__);
 #else
 	//opengl 1.4 way
-	if(s->m_hasverts)	glEnableClientState(GL_VERTEX_ARRAY);
+	glEnableClientState(GL_VERTEX_ARRAY);
 	if(s->m_hastexcoords)	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
 	if(s->m_hasnormals)	glEnableClientState(GL_NORMAL_ARRAY);
 #endif
@@ -386,7 +386,7 @@ void EndS()
 
 	Shader* s = &g_shader[g_curS];
 
-#if 1
+#if 0
 	//opengl 3 way
 	CheckGLError(__FILE__, __LINE__);
 	if(s->m_slot[SSLOT_POSITION] != -1)	glDisableVertexAttribArray(s->m_slot[SSLOT_POSITION]);

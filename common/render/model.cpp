@@ -122,14 +122,17 @@ void DrawVA(VertexArray* va, Vec3f pos)
 		glVertexAttribPointer(s->m_slot[SSLOT_NORMAL], 3, GL_FLOAT, GL_FALSE, 0, va->normals);
 #else
 	glBindBuffer(GL_ARRAY_BUFFER, va->vbo[VBO_POSITION]);
-	glVertexAttribPointer(s->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, 0);
+	//glVertexAttribPointer(s->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, 0);
+	glVertexPointer(3, GL_FLOAT, 0, 0);
 	glBindBuffer(GL_ARRAY_BUFFER, va->vbo[VBO_TEXCOORD]);
-	glVertexAttribPointer(s->m_slot[SSLOT_TEXCOORD0], 2, GL_FLOAT, GL_FALSE, 0, 0);
+	//glVertexAttribPointer(s->m_slot[SSLOT_TEXCOORD0], 2, GL_FLOAT, GL_FALSE, 0, 0);
+	glTexCoordPointer(2, GL_FLOAT, 0, 0);
 
-	if(s->m_slot[SSLOT_NORMAL] != -1)
+	//if(s->m_slot[SSLOT_NORMAL] != -1)
 	{
 		glBindBuffer(GL_ARRAY_BUFFER, va->vbo[VBO_NORMAL]);
-		glVertexAttribPointer(s->m_slot[SSLOT_NORMAL], 3, GL_FLOAT, GL_FALSE, 0, 0);
+		//glVertexAttribPointer(s->m_slot[SSLOT_NORMAL], 3, GL_FLOAT, GL_FALSE, 0, 0);
+		glNormalPointer(GL_FLOAT, 0, 0);
 	}
 #endif
 
@@ -231,15 +234,22 @@ void Model::draw(int frame, Vec3f pos, float yaw)
 		glVertexAttribPointer(s->m_slot[SSLOT_NORMAL], 3, GL_FLOAT, GL_FALSE, 0, va->normals);
 #else
 	glBindBuffer(GL_ARRAY_BUFFER, va->vbo[VBO_POSITION]);
-	glVertexAttribPointer(s->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, 0);
+	//glVertexAttribPointer(s->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, 0);
+	glVertexPointer(3, GL_FLOAT, 0, 0);
 	glBindBuffer(GL_ARRAY_BUFFER, va->vbo[VBO_TEXCOORD]);
-	glVertexAttribPointer(s->m_slot[SSLOT_TEXCOORD0], 2, GL_FLOAT, GL_FALSE, 0, 0);
+	//glVertexAttribPointer(s->m_slot[SSLOT_TEXCOORD0], 2, GL_FLOAT, GL_FALSE, 0, 0);
+	glTexCoordPointer(2, GL_FLOAT, 0, 0);
 
+#if 0
 	if(s->m_slot[SSLOT_NORMAL] != -1)
 	{
 		glBindBuffer(GL_ARRAY_BUFFER, va->vbo[VBO_NORMAL]);
 		glVertexAttribPointer(s->m_slot[SSLOT_NORMAL], 3, GL_FLOAT, GL_FALSE, 0, 0);
 	}
+#else
+	glBindBuffer(GL_ARRAY_BUFFER, va->vbo[VBO_NORMAL]);
+	glNormalPointer(GL_FLOAT, 0, 0);
+#endif
 #endif
 
 	glDrawArrays(GL_TRIANGLES, 0, va->numverts);

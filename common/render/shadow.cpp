@@ -484,7 +484,7 @@ void RenderShadowedScene(Matrix projection, Matrix viewmat, Matrix modelmat, Mat
 		drawscenefunc(projection, viewmat, modelmat, modelviewinv, lightpos, (float*)&lightdir);
 	//DrawSceneFunc(projection, viewmat, modelmat, modelviewinv, (float*)&g_lightpos, lightdir);
 
-	TurnOffShader();
+	//TurnOffShader();
 	glBindTexture(GL_TEXTURE_2D, 0);
 	glActiveTexture(GL_TEXTURE0);
 	/*

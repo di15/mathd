@@ -104,7 +104,8 @@ void DrawSteps()
 	glUniform4f(s->m_slot[SSLOT_COLOR], 0.5f, 0.5f, 0, 1);
 	//glBegin(GL_LINES);
 
-	glVertexAttribPointer(s->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, &lines[0]);
+	//glVertexAttribPointer(s->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, &lines[0]);
+	glVertexPointer(3, GL_FLOAT, 0, &lines[0]);
 	glDrawArrays(GL_LINES, 0, lines.size());
 }
 
@@ -118,7 +119,9 @@ void DrawGrid()
 		glUniform4f(s->m_slot[SSLOT_COLOR], 1, 1, 1, 1);
 		//glBegin(GL_LINES);
 
-		glVertexAttribPointer(s->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, &gridvecs[0]);
+		//glVertexAttribPointer(s->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, &gridvecs[0]);
+		glVertexPointer(3, GL_FLOAT, 0, &gridvecs[0]);
+
 		if(s->m_slot[SSLOT_TEXCOORD0] != -1)    glVertexAttribPointer(s->m_slot[SSLOT_TEXCOORD0], 2, GL_FLOAT, GL_FALSE, 0, &gridvecs[0]);
 		glDrawArrays(GL_LINES, 0, gridvecs.size());
 	}
@@ -187,7 +190,8 @@ void DrawGrid()
 				vecs[2].y = g_hmap.accheight(vecs[2].x, vecs[2].z) + TILE_SIZE/100;
 				vecs[3].y = g_hmap.accheight(vecs[3].x, vecs[3].z) + TILE_SIZE/100;
 
-				glVertexAttribPointer(s->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, &vecs[0]);
+				//glVertexAttribPointer(s->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, &vecs[0]);
+				glVertexPointer(3, GL_FLOAT, 0, &vecs[0]);
 				glDrawArrays(GL_LINES, 0, vecs.size());
 			}
 	}
@@ -278,7 +282,8 @@ void DrawUnitSquares()
 		vecs[3].y = g_hmap.accheight(vecs[3].x, vecs[3].z) + TILE_SIZE/100;
 		vecs[4].y = g_hmap.accheight(vecs[4].x, vecs[4].z) + TILE_SIZE/100;
 
-		glVertexAttribPointer(s->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, &vecs[0]);
+		//glVertexAttribPointer(s->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, &vecs[0]);
+		glVertexPointer(3, GL_FLOAT, 0, &vecs[0]);
 		glDrawArrays(GL_LINE_STRIP, 0, vecs.size());
 	}
 
@@ -334,7 +339,8 @@ void DrawPaths()
 
 		if(vecs.size() > 1)
 		{
-			glVertexAttribPointer(s->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, &vecs[0]);
+			//glVertexAttribPointer(s->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, &vecs[0]);
+			glVertexPointer(3, GL_FLOAT, 0, &vecs[0]);
 			glDrawArrays(GL_LINE_STRIP, 0, vecs.size());
 		}
 		else
@@ -379,7 +385,9 @@ void DrawVelocities()
 
 		if(vecs.size() > 0)
 		{
-			glVertexAttribPointer(s->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, &vecs[0]);
+			//glVertexAttribPointer(s->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, &vecs[0]);
+			//glVertexPointer(3, GL_FLOAT, 0, &vecs[0]);
+			glVertexPointer(3, GL_FLOAT, 0, &vecs[0]);
 			glDrawArrays(GL_LINE_STRIP, 0, vecs.size());
 		}
 	}

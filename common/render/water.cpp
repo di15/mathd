@@ -164,9 +164,12 @@ void DrawWater3()
 	//glPolygonOffset(1.0, 250.0);
 #endif
 
-	glVertexAttribPointer(s->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, g_waterverts);
-	glVertexAttribPointer(s->m_slot[SSLOT_TEXCOORD0], 2, GL_FLOAT, GL_FALSE, 0, g_watertexcos);
-	glVertexAttribPointer(s->m_slot[SSLOT_NORMAL], 3, GL_FLOAT, GL_FALSE, 0, g_waternorms);
+	//glVertexAttribPointer(s->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, g_waterverts);
+	glVertexPointer(3, GL_FLOAT, 0, g_waterverts);
+	//glVertexAttribPointer(s->m_slot[SSLOT_TEXCOORD0], 2, GL_FLOAT, GL_FALSE, 0, g_watertexcos);
+	glTexCoordPointer(2, GL_FLOAT, 0, g_watertexcos);
+	//glVertexAttribPointer(s->m_slot[SSLOT_NORMAL], 3, GL_FLOAT, GL_FALSE, 0, g_waternorms);
+	glNormalPointer(GL_FLOAT, 0, g_waternorms);
 
 	glDrawArrays(GL_TRIANGLES, 0, g_hmap.m_widthx * g_hmap.m_widthz * 6 );
 
@@ -288,9 +291,12 @@ void DrawWater()
 	//glPolygonOffset(1.0, 250.0);
 #endif
 
-	glVertexAttribPointer(s->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, vertices);
-	glVertexAttribPointer(s->m_slot[SSLOT_TEXCOORD0], 2, GL_FLOAT, GL_FALSE, 0, texcoords0);
-	glVertexAttribPointer(s->m_slot[SSLOT_NORMAL], 3, GL_FLOAT, GL_FALSE, 0, normals);
+	//glVertexAttribPointer(s->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, vertices);
+	glVertexPointer(3, GL_FLOAT, 0, vertices);
+	//glVertexAttribPointer(s->m_slot[SSLOT_TEXCOORD0], 2, GL_FLOAT, GL_FALSE, 0, texcoords0);
+	glTexCoordPointer(2, GL_FLOAT, 0, texcoords0);
+	//glVertexAttribPointer(s->m_slot[SSLOT_NORMAL], 3, GL_FLOAT, GL_FALSE, 0, normals);
+	glNormalPointer(GL_FLOAT, 0, normals);
 
 	glDrawArrays(GL_TRIANGLES, 0, 6);
 
@@ -421,11 +427,14 @@ void DrawWater2()
 
 	CheckGLError(__FILE__, __LINE__);
 
-	glVertexAttribPointer(s->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, vertices);
+	//glVertexAttribPointer(s->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, vertices);
+	glVertexPointer(3, GL_FLOAT, 0, vertices);
 	CheckGLError(__FILE__, __LINE__);
-	glVertexAttribPointer(s->m_slot[SSLOT_TEXCOORD0], 2, GL_FLOAT, GL_FALSE, 0, texcoords0);
+	//glVertexAttribPointer(s->m_slot[SSLOT_TEXCOORD0], 2, GL_FLOAT, GL_FALSE, 0, texcoords0);
+	glTexCoordPointer(2, GL_FLOAT, 0, texcoords0);
 	CheckGLError(__FILE__, __LINE__);
-	glVertexAttribPointer(s->m_slot[SSLOT_NORMAL], 3, GL_FLOAT, GL_FALSE, 0, normals);
+	//glVertexAttribPointer(s->m_slot[SSLOT_NORMAL], 3, GL_FLOAT, GL_FALSE, 0, normals);
+	glNormalPointer(GL_FLOAT, 0, normals);
 	CheckGLError(__FILE__, __LINE__);
 
 	glDrawArrays(GL_TRIANGLES, 0, 6);

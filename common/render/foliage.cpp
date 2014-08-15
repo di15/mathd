@@ -155,10 +155,13 @@ void DrawFoliage(Vec3f zoompos, Vec3f vertical, Vec3f horizontal)
 		//Transpose(modelviewinv, modelviewinv);
 		glUniformMatrix4fv(s->m_slot[SSLOT_NORMALMAT], 1, 0, modelviewinv.m_matrix);
 
-		glVertexAttribPointer(s->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, va->vertices);
-		glVertexAttribPointer(s->m_slot[SSLOT_TEXCOORD0], 2, GL_FLOAT, GL_FALSE, 0, va->texcoords);
-		if(s->m_slot[SSLOT_NORMAL] != -1)
-			glVertexAttribPointer(s->m_slot[SSLOT_NORMAL], 3, GL_FLOAT, GL_FALSE, 0, va->normals);
+		//glVertexAttribPointer(s->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, va->vertices);
+		glVertexPointer(3, GL_FLOAT, 0, va->vertices);
+		//glVertexAttribPointer(s->m_slot[SSLOT_TEXCOORD0], 2, GL_FLOAT, GL_FALSE, 0, va->texcoords);
+		glTexCoordPointer(2, GL_FLOAT, 0, va->texcoords);
+		//if(s->m_slot[SSLOT_NORMAL] != -1)
+		//	glVertexAttribPointer(s->m_slot[SSLOT_NORMAL], 3, GL_FLOAT, GL_FALSE, 0, va->normals);
+		glNormalPointer(GL_FLOAT, 0, va->normals);
 		glDrawArrays(GL_TRIANGLES, 0, va->numverts);
 	}
 }

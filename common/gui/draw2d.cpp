@@ -22,8 +22,10 @@ void DrawImage(unsigned int tex, float left, float top, float right, float botto
 
 	//glVertexPointer(2, GL_FLOAT, sizeof(float) * 4, &vertices[0]);
 	//glTexCoordPointer(2, GL_FLOAT, sizeof(float) * 4, &vertices[2]);
-	glVertexAttribPointer(g_shader[g_curS].m_slot[SSLOT_POSITION], 2, GL_FLOAT, GL_FALSE, sizeof(float)*4, &vertices[0]);
-	glVertexAttribPointer(g_shader[g_curS].m_slot[SSLOT_TEXCOORD0], 2, GL_FLOAT, GL_FALSE, sizeof(float)*4, &vertices[2]);
+	//glVertexAttribPointer(g_shader[g_curS].m_slot[SSLOT_POSITION], 2, GL_FLOAT, GL_FALSE, sizeof(float)*4, &vertices[0]);
+	glVertexPointer(3, GL_FLOAT, sizeof(float)*4, &vertices[0]);
+	//glVertexAttribPointer(g_shader[g_curS].m_slot[SSLOT_TEXCOORD0], 2, GL_FLOAT, GL_FALSE, sizeof(float)*4, &vertices[2]);
+	glTexCoordPointer(2, GL_FLOAT, sizeof(float)*4, &vertices[2]);
 
 	glDrawArrays(GL_TRIANGLES, 0, 6);
 }
@@ -59,7 +61,8 @@ void DrawSquare(float r, float g, float b, float a, float left, float top, float
 		left, top,0,          0, 0
 	};
 
-	glVertexAttribPointer(g_shader[SHADER_COLOR2D].m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, sizeof(float)*5, &vertices[0]);
+	//glVertexAttribPointer(g_shader[SHADER_COLOR2D].m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, sizeof(float)*5, &vertices[0]);
+	glVertexPointer(3, GL_FLOAT, sizeof(float)*5, &vertices[0]);
 
 	//glVertexPointer(3, GL_FLOAT, sizeof(float)*5, &vertices[0]);
 	//glTexCoordPointer(2, GL_FLOAT, sizeof(float)*5, &vertices[3]);
@@ -93,7 +96,8 @@ void DrawLine(float r, float g, float b, float a, float x1, float y1, float x2, 
 		x2, y2,0,         1, 0,
 	};
 
-	glVertexAttribPointer(g_shader[SHADER_COLOR2D].m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, sizeof(float)*5, &vertices[0]);
+	//glVertexAttribPointer(g_shader[SHADER_COLOR2D].m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, sizeof(float)*5, &vertices[0]);
+	glVertexPointer(3, GL_FLOAT, sizeof(float)*5, &vertices[0]);
 
 	//glVertexPointer(3, GL_FLOAT, sizeof(float)*5, &vertices[0]);
 	//glTexCoordPointer(2, GL_FLOAT, sizeof(float)*5, &vertices[3]);

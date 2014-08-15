@@ -93,8 +93,10 @@ void DrawOrders(Matrix* projection, Matrix* modelmat, Matrix* viewmat)
 		//glVertexPointer(3, GL_FLOAT, sizeof(float)*5, &vertices[0]);
 		//glTexCoordPointer(2, GL_FLOAT, sizeof(float)*5, &vertices[3]);
 
-		glVertexAttribPointer(s->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, sizeof(float) * 5, &vertices[0]);
-		glVertexAttribPointer(s->m_slot[SSLOT_TEXCOORD0], 2, GL_FLOAT, GL_FALSE, sizeof(float) * 5, &vertices[3]);
+		//glVertexAttribPointer(s->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, sizeof(float) * 5, &vertices[0]);
+		glVertexPointer(3, GL_FLOAT, sizeof(float)*5, &vertices[0]);
+		//glVertexAttribPointer(s->m_slot[SSLOT_TEXCOORD0], 2, GL_FLOAT, GL_FALSE, sizeof(float) * 5, &vertices[3]);
+		glTexCoordPointer(2, GL_FLOAT, sizeof(float)*5, &vertices[3]);
 		//glVertexAttribPointer(s->m_slot[SLOT::NORMAL], 3, GL_FLOAT, GL_FALSE, sizeof(float) * 5, va->normals);
 
 		glDrawArrays(GL_TRIANGLES, 0, 6);
