@@ -86,7 +86,7 @@ void InitGLSL()
 	g_log<<"Renderer: "<<(char*)glGetString(GL_RENDERER)<<std::endl;
 	g_log<<"GL_VERSION = "<<(char*)glGetString(GL_VERSION)<<std::endl;
 
-#if 1
+#if 0
 	if( !GLEW_VERSION_3_0 )
 	{
 		ErrorMessage("Error", "OpenGL 3.0 not supported!\n" );
@@ -141,11 +141,19 @@ void InitGLSL()
 	int major, minor;
 	GetGLVersion(&major, &minor);
 
+#if 0
 	if(major < 3 || ( major == 3 && minor < 0 ))
 	{
 		ErrorMessage("Error", "OpenGL 3.0 is not supported!");
 		g_quit = true;
 	}
+#else
+	if(major < 1 || ( major == 1 && minor < 4 ))
+	{
+		ErrorMessage("Error", "OpenGL 1.4 is not supported!");
+		g_quit = true;
+	}
+#endif
 
 	LoadShader(SHADER_ORTHO, "shaders/ortho.vert", "shaders/ortho.frag", true, false);
 	LoadShader(SHADER_COLOR2D, "shaders/color2d.vert", "shaders/color2d.frag", false, false);

@@ -73,7 +73,8 @@ void DrawMarquee()
 		(float)py->mousestart.x,	(float)py->mousestart.y,0,			0, 1
 	};
 
-	glVertexAttribPointer(g_shader[SHADER_COLOR2D].m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, sizeof(float)*5, &vertices[0]);
+	//glVertexAttribPointer(g_shader[SHADER_COLOR2D].m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, sizeof(float)*5, &vertices[0]);
+	glVertexPointer(3, GL_FLOAT, sizeof(float)*5, &vertices[0]);
 
 	glDrawArrays(GL_LINE_STRIP, 0, 5);
 }
@@ -142,8 +143,9 @@ void DrawSel(Matrix* projection, Matrix* modelmat, Matrix* viewmat)
 			(float)(cmminx - off), y4, (float)(cmminz - off),
 			(float)(cmmaxx + off), y1, (float)(cmminz - off)
 		};
-
-		glVertexAttribPointer(s->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, &vertices[0]);
+		
+		//glVertexAttribPointer(s->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, &vertices[0]);
+		glVertexPointer(2, GL_FLOAT, 0, &vertices[0]);
 		//glVertexAttribPointer(s->m_slot[SSLOT_TEXCOORD0], 2, GL_FLOAT, GL_FALSE, sizeof(float) * 5, &vertices[3]);
 		//glVertexAttribPointer(s->m_slot[SSLOT_NORMAL], 3, GL_FLOAT, GL_FALSE, sizeof(float) * 5, va->normals);
 
@@ -219,8 +221,10 @@ void DrawSel(Matrix* projection, Matrix* modelmat, Matrix* viewmat)
 		//glVertexPointer(3, GL_FLOAT, sizeof(float)*5, &vertices[0]);
 		//glTexCoordPointer(2, GL_FLOAT, sizeof(float)*5, &vertices[3]);
 
-		glVertexAttribPointer(s->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, sizeof(float) * 5, &vertices[0]);
-		glVertexAttribPointer(s->m_slot[SSLOT_TEXCOORD0], 2, GL_FLOAT, GL_FALSE, sizeof(float) * 5, &vertices[3]);
+		//glVertexAttribPointer(s->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, sizeof(float) * 5, &vertices[0]);
+		glVertexPointer(3, GL_FLOAT, sizeof(float)*5, &vertices[0]);
+		//glVertexAttribPointer(s->m_slot[SSLOT_TEXCOORD0], 2, GL_FLOAT, GL_FALSE, sizeof(float) * 5, &vertices[3]);
+		glTexCoordPointer(2, GL_FLOAT, sizeof(float)*5, &vertices[3]);
 		//glVertexAttribPointer(s->m_slot[SSLOT_NORMAL], 3, GL_FLOAT, GL_FALSE, sizeof(float) * 5, va->normals);
 
 		glDrawArrays(GL_TRIANGLES, 0, 6);
