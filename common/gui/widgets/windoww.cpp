@@ -81,6 +81,8 @@ WindowW::WindowW(Widget* parent, const char* n, void (*reframef)(Widget* thisw))
 
 	vscroll = VScroll(this, "vscroll");
 
+	title_text = Text(this, "title", RichText(""), FONT_EUROSTILE16, NULL, true, 1, 1, 1, 1.0f);
+
 	//m_minsz[0] = 32*2 + 12*2;
 	m_minsz[0] = 12*2 + 10;
 	m_minsz[1] = 10;
@@ -98,18 +100,25 @@ WindowW::WindowW(Widget* parent, const char* n, void (*reframef)(Widget* thisw))
 
 void WindowW::reframe()
 {
-	//if(reframefunc)
-	//	reframefunc(this);
+	if(reframefunc)
+		reframefunc(this);
 
 	bg_image.m_pos[0] = m_pos[0];
 	bg_image.m_pos[1] = m_pos[1];
 	bg_image.m_pos[2] = m_pos[2];
 	bg_image.m_pos[3] = m_pos[3];
 
+#if 0
 	float innerleft = m_pos[0] - 45;
 	float innertop = m_pos[1] - 50;
 	float innerright = m_pos[2] + 45;
 	float innerbottom = m_pos[3] + 50;
+#else
+	float innerleft = m_pos[0] - 20;
+	float innertop = m_pos[1] - 20;
+	float innerright = m_pos[2] + 20;
+	float innerbottom = m_pos[3] + 20;
+#endif
 
 	float innerfree = innerright - innerleft - 32*2 - 12*2;
 
@@ -123,6 +132,11 @@ void WindowW::reframe()
 	inner_top_mid_image.m_pos[1] = innertop;
 	inner_top_mid_image.m_pos[2] = innerright - 12 - innerfree/6.0f - 32;
 	inner_top_mid_image.m_pos[3] = innertop + 3;
+
+	title_text.m_pos[0] = inner_top_mid_image.m_pos[0];
+	title_text.m_pos[1] = inner_top_mid_image.m_pos[1];
+	title_text.m_pos[2] = inner_top_mid_image.m_pos[2];
+	title_text.m_pos[3] = inner_top_mid_image.m_pos[1] + 32;
 
 	float minsz = fmin((innerright-innerleft),(innerbottom-innertop));
 
@@ -298,7 +312,8 @@ void WindowW::draw()
 	inner_bottom_leftvblur_image.draw();
 	inner_bottom_rightvblur_image.draw();
 
-	vscroll.draw();
+	//vscroll.draw();
+	title_text.draw();
 
 	for(auto w=m_subwidg.begin(); w!=m_subwidg.end(); w++)
 		(*w)->draw();
@@ -309,7 +324,7 @@ void WindowW::drawover()
 	if(!m_opened)
 		return;
 
-	vscroll.drawover();
+	//vscroll.drawover();
 
 	for(auto w=m_subwidg.begin(); w!=m_subwidg.end(); w++)
 		(*w)->drawover();
@@ -325,7 +340,7 @@ void WindowW::inev(InEv* ev)
 
 	Player* py = &g_player[g_curP];
 
-	vscroll.inev(ev);
+	//vscroll.inev(ev);
 
 	if(m_ldown)
 	{

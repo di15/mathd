@@ -21,6 +21,7 @@ public:
 	int cmodel;
 
 	char name[64];
+	std::string desc;
 
 	int foundation;
 
@@ -69,5 +70,6 @@ void BConMat(int type, int res, int amt);
 void BInput(int type, int res, int amt);
 void BOutput(int type, int res, int amt);
 void BEmitter(int type, int emitterindex, int ptype, Vec3f offset);
+void BDesc(int type, const char* desc);
 
 #endif

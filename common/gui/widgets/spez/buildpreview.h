@@ -3,8 +3,9 @@
 
 #include "../../widget.h"
 #include "../viewportw.h"
+#include "../windoww.h"
 
-class BuildPreview : public Widget
+class BuildPreview : public WindowW
 {
 public:
 	BuildPreview(Widget* parent, const char* n, void (*reframef)(Widget* thisw));
@@ -32,11 +33,15 @@ public:
 
 	Image white_bg;
 
-	void draw();
-	void drawover();
-	void reframe();
-	void inev(InEv* ev);
-	void frameupd();
+	Text title_text;
+	TextBlock params_block;
+	TextBlock desc_block;
+
+	//void draw();
+	//void drawover();
+	//void reframe();
+	//void inev(InEv* ev);
+	//void frameupd();
 };
 
 #endif

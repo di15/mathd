@@ -21,6 +21,7 @@
 #include "../../common/sim/powl.h"
 #include "../../common/sim/crpipe.h"
 #include "../../common/sim/player.h"
+#include "../../common/sim/infrastructure.h"
 
 void Resize_ResNamesTextBlock(Widget* thisw)
 {
@@ -171,6 +172,139 @@ void Over_BuildButton(int bwhat)
 	py->bptype = bwhat;
 
 	gui->open("build preview");
+	BuildPreview* bp = (BuildPreview*)gui->get("build preview");
+	Text* tl = (Text*)bp->get("title");
+
+	std::string bname;
+	RichText cb;	//conmat block
+	RichText ib;	//inputs block
+	RichText ob;	//outputs block
+	RichText db;	//description block
+
+	TextBlock* cbw = (TextBlock*)bp->get("conmat block");
+	TextBlock* ibw = (TextBlock*)bp->get("input block");
+	TextBlock* obw = (TextBlock*)bp->get("output block");
+	TextBlock* dbw = (TextBlock*)bp->get("desc block");
+
+	cb.m_part.push_back(RichTextP(UString("CONSTRUCTION REQUISITES:")));
+
+	if(bwhat < 0)
+		;
+	else if(bwhat < BUILDING_TYPES)
+	{
+		ib.m_part.push_back(RichTextP(UString("INPUTS:")));
+		ob.m_part.push_back(RichTextP(UString("OUTPUTS:")));
+
+		BlType* bt = &g_bltype[bwhat];
+		bname = bt->name;
+
+		db.m_part.push_back(RichTextP(UString(bt->desc.c_str())));
+
+		int nc = 0;
+		for(int ri=0; ri<RESOURCES; ri++)
+		{
+			if(bt->conmat[ri] <= 0)
+				continue;
+
+			nc ++;
+			Resource* r = &g_resource[ri];
+
+			cb.m_part.push_back(RichTextP(UString("\n")));
+			cb.m_part.push_back(RichTextP(UString(r->name.c_str())));
+			cb.m_part.push_back(RichTextP(UString(" ")));
+			cb.m_part.push_back(RichTextP(RICHTEXT_ICON, r->icon));
+			cb.m_part.push_back(RichTextP(UString(": ")));
+
+			char num[32];
+			sprintf(num, "%d", bt->conmat[ri]);
+			cb.m_part.push_back(RichTextP(UString(num)));
+		}
+
+		if(nc <= 0)
+			cb.m_part.push_back(RichTextP(UString("\nNone")));
+
+		int ni = 0;
+		for(int ri=0; ri<RESOURCES; ri++)
+		{
+			if(bt->input[ri] <= 0)
+				continue;
+
+			ni ++;
+			Resource* r = &g_resource[ri];
+
+			ib.m_part.push_back(RichTextP(UString("\n")));
+			ib.m_part.push_back(RichTextP(UString(r->name.c_str())));
+			ib.m_part.push_back(RichTextP(UString(" ")));
+			ib.m_part.push_back(RichTextP(RICHTEXT_ICON, r->icon));
+			ib.m_part.push_back(RichTextP(UString(": ")));
+
+			char num[32];
+			sprintf(num, "%d", bt->input[ri]);
+			ib.m_part.push_back(RichTextP(UString(num)));
+		}
+
+		if(ni <= 0)
+			ib.m_part.push_back(RichTextP(UString("\nNone")));
+
+		int no = 0;
+		for(int ri=0; ri<RESOURCES; ri++)
+		{
+			if(bt->output[ri] <= 0)
+				continue;
+
+			no ++;
+			Resource* r = &g_resource[ri];
+
+			ob.m_part.push_back(RichTextP(UString("\n")));
+			ob.m_part.push_back(RichTextP(UString(r->name.c_str())));
+			ob.m_part.push_back(RichTextP(UString(" ")));
+			ob.m_part.push_back(RichTextP(RICHTEXT_ICON, r->icon));
+			ob.m_part.push_back(RichTextP(UString(": ")));
+
+			char num[32];
+			sprintf(num, "%d", bt->output[ri]);
+			ob.m_part.push_back(RichTextP(UString(num)));
+		}
+
+		if(no <= 0)
+			ob.m_part.push_back(RichTextP(UString("\nNone")));
+	}
+	else if(bwhat < BUILDING_TYPES + CONDUIT_TYPES)
+	{
+		ConduitType* ct = &g_cotype[bwhat - BUILDING_TYPES];
+		bname = ct->name;
+
+		db.m_part.push_back(RichTextP(UString(ct->desc.c_str())));
+
+		int nc = 0;
+		for(int ri=0; ri<RESOURCES; ri++)
+		{
+			if(ct->conmat[ri] <= 0)
+				continue;
+
+			nc ++;
+			Resource* r = &g_resource[ri];
+
+			cb.m_part.push_back(RichTextP(UString("\n")));
+			cb.m_part.push_back(RichTextP(UString(r->name.c_str())));
+			cb.m_part.push_back(RichTextP(UString(" ")));
+			cb.m_part.push_back(RichTextP(RICHTEXT_ICON, r->icon));
+			cb.m_part.push_back(RichTextP(UString(": ")));
+
+			char num[32];
+			sprintf(num, "%d", ct->conmat[ri]);
+			cb.m_part.push_back(RichTextP(UString(num)));
+		}
+
+		if(nc <= 0)
+			cb.m_part.push_back(RichTextP(UString("\nNone")));
+	}
+
+	tl->m_text = RichText(UString(bname.c_str()));
+	cbw->m_text = cb;
+	ibw->m_text = ib;
+	obw->m_text = ob;
+	dbw->m_text = db;
 
 	py->bpcam.position(TILE_SIZE*3, TILE_SIZE*3, TILE_SIZE*3, 0, 0, 0, 0, 1, 0);
 }
@@ -287,10 +421,10 @@ void Resize_BuildPreview(Widget* thisw)
 	thisw->m_pos[2] = centerx+200;
 	thisw->m_pos[3] = centery+200;
 #elif 1
-	thisw->m_pos[0] = py->width - 400;
-	thisw->m_pos[1] = py->height - MINIMAP_SIZE - 32 - 400;
-	thisw->m_pos[2] = py->width;
-	thisw->m_pos[3] = py->height - MINIMAP_SIZE - 32;
+	thisw->m_pos[0] = py->width - 400 - 64;
+	thisw->m_pos[1] = py->height - MINIMAP_SIZE - 60 - 350;
+	thisw->m_pos[2] = py->width - 64;
+	thisw->m_pos[3] = py->height - MINIMAP_SIZE - 100;
 #endif
 }
 
@@ -607,11 +741,13 @@ void FillPlayGUI()
 
 	constrview->add(new ConstructionView(NULL, "construction view", Resize_ConstructionView, Click_MoveConstruction, Click_CancelConstruction, Click_ProceedConstruction, Click_EstimateConstruction));
 
-	gui->add(new ViewLayer(gui, "build preview"));
-	ViewLayer* buildpreview = (ViewLayer*)gui->get("build preview");
+	//gui->add(new ViewLayer(gui, "build preview"));
+	gui->add(new BuildPreview(gui, "build preview", Resize_BuildPreview));
+	//ViewLayer* buildpreview = (ViewLayer*)gui->get("build preview");
 
 	//buildpreview->add(new TouchListener(NULL, Resize_Fullscreen, NULL, NULL, NULL, -1));
-	buildpreview->add(new BuildPreview(NULL, "build preview", Resize_BuildPreview));
+	//buildpreview->add(new BuildPreview(buildpreview, "build preview", Resize_BuildPreview));
+	//buildpreview->add(new WindowW(buildpreview, "build preview", Resize_BuildPreview));
 
 	gui->add(new ViewLayer(gui, "construction estimate view"));
 	ViewLayer* cev = (ViewLayer*)gui->get("construction estimate view");

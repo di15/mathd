@@ -55,6 +55,8 @@ public:
 	Vec3f drawoff;	//offset in cm
 	ConduitTile* cotiles[2];	//0 = actual placed, 1 = plan proposed
 	bool cornerpl;	//is the conduit centered on corners or tile centers?
+	char name[32];
+	std::string desc;
 
 	ConduitType()
 	{
@@ -63,6 +65,7 @@ public:
 		cotiles[0] = NULL;
 		cotiles[1] = NULL;
 		cornerpl = false;
+		name[0] = '\0';
 	}
 
 	~ConduitType()
@@ -88,6 +91,7 @@ inline ConduitTile* GetCo(unsigned char ctype, int tx, int tz, bool plan)
 class Building;
 
 void DefCo(unsigned char ctype,
+			const char* name,
            unsigned short netwoff,
            unsigned short seloff,
            unsigned short maxforwincl,
@@ -96,6 +100,7 @@ void DefCo(unsigned char ctype,
            bool cornerpl,
            Vec2i physoff,
            Vec3f drawoff);
+void CoDesc(unsigned char ctype, const char* desc);
 void CoConMat(unsigned char ctype, unsigned char rtype, short ramt);
 void UpdCoPlans(unsigned char ctype, char owner, Vec3f start, Vec3f end);
 void ClearCoPlans(unsigned char ctype);

@@ -25,6 +25,12 @@ void DefB(int type, const char* name, Vec2i size, bool hugterr, const char* mode
 	t->reqdeposit = reqdeposit;
 }
 
+void BDesc(int type, const char* desc)
+{
+	BlType* t = &g_bltype[type];
+	t->desc = desc;
+}
+
 void BConMat(int type, int res, int amt)
 {
 	BlType* t = &g_bltype[type];

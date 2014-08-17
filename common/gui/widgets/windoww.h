@@ -21,6 +21,8 @@ public:
 	Image bg_image;
 	Image bg_logo_image;
 
+	Text title_text;
+
 	Image inner_top_mid_image;
 	Image inner_top_leftdiag_image;
 	Image inner_top_rightdiag_image;

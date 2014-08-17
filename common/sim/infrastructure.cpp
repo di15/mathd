@@ -1229,6 +1229,7 @@ void DefConn(unsigned char conduittype, unsigned char connectiontype, bool finis
 }
 
 void DefCo(unsigned char ctype,
+			const char* name,
            unsigned short netwoff,
            unsigned short seloff,
            unsigned short maxforwincl,
@@ -1239,6 +1240,7 @@ void DefCo(unsigned char ctype,
            Vec3f drawoff)
 {
 	ConduitType* ct = &g_cotype[ctype];
+	strcpy(ct->name, name);
 	ct->netwoff = netwoff;
 	ct->seloff = seloff;
 	ct->maxforwincl = maxforwincl;
@@ -1247,6 +1249,12 @@ void DefCo(unsigned char ctype,
 	ct->drawoff = drawoff;
 	ct->cornerpl = cornerpl;
 	ct->blconduct = blconduct;
+}
+
+void CoDesc(unsigned char ctype, const char* desc)
+{
+	ConduitType* ct = &g_cotype[ctype];
+	ct->desc = desc;
 }
 
 void CoConMat(unsigned char ctype, unsigned char rtype, short ramt)
