@@ -1237,7 +1237,7 @@ void LoadFonts()
 {
 	LoadFont(FONT_EUROSTILE32, "fonts/eurostile32");
 	LoadFont(FONT_MSUIGOTHIC16, "fonts/msuigothic16");
-	LoadFont(FONT_SMALLFONTS10, "fonts/smallfonts10");
+	LoadFont(FONT_SMALLFONTS8, "fonts/smallfonts8");
 	LoadFont(FONT_GULIM32, "fonts/gulim32");
 	LoadFont(FONT_EUROSTILE16, "fonts/eurostile16");
 	LoadFont(FONT_CALIBRILIGHT16, "fonts/calibrilight16s");

@@ -143,6 +143,9 @@ BuildPreview::BuildPreview(Widget* parent, const char* n, void (*reframef)(Widge
 	m_subwidg.push_back(new TextBlock(this, "input block", RichText("input block \n1 \n2 \n3"), MAINFONT16, Resize_BP_PB_I, 0, 1, 0, 1));
 	m_subwidg.push_back(new TextBlock(this, "output block", RichText("output block \n1 \n2 \n3"), MAINFONT16, Resize_BP_PB_O, 1, 0, 1, 1));
 	m_subwidg.push_back(new TextBlock(this, "desc block", RichText("description block \n1 \n2 \n3"), MAINFONT16, Resize_BP_Ds, 0, 1, 1, 1));
+	
+	if(reframefunc)
+		reframefunc(this);
 
 	reframe();
 }

@@ -20,6 +20,7 @@
 #include "../path/pathnode.h"
 #include "../path/partialpath.h"
 #include "labourer.h"
+#include "../../game/gui/chattext.h"
 
 bool UnitCollides(Unit* u, Vec2i cmpos, int utype)
 {
@@ -246,9 +247,11 @@ void MoveUnit(Unit* u)
 			NewTransx(u->drawpos + Vec3f(0,t->size.y,0), &rtext);
 #endif
 		}
-		else if(!u->pathblocked)
+		else //if(!u->pathblocked)
 #endif
 		{
+			RichText rt(UString("path"));
+			AddChat(&rt);
 #if 0
 			if(!FullPath(0,
 			                u->type, u->mode,

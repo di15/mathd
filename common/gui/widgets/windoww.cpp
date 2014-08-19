@@ -94,14 +94,17 @@ WindowW::WindowW(Widget* parent, const char* n, void (*reframef)(Widget* thisw))
 	{
 		// to do
 	}
+	
+	if(reframefunc)
+		reframefunc(this);
 
 	reframe();
 }
 
 void WindowW::reframe()
 {
-	if(reframefunc)
-		reframefunc(this);
+	//if(reframefunc)
+	//	reframefunc(this);
 
 	bg_image.m_pos[0] = m_pos[0];
 	bg_image.m_pos[1] = m_pos[1];

@@ -121,5 +121,6 @@ void ResetGoal(Unit* u);
 void ResetMode(Unit* u);
 void ResetTarget(Unit* u);
 void StartBel(Unit* u);
+void DrawUOv(Matrix* mvp);
 
 #endif

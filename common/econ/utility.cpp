@@ -68,5 +68,8 @@ int JobUtil(int wage, int cmdist, int workdelay)
 	if(cmdist <= 0)
 		return MAX_UTIL;
 
-	return MAX_UTIL * wage / cmdist / workdelay;
+	if(workdelay <= 0)
+		return MAX_UTIL;
+
+	return MAX_UTIL / cmdist / workdelay * wage;
 }

@@ -12,7 +12,7 @@
 //#define AI_FRAMES	CYCLE_FRAMES
 #define AI_FRAMES	1
 
-void UpdateAI()
+void UpdAI()
 {
 	return;	//do nothing for now
 #if 0
@@ -48,7 +48,7 @@ void UpdateAI()
 		if(!p->ai)
 			continue;
 
-		UpdateAI(p);
+		UpdAI(p);
 	}
 
 	if(g_simframe - lastthink >= AI_FRAMES)
@@ -470,7 +470,7 @@ bool AdjPr(Player* p)
 	return change;
 }
 
-void UpdateAI(Player* p)
+void UpdAI(Player* p)
 {
 	//if(p != g_player)
 	//	return;

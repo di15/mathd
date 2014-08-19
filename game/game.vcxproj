@@ -272,6 +272,7 @@
     <ClCompile Include="..\common\utils.cpp" />
     <ClCompile Include="..\common\window.cpp" />
     <ClCompile Include="gmain.cpp" />
+    <ClCompile Include="gui\chattext.cpp" />
     <ClCompile Include="gui\editorgui.cpp" />
     <ClCompile Include="gui\ggui.cpp" />
     <ClCompile Include="gui\gviewport.cpp" />
@@ -399,6 +400,7 @@
     <ClInclude Include="..\common\window.h" />
     <ClInclude Include="gmain.h" />
     <ClInclude Include="gres.h" />
+    <ClInclude Include="gui\chattext.h" />
     <ClInclude Include="gui\editorgui.h" />
     <ClInclude Include="gui\ggui.h" />
     <ClInclude Include="gui\gviewport.h" />

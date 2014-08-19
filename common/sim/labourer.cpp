@@ -9,6 +9,7 @@
 #include "sim.h"
 #include "job.h"
 #include "unitmove.h"
+#include "../../game/gui/chattext.h"
 
 bool NeedFood(Unit* u)
 {
@@ -541,7 +542,8 @@ void GoRest(Unit* u)
 		if(eviction)
 		{
 			RichText em(UString("Eviction"));
-			SubmitConsole(&em);
+			//SubmitConsole(&em);
+			AddChat(&em);
 			Evict(u);
 		}
 		ResetMode(u);
@@ -598,7 +600,8 @@ void CheckMul(Unit* u)
 	u->belongings[RES_RETFOOD] -= STARTING_RETFOOD;
 
 	RichText gr(UString("Growth!"));
-	SubmitConsole(&gr);
+	//SubmitConsole(&gr);
+	AddChat(&gr);
 }
 
 // do shop
@@ -658,7 +661,8 @@ void DoRest(Unit* u)
 		if(eviction)
 		{
 			RichText em(UString("Eviction"));
-			SubmitConsole(&em);
+			//SubmitConsole(&em);
+			AddChat(&em);
 			Evict(u);
 		}
 		ResetMode(u);
@@ -866,19 +870,22 @@ void DoDrTra(Unit* op)
 
 void UpdLab(Unit* u)
 {
-	return;	//do nothing for now
+	//return;	//do nothing for now
 
-	u->belongings[RES_RETFOOD] -= LABOURER_FOODCONSUM;
 	u->frameslookjobago ++;
 	u->cyframes--;
 
 	if(u->cyframes < 0)
-		u->cyframes = WORK_DELAY;
+		u->cyframes = WORK_DELAY-1;
+	
+	if(u->cyframes == 0)
+		u->belongings[RES_RETFOOD] -= LABOURER_FOODCONSUM;
 
 	if(u->belongings[RES_RETFOOD] <= 0)
 	{
 		RichText sr(UString("Starvation!"));
-		SubmitConsole(&sr);
+		//SubmitConsole(&sr);
+		AddChat(&sr);
 		u->destroy();
 		return;
 	}

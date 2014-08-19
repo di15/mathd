@@ -4,8 +4,8 @@
 class Player;
 class Building;
 
-void UpdateAI();
-void UpdateAI(Player* p);
+void UpdAI();
+void UpdAI(Player* p);
 bool AdjPr(Player* p);
 bool AdjPr(Building* b);
 

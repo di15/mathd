@@ -10,8 +10,9 @@
 #include "../../widget.h"
 #include "../viewportw.h"
 #include "../../../sim/selection.h"
+#include "../windoww.h"
 
-class ConstructionView : public Widget
+class ConstructionView : public WindowW
 {
 public:
 	ConstructionView(Widget* parent, const char* n, void (*reframef)(Widget* thisw), void (*movefunc)(), void (*cancelfunc)(), void (*proceedfunc)(), void (*estimatefunc)());
@@ -57,11 +58,11 @@ public:
 	Button proceed_button;
 	Button estimate_button;
 
-	void draw();
-	void drawover();
-	void reframe();
-	void inev(InEv* ev);
-	void frameupd();
+	//void draw();
+	//void drawover();
+	//void reframe();
+	//void inev(InEv* ev);
+	//void frameupd();
 	void regen(Selection* sel);
 };
 

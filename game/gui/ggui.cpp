@@ -308,7 +308,7 @@ void Click_NewGame()
 
 			//Vec3i cmpos((g_hmap.m_widthx+4)*TILE_SIZE/2 + (i+2)*PATHNODE_SIZE, 0, g_hmap.m_widthz*TILE_SIZE/2 + (j+2)*PATHNODE_SIZE);
 			//cmpos.y = g_hmap.accheight(cmpos.x, cmpos.z);
-			Vec2i cmpos((g_hmap.m_widthx+4)*TILE_SIZE/2 + (i+2)*PATHNODE_SIZE, g_hmap.m_widthz*TILE_SIZE/2 + (j+2)*PATHNODE_SIZE);
+			Vec2i cmpos((g_hmap.m_widthx+4)*TILE_SIZE/2 + (i+2)*PATHNODE_SIZE*4, g_hmap.m_widthz*TILE_SIZE/2 + (j+2)*PATHNODE_SIZE*4);
 
 			//if(rand()%2 == 1)
 			//	PlaceUnit(UNIT_ROBOSOLDIER, cmpos, 0);
@@ -855,12 +855,12 @@ void FillGUI()
 	g_log.flush();
 
 	gui->add(new ViewLayer(gui, "loading"));
-	ViewLayer* loadingview = (ViewLayer*)gui->get("loading");
+	ViewLayer* loadview = (ViewLayer*)gui->get("loading");
 
 	g_log<<"2.3"<<std::endl;
 	g_log.flush();
 
-	loadingview->add(new Text(NULL, "status", RichText("Loading..."), MAINFONT8, Resize_LoadingStatus));
+	loadview->add(new Text(NULL, "status", RichText("Loading..."), MAINFONT8, Resize_LoadingStatus));
 
 	gui->closeall();
 	gui->open("loading");

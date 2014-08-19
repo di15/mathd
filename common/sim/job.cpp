@@ -6,15 +6,12 @@
 #include "unittype.h"
 #include "sim.h"
 #include "../econ/utility.h"
+#include "../../game/gui/chattext.h"
 
 bool FindJob(Unit* u)
 {
-	//char msg[128];
-	//sprintf(msg, "u %d fj @ %d", UnitID(this), (int)GetTickCount());
-	//Chat(msg);
-
-	if(u->frameslookjobago < LOOKJOB_DELAY_MAX)
-		return false;
+	//if(u->frameslookjobago < LOOKJOB_DELAY_MAX)
+	//	return false;
 
 	//bool pathed = false;
 
@@ -86,14 +83,11 @@ bool FindJob(Unit* u)
 		if(jobutil <= bestutil)
 			continue;
 
-		//bestDistWage = distWage;
 		bestutil = jobutil;
 		besttarget = i;
 		bestjobtype = UMODE_DRTRANSP;
 		bestgoal = u2->cmpos;
 	}
-
-	//LastNum("after truck job");
 
 	// Construction jobs
 	for(int i=0; i<BUILDINGS; i++)
@@ -126,6 +120,11 @@ bool FindJob(Unit* u)
 
 		int jobutil = JobUtil(b->conwage, cmdist, WORK_DELAY);
 
+		char msg[128];
+		sprintf(msg, "job util %d", jobutil);
+		RichText rt(msg);
+		AddChat(&rt);
+
 		//if(distWage < bestDistWage)
 		if(jobutil <= bestutil)
 			continue;
@@ -136,8 +135,6 @@ bool FindJob(Unit* u)
 		bestutil = jobutil;
 		bestgoal = bcmpos;
 	}
-
-	//LastNum("after truck job 1");
 
 	// Normal/building jobs
 	for(int i=0; i<BUILDINGS; i++)
@@ -256,6 +253,11 @@ bool FindJob(Unit* u)
 	u->target = besttarget;
 	u->target2 = besttarget2;
 	u->cdtype = bestctype;
+
+	char msg[128];
+	sprintf(msg, "new goal d: %d,%d", u->goal.x - u->cmpos.x, u->goal.y - u->cmpos.y);
+	RichText rt(msg);
+	AddChat(&rt);
 
 #if 0
 

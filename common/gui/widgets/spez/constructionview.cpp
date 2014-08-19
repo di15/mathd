@@ -24,7 +24,7 @@
 #include "../../../sim/powl.h"
 #include "../../../sim/player.h"
 
-ConstructionView::ConstructionView(Widget* parent, const char* n, void (*reframef)(Widget* thisw), void (*movefunc)(), void (*cancelfunc)(), void (*proceedfunc)(), void (*estimatefunc)())
+ConstructionView::ConstructionView(Widget* parent, const char* n, void (*reframef)(Widget* thisw), void (*movefunc)(), void (*cancelfunc)(), void (*proceedfunc)(), void (*estimatefunc)()) : WindowW(parent, n, reframef)
 {
 	m_parent = parent;
 	m_type = WIDGET_CONSTRUCTIONVIEW;
@@ -87,6 +87,9 @@ ConstructionView::ConstructionView(Widget* parent, const char* n, void (*reframe
 	cancel_button = Button(this, "", "gui/cancel.png", RichText("Cancel construction"), RichText(""), MAINFONT16, BUTTON_LEFTIMAGE, NULL, cancelfunc, NULL, NULL, NULL, NULL, -1);
 	proceed_button = Button(this, "", "gui/accept.png", RichText("Proceed with plan"), RichText(""), MAINFONT16, BUTTON_LEFTIMAGE, NULL, proceedfunc, NULL, NULL, NULL, NULL, -1);
 	estimate_button = Button(this, "", "gui/icons/dollars.png", RichText("Estimate cost"), RichText(""), MAINFONT16, BUTTON_LEFTIMAGE, NULL, estimatefunc, NULL, NULL, NULL, NULL, -1);
+	
+	if(reframefunc)
+		reframefunc(this);
 
 	reframe();
 }
@@ -289,6 +292,7 @@ void ConstructionView::regen(Selection* sel)
 	reframe();
 }
 
+#if 0
 void ConstructionView::reframe()	//resized or moved
 {
 	if(reframefunc)
@@ -489,3 +493,5 @@ void ConstructionView::frameupd()
 	for(auto i=m_subwidg.rbegin(); i!=m_subwidg.rend(); i++)
 		(*i)->frameupd();
 }
+
+#endif

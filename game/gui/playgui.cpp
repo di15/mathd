@@ -22,6 +22,7 @@
 #include "../../common/sim/crpipe.h"
 #include "../../common/sim/player.h"
 #include "../../common/sim/infrastructure.h"
+#include "chattext.h"
 
 void Resize_ResNamesTextBlock(Widget* thisw)
 {
@@ -73,8 +74,8 @@ void UpdateResTicker()
 
 	Player* py = &g_player[g_curP];
 	GUI* gui = &py->gui;
-	ViewLayer* playguiview = (ViewLayer*)gui->get("play gui");
-	ResTicker* restickerw = (ResTicker*)playguiview->get("res ticker");
+	ViewLayer* playview = (ViewLayer*)gui->get("play gui");
+	ResTicker* restickerw = (ResTicker*)playview->get("res ticker");
 	Widget* restickertw = &restickerw->restext;
 	RichText restext;
 
@@ -166,8 +167,8 @@ void Over_BuildButton(int bwhat)
 	Player* py = &g_player[g_curP];
 	GUI* gui = &py->gui;
 
-	if(gui->get("construction view")->m_opened)
-		return;
+	//if(gui->get("construction view")->m_opened)
+	//	return;
 
 	py->bptype = bwhat;
 
@@ -321,9 +322,9 @@ void BuildMenu_OpenPage1()
 {
 	Player* py = &g_player[g_curP];
 	GUI* gui = &py->gui;
-	ViewLayer* playguiview = (ViewLayer*)gui->get("play gui");
+	ViewLayer* playview = (ViewLayer*)gui->get("play gui");
 
-	BottomPanel* bp = (BottomPanel*)playguiview->get("bottom panel");
+	BottomPanel* bp = (BottomPanel*)playview->get("bottom panel");
 
 #if 0
 	Button(Widget* parent, const char* filepath, const RichText t, int f, int style, void (*reframef)(Widget* thisw), void (*click)(), void (*click2)(int p), void (*overf)(), void (*overf2)(int p), void (*out)(), int parm)
@@ -364,9 +365,9 @@ void BuildMenu_OpenPage2()
 {
 	Player* py = &g_player[g_curP];
 	GUI* gui = &py->gui;
-	ViewLayer* playguiview = (ViewLayer*)gui->get("play gui");
+	ViewLayer* playview = (ViewLayer*)gui->get("play gui");
 
-	BottomPanel* bp = (BottomPanel*)playguiview->get("bottom panel");
+	BottomPanel* bp = (BottomPanel*)playview->get("bottom panel");
 
 	bp->bottomright_button[0] = Button(bp, "name", "gui/brbut/nucpow2.png", RichText(""), RichText(""), MAINFONT8, BUTTON_CORRODE, NULL, NULL, Click_BuildButton, NULL, Over_BuildButton, Out_BuildButton, BUILDING_NUCPOW);
 	bp->bottomright_button_on[0] = true;
@@ -432,9 +433,9 @@ void Resize_ConstructionView(Widget* thisw)
 {
 	Player* py = &g_player[g_curP];
 
-	thisw->m_pos[0] = 0;
+	thisw->m_pos[0] = py->width/2 - 200;
 	thisw->m_pos[1] = py->height - MINIMAP_SIZE - 32 - 400;
-	thisw->m_pos[2] = 400;
+	thisw->m_pos[2] = py->width/2 + 200;
 	thisw->m_pos[3] = py->height - MINIMAP_SIZE - 32;
 }
 
@@ -582,8 +583,8 @@ void Click_ProceedConstruction()
 	Player* py = &g_player[g_curP];
 	GUI* gui = &py->gui;
 
-	ViewLayer* cv = (ViewLayer*)gui->get("construction view");
-	ConstructionView* cvw = (ConstructionView*)cv->get("construction view");
+	//ViewLayer* cv = (ViewLayer*)gui->get("construction view");
+	ConstructionView* cvw = (ConstructionView*)gui->get("construction view");
 
 	int maxcost[RESOURCES];
 	Zero(maxcost);
@@ -725,21 +726,24 @@ void FillPlayGUI()
 	//Sleep(6000);
 
 	gui->add(new ViewLayer(gui, "play gui"));
-	ViewLayer* playguiview = (ViewLayer*)gui->get("play gui");
+	ViewLayer* playview = (ViewLayer*)gui->get("play gui");
 
-	//playguiview->add(new Image(NULL, "gui/backg/white.png", Resize_ResTicker));
-	//playguiview->add(new Text(NULL, "res ticker", RichText(" "), MAINFONT16, Resize_ResTicker, true, 1, 1, 1, 1));
-	playguiview->add(new ResTicker(NULL, "res ticker", Resize_ResTicker));
-	playguiview->add(new BottomPanel(NULL, "bottom panel", Resize_BottomPanel));
+	//playview->add(new Image(NULL, "gui/backg/white.png", Resize_ResTicker));
+	//playview->add(new Text(NULL, "res ticker", RichText(" "), MAINFONT16, Resize_ResTicker, true, 1, 1, 1, 1));
+	playview->add(new ResTicker(playview, "res ticker", Resize_ResTicker));
+	playview->add(new BottomPanel(playview, "bottom panel", Resize_BottomPanel));
+
+	AddChat(playview);
 
 	//preload all the button images
 	BuildMenu_OpenPage2();
 	BuildMenu_OpenPage1();
 
-	gui->add(new ViewLayer(gui, "construction view"));
-	ViewLayer* constrview = (ViewLayer*)gui->get("construction view");
+	//gui->add(new ViewLayer(gui, "construction view"));
+	gui->add(new ConstructionView(gui, "construction view", Resize_ConstructionView, Click_MoveConstruction, Click_CancelConstruction, Click_ProceedConstruction, Click_EstimateConstruction));
+	//ViewLayer* constrview = (ViewLayer*)gui->get("construction view");
 
-	constrview->add(new ConstructionView(NULL, "construction view", Resize_ConstructionView, Click_MoveConstruction, Click_CancelConstruction, Click_ProceedConstruction, Click_EstimateConstruction));
+	//constrview->add(new ConstructionView(NULL, "construction view", Resize_ConstructionView, Click_MoveConstruction, Click_CancelConstruction, Click_ProceedConstruction, Click_EstimateConstruction));
 
 	//gui->add(new ViewLayer(gui, "build preview"));
 	gui->add(new BuildPreview(gui, "build preview", Resize_BuildPreview));

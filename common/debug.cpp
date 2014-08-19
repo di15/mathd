@@ -198,8 +198,8 @@ void CheckNum(const char* num)
 	Player* py = &g_player[g_curP];
 	GUI* gui = &py->gui;
 
-	ViewLayer* v = (ViewLayer*)gui->get("construction view");
-	ConstructionView* cv = (ConstructionView*)v->get("construction view");
+	//ViewLayer* v = (ViewLayer*)gui->get("construction view");
+	ConstructionView* cv = (ConstructionView*)gui->get("construction view");
 	Text* tl = &cv->titletext;
 
 	g_log<<": ";

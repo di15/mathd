@@ -473,7 +473,7 @@ bool PlaceBl(int type, Vec2i pos, bool finished, int owner, int* bid)
 			py->sel.buildings.push_back(i);
 
 			GUI* gui = &py->gui;
-			ConstructionView* cv = (ConstructionView*)gui->get("construction view")->get("construction view");
+			ConstructionView* cv = (ConstructionView*)gui->get("construction view");
 			cv->regen(&py->sel);
 			gui->open("construction view");
 		}

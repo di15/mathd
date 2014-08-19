@@ -665,7 +665,7 @@ void AfterSel(Selection* s)
 	{
 		Player* py = &g_player[g_curP];
 		GUI* gui = &py->gui;
-		ConstructionView* cv = (ConstructionView*)gui->get("construction view")->get("construction view");
+		ConstructionView* cv = (ConstructionView*)gui->get("construction view");
 		cv->regen(s);
 		gui->open("construction view");
 	}

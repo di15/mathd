@@ -56,7 +56,7 @@ void SkipLogo()
 	gui->open("loading");
 }
 
-void UpdateLogo()
+void UpdLogo()
 {
 	static int stage = 0;
 
@@ -79,7 +79,7 @@ void UpdateLogo()
 	stage++;
 }
 
-void UpdateLoading()
+void UpdLoad()
 {
 	static int stage = 0;
 
@@ -101,7 +101,7 @@ void UpdateLoading()
 }
 
 int g_reStage = 0;
-void UpdateReloading()
+void UpdReload()
 {
 	switch(g_reStage)
 	{
@@ -189,11 +189,11 @@ bool UpdNextFrame(int desiredFrameRate)
 	return false;*/
 }
 
-void UpdSimState()
+void UpdSim()
 {
 	g_simframe ++;
 
-	UpdateAI();
+	UpdAI();
 	StartTimer(TIMER_UPDATEUNITS);
 	UpdUnits();
 	StopTimer(TIMER_UPDATEUNITS);
@@ -202,7 +202,7 @@ void UpdSimState()
 	StopTimer(TIMER_UPDATEBUILDINGS);
 }
 
-void UpdateEditor()
+void UpdEd()
 {
 #if 0
 	UpdateFPS();
@@ -212,17 +212,17 @@ void UpdateEditor()
 void Update()
 {
 	if(g_mode == APPMODE_LOGO)
-		UpdateLogo();
+		UpdLogo();
 	//else if(g_mode == APPMODE_INTRO)
 	//	UpdateIntro();
 	else if(g_mode == APPMODE_LOADING)
-		UpdateLoading();
+		UpdLoad();
 	else if(g_mode == APPMODE_RELOADING)
-		UpdateReloading();
+		UpdReload();
 	else if(g_mode == APPMODE_PLAY)
-		UpdSimState();
+		UpdSim();
 	else if(g_mode == APPMODE_EDITOR)
-		UpdateEditor();
+		UpdEd();
 }
 
 void DrawScene(Matrix projection, Matrix viewmat, Matrix modelmat, Matrix modelviewinv, float lightpos[3], float lightdir[3])
@@ -538,6 +538,10 @@ void Draw()
 		CheckGLError(__FILE__, __LINE__);
 		RenderShadowedScene(projection, viewmat, modelmat, modelview, DrawScene);
 		CheckGLError(__FILE__, __LINE__);
+		
+		Ortho(py->width, py->height, 1, 1, 1, 1);
+		DrawUOv(&mvpmat);
+		EndS();
 	}
 	CheckGLError(__FILE__, __LINE__);
 #endif

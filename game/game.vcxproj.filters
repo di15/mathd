@@ -431,6 +431,9 @@
     <ClCompile Include="..\common\sim\job.cpp">
       <Filter>Source Files\common\sim</Filter>
     </ClCompile>
+    <ClCompile Include="gui\chattext.cpp">
+      <Filter>Source Files\gui</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="gmain.h">
@@ -807,6 +810,9 @@
     </ClInclude>
     <ClInclude Include="..\common\sim\job.h">
       <Filter>Source Files\common\sim</Filter>
+    </ClInclude>
+    <ClInclude Include="gui\chattext.h">
+      <Filter>Source Files\gui</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
