@@ -41,27 +41,8 @@ bool UnitCollides(Unit* u, Vec2i cmpos, int utype)
 	if(cell->flags & FLAG_ABRUPT)
 		return true;
 
-	if(u == g_pathunit)
-	{
-		g_log<<"================================"<<std::endl;
-		g_log<<"unit "<<(int)(u - g_unit)<<" move simframe "<<g_simframe<<std::endl;
-		g_log<<"cm pos = "<<u->cmpos.x<<","<<u->cmpos.y<<std::endl;
-		g_log<<"cm rect = ("<<minx<<","<<minz<<")->("<<maxx<<","<<maxz<<")"<<std::endl;
-
-		int cposx = cmpos.x / PATHNODE_SIZE;
-		int cposz = cmpos.y / PATHNODE_SIZE;
-		int cminx = minx / PATHNODE_SIZE;
-		int cminz = minz / PATHNODE_SIZE;
-		int cmaxx = maxx / PATHNODE_SIZE;
-		int cmaxz = maxz / PATHNODE_SIZE;
-
-		g_log<<"pathcell rect: ("<<cminx<<","<<cminz<<")->("<<cmaxx<<","<<cmaxz<<")"<<std::endl;
-		g_log<<"pathcell pos: ("<<cposx<<","<<cposz<<")"<<std::endl;
-
-		g_log.flush();
-	}
-
 #if 0
+	//complete collision check - slow
 	for(int i=0; i<UNITS; i++)
 	{
 		Unit* u2 = &g_unit[i];
@@ -95,28 +76,6 @@ bool UnitCollides(Unit* u, Vec2i cmpos, int utype)
 
 		if(maxz <= minz2)
 			continue;
-
-		if(u == g_pathunit)
-		{
-			g_log<<"collision with unit "<<i<<std::endl;
-
-			g_log<<"\tcm pos = "<<u2->cmpos.x<<","<<u2->cmpos.y<<std::endl;
-			g_log<<"\tcm rect = ("<<minx2<<","<<minz2<<")->("<<maxx2<<","<<maxz2<<")"<<std::endl;
-
-			int cposx = u->cmpos.x / PATHNODE_SIZE;
-			int cposz = u->cmpos.y / PATHNODE_SIZE;
-			int cminx = minx / PATHNODE_SIZE;
-			int cminz = minz / PATHNODE_SIZE;
-			int cmaxx = maxx / PATHNODE_SIZE;
-			int cmaxz = maxz / PATHNODE_SIZE;
-
-			g_log<<"\tpathcell rect: ("<<cminx<<","<<cminz<<")->("<<cmaxx<<","<<cmaxz<<")"<<std::endl;
-			g_log<<"\tpathcell pos: ("<<cposx<<","<<cposz<<")"<<std::endl;
-
-			g_log<<"-----------------------------------------"<<std::endl;
-
-			g_log.flush();
-		}
 
 		return true;
 	}
@@ -182,14 +141,6 @@ bool UnitCollides(Unit* u, Vec2i cmpos, int utype)
 			}
 		}
 #endif
-
-
-	if(u == g_pathunit)
-	{
-		g_log<<"no collision"<<std::endl;
-		g_log<<"-----------------------------------------"<<std::endl;
-		g_log.flush();
-	}
 
 	return false;
 }
@@ -402,7 +353,11 @@ bool CheckIfArrived(Unit* u)
 		bcmmaxz = bcmminz + bt->widthz*TILE_SIZE - 1;
 
 		if(ucmminx <= bcmmaxx && ucmminz <= bcmmaxz && bcmminx <= ucmmaxx && bcmminz <= ucmmaxz)
+		{
+			RichText at("arr");
+			AddChat(&at);
 			return true;
+		}
 		break;
 
 	case UMODE_GOCDJOB:

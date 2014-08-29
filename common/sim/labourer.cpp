@@ -10,6 +10,7 @@
 #include "job.h"
 #include "unitmove.h"
 #include "../../game/gui/chattext.h"
+#include "../render/transaction.h"
 
 bool NeedFood(Unit* u)
 {
@@ -616,8 +617,11 @@ void DoShop(Unit* u)
 
 	//if(GetTickCount() - last < WORK_DELAY)
 	//	return;
+	
+	// TO DO: make consume 50-15 per sec from py->global and then b->stocked
 
-	if(u->cyframes > 0)
+	//if(u->cyframes > 0)
+	if(u->cyframes % 2 == 0)
 		return;
 
 	//last = GetTickCount();
@@ -642,12 +646,28 @@ void DoShop(Unit* u)
 	//sprintf(msg, "shopping");
 	//LogTransx(b->owner, p->price[CONSUMERGOODS], msg);
 
-#if 0
+#if 1
 	//b->Emit(SMILEY);
 #ifdef LOCAL_TRANSX
 	if(b->owner == g_localP)
 #endif
-		NewTransx(b->pos, CURRENC, p->price[CONSUMERGOODS], CONSUMERGOODS, -1);
+	{
+		RichText tt;	//transaction text
+
+		tt.m_part.push_back(RichPart(RICHTEXT_ICON, ICON_DOLLARS));
+
+		char mt[32];	//money text
+		sprintf(mt, "%+d ", b->prodprice[RES_RETFOOD]);
+		tt.m_part.push_back(RichPart(UString(mt)));
+
+		tt.m_part.push_back(RichPart(RICHTEXT_ICON, ICON_RETFOOD));
+
+		char ft[32];	//food text
+		sprintf(ft, "%+d ", -1);
+		tt.m_part.push_back(RichPart(UString(ft)));
+
+		NewTransx(u->drawpos, &tt);
+	}
 #endif
 }
 

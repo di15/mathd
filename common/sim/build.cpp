@@ -151,46 +151,46 @@ void DrawBReason(Matrix* mvp, float width, float height, bool persp)
 	switch(py->bpcol)
 	{
 	case COLLIDER_NONE:
-		reason.m_part.push_back(RichTextP(UString("")));
+		reason.m_part.push_back(RichPart(UString("")));
 		break;
 	case COLLIDER_UNIT:
-		reason.m_part.push_back(RichTextP(RICHTEXT_ICON, ICON_EXCLAMATION));
-		reason.m_part.push_back(RichTextP(UString(" A unit is in the way.")));
+		reason.m_part.push_back(RichPart(RICHTEXT_ICON, ICON_EXCLAMATION));
+		reason.m_part.push_back(RichPart(UString(" A unit is in the way.")));
 		break;
 	case COLLIDER_BUILDING:
-		reason.m_part.push_back(RichTextP(RICHTEXT_ICON, ICON_EXCLAMATION));
-		reason.m_part.push_back(RichTextP(UString(" Another building is in the way.")));
+		reason.m_part.push_back(RichPart(RICHTEXT_ICON, ICON_EXCLAMATION));
+		reason.m_part.push_back(RichPart(UString(" Another building is in the way.")));
 		break;
 	case COLLIDER_TERRAIN:
-		reason.m_part.push_back(RichTextP(RICHTEXT_ICON, ICON_EXCLAMATION));
-		reason.m_part.push_back(RichTextP(UString(" Buildings must be placed on even terrain.")));
+		reason.m_part.push_back(RichPart(RICHTEXT_ICON, ICON_EXCLAMATION));
+		reason.m_part.push_back(RichPart(UString(" Buildings must be placed on even terrain.")));
 		break;
 	case COLLIDER_NOROAD:
-		reason.m_part.push_back(RichTextP(UString("")));
+		reason.m_part.push_back(RichPart(UString("")));
 		break;
 	case COLLIDER_OTHER:
-		reason.m_part.push_back(RichTextP(RICHTEXT_ICON, ICON_EXCLAMATION));
-		reason.m_part.push_back(RichTextP(UString(" Can't place here.")));
+		reason.m_part.push_back(RichPart(RICHTEXT_ICON, ICON_EXCLAMATION));
+		reason.m_part.push_back(RichPart(UString(" Can't place here.")));
 		break;
 	case COLLIDER_NOLAND:
-		reason.m_part.push_back(RichTextP(RICHTEXT_ICON, ICON_EXCLAMATION));
-		reason.m_part.push_back(RichTextP(UString(" This building must be placed on land.")));
+		reason.m_part.push_back(RichPart(RICHTEXT_ICON, ICON_EXCLAMATION));
+		reason.m_part.push_back(RichPart(UString(" This building must be placed on land.")));
 		break;
 	case COLLIDER_NOSEA:
-		reason.m_part.push_back(RichTextP(RICHTEXT_ICON, ICON_EXCLAMATION));
-		reason.m_part.push_back(RichTextP(UString(" This structure must be placed in the sea.")));
+		reason.m_part.push_back(RichPart(RICHTEXT_ICON, ICON_EXCLAMATION));
+		reason.m_part.push_back(RichPart(UString(" This structure must be placed in the sea.")));
 		break;
 	case COLLIDER_NOCOAST:
-		reason.m_part.push_back(RichTextP(RICHTEXT_ICON, ICON_EXCLAMATION));
-		reason.m_part.push_back(RichTextP(UString(" This building must be placed along the coast.")));
+		reason.m_part.push_back(RichPart(RICHTEXT_ICON, ICON_EXCLAMATION));
+		reason.m_part.push_back(RichPart(UString(" This building must be placed along the coast.")));
 		break;
 	case COLLIDER_ROAD:
-		reason.m_part.push_back(RichTextP(RICHTEXT_ICON, ICON_EXCLAMATION));
-		reason.m_part.push_back(RichTextP(UString(" A road is in the way.")));
+		reason.m_part.push_back(RichPart(RICHTEXT_ICON, ICON_EXCLAMATION));
+		reason.m_part.push_back(RichPart(UString(" A road is in the way.")));
 		break;
 	case COLLIDER_OFFMAP:
-		reason.m_part.push_back(RichTextP(RICHTEXT_ICON, ICON_EXCLAMATION));
-		reason.m_part.push_back(RichTextP(UString(" Building is out of bounds.")));
+		reason.m_part.push_back(RichPart(RICHTEXT_ICON, ICON_EXCLAMATION));
+		reason.m_part.push_back(RichPart(UString(" Building is out of bounds.")));
 		break;
 	}
 
@@ -462,7 +462,7 @@ bool PlaceBl(int type, Vec2i pos, bool finished, int owner, int* bid)
 
 	if(g_mode == APPMODE_PLAY)
 	{
-		//b->allocres();
+		b->allocres();
 		b->inoperation = false;
 
 		if(!b->finished && owner == g_curP)
@@ -694,33 +694,26 @@ bool PlaceBAb(int btype, Vec2i tabout, Vec2i* tplace)
 //find to place unit about certain position
 bool PlaceUAb(int utype, Vec2i cmabout, Vec2i* cmplace)
 {
-	//g_log<<"PlaceBAround "<<player<<std::endl;
-	//g_log.flush();
-
 	UType* t = &g_utype[utype];
-	int shell = 1;
-
-	//char msg[128];
-	//sprintf(msg, "place b a %f,%f,%f", vAround.x/16, vAround.y/16, vAround.z/16);
-	//Chat(msg);
+	int shell = 0;
 
 	do
 	{
 		std::vector<Vec2i> canplace;
 		Vec2i cmtry;
-		int tilex, tilez;
+		int cmx, cmz;
 		int left, right, top, bottom;
-		left = cmabout.x - shell;
-		top = cmabout.y - shell;
-		right = cmabout.x + shell;
-		bottom = cmabout.y + shell;
+		left = cmabout.x - shell*t->size.x;
+		top = cmabout.y - shell*t->size.z;
+		right = cmabout.x + shell*t->size.x;
+		bottom = cmabout.y + shell*t->size.z;
 
-		canplace.reserve( (right-left)*2/t->size.x + (bottom-top)*2/t->size.z );
+		//canplace.reserve( (right-left)*2/t->size.x + (bottom-top)*2/t->size.z );
 
-		tilez = top;
-		for(tilex=left; tilex<right; tilex++)
+		cmz = top;
+		for(cmx=left; cmx<right; cmx++)
 		{
-			cmtry = Vec2i(tilex, tilez);
+			cmtry = Vec2i(cmx, cmz);
 
 			int cmstartx = cmtry.x - t->size.x/2;
 			int cmendx = cmstartx + t->size.x - 1;
@@ -735,10 +728,6 @@ bool PlaceUAb(int utype, Vec2i cmabout, Vec2i* cmplace)
 				continue;
 			else if(cmendz >= g_hmap.m_widthz * TILE_SIZE)
 				continue;
-
-			//char msg[128];
-			//sprintf(msg, "check %d,%d,%d,%d", startx, startz, endx, endz);
-			//Chat(msg);
 
 			//if(!CheckCanPlace(btype, cmtry))
 			if(UnitCollides(NULL, cmtry, utype))
@@ -746,10 +735,10 @@ bool PlaceUAb(int utype, Vec2i cmabout, Vec2i* cmplace)
 			canplace.push_back(cmtry);
 		}
 
-		tilex = right;
-		for(tilez=top; tilez<bottom; tilez++)
+		cmx = right;
+		for(cmz=top; cmz<bottom; cmz++)
 		{
-			cmtry = Vec2i(tilex, tilez);
+			cmtry = Vec2i(cmx, cmz);
 
 			int cmstartx = cmtry.x - t->size.x/2;
 			int cmendx = cmstartx + t->size.x - 1;
@@ -764,20 +753,16 @@ bool PlaceUAb(int utype, Vec2i cmabout, Vec2i* cmplace)
 				continue;
 			else if(cmendz >= g_hmap.m_widthz * TILE_SIZE)
 				continue;
-
-			//char msg[128];
-			//sprintf(msg, "check %d,%d,%d,%d", startx, startz, endx, endz);
-			//Chat(msg);
 
 			if(UnitCollides(NULL, cmtry, utype))
 				continue;
 			canplace.push_back(cmtry);
 		}
 
-		tilez = bottom;
-		for(tilex=right; tilex>left; tilex--)
+		cmz = bottom;
+		for(cmx=right; cmx>left; cmx--)
 		{
-			cmtry = Vec2i(tilex, tilez);
+			cmtry = Vec2i(cmx, cmz);
 
 			int cmstartx = cmtry.x - t->size.x/2;
 			int cmendx = cmstartx + t->size.x - 1;
@@ -792,20 +777,16 @@ bool PlaceUAb(int utype, Vec2i cmabout, Vec2i* cmplace)
 				continue;
 			else if(cmendz >= g_hmap.m_widthz * TILE_SIZE)
 				continue;
-
-			//char msg[128];
-			//sprintf(msg, "check %d,%d,%d,%d", startx, startz, endx, endz);
-			//Chat(msg);
 
 			if(UnitCollides(NULL, cmtry, utype))
 				continue;
 			canplace.push_back(cmtry);
 		}
 
-		tilex = left;
-		for(tilez=bottom; tilez>top; tilez--)
+		cmx = left;
+		for(cmz=bottom; cmz>top; cmz--)
 		{
-			cmtry = Vec2i(tilex, tilez);
+			cmtry = Vec2i(cmx, cmz);
 
 			int cmstartx = cmtry.x - t->size.x/2;
 			int cmendx = cmstartx + t->size.x - 1;
@@ -820,10 +801,6 @@ bool PlaceUAb(int utype, Vec2i cmabout, Vec2i* cmplace)
 				continue;
 			else if(cmendz >= g_hmap.m_widthz * TILE_SIZE)
 				continue;
-
-			//char msg[128];
-			//sprintf(msg, "check %d,%d,%d,%d", startx, startz, endx, endz);
-			//Chat(msg);
 
 			if(UnitCollides(NULL, cmtry, utype))
 				continue;
@@ -832,18 +809,10 @@ bool PlaceUAb(int utype, Vec2i cmabout, Vec2i* cmplace)
 
 		if(canplace.size() > 0)
 		{
-			//Chat("placing");
-			//g_log<<"placeb t="<<btype<<" "<<vTile.x<<","<<vTile.y<<","<<vTile.z<<"("<<(vTile.x/16)<<","<<(vTile.y/16)<<","<<(vTile.z/16)<<")"<<std::endl;
-			//g_log.flush();
-			//*tpos = canplace[ rand()%canplace.size() ];
 			*cmplace = canplace[ 0 ];
 
 			return true;
 		}
-
-		//char msg[128];
-		//sprintf(msg, "shell %d", shell);
-		//Chat(msg);
 
 		shell++;
 	} while(shell < g_hmap.m_widthx || shell < g_hmap.m_widthz);

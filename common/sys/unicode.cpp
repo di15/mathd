@@ -118,7 +118,7 @@ unsigned int *ToUTF32(const unsigned char *utf8, int len)
 	unsigned int ch;
 	int x = 0;
 	int l;
-	unsigned int *result = new unsigned int [len];
+	unsigned int *result = new unsigned int [len+1];
 	unsigned int *r = result;
 	if (!result)
 	{

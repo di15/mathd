@@ -33,7 +33,7 @@ static int starti;
 static int gstartx;
 static int goffstartx;
 static float frame[4];
-static std::list<RichTextP>::const_iterator g_rtextp;
+static std::list<RichPart>::const_iterator g_rtextp;
 static int pi;	//RichText part's [i] index
 static float currcolor[4];
 

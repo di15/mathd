@@ -8,7 +8,7 @@
 #define RICHTEXT_ICON		1
 
 // Rich text part
-class RichTextP
+class RichPart
 {
 public:
 	int m_type;
@@ -17,25 +17,25 @@ public:
 	int texlen() const;	//each icon counts as 1
 	int rawlen() const;	//icon tags are counted
 	std::string texval() const;
-	RichTextP substr(int start, int length) const;
-	RichTextP();
-	RichTextP(const RichTextP& original);
-	RichTextP(const char* cstr);
-	RichTextP(UString ustr);
-	RichTextP& operator=(const RichTextP &original);
-	RichTextP(int type, int subtype);
+	RichPart substr(int start, int length) const;
+	RichPart();
+	RichPart(const RichPart& original);
+	RichPart(const char* cstr);
+	RichPart(UString ustr);
+	RichPart& operator=(const RichPart &original);
+	RichPart(int type, int subtype);
 };
 
 class RichText
 {
 public:
-	std::list<RichTextP> m_part;
+	std::list<RichPart> m_part;
 	std::string rawstr() const;
 	int texlen() const;	//each icon counts as 1
 	int rawlen() const;	//icon tags are counted
 	RichText pwver() const;	//asterisk-mask password std::string
 	RichText();
-	RichText(const RichTextP& part);
+	RichText(const RichPart& part);
 	RichText(const RichText& original);
 	RichText(const char* cstr);
 	RichText& operator=(const RichText &original);

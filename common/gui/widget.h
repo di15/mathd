@@ -105,10 +105,7 @@ public:
 
 	virtual ~Widget()
 	{
-		for(auto i=m_subwidg.begin(); i!=m_subwidg.end(); i++)
-			delete *i;
-
-		m_subwidg.clear();
+		freech();
 	}
 
 	virtual void draw()	{}
@@ -124,6 +121,7 @@ public:
 	virtual void add(Widget* neww);
 	virtual void close();
 	virtual void chcall(Widget* ch, int type, void* data);	//child callback
+	virtual void freech();	//free subwidget children
 };
 
 void CenterLabel(Widget* w);

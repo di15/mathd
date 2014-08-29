@@ -68,5 +68,6 @@ public:
 void DefR(int resi, const char* n, const char* depn, int iconindex, bool phys, bool cap, bool glob, float r, float g, float b, float a, int conduit);
 void Zero(int *b);
 bool ResB(int building, int res);
+bool TrySubtract(const int* cost, int* universal, int* stock, int* local, int* netch, int* insufres);
 
 #endif

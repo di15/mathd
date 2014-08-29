@@ -71,7 +71,6 @@ void WriteProfiles(int in, int layer);
 void InitProfiles();
 
 void LogRich(const RichText* rt);
-void CheckNum(const char* num);
 void LastNum(const char* l);
 void CheckMem(const char* file, int line, const char* sep);
 

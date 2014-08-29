@@ -587,7 +587,7 @@ void Draw()
 	for(int i=16000; i<19000; i++)
 		//for(int i=0; i<3000; i++)
 	{
-		uni.m_part.push_back(RichTextP(i));
+		uni.m_part.push_back(RichPart(i));
 	}
 
 	float color[] = {1,1,1,1};
@@ -742,20 +742,16 @@ void Scroll()
 
 	Vec3f clip;
 
-#if 0
-	if(GetMapIntersection(&g_hmap, line, &clip))
-#else
 	if(FastMapIntersect(&g_hmap, line, &clip))
 	{
-#endif
 		*c = oldcam;
-}
-else
-{
-	//CalcMapView();
-}
+	}
+	else
+	{
+		//CalcMapView();
+	}
 
-c->friction2();
+	c->friction2();
 }
 
 void LoadConfig()

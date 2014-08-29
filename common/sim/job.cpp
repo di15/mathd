@@ -85,7 +85,7 @@ bool FindJob(Unit* u)
 
 		bestutil = jobutil;
 		besttarget = i;
-		bestjobtype = UMODE_DRTRANSP;
+		bestjobtype = UMODE_GOTRANSP;
 		bestgoal = u2->cmpos;
 	}
 
@@ -121,7 +121,7 @@ bool FindJob(Unit* u)
 		int jobutil = JobUtil(b->conwage, cmdist, WORK_DELAY);
 
 		char msg[128];
-		sprintf(msg, "job util %d", jobutil);
+		sprintf(msg, "%lld job util %d", g_simframe, jobutil);
 		RichText rt(msg);
 		AddChat(&rt);
 
@@ -130,7 +130,7 @@ bool FindJob(Unit* u)
 			continue;
 
 		besttarget = i;
-		bestjobtype = UMODE_CSTJOB;
+		bestjobtype = UMODE_GOCSTJOB;
 		//bestDistWage = distWage;
 		bestutil = jobutil;
 		bestgoal = bcmpos;
@@ -184,7 +184,7 @@ bool FindJob(Unit* u)
 			continue;
 
 		besttarget = i;
-		bestjobtype = UMODE_BLJOB;
+		bestjobtype = UMODE_GOBLJOB;
 		//bestDistWage = distWage;
 		bestutil = jobutil;
 		bestgoal = bcmpos;
@@ -230,7 +230,7 @@ bool FindJob(Unit* u)
 
 				besttarget = x;
 				besttarget2 = z;
-				bestjobtype = UMODE_CDJOB;
+				bestjobtype = UMODE_GOCDJOB;
 				bestctype = ctype;
 				bestutil = jobutil;
 				bestgoal = ccmpos;
@@ -255,7 +255,7 @@ bool FindJob(Unit* u)
 	u->cdtype = bestctype;
 
 	char msg[128];
-	sprintf(msg, "new goal d: %d,%d", u->goal.x - u->cmpos.x, u->goal.y - u->cmpos.y);
+	sprintf(msg, "new goal d: %d,%d, newmode:%d", u->goal.x - u->cmpos.x, u->goal.y - u->cmpos.y, u->mode);
 	RichText rt(msg);
 	AddChat(&rt);
 

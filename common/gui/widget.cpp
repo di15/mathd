@@ -59,6 +59,17 @@ void Widget::chcall(Widget* ch, int type, void* data)
 {
 }
 
+//free subwidget children
+void Widget::freech()
+{
+	auto witer = m_subwidg.begin();
+	while(witer != m_subwidg.end())
+	{
+		delete *witer;
+		witer = m_subwidg.erase(witer);
+	}
+}
+
 void SubFrame(float *a, float *b, float *c)
 {
 	c[0] = fmax(a[0], b[0]);

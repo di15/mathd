@@ -5,44 +5,44 @@
 
 //#define USTR_DEBUG
 
-RichTextP::RichTextP()
+RichPart::RichPart()
 {
 #ifdef USTR_DEBUG
-	g_log<<"RichTextP::RichTextP()"<<std::endl;
+	g_log<<"RichPart::RichPart()"<<std::endl;
 	g_log.flush();
 #endif
 }
 
-RichTextP::RichTextP(const RichTextP& original)
+RichPart::RichPart(const RichPart& original)
 {
 
 #ifdef USTR_DEBUG
-	g_log<<"RichTextP::RichTextP(const RichTextP& original)"<<std::endl;
+	g_log<<"RichPart::RichPart(const RichPart& original)"<<std::endl;
 	g_log.flush();
 #endif
 
 	*this = original;
 }
 
-RichTextP::RichTextP(const char* cstr)
+RichPart::RichPart(const char* cstr)
 {
 	m_type = RICHTEXT_TEXT;
 	m_text = UString(cstr);
 
 #ifdef USTR_DEBUG
-	g_log<<"RichTextP::RichTextP(const char* cstr) end '"<<m_text.rawstr()<<"'"<<std::endl;
+	g_log<<"RichPart::RichPart(const char* cstr) end '"<<m_text.rawstr()<<"'"<<std::endl;
 	g_log.flush();
 #endif
 }
 
-RichTextP::RichTextP(UString ustr)
+RichPart::RichPart(UString ustr)
 {
 	m_type = RICHTEXT_TEXT;
 	m_text = ustr;
 }
 
 
-RichTextP::RichTextP(int type, int subtype)
+RichPart::RichPart(int type, int subtype)
 {
 	if(type == RICHTEXT_ICON)
 	{
@@ -54,10 +54,10 @@ RichTextP::RichTextP(int type, int subtype)
 	m_type = RICHTEXT_TEXT;
 }
 
-RichTextP& RichTextP::operator=(const RichTextP &original)
+RichPart& RichPart::operator=(const RichPart &original)
 {
 #ifdef USTR_DEBUG
-	g_log<<"RichTextP& RichTextP::operator=(const RichTextP &original)"<<std::endl;
+	g_log<<"RichPart& RichPart::operator=(const RichPart &original)"<<std::endl;
 	g_log.flush();
 #endif
 
@@ -68,7 +68,7 @@ RichTextP& RichTextP::operator=(const RichTextP &original)
 	return *this;
 }
 
-int RichTextP::texlen() const	// icons count as 1 glyph
+int RichPart::texlen() const	// icons count as 1 glyph
 {
 	if(m_type == RICHTEXT_TEXT)
 		return m_text.m_length;
@@ -79,7 +79,7 @@ int RichTextP::texlen() const	// icons count as 1 glyph
 	return 0;
 }
 
-int RichTextP::rawlen() const	// icon tag length is counted
+int RichPart::rawlen() const	// icon tag length is counted
 {
 	if(m_type == RICHTEXT_TEXT)
 		return m_text.m_length;
@@ -89,13 +89,13 @@ int RichTextP::rawlen() const	// icon tag length is counted
 	return 0;
 }
 
-std::string RichTextP::texval() const
+std::string RichPart::texval() const
 {
 	if(m_type == RICHTEXT_TEXT)
 	{
 #if 0
 //#ifdef USTR_DEBUG
-		g_log<<"\tstring RichTextP::texval() const..."<<std::endl;
+		g_log<<"\tstring RichPart::texval() const..."<<std::endl;
 		g_log.flush();
 #endif
 
@@ -103,7 +103,7 @@ std::string RichTextP::texval() const
 
 #if 0
 //#ifdef USTR_DEBUG
-		g_log<<"\tstring RichTextP::texval() const = "<<m_text.rawstr()<<std::endl;
+		g_log<<"\tstring RichPart::texval() const = "<<m_text.rawstr()<<std::endl;
 		g_log.flush();
 #endif
 	}
@@ -116,20 +116,20 @@ std::string RichTextP::texval() const
 	return m_text.rawstr();
 }
 
-RichTextP RichTextP::substr(int start, int length) const
+RichPart RichPart::substr(int start, int length) const
 {
 	if(m_type == RICHTEXT_ICON)
 		return *this;
 	else if(m_type == RICHTEXT_TEXT)
 	{
-		RichTextP subp(m_text.substr(start, length));
+		RichPart subp(m_text.substr(start, length));
 		return subp;
 	}
 
 	return *this;
 }
 
-RichText::RichText(const RichTextP& part)
+RichText::RichText(const RichPart& part)
 {
 	m_part.push_back(part);
 }
@@ -146,7 +146,7 @@ RichText::RichText(const char* cstr)
 	g_log.flush();
 #endif
 
-	m_part.push_back( RichTextP(cstr) );
+	m_part.push_back( RichPart(cstr) );
 }
 
 RichText& RichText::operator=(const RichText &original)
@@ -175,11 +175,11 @@ RichText& RichText::operator=(const RichText &original)
 
 RichText RichText::operator+(const RichText &other)
 {
-	RichTextP twopart;
+	RichPart twopart;
 	bool havecombomid = false;
 
-	RichTextP* last1 = NULL;
-	RichTextP* first2 = NULL;
+	RichPart* last1 = NULL;
+	RichPart* first2 = NULL;
 
 	if(m_part.size() > 0 && other.m_part.size() > 0)
 	{
@@ -196,7 +196,7 @@ RichText RichText::operator+(const RichText &other)
 		{
 			if(i->texlen() > 0)
 			{
-				first2 = (RichTextP*)&*i;
+				first2 = (RichPart*)&*i;
 				break;
 			}
 		}
@@ -271,7 +271,7 @@ RichText RichText::substr(int start, int length) const
 		//if(currplace < start+length && currplace+currlen >= start)
 		if(startplace < currlen && endplace >= 0)
 		{
-			RichTextP addp;
+			RichPart addp;
 
 			if(startplace < 0)
 				startplace = 0;
@@ -357,7 +357,7 @@ RichText RichText::pwver() const	//asterisk-mask password std::string
 
 	pwcstr[len] = '\0';
 
-	RichTextP pwstrp(pwcstr);
+	RichPart pwstrp(pwcstr);
 	delete pwcstr;
 
 	RichText pwstr;
@@ -408,7 +408,7 @@ RichText ParseTags(RichText original, int* caret)
 
 				if(firstof > 0)
 				{
-					RichTextP before = i->substr(0, firstof);
+					RichPart before = i->substr(0, firstof);
 
 #ifdef USTR_DEBUG
 					g_log<<"ParseTags before str at "<<firstof<<" \""<<before.m_text.rawstr()<<"\""<<std::endl;
@@ -423,7 +423,7 @@ RichText ParseTags(RichText original, int* caret)
 #endif
 				}
 
-				RichTextP iconp(RICHTEXT_ICON, j);
+				RichPart iconp(RICHTEXT_ICON, j);
 				parsed = parsed + RichText(iconp);
 
 				int taglen = icon->m_tag.m_length;
@@ -436,7 +436,7 @@ RichText ParseTags(RichText original, int* caret)
 
 				if(firstof+taglen < partlen)
 				{
-					RichTextP after = i->substr(firstof+taglen, partlen-(firstof+taglen));
+					RichPart after = i->substr(firstof+taglen, partlen-(firstof+taglen));
 
 #ifdef USTR_DEBUG
 					g_log<<"ParseTags after str at "<<(firstof+taglen)<<" \""<<after.m_text.rawstr()<<"\""<<std::endl;

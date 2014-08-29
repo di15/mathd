@@ -190,25 +190,6 @@ void InitProfiles()
 	DefTimer(TIMER_DRAWUTEXBIND, TIMER_DRAWUNITS, "texture bind");
 }
 
-void CheckNum(const char* num)
-{
-	g_log<<"Check #"<<num;
-	g_log.flush();
-
-	Player* py = &g_player[g_curP];
-	GUI* gui = &py->gui;
-
-	//ViewLayer* v = (ViewLayer*)gui->get("construction view");
-	ConstructionView* cv = (ConstructionView*)gui->get("construction view");
-	Text* tl = &cv->titletext;
-
-	g_log<<": ";
-	g_log.flush();
-
-	g_log<<tl->m_text.rawstr()<<std::endl;
-	g_log.flush();
-}
-
 void LastNum(const char* l)
 {
 	//return;

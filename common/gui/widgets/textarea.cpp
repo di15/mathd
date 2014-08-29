@@ -565,7 +565,7 @@ void TextArea::placechar(unsigned int k)
 				if(i->m_text.m_length <= 1)
 					continue;
 
-				RichTextP chpart;
+				RichPart chpart;
 
 				chpart.m_type = RICHTEXT_TEXT;
 
@@ -595,13 +595,13 @@ void TextArea::placechar(unsigned int k)
 
 				if(subplace <= 0)
 				{
-					newval = newval + RichText(RichTextP(UString(k)));
+					newval = newval + RichText(RichPart(UString(k)));
 					newval = newval + RichText(*i);
 				}
 				else
 				{
 					newval = newval + RichText(*i);
-					newval = newval + RichText(RichTextP(UString(k)));
+					newval = newval + RichText(RichPart(UString(k)));
 				}
 			}
 

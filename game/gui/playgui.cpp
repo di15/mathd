@@ -79,48 +79,48 @@ void UpdateResTicker()
 	Widget* restickertw = &restickerw->restext;
 	RichText restext;
 
-	restext.m_part.push_back(RichTextP(RICHTEXT_ICON, ICON_DOLLARS));
-	restext.m_part.push_back(RichTextP(" Funds: 100 +1/"));
-	restext.m_part.push_back(RichTextP(RICHTEXT_ICON, ICON_TIME));
-	restext.m_part.push_back(RichTextP("    "));
-	restext.m_part.push_back(RichTextP(RICHTEXT_ICON, ICON_HOUSING));
-	restext.m_part.push_back(RichTextP(" Housing: 100/120"));
-	restext.m_part.push_back(RichTextP("    "));
-	restext.m_part.push_back(RichTextP(RICHTEXT_ICON, ICON_FARMPRODUCT));
-	restext.m_part.push_back(RichTextP(" Farm Products: 100 +1/"));
-	restext.m_part.push_back(RichTextP(RICHTEXT_ICON, ICON_TIME));
-	restext.m_part.push_back(RichTextP("    "));
-	restext.m_part.push_back(RichTextP(RICHTEXT_ICON, ICON_RETFOOD));
-	restext.m_part.push_back(RichTextP(" Retail Food: 100 +1/"));
-	restext.m_part.push_back(RichTextP(RICHTEXT_ICON, ICON_TIME));
-	restext.m_part.push_back(RichTextP("    "));
-	restext.m_part.push_back(RichTextP(RICHTEXT_ICON, ICON_PRODUCTION));
-	restext.m_part.push_back(RichTextP(" Production: 100 +1/"));
-	restext.m_part.push_back(RichTextP(RICHTEXT_ICON, ICON_TIME));
-	restext.m_part.push_back(RichTextP("    "));
-	restext.m_part.push_back(RichTextP(RICHTEXT_ICON, ICON_IRONORE));
-	restext.m_part.push_back(RichTextP(" Minerals: 100 +1/"));
-	restext.m_part.push_back(RichTextP(RICHTEXT_ICON, ICON_TIME));
-	restext.m_part.push_back(RichTextP("    "));
-	restext.m_part.push_back(RichTextP(RICHTEXT_ICON, ICON_CRUDEOIL));
-	restext.m_part.push_back(RichTextP(" Crude Oil: 100 +1/"));
-	restext.m_part.push_back(RichTextP(RICHTEXT_ICON, ICON_TIME));
-	restext.m_part.push_back(RichTextP("    "));
-	restext.m_part.push_back(RichTextP(RICHTEXT_ICON, ICON_WSFUEL));
-	restext.m_part.push_back(RichTextP(" Wholesale Fuel: 100 +1/"));
-	restext.m_part.push_back(RichTextP(RICHTEXT_ICON, ICON_TIME));
-	restext.m_part.push_back(RichTextP("    "));
-	restext.m_part.push_back(RichTextP(RICHTEXT_ICON, ICON_RETFUEL));
-	restext.m_part.push_back(RichTextP(" Retail Fuel: 100 +1/"));
-	restext.m_part.push_back(RichTextP(RICHTEXT_ICON, ICON_TIME));
-	restext.m_part.push_back(RichTextP("    "));
-	restext.m_part.push_back(RichTextP(RICHTEXT_ICON, ICON_ENERGY));
-	restext.m_part.push_back(RichTextP(" Energy: 100/120"));
-	restext.m_part.push_back(RichTextP("    "));
-	restext.m_part.push_back(RichTextP(RICHTEXT_ICON, ICON_ENRICHEDURAN));
-	restext.m_part.push_back(RichTextP(" Uranium: 100 +1/"));
-	restext.m_part.push_back(RichTextP(RICHTEXT_ICON, ICON_TIME));
-	restext.m_part.push_back(RichTextP("    "));
+	restext.m_part.push_back(RichPart(RICHTEXT_ICON, ICON_DOLLARS));
+	restext.m_part.push_back(RichPart(" Funds: 100 +1/"));
+	restext.m_part.push_back(RichPart(RICHTEXT_ICON, ICON_TIME));
+	restext.m_part.push_back(RichPart("    "));
+	restext.m_part.push_back(RichPart(RICHTEXT_ICON, ICON_HOUSING));
+	restext.m_part.push_back(RichPart(" Housing: 100/120"));
+	restext.m_part.push_back(RichPart("    "));
+	restext.m_part.push_back(RichPart(RICHTEXT_ICON, ICON_FARMPRODUCT));
+	restext.m_part.push_back(RichPart(" Farm Products: 100 +1/"));
+	restext.m_part.push_back(RichPart(RICHTEXT_ICON, ICON_TIME));
+	restext.m_part.push_back(RichPart("    "));
+	restext.m_part.push_back(RichPart(RICHTEXT_ICON, ICON_RETFOOD));
+	restext.m_part.push_back(RichPart(" Retail Food: 100 +1/"));
+	restext.m_part.push_back(RichPart(RICHTEXT_ICON, ICON_TIME));
+	restext.m_part.push_back(RichPart("    "));
+	restext.m_part.push_back(RichPart(RICHTEXT_ICON, ICON_PRODUCTION));
+	restext.m_part.push_back(RichPart(" Production: 100 +1/"));
+	restext.m_part.push_back(RichPart(RICHTEXT_ICON, ICON_TIME));
+	restext.m_part.push_back(RichPart("    "));
+	restext.m_part.push_back(RichPart(RICHTEXT_ICON, ICON_IRONORE));
+	restext.m_part.push_back(RichPart(" Minerals: 100 +1/"));
+	restext.m_part.push_back(RichPart(RICHTEXT_ICON, ICON_TIME));
+	restext.m_part.push_back(RichPart("    "));
+	restext.m_part.push_back(RichPart(RICHTEXT_ICON, ICON_CRUDEOIL));
+	restext.m_part.push_back(RichPart(" Crude Oil: 100 +1/"));
+	restext.m_part.push_back(RichPart(RICHTEXT_ICON, ICON_TIME));
+	restext.m_part.push_back(RichPart("    "));
+	restext.m_part.push_back(RichPart(RICHTEXT_ICON, ICON_WSFUEL));
+	restext.m_part.push_back(RichPart(" Wholesale Fuel: 100 +1/"));
+	restext.m_part.push_back(RichPart(RICHTEXT_ICON, ICON_TIME));
+	restext.m_part.push_back(RichPart("    "));
+	restext.m_part.push_back(RichPart(RICHTEXT_ICON, ICON_RETFUEL));
+	restext.m_part.push_back(RichPart(" Retail Fuel: 100 +1/"));
+	restext.m_part.push_back(RichPart(RICHTEXT_ICON, ICON_TIME));
+	restext.m_part.push_back(RichPart("    "));
+	restext.m_part.push_back(RichPart(RICHTEXT_ICON, ICON_ENERGY));
+	restext.m_part.push_back(RichPart(" Energy: 100/120"));
+	restext.m_part.push_back(RichPart("    "));
+	restext.m_part.push_back(RichPart(RICHTEXT_ICON, ICON_ENRICHEDURAN));
+	restext.m_part.push_back(RichPart(" Uranium: 100 +1/"));
+	restext.m_part.push_back(RichPart(RICHTEXT_ICON, ICON_TIME));
+	restext.m_part.push_back(RichPart("    "));
 
 	int len = restext.texlen();
 
@@ -167,8 +167,8 @@ void Over_BuildButton(int bwhat)
 	Player* py = &g_player[g_curP];
 	GUI* gui = &py->gui;
 
-	//if(gui->get("construction view")->m_opened)
-	//	return;
+	if(gui->get("construction view")->m_opened)
+		return;
 
 	py->bptype = bwhat;
 
@@ -187,19 +187,19 @@ void Over_BuildButton(int bwhat)
 	TextBlock* obw = (TextBlock*)bp->get("output block");
 	TextBlock* dbw = (TextBlock*)bp->get("desc block");
 
-	cb.m_part.push_back(RichTextP(UString("CONSTRUCTION REQUISITES:")));
+	cb.m_part.push_back(RichPart(UString("CONSTRUCTION REQUISITES:")));
 
 	if(bwhat < 0)
 		;
 	else if(bwhat < BUILDING_TYPES)
 	{
-		ib.m_part.push_back(RichTextP(UString("INPUTS:")));
-		ob.m_part.push_back(RichTextP(UString("OUTPUTS:")));
+		ib.m_part.push_back(RichPart(UString("INPUTS:")));
+		ob.m_part.push_back(RichPart(UString("OUTPUTS:")));
 
 		BlType* bt = &g_bltype[bwhat];
 		bname = bt->name;
 
-		db.m_part.push_back(RichTextP(UString(bt->desc.c_str())));
+		db.m_part.push_back(RichPart(UString(bt->desc.c_str())));
 
 		int nc = 0;
 		for(int ri=0; ri<RESOURCES; ri++)
@@ -210,19 +210,19 @@ void Over_BuildButton(int bwhat)
 			nc ++;
 			Resource* r = &g_resource[ri];
 
-			cb.m_part.push_back(RichTextP(UString("\n")));
-			cb.m_part.push_back(RichTextP(UString(r->name.c_str())));
-			cb.m_part.push_back(RichTextP(UString(" ")));
-			cb.m_part.push_back(RichTextP(RICHTEXT_ICON, r->icon));
-			cb.m_part.push_back(RichTextP(UString(": ")));
+			cb.m_part.push_back(RichPart(UString("\n")));
+			cb.m_part.push_back(RichPart(UString(r->name.c_str())));
+			cb.m_part.push_back(RichPart(UString(" ")));
+			cb.m_part.push_back(RichPart(RICHTEXT_ICON, r->icon));
+			cb.m_part.push_back(RichPart(UString(": ")));
 
 			char num[32];
 			sprintf(num, "%d", bt->conmat[ri]);
-			cb.m_part.push_back(RichTextP(UString(num)));
+			cb.m_part.push_back(RichPart(UString(num)));
 		}
 
 		if(nc <= 0)
-			cb.m_part.push_back(RichTextP(UString("\nNone")));
+			cb.m_part.push_back(RichPart(UString("\nNone")));
 
 		int ni = 0;
 		for(int ri=0; ri<RESOURCES; ri++)
@@ -233,19 +233,19 @@ void Over_BuildButton(int bwhat)
 			ni ++;
 			Resource* r = &g_resource[ri];
 
-			ib.m_part.push_back(RichTextP(UString("\n")));
-			ib.m_part.push_back(RichTextP(UString(r->name.c_str())));
-			ib.m_part.push_back(RichTextP(UString(" ")));
-			ib.m_part.push_back(RichTextP(RICHTEXT_ICON, r->icon));
-			ib.m_part.push_back(RichTextP(UString(": ")));
+			ib.m_part.push_back(RichPart(UString("\n")));
+			ib.m_part.push_back(RichPart(UString(r->name.c_str())));
+			ib.m_part.push_back(RichPart(UString(" ")));
+			ib.m_part.push_back(RichPart(RICHTEXT_ICON, r->icon));
+			ib.m_part.push_back(RichPart(UString(": ")));
 
 			char num[32];
 			sprintf(num, "%d", bt->input[ri]);
-			ib.m_part.push_back(RichTextP(UString(num)));
+			ib.m_part.push_back(RichPart(UString(num)));
 		}
 
 		if(ni <= 0)
-			ib.m_part.push_back(RichTextP(UString("\nNone")));
+			ib.m_part.push_back(RichPart(UString("\nNone")));
 
 		int no = 0;
 		for(int ri=0; ri<RESOURCES; ri++)
@@ -256,26 +256,26 @@ void Over_BuildButton(int bwhat)
 			no ++;
 			Resource* r = &g_resource[ri];
 
-			ob.m_part.push_back(RichTextP(UString("\n")));
-			ob.m_part.push_back(RichTextP(UString(r->name.c_str())));
-			ob.m_part.push_back(RichTextP(UString(" ")));
-			ob.m_part.push_back(RichTextP(RICHTEXT_ICON, r->icon));
-			ob.m_part.push_back(RichTextP(UString(": ")));
+			ob.m_part.push_back(RichPart(UString("\n")));
+			ob.m_part.push_back(RichPart(UString(r->name.c_str())));
+			ob.m_part.push_back(RichPart(UString(" ")));
+			ob.m_part.push_back(RichPart(RICHTEXT_ICON, r->icon));
+			ob.m_part.push_back(RichPart(UString(": ")));
 
 			char num[32];
 			sprintf(num, "%d", bt->output[ri]);
-			ob.m_part.push_back(RichTextP(UString(num)));
+			ob.m_part.push_back(RichPart(UString(num)));
 		}
 
 		if(no <= 0)
-			ob.m_part.push_back(RichTextP(UString("\nNone")));
+			ob.m_part.push_back(RichPart(UString("\nNone")));
 	}
 	else if(bwhat < BUILDING_TYPES + CONDUIT_TYPES)
 	{
 		ConduitType* ct = &g_cotype[bwhat - BUILDING_TYPES];
 		bname = ct->name;
 
-		db.m_part.push_back(RichTextP(UString(ct->desc.c_str())));
+		db.m_part.push_back(RichPart(UString(ct->desc.c_str())));
 
 		int nc = 0;
 		for(int ri=0; ri<RESOURCES; ri++)
@@ -286,19 +286,19 @@ void Over_BuildButton(int bwhat)
 			nc ++;
 			Resource* r = &g_resource[ri];
 
-			cb.m_part.push_back(RichTextP(UString("\n")));
-			cb.m_part.push_back(RichTextP(UString(r->name.c_str())));
-			cb.m_part.push_back(RichTextP(UString(" ")));
-			cb.m_part.push_back(RichTextP(RICHTEXT_ICON, r->icon));
-			cb.m_part.push_back(RichTextP(UString(": ")));
+			cb.m_part.push_back(RichPart(UString("\n")));
+			cb.m_part.push_back(RichPart(UString(r->name.c_str())));
+			cb.m_part.push_back(RichPart(UString(" ")));
+			cb.m_part.push_back(RichPart(RICHTEXT_ICON, r->icon));
+			cb.m_part.push_back(RichPart(UString(": ")));
 
 			char num[32];
 			sprintf(num, "%d", ct->conmat[ri]);
-			cb.m_part.push_back(RichTextP(UString(num)));
+			cb.m_part.push_back(RichPart(UString(num)));
 		}
 
 		if(nc <= 0)
-			cb.m_part.push_back(RichTextP(UString("\nNone")));
+			cb.m_part.push_back(RichPart(UString("\nNone")));
 	}
 
 	tl->m_text = RichText(UString(bname.c_str()));
@@ -582,64 +582,6 @@ void Click_ProceedConstruction()
 {
 	Player* py = &g_player[g_curP];
 	GUI* gui = &py->gui;
-
-	//ViewLayer* cv = (ViewLayer*)gui->get("construction view");
-	ConstructionView* cvw = (ConstructionView*)gui->get("construction view");
-
-	int maxcost[RESOURCES];
-	Zero(maxcost);
-
-	for(auto rriter = cvw->reqrows.begin(); rriter != cvw->reqrows.end(); rriter++)
-	{
-		int resi = rriter->restype;
-		maxcost[resi] = StrToInt(rriter->editbox.m_value.rawstr().c_str());
-	}
-
-	for(auto siter = py->sel.buildings.begin(); siter != py->sel.buildings.end(); siter++)
-	{
-		int bi = *siter;
-		Building* b = &g_building[bi];
-
-		for(int i=0; i<RESOURCES; i++)
-			b->maxcost[i] = maxcost[i];
-
-		b->allocres();
-	}
-
-#if 0
-	for(auto siter = py->sel.roads.begin(); siter != py->sel.roads.end(); siter++)
-	{
-		Vec2i tpos = *siter;
-		RoadTile* r = RoadAt(tpos.x, tpos.y);
-
-		for(int i=0; i<RESOURCES; i++)
-			r->maxcost[i] = maxcost[i];
-
-		r->allocate();
-	}
-
-	for(auto siter = py->sel.powls.begin(); siter != py->sel.powls.end(); siter++)
-	{
-		Vec2i tpos = *siter;
-		PowlTile* p = PowlAt(tpos.x, tpos.y);
-
-		for(int i=0; i<RESOURCES; i++)
-			p->maxcost[i] = maxcost[i];
-
-		p->allocate();
-	}
-
-	for(auto siter = py->sel.crpipes.begin(); siter != py->sel.crpipes.end(); siter++)
-	{
-		Vec2i tpos = *siter;
-		CrPipeTile* p = CrPipeAt(tpos.x, tpos.y);
-
-		for(int i=0; i<RESOURCES; i++)
-			p->maxcost[i] = maxcost[i];
-
-		p->allocate();
-	}
-#endif
 
 	ClearSel(&py->sel);
 	gui->close("construction view");

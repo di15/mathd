@@ -28,14 +28,16 @@ void SaveScreenshot()
 
 	char relative[256];
 	std::string datetime = FileDateTime();
-	sprintf(relative, "screenshots/%s.jpg", datetime.c_str());
+	//sprintf(relative, "screenshots/%s.jpg", datetime.c_str());
+	sprintf(relative, "screenshots/%s.png", datetime.c_str());
 	char fullpath[MAX_PATH+1];
 	FullPath(relative, fullpath);
 
 	g_log<<"Writing screenshot "<<fullpath<<std::endl;
 	g_log.flush();
 
-	SaveJPEG(fullpath, &screenshot, 0.9f);
+	//SaveJPEG(fullpath, &screenshot, 0.9f);
+	SavePNG(fullpath, &screenshot);
 
 	//free(screenshot.data);
 }

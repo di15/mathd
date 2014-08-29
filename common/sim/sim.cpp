@@ -217,7 +217,7 @@ void Queue()
 	//DefB(BUILDING_APARTMENT, "Apartment Building", Vec2i(2,1), "models/apartment1/basebuilding.ms3d", Vec3f(100,100,100), Vec3f(0,0,0), "models/apartment1/basebuilding.ms3d", Vec3f(100,100,100), Vec3f(0,0,0), FOUNDATION_LAND, RES_NONE);
 	DefB(BUILDING_APARTMENT, "Apartment Building", Vec2i(2,2),  false, "models/apartment2/b1911", Vec3f(1,1,1), Vec3f(0,0,0), "models/apartment2/b1911", Vec3f(1,1,1), Vec3f(0,0,0), FOUNDATION_LAND, RES_NONE);
 	BConMat(BUILDING_APARTMENT, RES_MINERALS, 5);
-	BConMat(BUILDING_APARTMENT, RES_LABOUR, 10);
+	BConMat(BUILDING_APARTMENT, RES_LABOUR, 50);
 	//BInput(BUILDING_APARTMENT, RES_ENERGY, 50);
 	BOutput(BUILDING_APARTMENT, RES_HOUSING, 15);
 	//BOutput(BUILDING_APARTMENT, RES_HOUSING, 50);

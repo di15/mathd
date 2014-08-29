@@ -6,6 +6,7 @@
 #include "../sim/building.h"
 #include "../gui/cursor.h"
 #include "../script/console.h"
+#include "../../game/gui/chattext.h"
 
 PlayerColor g_pycols[PLAYER_COLORS] =
 {
@@ -118,7 +119,8 @@ void Bankrupt(int player, const char* reason)
 	if(player == g_localP)
 	{
 		RichText lm(UString("You've gone bankrupt"));
-		SubmitConsole(&lm);
+		//SubmitConsole(&lm);
+		AddChat(&lm);
 	}
 	else //if(p->activity != ACTIVITY_NONE)
 	{
@@ -137,7 +139,8 @@ void Bankrupt(int player, const char* reason)
 		strcat(msg, add);
 
 		RichText lm;
-		lm.m_part.push_back(RichTextP(UString(msg)));
-		SubmitConsole(&lm);
+		lm.m_part.push_back(RichPart(UString(msg)));
+		//SubmitConsole(&lm);
+		AddChat(&lm);
 	}
 }

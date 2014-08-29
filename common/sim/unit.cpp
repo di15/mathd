@@ -54,6 +54,9 @@ void DrawUnits()
 		if(!u->on)
 			continue;
 
+		if(u->hidden())
+			continue;
+
 		UType* t = &g_utype[u->type];
 
 		Vec3f vmin(u->drawpos.x - t->size.x/2, u->drawpos.y, u->drawpos.z - t->size.x/2);
@@ -95,7 +98,7 @@ void StartBel(Unit* u)
 			u->belongings[ RES_FUNDS ] = CYCLE_FRAMES/SIM_FRAME_RATE * LABOURER_FOODCONSUM * 10;
 		}
 
-		u->belongings[ RES_RETFOOD ] = STARTING_RETFOOD;
+		u->belongings[ RES_RETFOOD ] = STARTING_RETFOOD - 250;
 		u->belongings[ RES_LABOUR ] = STARTING_LABOUR;
 	}
 }
@@ -210,24 +213,21 @@ void FreeUnits()
 
 bool Unit::hidden() const
 {
-#if 0
-	if(mode == NORMJOB)
+	switch(mode)
+	{
+	case UMODE_BLJOB:
+	case UMODE_CSTJOB:
+	case UMODE_CDJOB:
+	case UMODE_SHOPPING:
+	case UMODE_RESTING:
+	case UMODE_DRTRANSP:
+	//case UMODE_REFUELING:
+	//case UMODE_ATDEMB:
+	//case UMODE_ATDEMCD:
 		return true;
-	if(mode == CONJOB)
-		return true;
-	if(mode == PIPEJOB)
-		return true;
-	if(mode == ROADJOB)
-		return true;
-	if(mode == POWLJOB)
-		return true;
-	if(mode == DRIVING)
-		return true;
-	if(mode == RESTING)
-		return true;
-	if(mode == SHOPPING)
-		return true;
-#endif
+	default:break;
+	}
+
 	return false;
 }
 
@@ -296,6 +296,23 @@ void ResetGoal(Unit* u)
 
 void ResetMode(Unit* u)
 {
+	switch(u->mode)
+	{
+	case UMODE_BLJOB:
+	case UMODE_CSTJOB:
+	case UMODE_CDJOB:
+	case UMODE_SHOPPING:
+	case UMODE_RESTING:
+	case UMODE_DRTRANSP:
+	//case UMODE_REFUELING:
+	//case UMODE_ATDEMB:
+	//case UMODE_ATDEMCD:
+		u->freecollider();
+		PlaceUAb(u->type, u->cmpos, &u->cmpos);
+		u->fillcollider();
+	default:break;
+	}
+
 	//LastNum("resetmode 1");
 	if(u->type == UNIT_LABOURER)
 	{
@@ -368,6 +385,7 @@ void ResetTarget(Unit* u)
 	ResetMode(u);
 }
 
+//draw unit info overlay
 void DrawUOv(Matrix* mvp)
 {
 	Player* py = &g_player[g_curP];
@@ -383,6 +401,9 @@ void DrawUOv(Matrix* mvp)
 			continue;
 
 		if(u->type != UNIT_LABOURER && u->type != UNIT_TRUCK)
+			continue;
+		
+		if(u->hidden())
 			continue;
 
 		if(!g_frustum.pointin(u->drawpos.x, u->drawpos.y, u->drawpos.z))
@@ -486,7 +507,7 @@ void DrawUOv(Matrix* mvp)
 			break;
 		}
 
-		rt.m_part.push_back(RichTextP(UString(mode.c_str())));
+		rt.m_part.push_back(RichPart(UString(mode.c_str())));
 		DrawCenterShadText(MAINFONT8, screenpos.x, screenpos.y, &rt);
 		
 		RichText rt2;
@@ -501,12 +522,12 @@ void DrawUOv(Matrix* mvp)
 			sprintf(labour, "%d ", u->belongings[RES_LABOUR]);
 			sprintf(funds, "%d ", u->belongings[RES_FUNDS]);
 			
-			rt2.m_part.push_back(RichTextP(RICHTEXT_ICON, ICON_RETFOOD));
-			rt2.m_part.push_back(RichTextP(UString(food)));
-			rt2.m_part.push_back(RichTextP(RICHTEXT_ICON, ICON_LABOUR));
-			rt2.m_part.push_back(RichTextP(UString(labour)));
-			rt2.m_part.push_back(RichTextP(RICHTEXT_ICON, ICON_DOLLARS));
-			rt2.m_part.push_back(RichTextP(UString(funds)));
+			rt2.m_part.push_back(RichPart(RICHTEXT_ICON, ICON_RETFOOD));
+			rt2.m_part.push_back(RichPart(UString(food)));
+			rt2.m_part.push_back(RichPart(RICHTEXT_ICON, ICON_LABOUR));
+			rt2.m_part.push_back(RichPart(UString(labour)));
+			rt2.m_part.push_back(RichPart(RICHTEXT_ICON, ICON_DOLLARS));
+			rt2.m_part.push_back(RichPart(UString(funds)));
 		}
 		else if(u->type == UNIT_TRUCK)
 		{

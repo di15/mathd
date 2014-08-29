@@ -309,10 +309,10 @@ void Building::allocres()
 		{
 			char numpart[128];
 			sprintf(numpart, "%+d", -alloc);
-			transx.m_part.push_back( RichTextP( numpart ) );
-			transx.m_part.push_back( RichTextP( RICHTEXT_ICON, g_resource[i].icon ) );
-			transx.m_part.push_back( RichTextP( g_resource[i].name.c_str() ) );
-			transx.m_part.push_back( RichTextP( "\n" ) );
+			transx.m_part.push_back( RichPart( numpart ) );
+			transx.m_part.push_back( RichPart( RICHTEXT_ICON, g_resource[i].icon ) );
+			transx.m_part.push_back( RichPart( g_resource[i].name.c_str() ) );
+			transx.m_part.push_back( RichPart( "\n" ) );
 		}
 	}
 

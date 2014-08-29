@@ -320,13 +320,10 @@ void Click_NewGame()
 
 	for(int i=0; i<PLAYERS; i++)
 	{
-		if(i == g_localP)
-			continue;
-
 		Player* p = &g_player[i];
 
 		p->on = true;
-		p->ai = true;
+		p->ai = (i == g_localP) ? false : true;
 
 		p->global[RES_FUNDS] = 4000;
 		p->global[RES_FARMPRODUCTS] = 4000;
@@ -424,10 +421,10 @@ void Click_NewGame()
 
 	for(int i=0; i<2000; i++)
 	{
-		bigtext.m_part.push_back(RichTextP((unsigned int)(rand()%3000+16000)));
+		bigtext.m_part.push_back(RichPart((unsigned int)(rand()%3000+16000)));
 
 		if(rand()%10 == 1)
-			bigtext.m_part.push_back(RichTextP((unsigned int)'\n'));
+			bigtext.m_part.push_back(RichPart((unsigned int)'\n'));
 	}
 
 	win->add(new TextBlock(win, "text block", bigtext, MAINFONT16, Resize_WinText));

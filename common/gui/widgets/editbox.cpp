@@ -482,9 +482,9 @@ void EditBox::inev(InEv* ev)
 		}
 		else
 #endif
-			unsigned int* ustr = ToUTF32((const unsigned char*)ev->text.c_str(), ev->text.length());
-		//RichText addstr(RichTextP(UString(ustr)));	//Why does MSVS2012 not accept this?
-		RichText addstr = RichText(RichTextP(UString(ustr)));
+		unsigned int* ustr = ToUTF32((const unsigned char*)ev->text.c_str(), ev->text.length());
+		//RichText addstr(RichPart(UString(ustr)));	//Why does MSVS2012 not accept this?
+		RichText addstr = RichText(RichPart(UString(ustr)));
 		unsigned int first = ustr[0];
 		delete [] ustr;
 
