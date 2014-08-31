@@ -304,6 +304,8 @@
 		<Unit filename="gmain.cpp" />
 		<Unit filename="gmain.h" />
 		<Unit filename="gres.h" />
+		<Unit filename="gui/chattext.cpp" />
+		<Unit filename="gui/chattext.h" />
 		<Unit filename="gui/editorgui.cpp" />
 		<Unit filename="gui/editorgui.h" />
 		<Unit filename="gui/ggui.cpp" />
