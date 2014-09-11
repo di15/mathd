@@ -35,6 +35,8 @@ extern long long g_simframe;
 #define WORK_DELAY				(SIM_FRAME_RATE*1)	//in sim frames
 #define LOOKJOB_DELAY_MAX		(SIM_FRAME_RATE*5)
 #define FUEL_DISTANCE			(TILE_SIZE)		//(TILE_SIZE*2.0f)
+#define	SHOP_RATE				200
+
 
 void Queue();
 

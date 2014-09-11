@@ -620,8 +620,8 @@ void DoShop(Unit* u)
 	
 	// TO DO: make consume 50-15 per sec from py->global and then b->stocked
 
-	//if(u->cyframes > 0)
-	if(u->cyframes % 2 == 0)
+	if(u->cyframes > 0)
+	//if(u->cyframes % 2 == 0)
 		return;
 
 	//last = GetTickCount();
@@ -629,6 +629,7 @@ void DoShop(Unit* u)
 	Building* b = &g_building[u->target];
 	Player* p = &g_player[b->owner];
 
+#if 0
 	if(p->global[RES_RETFOOD] > 0)
 		p->global[RES_RETFOOD] -= 1;
 	else
@@ -641,10 +642,22 @@ void DoShop(Unit* u)
 	p->global[RES_FUNDS] += b->prodprice[RES_RETFOOD];
 	u->belongings[RES_FUNDS] -= b->prodprice[RES_RETFOOD];
 	//b->recenth.consumed[CONSUMERGOODS] += 1.0f;
+#endif
 
-	//char msg[128];
-	//sprintf(msg, "shopping");
-	//LogTransx(b->owner, p->price[CONSUMERGOODS], msg);
+	for(int trysub=SHOP_RATE; trysub>0; trysub--)
+	{
+		if(b->prodprice[RES_RETFOOD] * trysub > u->belongings[RES_FUNDS])
+			continue;
+
+		int sub[RESOURCES];
+		Zero(sub);
+
+		if(!TrySub(sub, p->global, b->stocked, p->local, NULL, NULL))
+			continue;
+
+		u->belongings[RES_RETFOOD] += trysub;
+		p->global[RES_FUNDS] += b->prodprice[RES_RETFOOD] * trysub;
+		u->belongings[RES_FUNDS] -= b->prodprice[RES_RETFOOD] * trysub;
 
 #if 1
 	//b->Emit(SMILEY);
@@ -663,12 +676,15 @@ void DoShop(Unit* u)
 		tt.m_part.push_back(RichPart(RICHTEXT_ICON, ICON_RETFOOD));
 
 		char ft[32];	//food text
-		sprintf(ft, "%+d ", -1);
+		sprintf(ft, "%+d ", -trysub);
 		tt.m_part.push_back(RichPart(UString(ft)));
 
 		NewTransx(u->drawpos, &tt);
 	}
 #endif
+
+		break;
+	}
 }
 
 // do rest

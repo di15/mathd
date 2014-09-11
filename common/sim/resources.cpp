@@ -53,7 +53,7 @@ Parameters
 	netch:	a pointer a resource array indicating the net change of resources (I don't remember how this was any different from cost)
 	insufres:	a pointer to an int that will indicate the resource type that was insufficient if false is returned (transaction failure)
 */
-bool TrySubtract(const int* cost, int* universal, int* stock, int* local, int* netch, int* insufres)
+bool TrySub(const int* cost, int* universal, int* stock, int* local, int* netch, int* insufres)
 {
 	int combined[RESOURCES];
 
