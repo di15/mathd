@@ -98,7 +98,7 @@ void StartBel(Unit* u)
 			u->belongings[ RES_FUNDS ] = CYCLE_FRAMES/SIM_FRAME_RATE * LABOURER_FOODCONSUM * 10;
 		}
 
-		u->belongings[ RES_RETFOOD ] = STARTING_RETFOOD - 250;
+		u->belongings[ RES_RETFOOD ] = STARTING_RETFOOD;
 		u->belongings[ RES_LABOUR ] = STARTING_LABOUR;
 	}
 }

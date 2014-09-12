@@ -183,6 +183,7 @@
     <ClCompile Include="..\common\gui\widgets\link.cpp" />
     <ClCompile Include="..\common\gui\widgets\listbox.cpp" />
     <ClCompile Include="..\common\gui\widgets\spez\bottompanel.cpp" />
+    <ClCompile Include="..\common\gui\widgets\spez\buildingview.cpp" />
     <ClCompile Include="..\common\gui\widgets\spez\buildpreview.cpp" />
     <ClCompile Include="..\common\gui\widgets\spez\constructionview.cpp" />
     <ClCompile Include="..\common\gui\widgets\spez\resticker.cpp" />
@@ -307,6 +308,7 @@
     <ClInclude Include="..\common\gui\widgets\link.h" />
     <ClInclude Include="..\common\gui\widgets\listbox.h" />
     <ClInclude Include="..\common\gui\widgets\spez\bottompanel.h" />
+    <ClInclude Include="..\common\gui\widgets\spez\buildingview.h" />
     <ClInclude Include="..\common\gui\widgets\spez\buildpreview.h" />
     <ClInclude Include="..\common\gui\widgets\spez\constructionview.h" />
     <ClInclude Include="..\common\gui\widgets\spez\resticker.h" />

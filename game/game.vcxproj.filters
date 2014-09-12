@@ -434,6 +434,9 @@
     <ClCompile Include="gui\chattext.cpp">
       <Filter>Source Files\gui</Filter>
     </ClCompile>
+    <ClCompile Include="..\common\gui\widgets\spez\buildingview.cpp">
+      <Filter>Source Files\common\gui\widgets\spez</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="gmain.h">
@@ -813,6 +816,9 @@
     </ClInclude>
     <ClInclude Include="gui\chattext.h">
       <Filter>Source Files\gui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\gui\widgets\spez\buildingview.h">
+      <Filter>Source Files\common\gui\widgets\spez</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
