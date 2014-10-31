@@ -29,12 +29,12 @@
 #include "sim.h"
 #include "../math/fixmath.h"
 
-void UpdateSBuild()
+void UpdSBl()
 {
 	Player* py = &g_player[g_curP];
 	Camera* c = &py->camera;
 
-	if(py->build == BUILDING_NONE)
+	if(py->build == BL_NONE)
 		return;
 
 	//py->vdrag[0] = Vec3f(-1,-1,-1);
@@ -62,7 +62,7 @@ void UpdateSBuild()
 
 	py->canplace = true;
 
-	if(py->build < BUILDING_TYPES)
+	if(py->build < BL_TYPES)
 	{
 		Vec2i tilepos (intersection.x/TILE_SIZE, intersection.z/TILE_SIZE);
 
@@ -85,9 +85,9 @@ void UpdateSBuild()
 		}
 		//PlaceBl(type, tilepos, true, -1, -1, -1);
 	}
-	else if(py->build >= BUILDING_TYPES && py->build < BUILDING_TYPES+CONDUIT_TYPES)
+	else if(py->build >= BL_TYPES && py->build < BL_TYPES+CONDUIT_TYPES)
 	{
-		int ctype = py->build - BUILDING_TYPES;
+		int ctype = py->build - BL_TYPES;
 
 		if(py->mousekeys[0])
 			UpdCoPlans(ctype, g_localP, py->vdrag[0], py->vdrag[1]);
@@ -99,16 +99,16 @@ void UpdateSBuild()
 	}
 }
 
-void DrawSBuild()
+void DrawSBl()
 {
 	Player* py = &g_player[g_curP];
 
-	if(py->build == BUILDING_NONE)
+	if(py->build == BL_NONE)
 		return;
 
 	Shader* s = &g_shader[g_curS];
 
-	if(py->build < BUILDING_TYPES)
+	if(py->build < BL_TYPES)
 	{
 		//g_log<<"dr"<<std::endl;
 
@@ -121,13 +121,13 @@ void DrawSBuild()
 		Model* m = &g_model[ t->model ];
 		m->draw(0, py->vdrag[0], 0);
 	}
-	else if(py->build == BUILDING_ROAD)
+	else if(py->build == BL_ROAD)
 	{
 	}
-	else if(py->build == BUILDING_POWL)
+	else if(py->build == BL_POWL)
 	{
 	}
-	else if(py->build == BUILDING_CRPIPE)
+	else if(py->build == BL_CRPIPE)
 	{
 	}
 }
@@ -136,12 +136,12 @@ void DrawBReason(Matrix* mvp, float width, float height, bool persp)
 {
 	Player* py = &g_player[g_curP];
 
-	if(py->canplace || py->build == BUILDING_NONE)
+	if(py->canplace || py->build == BL_NONE)
 		return;
 
 	Vec3f pos3 = py->vdrag[0];
 
-	if(py->build >= BUILDING_TYPES)
+	if(py->build >= BL_TYPES)
 		pos3 = py->vdrag[1];
 
 	RichText reason;
@@ -199,7 +199,7 @@ void DrawBReason(Matrix* mvp, float width, float height, bool persp)
 	DrawBoxShadText(MAINFONT32, pos4.x-200, pos4.y-64-100, 400, 200, &reason, color, 0, -1);
 }
 
-bool BuildingLevel(int type, Vec2i tpos)
+bool BlLevel(int type, Vec2i tpos)
 {
 #if 1
 	BlType* t = &g_bltype[type];
@@ -334,7 +334,7 @@ bool Offmap(int minx, int minz, int maxx, int maxz)
 	return false;
 }
 
-bool BuildingCollides(int type, Vec2i tpos)
+bool BlCollides(int type, Vec2i tpos)
 {
 	BlType* t = &g_bltype[type];
 
@@ -365,6 +365,8 @@ bool BuildingCollides(int type, Vec2i tpos)
 				return true;
 			}
 
+		//return false;
+
 	if(CollidesWithBuildings(cmmin.x, cmmin.y, cmmax.x, cmmax.y, -1))
 		return true;
 
@@ -376,10 +378,10 @@ bool BuildingCollides(int type, Vec2i tpos)
 
 bool CheckCanPlace(int type, Vec2i pos)
 {
-	if(!BuildingLevel(type, pos))
+	if(!BlLevel(type, pos))
 		return false;
 
-	if(BuildingCollides(type, pos))
+	if(BlCollides(type, pos))
 		return false;
 
 	return true;
@@ -428,7 +430,6 @@ bool PlaceBl(int type, Vec2i pos, bool finished, int owner, int* bid)
 
 	Zero(b->conmat);
 	Zero(b->stocked);
-	Zero(b->maxcost);
 	Zero(b->prodprice);
 	b->propprice = 0;
 

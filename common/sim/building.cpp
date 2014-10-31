@@ -22,9 +22,11 @@
 #include "../render/shadow.h"
 #include "../math/frustum.h"
 #include "unit.h"
+#include "sim.h"
 #include "labourer.h"
 #include "../econ/demand.h"
 #include "../math/fixmath.h"
+#include "../ai/ai.h"
 
 Building g_building[BUILDINGS];
 
@@ -394,7 +396,7 @@ void DrawBl()
 			continue;
 
 		const BlType* t = &g_bltype[b->type];
-		//const BlType* t = &g_bltype[BUILDING_APARTMENT];
+		//const BlType* t = &g_bltype[BL_APARTMENT];
 		Model* m = &g_model[ t->model ];
 
 		Vec3f vmin(b->drawpos.x - t->widthx*TILE_SIZE/2, b->drawpos.y, b->drawpos.z - t->widthz*TILE_SIZE/2);
@@ -466,47 +468,6 @@ void DrawBl()
 
 void UpdBls()
 {
-#if 0
-	static float completion = 2.0f;
-
-	if(completion+EPSILON >= 1 && completion-EPSILON <= 1)
-		Explode(&g_building[1]);
-
-#if 1
-	//StageCopyVA(&g_building[0].drawva, &g_model[g_bltype[g_building[0].type].model].m_va[0], completion);
-	HeightCopyVA(&g_building[1].drawva, &g_model[g_bltype[g_building[1].type].model].m_va[0], Clipf(completion, 0, 1));
-
-	completion -= 0.01f;
-
-	if(completion < -1.0f)
-		completion = 2.0f;
-#elif 1
-	HeightCopyVA(&g_building[0].drawva, &g_model[g_bltype[g_building[0].type].model].m_va[0], completion);
-
-	completion *= 0.95f;
-
-	if(completion < 0.001f)
-		completion = 1.0f;
-#endif
-#elif 0
-	static float completion = 2.0f;
-
-	StageCopyVA(&g_building[0].drawva, &g_model[g_bltype[g_building[0].type].cmodel].m_va[0], completion);
-
-	completion += 0.005f;
-
-	if(completion < 2.0f && completion >= 1.0f)
-	{
-		g_building[0].finished = true;
-		CopyVA(&g_building[0].drawva, &g_model[g_bltype[g_building[0].type].model].m_va[0]);
-	}
-	if(completion >= 2.0f)
-	{
-		completion = 0.1f;
-		g_building[0].finished = false;
-	}
-#endif
-
 	for(int i=0; i<BUILDINGS; i++)
 	{
 		Building* b = &g_building[i];
@@ -521,6 +482,7 @@ void UpdBls()
 		if(!b->finished)
 			continue;
 
+		//emit decorations
 		for(int j=0; j<MAX_B_EMITTERS; j++)
 		{
 			//first = true;

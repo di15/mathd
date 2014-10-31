@@ -56,7 +56,7 @@ void CloseEdTools()
 	gui->close("place powls");
 	gui->close("place crude pipelines");
 
-	py->build = BUILDING_NONE;
+	py->build = BL_NONE;
 }
 
 int GetEdTool()
@@ -103,15 +103,15 @@ void Change_EditorToolsSelector()
 	}
 	else if(selected == EDTOOL_PLACEROADS)
 	{
-		py->build = BUILDING_ROAD;
+		py->build = BL_ROAD;
 	}
 	else if(selected == EDTOOL_PLACECRUDEPIPES)
 	{
-		py->build = BUILDING_CRPIPE;
+		py->build = BL_CRPIPE;
 	}
 	else if(selected == EDTOOL_PLACEPOWERLINES)
 	{
-		py->build = BUILDING_POWL;
+		py->build = BL_POWL;
 	}
 #if 0
 #define EDTOOL_PLACEROADS		4
@@ -228,7 +228,7 @@ void FillPlaceBuildingsView()
 
 	Widget* buildingselector = placebuildingsview->get("building selector");
 
-	for(int i=0; i<BUILDING_TYPES; i++)
+	for(int i=0; i<BL_TYPES; i++)
 	{
 		buildingselector->m_options.push_back(RichText(g_bltype[i].name));
 	}

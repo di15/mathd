@@ -1,5 +1,5 @@
-#ifndef BUILDING_H
-#define BUILDING_H
+#ifndef BL_H
+#define BL_H
 
 #include "../math/vec2i.h"
 #include "../math/vec3f.h"
@@ -34,7 +34,6 @@ public:
 	VertexArray drawva;
 
 	int conmat[RESOURCES];
-	int maxcost[RESOURCES];
 	bool inoperation;
 
 	int prodprice[RESOURCES];	//price of produced goods

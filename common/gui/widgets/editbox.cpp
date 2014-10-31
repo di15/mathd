@@ -40,7 +40,7 @@ EditBox::EditBox() : Widget()
 	//reframe();
 }
 
-EditBox::EditBox(Widget* parent, const char* n, const RichText t, int f, void (*reframef)(Widget* thisw), bool pw, int maxl, void (*change3)(unsigned int key, unsigned int scancode, bool down), void (*submitf)(), int parm) : Widget()
+EditBox::EditBox(Widget* parent, const char* n, const RichText t, int f, void (*reframef)(Widget* thisw), bool pw, int maxl, void (*change3)(unsigned int key, unsigned int scancode, bool down, int parm), void (*submitf)(), int parm) : Widget()
 {
 	m_parent = parent;
 	m_type = WIDGET_EDITBOX;
@@ -421,7 +421,7 @@ void EditBox::inev(InEv* ev)
 			changefunc2(m_param);
 
 		if(changefunc3 != NULL)
-			changefunc3(ev->key, ev->scancode, true);
+			changefunc3(ev->key, ev->scancode, true, m_param);
 
 		ev->intercepted = true;
 	}
@@ -431,7 +431,7 @@ void EditBox::inev(InEv* ev)
 			return;
 
 		if(changefunc3 != NULL)
-			changefunc3(ev->key, ev->scancode, false);
+			changefunc3(ev->key, ev->scancode, false, m_param);
 
 		ev->intercepted = true;
 	}
@@ -497,7 +497,7 @@ void EditBox::inev(InEv* ev)
 			changefunc2(m_param);
 
 		if(changefunc3 != NULL)
-			changefunc3(first, 0, true);
+			changefunc3(first, 0, true, m_param);
 
 		ev->intercepted = true;
 	}

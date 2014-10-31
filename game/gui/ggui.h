@@ -13,6 +13,7 @@ extern bool g_canselect;
 
 extern char g_lastsave[MAX_PATH+1];
 
+void Resize_Fullscreen(Widget* thisw);
 void Click_NewGame();
 void Click_OpenEditor();
 void FillGUI();

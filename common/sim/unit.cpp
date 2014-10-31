@@ -93,9 +93,9 @@ void StartBel(Unit* u)
 	{
 		//if(u->owner >= 0)
 		{
-			//u->belongings[ RES_FUNDS ] = 100;
-			//u->belongings[ RES_FUNDS ] = CYCLE_FRAMES * LABOURER_FOODCONSUM * 30;
-			u->belongings[ RES_FUNDS ] = CYCLE_FRAMES/SIM_FRAME_RATE * LABOURER_FOODCONSUM * 10;
+			//u->belongings[ RES_DOLLARS ] = 100;
+			//u->belongings[ RES_DOLLARS ] = CYCLE_FRAMES * LABOURER_FOODCONSUM * 30;
+			u->belongings[ RES_DOLLARS ] = CYCLE_FRAMES/SIM_FRAME_RATE * LABOURER_FOODCONSUM * 10;
 		}
 
 		u->belongings[ RES_RETFOOD ] = STARTING_RETFOOD;
@@ -520,7 +520,7 @@ void DrawUOv(Matrix* mvp)
 			
 			sprintf(food, "%d ", u->belongings[RES_RETFOOD]);
 			sprintf(labour, "%d ", u->belongings[RES_LABOUR]);
-			sprintf(funds, "%d ", u->belongings[RES_FUNDS]);
+			sprintf(funds, "%d ", u->belongings[RES_DOLLARS]);
 			
 			rt2.m_part.push_back(RichPart(RICHTEXT_ICON, ICON_RETFOOD));
 			rt2.m_part.push_back(RichPart(UString(food)));

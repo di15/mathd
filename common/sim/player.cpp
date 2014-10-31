@@ -70,9 +70,6 @@ Player::Player()
 	Zero(local);
 	Zero(global);
 
-	global[RES_MINERALS] = 10000;
-	//global[RES_LABOUR] = 10000;
-
 	on = false;
 	zoom = INI_ZOOM;
 	width = INI_WIDTH;
@@ -83,7 +80,7 @@ Player::Player()
 	moved = false;
 	canplace = false;
 	bpcol = -1;
-	build = BUILDING_NONE;
+	build = BL_NONE;
 	bptype = -1;
 	bpyaw = 0;
 	mouseoveraction = false;

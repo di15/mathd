@@ -312,22 +312,22 @@ void DrawPreview(Matrix projection, Matrix viewmat, Matrix modelmat, Matrix mode
 
 	Player* py = &g_player[g_curP];
 
-	if(py->bptype >= 0 && py->bptype < BUILDING_TYPES)
+	if(py->bptype >= 0 && py->bptype < BL_TYPES)
 	{
 		BlType* t = &g_bltype[py->bptype];
 		m = &g_model[t->model];
 	}
-	else if(py->bptype == BUILDING_ROAD)
+	else if(py->bptype == BL_ROAD)
 	{
 		ConduitType* ct = &g_cotype[CONDUIT_ROAD];
 		m = &g_model[ct->model[CONNECTION_EASTWEST][1]];
 	}
-	else if(py->bptype == BUILDING_POWL)
+	else if(py->bptype == BL_POWL)
 	{
 		ConduitType* ct = &g_cotype[CONDUIT_POWL];
 		m = &g_model[ct->model[CONNECTION_EASTWEST][1]];
 	}
-	else if(py->bptype == BUILDING_CRPIPE)
+	else if(py->bptype == BL_CRPIPE)
 	{
 		ConduitType* ct = &g_cotype[CONDUIT_CRPIPE];
 		m = &g_model[ct->model[CONNECTION_EASTWEST][1]];
@@ -402,22 +402,22 @@ void DrawPreviewDepth()
 
 	Player* py = &g_player[g_curP];
 
-	if(py->bptype >= 0 && py->bptype < BUILDING_TYPES)
+	if(py->bptype >= 0 && py->bptype < BL_TYPES)
 	{
 		BlType* t = &g_bltype[py->bptype];
 		m = &g_model[t->model];
 	}
-	else if(py->bptype == BUILDING_ROAD)
+	else if(py->bptype == BL_ROAD)
 	{
 		ConduitType* ct = &g_cotype[CONDUIT_ROAD];
 		m = &g_model[ct->model[CONNECTION_EASTWEST][1]];
 	}
-	else if(py->bptype == BUILDING_POWL)
+	else if(py->bptype == BL_POWL)
 	{
 		ConduitType* ct = &g_cotype[CONDUIT_POWL];
 		m = &g_model[ct->model[CONNECTION_EASTWEST][1]];
 	}
-	else if(py->bptype == BUILDING_CRPIPE)
+	else if(py->bptype == BL_CRPIPE)
 	{
 		ConduitType* ct = &g_cotype[CONDUIT_CRPIPE];
 		m = &g_model[ct->model[CONNECTION_EASTWEST][1]];

@@ -22,7 +22,7 @@
 #include "../gui/sprite.h"
 #include "../gui/cursor.h"
 
-extern long long g_simframe;
+extern int g_simframe;
 
 #define SIM_FRAME_RATE		30
 

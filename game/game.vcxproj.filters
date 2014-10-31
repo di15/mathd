@@ -311,9 +311,6 @@
     <ClCompile Include="gui\gviewport.cpp">
       <Filter>Source Files\gui</Filter>
     </ClCompile>
-    <ClCompile Include="..\common\econ\demand.cpp">
-      <Filter>Source Files\common\econ</Filter>
-    </ClCompile>
     <ClCompile Include="..\common\sim\player.cpp">
       <Filter>Source Files\common\sim</Filter>
     </ClCompile>
@@ -374,17 +371,11 @@
     <ClCompile Include="..\common\ai\ai.cpp">
       <Filter>Source Files\common\ai</Filter>
     </ClCompile>
-    <ClCompile Include="..\common\econ\balance.cpp">
-      <Filter>Source Files\common\econ</Filter>
-    </ClCompile>
     <ClCompile Include="..\common\sim\infrastructure.cpp">
       <Filter>Source Files\common\sim</Filter>
     </ClCompile>
     <ClCompile Include="..\common\math\fixmath.cpp">
       <Filter>Source Files\common\math</Filter>
-    </ClCompile>
-    <ClCompile Include="..\common\econ\utility.cpp">
-      <Filter>Source Files\common\econ</Filter>
     </ClCompile>
     <ClCompile Include="..\common\path\astarpath.cpp">
       <Filter>Source Files\common\path</Filter>
@@ -436,6 +427,15 @@
     </ClCompile>
     <ClCompile Include="..\common\gui\widgets\spez\buildingview.cpp">
       <Filter>Source Files\common\gui\widgets\spez</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\econ\balance.cpp">
+      <Filter>Source Files\common\econ</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\econ\demand.cpp">
+      <Filter>Source Files\common\econ</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\econ\utility.cpp">
+      <Filter>Source Files\common\econ</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -694,9 +694,6 @@
     <ClInclude Include="gui\gviewport.h">
       <Filter>Source Files\gui</Filter>
     </ClInclude>
-    <ClInclude Include="..\common\econ\demand.h">
-      <Filter>Source Files\common\econ</Filter>
-    </ClInclude>
     <ClInclude Include="..\common\sim\player.h">
       <Filter>Source Files\common\sim</Filter>
     </ClInclude>
@@ -757,17 +754,11 @@
     <ClInclude Include="..\common\ai\ai.h">
       <Filter>Source Files\common\ai</Filter>
     </ClInclude>
-    <ClInclude Include="..\common\econ\balance.h">
-      <Filter>Source Files\common\econ</Filter>
-    </ClInclude>
     <ClInclude Include="..\common\sim\infrastructure.h">
       <Filter>Source Files\common\sim</Filter>
     </ClInclude>
     <ClInclude Include="..\common\math\fixmath.h">
       <Filter>Source Files\common\math</Filter>
-    </ClInclude>
-    <ClInclude Include="..\common\econ\utility.h">
-      <Filter>Source Files\common\econ</Filter>
     </ClInclude>
     <ClInclude Include="..\common\path\astarpath.h">
       <Filter>Source Files\common\path</Filter>
@@ -819,6 +810,15 @@
     </ClInclude>
     <ClInclude Include="..\common\gui\widgets\spez\buildingview.h">
       <Filter>Source Files\common\gui\widgets\spez</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\econ\balance.h">
+      <Filter>Source Files\common\econ</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\econ\demand.h">
+      <Filter>Source Files\common\econ</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\econ\utility.h">
+      <Filter>Source Files\common\econ</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -46,13 +46,13 @@ bool FindFood(Unit* u)
 		if(b->stocked[RES_RETFOOD] + py->global[RES_RETFOOD] <= 0)
 			continue;
 
-		if(b->prodprice[RES_RETFOOD] > u->belongings[RES_FUNDS])
+		if(b->prodprice[RES_RETFOOD] > u->belongings[RES_DOLLARS])
 			continue;
 
 		if(u->home >= 0)
 		{
 			Building* hm = &g_building[u->home];
-			if(u->belongings[RES_FUNDS] <= hm->prodprice[RES_HOUSING])
+			if(u->belongings[RES_DOLLARS] <= hm->prodprice[RES_HOUSING])
 				return false;
 		}
 
@@ -134,7 +134,7 @@ bool FindRest(Unit* u)
 		if(bt->output[RES_HOUSING] - b->inuse[RES_HOUSING] <= 0)
 			continue;
 
-		if(b->prodprice[RES_HOUSING] > u->belongings[RES_FUNDS])
+		if(b->prodprice[RES_HOUSING] > u->belongings[RES_DOLLARS])
 			continue;
 
 		bcmpos = b->tilepos * TILE_SIZE + Vec2i(TILE_SIZE,TILE_SIZE)/2;
@@ -187,7 +187,7 @@ bool CanCstBl(Unit* u)
 	if(b->conmat[RES_LABOUR] >= bt->conmat[RES_LABOUR])
 		return false;
 
-	if(py->global[RES_FUNDS] < b->conwage)
+	if(py->global[RES_DOLLARS] < b->conwage)
 	{
 		char reason[32];
 		sprintf(reason, "%s construction", bt->name);
@@ -236,8 +236,8 @@ void DoCstJob(Unit* u)
 	b->conmat[RES_LABOUR] += 1;
 	u->belongings[RES_LABOUR] -= 1;
 
-	py->global[RES_FUNDS] -= b->conwage;
-	u->belongings[RES_FUNDS] += b->conwage;
+	py->global[RES_DOLLARS] -= b->conwage;
+	u->belongings[RES_DOLLARS] += b->conwage;
 
 #if 0
 	//b->Emit(HAMMER);
@@ -291,7 +291,7 @@ bool CanBlJob(Unit* u)
 
 	Player* py = &g_player[b->owner];
 
-	if(py->global[RES_FUNDS] < b->opwage)
+	if(py->global[RES_DOLLARS] < b->opwage)
 	{
 		char reason[64];
 		sprintf(reason, "%s expenses", g_bltype[b->type].name);
@@ -340,8 +340,8 @@ void DoBlJob(Unit* u)
 	b->stocked[RES_LABOUR] += 1;
 	u->belongings[RES_LABOUR] -= 1;
 
-	py->global[RES_FUNDS] -= b->opwage;
-	u->belongings[RES_FUNDS] += b->opwage;
+	py->global[RES_DOLLARS] -= b->opwage;
+	u->belongings[RES_DOLLARS] += b->opwage;
 
 	if(!b->tryprod())
 	{
@@ -376,7 +376,7 @@ bool CanCstCd(Unit* u)
 	if(ctile->conmat[RES_LABOUR] >= ct->conmat[RES_LABOUR])
 		return false;
 
-	if(py->global[RES_FUNDS] < ctile->conwage)
+	if(py->global[RES_DOLLARS] < ctile->conwage)
 	{
 		Bankrupt(ctile->owner, "conduit construction");
 		return false;
@@ -420,8 +420,8 @@ void DoCdJob(Unit* u)
 	ctile->conmat[RES_LABOUR] += 1;
 	u->belongings[RES_LABOUR] -= 1;
 
-	py->global[RES_FUNDS] -= ctile->conwage;
-	u->belongings[RES_FUNDS] += ctile->conwage;
+	py->global[RES_DOLLARS] -= ctile->conwage;
+	u->belongings[RES_DOLLARS] += ctile->conwage;
 
 #if 0
 	//r->Emit(HAMMER);
@@ -452,7 +452,7 @@ bool CanShop(Unit* u)
 	if(b->stocked[RES_RETFOOD] + p->global[RES_RETFOOD] <= 0)
 		return false;
 
-	if(b->prodprice[RES_RETFOOD] > u->belongings[RES_FUNDS])
+	if(b->prodprice[RES_RETFOOD] > u->belongings[RES_DOLLARS])
 		return false;
 
 	if(u->belongings[RES_RETFOOD] >= STARTING_RETFOOD*2)
@@ -461,7 +461,7 @@ bool CanShop(Unit* u)
 	if(u->home >= 0)
 	{
 		Building* hm = &g_building[u->home];
-		if(u->belongings[RES_FUNDS] <= hm->prodprice[RES_HOUSING])
+		if(u->belongings[RES_DOLLARS] <= hm->prodprice[RES_HOUSING])
 			return false;
 	}
 
@@ -497,7 +497,7 @@ bool CanRest(Unit* u, bool* eviction)
 	//if(b->stock[HOUSING] + p->global[HOUSING] <= 0.0f)
 	//	return false;
 
-	if(b->prodprice[RES_HOUSING] > u->belongings[RES_FUNDS])
+	if(b->prodprice[RES_HOUSING] > u->belongings[RES_DOLLARS])
 	{
 		//char msg[128];
 		//sprintf(msg, "eviction %f < %f", currency, p->price[HOUSING]);
@@ -639,14 +639,14 @@ void DoShop(Unit* u)
 	}
 
 	u->belongings[RES_RETFOOD] += 1;
-	p->global[RES_FUNDS] += b->prodprice[RES_RETFOOD];
-	u->belongings[RES_FUNDS] -= b->prodprice[RES_RETFOOD];
+	p->global[RES_DOLLARS] += b->prodprice[RES_RETFOOD];
+	u->belongings[RES_DOLLARS] -= b->prodprice[RES_RETFOOD];
 	//b->recenth.consumed[CONSUMERGOODS] += 1.0f;
 #endif
 
 	for(int trysub=SHOP_RATE; trysub>0; trysub--)
 	{
-		if(b->prodprice[RES_RETFOOD] * trysub > u->belongings[RES_FUNDS])
+		if(b->prodprice[RES_RETFOOD] * trysub > u->belongings[RES_DOLLARS])
 			continue;
 
 		int sub[RESOURCES];
@@ -656,8 +656,8 @@ void DoShop(Unit* u)
 			continue;
 
 		u->belongings[RES_RETFOOD] += trysub;
-		p->global[RES_FUNDS] += b->prodprice[RES_RETFOOD] * trysub;
-		u->belongings[RES_FUNDS] -= b->prodprice[RES_RETFOOD] * trysub;
+		p->global[RES_DOLLARS] += b->prodprice[RES_RETFOOD] * trysub;
+		u->belongings[RES_DOLLARS] -= b->prodprice[RES_RETFOOD] * trysub;
 
 #if 1
 	//b->Emit(SMILEY);
@@ -733,7 +733,7 @@ bool CanDrTra(Unit* op)
 
 	Player* p = &g_player[tr->owner];
 
-	if(p->global[RES_FUNDS] < tr->transpwage)
+	if(p->global[RES_DOLLARS] < tr->transpwage)
 	{
 		Bankrupt(tr->owner, "truck expenses");
 		return false;
@@ -868,8 +868,8 @@ void DoDrTra(Unit* op)
 
 	op->belongings[RES_LABOUR] --;
 
-	py->global[RES_FUNDS] -= tr->transpwage;
-	op->belongings[RES_FUNDS] += tr->transpwage;
+	py->global[RES_DOLLARS] -= tr->transpwage;
+	op->belongings[RES_DOLLARS] += tr->transpwage;
 
 	//LogTransx(truck->owner, -p->truckwage, "driver wage");
 

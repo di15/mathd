@@ -46,7 +46,8 @@ public:
 #define ICON_LUMBER			30
 #define ICON_WATER			31
 #define ICON_EXCLAMATION	32
-#define ICONS				33
+#define ICON_CENTS			33
+#define ICONS				34
 
 extern Icon g_icon[ICONS];
 

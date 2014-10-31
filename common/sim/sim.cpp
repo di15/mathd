@@ -4,7 +4,7 @@
 #include "road.h"
 #include "building.h"
 
-long long g_simframe = 0;
+int g_simframe = 0;
 
 // Queue all the game resources and define objects
 void Queue()
@@ -113,42 +113,52 @@ void Queue()
 	DefI(ICON_LUMBER, "gui/icons/lumber.png", ":lumber:");
 	DefI(ICON_WATER, "gui/icons/water.png", ":water:");
 	DefI(ICON_EXCLAMATION, "gui/icons/exclamation.png", ":exclam:");
+	DefI(ICON_CENTS, "gui/icons/cents.png", ":cent:");
 
 
 	// Resource types
 
 #if 0
-#define RES_NONE			-1
-#define RES_FUNDS			0
+#define RES_DOLLARS			0
 #define RES_LABOUR			1
 #define RES_HOUSING			2
 #define RES_FARMPRODUCTS	3
 #define RES_RETFOOD			4
-#define RES_PRODUCTION		5
-#define RES_MINERALS		6
-#define RES_CRUDEOIL		7
-#define RES_WSFUEL			8
-#define RES_RETFUEL			9
-#define RES_ENERGY			10
-#define RES_URANIUM			11
-#define RESOURCES			12
+#define RES_CHEMICALS		5
+#define RES_ELECTRONICS		6
+#define RES_IRONORE			7
+#define RES_METAL			8
+#define RES_STONE			9
+#define RES_CEMENT			10
+#define RES_COAL			11
+#define RES_URANIUM			12
+#define RES_PRODUCTION		13
+#define RES_CRUDEOIL		15
+#define RES_FUEL			16
+#define RES_ENERGY			17
+#define RESOURCES			18
 #endif
 
 #if 0
 	void DefR(int resi, const char* n, const char* depn, int iconindex, bool phys, bool cap, bool glob, float r, float g, float b, float a)
 #endif
 
-	DefR(RES_FUNDS,			"Funds",				"",							ICON_DOLLARS,		true,	false,	false,	1.0f,1.0f,1.0f,1.0f,	CONDUIT_NONE);
+	DefR(RES_DOLLARS,		"Funds",				"",							ICON_DOLLARS,		true,	false,	false,	1.0f,1.0f,1.0f,1.0f,	CONDUIT_NONE);
 	DefR(RES_LABOUR,		"Labour",				"",							ICON_LABOUR,		true,	false,	false,	1.0f,1.0f,1.0f,1.0f,	CONDUIT_NONE);
 	DefR(RES_HOUSING,		"Housing",				"",							ICON_HOUSING,		true,	true,	false,	1.0f,1.0f,1.0f,1.0f,	CONDUIT_ROAD);
 	DefR(RES_FARMPRODUCTS,	"Farm Products",		"Fertile",					ICON_FARMPRODUCT,	true,	false,	false,	1.0f,1.0f,1.0f,1.0f,	CONDUIT_ROAD);
 	DefR(RES_PRODUCTION,	"Production",			"",							ICON_PRODUCTION,	true,	false,	false,	1.0f,1.0f,1.0f,1.0f,	CONDUIT_ROAD);
 	DefR(RES_RETFOOD,		"Retail Food",			"",							ICON_RETFOOD,		true,	false,	false,	1.0f,1.0f,1.0f,1.0f,	CONDUIT_ROAD);
-	DefR(RES_MINERALS,		"Minerals",				"Iron Ore Deposit",			ICON_IRONORE,		true,	false,	false,	1.0f,1.0f,1.0f,1.0f,	CONDUIT_ROAD);
 	DefR(RES_CRUDEOIL,		"Crude Oil",			"Oil Deposit",				ICON_CRUDEOIL,		true,	false,	false,	1.0f,1.0f,1.0f,1.0f,	CONDUIT_CRPIPE);
-	DefR(RES_WSFUEL,		"Wholesale Fuel",		"",							ICON_WSFUEL,		true,	false,	false,	1.0f,1.0f,1.0f,1.0f,	CONDUIT_ROAD);
-	DefR(RES_RETFUEL,		"Retail Fuel",			"",							ICON_RETFUEL,		true,	false,	false,	1.0f,1.0f,1.0f,1.0f,	CONDUIT_ROAD);
+	DefR(RES_FUEL,			"Fuel",					"",							ICON_WSFUEL,		true,	false,	false,	1.0f,1.0f,1.0f,1.0f,	CONDUIT_ROAD);
 	DefR(RES_ENERGY,		"Energy",				"",							ICON_ENERGY,		false,	true,	false,	1.0f,1.0f,1.0f,1.0f,	CONDUIT_POWL);
+	DefR(RES_CHEMICALS,		"Chemicals",			"",							ICON_CHEMICALS,		true,	false,	false,	1.0f,1.0f,1.0f,1.0f,	CONDUIT_ROAD);
+	DefR(RES_ELECTRONICS,	"Electronics",			"",							ICON_ELECTRONICS,	true,	false,	false,	1.0f,1.0f,1.0f,1.0f,	CONDUIT_ROAD);
+	DefR(RES_IRONORE,		"Iron Ore",				"",							ICON_IRONORE,		true,	false,	false,	1.0f,1.0f,1.0f,1.0f,	CONDUIT_ROAD);
+	DefR(RES_METAL,			"Metal",				"",							ICON_STEEL,			true,	false,	false,	1.0f,1.0f,1.0f,1.0f,	CONDUIT_ROAD);
+	DefR(RES_STONE,			"Stone",				"",							ICON_STONE,			true,	false,	false,	1.0f,1.0f,1.0f,1.0f,	CONDUIT_ROAD);
+	DefR(RES_CEMENT,		"Cement",				"",							ICON_CEMENT,		true,	false,	false,	1.0f,1.0f,1.0f,1.0f,	CONDUIT_ROAD);
+	DefR(RES_COAL,			"Coal",					"",							ICON_COAL,			true,	false,	false,	1.0f,1.0f,1.0f,1.0f,	CONDUIT_ROAD);
 	DefR(RES_URANIUM,		"Uranium",				"",							ICON_ENRICHEDURAN,	true,	false,	false,	1.0f,1.0f,1.0f,1.0f,	CONDUIT_ROAD);
 
 
@@ -214,89 +224,253 @@ void Queue()
 
 	// Building types
 
-	//DefB(BUILDING_APARTMENT, "Apartment Building", Vec2i(2,1), "models/apartment1/basebuilding.ms3d", Vec3f(100,100,100), Vec3f(0,0,0), "models/apartment1/basebuilding.ms3d", Vec3f(100,100,100), Vec3f(0,0,0), FOUNDATION_LAND, RES_NONE);
-	DefB(BUILDING_APARTMENT, "Apartment Building", Vec2i(2,2),  false, "models/apartment2/b1911", Vec3f(1,1,1), Vec3f(0,0,0), "models/apartment2/b1911", Vec3f(1,1,1), Vec3f(0,0,0), FOUNDATION_LAND, RES_NONE);
-	BConMat(BUILDING_APARTMENT, RES_MINERALS, 5);
-	BConMat(BUILDING_APARTMENT, RES_LABOUR, 50);
-	//BInput(BUILDING_APARTMENT, RES_ENERGY, 50);
-	BOutput(BUILDING_APARTMENT, RES_HOUSING, 15);
-	//BOutput(BUILDING_APARTMENT, RES_HOUSING, 50);
-	BDesc(BUILDING_APARTMENT, "Apartments collect rent from labourers. They are required by the labourers to regenerate labour power.");
+#if 0
+#define BL_APARTMENT		0
+#define BL_STORE		1
+#define BL_FACTORY		2
+#define BL_FARM			3
+#define BL_MINE			4
+#define BL_SMELTER		5
+#define BL_OILWELL		6
+#define BL_REFINERY		7
+#define BL_NUCPOW			8
+#define BL_COALPOW		9
+#define BL_QUARRY			10
+#define BL_CEMPLANT		11
+#define BL_CHEMPLANT		12
+#define BL_ELECPLANT		13
+#define BL_TYPES			14
+#endif
 
-	DefB(BUILDING_FACTORY, "Factory", Vec2i(1,1),  false, "models/factory3/factory3", Vec3f(1,1,1)/2, Vec3f(0,0,0), "models/factory3/factory3", Vec3f(1,1,1)/2, Vec3f(0,0,0), FOUNDATION_LAND, RES_NONE);
-	BConMat(BUILDING_FACTORY, RES_MINERALS, 5);
-	BConMat(BUILDING_FACTORY, RES_LABOUR, 10);
-	BInput(BUILDING_FACTORY, RES_ENERGY, 50);
-	BOutput(BUILDING_FACTORY, RES_PRODUCTION, 5);
-	BDesc(BUILDING_FACTORY, "Factories produce units. They generate production necessary for the processing and packaging of farm products to create retail food.");
+#if 0
+		//		Building	Name					Model									Construction model							wX wZ	HP		Qta
+	BDefine(APARTMENT,	"Apartment",		"models\\apartment\\apartment.ms3d",		"models\\apartment\\apartment_c.ms3d",		2, 2,	100,	1);
+	BCost(LABOUR, 4);
+	BCost(CEMENT, 4);
+	BCost(STONE, 2);
+	//BIn(ELECTRICITY, 1);
+	BOut(HOUSING, 8);	// = 1
+    
+	BDefine(SHOPCPLX,	"Shopping Complex",	"models\\shopcplx\\shopcplx.ms3d",			"models\\shopcplx\\shopcplx_c.ms3d",		2, 2,	100,	10);
+	BCost(LABOUR, 4);
+	BCost(CEMENT, 3);
+	BCost(STONE, 1);
+	BCost(ELECTRONICS, 2);
+	BIn(LABOUR, 10);		//+10
+	BIn(PRODUCE, 5);		//+70
+	BIn(PRODUCTION, 5);		//+15
+	BIn(ELECTRICITY, 3);	//+6
+	BOut(CONSUMERGOODS, 39);	// 101/10+1+2*12 = 35.1
+    
+	BDefine(FACTORY,	"Factory",			"models\\factory\\factory.ms3d",			"models\\factory\\factory_c.ms3d",			2, 2,	100,	10);
+	BCost(LABOUR, 4);
+	BCost(METAL, 2);
+	BCost(CEMENT, 3);
+	BCost(ELECTRONICS, 10);
+	BIn(LABOUR, 10);		//+10
+	BIn(ELECTRICITY, 10);	//+20
+	BIn(CHEMICALS, 3);		//+12
+	BIn(METAL, 3);
+	BOut(PRODUCTION, 18);	// 32/20+1+1*12 = 15
+	BBuildable(TRUCK);
+	BBuildable(BATTLECOMP);
+	BBuildable(CARLYLE);
+    
+	BDefine(FARM,		"Farm",				"models\\farm\\farm.ms3d",					"models\\farm\\farm_c.ms3d",				4, 2,	100,	10);
+	BCost(LABOUR, 4);
+	BIn(LABOUR, 10);		//+10
+	BIn(ELECTRICITY, 1);	//+2
+	BIn(CHEMICALS, 1);		//+4
+	BOut(PRODUCE, 5);		//16/5+1+1*12 = 16
+    
+	BDefine(MINE,		"Mine",				"models\\mine\\mine.ms3d",					"models\\mine\\mine_c.ms3d",				2, 2,	100,	10);
+	BCost(LABOUR, 4);
+	BCost(CEMENT, 3);
+	//BCost(METAL, 4);
+	BIn(LABOUR, 10);		//+10
+	BOut(ORE, 5);			// 10/15+1 = 2
+	BOut(URONIUM, 5);
+	BOut(COHL, 5);
+    
+	BDefine(SMELTER,	"Smelter",			"models\\smelter\\smelter.ms3d",			"models\\smelter\\smelter_c.ms3d",			2, 2,	100,	10);
+	BCost(LABOUR, 4);
+	BCost(CEMENT, 3);
+	BCost(STONE, 1);
+	BIn(LABOUR, 10);		//+10
+	BIn(ELECTRICITY, 10);	//+20
+	BIn(ORE, 5);			//+10
+	BIn(CHEMICALS, 10);		//+40
+	BOut(METAL, 5);			// 80/5+1+2*12 = 41
+	BEmitter(EXHAUST, Vec3f(-7.0f, 23.2f, -11.5f));
+	BEmitter(EXHAUST, Vec3f(-12.1f, 23.2f, -6.0f));
+    
+	BDefine(DERRICK,	"Derrick",			"models\\derrick\\derrick.ms3d",			"models\\derrick\\derrick_c.ms3d",			1, 1,	100,	10);
+	BCost(LABOUR, 4);
+	BCost(METAL, 3);
+	BIn(LABOUR, 10);	//+10
+	BOut(CRUDE, 3);		// 10/3+1 = 4
+    
+	BDefine(REFINERY,	"Refinery",			"models\\refinery\\refinery.ms3d",			"models\\refinery\\refinery_c.ms3d",		2, 2,	100,	10);
+	BCost(LABOUR, 4);
+	BCost(METAL, 3);
+	BCost(CEMENT, 3);
+	BCost(STONE, 1);
+	BIn(LABOUR, 1);			//+1
+	BIn(ELECTRICITY, 1);	//+2
+	BIn(CHEMICALS, 1);		//+4
+	BIn(CRUDE, 3);			//+4
+	BOut(ZETROL, 21);		// 11/7+1+1*12 = 17
+	BEmitter(EXHAUST, Vec3f(-4.0f, 22.4f, -6.5f));
+	BEmitter(EXHAUST, Vec3f(8.9f, 22.4f, 9.0f));
+    
+	BDefine(REACTOR,	"Reactor",			"models\\reactor\\reactor.ms3d",			"models\\reactor\\reactor_c.ms3d",			2, 2,	100,	10);
+	BCost(LABOUR, 4);
+	BCost(CEMENT, 3);
+	BCost(STONE, 1);
+	BCost(ELECTRONICS, 3);
+	BIn(LABOUR, 10);	//+10
+	BIn(URONIUM, 1);	//+2
+	BOut(ELECTRICITY, 10);	// 12/10+1+1*12 = 14
+	BEmitter(EXHAUSTBIG, Vec3f(1.8f, 15.69f, -7.99f));
+	BEmitter(EXHAUSTBIG, Vec3f(-8.0f, 15.69f, 2.35f));
+    
+	BDefine(COMBUSTOR,	"Combustor",		"models\\combustor\\combustor.ms3d",		"models\\combustor\\combustor_c.ms3d",		2, 2,	100,	10);
+	BCost(LABOUR, 4);
+	BCost(CEMENT, 3);
+	BCost(STONE, 1);
+	BCost(ELECTRONICS, 1);
+	BIn(LABOUR, 10);	//+10
+	BIn(COHL, 1);		//+2
+	BOut(ELECTRICITY, 10);	// 12/10+1+1*12 = 14
+	BEmitter(EXHAUST, Vec3f(-8.7f, 23.1f, -11.3f));
+	BEmitter(EXHAUST, Vec3f(-10.7f, 23.1f, -8.8f));
+	BEmitter(EXHAUST, Vec3f(-10.3f, 23.1f, 9.6f));
+	BEmitter(EXHAUST, Vec3f(-8.4f, 23.1f, 11.8f));
+    
+	BDefine(QUARRY,		"Quarry",			"models\\quarry\\quarry.ms3d",				"models\\quarry\\quarry_c.ms3d",			2, 2,	100,	10);
+	BCost(LABOUR, 4);
+	BCost(METAL, 3);
+	BIn(LABOUR, 10);	//+10
+	BOut(STONE, 5);		// 10/5+1 = 3
 
-	DefB(BUILDING_REFINERY, "Oil Refinery", Vec2i(2,2),  false, "models/refinery2/refinery2", Vec3f(1,1,1), Vec3f(0,0,0), "models/refinery2/refinery2", Vec3f(1,1,1), Vec3f(0,0,0), FOUNDATION_LAND, RES_NONE);
-	BConMat(BUILDING_REFINERY, RES_MINERALS, 5);
-	BConMat(BUILDING_REFINERY, RES_LABOUR, 10);
-	BInput(BUILDING_REFINERY, RES_ENERGY, 50);
-	BInput(BUILDING_REFINERY, RES_CRUDEOIL, 5);
-	BOutput(BUILDING_REFINERY, RES_WSFUEL, 5);
-	BEmitter(BUILDING_REFINERY, 0, PARTICLE_EXHAUST, Vec3f(TILE_SIZE*5.7/10, TILE_SIZE*3/2, TILE_SIZE*-5/10));
-	BEmitter(BUILDING_REFINERY, 1, PARTICLE_EXHAUST2, Vec3f(TILE_SIZE*5.7/10, TILE_SIZE*3/2, TILE_SIZE*-5/10));
-	BEmitter(BUILDING_REFINERY, 2, PARTICLE_EXHAUST, Vec3f(TILE_SIZE*-4.5/10, TILE_SIZE*1.75, TILE_SIZE*3.0f/10));
-	BEmitter(BUILDING_REFINERY, 3, PARTICLE_EXHAUST2, Vec3f(TILE_SIZE*-4.5/10, TILE_SIZE*1.75, TILE_SIZE*3.0f/10));
-	BDesc(BUILDING_REFINERY, "Turn crude oil into wholesale fuel. Must be distributed at gas stations.");
+	BDefine(CEMPLANT,	"Cement Plant",		"models\\cemplant\\cemplant.ms3d",			"models\\cemplant\\cemplant_c.ms3d",		1, 1,	100,	10);
+	BCost(LABOUR, 4);
+	BCost(METAL, 3);
+	BIn(LABOUR, 10);	//+10
+	BIn(STONE, 5);		//+15
+	BOut(CEMENT, 5);	//  (25+1*12)/5+1 = 18
+    
+	BDefine(CHEMPLANT,	"Chemical Plant",	"models\\chemplant\\chemplant.ms3d",		"models\\chemplant\\chemplant_c.ms3d",		2, 2,	100,	10);
+	BCost(LABOUR, 4);
+	BCost(CEMENT, 2);
+	BCost(STONE, 1);
+	BCost(ELECTRONICS, 1);
+	BCost(METAL, 1);
+	BIn(LABOUR, 10);		//+10
+	BIn(ELECTRICITY, 10);	//+20
+	BOut(CHEMICALS, 42);	// 30/10+1 = 4
+    
+	BDefine(ELECPLANT,	"Electronics Plant", "models\\elecplant\\elecplant.ms3d",		"models\\elecplant\\elecplant_c.ms3d",		2, 2,	100,	10);
+	BCost(LABOUR, 4);
+	BCost(CEMENT, 3);
+	BCost(STONE, 1);
+	BCost(METAL, 3);
+	BIn(LABOUR, 1);		//+10
+	BIn(ELECTRICITY, 1);	//+20
+	BIn(METAL, 1);			//+27
+	BIn(CHEMICALS, 1);		//+40
+	BOut(ELECTRONICS, 25);	// 97/5+1+2*12 = 45
+    
+	BDefine(RNDFACILITY,	"R&D Facility",		"models\\rndfac\\rndfac.ms3d",				"models\\rndfac\\rndfac_c.ms3d",			2, 2,	100,	1);
+	BCost(LABOUR, 4);
+	BCost(CEMENT, 3);
+	BCost(STONE, 1);
+	BCost(METAL, 1);
+	BIn(LABOUR, 1);			//+10
+	BIn(ELECTRICITY, 1);		//+20
+	BIn(METAL, 1);				//+27
+	BIn(ELECTRONICS, 1);		//+21
+	BIn(CHEMICALS, 1);			//+40
+	BOut(RESEARCH, 1);			// 118/1+1+3*12 = 155
+#endif
 
-	DefB(BUILDING_NUCPOW, "Nuclear Powerplant", Vec2i(2,2), false, "models/nucpow2/nucpow2", Vec3f(1,1,1), Vec3f(0,0,0), "models/nucpow2/nucpow2", Vec3f(1,1,1), Vec3f(0,0,0), FOUNDATION_LAND, RES_NONE);
-	BConMat(BUILDING_NUCPOW, RES_MINERALS, 5);
-	BConMat(BUILDING_NUCPOW, RES_LABOUR, 10);
-	BInput(BUILDING_NUCPOW, RES_URANIUM, 5);
-	BOutput(BUILDING_NUCPOW, RES_ENERGY, 1000);
-	BEmitter(BUILDING_NUCPOW, 0, PARTICLE_EXHAUSTBIG, Vec3f(TILE_SIZE*-0.63f, TILE_SIZE*1.5f, TILE_SIZE*0));
-	BEmitter(BUILDING_NUCPOW, 1, PARTICLE_EXHAUSTBIG, Vec3f(TILE_SIZE*0.17f, TILE_SIZE*1.5f, TILE_SIZE*-0.64f));
-	BDesc(BUILDING_NUCPOW, "Generates electricity from uranium.");
+	//DefB(BL_APARTMENT, "Apartment Building", Vec2i(2,1), "models/apartment1/basebuilding.ms3d", Vec3f(100,100,100), Vec3f(0,0,0), "models/apartment1/basebuilding.ms3d", Vec3f(100,100,100), Vec3f(0,0,0), FOUNDATION_LAND, RES_NONE);
+	DefB(BL_APARTMENT, "Apartment Building", Vec2i(2,2),  false, "models/apartment2/b1911", Vec3f(1,1,1), Vec3f(0,0,0), "models/apartment2/b1911", Vec3f(1,1,1), Vec3f(0,0,0), FOUNDATION_LAND, RES_NONE);
+	BMat(BL_APARTMENT, RES_CEMENT, 5);
+	BMat(BL_APARTMENT, RES_LABOUR, 50);
+	BOut(BL_APARTMENT, RES_HOUSING, 15);
+	BDesc(BL_APARTMENT, "Apartments collect rent from labourers. They are required by the labourers to regenerate labour power.");
 
-	DefB(BUILDING_FARM, "Farm", Vec2i(4,2), true, "models/farm2/farm2", Vec3f(1,1,1), Vec3f(0,0,0), "models/farm2/farm2", Vec3f(1,1,1), Vec3f(0,0,0), FOUNDATION_LAND, RES_NONE);
-	BConMat(BUILDING_FARM, RES_MINERALS, 5);
-	BConMat(BUILDING_FARM, RES_LABOUR, 10);
-	BInput(BUILDING_FARM, RES_ENERGY, 50);
-	BOutput(BUILDING_FARM, RES_FARMPRODUCTS, 1900);
-	BDesc(BUILDING_FARM, "Produces farm products, necessary for the production of retail food.");
+	DefB(BL_FACTORY, "Factory", Vec2i(1,1),  false, "models/factory3/factory3", Vec3f(1,1,1)/2, Vec3f(0,0,0), "models/factory3/factory3", Vec3f(1,1,1)/2, Vec3f(0,0,0), FOUNDATION_LAND, RES_NONE);
+	BMat(BL_FACTORY, RES_CEMENT, 5);
+	BMat(BL_FACTORY, RES_LABOUR, 10);
+	BIn(BL_FACTORY, RES_ENERGY, 50);
+	BOut(BL_FACTORY, RES_PRODUCTION, 5);
+	BDesc(BL_FACTORY, "Factories produce units. They generate production necessary for the processing and packaging of farm products to create retail food.");
 
-	DefB(BUILDING_STORE, "Store", Vec2i(2,1), true, "models/store1/hugterr.ms3d", Vec3f(100,100,100), Vec3f(0,0,0), "models/store1/hugterr.ms3d", Vec3f(100,100,100), Vec3f(0,0,0), FOUNDATION_LAND, RES_NONE);
-	BConMat(BUILDING_STORE, RES_MINERALS, 5);
-	BConMat(BUILDING_STORE, RES_LABOUR, 10);
-	BInput(BUILDING_STORE, RES_ENERGY, 50);
-	//BInput(BUILDING_STORE, RES_FARMPRODUCTS, 3600);
-	BInput(BUILDING_STORE, RES_FARMPRODUCTS, 3600);
-	BInput(BUILDING_STORE, RES_PRODUCTION, 5);
-	//BOutput(BUILDING_STORE, RES_RETFOOD, 3600);
-	BOutput(BUILDING_STORE, RES_RETFOOD, 3600);
-	BDesc(BUILDING_STORE, "Generates retail food from farm products and production, necessary for labourers to survive and multiply.");
+	DefB(BL_REFINERY, "Oil Refinery", Vec2i(2,2),  false, "models/refinery2/refinery2", Vec3f(1,1,1), Vec3f(0,0,0), "models/refinery2/refinery2", Vec3f(1,1,1), Vec3f(0,0,0), FOUNDATION_LAND, RES_NONE);
+	BMat(BL_REFINERY, RES_CEMENT, 5);
+	BMat(BL_REFINERY, RES_LABOUR, 10);
+	BIn(BL_REFINERY, RES_ENERGY, 50);
+	BIn(BL_REFINERY, RES_CRUDEOIL, 5);
+	BOut(BL_REFINERY, RES_FUEL, 5);
+	BEmitter(BL_REFINERY, 0, PARTICLE_EXHAUST, Vec3f(TILE_SIZE*5.7/10, TILE_SIZE*3/2, TILE_SIZE*-5/10));
+	BEmitter(BL_REFINERY, 1, PARTICLE_EXHAUST2, Vec3f(TILE_SIZE*5.7/10, TILE_SIZE*3/2, TILE_SIZE*-5/10));
+	BEmitter(BL_REFINERY, 2, PARTICLE_EXHAUST, Vec3f(TILE_SIZE*-4.5/10, TILE_SIZE*1.75, TILE_SIZE*3.0f/10));
+	BEmitter(BL_REFINERY, 3, PARTICLE_EXHAUST2, Vec3f(TILE_SIZE*-4.5/10, TILE_SIZE*1.75, TILE_SIZE*3.0f/10));
+	BDesc(BL_REFINERY, "Turn crude oil into wholesale fuel. Must be distributed at gas stations.");
+	
+#if 0
+	DefB(BL_REFINERY, "Gas Station", Vec2i(2,2),  false, "models/refinery2/refinery2", Vec3f(1,1,1), Vec3f(0,0,0), "models/refinery2/refinery2", Vec3f(1,1,1), Vec3f(0,0,0), FOUNDATION_LAND, RES_NONE);
+	BMat(BL_REFINERY, RES_CEMENT, 5);
+	BMat(BL_REFINERY, RES_LABOUR, 10);
+	BIn(BL_REFINERY, RES_ENERGY, 50);
+	BIn(BL_REFINERY, RES_WSFUEL, 5);
+	BOut(BL_REFINERY, RES_RETFUEL, 5);
+	BDesc(BL_REFINERY, "Turn wholesale fuel into retail fuel, generated at refineries.");
+#endif
 
-	DefB(BUILDING_HARBOUR, "Harbour", Vec2i(2,2), false, "models/harbour2/harbour2", Vec3f(1,1,1), Vec3f(0,0,0), "models/harbour2/harbour2", Vec3f(1,1,1), Vec3f(0,0,0), FOUNDATION_COASTAL, RES_NONE);
-	BConMat(BUILDING_HARBOUR, RES_MINERALS, 5);
-	BConMat(BUILDING_HARBOUR, RES_LABOUR, 10);
-	BInput(BUILDING_HARBOUR, RES_ENERGY, 50);
-	BDesc(BUILDING_HARBOUR, "Produces sea units. Necessary for transport between sea and roads.");
+	DefB(BL_NUCPOW, "Nuclear Powerplant", Vec2i(2,2), false, "models/nucpow2/nucpow2", Vec3f(1,1,1), Vec3f(0,0,0), "models/nucpow2/nucpow2", Vec3f(1,1,1), Vec3f(0,0,0), FOUNDATION_LAND, RES_NONE);
+	BMat(BL_NUCPOW, RES_CEMENT, 5);
+	BMat(BL_NUCPOW, RES_LABOUR, 10);
+	BIn(BL_NUCPOW, RES_URANIUM, 5);
+	BOut(BL_NUCPOW, RES_ENERGY, 1000);
+	BEmitter(BL_NUCPOW, 0, PARTICLE_EXHAUSTBIG, Vec3f(TILE_SIZE*-0.63f, TILE_SIZE*1.5f, TILE_SIZE*0));
+	BEmitter(BL_NUCPOW, 1, PARTICLE_EXHAUSTBIG, Vec3f(TILE_SIZE*0.17f, TILE_SIZE*1.5f, TILE_SIZE*-0.64f));
+	BDesc(BL_NUCPOW, "Generates electricity from uranium.");
 
-	DefB(BUILDING_OILWELL, "Oil Well", Vec2i(1,1), false, "models/oilwell2/oilwell2", Vec3f(1,1,1), Vec3f(0,0,0), "models/oilwell2/oilwell2", Vec3f(1,1,1), Vec3f(0,0,0), FOUNDATION_LAND, RES_CRUDEOIL);
-	BConMat(BUILDING_OILWELL, RES_MINERALS, 5);
-	BConMat(BUILDING_OILWELL, RES_LABOUR, 10);
-	BInput(BUILDING_OILWELL, RES_ENERGY, 50);
-	BOutput(BUILDING_OILWELL, RES_CRUDEOIL, 5);
-	BDesc(BUILDING_OILWELL, "Pumps up crude oil, necessary for fuel, which is consumed by all road vehicles.");
+	DefB(BL_FARM, "Farm", Vec2i(4,2), true, "models/farm2/farm2", Vec3f(1,1,1), Vec3f(0,0,0), "models/farm2/farm2", Vec3f(1,1,1), Vec3f(0,0,0), FOUNDATION_LAND, RES_NONE);
+	BMat(BL_FARM, RES_CEMENT, 5);
+	BMat(BL_FARM, RES_LABOUR, 10);
+	BIn(BL_FARM, RES_ENERGY, 50);
+	BOut(BL_FARM, RES_FARMPRODUCTS, 1900);
+	BDesc(BL_FARM, "Produces farm products, necessary for the production of retail food.");
 
-	DefB(BUILDING_MINE, "Mine", Vec2i(1,1), false, "models/mine/nobottom.ms3d", Vec3f(1,1,1)/32.0f*TILE_SIZE, Vec3f(0,0,0), "models/mine/nobottom.ms3d", Vec3f(1,1,1)/32.0f*TILE_SIZE, Vec3f(0,0,0), FOUNDATION_LAND, -1);
-	BConMat(BUILDING_MINE, RES_MINERALS, 5);
-	BConMat(BUILDING_MINE, RES_LABOUR, 10);
-	BInput(BUILDING_MINE, RES_ENERGY, 50);
-	BOutput(BUILDING_MINE, RES_MINERALS, 500);
-	BOutput(BUILDING_MINE, RES_URANIUM, 10);
-	BDesc(BUILDING_MINE, "Digs up minerals necessary for production at factories, and uranium, necessary for electricity generation at nuclear powerplants.");
+	DefB(BL_STORE, "Store", Vec2i(2,1), true, "models/store1/hugterr.ms3d", Vec3f(100,100,100), Vec3f(0,0,0), "models/store1/hugterr.ms3d", Vec3f(100,100,100), Vec3f(0,0,0), FOUNDATION_LAND, RES_NONE);
+	BMat(BL_STORE, RES_CEMENT, 5);
+	BMat(BL_STORE, RES_LABOUR, 10);
+	BIn(BL_STORE, RES_ENERGY, 50);
+	//BIn(BL_STORE, RES_FARMPRODUCTS, 3600);
+	BIn(BL_STORE, RES_FARMPRODUCTS, 3600);
+	BIn(BL_STORE, RES_PRODUCTION, 5);
+	//BOut(BL_STORE, RES_RETFOOD, 3600);
+	BOut(BL_STORE, RES_RETFOOD, 3600);
+	BDesc(BL_STORE, "Generates retail food from farm products and production, necessary for labourers to survive and multiply.");
 
-	DefB(BUILDING_GASSTATION, "Gas Station", Vec2i(1,1), true, "models/gasstation2/gasstation2.ms3d", Vec3f(1,1,1)/80.0f*TILE_SIZE, Vec3f(0,0,0), "models/gasstation2/gasstation2.ms3d", Vec3f(1,1,1)/80.0f*TILE_SIZE, Vec3f(0,0,0), FOUNDATION_LAND, RES_NONE);
-	BConMat(BUILDING_GASSTATION, RES_MINERALS, 5);
-	BConMat(BUILDING_GASSTATION, RES_LABOUR, 10);
-	BInput(BUILDING_GASSTATION, RES_ENERGY, 50);
-	BInput(BUILDING_GASSTATION, RES_WSFUEL, 5);
-	BOutput(BUILDING_GASSTATION, RES_RETFUEL, 5);
-	BDesc(BUILDING_GASSTATION, "Gas stations get fuel from a central oil refinery and dispense it to road vehicles when they need it.");
+	DefB(BL_OILWELL, "Oil Well", Vec2i(1,1), false, "models/oilwell2/oilwell2", Vec3f(1,1,1), Vec3f(0,0,0), "models/oilwell2/oilwell2", Vec3f(1,1,1), Vec3f(0,0,0), FOUNDATION_LAND, RES_CRUDEOIL);
+	BMat(BL_OILWELL, RES_CEMENT, 5);
+	BMat(BL_OILWELL, RES_LABOUR, 10);
+	BIn(BL_OILWELL, RES_ENERGY, 50);
+	BOut(BL_OILWELL, RES_CRUDEOIL, 5);
+	BDesc(BL_OILWELL, "Pumps up crude oil, necessary for fuel, which is consumed by all road vehicles.");
+
+	DefB(BL_MINE, "Mine", Vec2i(1,1), false, "models/mine/nobottom.ms3d", Vec3f(1,1,1)/32.0f*TILE_SIZE, Vec3f(0,0,0), "models/mine/nobottom.ms3d", Vec3f(1,1,1)/32.0f*TILE_SIZE, Vec3f(0,0,0), FOUNDATION_LAND, -1);
+	BMat(BL_MINE, RES_CEMENT, 5);
+	BMat(BL_MINE, RES_LABOUR, 10);
+	BIn(BL_MINE, RES_ENERGY, 50);
+	BOut(BL_MINE, RES_CEMENT, 500);
+	BOut(BL_MINE, RES_URANIUM, 10);
+	BDesc(BL_MINE, "Digs up minerals necessary for production at factories, and uranium, necessary for electricity generation at nuclear powerplants.");
 
 
 	// Conduit types
@@ -307,7 +481,7 @@ void Queue()
 	DefCo(CONDUIT_ROAD, "Road", offsetof(Building,roadnetw), offsetof(Selection,roads), ROAD_MAX_FOREW_INCLINE, ROAD_MAX_SIDEW_INCLINE, false, false, Vec2i(TILE_SIZE/2, TILE_SIZE/2), Vec3f(TILE_SIZE/2, 0, TILE_SIZE/2));
 	CoDesc(CONDUIT_ROAD, "Necessary for the transportation of all physical resources between buildings.");
 	CoConMat(CONDUIT_ROAD, RES_LABOUR, 1);
-	CoConMat(CONDUIT_ROAD, RES_MINERALS, 1);
+	CoConMat(CONDUIT_ROAD, RES_CEMENT, 1);
 	DefConn(CONDUIT_ROAD, CONNECTION_NOCONNECTION, CONSTRUCTION, "models/road/1_c.ms3d", scale, trans);
 	DefConn(CONDUIT_ROAD, CONNECTION_NORTH, CONSTRUCTION, "models/road/n_c.ms3d", scale, trans);
 	DefConn(CONDUIT_ROAD, CONNECTION_EAST, CONSTRUCTION, "models/road/e_c.ms3d", scale, trans);
@@ -344,7 +518,7 @@ void Queue()
 	DefCo(CONDUIT_POWL, "Powerline", offsetof(Building,pownetw), offsetof(Selection,powls), TILE_SIZE*2, TILE_SIZE*2, true, true, Vec2i(0, 0), Vec3f(0, 0, 0));
 	CoDesc(CONDUIT_POWL, "Necessary to conduct electricity between buildings.");
 	CoConMat(CONDUIT_POWL, RES_LABOUR, 1);
-	CoConMat(CONDUIT_POWL, RES_MINERALS, 1);
+	CoConMat(CONDUIT_POWL, RES_CEMENT, 1);
 	DefConn(CONDUIT_POWL, CONNECTION_NOCONNECTION, CONSTRUCTION, "models/powl/1_c.ms3d", scale, trans);
 	DefConn(CONDUIT_POWL, CONNECTION_NORTH, CONSTRUCTION, "models/powl/n_c.ms3d", scale, trans);
 	DefConn(CONDUIT_POWL, CONNECTION_EAST, CONSTRUCTION, "models/powl/e_c.ms3d", scale, trans);
@@ -382,7 +556,7 @@ void Queue()
 	DefCo(CONDUIT_CRPIPE, "Crude Oil Pipeline", offsetof(Building,crpipenetw), offsetof(Selection,crpipes), TILE_SIZE*2, TILE_SIZE*2, true, true, Vec2i(0, 0), Vec3f(0, 0, 0));
 	CoDesc(CONDUIT_CRPIPE, "Pumps crude oil between oil wells and refineries.");
 	CoConMat(CONDUIT_CRPIPE, RES_LABOUR, 1);
-	CoConMat(CONDUIT_CRPIPE, RES_MINERALS, 1);
+	CoConMat(CONDUIT_CRPIPE, RES_CEMENT, 1);
 	DefConn(CONDUIT_CRPIPE, CONNECTION_NOCONNECTION, CONSTRUCTION, "models/crpipe/1_c.ms3d", scale, trans);
 	DefConn(CONDUIT_CRPIPE, CONNECTION_NORTH, CONSTRUCTION, "models/crpipe/n_c.ms3d", scale, trans);
 	DefConn(CONDUIT_CRPIPE, CONNECTION_EAST, CONSTRUCTION, "models/crpipe/e_c.ms3d", scale, trans);

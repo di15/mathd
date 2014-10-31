@@ -27,7 +27,7 @@ void Resize_Console(Widget* thisw)
 	thisw->m_pos[3] = 30 + f->gheight * (i+1);
 }
 
-void Change_Console(unsigned int key, unsigned int scancode, bool down)
+void Change_Console(unsigned int key, unsigned int scancode, bool down, int parm)
 {
 	Player* py = &g_player[g_curP];
 	GUI* gui = &py->gui;

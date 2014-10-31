@@ -16,6 +16,7 @@
 #include "build.h"
 #include "player.h"
 #include "../gui/widgets/spez/constructionview.h"
+#include "../gui/widgets/spez/buildingview.h"
 #include "../gui/gui.h"
 #include "powl.h"
 #include "crpipe.h"
@@ -49,7 +50,7 @@ void DrawMarquee()
 {
 	Player* py = &g_player[g_curP];
 
-	if(!py->mousekeys[0] || py->keyintercepted || g_mode != APPMODE_PLAY || py->build != BUILDING_NONE)
+	if(!py->mousekeys[0] || py->keyintercepted || g_mode != APPMODE_PLAY || py->build != BL_NONE)
 		return;
 
 #if 0
@@ -612,6 +613,7 @@ void ClearSel(Selection* s)
 void AfterSel(Selection* s)
 {
 	bool haveconstr = false;
+	bool havefini = false;
 
 	for(auto seliter = s->buildings.begin(); seliter != s->buildings.end(); seliter++)
 	{
@@ -621,6 +623,11 @@ void AfterSel(Selection* s)
 		if(!b->finished)
 		{
 			haveconstr = true;
+			break;
+		}
+		else
+		{
+			havefini = true;
 			break;
 		}
 	}
@@ -668,5 +675,13 @@ void AfterSel(Selection* s)
 		ConstructionView* cv = (ConstructionView*)gui->get("construction view");
 		cv->regen(s);
 		gui->open("construction view");
+	}
+	else if(havefini)
+	{
+		Player* py = &g_player[g_curP];
+		GUI* gui = &py->gui;
+		BuildingView* bv = (BuildingView*)gui->get("building view");
+		bv->regen(s);
+		gui->open("building view");
 	}
 }

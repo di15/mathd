@@ -41,7 +41,7 @@ void Resize_CV_Cl(Widget* thisw)
 }
 
 // change construction view construction wage
-void Change_CV_CW(unsigned int key, unsigned int scancode, bool down)
+void Change_CV_CW(unsigned int key, unsigned int scancode, bool down, int parm)
 {
 	Player* py = &g_player[g_curP];
 	GUI* gui = &py->gui;
@@ -62,33 +62,39 @@ void Change_CV_CW(unsigned int key, unsigned int scancode, bool down)
 		BlType* t = &g_bltype[b->type];
 		b->conwage = ival;
 	}
-#if 0
+#if 1
 	else if(sel->roads.size() > 0)
 	{
-		py->bptype = BUILDING_ROAD;
-		conmat = g_roadcost;
-		qty = sel->roads.size();
-		Vec2i xz = *sel->roads.begin();
-		RoadTile* road = RoadAt(xz.x, xz.y);
-		maxcost = road->maxcost;
+		py->bptype = BL_ROAD;
+		ConduitType* cot = &g_cotype[CONDUIT_ROAD];
+		for(auto coi=sel->roads.begin(); coi!=sel->roads.end(); coi++)
+		{
+			Vec2i xz = *coi;
+			ConduitTile* co = GetCo(CONDUIT_ROAD, xz.x, xz.y, false);
+			co->conwage = ival;
+		}
 	}
 	else if(sel->powls.size() > 0)
 	{
-		py->bptype = BUILDING_POWL;
-		conmat = g_powlcost;
-		qty = sel->powls.size();
-		Vec2i xz = *sel->powls.begin();
-		PowlTile* powl = PowlAt(xz.x, xz.y);
-		maxcost = powl->maxcost;
+		py->bptype = BL_POWL;
+		ConduitType* cot = &g_cotype[CONDUIT_POWL];
+		for(auto coi=sel->powls.begin(); coi!=sel->powls.end(); coi++)
+		{
+			Vec2i xz = *coi;
+			ConduitTile* co = GetCo(CONDUIT_POWL, xz.x, xz.y, false);
+			co->conwage = ival;
+		}
 	}
 	else if(sel->crpipes.size() > 0)
 	{
-		py->bptype = BUILDING_CRPIPE;
-		qty = sel->crpipes.size();
-		conmat = g_crpipecost;
-		Vec2i xz = *sel->crpipes.begin();
-		CrPipeTile* crpipe = CrPipeAt(xz.x, xz.y);
-		maxcost = crpipe->maxcost;
+		py->bptype = BL_CRPIPE;
+		ConduitType* cot = &g_cotype[CONDUIT_CRPIPE];
+		for(auto coi=sel->crpipes.begin(); coi!=sel->crpipes.end(); coi++)
+		{
+			Vec2i xz = *coi;
+			ConduitTile* co = GetCo(CONDUIT_CRPIPE, xz.x, xz.y, false);
+			co->conwage = ival;
+		}
 	}
 #endif
 }
@@ -115,9 +121,9 @@ void ConstructionView::regen(Selection* sel)
 {
 	int* conmat = NULL;
 	int qty = -1;
-	int* maxcost = NULL;
 	RichText bname;
 	int conwage;
+	ConduitType* cot;
 
 	Player* py = &g_player[g_curP];
 
@@ -129,37 +135,39 @@ void ConstructionView::regen(Selection* sel)
 
 		conmat = t->conmat;
 		py->bptype = b->type;
-		maxcost = b->maxcost;
 		bname = RichText(UString(t->name));
 		conwage = b->conwage;
 	}
-#if 0
+#if 1
 	else if(sel->roads.size() > 0)
 	{
-		py->bptype = BUILDING_ROAD;
-		conmat = g_roadcost;
+		py->bptype = BL_ROAD;
+		cot = &g_cotype[CONDUIT_ROAD];
+		conmat = cot->conmat;
 		qty = sel->roads.size();
 		Vec2i xz = *sel->roads.begin();
-		RoadTile* road = RoadAt(xz.x, xz.y);
-		maxcost = road->maxcost;
+		ConduitTile* co = GetCo(CONDUIT_ROAD, xz.x, xz.y, false);
+		conwage = co->conwage;
 	}
 	else if(sel->powls.size() > 0)
 	{
-		py->bptype = BUILDING_POWL;
-		conmat = g_powlcost;
+		py->bptype = BL_POWL;
+		cot = &g_cotype[CONDUIT_POWL];
+		conmat = cot->conmat;
 		qty = sel->powls.size();
 		Vec2i xz = *sel->powls.begin();
-		PowlTile* powl = PowlAt(xz.x, xz.y);
-		maxcost = powl->maxcost;
+		ConduitTile* co = GetCo(CONDUIT_POWL, xz.x, xz.y, false);
+		conwage = co->conwage;
 	}
 	else if(sel->crpipes.size() > 0)
 	{
-		py->bptype = BUILDING_CRPIPE;
+		py->bptype = BL_CRPIPE;
 		qty = sel->crpipes.size();
-		conmat = g_crpipecost;
+		cot = &g_cotype[CONDUIT_CRPIPE];
+		conmat = cot->conmat;
 		Vec2i xz = *sel->crpipes.begin();
-		CrPipeTile* crpipe = CrPipeAt(xz.x, xz.y);
-		maxcost = crpipe->maxcost;
+		ConduitTile* co = GetCo(CONDUIT_CRPIPE, xz.x, xz.y, false);
+		conwage = co->conwage;
 	}
 #endif
 

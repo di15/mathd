@@ -68,7 +68,7 @@ bool FindJob(Unit* u)
 
 		//Chat("tj3");
 
-		if(py->global[RES_FUNDS] < u2->transpwage)
+		if(py->global[RES_DOLLARS] < u2->transpwage)
 		{
 			Bankrupt(u2->owner, "truck expenses");
 			continue;
@@ -107,7 +107,7 @@ bool FindJob(Unit* u)
 
 		Player* py = &g_player[b->owner];
 
-		if(py->global[RES_FUNDS] < b->conwage)
+		if(py->global[RES_DOLLARS] < b->conwage)
 		{
 			char reason[32];
 			sprintf(reason, "%s construction", bt->name);
@@ -166,7 +166,7 @@ bool FindJob(Unit* u)
 
 		Player* py = &g_player[b->owner];
 
-		if(py->global[RES_FUNDS] < b->opwage)
+		if(py->global[RES_DOLLARS] < b->opwage)
 		{
 			char reason[32];
 			sprintf(reason, "%s expenses", bt->name);
@@ -214,7 +214,7 @@ bool FindJob(Unit* u)
 
 				Player* py = &g_player[ctile->owner];
 
-				if(py->global[RES_FUNDS] < ctile->conwage)
+				if(py->global[RES_DOLLARS] < ctile->conwage)
 				{
 					Bankrupt(ctile->owner, "infrastructure construction");
 					continue;

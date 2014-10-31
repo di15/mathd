@@ -181,7 +181,7 @@ bool OffMap(int minx, int minz, int maxx, int maxz)
 #if 0
 
 // TO DO: REWRITE
-bool BuildingCollides(int type, Vec3f pos)
+bool BlCollides(int type, Vec3f pos)
 {
 	BlType* t = &g_bltype[type];
 

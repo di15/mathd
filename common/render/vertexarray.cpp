@@ -1,5 +1,5 @@
 #include "vertexarray.h"
-
+#include "../utils.h"
 
 VertexArray::VertexArray(const VertexArray& original)
 {

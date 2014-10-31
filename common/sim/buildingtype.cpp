@@ -1,7 +1,7 @@
 #include "../render/model.h"
 #include "buildingtype.h"
 
-BlType g_bltype[BUILDING_TYPES];
+BlType g_bltype[BL_TYPES];
 
 BlType::BlType()
 {
@@ -31,19 +31,19 @@ void BDesc(int type, const char* desc)
 	t->desc = desc;
 }
 
-void BConMat(int type, int res, int amt)
+void BMat(int type, int res, int amt)
 {
 	BlType* t = &g_bltype[type];
 	t->conmat[res] = amt;
 }
 
-void BInput(int type, int res, int amt)
+void BIn(int type, int res, int amt)
 {
 	BlType* t = &g_bltype[type];
 	t->input[res] = amt;
 }
 
-void BOutput(int type, int res, int amt)
+void BOut(int type, int res, int amt)
 {
 	BlType* t = &g_bltype[type];
 	t->output[res] = amt;

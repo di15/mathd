@@ -26,142 +26,21 @@
 #include "../../common/gui/widgets/windoww.h"
 #include "../../common/debug.h"
 #include "../../common/script/console.h"
+#include "../../common/window.h"
 
 //bool g_canselect = true;
 
 char g_lastsave[MAX_PATH+1];
 
-
-#if 0
-void Change_Fullscreen()
+void Resize_Fullscreen(Widget* thisw)
 {
-	int selected = gui->get("settings")->get("fullscreen", DROPDOWN)->selected;
+	Player* py = &g_player[g_curP];
 
-	if(g_fullscreen == (bool)selected)
-		return;
-
-	DestroyWindow();
-	g_fullscreen = selected;
-	WriteConfig();
-	MakeWindow();
-	Reload();
-	RedoGUI();
+	thisw->m_pos[0] = 0;
+	thisw->m_pos[1] = 0;
+	thisw->m_pos[2] = py->width-1;
+	thisw->m_pos[3] = py->height-1;
 }
-
-void Change_Resolution()
-{
-	int selected = gui->get("settings")->get("resolution", DROPDOWN)->selected;
-
-	if(g_selectedRes.width == g_resolution[selected].width && g_selectedRes.height == g_resolution[selected].height)
-		return;
-
-	g_selectedRes = g_resolution[selected];
-	WriteConfig();
-
-	if(g_fullscreen)
-	{
-		DestroyWindow();
-		MakeWindow();
-		Reload();
-		RedoGUI();
-	}
-	else
-	{
-		DWORD dwExStyle;
-		DWORD dwStyle;
-		RECT WindowRect;
-		WindowRect.left=(long)0;
-		WindowRect.right=(long)g_selectedRes.width;
-		WindowRect.top=(long)0;
-		WindowRect.bottom=(long)g_selectedRes.height;
-
-		dwExStyle = WS_EX_APPWINDOW | WS_EX_WINDOWEDGE;
-		dwStyle = WS_OVERLAPPEDWINDOW;
-		//startx = CW_USEDEFAULT;
-		//starty = CW_USEDEFAULT
-		int startx = GetSystemMetrics(SM_CXSCREEN)/2 - g_selectedRes.width/2;
-		int starty = GetSystemMetrics(SM_CYSCREEN)/2 - g_selectedRes.height/2;
-
-		AdjustWindowRectEx(&WindowRect, dwStyle, FALSE, dwExStyle);
-		MoveWindow(g_hWnd, startx, starty, WindowRect.right-WindowRect.left, WindowRect.bottom-WindowRect.top, false);
-
-		//int startx = GetSystemMetrics(SM_CXSCREEN)/2 - g_selectedRes.width/2;
-		//int starty = GetSystemMetrics(SM_CYSCREEN)/2 - g_selectedRes.height/2;
-
-		//MoveWindow(g_hWnd, startx, starty, g_selectedRes.width, g_selectedRes.height, false);
-	}
-}
-
-void Change_BPP()
-{
-	int selected = gui->get("settings")->get("bpp", DROPDOWN)->selected;
-
-	if(py->bpp == g_bpps[selected])
-		return;
-
-	py->bpp = g_bpps[selected];
-	WriteConfig();
-	DestroyWindow();
-	MakeWindow();
-	Reload();
-	RedoGUI();
-}
-
-void Click_BuildNum(int param)
-{
-	if(param == NOTHING && g_mode != APPMODE_EDITOR)
-		g_canselect = true;
-
-	//if(g_mode != APPMODE_EDITOR)
-	gui->close("build selector");
-
-	py->build = param;
-
-	if(g_mode == APPMODE_EDITOR)
-		g_edTool = EDTOOL::NOTOOL;
-}
-
-void Click_OutBuild()
-{
-	CView* v = gui->get("build selector");
-	/*
-	Widget* sw = &v->widget[0];
-	sw->ldown = false;
-
-	Widget* w;
-
-	for(int i=0; i<sw->subwidg.size(); i++)
-	{
-		w = &sw->subwidg[i];
-		w->ldown = false;
-	}
-	*/
-	g_canselect = true;
-
-	gui->close("build selector");
-}
-
-void Reload()
-{
-	g_mode = APPMODE_RELOADING;
-	g_reStage = 0;
-	g_lastLTex = -1;
-
-	LoadTiles();
-	LoadParticles();
-	LoadProjectiles();
-	LoadTerrainTextures();
-	LoadHoverTex();
-	LoadUnitSprites();
-	BSprites();
-
-	for(int i=0; i<MODELS; i++)
-	{
-		if(g_model[i].on)
-			g_model[i].ReloadTexture();
-	}
-}
-#endif
 
 void Click_LoadMapButton()
 {
@@ -325,24 +204,24 @@ void Click_NewGame()
 		p->on = true;
 		p->ai = (i == g_localP) ? false : true;
 
-		p->global[RES_FUNDS] = 4000;
+		p->global[RES_DOLLARS] = 4000;
 		p->global[RES_FARMPRODUCTS] = 4000;
 		p->global[RES_RETFOOD] = 4000;
-		p->global[RES_MINERALS] = 4000;
-		p->global[RES_WSFUEL] = 4000;
+		p->global[RES_CEMENT] = 4000;
+		p->global[RES_FUEL] = 4000;
 		p->global[RES_URANIUM] = 4000;
 
 #if 0
-#define RES_FUNDS			0
+#define RES_DOLLARS			0
 #define RES_LABOUR			1
 #define RES_HOUSING			2
 #define RES_FARMPRODUCTS	3
 #define RES_RETFOOD			4
 #define RES_PRODUCTION		5
-#define RES_MINERALS		6
+#define RES_CEMENT		6
 #define RES_CRUDEOIL		7
-#define RES_WSFUEL			8
-#define RES_RETFUEL			9
+#define RES_FUEL			8
+#define RES_FUEL			9
 #define RES_ENERGY			10
 #define RES_URANIUM			11
 #define RESOURCES			12
@@ -350,10 +229,10 @@ void Click_NewGame()
 	}
 
 #if 0
-	PlaceBl(BUILDING_HARBOUR, Vec2i(g_hmap.m_widthx/2-1, g_hmap.m_widthz/2-3), true, 0);
-	PlaceBl(BUILDING_APARTMENT, Vec2i(g_hmap.m_widthx/2+2, g_hmap.m_widthz/2-2), true, 0);
-	PlaceBl(BUILDING_APARTMENT, Vec2i(g_hmap.m_widthx/2+4, g_hmap.m_widthz/2-3), true, 0);
-	PlaceBl(BUILDING_APARTMENT, Vec2i(g_hmap.m_widthx/2+6, g_hmap.m_widthz/2-3), true, 0);
+	PlaceBl(BL_HARBOUR, Vec2i(g_hmap.m_widthx/2-1, g_hmap.m_widthz/2-3), true, 0);
+	PlaceBl(BL_APARTMENT, Vec2i(g_hmap.m_widthx/2+2, g_hmap.m_widthz/2-2), true, 0);
+	PlaceBl(BL_APARTMENT, Vec2i(g_hmap.m_widthx/2+4, g_hmap.m_widthz/2-3), true, 0);
+	PlaceBl(BL_APARTMENT, Vec2i(g_hmap.m_widthx/2+6, g_hmap.m_widthz/2-3), true, 0);
 	PlaceRoad(g_hmap.m_widthx/2+1, g_hmap.m_widthz/2-1, 1, false);
 	PlaceRoad(g_hmap.m_widthx/2+2, g_hmap.m_widthz/2-1, 1, false);
 	PlaceRoad(g_hmap.m_widthx/2+3, g_hmap.m_widthz/2-1, 1, false);
@@ -370,9 +249,9 @@ void Click_NewGame()
 	PlaceRoad(g_hmap.m_widthx/2+8, g_hmap.m_widthz/2-2, 1, false);
 	PlaceRoad(g_hmap.m_widthx/2+9, g_hmap.m_widthz/2-2, 1, false);
 	PlaceRoad(g_hmap.m_widthx/2+10, g_hmap.m_widthz/2-2, 1, false);
-	PlaceBl(BUILDING_FACTORY, Vec2i(g_hmap.m_widthx/2+9, g_hmap.m_widthz/2-3), true, 0);
-	PlaceBl(BUILDING_REFINERY, Vec2i(g_hmap.m_widthx/2+11, g_hmap.m_widthz/2-3), true, 0);
-	PlaceBl(BUILDING_NUCPOW, Vec2i(g_hmap.m_widthx/2+13, g_hmap.m_widthz/2-3), true, 0);
+	PlaceBl(BL_FACTORY, Vec2i(g_hmap.m_widthx/2+9, g_hmap.m_widthz/2-3), true, 0);
+	PlaceBl(BL_REFINERY, Vec2i(g_hmap.m_widthx/2+11, g_hmap.m_widthz/2-3), true, 0);
+	PlaceBl(BL_NUCPOW, Vec2i(g_hmap.m_widthx/2+13, g_hmap.m_widthz/2-3), true, 0);
 	PlaceRoad(g_hmap.m_widthx/2+11, g_hmap.m_widthz/2-2, 1, false);
 	PlaceRoad(g_hmap.m_widthx/2+12, g_hmap.m_widthz/2-2, 1, false);
 	PlaceRoad(g_hmap.m_widthx/2+13, g_hmap.m_widthz/2-2, 1, false);
@@ -383,19 +262,19 @@ void Click_NewGame()
 	PlaceRoad(g_hmap.m_widthx/2+14, g_hmap.m_widthz/2-6, 1, false);
 	PlaceRoad(g_hmap.m_widthx/2+14, g_hmap.m_widthz/2-7, 1, false);
 	PlaceRoad(g_hmap.m_widthx/2+15, g_hmap.m_widthz/2-2, 1, false);
-	PlaceBl(BUILDING_FARM, Vec2i(g_hmap.m_widthx/2+6, g_hmap.m_widthz/2-0), true, 0);
+	PlaceBl(BL_FARM, Vec2i(g_hmap.m_widthx/2+6, g_hmap.m_widthz/2-0), true, 0);
 	PlaceRoad(g_hmap.m_widthx/2+10, g_hmap.m_widthz/2-1, 1, false);
 	PlaceRoad(g_hmap.m_widthx/2+10, g_hmap.m_widthz/2-0, 1, false);
 	PlaceRoad(g_hmap.m_widthx/2+10, g_hmap.m_widthz/2+1, 1, false);
-	PlaceBl(BUILDING_STORE, Vec2i(g_hmap.m_widthx/2+9, g_hmap.m_widthz/2-1), true, 0);
-	PlaceBl(BUILDING_OILWELL, Vec2i(g_hmap.m_widthx/2+9, g_hmap.m_widthz/2-0), true, 0);
-	PlaceBl(BUILDING_MINE, Vec2i(g_hmap.m_widthx/2+11, g_hmap.m_widthz/2-0), true, 0);
-	PlaceBl(BUILDING_MINE, Vec2i(g_hmap.m_widthx/2+12, g_hmap.m_widthz/2-0), true, 0);
+	PlaceBl(BL_STORE, Vec2i(g_hmap.m_widthx/2+9, g_hmap.m_widthz/2-1), true, 0);
+	PlaceBl(BL_OILWELL, Vec2i(g_hmap.m_widthx/2+9, g_hmap.m_widthz/2-0), true, 0);
+	PlaceBl(BL_MINE, Vec2i(g_hmap.m_widthx/2+11, g_hmap.m_widthz/2-0), true, 0);
+	PlaceBl(BL_MINE, Vec2i(g_hmap.m_widthx/2+12, g_hmap.m_widthz/2-0), true, 0);
 	PlaceRoad(g_hmap.m_widthx/2+13, g_hmap.m_widthz/2-1, 1, false);
 	PlaceRoad(g_hmap.m_widthx/2+13, g_hmap.m_widthz/2-0, 1, false);
 	PlaceRoad(g_hmap.m_widthx/2+13, g_hmap.m_widthz/2+1, 1, false);
 	CheckGLError(__FILE__, __LINE__);
-	PlaceBl(BUILDING_GASSTATION, Vec2i(g_hmap.m_widthx/2+14, g_hmap.m_widthz/2-1), true, 0);
+	PlaceBl(BL_GASSTATION, Vec2i(g_hmap.m_widthx/2+14, g_hmap.m_widthz/2-1), true, 0);
 	g_hmap.genvbo();
 #endif
 
@@ -617,13 +496,14 @@ void MouseLUp()
 		Camera* c = &py->camera;
 		GUI* gui = &py->gui;
 
-		if(py->build == BUILDING_NONE)
+		if(py->build == BL_NONE)
 		{
 			gui->close("construction view");
+			gui->close("building view");
 			py->sel = DoSel(c->zoompos(), c->m_strafe, c->up2(), Normalize(c->m_view - c->zoompos()));
 			AfterSel(&py->sel);
 		}
-		else if(py->build < BUILDING_TYPES)
+		else if(py->build < BL_TYPES)
 		{
 			if(py->canplace)
 			{
@@ -635,10 +515,10 @@ void MouseLUp()
 
 			py->build = -1;
 		}
-		else if(py->build >= BUILDING_TYPES && py->build < BUILDING_TYPES+CONDUIT_TYPES)
+		else if(py->build >= BL_TYPES && py->build < BL_TYPES+CONDUIT_TYPES)
 		{
 			//g_log<<"place r"<<std::endl;
-			PlaceCo(py->build - BUILDING_TYPES);
+			PlaceCo(py->build - BL_TYPES);
 			py->build = -1;
 		}
 	}
@@ -772,7 +652,7 @@ void MouseMove()
 			CenterMouse();
 		}
 
-		UpdateSBuild();
+		UpdSBl();
 
 		if(py->mousekeys[MOUSE_LEFT])
 		{
@@ -857,6 +737,7 @@ void FillGUI()
 	g_log<<"2.3"<<std::endl;
 	g_log.flush();
 
+	loadview->add(new Image(loadview, "gui/mmbg.jpg", true, Resize_Fullscreen));
 	loadview->add(new Text(NULL, "status", RichText("Loading..."), MAINFONT8, Resize_LoadingStatus));
 
 	gui->closeall();

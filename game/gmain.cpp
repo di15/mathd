@@ -308,7 +308,7 @@ void DrawScene(Matrix projection, Matrix viewmat, Matrix modelmat, Matrix modelv
 	StartTimer(TIMER_DRAWPOWLS);
 	DrawCo(CONDUIT_POWL);
 	StopTimer(TIMER_DRAWPOWLS);
-	DrawSBuild();
+	DrawSBl();
 	EndS();
 	CheckGLError(__FILE__, __LINE__);
 #endif
@@ -601,7 +601,7 @@ void Draw()
 
 #if 1
 	char fpsstr[256];
-	sprintf(fpsstr, "draw fps: %lf (%lf s/frame), upd fps: %lf (%lf s/frame), zoom: %f, simframe: %lld", g_instantdrawfps, 1.0/g_instantdrawfps, g_instantupdfps, 1.0/g_instantupdfps, py->zoom, g_simframe);
+	sprintf(fpsstr, "draw fps: %lf (%lf s/frame), upd fps: %lf (%lf s/frame), zoom: %f, simframe: %d", g_instantdrawfps, 1.0/g_instantdrawfps, g_instantupdfps, 1.0/g_instantupdfps, py->zoom, g_simframe);
 	RichText fpsrstr(fpsstr);
 	DrawShadowedText(MAINFONT8, 0, py->height-MINIMAP_SIZE-32-10, &fpsrstr);
 	CheckGLError(__FILE__, __LINE__);

@@ -9,10 +9,10 @@ public:
 	int m_highl[2];	// highlighted (selected) text
 	UString m_compos;	//composition for unicode text
 	void (*submitfunc)();
-	void (*changefunc3)(unsigned int key, unsigned int scancode, bool down);
+	void (*changefunc3)(unsigned int key, unsigned int scancode, bool down, int parm);
 
 	EditBox();
-	EditBox(Widget* parent, const char* n, const RichText t, int f, void (*reframef)(Widget* thisw), bool pw, int maxl, void (*change3)(unsigned int key, unsigned int scancode, bool down), void (*submitf)(), int parm);
+	EditBox(Widget* parent, const char* n, const RichText t, int f, void (*reframef)(Widget* thisw), bool pw, int maxl, void (*change3)(unsigned int key, unsigned int scancode, bool down, int parm), void (*submitf)(), int parm);
 
 	void draw();
 	RichText drawvalue();

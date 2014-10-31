@@ -12,6 +12,8 @@
 #include "../../game/gui/ggui.h"
 #include "../math/hmapmath.h"
 #include "../render/foliage.h"
+#include "../render/transaction.h"
+#include "../../game/gui/chattext.h"
 
 ConduitType g_cotype[CONDUIT_TYPES];
 
@@ -579,12 +581,12 @@ void RemeshCo(unsigned char ctype, int tx, int tz, bool plan)
 	if(!ctile->on)
 		return;
 #if 0
-	g_log<<"mesh on "<<x<<","<<z<<std::endl;
+	g_log<<"mesh on "<<tx<<","<<tz<<" plan?"<<plan<<std::endl;
 	g_log.flush();
 #endif
 
 	ConduitType* ct = &g_cotype[ctype];
-	int mi = ct->model[ctile->conntype][plan];
+	int mi = ct->model[ctile->conntype][ctile->finished];
 	Model* m = &g_model[mi];
 
 	VertexArray* cva = &ctile->drawva;
@@ -809,8 +811,17 @@ bool CoPlaceable(int ctype, int x, int z)
 		}
 
 		if(!found)
-			return false;
+		{
+			Player* py = &g_player[g_curP];
+			
+			//display error?
+			if(py->build == BL_TYPES + ctype)
+			{
 
+			}
+
+			return false;
+		}
 #if 0
 		cmminx -= 1;
 		cmminz -= 1;
@@ -955,6 +966,9 @@ void PlaceCo(unsigned char ctype, int tx, int tz, int owner, bool plan)
 	if(!CoPlaceable(ctype, tx, tz))
 		return;
 
+	//if(ctype == CONDUIT_CRPIPE)
+	//	InfoMessage("a,","a");
+
 	ConduitTile* ctile = GetCo(ctype, tx, tz, plan);
 
 	ctile->on = true;
@@ -967,7 +981,12 @@ void PlaceCo(unsigned char ctype, int tx, int tz, int owner, bool plan)
 	ctile->drawpos = Vec3f(tx*TILE_SIZE, 0, tz*TILE_SIZE) + ct->drawoff;
 
 	if(g_mode == APPMODE_PLAY)
+	{
 		ctile->finished = false;
+
+		if(!plan)
+			ctile->allocate();
+	}
 	//if(plan || g_mode == APPMODE_EDITOR)
 	if(plan)
 		ctile->finished = true;
@@ -1035,7 +1054,9 @@ void PlaceCo(unsigned char ctype)
 		Player* py = &g_player[g_curP];
 		GUI* gui = &py->gui;
 
-		if(py->sel.roads.size() > 0)
+		std::list<Vec2i>* csel = (std::list<Vec2i>*)((char*)(&py->sel)+ct->seloff);
+
+		if(csel->size() > 0)
 		{
 			ConstructionView* cv = (ConstructionView*)gui->get("construction view");
 			cv->regen(&py->sel);
@@ -1070,7 +1091,7 @@ void DrawCo(unsigned char ctype)
 			DrawVA(&ctile->drawva, ctile->drawpos);
 		}
 
-	if(py->build != BUILDING_TYPES + ctype)
+	if(py->build != BL_TYPES + ctype)
 		return;
 
 	glUniform4f(s->m_slot[SSLOT_COLOR], 1, 1, 1, 0.5f);
@@ -1139,43 +1160,49 @@ void ConduitTile::destroy()
 
 void ConduitTile::allocate()
 {
-#if 0
-	CPlayer* p = &g_player[owner];
-
-	float alloc;
-
-	char transx[32];
-	transx[0] = '\0';
+#if 1
+	Player* py = &g_player[owner];
+	ConduitType* cot = &g_cotype[condtype()];
+	RichText transx;
 
 	for(int i=0; i<RESOURCES; i++)
 	{
-		if(g_roadcost[i] <= 0)
+		if(cot->conmat[i] <= 0)
 			continue;
 
-		if(i == LABOUR)
+		if(i == RES_LABOUR)
 			continue;
+		//InfoMessage("a","a1");
 
-		alloc = g_roadcost[i] - conmat[i];
+		int alloc = cot->conmat[i] - conmat[i];
 
-		if(p->global[i] < alloc)
-			alloc = p->global[i];
+		if(py->global[i] < alloc)
+			alloc = py->global[i];
 
 		conmat[i] += alloc;
-		p->global[i] -= alloc;
+		py->global[i] -= alloc;
 
-		if(alloc > 0.0f)
-			TransxAppend(transx, i, -alloc);
+		if(alloc > 0)
+		{
+		//InfoMessage("a","a");
+			Resource* r = &g_resource[i];
+			transx.m_part.push_back(RichPart(RICHTEXT_ICON, r->icon));
+			char cstr1[32];
+			sprintf(cstr1, "-%d  ", alloc);
+			transx.m_part.push_back(RichPart(cstr1));
+		}
 	}
 
-	if(transx[0] != '\0'
+	if(transx.m_part.size() > 0
 #ifdef LOCAL_TRANSX
 	                && owner == g_localP
 #endif
 	  )
 	{
 		int x, z;
-		RoadXZ(this, x, z);
-		NewTransx(RoadPosition(x, z), transx);
+		CoXZ(condtype(), this, false, x, z);
+		NewTransx(drawpos, &transx);
+		//InfoMessage("a","a");
 	}
 
 	checkconstruction();
@@ -1190,26 +1217,26 @@ bool ConduitTile::checkconstruction()
 		if(conmat[i] < ct->conmat[i])
 			return false;
 
-#if 0
+#if 1
 	if(owner == g_localP)
 	{
-		Chat("Road construction complete.");
-		ConCom();
+		RichText rt;
+		rt.m_part.push_back("Road construction complete.");
+		AddChat(&rt);
+		//ConCom();
 	}
 
 	finished = true;
 	fillcollider();
 
 	int x, z;
-	RoadXZ(this, x, z);
-	MeshRoad(x, z);
-	ReRoadNetw();
+	CoXZ(condtype(), this, false, x, z);
+	RemeshCo(condtype(), x, z, false);
+	ReNetw(condtype());
 
-	if(owner == g_localP)
-		OnFinishedB(ROAD);
+	//if(owner == g_localP)
+	//	OnFinishedB(ROAD);
 #endif
-
-	fillcollider();
 
 	return true;
 }

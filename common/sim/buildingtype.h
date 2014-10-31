@@ -36,6 +36,10 @@ public:
 
 	bool hugterr;
 
+	int sprite;
+	
+	std::vector<int> buildable;
+
 	BlType();
 };
 
@@ -43,32 +47,37 @@ public:
 #define FOUNDATION_COASTAL		1
 #define FOUNDATION_SEA			2
 
-#define BUILDING_NONE			-1
-#define BUILDING_APARTMENT		0
-#define BUILDING_FACTORY		1
-#define BUILDING_REFINERY		2
-#define BUILDING_NUCPOW			3
-#define BUILDING_FARM			4
-#define BUILDING_STORE			5
-#define BUILDING_HARBOUR		6
-#define BUILDING_OILWELL		7
-#define BUILDING_MINE			8
-#define BUILDING_GASSTATION		9
-#define BUILDING_TYPES			10
+#define BL_NONE				-1
+#define BL_APARTMENT		0
+#define BL_STORE			1
+#define BL_FACTORY			2
+#define BL_FARM				3
+#define BL_MINE				4
+#define BL_SMELTER			5
+#define BL_OILWELL			6
+#define BL_REFINERY			7
+#define BL_NUCPOW			8
+#define BL_COALPOW			9
+#define BL_QUARRY			10
+#define BL_CEMPLANT			11
+#define BL_CHEMPLANT		12
+#define BL_ELECPLANT		13
+#define BL_GASSTATION		14
+#define BL_TYPES			15
 
-#define BUILDING_ROAD			(BUILDING_TYPES+CONDUIT_ROAD)
-#define BUILDING_POWL			(BUILDING_TYPES+CONDUIT_POWL)
-#define BUILDING_CRPIPE			(BUILDING_TYPES+CONDUIT_CRPIPE)
-//#define BUILDING_WATERPIPE		(BUILDING_TYPES+4)
+#define BL_ROAD				(BL_TYPES+CONDUIT_ROAD)
+#define BL_POWL				(BL_TYPES+CONDUIT_POWL)
+#define BL_CRPIPE			(BL_TYPES+CONDUIT_CRPIPE)
+//#define BL_WATERPIPE		(BL_TYPES+4)
 
-#define TOTAL_BUILDABLES		(BUILDING_TYPES+CONDUIT_TYPES)
+#define TOTAL_BUILDABLES	(BL_TYPES+CONDUIT_TYPES)
 
-extern BlType g_bltype[BUILDING_TYPES];
+extern BlType g_bltype[BL_TYPES];
 
 void DefB(int type, const char* name, Vec2i size, bool hugterr, const char* modelrelative, Vec3f scale, Vec3f translate, const char* cmodelrelative,  Vec3f cscale, Vec3f ctranslate, int foundation, int reqdeposit);
-void BConMat(int type, int res, int amt);
-void BInput(int type, int res, int amt);
-void BOutput(int type, int res, int amt);
+void BMat(int type, int res, int amt);
+void BIn(int type, int res, int amt);
+void BOut(int type, int res, int amt);
 void BEmitter(int type, int emitterindex, int ptype, Vec3f offset);
 void BDesc(int type, const char* desc);
 
