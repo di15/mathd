@@ -7,6 +7,7 @@
 #include "resources.h"
 #include "buildingtype.h"
 #include "../render/vertexarray.h"
+#include "unittype.h"
 
 class VertexArray;
 
@@ -48,6 +49,8 @@ public:
 	int cymet;	//used to keep track of what was produced this cycle, out of max of prodlevel
 	int lastcy;	//last simframe of last production cycle
 	std::list<CapSup> capsup;	//capacity suppliers
+
+	int manufprc[UNIT_TYPES];
 
 	bool excin(int rtype);	//excess input resource right now?
 	bool metout();	//met production target for now?

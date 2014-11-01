@@ -14,5 +14,6 @@ public:
 
 void Resize_BP_VP(Widget* thisw);
 void Resize_BP_Tl(Widget* thisw);
+void Resize_BP_Ow(Widget* thisw);
 
 #endif

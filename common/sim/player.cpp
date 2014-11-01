@@ -70,6 +70,10 @@ Player::Player()
 	Zero(local);
 	Zero(global);
 
+	bbframesago = 0;
+	buframesago = 0;
+	priceadjframes = 0;
+
 	on = false;
 	zoom = INI_ZOOM;
 	width = INI_WIDTH;

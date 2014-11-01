@@ -432,6 +432,8 @@ bool PlaceBl(int type, Vec2i pos, bool finished, int owner, int* bid)
 	Zero(b->stocked);
 	Zero(b->prodprice);
 	b->propprice = 0;
+	for(int ui=0; ui<UNIT_TYPES; ui++)
+		b->manufprc[ui] = 0;
 
 	b->occupier.clear();
 	b->worker.clear();

@@ -40,6 +40,17 @@ void Resize_BP_Tl(Widget* thisw)
 	thisw->m_pos[3] = parw->m_pos[3] - 10;
 }
 
+//owner name
+void Resize_BP_Ow(Widget* thisw)
+{
+	Widget* parw = thisw->m_parent;
+
+	thisw->m_pos[0] = parw->m_pos[0] + 15;
+	thisw->m_pos[1] = parw->m_pos[1] + 39;
+	thisw->m_pos[2] = parw->m_pos[2] - 10;
+	thisw->m_pos[3] = parw->m_pos[3] - 10;
+}
+
 //params text block: construction material
 void Resize_BP_PB_C(Widget* thisw)
 {

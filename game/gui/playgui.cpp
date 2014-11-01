@@ -453,6 +453,39 @@ void BuildMenu_OpenPage2()
 	bp->bottomright_button[5] = Button(bp, "name", "gui/next.png", RichText(""), RichText(""), MAINFONT8, BUTTON_CORRODE, NULL, NULL, Click_NextBuildButton, NULL, NULL, NULL, 1);
 	bp->bottomright_button_on[5] = true;
 #else
+	bp->bottomright_button[0] = Button(bp, "name", "gui/brbut/coalpow.png", RichText(""), RichText(""), MAINFONT8, BUTTON_CORRODE, NULL, NULL, Click_BuildButton, NULL, Over_BuildButton, Out_BuildButton, BL_COALPOW);
+	bp->bottomright_button_on[0] = true;
+	
+	bp->bottomright_button[1] = Button(bp, "name", "gui/brbut/chemplant.png", RichText(""), RichText(""), MAINFONT8, BUTTON_CORRODE, NULL, NULL, Click_BuildButton, NULL, Over_BuildButton, Out_BuildButton, BL_CHEMPLANT);
+	bp->bottomright_button_on[1] = true;
+	
+	bp->bottomright_button[2] = Button(bp, "name", "gui/brbut/elecplant.png", RichText(""), RichText(""), MAINFONT8, BUTTON_CORRODE, NULL, NULL, Click_BuildButton, NULL, Over_BuildButton, Out_BuildButton, BL_ELECPLANT);
+	bp->bottomright_button_on[2] = true;
+	
+	bp->bottomright_button[3] = Button(bp, "name", "gui/brbut/cemplant.png", RichText(""), RichText(""), MAINFONT8, BUTTON_CORRODE, NULL, NULL, Click_BuildButton, NULL, Over_BuildButton, Out_BuildButton, BL_CEMPLANT);
+	bp->bottomright_button_on[3] = true;
+
+	bp->bottomright_button[4] = Button(bp, "name", "gui/brbut/quarry.png", RichText(""), RichText(""), MAINFONT8, BUTTON_CORRODE, NULL, NULL, Click_BuildButton, NULL, Over_BuildButton, Out_BuildButton, BL_QUARRY);
+	bp->bottomright_button_on[4] = true;
+	
+	bp->bottomright_button[5] = Button(bp, "name", "gui/brbut/smelter.png", RichText(""), RichText(""), MAINFONT8, BUTTON_CORRODE, NULL, NULL, Click_BuildButton, NULL, Over_BuildButton, Out_BuildButton, BL_SMELTER);
+	bp->bottomright_button_on[5] = true;
+
+	bp->bottomright_button[8] = Button(bp, "name", "gui/next.png", RichText(""), RichText(""), MAINFONT8, BUTTON_CORRODE, NULL, NULL, Click_NextBuildButton, NULL, NULL, NULL, 3);
+	bp->bottomright_button_on[8] = true;
+#endif
+
+	bp->reframe();
+}
+
+void BuildMenu_OpenPage3()
+{
+	Player* py = &g_player[g_curP];
+	GUI* gui = &py->gui;
+	ViewLayer* playview = (ViewLayer*)gui->get("play gui");
+
+	BottomPanel* bp = (BottomPanel*)playview->get("bottom panel");
+
 	bp->bottomright_button[0] = Button(bp, "name", "gui/brbut/road.png", RichText(""), RichText(""), MAINFONT8, BUTTON_CORRODE, NULL, NULL, Click_BuildButton, NULL, Over_BuildButton, Out_BuildButton, BL_ROAD);
 	bp->bottomright_button_on[0] = true;
 
@@ -464,7 +497,6 @@ void BuildMenu_OpenPage2()
 
 	bp->bottomright_button[8] = Button(bp, "name", "gui/next.png", RichText(""), RichText(""), MAINFONT8, BUTTON_CORRODE, NULL, NULL, Click_NextBuildButton, NULL, NULL, NULL, 1);
 	bp->bottomright_button_on[8] = true;
-#endif
 
 	bp->reframe();
 }
@@ -738,6 +770,7 @@ void FillPlayGUI()
 	AddChat(playview);
 
 	//preload all the button images
+	BuildMenu_OpenPage3();
 	BuildMenu_OpenPage2();
 	BuildMenu_OpenPage1();
 

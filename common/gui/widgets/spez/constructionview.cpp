@@ -35,9 +35,9 @@ void Resize_CV_Cl(Widget* thisw)
 	sscanf(thisw->m_name.c_str(), "%d %d", &col, &row);
 	
 	thisw->m_pos[0] = parw->m_pos[0] + 150*row;
-	thisw->m_pos[1] = parw->m_pos[1] + 20*col + 60;
+	thisw->m_pos[1] = parw->m_pos[1] + 20*col + 90;
 	thisw->m_pos[2] = imin(parw->m_pos[0] + 150*(row+1), parw->m_pos[2]);
-	thisw->m_pos[3] = imin(parw->m_pos[1] + 20*(col+1) + 60, parw->m_pos[3]);
+	thisw->m_pos[3] = imin(parw->m_pos[1] + 20*(col+1) + 90, parw->m_pos[3]);
 }
 
 // change construction view construction wage
@@ -126,6 +126,7 @@ void ConstructionView::regen(Selection* sel)
 	ConduitType* cot;
 
 	Player* py = &g_player[g_curP];
+	Player* opy;
 
 	if(sel->buildings.size() > 0)
 	{
@@ -137,6 +138,7 @@ void ConstructionView::regen(Selection* sel)
 		py->bptype = b->type;
 		bname = RichText(UString(t->name));
 		conwage = b->conwage;
+		opy = &g_player[b->owner];
 	}
 #if 1
 	else if(sel->roads.size() > 0)
@@ -148,6 +150,7 @@ void ConstructionView::regen(Selection* sel)
 		Vec2i xz = *sel->roads.begin();
 		ConduitTile* co = GetCo(CONDUIT_ROAD, xz.x, xz.y, false);
 		conwage = co->conwage;
+		opy = &g_player[co->owner];
 	}
 	else if(sel->powls.size() > 0)
 	{
@@ -158,6 +161,7 @@ void ConstructionView::regen(Selection* sel)
 		Vec2i xz = *sel->powls.begin();
 		ConduitTile* co = GetCo(CONDUIT_POWL, xz.x, xz.y, false);
 		conwage = co->conwage;
+		opy = &g_player[co->owner];
 	}
 	else if(sel->crpipes.size() > 0)
 	{
@@ -168,12 +172,14 @@ void ConstructionView::regen(Selection* sel)
 		Vec2i xz = *sel->crpipes.begin();
 		ConduitTile* co = GetCo(CONDUIT_CRPIPE, xz.x, xz.y, false);
 		conwage = co->conwage;
+		opy = &g_player[co->owner];
 	}
 #endif
 
 	freech();
 
 	m_subwidg.push_back(new ViewportW(this, "viewport", Resize_BP_VP, &DrawViewport, &ViewportLDown, &ViewportLUp, &ViewportMousemove, &ViewportRDown, &ViewportRUp, ViewportMousewheel, VIEWPORT_ENTVIEW));
+	m_subwidg.push_back(new Text(this, "owner", opy->name, FONT_EUROSTILE16, Resize_BP_Ow, true, opy->colorcode[0], opy->colorcode[1], opy->colorcode[2], opy->colorcode[3]));
 	m_subwidg.push_back(new Text(this, "title", bname, MAINFONT32, Resize_BP_Tl, true, 0.9f, 0.7f, 0.3f, 1));
 
 	int col = 0;

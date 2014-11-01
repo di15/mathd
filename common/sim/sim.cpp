@@ -430,6 +430,54 @@ void Queue()
 	BDesc(BL_REFINERY, "Turn wholesale fuel into retail fuel, generated at refineries.");
 #endif
 
+	DefB(BL_COALPOW, "Coal Powerplant", Vec2i(2,2), true, "models/coalpow/combustor.ms3d", Vec3f(1,1,1)/32.0f*TILE_SIZE*2, Vec3f(0,0,0), "models/coalpow/combustor.ms3d", Vec3f(1,1,1)/32.0f*TILE_SIZE*2, Vec3f(0,0,0), FOUNDATION_LAND, RES_NONE);
+	BMat(BL_COALPOW, RES_CEMENT, 5);
+	BMat(BL_COALPOW, RES_LABOUR, 10);
+	BIn(BL_COALPOW, RES_COAL, 5);
+	BOut(BL_COALPOW, RES_ENERGY, 1000);
+	BEmitter(BL_COALPOW, 0, PARTICLE_EXHAUST, Vec3f(TILE_SIZE*-9.5f, TILE_SIZE*23.4f, TILE_SIZE*10.6f)/32.0f);
+	BEmitter(BL_COALPOW, 1, PARTICLE_EXHAUST, Vec3f(TILE_SIZE*-9.9f, TILE_SIZE*23.4f, TILE_SIZE*-10.0f)/32.0f);
+	BDesc(BL_COALPOW, "Generates electricity from coal.");
+	
+	DefB(BL_CHEMPLANT, "Chemical Plant", Vec2i(2,2), true, "models/chemplant/chemplant.ms3d", Vec3f(1,1,1)/32.0f*TILE_SIZE*2, Vec3f(0,0,0), "models/chemplant/chemplant.ms3d", Vec3f(1,1,1)/32.0f*TILE_SIZE*2, Vec3f(0,0,0), FOUNDATION_LAND, RES_NONE);
+	BMat(BL_CHEMPLANT, RES_CEMENT, 5);
+	BMat(BL_CHEMPLANT, RES_LABOUR, 10);
+	BIn(BL_CHEMPLANT, RES_IRONORE, 5);
+	BIn(BL_CHEMPLANT, RES_ENERGY, 5);
+	BOut(BL_CHEMPLANT, RES_CHEMICALS, 10);
+	BDesc(BL_CHEMPLANT, "Generates chemicals necessary for farming and petrol refining.");
+	
+	DefB(BL_ELECPLANT, "Electronics Plant", Vec2i(2,2), true, "models/elecplant/elecplant.ms3d", Vec3f(1,1,1)/32.0f*TILE_SIZE*2, Vec3f(0,0,0), "models/elecplant/elecplant.ms3d", Vec3f(1,1,1)/32.0f*TILE_SIZE*2, Vec3f(0,0,0), FOUNDATION_LAND, RES_NONE);
+	BMat(BL_ELECPLANT, RES_CEMENT, 5);
+	BMat(BL_ELECPLANT, RES_LABOUR, 10);
+	BIn(BL_ELECPLANT, RES_IRONORE, 5);
+	BIn(BL_ELECPLANT, RES_ENERGY, 5);
+	BOut(BL_ELECPLANT, RES_ELECTRONICS, 10);
+	BDesc(BL_ELECPLANT, "Produces electronics necessary for units.");
+
+	DefB(BL_CEMPLANT, "Cement Plant", Vec2i(1,1), true, "models/cemplant/cemplant.ms3d", Vec3f(1,1,1)/32.0f*TILE_SIZE*2, Vec3f(0,0,0), "models/cemplant/cemplant.ms3d", Vec3f(1,1,1)/32.0f*TILE_SIZE*2, Vec3f(0,0,0), FOUNDATION_LAND, RES_NONE);
+	BMat(BL_CEMPLANT, RES_CEMENT, 5);
+	BMat(BL_CEMPLANT, RES_LABOUR, 10);
+	BIn(BL_CEMPLANT, RES_STONE, 5);
+	BIn(BL_CEMPLANT, RES_ENERGY, 5);
+	BOut(BL_CEMPLANT, RES_CEMENT, 10);
+	BDesc(BL_CEMPLANT, "Produces cement from stone.");
+	
+	DefB(BL_QUARRY, "Quarry", Vec2i(1,1), true, "models/quarry/quarry.ms3d", Vec3f(1,1,1)/32.0f*TILE_SIZE, Vec3f(0,0,0), "models/quarry/quarry.ms3d", Vec3f(1,1,1)/32.0f*TILE_SIZE, Vec3f(0,0,0), FOUNDATION_LAND, RES_NONE);
+	BMat(BL_QUARRY, RES_CEMENT, 5);
+	BMat(BL_QUARRY, RES_LABOUR, 10);
+	BIn(BL_QUARRY, RES_ENERGY, 5);
+	BOut(BL_QUARRY, RES_STONE, 10);
+	BDesc(BL_QUARRY, "Extracts stone.");
+	
+	DefB(BL_SMELTER, "Smelter", Vec2i(2,2), true, "models/smelter/smelter.ms3d", Vec3f(1,1,1)/32.0f*TILE_SIZE*2, Vec3f(0,0,0), "models/smelter/smelter.ms3d", Vec3f(1,1,1)/32.0f*TILE_SIZE*2, Vec3f(0,0,0), FOUNDATION_LAND, RES_NONE);
+	BMat(BL_SMELTER, RES_CEMENT, 5);
+	BMat(BL_SMELTER, RES_LABOUR, 10);
+	BIn(BL_SMELTER, RES_ENERGY, 5);
+	BIn(BL_SMELTER, RES_IRONORE, 5);
+	BOut(BL_SMELTER, RES_METAL, 10);
+	BDesc(BL_SMELTER, "Turns iron ore into metal.");
+
 	DefB(BL_NUCPOW, "Nuclear Powerplant", Vec2i(2,2), false, "models/nucpow2/nucpow2", Vec3f(1,1,1), Vec3f(0,0,0), "models/nucpow2/nucpow2", Vec3f(1,1,1), Vec3f(0,0,0), FOUNDATION_LAND, RES_NONE);
 	BMat(BL_NUCPOW, RES_CEMENT, 5);
 	BMat(BL_NUCPOW, RES_LABOUR, 10);

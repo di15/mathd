@@ -26,6 +26,10 @@ public:
 
 	int local[RESOURCES];	// used just for counting; cannot be used
 	int global[RESOURCES];
+	
+	int bbframesago;
+	int buframesago;
+	int priceadjframes;
 
 	float colorcode[4];
 	RichText name;

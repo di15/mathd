@@ -221,7 +221,55 @@ void Button::draw()
 
 		DrawShadowedText(m_font, textleft, texttop, &m_label);
 	}
+	else if(m_style == BUTTON_LINEBASED)
+	{
+		Player* py = &g_player[g_curP];
 
+		EndS();
+
+		UseS(SHADER_COLOR2D);
+		glUniform1f(g_shader[g_curS].m_slot[SSLOT_WIDTH], (float)py->currw);
+		glUniform1f(g_shader[g_curS].m_slot[SSLOT_HEIGHT], (float)py->currh);
+
+		float midcolor[] = {0.7f,0.7f,0.7f,0.8f};
+		float lightcolor[] = {0.8f,0.8f,0.8f,0.8f};
+		float darkcolor[] = {0.5f,0.5f,0.5f,0.8f};
+
+		if(m_over)
+		{
+			for(int i=0; i<3; i++)
+			{
+				midcolor[i] = 0.8f;
+				lightcolor[i] = 0.9f;
+				darkcolor[i] = 0.6f;
+			}
+		}
+
+		DrawSquare(midcolor[0], midcolor[1], midcolor[2], midcolor[3], m_pos[0], m_pos[1], m_pos[2], m_pos[3]);
+
+		DrawLine(lightcolor[0], lightcolor[1], lightcolor[2], lightcolor[3], m_pos[2], m_pos[1], m_pos[2], m_pos[3]-1);
+		DrawLine(lightcolor[0], lightcolor[1], lightcolor[2], lightcolor[3], m_pos[0], m_pos[1], m_pos[2]-1, m_pos[1]);
+
+		DrawLine(darkcolor[0], darkcolor[1], darkcolor[2], darkcolor[3], m_pos[0]+1, m_pos[3], m_pos[2], m_pos[3]);
+		DrawLine(darkcolor[0], darkcolor[1], darkcolor[2], darkcolor[3], m_pos[2], m_pos[1]+1, m_pos[2], m_pos[3]);
+
+		EndS();
+		CheckGLError(__FILE__, __LINE__);
+		Ortho(py->currw, py->currh, 1, 1, 1, 1);
+
+		float w = m_pos[2]-m_pos[0]-2;
+		float h = m_pos[3]-m_pos[1]-2;
+		float minsz = fmin(w, h);
+
+		//DrawImage(g_texture[m_tex].texname, m_pos[0]+1, m_pos[1]+1, m_pos[0]+minsz, m_pos[1]+minsz);
+
+		float gheight = g_font[m_font].gheight;
+		float texttop = m_pos[1] + h/2.0f - gheight/2.0f;
+		float textleft = m_pos[0]+minsz+1;
+
+		DrawShadowedText(m_font, textleft, texttop, &m_label);
+	}
+	
 	//if(_stricmp(m_name.c_str(), "choose texture") == 0)
 	//	g_log<<"draw choose texture"<<std::endl;
 }
