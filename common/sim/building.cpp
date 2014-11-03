@@ -22,7 +22,7 @@
 #include "../render/shadow.h"
 #include "../math/frustum.h"
 #include "unit.h"
-#include "sim.h"
+#include "simdef.h"
 #include "labourer.h"
 #include "../econ/demand.h"
 #include "../math/fixmath.h"

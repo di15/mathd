@@ -15,7 +15,7 @@
 #include "../common/render/shadow.h"
 #include "../common/window.h"
 #include "../common/utils.h"
-#include "../common/sim/sim.h"
+#include "../common/sim/simdef.h"
 #include "../common/math/hmapmath.h"
 #include "../common/sim/unit.h"
 #include "../common/sim/building.h"

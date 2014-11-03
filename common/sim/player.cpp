@@ -64,15 +64,12 @@ Player g_player[PLAYERS];
 int g_localP = 0;
 int g_curP = g_localP;
 int g_playerm;
+bool g_diplomacy[PLAYERS][PLAYERS] = {1};
 
 Player::Player()
 {
 	Zero(local);
 	Zero(global);
-
-	bbframesago = 0;
-	buframesago = 0;
-	priceadjframes = 0;
 
 	on = false;
 	zoom = INI_ZOOM;

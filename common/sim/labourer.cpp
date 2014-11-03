@@ -6,7 +6,7 @@
 #include "building.h"
 #include "../econ/utility.h"
 #include "../script/console.h"
-#include "sim.h"
+#include "simdef.h"
 #include "job.h"
 #include "unitmove.h"
 #include "../../game/gui/chattext.h"

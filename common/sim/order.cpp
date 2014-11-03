@@ -4,7 +4,7 @@
 #include "unit.h"
 #include "unittype.h"
 #include "../render/heightmap.h"
-#include "sim.h"
+#include "simdef.h"
 #include "../window.h"
 #include "../texture.h"
 #include "../utils.h"

@@ -13,7 +13,7 @@
 #include "../utils.h"
 #include "../render/shader.h"
 #include "../sim/selection.h"
-#include "../sim/sim.h"
+#include "../sim/simdef.h"
 #include "../phys/trace.h"
 #include "binheap.h"
 #include "pathnode.h"

@@ -1,4 +1,4 @@
-#include "sim.h"
+#include "simdef.h"
 #include "../script/console.h"
 #include "infrastructure.h"
 #include "road.h"
@@ -242,7 +242,7 @@ void Queue()
 #define BL_TYPES			14
 #endif
 
-#if 0
+#if 0	//from old corpstates
 		//		Building	Name					Model									Construction model							wX wZ	HP		Qta
 	BDefine(APARTMENT,	"Apartment",		"models\\apartment\\apartment.ms3d",		"models\\apartment\\apartment_c.ms3d",		2, 2,	100,	1);
 	BCost(LABOUR, 4);
@@ -396,16 +396,22 @@ void Queue()
 
 	//DefB(BL_APARTMENT, "Apartment Building", Vec2i(2,1), "models/apartment1/basebuilding.ms3d", Vec3f(100,100,100), Vec3f(0,0,0), "models/apartment1/basebuilding.ms3d", Vec3f(100,100,100), Vec3f(0,0,0), FOUNDATION_LAND, RES_NONE);
 	DefB(BL_APARTMENT, "Apartment Building", Vec2i(2,2),  false, "models/apartment2/b1911", Vec3f(1,1,1), Vec3f(0,0,0), "models/apartment2/b1911", Vec3f(1,1,1), Vec3f(0,0,0), FOUNDATION_LAND, RES_NONE);
-	BMat(BL_APARTMENT, RES_CEMENT, 5);
-	BMat(BL_APARTMENT, RES_LABOUR, 50);
+	BMat(BL_APARTMENT, RES_CEMENT, 4);
+	BMat(BL_APARTMENT, RES_LABOUR, 4);
+	BMat(BL_APARTMENT, RES_STONE, 2);
 	BOut(BL_APARTMENT, RES_HOUSING, 15);
 	BDesc(BL_APARTMENT, "Apartments collect rent from labourers. They are required by the labourers to regenerate labour power.");
 
 	DefB(BL_FACTORY, "Factory", Vec2i(1,1),  false, "models/factory3/factory3", Vec3f(1,1,1)/2, Vec3f(0,0,0), "models/factory3/factory3", Vec3f(1,1,1)/2, Vec3f(0,0,0), FOUNDATION_LAND, RES_NONE);
-	BMat(BL_FACTORY, RES_CEMENT, 5);
-	BMat(BL_FACTORY, RES_LABOUR, 10);
-	BIn(BL_FACTORY, RES_ENERGY, 50);
-	BOut(BL_FACTORY, RES_PRODUCTION, 5);
+	BMat(BL_FACTORY, RES_LABOUR, 4);
+	BMat(BL_FACTORY, RES_METAL, 2);
+	BMat(BL_FACTORY, RES_CEMENT, 3);
+	BMat(BL_FACTORY, RES_ELECTRONICS, 10);
+	BIn(BL_FACTORY, RES_LABOUR, 10);
+	BIn(BL_FACTORY, RES_ENERGY, 10);
+	BIn(BL_FACTORY, RES_CHEMICALS, 3);
+	BIn(BL_FACTORY, RES_METAL, 3);
+	BOut(BL_FACTORY, RES_PRODUCTION, 18);
 	BDesc(BL_FACTORY, "Factories produce units. They generate production necessary for the processing and packaging of farm products to create retail food.");
 
 	DefB(BL_REFINERY, "Oil Refinery", Vec2i(2,2),  false, "models/refinery2/refinery2", Vec3f(1,1,1), Vec3f(0,0,0), "models/refinery2/refinery2", Vec3f(1,1,1), Vec3f(0,0,0), FOUNDATION_LAND, RES_NONE);
@@ -469,12 +475,14 @@ void Queue()
 	BIn(BL_QUARRY, RES_ENERGY, 5);
 	BOut(BL_QUARRY, RES_STONE, 10);
 	BDesc(BL_QUARRY, "Extracts stone.");
-	
+
 	DefB(BL_SMELTER, "Smelter", Vec2i(2,2), true, "models/smelter/smelter.ms3d", Vec3f(1,1,1)/32.0f*TILE_SIZE*2, Vec3f(0,0,0), "models/smelter/smelter.ms3d", Vec3f(1,1,1)/32.0f*TILE_SIZE*2, Vec3f(0,0,0), FOUNDATION_LAND, RES_NONE);
-	BMat(BL_SMELTER, RES_CEMENT, 5);
-	BMat(BL_SMELTER, RES_LABOUR, 10);
-	BIn(BL_SMELTER, RES_ENERGY, 5);
+	BMat(BL_SMELTER, RES_LABOUR, 4);
+	BMat(BL_SMELTER, RES_CEMENT, 3);
+	BMat(BL_SMELTER, RES_STONE, 1);
+	BIn(BL_SMELTER, RES_LABOUR, 10);
 	BIn(BL_SMELTER, RES_IRONORE, 5);
+	BIn(BL_SMELTER, RES_CHEMICALS, 10);
 	BOut(BL_SMELTER, RES_METAL, 10);
 	BDesc(BL_SMELTER, "Turns iron ore into metal.");
 
@@ -488,9 +496,10 @@ void Queue()
 	BDesc(BL_NUCPOW, "Generates electricity from uranium.");
 
 	DefB(BL_FARM, "Farm", Vec2i(4,2), true, "models/farm2/farm2", Vec3f(1,1,1), Vec3f(0,0,0), "models/farm2/farm2", Vec3f(1,1,1), Vec3f(0,0,0), FOUNDATION_LAND, RES_NONE);
-	BMat(BL_FARM, RES_CEMENT, 5);
-	BMat(BL_FARM, RES_LABOUR, 10);
-	BIn(BL_FARM, RES_ENERGY, 50);
+	BMat(BL_FARM, RES_LABOUR, 4);
+	BIn(BL_FARM, RES_LABOUR, 10);
+	BIn(BL_FARM, RES_ENERGY, 1);
+	BIn(BL_FARM, RES_CHEMICALS, 1);
 	BOut(BL_FARM, RES_FARMPRODUCTS, 1900);
 	BDesc(BL_FARM, "Produces farm products, necessary for the production of retail food.");
 
@@ -513,11 +522,12 @@ void Queue()
 	BDesc(BL_OILWELL, "Pumps up crude oil, necessary for fuel, which is consumed by all road vehicles.");
 
 	DefB(BL_MINE, "Mine", Vec2i(1,1), false, "models/mine/nobottom.ms3d", Vec3f(1,1,1)/32.0f*TILE_SIZE, Vec3f(0,0,0), "models/mine/nobottom.ms3d", Vec3f(1,1,1)/32.0f*TILE_SIZE, Vec3f(0,0,0), FOUNDATION_LAND, -1);
-	BMat(BL_MINE, RES_CEMENT, 5);
-	BMat(BL_MINE, RES_LABOUR, 10);
-	BIn(BL_MINE, RES_ENERGY, 50);
-	BOut(BL_MINE, RES_CEMENT, 500);
-	BOut(BL_MINE, RES_URANIUM, 10);
+	BMat(BL_MINE, RES_LABOUR, 4);
+	BMat(BL_MINE, RES_CEMENT, 3);
+	BIn(BL_MINE, RES_LABOUR, 10);
+	BOut(BL_MINE, RES_IRONORE, 5);
+	BOut(BL_MINE, RES_URANIUM, 5);
+	BOut(BL_MINE, RES_COAL, 5);
 	BDesc(BL_MINE, "Digs up minerals necessary for production at factories, and uranium, necessary for electricity generation at nuclear powerplants.");
 
 

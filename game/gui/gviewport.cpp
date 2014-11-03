@@ -16,7 +16,7 @@
 #include "../../common/math/vec4f.h"
 #include "../../common/math/brush.h"
 #include "../../common/math/frustum.h"
-#include "../../common/sim/sim.h"
+#include "../../common/sim/simdef.h"
 #include "gviewport.h"
 #include "../../common/math/hmapmath.h"
 #include "../../common/render/water.h"

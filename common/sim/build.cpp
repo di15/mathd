@@ -26,7 +26,7 @@
 #include "../gui/widgets/spez/constructionview.h"
 #include "../render/foliage.h"
 #include "unitmove.h"
-#include "sim.h"
+#include "simdef.h"
 #include "../math/fixmath.h"
 
 void UpdSBl()

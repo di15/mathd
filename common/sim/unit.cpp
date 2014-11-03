@@ -7,7 +7,7 @@
 #include "../render/model.h"
 #include "../math/hmapmath.h"
 #include "unitmove.h"
-#include "sim.h"
+#include "simdef.h"
 #include "labourer.h"
 #include "../debug.h"
 #include "../math/frustum.h"

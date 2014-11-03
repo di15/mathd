@@ -13,7 +13,7 @@
 #include "../math/vec3f.h"
 #include "../math/matrix.h"
 #include "model.h"
-#include "../sim/sim.h"
+#include "../sim/simdef.h"
 #include "model.h"
 #include "../math/camera.h"
 #include "../window.h"

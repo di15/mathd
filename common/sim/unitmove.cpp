@@ -8,7 +8,7 @@
 #include "../math/hmapmath.h"
 #include "unitmove.h"
 #include "../render/transaction.h"
-#include "sim.h"
+#include "simdef.h"
 #include "../phys/trace.h"
 #include "../phys/collision.h"
 #include "../path/collidertile.h"

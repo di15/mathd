@@ -26,10 +26,6 @@ public:
 
 	int local[RESOURCES];	// used just for counting; cannot be used
 	int global[RESOURCES];
-	
-	int bbframesago;
-	int buframesago;
-	int priceadjframes;
 
 	float colorcode[4];
 	RichText name;
@@ -80,6 +76,7 @@ extern Player g_player[PLAYERS];
 extern int g_localP;
 extern int g_curP;
 extern int g_playerm;
+extern bool g_diplomacy[PLAYERS][PLAYERS];
 
 
 void DefP(int ID, float red, float green, float blue, float alpha, RichText name);

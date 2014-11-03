@@ -13,7 +13,7 @@
 #include "../utils.h"
 #include "../render/shader.h"
 #include "../sim/selection.h"
-#include "../sim/sim.h"
+#include "../sim/simdef.h"
 #include "../math/3dmath.h"
 #include "collision.h"
 #include "../math/vec2i.h"
