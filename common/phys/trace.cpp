@@ -22,6 +22,7 @@
 
 #define EPSILON_I		1
 
+//experimental, so far, haven't found a way to use fixmath instead of floats for pass ratios
 bool PassUnits(Vec2i vstart, Vec2i vend,
                int cmminx, int cmminz, int cmmaxx, int cmmaxz,
                Unit* u2)

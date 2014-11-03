@@ -58,9 +58,9 @@ void UpdAI()
 //build buildings
 bool Build(Player* p)
 {
-	//DemGraph* dm = &g_demgraph;
+	//DemTree* dm = &g_demtree;
 	int pi = p - g_player;
-	DemGraph* dm = &g_demgraph2[pi];
+	DemTree* dm = &g_demtree2[pi];
 
 	for(auto biter = dm->supbpcopy.begin(); biter != dm->supbpcopy.end(); biter ++)
 	{
@@ -204,7 +204,7 @@ bool AdjPr(Building* b)
 {
 	int pi = b->owner;
 	Player* p = &g_player[pi];
-	DemGraph* dm = &g_demgraph2[pi];
+	DemTree* dm = &g_demtree2[pi];
 	BlType* bt = &g_bltype[b->type];
 	Vec2i supcmpos = b->tilepos * TILE_SIZE + Vec2i(TILE_SIZE,TILE_SIZE)/2;
 	bool change = false;

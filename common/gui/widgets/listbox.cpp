@@ -42,7 +42,7 @@ void ListBox::erase(int which)
 		m_selected = -1;
 
 	if(m_scroll[1] + rowsshown() > m_options.size())
-		m_scroll[1] = m_options.size() - rowsshown();
+		m_scroll[1] = m_options.size() - (float)rowsshown();
 
 	if(m_scroll[1] < 0)
 		m_scroll[1] = 0;
@@ -50,9 +50,9 @@ void ListBox::erase(int which)
 
 int ListBox::rowsshown()
 {
-	int rows = (m_pos[3]-m_pos[1])/g_font[m_font].gheight;
+	int rows = (int)( (m_pos[3]-m_pos[1])/g_font[m_font].gheight );
 
-	if(rows > m_options.size())
+	if(rows > (int)m_options.size())
 		rows = m_options.size();
 
 	return rows;
@@ -60,7 +60,7 @@ int ListBox::rowsshown()
 
 int ListBox::square()
 {
-	return g_font[m_font].gheight;
+	return (int)g_font[m_font].gheight;
 }
 
 float ListBox::scrollspace()
@@ -123,7 +123,7 @@ void ListBox::inev(InEv* ev)
 		}
 		else if(m_scroll[1] + rowsshown() > m_options.size())
 		{
-			m_scroll[1] = m_options.size() - rowsshown();
+			m_scroll[1] = m_options.size() - (float)rowsshown();
 			ev->intercepted = true;
 			return;
 		}
@@ -231,7 +231,7 @@ void ListBox::inev(InEv* ev)
 		{
 			m_scroll[1]++;
 			if(m_scroll[1]+rowsshown() > m_options.size())
-				m_scroll[1] = m_options.size() - rowsshown();
+				m_scroll[1] = m_options.size() - (float)rowsshown();
 
 			ev->intercepted = true;
 			return;

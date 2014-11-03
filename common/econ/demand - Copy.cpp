@@ -1,4 +1,3 @@
-
 #include "demand.h"
 #include "../sim/unit.h"
 #include "../sim/building.h"
@@ -10,8 +9,8 @@
 #include "../sim/build.h"
 #include "../debug.h"
 
-DemGraph g_demgraph;
-DemGraph g_demgraph2[PLAYERS];
+DemTree g_demtree;
+DemTree g_demtree2[PLAYERS];
 
 DemNode::DemNode()
 {
@@ -19,8 +18,6 @@ DemNode::DemNode()
 	parent = NULL;
 	bid.maxbid = 0;
 	profit = 0;
-	orig = NULL;
-	copy = NULL;
 }
 
 int CountU(int utype)
@@ -68,7 +65,7 @@ Connect the buildings to the power and road grid, and crude oil pipeline grid if
 First parent is always a DemsAtB, while parent2 might be DemsAtU or DemsAtB
 Maybe change so that it's clear which one is supplier and which demander?
 */
-void AddInf(DemGraph* dm, DemGraphMod* dmod, std::list<DemNode*>* cdarr, DemNode* parent, DemNode* parent2, int rtype, int ramt, int depth, bool* success)
+void AddInf(DemTree* dm, std::list<DemNode*>* cdarr, DemNode* parent, DemNode* parent2, int rtype, int ramt, int depth, bool* success)
 {
 	// TO DO: roads and infrastructure to suppliers
 
@@ -91,14 +88,13 @@ void AddInf(DemGraph* dm, DemGraphMod* dmod, std::list<DemNode*>* cdarr, DemNode
 }
 
 //best actual (not just proposed) supplier
-//a proposed supplier doesn't exist yet in g_building; it is just a node in the demand graph
-DemsAtB* BestAcSup(DemGraph* dm, DemGraphMod* dmod, Vec2i demtpos, Vec2i demcmpos, int rtype, int* retutil, int* retmargpr)
+DemsAtB* BestAcSup(DemTree* dm, Vec2i demtpos, Vec2i demcmpos, int rtype, int* retutil, int* retmargpr)
 {
 	DemsAtB* bestdemb = NULL;
 	int bestutil = -1;
 	Resource* r = &g_resource[rtype];
 
-	for(auto biter = dmod->supbpcopy.begin(); biter != dmod->supbpcopy.end(); biter++)
+	for(auto biter = dm->supbpcopy.begin(); biter != dm->supbpcopy.end(); biter++)
 	{
 		DemsAtB* demb = (DemsAtB*)*biter;
 		BlType* bt = &g_bltype[demb->btype];
@@ -158,14 +154,14 @@ DemsAtB* BestAcSup(DemGraph* dm, DemGraphMod* dmod, Vec2i demtpos, Vec2i demcmpo
 }
 
 //best proposed supplier
-DemsAtB* BestPrSup(DemGraph* dm, DemGraphMod* dmod, Vec2i demtpos, Vec2i demcmpos, int rtype, int* retutil, int* retmargpr)
+DemsAtB* BestPrSup(DemTree* dm, Vec2i demtpos, Vec2i demcmpos, int rtype, int* retutil, int* retmargpr)
 {
 	DemsAtB* bestdemb = NULL;
 	int bestutil = -1;
 	Resource* r = &g_resource[rtype];
 
 	//include proposed demb's in search if all actual b's used up
-	for(auto biter = dmod->supbpcopy.begin(); biter != dmod->supbpcopy.end(); biter++)
+	for(auto biter = dm->supbpcopy.begin(); biter != dm->supbpcopy.end(); biter++)
 	{
 		DemsAtB* demb = (DemsAtB*)*biter;
 		BlType* bt = &g_bltype[demb->btype];
@@ -220,7 +216,7 @@ DemsAtB* BestPrSup(DemGraph* dm, DemGraphMod* dmod, Vec2i demtpos, Vec2i demcmpo
 // demb is requested building
 // returns false if building doesn't produce res type or on other failure
 // "nodes" is a place where to add rdem, as in original demander of the res.
-bool AddLoad(Player* p, Vec2i demcmpos, std::list<DemNode*>* nodes, DemGraph* dm, DemGraphMod* dmod, DemsAtB* demb, int rtype, int& rremain, RDemNode* rdem, int depth)
+bool AddLoad(Player* p, Vec2i demcmpos, std::list<DemNode*>* nodes, DemTree* dm, DemsAtB* demb, int rtype, int& rremain, RDemNode* rdem, int depth)
 {
 	//DemsAtB* demb = bestdemb;
 	BlType* bt = &g_bltype[demb->btype];
@@ -280,8 +276,7 @@ bool AddLoad(Player* p, Vec2i demcmpos, std::list<DemNode*>* nodes, DemGraph* dm
 	//because it might loop back to this building and think there is still
 	//room for a bigger load.
 	nodes->push_back(rdem);
-	//dm->rdemcopy.push_back(rdem);
-	dmod->rdemcopy.push_back(rdem);
+	dm->rdemcopy.push_back(rdem);
 
 	//int producing = bt->output[rtype] * demb->prodratio / RATIO_DENOM;
 	//int overprod = producing - demb->supplying[rtype] - suphere;
@@ -326,7 +321,7 @@ bool AddLoad(Player* p, Vec2i demcmpos, std::list<DemNode*>* nodes, DemGraph* dm
 			}
 
 			bool subsuccess;
-			AddReq(dm, dmod, p, &demb->proddems, demb, ri, rreq, suptpos, supcmpos, depth+1, &subsuccess, rdem->bid.maxbid);
+			AddReq(dm, p, &demb->proddems, demb, ri, rreq, suptpos, supcmpos, depth+1, &subsuccess, rdem->bid.maxbid);
 		}
 	}
 
@@ -335,7 +330,7 @@ bool AddLoad(Player* p, Vec2i demcmpos, std::list<DemNode*>* nodes, DemGraph* dm
 
 //add requisite resource demand
 //try to match to suppliers
-void AddReq(DemGraph* dm, DemGraphMod* dmod, Player* p, std::list<DemNode*>* nodes, DemNode* parent, int rtype, int ramt, Vec2i demtpos, Vec2i demcmpos, int depth, bool* success, int maxbid)
+void AddReq(DemTree* dm, Player* p, std::list<DemNode*>* nodes, DemNode* parent, int rtype, int ramt, Vec2i demtpos, Vec2i demcmpos, int depth, bool* success, int maxbid)
 {
 #ifdef DEBUG
 	if(ramt <= 0)
@@ -418,11 +413,11 @@ void AddReq(DemGraph* dm, DemGraphMod* dmod, Player* p, std::list<DemNode*>* nod
 		int bestmargpr = 0;
 
 		//bestac
-		bestdemb = BestAcSup(dm, dmod, demtpos, demcmpos, rtype, &bestutil, &bestmargpr);
+		bestdemb = BestAcSup(dm, demtpos, demcmpos, rtype, &bestutil, &bestmargpr);
 
 		//best prop
 		if(!bestdemb)
-			bestdemb = BestPrSup(dm, dmod, demtpos, demcmpos, rtype, &bestutil, &bestmargpr);
+			bestdemb = BestPrSup(dm, demtpos, demcmpos, rtype, &bestutil, &bestmargpr);
 
 		//if there's still no supplier, propose one to be made
 		//and set that supplier as bestdemb
@@ -437,6 +432,7 @@ void AddReq(DemGraph* dm, DemGraphMod* dmod, Player* p, std::list<DemNode*>* nod
 		//	return;
 		//actually, add rdem to dm->rdemcopy with minutil=-1 and let it
 		//be matched by the next call to CheclBl
+
 
 		RDemNode* rdem = new RDemNode;
 		if(!rdem) OutOfMem(__FILE__, __LINE__);
@@ -462,11 +458,11 @@ void AddReq(DemGraph* dm, DemGraphMod* dmod, Player* p, std::list<DemNode*>* nod
 			rdem->bid.marginpr = bestmargpr;
 
 			//AddLoad
-			AddLoad(p, demcmpos, nodes, dm, dmod, bestdemb, rtype, rremain, rdem, depth+1);
+			AddLoad(p, demcmpos, nodes, dm, bestdemb, rtype, rremain, rdem, depth+1);
 
 			bool subsuccess;
 			//add infrastructure to supplier
-			AddInf(dm, dmod, bestdemb->cddems, parent, bestdemb, rtype, ramt, depth, &subsuccess);
+			AddInf(dm, bestdemb->cddems, parent, bestdemb, rtype, ramt, depth, &subsuccess);
 
 			//this information might be important for building placement
 			*success = subsuccess ? *success : false;
@@ -480,8 +476,7 @@ void AddReq(DemGraph* dm, DemGraphMod* dmod, Player* p, std::list<DemNode*>* nod
 			//int requtil = -1;
 			rdem->bid.minutil = -1;
 			nodes->push_back(rdem);
-			//dm->rdemcopy.push_back(rdem);
-			dmod->rdemcopy.push_back(rdem);
+			dm->rdemcopy.push_back(rdem);
 		}
 		if(rremain <= 0)
 			return;
@@ -489,7 +484,7 @@ void AddReq(DemGraph* dm, DemGraphMod* dmod, Player* p, std::list<DemNode*>* nod
 #endif
 }
 
-void AddBl(DemGraph* dm)
+void AddBl(DemTree* dm)
 {
 	for(int i=0; i<BUILDINGS; i++)
 	{
@@ -514,7 +509,7 @@ void AddBl(DemGraph* dm)
 	}
 }
 
-void AddU(DemGraph* dm, Unit* u, DemsAtU** retdemu)
+void AddU(DemTree* dm, Unit* u, DemsAtU** retdemu)
 {
 #if 0
 	int ui;
@@ -537,7 +532,7 @@ void AddU(DemGraph* dm, Unit* u, DemsAtU** retdemu)
 	*retdemu = demu;
 }
 
-void BlConReq(DemGraph* dm, DemGraphMod* dmod, Player* curp)
+void BlConReq(DemTree* dm, Player* curp)
 {
 	bool success;
 
@@ -590,7 +585,7 @@ void BlConReq(DemGraph* dm, DemGraphMod* dmod, Player* curp)
 
 				maxbid = p->global[RES_DOLLARS];
 
-				AddReq(dm, dmod, curp, &demb->condems, *biter, i, req, tpos, cmpos, 0, &success, maxbid);
+				AddReq(dm, curp, &demb->condems, *biter, i, req, tpos, cmpos, 0, &success, maxbid);
 			}
 		}
 		//else finished construction
@@ -609,14 +604,9 @@ void BlConReq(DemGraph* dm, DemGraphMod* dmod, Player* curp)
 // Roads and infrastructure considered?
 void CalcDem1()
 {
-	g_demgraph.free();
-	AddBl(&g_demgraph);
-
-	DemGraphMod dmod;
-	IniDmMod(&g_demgraph, &dmod);
-	BlConReq(&g_demgraph, &dmod, NULL);
-	ApplyDem(&g_demgraph, &dmod);
-	dmod.free();
+	g_demtree.free();
+	AddBl(&g_demtree);
+	BlConReq(&g_demtree, NULL);
 
 	int nlab = CountU(UNIT_LABOURER);
 
@@ -635,13 +625,13 @@ void CalcDem1()
 		labfunds += u->belongings[RES_DOLLARS];
 	}
 
-	//AddReq(&g_demgraph, &g_demgraph.nodes, NULL, RES_HOUSING, nlab, 0);
-	//AddReq(&g_demgraph, &g_demgraph.nodes, NULL, RES_RETFOOD, LABOURER_FOODCONSUM * CYCLE_FRAMES, 0);
-	//AddReq(&g_demgraph, &g_demgraph.nodes, NULL, RES_ENERGY, nlab * LABOURER_ENERGYCONSUM, 0);
+	//AddReq(&g_demtree, &g_demtree.nodes, NULL, RES_HOUSING, nlab, 0);
+	//AddReq(&g_demtree, &g_demtree.nodes, NULL, RES_RETFOOD, LABOURER_FOODCONSUM * CYCLE_FRAMES, 0);
+	//AddReq(&g_demtree, &g_demtree.nodes, NULL, RES_ENERGY, nlab * LABOURER_ENERGYCONSUM, 0);
 }
 
 // Housing demand
-void LabDemH(DemGraph* dm, DemGraphMod* dmod, Unit* u, int* fundsleft, DemsAtU* pardemu)
+void LabDemH(DemTree* dm, Unit* u, int* fundsleft, DemsAtU* pardemu)
 {
 	if(*fundsleft <= 0)
 		return;
@@ -659,7 +649,7 @@ void LabDemH(DemGraph* dm, DemGraphMod* dmod, Unit* u, int* fundsleft, DemsAtU* 
 		// within distance.
 		Building* homeb = &g_building[u->home];
 
-		for(auto diter=dmod->supbpcopy.begin(); diter!=dmod->supbpcopy.end(); diter++)
+		for(auto diter=dm->supbpcopy.begin(); diter!=dm->supbpcopy.end(); diter++)
 		{
 			DemsAtB* demb = (DemsAtB*)*diter;
 
@@ -699,7 +689,7 @@ void LabDemH(DemGraph* dm, DemGraphMod* dmod, Unit* u, int* fundsleft, DemsAtU* 
 		int bestutil = -1;
 
 		//for(int bi=0; bi<BUILDINGS; bi++)
-		for(auto biter=dmod->supbpcopy.begin(); biter!=dmod->supbpcopy.end(); biter++)
+		for(auto biter=dm->supbpcopy.begin(); biter!=dm->supbpcopy.end(); biter++)
 		{
 			DemsAtB* demb = (DemsAtB*)*biter;
 			int bi = demb->bi;
@@ -822,16 +812,16 @@ void LabDemH(DemGraph* dm, DemGraphMod* dmod, Unit* u, int* fundsleft, DemsAtU* 
 	//dm->nodes.push_back(rdem);
 
 	if(!bestdemb)
-		dmod->rdemcopy.push_back(rdem);
+		dm->rdemcopy.push_back(rdem);
 	else
 	{
 		int reqhouse = 1;
-		AddLoad(NULL, u->cmpos, &pardemu->consumdems, dm, dmod, bestdemb, RES_HOUSING, reqhouse, rdem, 0);
+		AddLoad(NULL, u->cmpos, &pardemu->consumdems, dm, bestdemb, RES_HOUSING, reqhouse, rdem, 0);
 	}
 }
 
 // Food demand, bare necessity
-void LabDemF(DemGraph* dm, DemGraphMod* dmod, Unit* u, int* fundsleft, DemsAtU* pardemu)
+void LabDemF(DemTree* dm, Unit* u, int* fundsleft, DemsAtU* pardemu)
 {
 	// Food
 	// Which shop will the labourer shop at?
@@ -860,7 +850,7 @@ void LabDemF(DemGraph* dm, DemGraphMod* dmod, Unit* u, int* fundsleft, DemsAtU* 
 		int bestaffordqty = 0;
 
 		//for(int bi=0; bi<BUILDINGS; bi++)
-		for(auto biter=dmod->supbpcopy.begin(); biter!=dmod->supbpcopy.end(); biter++)
+		for(auto biter=dm->supbpcopy.begin(); biter!=dm->supbpcopy.end(); biter++)
 		{
 			DemsAtB* demb = (DemsAtB*)*biter;
 			int bi = demb->bi;
@@ -983,7 +973,7 @@ void LabDemF(DemGraph* dm, DemGraphMod* dmod, Unit* u, int* fundsleft, DemsAtU* 
 		//dm->nodes.push_back(rdem);
 		//dm->rdemcopy.push_back(rdem);
 
-		AddLoad(NULL, u->cmpos, &pardemu->consumdems, dm, dmod, bestdemb, RES_RETFOOD, reqfood, rdem, 0);
+		AddLoad(NULL, u->cmpos, &pardemu->consumdems, dm, bestdemb, RES_RETFOOD, reqfood, rdem, 0);
 
 #if 0
 		//if(ri == RES_HOUSING)
@@ -1038,7 +1028,7 @@ void LabDemF(DemGraph* dm, DemGraphMod* dmod, Unit* u, int* fundsleft, DemsAtU* 
 		demremain->bid.maxdist = -1;	//any distance
 		demremain->bid.minutil = -1;	//any util
 		//dm->nodes.push_back(demremain);
-		dmod->rdemcopy.push_back(demremain);
+		dm->rdemcopy.push_back(demremain);
 
 #if 0
 			//if(thisutil <= 0)
@@ -1057,7 +1047,7 @@ void LabDemF(DemGraph* dm, DemGraphMod* dmod, Unit* u, int* fundsleft, DemsAtU* 
 }
 
 // Food demand, luxurity with a limit
-void LabDemF3(DemGraph* dm, DemGraphMod* dmod, Unit* u, int* fundsleft, DemsAtU* pardemu)
+void LabDemF3(DemTree* dm, Unit* u, int* fundsleft, DemsAtU* pardemu)
 {
 	// Food
 	// Which shop will the labourer shop at?
@@ -1086,7 +1076,7 @@ void LabDemF3(DemGraph* dm, DemGraphMod* dmod, Unit* u, int* fundsleft, DemsAtU*
 		int bestaffordqty = 0;
 
 		//for(int bi=0; bi<BUILDINGS; bi++)
-		for(auto biter=dmod->supbpcopy.begin(); biter!=dmod->supbpcopy.end(); biter++)
+		for(auto biter=dm->supbpcopy.begin(); biter!=dm->supbpcopy.end(); biter++)
 		{
 			DemsAtB* demb = (DemsAtB*)*biter;
 			int bi = demb->bi;
@@ -1209,7 +1199,7 @@ void LabDemF3(DemGraph* dm, DemGraphMod* dmod, Unit* u, int* fundsleft, DemsAtU*
 		//dm->nodes.push_back(rdem);
 		//dm->rdemcopy.push_back(rdem);
 
-		AddLoad(NULL, u->cmpos, &pardemu->consumdems, dm, dmod, bestdemb, RES_RETFOOD, reqfood, rdem, 0);
+		AddLoad(NULL, u->cmpos, &pardemu->consumdems, dm, bestdemb, RES_RETFOOD, reqfood, rdem, 0);
 
 #if 0
 		//if(ri == RES_HOUSING)
@@ -1264,7 +1254,7 @@ void LabDemF3(DemGraph* dm, DemGraphMod* dmod, Unit* u, int* fundsleft, DemsAtU*
 		demremain->bid.maxdist = -1;	//any distance
 		demremain->bid.minutil = -1;	//any util
 		//dm->nodes.push_back(demremain);
-		dmod->rdemcopy.push_back(demremain);
+		dm->rdemcopy.push_back(demremain);
 
 #if 0
 			//if(thisutil <= 0)
@@ -1283,7 +1273,7 @@ void LabDemF3(DemGraph* dm, DemGraphMod* dmod, Unit* u, int* fundsleft, DemsAtU*
 }
 
 // Food demand, luxury
-void LabDemF2(DemGraph* dm, DemGraphMod* dmod, Unit* u, int* fundsleft, DemsAtU* pardemu)
+void LabDemF2(DemTree* dm, Unit* u, int* fundsleft, DemsAtU* pardemu)
 {
 	// Food
 	// Which shop will the labourer shop at?
@@ -1309,7 +1299,7 @@ void LabDemF2(DemGraph* dm, DemGraphMod* dmod, Unit* u, int* fundsleft, DemsAtU*
 		int bestutil = -1;
 
 		//for(int bi=0; bi<BUILDINGS; bi++)
-		for(auto biter=dmod->supbpcopy.begin(); biter!=dmod->supbpcopy.end(); biter++)
+		for(auto biter=dm->supbpcopy.begin(); biter!=dm->supbpcopy.end(); biter++)
 		{
 			DemsAtB* demb = (DemsAtB*)*biter;
 			int bi = demb->bi;
@@ -1425,7 +1415,7 @@ void LabDemF2(DemGraph* dm, DemGraphMod* dmod, Unit* u, int* fundsleft, DemsAtU*
 		//dm->rdemcopy.push_back(rdem);
 
 		int reqfood = STARTING_RETFOOD * 2;
-		AddLoad(NULL, u->cmpos, &pardemu->consumdems, dm, dmod, bestdemb, RES_RETFOOD, reqfood, rdem, 0);
+		AddLoad(NULL, u->cmpos, &pardemu->consumdems, dm, bestdemb, RES_RETFOOD, reqfood, rdem, 0);
 
 	} while(changed && fundsleft2 > 0);
 
@@ -1453,13 +1443,13 @@ void LabDemF2(DemGraph* dm, DemGraphMod* dmod, Unit* u, int* fundsleft, DemsAtU*
 	demremain->bid.maxdist = -1;	//any distance
 	demremain->bid.minutil = -1;	//any util
 	//dm->nodes.push_back(demremain);
-	dmod->rdemcopy.push_back(demremain);
+	dm->rdemcopy.push_back(demremain);
 
 	*fundsleft -= fundsleft2;
 }
 
 // Electricity demand, bare necessity
-void LabDemE(DemGraph* dm, DemGraphMod* dmod, Unit* u, int* fundsleft, DemsAtU* pardemu)
+void LabDemE(DemTree* dm, Unit* u, int* fundsleft, DemsAtU* pardemu)
 {
 	// Electricity
 	// Which provider will the labourer get energy from?
@@ -1487,7 +1477,7 @@ void LabDemE(DemGraph* dm, DemGraphMod* dmod, Unit* u, int* fundsleft, DemsAtU* 
 		int bestaffordqty = 0;
 
 		//for(int bi=0; bi<BUILDINGS; bi++)
-		for(auto biter=dmod->supbpcopy.begin(); biter!=dmod->supbpcopy.end(); biter++)
+		for(auto biter=dm->supbpcopy.begin(); biter!=dm->supbpcopy.end(); biter++)
 		{
 			DemsAtB* demb = (DemsAtB*)*biter;
 			int bi = demb->bi;
@@ -1606,7 +1596,7 @@ void LabDemE(DemGraph* dm, DemGraphMod* dmod, Unit* u, int* fundsleft, DemsAtU* 
 		//dm->nodes.push_back(rdem);
 		//dm->rdemcopy.push_back(rdem);
 
-		AddLoad(NULL, u->cmpos, &pardemu->consumdems, dm, dmod, bestdemb, RES_ENERGY, reqelec, rdem, 0);
+		AddLoad(NULL, u->cmpos, &pardemu->consumdems, dm, bestdemb, RES_ENERGY, reqelec, rdem, 0);
 
 	} while(changed && fundsleft2 > 0 && reqelec > 0);
 
@@ -1639,7 +1629,7 @@ void LabDemE(DemGraph* dm, DemGraphMod* dmod, Unit* u, int* fundsleft, DemsAtU* 
 		demremain->bid.maxdist = -1;	//any distance
 		demremain->bid.minutil = -1;	//any util
 		//dm->nodes.push_back(demremain);
-		dmod->rdemcopy.push_back(demremain);
+		dm->rdemcopy.push_back(demremain);
 
 		*fundsleft -= fundsleft2;
 	}
@@ -1650,8 +1640,8 @@ void LabDemE(DemGraph* dm, DemGraphMod* dmod, Unit* u, int* fundsleft, DemsAtU* 
 
 #if 0
 //See how much construction of bl, roads+infrastructure will cost, if location is suitable
-//If it is, all the proposed construction will be added to the demgraph
-bool CheckBl(DemGraph* dm, Player* p, RDemNode* pt, int* concost)
+//If it is, all the proposed construction will be added to the demtree
+bool CheckBl(DemTree* dm, Player* p, RDemNode* pt, int* concost)
 {
 	//pt is the tile with bid and bltype
 
@@ -1659,10 +1649,453 @@ bool CheckBl(DemGraph* dm, Player* p, RDemNode* pt, int* concost)
 }
 #endif
 
+//Duplicate demb's of demtree, without dem lists yet
+void DupDemB(DemTree* orig, DemTree* copy)
+{
+#if 0
+	int bi;
+	int btype;
+	std::list<DemNode*> condems;	//construction material
+	std::list<DemNode*> proddems;	//production input raw materials
+	std::list<DemNode*> manufdems;	//manufacturing input raw materials
+	std::list<CdDem*> cddems[CONDUIT_TYPES];
+	int prodratio;
+	int condem[RESOURCES];
+	int supplying[RESOURCES];
+#endif
+#if 0	//DemNode
+	DemNode* parent;
+	Bid bid;	//reflects the maximum possible gouging price
+	int profit;
+#endif
+
+	for(auto diter=orig->supbpcopy.begin(); diter!=orig->supbpcopy.end(); diter++)
+	{
+		DemsAtB* olddem = (DemsAtB*)*diter;
+		DemsAtB* newdem = new DemsAtB;
+		if(!newdem) OutOfMem(__FILE__, __LINE__);
+
+		newdem->bid = olddem->bid;
+		newdem->profit = olddem->profit;
+
+		newdem->bi = olddem->bi;
+		newdem->btype = olddem->btype;
+		newdem->prodratio = olddem->prodratio;
+		for(int ri=0; ri<RESOURCES; ri++)
+		{
+			newdem->condem[ri] = olddem->condem[ri];
+			newdem->supplying[ri] = olddem->supplying[ri];
+		}
+
+		copy->supbpcopy.push_back(newdem);
+	}
+}
+
+
+//Duplicate demb's of demtree, without dem lists yet
+void DupDemU(DemTree* orig, DemTree* copy)
+{
+//DemsAtU
+#if 0
+	int ui;
+	int utype;
+	std::list<RDemNode*> manufdems;
+	std::list<RDemNode*> consumdems;
+	DemsAtU* opup;	//operator/driver
+	int prodratio;
+	int timeused;
+	int totaldem[RESOURCES];
+#endif
+#if 0	//DemNode
+	DemNode* parent;
+	Bid bid;	//reflects the maximum possible gouging price
+	int profit;
+#endif
+
+	for(auto diter=orig->supupcopy.begin(); diter!=orig->supupcopy.end(); diter++)
+	{
+		DemsAtU* olddem = (DemsAtU*)*diter;
+		DemsAtU* newdem = new DemsAtU;
+		if(!newdem) OutOfMem(__FILE__, __LINE__);
+
+		newdem->bid = olddem->bid;
+		newdem->profit = olddem->profit;
+
+		newdem->ui = olddem->ui;
+		newdem->utype = olddem->utype;
+		newdem->prodratio = olddem->prodratio;
+		newdem->timeused = olddem->timeused;
+		for(int ri=0; ri<RESOURCES; ri++)
+		{
+			newdem->totaldem[ri] = olddem->totaldem[ri];
+		}
+
+		copy->supupcopy.push_back(newdem);
+	}
+}
+
+//Duplicate demb's of demtree, without dem lists yet
+void DupDemCo(DemTree* orig, DemTree* copy)
+{
+//CdDem
+#if 0
+	int cdtype;
+	Vec2i tpos;
+	std::list<RDemNode*> condems;
+#endif
+
+#if 0	//DemNode
+	DemNode* parent;
+	Bid bid;	//reflects the maximum possible gouging price
+	int profit;
+#endif
+
+	for(int ctype=0; ctype<CONDUIT_TYPES; ctype++)
+	{
+		for(auto diter=orig->codems[ctype].begin(); diter!=orig->codems[ctype].end(); diter++)
+		{
+			CdDem* olddem = (CdDem*)*diter;
+			CdDem* newdem = new CdDem;
+			if(!newdem) OutOfMem(__FILE__, __LINE__);
+
+			newdem->bid = olddem->bid;
+			newdem->profit = olddem->profit;
+
+			newdem->cdtype = olddem->cdtype;
+			newdem->tpos = olddem->tpos;
+
+			copy->codems[ctype].push_back(newdem);
+		}
+	}
+}
+
+//Duplicate dem nodes, but don't link yet
+void DupRDem(DemTree* orig, DemTree* copy)
+{
+	//	RDemNode
+#if 0
+	int rtype;
+	int ramt;
+	int btype;
+	int bi;
+	int utype;
+	int ui;
+	int demui;
+	DemsAtB* supbp;
+	DemsAtU* supup;
+	DemsAtU* opup;
+#endif
+
+#if 0	//DemNode
+	DemNode* parent;
+	Bid bid;	//reflects the maximum possible gouging price
+	int profit;
+#endif
+
+	for(auto diter=orig->rdemcopy.begin(); diter!=orig->rdemcopy.end(); diter++)
+	{
+		DemNode* olddem = *diter;
+
+		if(olddem->demtype != DEM_RNODE)
+			continue;
+
+		RDemNode* oldrdem = (RDemNode*)olddem;
+		RDemNode* newrdem = new RDemNode;
+		if(!newrdem) OutOfMem(__FILE__, __LINE__);
+
+		newrdem->bid = oldrdem->bid;
+		newrdem->profit = oldrdem->profit;
+
+		newrdem->rtype = oldrdem->rtype;
+		newrdem->ramt = oldrdem->ramt;
+		newrdem->btype = oldrdem->btype;
+		newrdem->bi = oldrdem->bi;
+		newrdem->utype = oldrdem->utype;
+		newrdem->ui = oldrdem->ui;
+		newrdem->demui = oldrdem->demui;
+
+		copy->rdemcopy.push_back(newrdem);
+	}
+}
+
+int DemIndex(DemNode* pdem, std::list<DemNode*>& list)
+{
+	if(!pdem)
+		return -1;
+
+	int di = 0;
+	for(auto diter=list.begin(); diter!=list.end(); diter++, di++)
+	{
+		if(*diter == pdem)
+			return di;
+	}
+
+	return -1;
+}
+
+DemNode* DemAt(std::list<DemNode*>& list, int seekdi)
+{
+	if(seekdi < 0)
+		return NULL;
+
+	int di = 0;
+	for(auto diter=list.begin(); diter!=list.end(); diter++, di++)
+	{
+		if(di == seekdi)
+			return *diter;
+	}
+
+	return NULL;
+}
+
+void LinkDems(std::list<DemNode*>& olist, std::list<DemNode*>& nlist, std::list<DemNode*>& osearch, std::list<DemNode*>& nsearch)
+{
+	for(auto oditer=olist.begin(); oditer!=olist.end(); oditer++)
+	{
+		DemNode* olddem = *oditer;
+		int cdi = DemIndex(olddem, osearch);
+		DemNode* newdem = DemAt(nsearch, cdi);
+		nlist.push_back(newdem);
+	}
+}
+
+void LinkPar(DemTree* orig, DemTree* copy, DemNode* olddem, DemNode* newdem)
+{
+	if(!olddem->parent)
+		return;
+
+	int bi = DemIndex(olddem->parent, orig->supbpcopy);
+	if(bi >= 0)
+	{
+		newdem->parent = DemAt(copy->supbpcopy, bi);
+		return;
+	}
+
+	int ui = DemIndex(olddem->parent, orig->supupcopy);
+	if(ui >= 0)
+	{
+		newdem->parent = DemAt(copy->supupcopy, ui);
+		return;
+	}
+
+	int ri = DemIndex(olddem->parent, orig->rdemcopy);
+	if(ri >= 0)
+	{
+		newdem->parent = DemAt(copy->rdemcopy, ri);
+		return;
+	}
+
+	for(int ctype=0; ctype<CONDUIT_TYPES; ctype++)
+	{
+		int ci = DemIndex(olddem->parent, orig->codems[ctype]);
+		if(ci >= 0)
+		{
+			newdem->parent = DemAt(copy->codems[ctype], ci);
+			return;
+		}
+	}
+}
+
+//Link dem nodes
+void LinkDemB(DemTree* orig, DemTree* copy)
+{
+#if 0	//DemNode
+	DemNode* parent;
+	Bid bid;	//reflects the maximum possible gouging price
+	int profit;
+#endif
+#if 0
+	int bi;
+	int btype;
+	std::list<RDemNode*> condems;	//construction material
+	std::list<RDemNode*> proddems;	//production input raw materials
+	std::list<RDemNode*> manufdems;	//manufacturing input raw materials
+	std::list<CdDem*> cddems[CONDUIT_TYPES];
+	int prodratio;
+	int condem[RESOURCES];
+	int supplying[RESOURCES];
+#endif
+
+	auto oditer=orig->supbpcopy.begin();
+	auto cditer=copy->supbpcopy.begin();
+	for(;
+	                oditer!=orig->supbpcopy.end() && cditer!=copy->supbpcopy.end();
+	                oditer++, cditer++)
+	{
+		DemsAtB* olddem = (DemsAtB*)*oditer;
+		DemsAtB* newdem = (DemsAtB*)*cditer;
+
+		LinkPar(orig, copy, olddem, newdem);
+		LinkDems(olddem->condems, newdem->condems, orig->rdemcopy, copy->rdemcopy);
+		LinkDems(olddem->proddems, newdem->proddems, orig->rdemcopy, copy->rdemcopy);
+		LinkDems(olddem->manufdems, newdem->manufdems, orig->rdemcopy, copy->rdemcopy);
+
+		for(int ctype=0; ctype<CONDUIT_TYPES; ctype++)
+			LinkDems(olddem->cddems[ctype], newdem->cddems[ctype], orig->codems[ctype], copy->codems[ctype]);
+	}
+}
+
+//Link dem nodes
+void LinkDemU(DemTree* orig, DemTree* copy)
+{
+#if 0	//DemNode
+	DemNode* parent;
+	Bid bid;	//reflects the maximum possible gouging price
+	int profit;
+#endif
+#if 0
+	int ui;
+	int utype;
+	std::list<RDemNode*> manufdems;
+	std::list<RDemNode*> consumdems;
+	DemsAtU* opup;	//operator/driver
+	int prodratio;
+	int timeused;
+	int totaldem[RESOURCES];
+#endif
+
+#if 0
+	int DemIndex(DemNode* pdem, std::list<DemNode*>& list)
+	DemNode* DemAt(std::list<DemNode*>& list, int seekdi)
+#endif
+
+	auto oditer=orig->supupcopy.begin();
+	auto cditer=copy->supupcopy.begin();
+	for(;
+	                oditer!=orig->supupcopy.end() && cditer!=copy->supupcopy.end();
+	                oditer++, cditer++)
+	{
+		DemsAtU* olddem = (DemsAtU*)*oditer;
+		DemsAtU* newdem = (DemsAtU*)*cditer;
+
+		//g_log<<"oldcd"<<olddem->consumdems.size()<<" newcd"<<newdem->consumdems.size()<<std::endl;
+		//g_log.flush();
+
+		LinkPar(orig, copy, olddem, newdem);
+		LinkDems(olddem->manufdems, newdem->manufdems, orig->rdemcopy, copy->rdemcopy);
+		LinkDems(olddem->consumdems, newdem->consumdems, orig->rdemcopy, copy->rdemcopy);
+		newdem->opup = DemAt(copy->supupcopy, DemIndex(olddem->opup, orig->supupcopy));
+	}
+}
+//Link dem nodes
+void LinkDemCo(DemTree* orig, DemTree* copy)
+{
+#if 0	//DemNode
+	DemNode* parent;
+	Bid bid;	//reflects the maximum possible gouging price
+	int profit;
+#endif
+#if 0
+	int cdtype;
+	Vec2i tpos;
+	std::list<RDemNode*> condems;
+#endif
+
+	for(int ctype=0; ctype<CONDUIT_TYPES; ctype++)
+	{
+		auto oditer=orig->codems[ctype].begin();
+		auto cditer=copy->codems[ctype].begin();
+		for(;
+						oditer!=orig->codems[ctype].end() && cditer!=copy->codems[ctype].end();
+						oditer++, cditer++)
+		{
+			CdDem* olddem = (CdDem*)*oditer;
+			CdDem* newdem = (CdDem*)*cditer;
+
+			LinkPar(orig, copy, olddem, newdem);
+			LinkDems(olddem->condems, newdem->condems, orig->rdemcopy, copy->rdemcopy);
+		}
+	}
+}
+
+//Link dem nodes
+void LinkDemR(DemTree* orig, DemTree* copy)
+{
+#if 0	//DemNode
+	DemNode* parent;
+	Bid bid;	//reflects the maximum possible gouging price
+	int profit;
+#endif
+#if 0
+	int rtype;
+	int ramt;
+	int btype;
+	int bi;
+	int utype;
+	int ui;
+	int demui;
+	DemsAtB* supbp;
+	DemsAtU* supup;
+	DemsAtU* opup;
+#endif
+
+	auto oditer=orig->rdemcopy.begin();
+	auto cditer=copy->rdemcopy.begin();
+	for(;
+	                oditer!=orig->rdemcopy.end() && cditer!=copy->rdemcopy.end();
+	                oditer++, cditer++)
+	{
+		RDemNode* olddem = (RDemNode*)*oditer;
+		RDemNode* newdem = (RDemNode*)*cditer;
+
+		LinkPar(orig, copy, olddem, newdem);
+		newdem->supbp = (DemsAtB*)DemAt(copy->supbpcopy, DemIndex(olddem->supbp, orig->supbpcopy));
+		newdem->supup = (DemsAtU*)DemAt(copy->supupcopy, DemIndex(olddem->supup, orig->supupcopy));
+		newdem->opup = (DemsAtU*)DemAt(copy->supupcopy, DemIndex(olddem->opup, orig->supupcopy));
+	}
+}
+
+void LinkNodes(DemTree* orig, DemTree* copy)
+{
+
+}
+
+//Duplicate demtree
+void DupDT(DemTree* orig, DemTree* copy)
+{
+#if 0
+	std::list<DemNode*> nodes;
+	std::list<DemsAtB*> supbpcopy;	//master copy, this one will be freed
+	std::list<DemsAtU*> supupcopy;	//master copy, this one will be freed
+	std::list<DemNode*> codems[CONDUIT_TYPES];	//conduit placements
+	std::list<RDemNode*> rdemcopy;	//master copy, this one will be freed
+	int pyrsup[PLAYERS][RESOURCES];	//player global res supplying
+#endif
+
+	char msg[128];
+	char msg2[128];
+
+#if 0
+	sprintf(msg, "orig %db %du %dr %dc", (int)orig->supbpcopy.size(), (int)orig->supupcopy.size(), (int)orig->rdemcopy.size(), (int)(orig->codems[0].size()+orig->codems[1].size()+orig->codems[2].size()));
+	sprintf(msg2, "copy %db %du %dr %dc", (int)copy->supbpcopy.size(), (int)copy->supupcopy.size(), (int)copy->rdemcopy.size(), (int)(copy->codems[0].size()+copy->codems[1].size()+copy->codems[2].size()));
+	g_log<<msg<<std::endl;
+	g_log<<msg2<<std::endl;
+	g_log.flush();
+#endif
+
+	DupDemB(orig, copy);
+	DupDemU(orig, copy);
+	DupDemCo(orig, copy);
+	DupRDem(orig, copy);
+	LinkDemB(orig, copy);
+	LinkDemU(orig, copy);
+	LinkDemCo(orig, copy);
+	LinkDemR(orig, copy);
+	LinkNodes(orig, copy);
+
+	for(int pi=0; pi<PLAYERS; pi++)
+	{
+		for(int ri=0; ri<RESOURCES; ri++)
+		{
+			copy->pyrsup[pi][ri] = orig->pyrsup[pi][ri];
+		}
+	}
+}
+
 /*
 Hypothetical transport cost, create demand for insufficient transports
 */
-void TranspCost(DemGraph* dm, Player* p, Vec2i tfrom, Vec2i tto)
+void TranspCost(DemTree* dm, Player* p, Vec2i tfrom, Vec2i tto)
 {
 
 }
@@ -1857,7 +2290,7 @@ Roads and infrastructure might not be present yet, create demand?
 If not on same island, maybe create demand for overseas transport?
 If no trucks are present, create demand?
 */
-void CheckBlType(DemGraph* dm, DemGraphMod* dmod, Player* p, int btype, int rtype, int ramt, Vec2i tpos, Bid* bid, int* blmaxr, bool* success, DemsAtB** retdemb)
+void CheckBlType(DemTree* dm, Player* p, int btype, int rtype, int ramt, Vec2i tpos, Bid* bid, int* blmaxr, bool* success, DemsAtB** retdemb)
 {
 	if(BlCollides(btype, tpos))
 	{
@@ -1893,8 +2326,7 @@ void CheckBlType(DemGraph* dm, DemGraphMod* dmod, Player* p, int btype, int rtyp
 	Vec2i cmpos = tpos * TILE_SIZE + Vec2i(TILE_SIZE,TILE_SIZE)/2;
 	bid->cmpos = cmpos;
 
-	//dm->supbpcopy.push_back(demb);
-	dmod->supbpcopy.push_back(demb);
+	dm->supbpcopy.push_back(demb);
 
 	*success = true;
 
@@ -1911,7 +2343,7 @@ void CheckBlType(DemGraph* dm, DemGraphMod* dmod, Player* p, int btype, int rtyp
 			continue;
 
 		//CheckSups(dm, p, ri, reqr, demb, rcostco[ri]);
-		AddReq(dm, dmod, p, &demb->proddems, demb, ri, reqr, tpos, cmpos, 0, success, maxbid);
+		AddReq(dm, p, &demb->proddems, demb, ri, reqr, tpos, cmpos, 0, success, maxbid);
 
 		//if there's no way to build infrastructure to suppliers
 		//then we shouldn't build this
@@ -1932,9 +2364,6 @@ void CheckBlType(DemGraph* dm, DemGraphMod* dmod, Player* p, int btype, int rtyp
 }
 
 //max profit
-//try all the possible price levels
-//a lower price gets more of the market segment, but each sale at a lower price
-//a higher price gets higher earning per sale but at the expense of market segment
 bool MaxPro(std::list<CostCompo>& costco, int pricelevel, int demramt, int* proramt, int maxbudget, int* bestrev, int* bestprofit)
 {
 	//int bestprofit = -1;
@@ -2008,10 +2437,10 @@ bool MaxPro(std::list<CostCompo>& costco, int pricelevel, int demramt, int* pror
 }
 
 /*
-Based on the dems in the graph, find the best price for this tile and res, if a profit can be generated
+Based on the dems in the tree, find the best price for this tile and res, if a profit can be generated
 pt: tile info to return, including cost compo, bid, profit
 */
-void CheckBlTile(DemGraph* dm, DemGraphMod* dmod, Player* p, int ri, RDemNode* pt, int x, int z, int* fixc, int* recurp, bool* success)
+void CheckBlTile(DemTree* dm, Player* p, int ri, RDemNode* pt, int x, int z, int* fixc, int* recurp, bool* success)
 {
 	//list of r demands for this res type, with max revenue and costs for this tile
 	std::list<DemNode*> rdems;	//RDemNode*
@@ -2021,7 +2450,7 @@ void CheckBlTile(DemGraph* dm, DemGraphMod* dmod, Player* p, int ri, RDemNode* p
 
 	std::list<RDemNode*> rdns;
 
-	for(auto diter=dmod->rdemcopy.begin(); diter!=dmod->rdemcopy.end(); diter++)
+	for(auto diter=dm->rdemcopy.begin(); diter!=dm->rdemcopy.end(); diter++)
 	{
 		DemNode* dn = *diter;
 
@@ -2176,7 +2605,7 @@ void CheckBlTile(DemGraph* dm, DemGraphMod* dmod, Player* p, int ri, RDemNode* p
 	int bestmaxr = maxramt;
 	int bestprofit = -1;
 	DemsAtB* bestdemb = NULL;
-	DemGraphMod bestbldmod;
+	DemTree bestbldm;
 
 	//TODO: variable cost of resource production and raw input transport
 	//Try for all supporting bltypes
@@ -2187,8 +2616,8 @@ void CheckBlTile(DemGraph* dm, DemGraphMod* dmod, Player* p, int ri, RDemNode* p
 		if(bt->output[ri] <= 0)
 			continue;
 
-		DemGraphMod bldmod;
-		IniDmMod(dm, &bldmod);
+		DemTree bldm;
+		DupDT(dm, &bldm);
 
 		Bid bltybid;
 		int blmaxr = maxramt;
@@ -2199,7 +2628,7 @@ void CheckBlTile(DemGraph* dm, DemGraphMod* dmod, Player* p, int ri, RDemNode* p
 		g_log.flush();
 #endif
 
-		CheckBlType(dm, &bldmod, p, btype, ri, maxramt, Vec2i(x,z), &bltybid, &blmaxr, success, &demb);
+		CheckBlType(&bldm, p, btype, ri, maxramt, Vec2i(x,z), &bltybid, &blmaxr, success, &demb);
 
 #ifdef DEBUGDEM
 		g_log<<"\t zx "<<z<<","<<x<<" p"<<(int)(p-g_player)<<" /fini calling CheckBlType"<<bt->name<<std::endl;
@@ -2207,10 +2636,7 @@ void CheckBlTile(DemGraph* dm, DemGraphMod* dmod, Player* p, int ri, RDemNode* p
 #endif
 
 		if(!*success)
-		{
-			bldmod.free();
 			continue;
-		}
 
 #ifdef DEBUGDEM
 		g_log<<"\t zx "<<z<<","<<x<<" p"<<(int)(p-g_player)<<" /fini calling CheckBlType success "<<bt->name<<std::endl;
@@ -2315,11 +2741,8 @@ void CheckBlTile(DemGraph* dm, DemGraphMod* dmod, Player* p, int ri, RDemNode* p
 			dupdm = true;	//expensive op
 		}
 
-		if(!dupdm)	//no success?
-		{
-			bldmod.free();
+		if(!dupdm)
 			continue;
-		}
 
 		//if(*recurp > totalmaxrev)
 		//	*recurp = totalmaxrev;
@@ -2340,7 +2763,7 @@ void CheckBlTile(DemGraph* dm, DemGraphMod* dmod, Player* p, int ri, RDemNode* p
 			if(!pardem)
 				continue;
 
-			//NOTE: need to get equivalent rdem from copied DemGraph, NOT original
+			//NOTE: need to get equivalent rdem from copied DemTree, NOT original
 
 			//AddInf(&bldm, bestdemb->cddems, bestdemb, rdem, ri, rdem->ramt, 0, success);
 		}
@@ -2348,24 +2771,15 @@ void CheckBlTile(DemGraph* dm, DemGraphMod* dmod, Player* p, int ri, RDemNode* p
 		//add infrastructure to supplier
 		//AddInf(dm, nodes, parent, *biter, rtype, ramt, depth, success);
 
-		//bestbldm.free();
-		bestbldmod.free();
-		AddDemMod(&bldmod, &bestbldmod);
+		bestbldm.free();
+		DupDT(&bldm, &bestbldm);
 	}
 
 	if(bestbtype < 0)
-	{
-		bestbldmod.free();
 		return;
-	}
 
-	AddDemMod(&bestbldmod, dmod);
-}
-
-void AddDemMod(DemGraphMod* src, DemGraphMod* dest)
-{
-	//TO DO
-	*dest = *src;
+	dm->free();
+	DupDT(&bestbldm, dm);
 }
 
 /*
@@ -2376,13 +2790,12 @@ tile for that building, consider the cost
 of connecting roads and infrastructure,
 and choose which is most profitable.
 */
-void CheckBl(DemGraph* dm, Player* p, int* fixcost, int* recurprof, bool* success)
+void CheckBl(DemTree* dm, Player* p, int* fixcost, int* recurprof, bool* success)
 {
-	DemGraphMod bestbldmod;
+	DemTree bestbldm;
 	int bestfixc = -1;
 	int bestrecurp = -1;
 	*success = false;
-	DemGraphMod dmod;
 
 	//For resources that must be transported physically
 	//For non-physical res suppliers, distance
@@ -2416,6 +2829,9 @@ void CheckBl(DemGraph* dm, Player* p, int* fixcost, int* recurprof, bool* succes
 				LastNum(msg);
 #endif
 
+				DemTree thisdm;
+				DupDT(dm, &thisdm);
+
 #if 0
 				if(ri == RES_HOUSING)
 				{
@@ -2429,9 +2845,7 @@ void CheckBl(DemGraph* dm, Player* p, int* fixcost, int* recurprof, bool* succes
 				int recurp = 0;
 				int fixc = 0;
 				bool subsuccess;
-				dmod.free();
-				IniDmMod(dm, &dmod);
-				CheckBlTile(dm, &dmod, p, ri, &tile, x, z, &fixc, &recurp, &subsuccess);
+				CheckBlTile(&thisdm, p, ri, &tile, x, z, &fixc, &recurp, &subsuccess);
 
 #if 0
 				if(ri == RES_HOUSING)
@@ -2457,9 +2871,9 @@ void CheckBl(DemGraph* dm, Player* p, int* fixcost, int* recurprof, bool* succes
 					bestfixc = fixc;
 					bestrecurp = recurp;
 					CheckMem(__FILE__, __LINE__, "\t\t1\t");
-					bestbldmod.free();
+					bestbldm.free();
 					CheckMem(__FILE__, __LINE__, "\t\t\t2\t");
-					AddDemMod(&dmod, &bestbldmod);
+					DupDT(&thisdm, &bestbldm);
 
 #ifdef DEBUGDEM
 					g_log<<"zx "<<z<<","<<x<<" /fini success dupdt"<<std::endl;
@@ -2485,301 +2899,12 @@ void CheckBl(DemGraph* dm, Player* p, int* fixcost, int* recurprof, bool* succes
 
 	//if no profit can be made
 	if(bestrecurp <= 0)
-	{
-		dmod.free();
-		bestbldmod.free();
 		return;
-	}
 
-	ApplyDem(dm, &bestbldmod);
-	bestbldmod.free();
+	dm->free();
+	DupDT(&bestbldm, dm);
 	*fixcost = bestfixc;
 	*recurprof = bestrecurp;
-}
-
-//apply demgraph mod to demgraph
-//the opposite of IniDmMod
-void ApplyDem(DemGraph* dm, DemGraphMod* dmod)
-{
-	//add demands
-	for(auto biter=dmod->supbpcopy.begin(); biter!=dmod->supbpcopy.end(); biter++)
-	{
-		DemsAtB* olddemb = (DemsAtB*)*biter;
-
-		if(olddemb->orig)
-			continue;
-
-		DemsAtB* newdemb = new DemsAtB;
-
-		*newdemb = *olddemb;
-
-		newdemb->copy = olddemb;
-		newdemb->orig = NULL;
-
-		dm->supbpcopy.push_back(newdemb);
-	}
-
-	for(auto uiter=dmod->supupcopy.begin(); uiter!=dmod->supupcopy.end(); uiter++)
-	{
-		DemsAtU* olddemu = (DemsAtU*)*uiter;
-		
-		if(olddemu->orig)
-			continue;
-
-		DemsAtU* newdemu = new DemsAtU;
-
-		*olddemu = *newdemu;
-
-		newdemu->copy = olddemu;
-		newdemu->orig = NULL;
-
-		dmod->supupcopy.push_back(newdemu);
-	}
-
-	for(auto riter=dmod->rdemcopy.begin(); riter!=dmod->rdemcopy.end(); riter++)
-	{
-		RDemNode* olddemr = (RDemNode*)*riter;
-
-		if(olddemr->orig)
-			continue;
-
-		RDemNode* newdemr = new RDemNode;
-
-		*newdemr = *olddemr;
-
-		newdemr->copy = olddemr;
-		newdemr->orig = NULL;
-
-		dmod->rdemcopy.push_back(newdemr);
-	}
-	
-	for(int ctype=0; ctype<CONDUIT_TYPES; ctype++)
-	{
-		for(auto citer=dmod->codems[ctype].begin(); citer!=dmod->codems[ctype].end(); citer++)
-		{
-			CdDem* olddemc = (CdDem*)*citer;
-			
-			if(olddemc->orig)
-				continue;
-
-			CdDem* newdemc = new CdDem;
-
-			*newdemc = *olddemc;
-
-			newdemc->copy = olddemc;
-			newdemc->orig = NULL;
-
-			dmod->supbpcopy.push_back(newdemc);
-		}
-	}
-
-	//set
-	for(auto biter=dmod->supbpcopy.begin(); biter!=dmod->supbpcopy.end(); biter++)
-	{
-		DemsAtB* copydemb = (DemsAtB*)*biter;
-
-		if(!copydemb->orig)
-			continue;
-
-		*copydemb->orig = *copydemb;
-	}
-
-	for(auto uiter=dmod->supupcopy.begin(); uiter!=dmod->supupcopy.end(); uiter++)
-	{
-		DemsAtU* copydemu = (DemsAtU*)*uiter;
-		
-		if(!copydemu->orig)
-			continue;
-		
-		*copydemu->orig = *copydemu;
-	}
-
-	for(auto riter=dmod->rdemcopy.begin(); riter!=dmod->rdemcopy.end(); riter++)
-	{
-		RDemNode* copydemr = (RDemNode*)*riter;
-
-		if(!copydemr->orig)
-			continue;
-		
-		*copydemr->orig = *copydemr;
-	}
-	
-	for(int ctype=0; ctype<CONDUIT_TYPES; ctype++)
-	{
-		for(auto citer=dmod->codems[ctype].begin(); citer!=dmod->codems[ctype].end(); citer++)
-		{
-			CdDem* copydemc = (CdDem*)*citer;
-			
-			if(!copydemc->orig)
-				continue;
-			
-			*copydemc->orig = *copydemc;
-		}
-	}
-
-	//set subdemands
-	for(auto biter=dm->supbpcopy.begin(); biter!=dm->supbpcopy.end(); biter++)
-	{
-		DemsAtB* demb = (DemsAtB*)*biter;
-
-#if 0
-	std::list<DemNode*> condems;	//construction material (RDemNode)
-	std::list<DemNode*> proddems;	//production input raw materials (RDemNode)
-	std::list<DemNode*> manufdems;	//manufacturing input raw materials (RDemNode)
-	std::list<DemNode*> cddems[CONDUIT_TYPES]; // (CdDem)
-#endif
-	
-		//if this is the copy, set it to original
-		if(demb->parent && demb->parent->orig)
-			demb->parent = demb->parent->orig;
-
-		for(auto subiter=demb->condems.begin(); subiter!=demb->condems.end(); subiter++)
-		{
-			RDemNode* subdem = (RDemNode*)*subiter;
-
-			//if this is the copy, set it to original
-			if(subdem->orig)
-				*subiter = subdem->orig;
-		}
-		for(auto subiter=demb->proddems.begin(); subiter!=demb->proddems.end(); subiter++)
-		{
-			RDemNode* subdem = (RDemNode*)*subiter;
-
-			//if this is the copy, set it to original
-			if(subdem->orig)
-				*subiter = subdem->orig;
-		}
-		for(auto subiter=demb->manufdems.begin(); subiter!=demb->manufdems.end(); subiter++)
-		{
-			RDemNode* subdem = (RDemNode*)*subiter;
-
-			//if this is the copy, set it to original
-			if(subdem->orig)
-				*subiter = subdem->orig;
-		}
-		for(int ctype=0; ctype<CONDUIT_TYPES; ctype++)
-		{
-			for(auto subiter=demb->cddems[ctype].begin(); subiter!=demb->cddems[ctype].end(); subiter++)
-			{
-				RDemNode* subdem = (RDemNode*)*subiter;
-
-				//if this is the copy, set it to original
-				if(subdem->orig)
-					*subiter = subdem->orig;
-			}
-		}
-	}
-
-	for(auto uiter=dm->supupcopy.begin(); uiter!=dm->supupcopy.end(); uiter++)
-	{
-		DemsAtU* demu = (DemsAtU*)*uiter;
-
-#if 0
-	std::list<DemNode*> manufdems;	// (RDemNode)
-	std::list<DemNode*> consumdems;	// (RDemNode)
-	DemNode* opup;	//operator/driver (DemsAtU)
-	int prodratio;
-	int timeused;
-	int totaldem[RESOURCES];
-#endif
-		//if this is the copy, set it to original
-		if(demu->parent && demu->parent->orig)
-			demu->parent = demu->parent->orig;
-
-		for(auto subiter=demu->manufdems.begin(); subiter!=demu->manufdems.end(); subiter++)
-		{
-			RDemNode* subdem = (RDemNode*)*subiter;
-
-			//if this is the copy, set it to original
-			if(subdem->orig)
-				*subiter = subdem->orig;
-		}
-		
-		for(auto subiter=demu->consumdems.begin(); subiter!=demu->consumdems.end(); subiter++)
-		{
-			RDemNode* subdem = (RDemNode*)*subiter;
-
-			//if this is the copy, set it to original
-			if(subdem->orig)
-				*subiter = subdem->orig;
-		}
-
-		//if this is the copy, set it to original
-		if(demu->opup && demu->opup->orig)
-			demu->opup = demu->opup->orig;
-	}
-
-	for(auto riter=dm->rdemcopy.begin(); riter!=dm->rdemcopy.end(); riter++)
-	{
-		RDemNode* demr = (RDemNode*)*riter;
-		
-		//std::list<DemNode*>* parlist;	//parent list, e.g., the condems of a DemsAtB
-		
-		//if this is the copy, set it to original
-		if(demr->parent && demr->parent->orig)
-			demr->parent = demr->parent->orig;
-		
-		//for(auto subiter=demr->parlist.begin(); subiter!=demr->parlist.end(); subiter++)
-		//{
-		//}
-	}
-
-	for(int ctype=0; ctype<CONDUIT_TYPES; ctype++)
-	{
-		for(auto citer=dmod->codems[ctype].begin(); citer!=dmod->codems[ctype].end(); citer++)
-		{
-			CdDem* demc = (CdDem*)*citer;
-			
-			//std::list<DemNode*> condems;	// (RDemNode)
-			
-			//if this is the copy, set it to original
-			if(demc->parent && demc->parent->orig)
-				demc->parent = demc->parent->orig;
-
-			for(auto subiter=demc->condems.begin(); subiter!=demc->condems.end(); subiter++)
-			{
-				RDemNode* subdem = (RDemNode*)*subiter;
-
-				//if this is the copy, set it to original
-				if(subdem->orig)
-					*subiter = subdem->orig;
-			}
-		}
-	}
-
-	//reset
-#if 0
-	for(auto biter=dm->supbpcopy.begin(); biter!=dm->supbpcopy.end(); biter++)
-	{
-		DemsAtB* demb = (DemsAtB*)*biter;
-		demb->copy = NULL;
-		demb->orig = NULL;
-	}
-
-	for(auto uiter=dm->supupcopy.begin(); uiter!=dm->supupcopy.end(); uiter++)
-	{
-		DemsAtU* demu = (DemsAtU*)*uiter;
-		demu->copy = NULL;
-		demu->orig = NULL;
-	}
-
-	for(auto riter=dm->rdemcopy.begin(); riter!=dm->rdemcopy.end(); riter++)
-	{
-		RDemNode* demr = (RDemNode*)*riter;
-		demr->copy = NULL;
-		demr->orig = NULL;
-	}
-
-	for(int ctype=0; ctype<CONDUIT_TYPES; ctype++)
-	{
-		for(auto citer=dm->codems[ctype].begin(); citer!=dm->codems[ctype].end(); citer++)
-		{
-			CdDem* demc = (CdDem*)*citer;
-			demc->copy = NULL;
-			demc->orig = NULL;
-		}
-	}
-#endif
 }
 
 // given a parent of an rdem node, get its position
@@ -2843,229 +2968,6 @@ bool DemCmPos(DemNode* pardem, Vec2i* demcmpos)
 	return false;
 }
 
-//init demgraph mod
-//make copies of bl dems with .orig pointers of originals
-void IniDmMod(DemGraph* dm, DemGraphMod* dmod)
-{
-	//reset
-	for(auto biter=dm->supbpcopy.begin(); biter!=dm->supbpcopy.end(); biter++)
-	{
-		DemsAtB* olddemb = (DemsAtB*)*biter;
-		olddemb->copy = NULL;
-		olddemb->orig = NULL;
-	}
-
-	for(auto uiter=dm->supupcopy.begin(); uiter!=dm->supupcopy.end(); uiter++)
-	{
-		DemsAtU* olddemu = (DemsAtU*)*uiter;
-		olddemu->copy = NULL;
-		olddemu->orig = NULL;
-	}
-
-	for(auto riter=dm->rdemcopy.begin(); riter!=dm->rdemcopy.end(); riter++)
-	{
-		RDemNode* olddemr = (RDemNode*)*riter;
-		olddemr->copy = NULL;
-		olddemr->orig = NULL;
-	}
-
-	for(int ctype=0; ctype<CONDUIT_TYPES; ctype++)
-	{
-		for(auto citer=dm->codems[ctype].begin(); citer!=dm->codems[ctype].end(); citer++)
-		{
-			CdDem* olddemc = (CdDem*)*citer;
-			olddemc->copy = NULL;
-			olddemc->orig = NULL;
-		}
-	}
-
-	//add demands
-	for(auto biter=dm->supbpcopy.begin(); biter!=dm->supbpcopy.end(); biter++)
-	{
-		DemsAtB* newdemb = new DemsAtB;
-		DemsAtB* olddemb = (DemsAtB*)*biter;
-
-		*newdemb = *olddemb;
-
-		olddemb->copy = newdemb;
-		newdemb->orig = olddemb;
-
-		dmod->supbpcopy.push_back(newdemb);
-	}
-
-	for(auto uiter=dm->supupcopy.begin(); uiter!=dm->supupcopy.end(); uiter++)
-	{
-		DemsAtU* newdemu = new DemsAtU;
-		DemsAtU* olddemu = (DemsAtU*)*uiter;
-
-		*olddemu = *newdemu;
-
-		olddemu->copy = newdemu;
-		newdemu->orig = olddemu;
-
-		dmod->supupcopy.push_back(newdemu);
-	}
-
-	for(auto riter=dm->rdemcopy.begin(); riter!=dm->rdemcopy.end(); riter++)
-	{
-		RDemNode* newdemr = new RDemNode;
-		RDemNode* olddemr = (RDemNode*)*riter;
-
-		*newdemr = *olddemr;
-
-		olddemr->copy = newdemr;
-		newdemr->orig = olddemr;
-
-		dmod->rdemcopy.push_back(newdemr);
-	}
-
-	for(int ctype=0; ctype<CONDUIT_TYPES; ctype++)
-	{
-		for(auto citer=dm->codems[ctype].begin(); citer!=dm->codems[ctype].end(); citer++)
-		{
-			CdDem* newdemc = new CdDem;
-			CdDem* olddemc = (CdDem*)*citer;
-
-			*newdemc = *olddemc;
-
-			olddemc->copy = newdemc;
-			newdemc->orig = olddemc;
-
-			dmod->supbpcopy.push_back(newdemc);
-		}
-	}
-
-	//set subdemands
-	for(auto biter=dmod->supbpcopy.begin(); biter!=dmod->supbpcopy.end(); biter++)
-	{
-		DemsAtB* demb = (DemsAtB*)*biter;
-
-#if 0
-	std::list<DemNode*> condems;	//construction material (RDemNode)
-	std::list<DemNode*> proddems;	//production input raw materials (RDemNode)
-	std::list<DemNode*> manufdems;	//manufacturing input raw materials (RDemNode)
-	std::list<DemNode*> cddems[CONDUIT_TYPES]; // (CdDem)
-#endif
-	
-		//if this is the original, set it to copy
-		if(demb->parent && !demb->parent->orig)
-			demb->parent = demb->parent->copy;
-
-		for(auto subiter=demb->condems.begin(); subiter!=demb->condems.end(); subiter++)
-		{
-			RDemNode* subdem = (RDemNode*)*subiter;
-
-			//if this is the original, set it to copy
-			if(!subdem->orig)
-				*subiter = subdem->copy;
-		}
-		for(auto subiter=demb->proddems.begin(); subiter!=demb->proddems.end(); subiter++)
-		{
-			RDemNode* subdem = (RDemNode*)*subiter;
-
-			//if this is the original, set it to copy
-			if(!subdem->orig)
-				*subiter = subdem->copy;
-		}
-		for(auto subiter=demb->manufdems.begin(); subiter!=demb->manufdems.end(); subiter++)
-		{
-			RDemNode* subdem = (RDemNode*)*subiter;
-
-			//if this is the original, set it to copy
-			if(!subdem->orig)
-				*subiter = subdem->copy;
-		}
-		for(int ctype=0; ctype<CONDUIT_TYPES; ctype++)
-		{
-			for(auto subiter=demb->cddems[ctype].begin(); subiter!=demb->cddems[ctype].end(); subiter++)
-			{
-				RDemNode* subdem = (RDemNode*)*subiter;
-
-				//if this is the original, set it to copy
-				if(!subdem->orig)
-					*subiter = subdem->copy;
-			}
-		}
-	}
-
-	for(auto uiter=dmod->supupcopy.begin(); uiter!=dmod->supupcopy.end(); uiter++)
-	{
-		DemsAtU* demu = (DemsAtU*)*uiter;
-
-#if 0
-	std::list<DemNode*> manufdems;	// (RDemNode)
-	std::list<DemNode*> consumdems;	// (RDemNode)
-	DemNode* opup;	//operator/driver (DemsAtU)
-	int prodratio;
-	int timeused;
-	int totaldem[RESOURCES];
-#endif
-		//if this is the original, set it to copy
-		if(demu->parent && !demu->parent->orig)
-			demu->parent = demu->parent->copy;
-
-		for(auto subiter=demu->manufdems.begin(); subiter!=demu->manufdems.end(); subiter++)
-		{
-			RDemNode* subdem = (RDemNode*)*subiter;
-
-			//if this is the original, set it to copy
-			if(!subdem->orig)
-				*subiter = subdem->copy;
-		}
-		
-		for(auto subiter=demu->consumdems.begin(); subiter!=demu->consumdems.end(); subiter++)
-		{
-			RDemNode* subdem = (RDemNode*)*subiter;
-
-			//if this is the original, set it to copy
-			if(!subdem->orig)
-				*subiter = subdem->copy;
-		}
-
-		//if this is the original, set it to copy
-		if(demu->opup && !demu->opup->orig)
-			demu->opup = demu->opup->copy;
-	}
-
-	for(auto riter=dmod->rdemcopy.begin(); riter!=dmod->rdemcopy.end(); riter++)
-	{
-		RDemNode* demr = (RDemNode*)*riter;
-		
-		//std::list<DemNode*>* parlist;	//parent list, e.g., the condems of a DemsAtB
-		
-		//if this is the original, set it to copy
-		if(demr->parent && !demr->parent->orig)
-			demr->parent = demr->parent->copy;
-		
-		//for(auto subiter=demr->parlist.begin(); subiter!=demr->parlist.end(); subiter++)
-		//{
-		//}
-	}
-
-	for(int ctype=0; ctype<CONDUIT_TYPES; ctype++)
-	{
-		for(auto citer=dmod->codems[ctype].begin(); citer!=dmod->codems[ctype].end(); citer++)
-		{
-			CdDem* demc = (CdDem*)*citer;
-			
-			//std::list<DemNode*> condems;	// (RDemNode)
-			
-			//if this is the original, set it to copy
-			if(demc->parent && !demc->parent->orig)
-				demc->parent = demc->parent->copy;
-
-			for(auto subiter=demc->condems.begin(); subiter!=demc->condems.end(); subiter++)
-			{
-				RDemNode* subdem = (RDemNode*)*subiter;
-
-				//if this is the original, set it to copy
-				if(!subdem->orig)
-					*subiter = subdem->copy;
-			}
-		}
-	}
-}
-
 // 1. Opportunities where something is overpriced
 // and building a second supplier would be profitable.
 // 2. Profitability of building for primary demands (from consumers)
@@ -3079,27 +2981,16 @@ void CalcDem2(Player* p, bool blopp)
 {
 	//OpenLog("log.txt", 123);
 
-	g_log<<"caldem2 p"<<(int)(p-g_player)<<std::endl;
-	g_log.flush();
-
 	int pi = p - g_player;
-	DemGraph* dm = &g_demgraph2[pi];
+	DemTree* dm = &g_demtree2[pi];
 
 	dm->free();
 
 	AddBl(dm);
 
-	g_log<<"\t1"<<std::endl;
-	g_log.flush();
-
 	//return;
 
 	// Point #2 - building for primary demands
-
-	DemGraphMod dmod;
-	IniDmMod(dm, &dmod);
-	g_log<<"\t2"<<std::endl;
-	g_log.flush();
 
 	for(int i=0; i<UNITS; i++)
 	{
@@ -3117,25 +3008,17 @@ void CalcDem2(Player* p, bool blopp)
 
 		AddU(dm, u, &demu);
 
-		LabDemH(dm, &dmod, u, &fundsleft, demu);
-	g_log<<"\t2.5"<<std::endl;
-	g_log.flush();
-		LabDemF(dm, &dmod, u, &fundsleft, demu);
-	g_log<<"\t2.6"<<std::endl;
-	g_log.flush();
+		LabDemH(dm, u, &fundsleft, demu);
+		LabDemF(dm, u, &fundsleft, demu);
 
 		if(u->home < 0)
 			continue;
 
-		LabDemE(dm, &dmod, u, &fundsleft, demu);
-	g_log<<"\t2.7"<<std::endl;
-	g_log.flush();
-		//LabDemF2(dm, &dmod, u, &fundsleft, demu);
-		//LabDemF3(dm, &dmod, u, &fundsleft, demu);
+		LabDemE(dm, u, &fundsleft, demu);
+		//LabDemF2(dm, u, &fundsleft, demu);
+		//LabDemF3(dm, u, &fundsleft, demu);
 	}
-	
-	g_log<<"\t3"<<std::endl;
-	g_log.flush();
+
 #if 0
 	g_log<<"housing capit"<<std::endl;
 	int htotal = 0;
@@ -3173,16 +3056,7 @@ void CalcDem2(Player* p, bool blopp)
 
 	//return;
 
-	BlConReq(dm, &dmod, p);
-	g_log<<"\t4"<<std::endl;
-	g_log.flush();
-	
-	ApplyDem(dm, &dmod);
-	g_log<<"\t5"<<std::endl;
-	g_log.flush();
-	dmod.free();
-	g_log<<"\t6"<<std::endl;
-	g_log.flush();
+	BlConReq(dm, p);
 
 	// To do: inter-industry demand
 	// TODO :...
@@ -3204,6 +3078,8 @@ void CalcDem2(Player* p, bool blopp)
 
 	if(blopp)
 	{
+		DemTree bldm;
+		DupDT(dm, &bldm);
 		int fixcost = 0;
 		int recurprof = 0;
 		bool success;
@@ -3211,11 +3087,9 @@ void CalcDem2(Player* p, bool blopp)
 		//return;
 
 		CheckMem(__FILE__, __LINE__, "1\t");
-		CheckBl(dm, p, &fixcost, &recurprof, &success);	//check if there's any profitable building opp
+		CheckBl(&bldm, p, &fixcost, &recurprof, &success);	//check if there's any profitable building opp
 		CheckMem(__FILE__, __LINE__, "\t2\t");
-		
-	g_log<<"\t7"<<std::endl;
-	g_log.flush();
+
 		//return;
 
 		//if(recurprof > 0)
@@ -3227,6 +3101,8 @@ void CalcDem2(Player* p, bool blopp)
 			g_log.flush();
 			//InfoMessage("suc", "suc");
 	#endif
+			dm->free();
+			DupDT(&bldm, dm);
 		}
 	#ifdef DEBUGDEM
 		else

@@ -35,8 +35,8 @@ void ViewLayer::reframe()
 
 	m_pos[0] = 0;
 	m_pos[1] = 0;
-	m_pos[2] = py->width-1;
-	m_pos[3] = py->height-1;
+	m_pos[2] = py->width-(float)1;
+	m_pos[3] = py->height-(float)1;
 
 	if(reframefunc)
 		reframefunc(this);

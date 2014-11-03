@@ -70,11 +70,6 @@ public:
 	DemNode* parent;
 	Bid bid;	//reflects the maximum possible gouging price
 	int profit;
-	
-	DemNode* orig;	//if this is part of a DemGraphMod, orig will point to a DemsAtB in the dm DemGraph and will have added demand loads to be applied this original dm DemGraph
-	//if this is part of a DemGraphMod, these are the changes
-
-	DemNode* copy;	//if this is the original, this will be the DemGraphMod duplicate
 
 	DemNode();
 	virtual ~DemNode()
@@ -98,7 +93,7 @@ public:
 	DemsAtB* supbp;
 	DemsAtU* supup;
 	DemsAtU* opup;
-	std::list<DemNode*>* parlist;	//parent list, e.g., the condems of a DemsAtB	//unused
+	std::list<DemNode*>* parlist;	//parent list, e.g., the condems of a DemsAtB
 
 	RDemNode() : DemNode()
 	{
@@ -227,7 +222,7 @@ public:
 	}
 };
 
-class DemGraph
+class DemTree
 {
 public:
 	//std::list<DemNode*> nodes;
@@ -308,55 +303,27 @@ public:
 			Zero(pyrsup[i]);
 	}
 
-	DemGraph()
+	DemTree()
 	{
 		for(int i=0; i<PLAYERS; i++)
 			Zero(pyrsup[i]);
 		//free();
 	}
 
-	~DemGraph()
+	~DemTree()
 	{
 		free();
 	}
 };
 
-//a list of changes/additions to a demgraph
-//each demnode that has an .orig != NULL is a mod
-//each demnode with orig=NULL is new
-//so each .orig can be modded just by making *n->orig = *n; n->orig->orig = NULL;
-//also each n->orig->demnode = n->orig->demnode->orig for n->orig->demnode->orig != 0
-class DemGraphMod : public DemGraph
-{
-public:
-	DemGraph* orig;
-
-	DemGraphMod()
-	{
-		for(int i=0; i<PLAYERS; i++)
-			Zero(pyrsup[i]);
-		//free();
-
-		orig = NULL;
-	}
-
-	~DemGraphMod()
-	{
-		//free();	//must be manually freed
-	}
-};
-
-extern DemGraph g_demgraph;
-extern DemGraph g_demgraph2[PLAYERS];
+extern DemTree g_demtree;
+extern DemTree g_demtree2[PLAYERS];
 
 void CalcDem1();
 void CalcDem2(Player* p, bool blopp);
 void CombCo(int btype, Bid* bid, int rtype, int ramt);
 bool MaxPro(std::list<CostCompo>& costco, int pricelevel, int demramt, int* proramt, int maxbudget, int* bestrev, int* bestprofit);
 bool DemCmPos(DemNode* pardem, Vec2i* demcmpos);
-void AddReq(DemGraph* dm, DemGraphMod* dmod, Player* p, std::list<DemNode*>* nodes, DemNode* parent, int rtype, int ramt, Vec2i demtpos, Vec2i demcmpos, int depth, bool* success, int maxbid);
-void ApplyDem(DemGraph* dm, DemGraphMod* dmod);
-void AddDemMod(DemGraphMod* src, DemGraphMod* dest);
-void IniDmMod(DemGraph* dm, DemGraphMod* dmod);
+void AddReq(DemTree* dm, Player* p, std::list<DemNode*>* nodes, DemNode* parent, int rtype, int ramt, Vec2i demtpos, Vec2i demcmpos, int depth, bool* success, int maxbid);
 
 #endif

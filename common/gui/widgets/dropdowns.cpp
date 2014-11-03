@@ -41,7 +41,7 @@ void DropDownS::erase(int which)
 		m_selected = -1;
 
 	if(m_scroll[1] + rowsshown() > m_options.size())
-		m_scroll[1] = m_options.size() - rowsshown();
+		m_scroll[1] = m_options.size() - (float)rowsshown();
 
 	if(m_scroll[1] < 0)
 		m_scroll[1] = 0;
@@ -59,7 +59,7 @@ int DropDownS::rowsshown()
 
 int DropDownS::square()
 {
-	return g_font[m_font].gheight;
+	return (int)g_font[m_font].gheight;
 }
 
 float DropDownS::scrollspace()
@@ -90,7 +90,7 @@ void DropDownS::draw()
 		return;
 	}
 
-	if(m_selected >= m_options.size())
+	if(m_selected >= (int)m_options.size())
 		return;
 
 	DrawShadowedText(m_font, m_pos[0]+3, m_pos[1], &m_options[m_selected]);
@@ -156,7 +156,7 @@ void DropDownS::inev(InEv* ev)
 		}
 		else if(m_scroll[1] + rowsshown() > m_options.size())
 		{
-			m_scroll[1] = m_options.size() - rowsshown();
+			m_scroll[1] = m_options.size() - (float)rowsshown();
 			ev->intercepted = true;
 			return;
 		}

@@ -21,9 +21,9 @@ float Bilerp(Heightmap* hmap, float x, float z)
 	int z1 = (int)(z);
 	int z2 = z1 + 1;
 
-	float xdenom = x2-x1;
-	float x2fac = (x2-x)/xdenom;
-	float x1fac = (x-x1)/xdenom;
+	float xdenom = (float)(x2-x1);
+	float x2fac = (float)(x2-x)/xdenom;
+	float x1fac = (float)(x-x1)/xdenom;
 
 	float hR1 = hmap->getheight(x1,z1)*x2fac + hmap->getheight(x2,z1)*x1fac;
 	float hR2 = hmap->getheight(x1,z2)*x2fac + hmap->getheight(x2,z2)*x1fac;
@@ -37,11 +37,13 @@ bool GetMapIntersection2(Heightmap* hmap, Vec3f* vLine, Vec3f* vIntersection)
 {
 	Vec3f vQuad[4];
 
+	//map bottom
+
 #if 1
-	vQuad[0] = Vec3f(-10*hmap->m_widthx*TILE_SIZE, WATER_LEVEL*2.0f, -10*hmap->m_widthz*TILE_SIZE);
-	vQuad[1] = Vec3f(10*hmap->m_widthx*TILE_SIZE, WATER_LEVEL*2.0f, -10*hmap->m_widthz*TILE_SIZE);
-	vQuad[2] = Vec3f(10*hmap->m_widthx*TILE_SIZE, WATER_LEVEL*2.0f, 10*hmap->m_widthz*TILE_SIZE);
-	vQuad[3] = Vec3f(-10*hmap->m_widthx*TILE_SIZE, WATER_LEVEL*2.0f, 10*hmap->m_widthz*TILE_SIZE);
+	vQuad[0] = Vec3f((float)-10*hmap->m_widthx*TILE_SIZE, WATER_LEVEL*2.0f, (float)-10*hmap->m_widthz*TILE_SIZE);
+	vQuad[1] = Vec3f((float)10*hmap->m_widthx*TILE_SIZE, WATER_LEVEL*2.0f, (float)-10*hmap->m_widthz*TILE_SIZE);
+	vQuad[2] = Vec3f((float)10*hmap->m_widthx*TILE_SIZE, WATER_LEVEL*2.0f, (float)10*hmap->m_widthz*TILE_SIZE);
+	vQuad[3] = Vec3f((float)-10*hmap->m_widthx*TILE_SIZE, WATER_LEVEL*2.0f, (float)10*hmap->m_widthz*TILE_SIZE);
 #else
 	vQuad[3] = Vec3f(-10*hmap->m_widthx*TILE_SIZE, WATER_LEVEL*2.0f, -10*hmap->m_widthz*TILE_SIZE);
 	vQuad[2] = Vec3f(10*hmap->m_widthx*TILE_SIZE, WATER_LEVEL*2.0f, -10*hmap->m_widthz*TILE_SIZE);
@@ -52,34 +54,36 @@ bool GetMapIntersection2(Heightmap* hmap, Vec3f* vLine, Vec3f* vIntersection)
 	if(InterPoly(vQuad, vLine, 4, vIntersection))
 		return true;
 
-	vQuad[0] = Vec3f(-10*hmap->m_widthx*TILE_SIZE, WATER_LEVEL*2.0f, -10*hmap->m_widthz*TILE_SIZE);
-	vQuad[1] = Vec3f(-10*hmap->m_widthx*TILE_SIZE, TILE_SIZE*500, -10*hmap->m_widthz*TILE_SIZE);
-	vQuad[2] = Vec3f(-10*hmap->m_widthx*TILE_SIZE, TILE_SIZE*500, 10*hmap->m_widthz*TILE_SIZE);
-	vQuad[3] = Vec3f(-10*hmap->m_widthx*TILE_SIZE, WATER_LEVEL*2.0f, 10*hmap->m_widthz*TILE_SIZE);
+	//map sides, necessary for the frustum outline on the minimap (player's view outline) to not have corners stretching to origin if they're out of map bounds
+
+	vQuad[0] = Vec3f((float)-10*hmap->m_widthx*TILE_SIZE, WATER_LEVEL*2.0f, (float)-10*hmap->m_widthz*TILE_SIZE);
+	vQuad[1] = Vec3f((float)-10*hmap->m_widthx*TILE_SIZE, (float)TILE_SIZE*500, (float)-10*hmap->m_widthz*TILE_SIZE);
+	vQuad[2] = Vec3f((float)-10*hmap->m_widthx*TILE_SIZE, (float)TILE_SIZE*500, (float)10*hmap->m_widthz*TILE_SIZE);
+	vQuad[3] = Vec3f((float)-10*hmap->m_widthx*TILE_SIZE, WATER_LEVEL*2.0f, (float)10*hmap->m_widthz*TILE_SIZE);
 
 	if(InterPoly(vQuad, vLine, 4, vIntersection))
 		return true;
 
-	vQuad[0] = Vec3f(10*hmap->m_widthx*TILE_SIZE, TILE_SIZE*500, -10*hmap->m_widthz*TILE_SIZE);
-	vQuad[1] = Vec3f(10*hmap->m_widthx*TILE_SIZE, WATER_LEVEL*2.0f, -10*hmap->m_widthz*TILE_SIZE);
-	vQuad[2] = Vec3f(10*hmap->m_widthx*TILE_SIZE, WATER_LEVEL*2.0f, 10*hmap->m_widthz*TILE_SIZE);
-	vQuad[3] = Vec3f(10*hmap->m_widthx*TILE_SIZE, TILE_SIZE*500, 10*hmap->m_widthz*TILE_SIZE);
+	vQuad[0] = Vec3f((float)10*hmap->m_widthx*TILE_SIZE, (float)TILE_SIZE*500, (float)-10*hmap->m_widthz*TILE_SIZE);
+	vQuad[1] = Vec3f((float)10*hmap->m_widthx*TILE_SIZE, WATER_LEVEL*2.0f, (float)-10*hmap->m_widthz*TILE_SIZE);
+	vQuad[2] = Vec3f((float)10*hmap->m_widthx*TILE_SIZE, WATER_LEVEL*2.0f, (float)10*hmap->m_widthz*TILE_SIZE);
+	vQuad[3] = Vec3f((float)10*hmap->m_widthx*TILE_SIZE, (float)TILE_SIZE*500, (float)10*hmap->m_widthz*TILE_SIZE);
 
 	if(InterPoly(vQuad, vLine, 4, vIntersection))
 		return true;
 
 	vQuad[0] = Vec3f(-10*hmap->m_widthx*TILE_SIZE, WATER_LEVEL*2.0f, -10*hmap->m_widthz*TILE_SIZE);
-	vQuad[1] = Vec3f(-10*hmap->m_widthx*TILE_SIZE, TILE_SIZE*500, -10*hmap->m_widthz*TILE_SIZE);
-	vQuad[2] = Vec3f(10*hmap->m_widthx*TILE_SIZE, TILE_SIZE*500, -10*hmap->m_widthz*TILE_SIZE);
+	vQuad[1] = Vec3f(-10*hmap->m_widthx*TILE_SIZE, (float)TILE_SIZE*500, -10*hmap->m_widthz*TILE_SIZE);
+	vQuad[2] = Vec3f(10*hmap->m_widthx*TILE_SIZE, (float)TILE_SIZE*500, -10*hmap->m_widthz*TILE_SIZE);
 	vQuad[3] = Vec3f(10*hmap->m_widthx*TILE_SIZE, WATER_LEVEL*2.0f, -10*hmap->m_widthz*TILE_SIZE);
 
 	if(InterPoly(vQuad, vLine, 4, vIntersection))
 		return true;
 
-	vQuad[0] = Vec3f(-10*hmap->m_widthx*TILE_SIZE, TILE_SIZE*500, 10*hmap->m_widthz*TILE_SIZE);
-	vQuad[1] = Vec3f(-10*hmap->m_widthx*TILE_SIZE, WATER_LEVEL*2.0f, 10*hmap->m_widthz*TILE_SIZE);
-	vQuad[2] = Vec3f(10*hmap->m_widthx*TILE_SIZE, WATER_LEVEL*2.0f, 10*hmap->m_widthz*TILE_SIZE);
-	vQuad[3] = Vec3f(10*hmap->m_widthx*TILE_SIZE, TILE_SIZE*500, 10*hmap->m_widthz*TILE_SIZE);
+	vQuad[0] = Vec3f((float)-10*hmap->m_widthx*TILE_SIZE, (float)TILE_SIZE*500, (float)10*hmap->m_widthz*TILE_SIZE);
+	vQuad[1] = Vec3f((float)-10*hmap->m_widthx*TILE_SIZE, WATER_LEVEL*2.0f, (float)10*hmap->m_widthz*TILE_SIZE);
+	vQuad[2] = Vec3f((float)10*hmap->m_widthx*TILE_SIZE, WATER_LEVEL*2.0f, (float)10*hmap->m_widthz*TILE_SIZE);
+	vQuad[3] = Vec3f((float)10*hmap->m_widthx*TILE_SIZE, (float)TILE_SIZE*500, (float)10*hmap->m_widthz*TILE_SIZE);
 
 	if(InterPoly(vQuad, vLine, 4, vIntersection))
 		return true;

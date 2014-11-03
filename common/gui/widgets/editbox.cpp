@@ -774,10 +774,10 @@ void EditBox::gainfocus()
 		m_opened = true;
 		SDL_StartTextInput();
 		SDL_Rect r;
-		r.x = m_pos[0];
-		r.y = m_pos[3];
-		r.w = py->width - m_pos[0];
-		r.h = py->height - m_pos[3];
+		r.x = (int)m_pos[0];
+		r.y = (int)m_pos[3];
+		r.w = (int)(py->width - m_pos[0]);
+		r.h = (int)(py->height - m_pos[3]);
 		SDL_SetTextInputRect(&r);
 		py->kbfocus++;
 	}
