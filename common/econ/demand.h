@@ -16,6 +16,9 @@
 //debug output for demand calcs?
 //#define DEBUGDEM
 
+//debug output
+//#define DEBUGDEM2
+
 class CostCompo
 {
 public:
@@ -237,6 +240,15 @@ public:
 	std::list<DemNode*> rdemcopy;	//master copy, this one will be freed (RDemNode)
 	int pyrsup[PLAYERS][RESOURCES];	//player global res supplying
 
+	void drop()	//unsafe
+	{
+		supbpcopy.clear();
+		supupcopy.clear();
+		for(int c=0; c<CONDUIT_TYPES; c++)
+			codems[c].clear();
+		rdemcopy.clear();
+	}
+
 	void free()
 	{
 #if 0
@@ -261,7 +273,7 @@ public:
 #endif
 
 		auto biter = supbpcopy.begin();
-		while(biter != supbpcopy.end())
+		while(supbpcopy.size() > 0 && biter != supbpcopy.end())
 		{
 			CheckMem(__FILE__, __LINE__, "\t\t\t1\tfreeb");
 			delete *biter;
@@ -270,7 +282,7 @@ public:
 		}
 
 		auto uiter = supupcopy.begin();
-		while(uiter != supupcopy.end())
+		while(supupcopy.size() > 0 && uiter != supupcopy.end())
 		{
 			delete *uiter;
 			uiter = supupcopy.erase(uiter);
@@ -285,7 +297,7 @@ public:
 		}
 #else
 		auto riter = rdemcopy.begin();
-		while(riter != rdemcopy.end())
+		while(rdemcopy.size() > 0 && riter != rdemcopy.end())
 		{
 			CheckMem(__FILE__, __LINE__, "\t\t\t1\tfreer");
 			delete *riter;
@@ -297,7 +309,7 @@ public:
 		for(unsigned int i=0; i<CONDUIT_TYPES; i++)
 		{
 			auto coiter = codems[i].begin();
-			while(coiter != codems[i].end())
+			while(codems[i].size() > 0 && coiter != codems[i].end())
 			{
 				delete *coiter;
 				coiter = codems[i].erase(coiter);

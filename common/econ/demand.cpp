@@ -1893,6 +1893,9 @@ void CheckBlType(DemGraph* dm, DemGraphMod* dmod, Player* p, int btype, int rtyp
 	Vec2i cmpos = tpos * TILE_SIZE + Vec2i(TILE_SIZE,TILE_SIZE)/2;
 	bid->cmpos = cmpos;
 
+	dmod->free();
+	IniDmMod(dm, dmod);
+
 	//dm->supbpcopy.push_back(demb);
 	dmod->supbpcopy.push_back(demb);
 
@@ -2021,17 +2024,50 @@ void CheckBlTile(DemGraph* dm, DemGraphMod* dmod, Player* p, int ri, RDemNode* p
 
 	std::list<RDemNode*> rdns;
 
+	
+#ifdef DEBUGDEM2
+	g_log<<"\t\t\t6.1.1"<<std::endl;
+	g_log.flush();
+#endif
+
+	dmod->free();
+	IniDmMod(dm, dmod);
+
 	for(auto diter=dmod->rdemcopy.begin(); diter!=dmod->rdemcopy.end(); diter++)
 	{
+	
+#ifdef DEBUGDEM2
+	g_log<<"\t\t\t6.1.1-1"<<std::endl;
+	g_log.flush();
+#endif
+
 		DemNode* dn = *diter;
+
+		
+#ifdef DEBUGDEM2
+	g_log<<"\t\t\t6.1.1-2"<<std::endl;
+	g_log.flush();
+#endif
 
 		if(dn->demtype != DEM_RNODE)
 			continue;
+
+		
+#ifdef DEBUGDEM2
+	g_log<<"\t\t\t6.1.1-3"<<std::endl;
+	g_log.flush();
+#endif
 
 		RDemNode* rdn = (RDemNode*)dn;
 
 		if(rdn->rtype != ri)
 			continue;
+
+		
+#ifdef DEBUGDEM2
+	g_log<<"\t\t\t6.1.1-4"<<std::endl;
+	g_log.flush();
+#endif
 
 		//if(rdn->bi >= 0)
 		//	continue;	//already supplied?
@@ -2040,6 +2076,12 @@ void CheckBlTile(DemGraph* dm, DemGraphMod* dmod, Player* p, int ri, RDemNode* p
 		//by the same player, otherwise it's a competitor.
 		if(rdn->bi >= 0)
 		{
+			
+#ifdef DEBUGDEM2
+	g_log<<"\t\t\t6.1.1-5"<<std::endl;
+	g_log.flush();
+#endif
+
 			Building* b = &g_building[rdn->bi];
 			Player* p2 = &g_player[b->owner];
 
@@ -2048,6 +2090,12 @@ void CheckBlTile(DemGraph* dm, DemGraphMod* dmod, Player* p, int ri, RDemNode* p
 			if(p2 == p)
 				continue;
 		}
+
+		
+#ifdef DEBUGDEM2
+	g_log<<"\t\t\t6.1.1-6"<<std::endl;
+	g_log.flush();
+#endif
 
 		//int requtil = rdn->bid.minutil+1;
 		//int requtil = rdn->bid.minutil;
@@ -2070,8 +2118,20 @@ void CheckBlTile(DemGraph* dm, DemGraphMod* dmod, Player* p, int ri, RDemNode* p
 
 		Vec2i demcmpos;
 
+		
+#ifdef DEBUGDEM2
+	g_log<<"\t\t\t6.1.1-7"<<std::endl;
+	g_log.flush();
+#endif
+
 		if(!DemCmPos(rdn->parent, &demcmpos))
 			continue;
+
+		
+#ifdef DEBUGDEM2
+	g_log<<"\t\t\t6.1.1-8"<<std::endl;
+	g_log.flush();
+#endif
 
 		int cmdist = Magnitude(Vec2i(x,z)*TILE_SIZE + Vec2i(TILE_SIZE,TILE_SIZE)/2 - demcmpos);
 		int maxpr = 0;
@@ -2089,6 +2149,12 @@ void CheckBlTile(DemGraph* dm, DemGraphMod* dmod, Player* p, int ri, RDemNode* p
 
 			if(maxpr <= 0)
 				continue;
+
+			
+#ifdef DEBUGDEM2
+	g_log<<"\t\t\t6.1.1-9"<<std::endl;
+	g_log.flush();
+#endif
 
 			while((r->physical ? PhUtil(maxpr, cmdist) : GlUtil(maxpr)) < requtil)
 				maxpr--;
@@ -2127,6 +2193,12 @@ void CheckBlTile(DemGraph* dm, DemGraphMod* dmod, Player* p, int ri, RDemNode* p
 		maxramt += rdn->ramt;
 		maxbudg += rdn->bid.maxbid;
 
+		
+#ifdef DEBUGDEM2
+	g_log<<"\t\t\t6.1.1-10"<<std::endl;
+	g_log.flush();
+#endif
+
 		rdns.push_back(rdn);
 
 #if 0
@@ -2146,6 +2218,12 @@ void CheckBlTile(DemGraph* dm, DemGraphMod* dmod, Player* p, int ri, RDemNode* p
 
 			g_log.flush();
 		}
+#endif
+
+		
+#ifdef DEBUGDEM2
+	g_log<<"\t\t\t6.1.2"<<std::endl;
+	g_log.flush();
 #endif
 
 		rdn->bid.marginpr = maxpr;
@@ -2168,8 +2246,19 @@ void CheckBlTile(DemGraph* dm, DemGraphMod* dmod, Player* p, int ri, RDemNode* p
 		rdems.push_back(rdn);
 	}
 
+	
+#ifdef DEBUGDEM2
+	g_log<<"\t\t\t6.1.2-2"<<std::endl;
+	g_log.flush();
+#endif
+
 	if(rdems.size() <= 0)
 		return;
+	
+#ifdef DEBUGDEM2
+	g_log<<"\t\t\t6.1.3"<<std::endl;
+	g_log.flush();
+#endif
 
 	int bestbtype = -1;
 	//int bestfix = -1;
@@ -2188,7 +2277,7 @@ void CheckBlTile(DemGraph* dm, DemGraphMod* dmod, Player* p, int ri, RDemNode* p
 			continue;
 
 		DemGraphMod bldmod;
-		IniDmMod(dm, &bldmod);
+		//IniDmMod(dm, &bldmod);//...
 
 		Bid bltybid;
 		int blmaxr = maxramt;
@@ -2199,14 +2288,27 @@ void CheckBlTile(DemGraph* dm, DemGraphMod* dmod, Player* p, int ri, RDemNode* p
 		g_log.flush();
 #endif
 
-		CheckBlType(dm, &bldmod, p, btype, ri, maxramt, Vec2i(x,z), &bltybid, &blmaxr, success, &demb);
+		
+#ifdef DEBUGDEM2
+	g_log<<"\t\t\t6.1.4"<<std::endl;
+	g_log.flush();
+#endif
+
+		bool subsuc = false;
+		CheckBlType(dm, &bldmod, p, btype, ri, maxramt, Vec2i(x,z), &bltybid, &blmaxr, &subsuc, &demb);
+
+		
+#ifdef DEBUGDEM2
+	g_log<<"\t\t\t6.1.5"<<std::endl;
+	g_log.flush();
+#endif
 
 #ifdef DEBUGDEM
 		g_log<<"\t zx "<<z<<","<<x<<" p"<<(int)(p-g_player)<<" /fini calling CheckBlType"<<bt->name<<std::endl;
 		g_log.flush();
 #endif
 
-		if(!*success)
+		if(!subsuc)
 		{
 			bldmod.free();
 			continue;
@@ -2230,6 +2332,12 @@ void CheckBlTile(DemGraph* dm, DemGraphMod* dmod, Player* p, int ri, RDemNode* p
 			int leastnext = prevprc;
 
 			//while there's another possible price, see if it will generate more total profit
+
+			
+#ifdef DEBUGDEM2
+	g_log<<"\t\t\t6.1.6"<<std::endl;
+	g_log.flush();
+#endif
 
 			for(auto diter=rdems.begin(); diter!=rdems.end(); diter++)
 				if(leastnext < 0 || ((*diter)->bid.marginpr < leastnext && (*diter)->bid.marginpr > prevprc))
@@ -2351,21 +2459,32 @@ void CheckBlTile(DemGraph* dm, DemGraphMod* dmod, Player* p, int ri, RDemNode* p
 		//bestbldm.free();
 		bestbldmod.free();
 		AddDemMod(&bldmod, &bestbldmod);
+		bldmod.drop();
 	}
 
 	if(bestbtype < 0)
 	{
 		bestbldmod.free();
+		dmod->drop();
 		return;
 	}
 
+	dmod->free();
 	AddDemMod(&bestbldmod, dmod);
+	bestbldmod.drop();
 }
 
 void AddDemMod(DemGraphMod* src, DemGraphMod* dest)
 {
 	//TO DO
 	*dest = *src;
+#if 0
+	dest->supbpcopy = src->supbpcopy;
+	dest->supupcopy = src->supupcopy;
+	dest->rdemcopy = src->rdemcopy;
+	for(int c=0; c<CONDUIT_TYPES; c++)
+		dest->codems[c] = src->codems[c];
+#endif
 }
 
 /*
@@ -2430,8 +2549,21 @@ void CheckBl(DemGraph* dm, Player* p, int* fixcost, int* recurprof, bool* succes
 				int fixc = 0;
 				bool subsuccess;
 				dmod.free();
-				IniDmMod(dm, &dmod);
+				//IniDmMod(dm, &dmod);
+
+				
+#ifdef DEBUGDEM2
+	g_log<<"\t\t6.1"<<std::endl;
+	g_log.flush();
+#endif
+
 				CheckBlTile(dm, &dmod, p, ri, &tile, x, z, &fixc, &recurp, &subsuccess);
+
+				
+#ifdef DEBUGDEM2
+	g_log<<"\t\t6.2"<<std::endl;
+	g_log.flush();
+#endif
 
 #if 0
 				if(ri == RES_HOUSING)
@@ -2442,7 +2574,10 @@ void CheckBl(DemGraph* dm, Player* p, int* fixcost, int* recurprof, bool* succes
 #endif
 
 				if(!subsuccess)
+				{
+					dmod.free();
 					continue;
+				}
 
 				if((bestrecurp < 0 || recurp > bestrecurp) && recurp > 0)
 				{
@@ -2460,6 +2595,13 @@ void CheckBl(DemGraph* dm, Player* p, int* fixcost, int* recurprof, bool* succes
 					bestbldmod.free();
 					CheckMem(__FILE__, __LINE__, "\t\t\t2\t");
 					AddDemMod(&dmod, &bestbldmod);
+					dmod.drop();
+
+					
+#ifdef DEBUGDEM2
+	g_log<<"\t\t6.3"<<std::endl;
+	g_log.flush();
+#endif
 
 #ifdef DEBUGDEM
 					g_log<<"zx "<<z<<","<<x<<" /fini success dupdt"<<std::endl;
@@ -2486,13 +2628,19 @@ void CheckBl(DemGraph* dm, Player* p, int* fixcost, int* recurprof, bool* succes
 	//if no profit can be made
 	if(bestrecurp <= 0)
 	{
-		dmod.free();
 		bestbldmod.free();
+		dmod.drop();
 		return;
 	}
+	
+#ifdef DEBUGDEM2
+	g_log<<"\t\t6.4"<<std::endl;
+	g_log.flush();
+#endif
 
 	ApplyDem(dm, &bestbldmod);
 	bestbldmod.free();
+	dmod.drop();
 	*fixcost = bestfixc;
 	*recurprof = bestrecurp;
 }
@@ -2501,9 +2649,12 @@ void CheckBl(DemGraph* dm, Player* p, int* fixcost, int* recurprof, bool* succes
 //the opposite of IniDmMod
 void ApplyDem(DemGraph* dm, DemGraphMod* dmod)
 {
+#ifdef DEBUGDEM2
 	g_log<<"\t\t4.1"<<std::endl;
 	g_log.flush();
+#endif
 	//add demands
+	//first those that don't exist in the demgraph
 	for(auto biter=dmod->supbpcopy.begin(); biter!=dmod->supbpcopy.end(); biter++)
 	{
 		DemsAtB* olddemb = (DemsAtB*)*biter;
@@ -2522,8 +2673,10 @@ void ApplyDem(DemGraph* dm, DemGraphMod* dmod)
 	}
 
 	
+#ifdef DEBUGDEM2
 	g_log<<"\t\t\t4.1.1"<<std::endl;
 	g_log.flush();
+#endif
 
 	for(auto uiter=dmod->supupcopy.begin(); uiter!=dmod->supupcopy.end(); uiter++)
 	{
@@ -2534,7 +2687,7 @@ void ApplyDem(DemGraph* dm, DemGraphMod* dmod)
 
 		DemsAtU* newdemu = new DemsAtU;
 
-		*olddemu = *newdemu;
+		*newdemu = *olddemu;
 
 		newdemu->copy = olddemu;
 		newdemu->orig = NULL;
@@ -2542,8 +2695,11 @@ void ApplyDem(DemGraph* dm, DemGraphMod* dmod)
 		dm->supupcopy.push_back(newdemu);
 	}
 	
+#ifdef DEBUGDEM2
 	g_log<<"\t\t\t4.1.2"<<std::endl;
 	g_log.flush();
+#endif
+
 	for(auto riter=dmod->rdemcopy.begin(); riter!=dmod->rdemcopy.end(); riter++)
 	{
 		RDemNode* olddemr = (RDemNode*)*riter;
@@ -2561,8 +2717,11 @@ void ApplyDem(DemGraph* dm, DemGraphMod* dmod)
 		dm->rdemcopy.push_back(newdemr);
 	}
 	
+#ifdef DEBUGDEM2
 	g_log<<"\t\t\t4.1.3"<<std::endl;
 	g_log.flush();
+#endif
+
 	for(int ctype=0; ctype<CONDUIT_TYPES; ctype++)
 	{
 		for(auto citer=dmod->codems[ctype].begin(); citer!=dmod->codems[ctype].end(); citer++)
@@ -2583,8 +2742,11 @@ void ApplyDem(DemGraph* dm, DemGraphMod* dmod)
 		}
 	}
 	
+#ifdef DEBUGDEM2
 	g_log<<"\t\t4.2"<<std::endl;
 	g_log.flush();
+#endif
+
 	//set
 	for(auto biter=dmod->supbpcopy.begin(); biter!=dmod->supbpcopy.end(); biter++)
 	{
@@ -2629,8 +2791,11 @@ void ApplyDem(DemGraph* dm, DemGraphMod* dmod)
 		}
 	}
 	
+#ifdef DEBUGDEM2
 	g_log<<"\t\t4.3"<<std::endl;
 	g_log.flush();
+#endif
+
 	//set subdemands
 	for(auto biter=dm->supbpcopy.begin(); biter!=dm->supbpcopy.end(); biter++)
 	{
@@ -2761,8 +2926,11 @@ void ApplyDem(DemGraph* dm, DemGraphMod* dmod)
 		}
 	}
 	
+#ifdef DEBUGDEM2
 	g_log<<"\t\t4.4"<<std::endl;
 	g_log.flush();
+#endif
+
 	//reset
 #if 0
 	for(auto biter=dm->supbpcopy.begin(); biter!=dm->supbpcopy.end(); biter++)
@@ -2805,22 +2973,50 @@ bool DemCmPos(DemNode* pardem, Vec2i* demcmpos)
 	if(!pardem)
 		return false;
 
+#ifdef DEBUGDEM2
+	g_log<<"\t\t\t\t6.1.1-7.1"<<std::endl;
+	g_log.flush();
+#endif
+
 	if(pardem->demtype == DEM_UNODE)
 	{
+#ifdef DEBUGDEM2
+	g_log<<"\t\t\t\t6.1.1-7.1-1"<<std::endl;
+	g_log.flush();
+#endif
+
 		DemsAtU* demu = (DemsAtU*)pardem;
 
 		if(demu->ui >= 0)
 		{
+			
+#ifdef DEBUGDEM2
+	g_log<<"\t\t\t\t6.1.1-7.1-2 demu->ui="<<demu->ui<<std::endl;
+	g_log.flush();
+#endif
+
 			Unit* u = &g_unit[demu->ui];
 			*demcmpos = u->cmpos;
 			return true;
 		}
 		else
 		{
+
+#ifdef DEBUGDEM2
+	g_log<<"\t\t\t\t6.1.1-7.1-3"<<std::endl;
+	g_log.flush();
+#endif
+
 			*demcmpos = demu->bid.cmpos;
 			return true;
 		}
 	}
+
+	
+#ifdef DEBUGDEM2
+	g_log<<"\t\t\t\t6.1.1-7.2"<<std::endl;
+	g_log.flush();
+#endif
 
 	if(pardem->demtype == DEM_BNODE)
 	{
@@ -2838,6 +3034,11 @@ bool DemCmPos(DemNode* pardem, Vec2i* demcmpos)
 			return true;
 		}
 	}
+	
+#ifdef DEBUGDEM2
+	g_log<<"\t\t\t\t6.1.1-7.3"<<std::endl;
+	g_log.flush();
+#endif
 
 	if(pardem->demtype == DEM_CDNODE)
 	{
@@ -2855,6 +3056,11 @@ bool DemCmPos(DemNode* pardem, Vec2i* demcmpos)
 			return true;
 		}
 	}
+
+#ifdef DEBUGDEM2
+	g_log<<"\t\t\t\t6.1.1-7.4"<<std::endl;
+	g_log.flush();
+#endif
 
 	return false;
 }
@@ -2914,7 +3120,7 @@ void IniDmMod(DemGraph* dm, DemGraphMod* dmod)
 		DemsAtU* newdemu = new DemsAtU;
 		DemsAtU* olddemu = (DemsAtU*)*uiter;
 
-		*olddemu = *newdemu;
+		*newdemu = *olddemu;
 
 		olddemu->copy = newdemu;
 		newdemu->orig = olddemu;
@@ -3094,9 +3300,11 @@ void IniDmMod(DemGraph* dm, DemGraphMod* dmod)
 void CalcDem2(Player* p, bool blopp)
 {
 	//OpenLog("log.txt", 123);
-
+	
+#ifdef DEBUGDEM2
 	g_log<<"caldem2 p"<<(int)(p-g_player)<<std::endl;
 	g_log.flush();
+#endif
 
 	int pi = p - g_player;
 	DemGraph* dm = &g_demgraph2[pi];
@@ -3104,9 +3312,11 @@ void CalcDem2(Player* p, bool blopp)
 	dm->free();
 
 	AddBl(dm);
-
+	
+#ifdef DEBUGDEM2
 	g_log<<"\t1"<<std::endl;
 	g_log.flush();
+#endif
 
 	//return;
 
@@ -3114,8 +3324,11 @@ void CalcDem2(Player* p, bool blopp)
 
 	DemGraphMod dmod;
 	IniDmMod(dm, &dmod);
+	
+#ifdef DEBUGDEM2
 	g_log<<"\t2"<<std::endl;
 	g_log.flush();
+#endif
 
 	for(int i=0; i<UNITS; i++)
 	{
@@ -3134,24 +3347,36 @@ void CalcDem2(Player* p, bool blopp)
 		AddU(dm, u, &demu);
 
 		LabDemH(dm, &dmod, u, &fundsleft, demu);
+
+#ifdef DEBUGDEM2
 	g_log<<"\t2.5"<<std::endl;
 	g_log.flush();
+#endif
+		
 		LabDemF(dm, &dmod, u, &fundsleft, demu);
+
+#ifdef DEBUGDEM2
 	g_log<<"\t2.6"<<std::endl;
 	g_log.flush();
+#endif
 
 		if(u->home < 0)
 			continue;
 
 		LabDemE(dm, &dmod, u, &fundsleft, demu);
+
+#ifdef DEBUGDEM2
 	g_log<<"\t2.7"<<std::endl;
 	g_log.flush();
+#endif
 		//LabDemF2(dm, &dmod, u, &fundsleft, demu);
 		//LabDemF3(dm, &dmod, u, &fundsleft, demu);
 	}
 	
+#ifdef DEBUGDEM2
 	g_log<<"\t3"<<std::endl;
 	g_log.flush();
+#endif
 #if 0
 	g_log<<"housing capit"<<std::endl;
 	int htotal = 0;
@@ -3190,15 +3415,25 @@ void CalcDem2(Player* p, bool blopp)
 	//return;
 
 	BlConReq(dm, &dmod, p);
+
+#ifdef DEBUGDEM2
 	g_log<<"\t4"<<std::endl;
 	g_log.flush();
-	
+#endif
+
 	ApplyDem(dm, &dmod);
+
+#ifdef DEBUGDEM2
 	g_log<<"\t5"<<std::endl;
 	g_log.flush();
+#endif
+
 	dmod.free();
+
+#ifdef DEBUGDEM2
 	g_log<<"\t6"<<std::endl;
 	g_log.flush();
+#endif
 
 	// To do: inter-industry demand
 	// TODO :...
@@ -3230,8 +3465,10 @@ void CalcDem2(Player* p, bool blopp)
 		CheckBl(dm, p, &fixcost, &recurprof, &success);	//check if there's any profitable building opp
 		CheckMem(__FILE__, __LINE__, "\t2\t");
 		
+#ifdef DEBUGDEM2
 	g_log<<"\t7"<<std::endl;
 	g_log.flush();
+#endif
 		//return;
 
 		//if(recurprof > 0)
