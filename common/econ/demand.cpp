@@ -2501,6 +2501,8 @@ void CheckBl(DemGraph* dm, Player* p, int* fixcost, int* recurprof, bool* succes
 //the opposite of IniDmMod
 void ApplyDem(DemGraph* dm, DemGraphMod* dmod)
 {
+	g_log<<"\t\t4.1"<<std::endl;
+	g_log.flush();
 	//add demands
 	for(auto biter=dmod->supbpcopy.begin(); biter!=dmod->supbpcopy.end(); biter++)
 	{
@@ -2519,6 +2521,10 @@ void ApplyDem(DemGraph* dm, DemGraphMod* dmod)
 		dm->supbpcopy.push_back(newdemb);
 	}
 
+	
+	g_log<<"\t\t\t4.1.1"<<std::endl;
+	g_log.flush();
+
 	for(auto uiter=dmod->supupcopy.begin(); uiter!=dmod->supupcopy.end(); uiter++)
 	{
 		DemsAtU* olddemu = (DemsAtU*)*uiter;
@@ -2533,9 +2539,11 @@ void ApplyDem(DemGraph* dm, DemGraphMod* dmod)
 		newdemu->copy = olddemu;
 		newdemu->orig = NULL;
 
-		dmod->supupcopy.push_back(newdemu);
+		dm->supupcopy.push_back(newdemu);
 	}
-
+	
+	g_log<<"\t\t\t4.1.2"<<std::endl;
+	g_log.flush();
 	for(auto riter=dmod->rdemcopy.begin(); riter!=dmod->rdemcopy.end(); riter++)
 	{
 		RDemNode* olddemr = (RDemNode*)*riter;
@@ -2550,9 +2558,11 @@ void ApplyDem(DemGraph* dm, DemGraphMod* dmod)
 		newdemr->copy = olddemr;
 		newdemr->orig = NULL;
 
-		dmod->rdemcopy.push_back(newdemr);
+		dm->rdemcopy.push_back(newdemr);
 	}
 	
+	g_log<<"\t\t\t4.1.3"<<std::endl;
+	g_log.flush();
 	for(int ctype=0; ctype<CONDUIT_TYPES; ctype++)
 	{
 		for(auto citer=dmod->codems[ctype].begin(); citer!=dmod->codems[ctype].end(); citer++)
@@ -2569,10 +2579,12 @@ void ApplyDem(DemGraph* dm, DemGraphMod* dmod)
 			newdemc->copy = olddemc;
 			newdemc->orig = NULL;
 
-			dmod->supbpcopy.push_back(newdemc);
+			dm->codems[ctype].push_back(newdemc);
 		}
 	}
-
+	
+	g_log<<"\t\t4.2"<<std::endl;
+	g_log.flush();
 	//set
 	for(auto biter=dmod->supbpcopy.begin(); biter!=dmod->supbpcopy.end(); biter++)
 	{
@@ -2616,7 +2628,9 @@ void ApplyDem(DemGraph* dm, DemGraphMod* dmod)
 			*copydemc->orig = *copydemc;
 		}
 	}
-
+	
+	g_log<<"\t\t4.3"<<std::endl;
+	g_log.flush();
 	//set subdemands
 	for(auto biter=dm->supbpcopy.begin(); biter!=dm->supbpcopy.end(); biter++)
 	{
@@ -2746,7 +2760,9 @@ void ApplyDem(DemGraph* dm, DemGraphMod* dmod)
 			}
 		}
 	}
-
+	
+	g_log<<"\t\t4.4"<<std::endl;
+	g_log.flush();
 	//reset
 #if 0
 	for(auto biter=dm->supbpcopy.begin(); biter!=dm->supbpcopy.end(); biter++)
@@ -2931,7 +2947,7 @@ void IniDmMod(DemGraph* dm, DemGraphMod* dmod)
 			olddemc->copy = newdemc;
 			newdemc->orig = olddemc;
 
-			dmod->supbpcopy.push_back(newdemc);
+			dmod->codems[ctype].push_back(newdemc);
 		}
 	}
 
