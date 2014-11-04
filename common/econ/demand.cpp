@@ -18,6 +18,565 @@ DemNode::DemNode()
 	parent = NULL;
 	bid.maxbid = 0;
 	profit = 0;
+	orig = NULL;
+	copy = NULL;
+}
+
+void AddDemMod(DemGraphMod* src, DemGraphMod* dest)
+{
+	//TO DO
+	*dest = *src;
+#if 0
+	dest->supbpcopy = src->supbpcopy;
+	dest->supupcopy = src->supupcopy;
+	dest->rdemcopy = src->rdemcopy;
+	for(int c=0; c<CONDUIT_TYPES; c++)
+		dest->codems[c] = src->codems[c];
+#endif
+}
+
+//apply demgraph mod to demgraph
+//the opposite of IniDmMod
+void ApplyDem(DemGraph* dm, DemGraphMod* dmod)
+{
+#ifdef DEBUGDEM2
+	g_log<<"\t\t4.1"<<std::endl;
+	g_log.flush();
+#endif
+	//add demands
+	//first those that don't exist in the demgraph
+	for(auto biter=dmod->supbpcopy.begin(); biter!=dmod->supbpcopy.end(); biter++)
+	{
+		DemsAtB* olddemb = (DemsAtB*)*biter;
+
+		if(olddemb->orig)
+			continue;
+
+		DemsAtB* newdemb = new DemsAtB;
+
+		*newdemb = *olddemb;
+
+		newdemb->copy = olddemb;
+		newdemb->orig = NULL;
+
+		dm->supbpcopy.push_back(newdemb);
+	}
+
+	
+#ifdef DEBUGDEM2
+	g_log<<"\t\t\t4.1.1"<<std::endl;
+	g_log.flush();
+#endif
+
+	for(auto uiter=dmod->supupcopy.begin(); uiter!=dmod->supupcopy.end(); uiter++)
+	{
+		DemsAtU* olddemu = (DemsAtU*)*uiter;
+		
+		if(olddemu->orig)
+			continue;
+
+		DemsAtU* newdemu = new DemsAtU;
+
+		*newdemu = *olddemu;
+
+		newdemu->copy = olddemu;
+		newdemu->orig = NULL;
+
+		dm->supupcopy.push_back(newdemu);
+	}
+	
+#ifdef DEBUGDEM2
+	g_log<<"\t\t\t4.1.2"<<std::endl;
+	g_log.flush();
+#endif
+
+	for(auto riter=dmod->rdemcopy.begin(); riter!=dmod->rdemcopy.end(); riter++)
+	{
+		RDemNode* olddemr = (RDemNode*)*riter;
+
+		if(olddemr->orig)
+			continue;
+
+		RDemNode* newdemr = new RDemNode;
+
+		*newdemr = *olddemr;
+
+		newdemr->copy = olddemr;
+		newdemr->orig = NULL;
+
+		dm->rdemcopy.push_back(newdemr);
+	}
+	
+#ifdef DEBUGDEM2
+	g_log<<"\t\t\t4.1.3"<<std::endl;
+	g_log.flush();
+#endif
+
+	for(int ctype=0; ctype<CONDUIT_TYPES; ctype++)
+	{
+		for(auto citer=dmod->codems[ctype].begin(); citer!=dmod->codems[ctype].end(); citer++)
+		{
+			CdDem* olddemc = (CdDem*)*citer;
+			
+			if(olddemc->orig)
+				continue;
+
+			CdDem* newdemc = new CdDem;
+
+			*newdemc = *olddemc;
+
+			newdemc->copy = olddemc;
+			newdemc->orig = NULL;
+
+			dm->codems[ctype].push_back(newdemc);
+		}
+	}
+	
+#ifdef DEBUGDEM2
+	g_log<<"\t\t4.2"<<std::endl;
+	g_log.flush();
+#endif
+
+	//set
+	for(auto biter=dmod->supbpcopy.begin(); biter!=dmod->supbpcopy.end(); biter++)
+	{
+		DemsAtB* copydemb = (DemsAtB*)*biter;
+
+		if(!copydemb->orig)
+			continue;
+
+		*copydemb->orig = *copydemb;
+	}
+
+	for(auto uiter=dmod->supupcopy.begin(); uiter!=dmod->supupcopy.end(); uiter++)
+	{
+		DemsAtU* copydemu = (DemsAtU*)*uiter;
+		
+		if(!copydemu->orig)
+			continue;
+		
+		*copydemu->orig = *copydemu;
+	}
+
+	for(auto riter=dmod->rdemcopy.begin(); riter!=dmod->rdemcopy.end(); riter++)
+	{
+		RDemNode* copydemr = (RDemNode*)*riter;
+
+		if(!copydemr->orig)
+			continue;
+		
+		*copydemr->orig = *copydemr;
+	}
+	
+	for(int ctype=0; ctype<CONDUIT_TYPES; ctype++)
+	{
+		for(auto citer=dmod->codems[ctype].begin(); citer!=dmod->codems[ctype].end(); citer++)
+		{
+			CdDem* copydemc = (CdDem*)*citer;
+			
+			if(!copydemc->orig)
+				continue;
+			
+			*copydemc->orig = *copydemc;
+		}
+	}
+	
+#ifdef DEBUGDEM2
+	g_log<<"\t\t4.3"<<std::endl;
+	g_log.flush();
+#endif
+
+	//set subdemands
+	for(auto biter=dm->supbpcopy.begin(); biter!=dm->supbpcopy.end(); biter++)
+	{
+		DemsAtB* demb = (DemsAtB*)*biter;
+
+#if 0
+	std::list<DemNode*> condems;	//construction material (RDemNode)
+	std::list<DemNode*> proddems;	//production input raw materials (RDemNode)
+	std::list<DemNode*> manufdems;	//manufacturing input raw materials (RDemNode)
+	std::list<DemNode*> cddems[CONDUIT_TYPES]; // (CdDem)
+#endif
+	
+		//if this is the copy, set it to original
+		if(demb->parent && demb->parent->orig)
+			demb->parent = demb->parent->orig;
+
+		for(auto subiter=demb->condems.begin(); subiter!=demb->condems.end(); subiter++)
+		{
+			RDemNode* subdem = (RDemNode*)*subiter;
+
+			//if this is the copy, set it to original
+			if(subdem->orig)
+				*subiter = subdem->orig;
+		}
+		for(auto subiter=demb->proddems.begin(); subiter!=demb->proddems.end(); subiter++)
+		{
+			RDemNode* subdem = (RDemNode*)*subiter;
+
+			//if this is the copy, set it to original
+			if(subdem->orig)
+				*subiter = subdem->orig;
+		}
+		for(auto subiter=demb->manufdems.begin(); subiter!=demb->manufdems.end(); subiter++)
+		{
+			RDemNode* subdem = (RDemNode*)*subiter;
+
+			//if this is the copy, set it to original
+			if(subdem->orig)
+				*subiter = subdem->orig;
+		}
+		for(int ctype=0; ctype<CONDUIT_TYPES; ctype++)
+		{
+			for(auto subiter=demb->cddems[ctype].begin(); subiter!=demb->cddems[ctype].end(); subiter++)
+			{
+				RDemNode* subdem = (RDemNode*)*subiter;
+
+				//if this is the copy, set it to original
+				if(subdem->orig)
+					*subiter = subdem->orig;
+			}
+		}
+	}
+
+	for(auto uiter=dm->supupcopy.begin(); uiter!=dm->supupcopy.end(); uiter++)
+	{
+		DemsAtU* demu = (DemsAtU*)*uiter;
+
+#if 0
+	std::list<DemNode*> manufdems;	// (RDemNode)
+	std::list<DemNode*> consumdems;	// (RDemNode)
+	DemNode* opup;	//operator/driver (DemsAtU)
+	int prodratio;
+	int timeused;
+	int totaldem[RESOURCES];
+#endif
+		//if this is the copy, set it to original
+		if(demu->parent && demu->parent->orig)
+			demu->parent = demu->parent->orig;
+
+		for(auto subiter=demu->manufdems.begin(); subiter!=demu->manufdems.end(); subiter++)
+		{
+			RDemNode* subdem = (RDemNode*)*subiter;
+
+			//if this is the copy, set it to original
+			if(subdem->orig)
+				*subiter = subdem->orig;
+		}
+		
+		for(auto subiter=demu->consumdems.begin(); subiter!=demu->consumdems.end(); subiter++)
+		{
+			RDemNode* subdem = (RDemNode*)*subiter;
+
+			//if this is the copy, set it to original
+			if(subdem->orig)
+				*subiter = subdem->orig;
+		}
+
+		//if this is the copy, set it to original
+		if(demu->opup && demu->opup->orig)
+			demu->opup = demu->opup->orig;
+	}
+
+	for(auto riter=dm->rdemcopy.begin(); riter!=dm->rdemcopy.end(); riter++)
+	{
+		RDemNode* demr = (RDemNode*)*riter;
+		
+		//std::list<DemNode*>* parlist;	//parent list, e.g., the condems of a DemsAtB
+		
+		//if this is the copy, set it to original
+		if(demr->parent && demr->parent->orig)
+			demr->parent = demr->parent->orig;
+		
+		//for(auto subiter=demr->parlist.begin(); subiter!=demr->parlist.end(); subiter++)
+		//{
+		//}
+	}
+
+	for(int ctype=0; ctype<CONDUIT_TYPES; ctype++)
+	{
+		for(auto citer=dmod->codems[ctype].begin(); citer!=dmod->codems[ctype].end(); citer++)
+		{
+			CdDem* demc = (CdDem*)*citer;
+			
+			//std::list<DemNode*> condems;	// (RDemNode)
+			
+			//if this is the copy, set it to original
+			if(demc->parent && demc->parent->orig)
+				demc->parent = demc->parent->orig;
+
+			for(auto subiter=demc->condems.begin(); subiter!=demc->condems.end(); subiter++)
+			{
+				RDemNode* subdem = (RDemNode*)*subiter;
+
+				//if this is the copy, set it to original
+				if(subdem->orig)
+					*subiter = subdem->orig;
+			}
+		}
+	}
+	
+#ifdef DEBUGDEM2
+	g_log<<"\t\t4.4"<<std::endl;
+	g_log.flush();
+#endif
+
+	//reset
+#if 0
+	for(auto biter=dm->supbpcopy.begin(); biter!=dm->supbpcopy.end(); biter++)
+	{
+		DemsAtB* demb = (DemsAtB*)*biter;
+		demb->copy = NULL;
+		demb->orig = NULL;
+	}
+
+	for(auto uiter=dm->supupcopy.begin(); uiter!=dm->supupcopy.end(); uiter++)
+	{
+		DemsAtU* demu = (DemsAtU*)*uiter;
+		demu->copy = NULL;
+		demu->orig = NULL;
+	}
+
+	for(auto riter=dm->rdemcopy.begin(); riter!=dm->rdemcopy.end(); riter++)
+	{
+		RDemNode* demr = (RDemNode*)*riter;
+		demr->copy = NULL;
+		demr->orig = NULL;
+	}
+
+	for(int ctype=0; ctype<CONDUIT_TYPES; ctype++)
+	{
+		for(auto citer=dm->codems[ctype].begin(); citer!=dm->codems[ctype].end(); citer++)
+		{
+			CdDem* demc = (CdDem*)*citer;
+			demc->copy = NULL;
+			demc->orig = NULL;
+		}
+	}
+#endif
+}
+
+//init demgraph mod
+//make copies of bl dems with .orig pointers of originals
+void IniDmMod(DemGraph* dm, DemGraphMod* dmod)
+{
+	//reset
+	for(auto biter=dm->supbpcopy.begin(); biter!=dm->supbpcopy.end(); biter++)
+	{
+		DemsAtB* olddemb = (DemsAtB*)*biter;
+		olddemb->copy = NULL;
+		olddemb->orig = NULL;
+	}
+
+	for(auto uiter=dm->supupcopy.begin(); uiter!=dm->supupcopy.end(); uiter++)
+	{
+		DemsAtU* olddemu = (DemsAtU*)*uiter;
+		olddemu->copy = NULL;
+		olddemu->orig = NULL;
+	}
+
+	for(auto riter=dm->rdemcopy.begin(); riter!=dm->rdemcopy.end(); riter++)
+	{
+		RDemNode* olddemr = (RDemNode*)*riter;
+		olddemr->copy = NULL;
+		olddemr->orig = NULL;
+	}
+
+	for(int ctype=0; ctype<CONDUIT_TYPES; ctype++)
+	{
+		for(auto citer=dm->codems[ctype].begin(); citer!=dm->codems[ctype].end(); citer++)
+		{
+			CdDem* olddemc = (CdDem*)*citer;
+			olddemc->copy = NULL;
+			olddemc->orig = NULL;
+		}
+	}
+
+	//add demands
+	for(auto biter=dm->supbpcopy.begin(); biter!=dm->supbpcopy.end(); biter++)
+	{
+		DemsAtB* newdemb = new DemsAtB;
+		DemsAtB* olddemb = (DemsAtB*)*biter;
+
+		*newdemb = *olddemb;
+
+		olddemb->copy = newdemb;
+		newdemb->orig = olddemb;
+
+		dmod->supbpcopy.push_back(newdemb);
+	}
+
+	for(auto uiter=dm->supupcopy.begin(); uiter!=dm->supupcopy.end(); uiter++)
+	{
+		DemsAtU* newdemu = new DemsAtU;
+		DemsAtU* olddemu = (DemsAtU*)*uiter;
+
+		*newdemu = *olddemu;
+
+		olddemu->copy = newdemu;
+		newdemu->orig = olddemu;
+
+		dmod->supupcopy.push_back(newdemu);
+	}
+
+	for(auto riter=dm->rdemcopy.begin(); riter!=dm->rdemcopy.end(); riter++)
+	{
+		RDemNode* newdemr = new RDemNode;
+		RDemNode* olddemr = (RDemNode*)*riter;
+
+		*newdemr = *olddemr;
+
+		olddemr->copy = newdemr;
+		newdemr->orig = olddemr;
+
+		dmod->rdemcopy.push_back(newdemr);
+	}
+
+	for(int ctype=0; ctype<CONDUIT_TYPES; ctype++)
+	{
+		for(auto citer=dm->codems[ctype].begin(); citer!=dm->codems[ctype].end(); citer++)
+		{
+			CdDem* newdemc = new CdDem;
+			CdDem* olddemc = (CdDem*)*citer;
+
+			*newdemc = *olddemc;
+
+			olddemc->copy = newdemc;
+			newdemc->orig = olddemc;
+
+			dmod->codems[ctype].push_back(newdemc);
+		}
+	}
+
+	//set subdemands
+	for(auto biter=dmod->supbpcopy.begin(); biter!=dmod->supbpcopy.end(); biter++)
+	{
+		DemsAtB* demb = (DemsAtB*)*biter;
+
+#if 0
+	std::list<DemNode*> condems;	//construction material (RDemNode)
+	std::list<DemNode*> proddems;	//production input raw materials (RDemNode)
+	std::list<DemNode*> manufdems;	//manufacturing input raw materials (RDemNode)
+	std::list<DemNode*> cddems[CONDUIT_TYPES]; // (CdDem)
+#endif
+	
+		//if this is the original, set it to copy
+		if(demb->parent && !demb->parent->orig)
+			demb->parent = demb->parent->copy;
+
+		for(auto subiter=demb->condems.begin(); subiter!=demb->condems.end(); subiter++)
+		{
+			RDemNode* subdem = (RDemNode*)*subiter;
+
+			//if this is the original, set it to copy
+			if(!subdem->orig)
+				*subiter = subdem->copy;
+		}
+		for(auto subiter=demb->proddems.begin(); subiter!=demb->proddems.end(); subiter++)
+		{
+			RDemNode* subdem = (RDemNode*)*subiter;
+
+			//if this is the original, set it to copy
+			if(!subdem->orig)
+				*subiter = subdem->copy;
+		}
+		for(auto subiter=demb->manufdems.begin(); subiter!=demb->manufdems.end(); subiter++)
+		{
+			RDemNode* subdem = (RDemNode*)*subiter;
+
+			//if this is the original, set it to copy
+			if(!subdem->orig)
+				*subiter = subdem->copy;
+		}
+		for(int ctype=0; ctype<CONDUIT_TYPES; ctype++)
+		{
+			for(auto subiter=demb->cddems[ctype].begin(); subiter!=demb->cddems[ctype].end(); subiter++)
+			{
+				RDemNode* subdem = (RDemNode*)*subiter;
+
+				//if this is the original, set it to copy
+				if(!subdem->orig)
+					*subiter = subdem->copy;
+			}
+		}
+	}
+
+	for(auto uiter=dmod->supupcopy.begin(); uiter!=dmod->supupcopy.end(); uiter++)
+	{
+		DemsAtU* demu = (DemsAtU*)*uiter;
+
+#if 0
+	std::list<DemNode*> manufdems;	// (RDemNode)
+	std::list<DemNode*> consumdems;	// (RDemNode)
+	DemNode* opup;	//operator/driver (DemsAtU)
+	int prodratio;
+	int timeused;
+	int totaldem[RESOURCES];
+#endif
+		//if this is the original, set it to copy
+		if(demu->parent && !demu->parent->orig)
+			demu->parent = demu->parent->copy;
+
+		for(auto subiter=demu->manufdems.begin(); subiter!=demu->manufdems.end(); subiter++)
+		{
+			RDemNode* subdem = (RDemNode*)*subiter;
+
+			//if this is the original, set it to copy
+			if(!subdem->orig)
+				*subiter = subdem->copy;
+		}
+		
+		for(auto subiter=demu->consumdems.begin(); subiter!=demu->consumdems.end(); subiter++)
+		{
+			RDemNode* subdem = (RDemNode*)*subiter;
+
+			//if this is the original, set it to copy
+			if(!subdem->orig)
+				*subiter = subdem->copy;
+		}
+
+		//if this is the original, set it to copy
+		if(demu->opup && !demu->opup->orig)
+			demu->opup = demu->opup->copy;
+	}
+
+	for(auto riter=dmod->rdemcopy.begin(); riter!=dmod->rdemcopy.end(); riter++)
+	{
+		RDemNode* demr = (RDemNode*)*riter;
+		
+		//std::list<DemNode*>* parlist;	//parent list, e.g., the condems of a DemsAtB
+		
+		//if this is the original, set it to copy
+		if(demr->parent && !demr->parent->orig)
+			demr->parent = demr->parent->copy;
+		
+		//for(auto subiter=demr->parlist.begin(); subiter!=demr->parlist.end(); subiter++)
+		//{
+		//}
+	}
+
+	for(int ctype=0; ctype<CONDUIT_TYPES; ctype++)
+	{
+		for(auto citer=dmod->codems[ctype].begin(); citer!=dmod->codems[ctype].end(); citer++)
+		{
+			CdDem* demc = (CdDem*)*citer;
+			
+			//std::list<DemNode*> condems;	// (RDemNode)
+			
+			//if this is the original, set it to copy
+			if(demc->parent && !demc->parent->orig)
+				demc->parent = demc->parent->copy;
+
+			for(auto subiter=demc->condems.begin(); subiter!=demc->condems.end(); subiter++)
+			{
+				RDemNode* subdem = (RDemNode*)*subiter;
+
+				//if this is the original, set it to copy
+				if(!subdem->orig)
+					*subiter = subdem->copy;
+			}
+		}
+	}
 }
 
 int CountU(int utype)
@@ -2051,7 +2610,7 @@ void LinkNodes(DemGraph* orig, DemGraph* copy)
 }
 
 //Duplicate demgraph
-void DupDT(DemGraph* orig, DemGraph* copy)
+void DupDm(DemGraph* orig, DemGraph* copy)
 {
 #if 0
 	std::list<DemNode*> nodes;
@@ -2617,7 +3176,7 @@ void CheckBlTile(DemGraph* dm, Player* p, int ri, RDemNode* pt, int x, int z, in
 			continue;
 
 		DemGraph bldm;
-		DupDT(dm, &bldm);
+		DupDm(dm, &bldm);
 
 		Bid bltybid;
 		int blmaxr = maxramt;
@@ -2772,14 +3331,14 @@ void CheckBlTile(DemGraph* dm, Player* p, int ri, RDemNode* pt, int x, int z, in
 		//AddInf(dm, nodes, parent, *biter, rtype, ramt, depth, success);
 
 		bestbldm.free();
-		DupDT(&bldm, &bestbldm);
+		DupDm(&bldm, &bestbldm);
 	}
 
 	if(bestbtype < 0)
 		return;
 
 	dm->free();
-	DupDT(&bestbldm, dm);
+	DupDm(&bestbldm, dm);
 }
 
 /*
@@ -2830,7 +3389,7 @@ void CheckBl(DemGraph* dm, Player* p, int* fixcost, int* recurprof, bool* succes
 #endif
 
 				DemGraph thisdm;
-				DupDT(dm, &thisdm);
+				DupDm(dm, &thisdm);
 
 #if 0
 				if(ri == RES_HOUSING)
@@ -2873,7 +3432,7 @@ void CheckBl(DemGraph* dm, Player* p, int* fixcost, int* recurprof, bool* succes
 					CheckMem(__FILE__, __LINE__, "\t\t1\t");
 					bestbldm.free();
 					CheckMem(__FILE__, __LINE__, "\t\t\t2\t");
-					DupDT(&thisdm, &bestbldm);
+					DupDm(&thisdm, &bestbldm);
 
 #ifdef DEBUGDEM
 					g_log<<"zx "<<z<<","<<x<<" /fini success dupdt"<<std::endl;
@@ -2902,7 +3461,7 @@ void CheckBl(DemGraph* dm, Player* p, int* fixcost, int* recurprof, bool* succes
 		return;
 
 	dm->free();
-	DupDT(&bestbldm, dm);
+	DupDm(&bestbldm, dm);
 	*fixcost = bestfixc;
 	*recurprof = bestrecurp;
 }
@@ -3079,7 +3638,7 @@ void CalcDem2(Player* p, bool blopp)
 	if(blopp)
 	{
 		DemGraph bldm;
-		DupDT(dm, &bldm);
+		DupDm(dm, &bldm);
 		int fixcost = 0;
 		int recurprof = 0;
 		bool success;
@@ -3102,7 +3661,7 @@ void CalcDem2(Player* p, bool blopp)
 			//InfoMessage("suc", "suc");
 	#endif
 			dm->free();
-			DupDT(&bldm, dm);
+			DupDm(&bldm, dm);
 		}
 	#ifdef DEBUGDEM
 		else

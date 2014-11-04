@@ -14,7 +14,7 @@
 
 void UpdAI()
 {
-	//return;	//do nothing for now
+	return;	//do nothing for now
 #if 0
 	for(int i=0; i<PLAYERS; i++)
 	{
