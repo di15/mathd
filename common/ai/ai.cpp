@@ -38,6 +38,8 @@ void UpdAI()
 
 	//CalcDem1();
 
+	unsigned int timer = GetTickCount();
+
 	for(int i=0; i<PLAYERS; i++)
 	{
 		Player* p = &g_player[i];
@@ -50,6 +52,10 @@ void UpdAI()
 
 		UpdAI(p);
 	}
+
+	char msg[128];
+	sprintf(msg, "elapsed %u", GetTickCount()-timer);
+	InfoMessage("elapsed", msg);
 
 	if(g_simframe - lastthink >= AI_FRAMES)
 		lastthink = g_simframe;
