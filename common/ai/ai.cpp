@@ -401,11 +401,45 @@ bool AdjPr(Building* b)
 		if(bestprofit <= 0)
 		{
 			b->prodprice[ri] = 1;
+
+#if 1
+		//if(ri == RES_HOUSING)
+		//if(ri == RES_RETFOOD)
+		//if(ri == RES_ENERGY)
+		{
+			char msg[1280];
+			int bi = b - g_building;
+
+			sprintf(msg, "nopr adjpr %s b%d to$%d from$%d", g_resource[ri].name.c_str(), bi, bestprc, b->prodprice[ri]);
+			
+			for(int bi=0; bi<BUILDINGS; bi++)
+			{
+				Building* b2 = &g_building[bi];
+
+				if(!b2->on)
+					continue;
+
+				BlType* b2t = &g_bltype[b2->type];
+
+				if(b2t->output[ri] <= 0)
+					continue;
+
+				char submsg[128];
+				sprintf(submsg, "\n p%d b%d pr$%d", b2->owner, bi, b2->prodprice[ri]);
+				strcat(msg, submsg);
+			}
+
+			//InfoMessage("info", msg);
+			g_log<<"----"<<std::endl<<msg<<std::endl;
+			g_log.flush();
+		}
+#endif
+
 			continue;
 		}
 
-#if 0
-		if(ri == RES_HOUSING)
+#if 1
+		//if(ri == RES_HOUSING)
 		//if(ri == RES_RETFOOD)
 		//if(ri == RES_ENERGY)
 		{

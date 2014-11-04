@@ -219,7 +219,6 @@
     <ClCompile Include="..\common\path\jpspartpath.cpp" />
     <ClCompile Include="..\common\path\jpspath.cpp" />
     <ClCompile Include="..\common\path\localavoid.cpp" />
-    <ClCompile Include="..\common\path\mempool.cpp" />
     <ClCompile Include="..\common\path\partialpath.cpp" />
     <ClCompile Include="..\common\path\pathdebug.cpp" />
     <ClCompile Include="..\common\path\pathjob.cpp" />
@@ -267,6 +266,7 @@
     <ClCompile Include="..\common\sim\unitmove.cpp" />
     <ClCompile Include="..\common\sim\unittype.cpp" />
     <ClCompile Include="..\common\sound\sound.cpp" />
+    <ClCompile Include="..\common\sys\mempool.cpp" />
     <ClCompile Include="..\common\sys\unicode.cpp" />
     <ClCompile Include="..\common\texture.cpp" />
     <ClCompile Include="..\common\ustring.cpp" />
@@ -347,7 +347,6 @@
     <ClInclude Include="..\common\path\jpspartpath.h" />
     <ClInclude Include="..\common\path\jpspath.h" />
     <ClInclude Include="..\common\path\localavoid.h" />
-    <ClInclude Include="..\common\path\mempool.h" />
     <ClInclude Include="..\common\path\partialpath.h" />
     <ClInclude Include="..\common\path\pathdebug.h" />
     <ClInclude Include="..\common\path\pathjob.h" />
@@ -395,6 +394,7 @@
     <ClInclude Include="..\common\sim\unitmove.h" />
     <ClInclude Include="..\common\sim\unittype.h" />
     <ClInclude Include="..\common\sound\sound.h" />
+    <ClInclude Include="..\common\sys\mempool.h" />
     <ClInclude Include="..\common\sys\unicode.h" />
     <ClInclude Include="..\common\texture.h" />
     <ClInclude Include="..\common\ustring.h" />
