@@ -6,12 +6,10 @@
 #include "../sim/player.h"
 #include "packets.h"
 
-#if 0
-
 #ifdef MATCHMAKER
-void SendData(char* data, int size, struct IPaddress * paddr, bool reliable, Client* c)
+void SendData(char* data, int size, struct IPaddress * paddr, bool reliable, NetConn* nc, UDPsocket* sock, bool bindaddr, Client* c)
 #else
-void SendData(char* data, int size, struct IPaddress * paddr, bool reliable)
+void SendData(char* data, int size, struct IPaddress * paddr, bool reliable, NetConn* nc, UDPsocket* sock, bool bindaddr)
 #endif
 {
 	UDPpacket *out = SDLNet_AllocPacket(65535);
@@ -25,7 +23,7 @@ void SendData(char* data, int size, struct IPaddress * paddr, bool reliable)
 #ifdef MATCHMAKER
 		((PacketHeader*)data)->ack = c->m_sendack;
 #else
-		((PacketHeader*)data)->ack = g_sendack;
+		((PacketHeader*)data)->ack = nc->sendack;
 #endif
 		OldPacket p;
 		p.buffer = new char[ size ];
@@ -40,7 +38,7 @@ void SendData(char* data, int size, struct IPaddress * paddr, bool reliable)
 #ifdef MATCHMAKER
 		c->m_sendack = NextAck(c->m_sendack);
 #else
-		g_sendack = NextAck(g_sendack);
+		nc->sendack = NextAck(nc->sendack);
 #endif
 	}
 
@@ -68,8 +66,19 @@ void SendData(char* data, int size, struct IPaddress * paddr, bool reliable)
 	if (err != 0)
 		NetError([NSError errorWithDomain:NSPOSIXErrorDomain code:err userInfo:nil]);
 #else
+
+	if(bindaddr)
+	{
+		SDLNet_UDP_Unbind(*sock, 0);
+		if(SDLNet_UDP_Bind(*sock, 0, &nc->addr) == -1)
+		{
+			//printf("SDLNet_UDP_Bind: %s\n",SDLNet_GetError());
+			//exit(7);
+		}
+	}
+
 	//sendto(g_socket, data, size, 0, (struct addr *)paddr, sizeof(struct sockaddr_in));
-	SDLNet_UDP_Send(g_socket, 0, out);
+	SDLNet_UDP_Send(*sock, 0, out);
 #endif
 	SDLNet_FreePacket(out);
 }
@@ -375,8 +384,6 @@ void Login(char* username, char* password)
 
 	SendData((char*)&p, sizeof(struct LoginPacket), &g_sockaddr, true);
 }
-
-#endif
 
 #endif
 

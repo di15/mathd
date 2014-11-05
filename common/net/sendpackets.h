@@ -10,14 +10,14 @@
 
 #ifdef MATCHMAKER
 class Client;
-void SendData(char* data, int size, struct IPaddress * paddr, bool reliable, Client* c);
-void Acknowledge(unsigned int ack, struct IPaddress  from);
+void SendData(char* data, int size, struct IPaddress * paddr, bool reliable, NetConn* nc, UDPsocket* sock, bool bindaddr, Client* c);
+void Acknowledge(unsigned int ack, NetConn* nc, UDPsocket* sock, bool bindaddr);
 void ResendPackets();
 void SendAll(int player, char* data, int size, bool reliable);
 void JoinInfo(Client* c);
 #else
-void SendData(char* data, int size, IPaddress * paddr, bool reliable);
-void Acknowledge(unsigned int ack);
+void SendData(char* data, int size, struct IPaddress * paddr, bool reliable, NetConn* nc, UDPsocket* sock, bool bindaddr);
+void Acknowledge(unsigned int ack, NetConn* nc, UDPsocket* sock, bool bindaddr);
 void ResendPackets();
 void Register(char* username, char* password, char* email);
 void Login(char* username, char* password);

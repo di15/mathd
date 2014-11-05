@@ -55,16 +55,10 @@ void ParseRecieved(unsigned int first, unsigned int last, NetConn* nc)
 			if(header->ack != current)
 				continue;
 
-			if(p->ipaddr != nc->addr)
-				continue;
-			
-			if(p->port != nc->port)
+			if(memcmp((void*)&p->addr, (void*)&nc->addr, sizeof(IPaddress)) != 0)
 				continue;
 
 #ifdef MATCHMAKER
-			if(memcmp((void*)&p->addr, (void*)&addr, sizeof(struct sockaddr_in)) != 0)
-				continue;
-
 			PacketSwitch(header->type, p->buffer, p->len, addr, c);
 #else
 			PacketSwitch(header->type, p->buffer, p->len);
@@ -78,12 +72,10 @@ void ParseRecieved(unsigned int first, unsigned int last, NetConn* nc)
 	} while(current != afterlast);
 }
 
-#if 0
-
 #ifdef MATCHMAKER
-bool Recieved(unsigned int first, unsigned int last, struct sockaddr_in addr)
+bool Recieved(unsigned int first, unsigned int last, NetConn* nc, struct sockaddr_in addr)
 #else
-bool Recieved(unsigned int first, unsigned int last)
+bool Recieved(unsigned int first, unsigned int last, NetConn* nc)
 #endif
 {
 	OldPacket* p;
@@ -102,11 +94,9 @@ bool Recieved(unsigned int first, unsigned int last)
 
 			if(header->ack != current)
 				continue;
-
-#ifdef MATCHMAKER
-			if(memcmp((void*)&p->addr, (void*)&addr, sizeof(struct sockaddr_in)) != 0)
+			
+			if(memcmp((void*)&p->addr, (void*)&nc->addr, sizeof(IPaddress)) != 0)
 				continue;
-#endif
 
 			current = NextAck(current);
 			missed = false;
@@ -121,25 +111,24 @@ bool Recieved(unsigned int first, unsigned int last)
 }
 
 #ifdef MATCHMAKER
-void AddRecieved(char* buffer, int len, struct sockaddr_in addr)
+void AddRecieved(char* buffer, int len, NetConn* nc, struct sockaddr_in addr)
 #else
-void AddRecieved(char* buffer, int len)
+void AddRecieved(char* buffer, int len, NetConn* nc)
 #endif
 {
 	OldPacket p;
 	p.buffer = new char[ len ];
 	p.len = len;
-	memcpy((void*)p.buffer, (void*)buffer, len);
-#ifdef MATCHMAKER
-	memcpy((void*)&p.addr, (void*)&addr, sizeof(struct sockaddr_in));
-#endif
+	memcpy((void*)p.buffer, (void*)buffer, len);	
+	memcpy((void*)&p.addr, (void*)&nc->addr, sizeof(IPaddress));
+
 	g_recv.push_back(p);
 }
 
 #ifdef MATCHMAKER
-void TranslatePacket(char* buffer, int bytes, struct sockaddr_in from, bool checkprev)
+void TranslatePacket(char* buffer, int bytes, NetConn* nc, struct sockaddr_in from, bool checkprev)
 #else
-void TranslatePacket(char* buffer, int bytes, bool checkprev)
+void TranslatePacket(char* buffer, int bytes, bool checkprev, NetConn* nc)
 #endif
 {
 	PacketHeader* header = (PacketHeader*)buffer;
@@ -205,13 +194,13 @@ void TranslatePacket(char* buffer, int bytes, bool checkprev)
 #ifdef MATCHMAKER
 		if(PastAck(header->ack, c->m_recvack) || Recieved(header->ack, header->ack, from))
 #else
-		if(PastAck(header->ack, g_recvack) || Recieved(header->ack, header->ack))
+		if(PastAck(header->ack, nc->recvack) || Recieved(header->ack, header->ack, nc))
 #endif
 		{
 #ifdef MATCHMAKER
-			Acknowledge(header->ack, from);
+			Acknowledge(header->ack, nc, from);
 #else
-			Acknowledge(header->ack);
+			Acknowledge(header->ack, nc);
 #endif
 			//g_log<<"ack "<<header->ack<<endl;
 			return;
@@ -220,7 +209,7 @@ void TranslatePacket(char* buffer, int bytes, bool checkprev)
 #ifdef MATCHMAKER
 		unsigned int next = NextAck(c->m_recvack);
 #else
-		unsigned int next = NextAck(g_recvack);
+		unsigned int next = NextAck(nc->recvack);
 #endif
 
 		if(header->ack == next) {}  // Translate packet
@@ -231,15 +220,15 @@ void TranslatePacket(char* buffer, int bytes, bool checkprev)
 			if(Recieved(next, last, from))
 				ParseRecieved(next, last, from, c);  // Translate in order
 #else
-			if(Recieved(next, last))
-				ParseRecieved(next, last);  // Translate in order
+			if(Recieved(next, last, nc))
+				ParseRecieved(next, last, nc);  // Translate in order
 #endif
 			else
 			{
 #ifdef MATCHMAKER
-				AddRecieved(buffer, bytes, from);
+				AddRecieved(buffer, bytes, nc, from);
 #else
-				AddRecieved(buffer, bytes);
+				AddRecieved(buffer, bytes, nc);
 #endif
 				return;
 			}
@@ -266,11 +255,15 @@ void TranslatePacket(char* buffer, int bytes, bool checkprev)
 			c->m_recvack = header->ack;
 		Acknowledge(header->ack, from);
 #else
-		g_recvack = header->ack;
+		nc->recvack = header->ack;
 		Acknowledge(header->ack);
 #endif
 	}
 }
+
+
+
+#if 0
 
 #ifdef MATCHMAKER
 void PacketSwitch(int type, char* buffer, int bytes, struct sockaddr_in from, Client* c)
