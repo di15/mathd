@@ -4,17 +4,10 @@
 #include "sendpackets.h"
 #include "packets.h"
 #include "net.h"
-#ifdef MATCHMAKER
-#else
-#include "../../game/gmain.h"
-#include "../gui/gui.h"
-#endif
+#include "netconn.h"
 #include "../sim/unit.h"
 #include "../sim/building.h"
-#include "../sim/player.h"
 #include "../utils.h"
-
-#define REGCRASH_DBG
 
 /*
 What this function does is take a range of packet ack's (acknowledgment number for reliable UDP transmission)
@@ -39,6 +32,8 @@ I keep a "sendack" and "recvack" for each client, for sent packets and received 
 recvack up to the latest one once a continuous range has been received, with no missing packets. Recvack
 is thus the last executed received packet.
 */
+
+#if 0
 
 #ifdef MATCHMAKER
 void ParseRecieved(unsigned int first, unsigned int last, struct sockaddr_in addr, Client* c)
@@ -159,7 +154,7 @@ void TranslatePacket(char* buffer, int bytes, bool checkprev)
 #else
 	g_lastR = GetTickCount64();
 
-	g_log<<"ack"<<header->ack<<" type"<<header->type<<endl;
+	//g_log<<"ack"<<header->ack<<" type"<<header->type<<std::endl;
 #endif
 
 	switch(header->type)
@@ -174,15 +169,8 @@ void TranslatePacket(char* buffer, int bytes, bool checkprev)
 	}
 #else
 	case PACKET_ACKNOWLEDGMENT:
-	case PACKET_USERNAME_EXISTS:
-	case PACKET_EMAIL_EXISTS:
-	case PACKET_INCORRECT_LOGIN:
-	case PACKET_INCORRECT_VERSION:
-	case PACKET_LOGIN_CORRECT:
-	case PACKET_TOO_MANY_CLIENTS:
-	case PACKET_REG_DB_ERROR:
-	case PACKET_REGISTRATION_DONE:
-	case PACKET_CONNECTION_RESET:
+	case PACKET_CONNECT:
+	case PACKET_DISCONNECT:
 	{
 		checkprev = false;
 		break;
@@ -349,4 +337,4 @@ void ReadConnectPacket(ConnectPacket* dp)
 	
 }
 
-#endif
+#endif	//0

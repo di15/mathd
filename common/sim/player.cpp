@@ -87,9 +87,6 @@ Player::Player()
 	mouseoveraction = false;
 	curst = CU_DEFAULT;
 	kbfocus = 0;
-
-	ipaddr = 0;
-	port = 0;
 }
 
 Player::~Player()

@@ -4,7 +4,7 @@
 #define NET_H
 
 #include "../platform.h"
-//#include "packets.h"
+#include "packets.h"
 
 #define PORT		50400
 //#define SV_ADDR		"corpstates.com"	//live server

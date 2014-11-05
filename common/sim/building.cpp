@@ -336,7 +336,7 @@ void Building::remesh()
 		CopyVA(&drawva, &g_model[t->model].m_va[0]);
 	else
 	{
-		float pct = 0.2f + 0.8f * CompletPct(t->conmat, conmat);
+		float pct = 0.1f + 0.9f * CompletPct(t->conmat, conmat);
 		StageCopyVA(&drawva, &g_model[t->cmodel].m_va[0], pct);
 	}
 
@@ -497,7 +497,7 @@ void UpdBls()
 
 			pt = &g_particleT[ep->type];
 
-			if(b->emitterco[j].EmitNext(pt->delay))
+			if(b->emitterco[j].emitnext(pt->delay))
 				EmitParticle(ep->type, b->drawpos + ep->offset);
 		}
 	}

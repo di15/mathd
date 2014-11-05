@@ -16,7 +16,7 @@ void ResendPackets();
 void SendAll(int player, char* data, int size, bool reliable);
 void JoinInfo(Client* c);
 #else
-void SendData(char* data, int size, struct IPaddress * paddr, bool reliable);
+void SendData(char* data, int size, IPaddress * paddr, bool reliable);
 void Acknowledge(unsigned int ack);
 void ResendPackets();
 void Register(char* username, char* password, char* email);

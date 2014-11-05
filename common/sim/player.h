@@ -1,13 +1,14 @@
 #ifndef PLAYER_H
 #define PLAYER_H
 
+#include "../platform.h"
+#include "../net/netconn.h"
 #include "resources.h"
 #include "../gui/richtext.h"
 #include "../gui/gui.h"
 #include "../math/camera.h"
 #include "selection.h"
 #include "../../libs/objectscript/objectscript.h"
-#include "../net/netconn.h"
 
 struct PlayerColor
 {

@@ -1,6 +1,7 @@
 
 #include "../platform.h"
 #include "net.h"
+#include "netconn.h"
 #include "readpackets.h"
 #include "packets.h"
 #include "../utils.h"
@@ -63,7 +64,7 @@ void InitNet()
 
 	int length = sizeof(struct sockaddr_in);
 
-	if(bind(g_socket, (struct sockaddr *)&g_sockaddr, length) < 0)
+	if(bind(g_socket, (struct addr *)&g_sockaddr, length) < 0)
 		g_error<<"Error binding socket errno="<<errno<<endl;
 
 	int flags = fcntl(g_socket, F_GETFL);
@@ -81,7 +82,7 @@ void InitNet()
 	g_socket = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
 
 	struct sockaddr_in clientaddr;
-	int socklen = sizeof(struct sockaddr);
+	int socklen = sizeof(struct addr);
 
 	memset((char*)&clientaddr, 0, sizeof(clientaddr));
 	clientaddr.sin_family = AF_INET;
@@ -146,7 +147,7 @@ void DeinitNet()
 #endif
 
 //Net input
-void NetIn()
+void NetIn(NetConn* nc)
 {
 	//struct sockaddr_in from;
 	//socklen_t fromlen = sizeof(struct sockaddr_in);
@@ -157,14 +158,16 @@ void NetIn()
 
 	in = SDLNet_AllocPacket(65535);
 
-	unsigned int svipaddr = SDL_SwapBE32(g_sockaddr.host);
-	unsigned short svport = SDL_SwapBE16(g_sockaddr.port);
+	IPaddress* addr = &nc->addr;
+
+	unsigned int svipaddr = SDL_SwapBE32(addr->host);
+	unsigned short svport = SDL_SwapBE16(addr->port);
 
 	do
 	{
 		in->data[0] = 0;
-		//bytes = recvfrom(g_socket, buffer, 1024, 0, (struct sockaddr *)&from, &fromlen);
-		bytes = SDLNet_UDP_Recv(g_socket, in);
+		//bytes = recvfrom(g_socket, buffer, 1024, 0, (struct addr *)&from, &fromlen);
+		bytes = SDLNet_UDP_Recv(nc->socket, in);
 
 		IPaddress ip;
 
@@ -183,13 +186,15 @@ void NetIn()
 				continue;
 			
 			//TranslatePacket(buffer, bytes, true);
-			TranslatePacket((char*)in->data, bytes, true);
+			//TranslatePacket((char*)in->data, bytes, true);
 #endif
 		}
 	} while(bytes > 0);
 
 	SDLNet_FreePacket(in);
 }
+
+#if 0
 
 void ClearPackets()
 {
@@ -199,3 +204,5 @@ void ClearPackets()
 	for(auto i=g_recv.begin(); i!=g_recv.end(); i++)
 		i->freemem();
 }
+
+#endif

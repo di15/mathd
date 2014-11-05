@@ -42,7 +42,6 @@
 #include <signal.h>
 #endif
 
-
 #include <string>
 #include <sstream>
 #include <stdio.h>

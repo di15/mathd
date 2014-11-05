@@ -22,7 +22,7 @@ int MatchClient(struct sockaddr_in from)
 		if(!c->m_on)
 			continue;
 
-		if(memcmp((void*)&c->m_addr, (void*)&from, sizeof(struct sockaddr)) == 0)
+		if(memcmp((void*)&c->m_addr, (void*)&from, sizeof(struct addr)) == 0)
 			return i;
 	}
 

@@ -25,23 +25,8 @@ void ReadAcknowledgmentPacket(AcknowledgmentPacket* ap, struct sockaddr_in from,
 void TranslatePacket(char* buffer, int bytes, bool checkprev);
 void PacketSwitch(int type, char* buffer, int bytes);
 void ReadAcknowledgmentPacket(AcknowledgmentPacket* ap);
-void ReadRegisteredPacket(RegisteredPacket* rp);
-void ReadSpawnUnitPacket(SpawnUnitPacket* sup);
-void ReadHeightPointPacket(HeightPointPacket* hpp);
-void ReadBuildingPacket(BuildingPacket* bp);
-void ReadGarrisonPacket(GarrisonPacket* gp);
-void ReadJoinInfoPacket(JoinInfoPacket* jip);
-void ReadDoneLoadingPacket(DoneLoadingPacket* dlp);
-
-void ReadUsernameExistsPacket(UsernameExistsPacket* uep);
-void ReadEmailExistsPacket(EmailExistsPacket* eep);
-void ReadIncorrectLoginPacket(IncorrectLoginPacket* ilp);
-void ReadIncorrectVersionPacket(IncorrectVersionPacket* ivp);
-void ReadLoginCorrectPacket(LoginCorrectPacket* lcp);
-void ReadTooManyClientsPacket(TooManyClientsPacket* tmcp);
-void ReadRegDBErrorPacket(RegDBErrorPacket* rdbep);
-void ReadConnectionResetPacket(ConnectionResetPacket* crp);
 void ReadDisconnectPacket(DisconnectPacket* dp);
+void ReadConnectPacket(ConnectPacket* dp);
 #endif	//MATCHMAKER
 
 #endif	//READPACKETS_H

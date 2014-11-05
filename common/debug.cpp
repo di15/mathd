@@ -41,7 +41,7 @@ void StopTimer(int id)
 	}
 #endif
 
-	int elapsed = GetTickCount() - g_profile[id].starttick;
+	unsigned int elapsed = GetTickCount() - g_profile[id].starttick;
 	g_profile[id].starttick = GetTickCount();
 	g_profile[id].lastframeelapsed += elapsed;
 

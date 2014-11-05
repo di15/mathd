@@ -3,9 +3,9 @@
 #ifndef NETCONN_H
 #define NETCONN_H
 
+#include "../platform.h"
 #include "net.h"
-
-class OldPacket;
+#include "packets.h"
 
 class NetConn
 {
@@ -16,7 +16,7 @@ public:
 	UDPsocket socket;
 	std::list<OldPacket> sent;
 	std::list<OldPacket> recv;
-	IPaddress sockaddr;
+	IPaddress addr;
 
 	NetConn()
 	{

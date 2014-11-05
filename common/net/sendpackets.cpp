@@ -1,18 +1,12 @@
 
 
 
-#include "sendpackets.h"
-
-
 #include "net.h"
+#include "sendpackets.h"
 #include "../sim/player.h"
 #include "packets.h"
 
-#ifdef MATCHMAKER
-#include "../server/svmain.h"
-#include "client.h"
-#include "../utils.h"
-#endif
+#if 0
 
 #ifdef MATCHMAKER
 void SendData(char* data, int size, struct IPaddress * paddr, bool reliable, Client* c)
@@ -54,7 +48,7 @@ void SendData(char* data, int size, struct IPaddress * paddr, bool reliable)
 	out->data[size] = 0;
 
 #ifdef MATCHMAKER
-	sendto(g_socket, data, size, 0, (struct sockaddr *)paddr, sizeof(struct sockaddr_in));
+	sendto(g_socket, data, size, 0, (struct addr *)paddr, sizeof(struct sockaddr_in));
 #elif defined( _IOS )
 	// Address is NULL and the data is automatically sent to g_hostAddr by virtue of the fact that the socket is connected to that address
 	ssize_t bytes = sendto(sock, data, size, 0, NULL, 0);
@@ -74,7 +68,7 @@ void SendData(char* data, int size, struct IPaddress * paddr, bool reliable)
 	if (err != 0)
 		NetError([NSError errorWithDomain:NSPOSIXErrorDomain code:err userInfo:nil]);
 #else
-	//sendto(g_socket, data, size, 0, (struct sockaddr *)paddr, sizeof(struct sockaddr_in));
+	//sendto(g_socket, data, size, 0, (struct addr *)paddr, sizeof(struct sockaddr_in));
 	SDLNet_UDP_Send(g_socket, 0, out);
 #endif
 	SDLNet_FreePacket(out);
@@ -381,6 +375,8 @@ void Login(char* username, char* password)
 
 	SendData((char*)&p, sizeof(struct LoginPacket), &g_sockaddr, true);
 }
+
+#endif
 
 #endif
 

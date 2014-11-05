@@ -424,7 +424,7 @@ void Queue()
 	BEmitter(BL_REFINERY, 1, PARTICLE_EXHAUST2, Vec3f(TILE_SIZE*5.7/10, TILE_SIZE*3/2, TILE_SIZE*-5/10));
 	BEmitter(BL_REFINERY, 2, PARTICLE_EXHAUST, Vec3f(TILE_SIZE*-4.5/10, TILE_SIZE*1.75, TILE_SIZE*3.0f/10));
 	BEmitter(BL_REFINERY, 3, PARTICLE_EXHAUST2, Vec3f(TILE_SIZE*-4.5/10, TILE_SIZE*1.75, TILE_SIZE*3.0f/10));
-	BDesc(BL_REFINERY, "Turn crude oil into wholesale fuel. Must be distributed at gas stations.");
+	BDesc(BL_REFINERY, "Turn crude oil into wholesale fuel.");
 	
 #if 0
 	DefB(BL_REFINERY, "Gas Station", Vec2i(2,2),  false, "models/refinery2/refinery2", Vec3f(1,1,1), Vec3f(0,0,0), "models/refinery2/refinery2", Vec3f(1,1,1), Vec3f(0,0,0), FOUNDATION_LAND, RES_NONE);
@@ -441,8 +441,8 @@ void Queue()
 	BMat(BL_COALPOW, RES_LABOUR, 10);
 	BIn(BL_COALPOW, RES_COAL, 5);
 	BOut(BL_COALPOW, RES_ENERGY, 1000);
-	BEmitter(BL_COALPOW, 0, PARTICLE_EXHAUST, Vec3f(TILE_SIZE*-9.5f, TILE_SIZE*23.4f, TILE_SIZE*10.6f)/32.0f);
-	BEmitter(BL_COALPOW, 1, PARTICLE_EXHAUST, Vec3f(TILE_SIZE*-9.9f, TILE_SIZE*23.4f, TILE_SIZE*-10.0f)/32.0f);
+	BEmitter(BL_COALPOW, 0, PARTICLE_EXHAUST, Vec3f(-9.5f, 23.4f, 10.6f)*TILE_SIZE/32.0f);
+	BEmitter(BL_COALPOW, 1, PARTICLE_EXHAUST, Vec3f(-9.9f, 23.4f, -10.0f)*TILE_SIZE/32.0f);
 	BDesc(BL_COALPOW, "Generates electricity from coal.");
 	
 	DefB(BL_CHEMPLANT, "Chemical Plant", Vec2i(2,2), true, "models/chemplant/chemplant.ms3d", Vec3f(1,1,1)/32.0f*TILE_SIZE*2, Vec3f(0,0,0), "models/chemplant/chemplant.ms3d", Vec3f(1,1,1)/32.0f*TILE_SIZE*2, Vec3f(0,0,0), FOUNDATION_LAND, RES_NONE);

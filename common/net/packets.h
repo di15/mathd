@@ -6,7 +6,6 @@
 #include "../platform.h"
 #include "../utils.h"
 #include "../debug.h"
-#include "../sim/player.h"
 #include "../math/vec2i.h"
 #include "../math/camera.h"
 

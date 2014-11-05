@@ -45,7 +45,7 @@ public:
 	{
 		last = GetTickCount();
 	}
-	bool EmitNext(int delay)
+	bool emitnext(int delay)
 	{
 		if(GetTickCount64()-last > (long long)delay)
 		{
@@ -94,8 +94,8 @@ public:
 	EmitterPlace(int t, Vec3f off)
 	{
 		on = true;
-		type=t;
-		offset=off;
+		type = t;
+		offset = off;
 	}
 	bool on;
 	Vec3f offset;
