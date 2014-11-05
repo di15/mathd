@@ -23,7 +23,7 @@ void SendData(char* data, int size, struct IPaddress * paddr, bool reliable, Net
 #ifdef MATCHMAKER
 		((PacketHeader*)data)->ack = c->m_sendack;
 #else
-		((PacketHeader*)data)->ack = nc->sendack;
+		((PacketHeader*)data)->ack = ns->sendack;
 #endif
 		OldPacket p;
 		p.buffer = new char[ size ];
@@ -38,7 +38,7 @@ void SendData(char* data, int size, struct IPaddress * paddr, bool reliable, Net
 #ifdef MATCHMAKER
 		c->m_sendack = NextAck(c->m_sendack);
 #else
-		nc->sendack = NextAck(nc->sendack);
+		ns->sendack = NextAck(ns->sendack);
 #endif
 	}
 
@@ -70,7 +70,7 @@ void SendData(char* data, int size, struct IPaddress * paddr, bool reliable, Net
 	if(bindaddr)
 	{
 		SDLNet_UDP_Unbind(*sock, 0);
-		if(SDLNet_UDP_Bind(*sock, 0, &nc->addr) == -1)
+		if(SDLNet_UDP_Bind(*sock, 0, &ns->addr) == -1)
 		{
 			//printf("SDLNet_UDP_Bind: %s\n",SDLNet_GetError());
 			//exit(7);
@@ -129,9 +129,9 @@ void ResendPackets()
 }
 
 #ifdef MATCHMAKER
-void Acknowledge(unsigned int ack, struct sockaddr_in from)
+void Acknowledge(unsigned short ack, NetConn* nc, IPaddress* addr, UDPsocket* sock, bool bindaddr)
 #else
-void Acknowledge(unsigned int ack)
+void Acknowledge(unsigned short ack, NetConn* nc, IPaddress* addr, UDPsocket* sock, bool bindaddr)
 #endif
 {
 	AcknowledgmentPacket p;
@@ -139,9 +139,9 @@ void Acknowledge(unsigned int ack)
 	p.header.ack = ack;
 
 #ifdef MATCHMAKER
-	SendData((char*)&p, sizeof(AcknowledgmentPacket), &from, false, NULL);
+	SendData((char*)&p, sizeof(AcknowledgmentPacket), addr, false, ns, sock, bindaddr);
 #else
-	SendData((char*)&p, sizeof(AcknowledgmentPacket), &g_sockaddr, false);
+	SendData((char*)&p, sizeof(AcknowledgmentPacket), addr, false, ns, sock, bindaddr);
 #endif
 }
 

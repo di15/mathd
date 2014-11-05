@@ -55,7 +55,7 @@ void ParseRecieved(unsigned int first, unsigned int last, NetConn* nc)
 			if(header->ack != current)
 				continue;
 
-			if(memcmp((void*)&p->addr, (void*)&nc->addr, sizeof(IPaddress)) != 0)
+			if(memcmp((void*)&p->addr, (void*)&ns->addr, sizeof(IPaddress)) != 0)
 				continue;
 
 #ifdef MATCHMAKER
@@ -95,7 +95,7 @@ bool Recieved(unsigned int first, unsigned int last, NetConn* nc)
 			if(header->ack != current)
 				continue;
 			
-			if(memcmp((void*)&p->addr, (void*)&nc->addr, sizeof(IPaddress)) != 0)
+			if(memcmp((void*)&p->addr, (void*)&ns->addr, sizeof(IPaddress)) != 0)
 				continue;
 
 			current = NextAck(current);
@@ -120,15 +120,15 @@ void AddRecieved(char* buffer, int len, NetConn* nc)
 	p.buffer = new char[ len ];
 	p.len = len;
 	memcpy((void*)p.buffer, (void*)buffer, len);	
-	memcpy((void*)&p.addr, (void*)&nc->addr, sizeof(IPaddress));
+	memcpy((void*)&p.addr, (void*)&ns->addr, sizeof(IPaddress));
 
 	g_recv.push_back(p);
 }
 
 #ifdef MATCHMAKER
-void TranslatePacket(char* buffer, int bytes, NetConn* nc, struct sockaddr_in from, bool checkprev)
+void TranslatePacket(char* buffer, int bytes, NetConn* nc, struct sockaddr_in from, bool checkprev, NetConn* nc, UDPsocket* sock)
 #else
-void TranslatePacket(char* buffer, int bytes, bool checkprev, NetConn* nc)
+void TranslatePacket(char* buffer, int bytes, bool checkprev, NetConn* nc, UDPsocket* sock, IPaddress* from)
 #endif
 {
 	PacketHeader* header = (PacketHeader*)buffer;
@@ -151,6 +151,23 @@ void TranslatePacket(char* buffer, int bytes, bool checkprev, NetConn* nc)
 	g_lastR = GetTickCount64();
 
 	//g_log<<"ack"<<header->ack<<" type"<<header->type<<std::endl;
+#endif
+
+	bool bindaddr;
+
+#ifdef MATCHMAKER
+	bindaddr = true;
+#else
+	switch(header->type)
+	{
+	case PACKET_CONNECT:
+	case PACKET_DISCONNECT:
+		bindaddr = true;
+		break;
+	default:
+		bindaddr = false;
+		break;
+	}
 #endif
 
 	switch(header->type)
@@ -194,13 +211,13 @@ void TranslatePacket(char* buffer, int bytes, bool checkprev, NetConn* nc)
 #ifdef MATCHMAKER
 		if(PastAck(header->ack, c->m_recvack) || Recieved(header->ack, header->ack, from))
 #else
-		if(PastAck(header->ack, nc->recvack) || Recieved(header->ack, header->ack, nc))
+		if(PastAck(header->ack, ns->recvack) || Recieved(header->ack, header->ack, ns))
 #endif
 		{
 #ifdef MATCHMAKER
-			Acknowledge(header->ack, nc, from);
+			Acknowledge(header->ack, ns, from);
 #else
-			Acknowledge(header->ack, nc);
+			Acknowledge(header->ack, ns);
 #endif
 			//g_log<<"ack "<<header->ack<<endl;
 			return;
@@ -209,7 +226,7 @@ void TranslatePacket(char* buffer, int bytes, bool checkprev, NetConn* nc)
 #ifdef MATCHMAKER
 		unsigned int next = NextAck(c->m_recvack);
 #else
-		unsigned int next = NextAck(nc->recvack);
+		unsigned int next = NextAck(ns->recvack);
 #endif
 
 		if(header->ack == next) {}  // Translate packet
@@ -220,15 +237,15 @@ void TranslatePacket(char* buffer, int bytes, bool checkprev, NetConn* nc)
 			if(Recieved(next, last, from))
 				ParseRecieved(next, last, from, c);  // Translate in order
 #else
-			if(Recieved(next, last, nc))
-				ParseRecieved(next, last, nc);  // Translate in order
+			if(Recieved(next, last, ns))
+				ParseRecieved(next, last, ns);  // Translate in order
 #endif
 			else
 			{
 #ifdef MATCHMAKER
-				AddRecieved(buffer, bytes, nc, from);
+				AddRecieved(buffer, bytes, ns, from);
 #else
-				AddRecieved(buffer, bytes, nc);
+				AddRecieved(buffer, bytes, ns);
 #endif
 				return;
 			}
@@ -238,7 +255,7 @@ void TranslatePacket(char* buffer, int bytes, bool checkprev, NetConn* nc)
 #ifdef MATCHMAKER
 	PacketSwitch(header->type, buffer, bytes, from, c);
 #else
-	PacketSwitch(header->type, buffer, bytes);
+	PacketSwitch(header->type, buffer, bytes, ns, from, sock, bindaddr);
 #endif
 
 	if(header->type != PACKET_ACKNOWLEDGMENT)
@@ -255,20 +272,16 @@ void TranslatePacket(char* buffer, int bytes, bool checkprev, NetConn* nc)
 			c->m_recvack = header->ack;
 		Acknowledge(header->ack, from);
 #else
-		nc->recvack = header->ack;
-		Acknowledge(header->ack);
+		ns->recvack = header->ack;
+		Acknowledge(header->ack, ns, from, sock, bindaddr);
 #endif
 	}
 }
 
-
-
-#if 0
-
 #ifdef MATCHMAKER
 void PacketSwitch(int type, char* buffer, int bytes, struct sockaddr_in from, Client* c)
 #else
-void PacketSwitch(int type, char* buffer, int bytes)
+void PacketSwitch(int type, char* buffer, int bytes, NetConn* nc, IPaddress* from, UDPsocket* sock, bool bindaddr)
 #endif
 {
 	switch(type)
@@ -296,6 +309,9 @@ void PacketSwitch(int type, char* buffer, int bytes)
 		break;
 	}
 }
+
+
+#if 0
 
 #ifdef MATCHMAKER
 void ReadAcknowledgmentPacket(AcknowledgmentPacket* ap, struct sockaddr_in from, Client* c)

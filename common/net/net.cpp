@@ -158,7 +158,7 @@ void NetIn(UDPsocket* sock)
 
 	in = SDLNet_AllocPacket(65535);
 
-	//IPaddress* addr = &nc->addr;
+	//IPaddress* addr = &ns->addr;
 
 	//unsigned int svipaddr = SDL_SwapBE32(addr->host);
 	//unsigned short svport = SDL_SwapBE16(addr->port);

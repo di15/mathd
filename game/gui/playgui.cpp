@@ -228,13 +228,13 @@ void Over_BuildButton(int bwhat)
 
 		db.m_part.push_back(RichPart(UString(bt->desc.c_str())));
 
-		int nc = 0;
+		int ns = 0;
 		for(int ri=0; ri<RESOURCES; ri++)
 		{
 			if(bt->conmat[ri] <= 0)
 				continue;
 
-			nc ++;
+			ns ++;
 			Resource* r = &g_resource[ri];
 
 			cb.m_part.push_back(RichPart(UString("\n")));
@@ -248,7 +248,7 @@ void Over_BuildButton(int bwhat)
 			cb.m_part.push_back(RichPart(UString(num)));
 		}
 
-		if(nc <= 0)
+		if(ns <= 0)
 			cb.m_part.push_back(RichPart(UString("\nNone")));
 
 		int ni = 0;
@@ -304,13 +304,13 @@ void Over_BuildButton(int bwhat)
 
 		db.m_part.push_back(RichPart(UString(ct->desc.c_str())));
 
-		int nc = 0;
+		int ns = 0;
 		for(int ri=0; ri<RESOURCES; ri++)
 		{
 			if(ct->conmat[ri] <= 0)
 				continue;
 
-			nc ++;
+			ns ++;
 			Resource* r = &g_resource[ri];
 
 			cb.m_part.push_back(RichPart(UString("\n")));
@@ -324,7 +324,7 @@ void Over_BuildButton(int bwhat)
 			cb.m_part.push_back(RichPart(UString(num)));
 		}
 
-		if(nc <= 0)
+		if(ns <= 0)
 			cb.m_part.push_back(RichPart(UString("\nNone")));
 	}
 

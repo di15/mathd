@@ -16,13 +16,13 @@
 
 #ifdef MATCHMAKER
 class Client;
-void TranslatePacket(char* buffer, int bytes, struct sockaddr_in from, bool checkprev);
+void TranslatePacket(char* buffer, int bytes, struct sockaddr_in from, bool checkprev, NetConn* nc, UDPsocket* sock);
 void PacketSwitch(int type, char* buffer, int bytes, struct sockaddr_in from, Client* c);
 void ReadLoginPacket(LoginPacket* p, struct sockaddr_in from, Client* c);
 void ReadRegistrationPacket(RegistrationPacket* p, struct sockaddr_in from, Client* c);
 void ReadAcknowledgmentPacket(AcknowledgmentPacket* ap, struct sockaddr_in from, Client* c);
 #else	//MATCHMAKER
-void TranslatePacket(char* buffer, int bytes, bool checkprev);
+void TranslatePacket(char* buffer, int bytes, bool checkprev, NetConn* nc, UDPsocket* sock);
 void PacketSwitch(int type, char* buffer, int bytes);
 void ReadAcknowledgmentPacket(AcknowledgmentPacket* ap);
 void ReadDisconnectPacket(DisconnectPacket* dp);
