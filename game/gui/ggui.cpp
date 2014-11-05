@@ -133,8 +133,18 @@ void Click_QSaveMapButton()
 	SaveMap(g_lastsave);
 }
 
-void Resize_NewGameLink(Widget* thisw)
+void Resize_MenuItem(Widget* thisw)
 {
+	int row;
+	sscanf(thisw->m_name.c_str(), "%d", &row);
+	Font* f = &g_font[thisw->m_font];
+
+	Player* py = &g_player[g_curP];
+	
+	thisw->m_pos[0] = py->width/2 - f->gheight*4;
+	thisw->m_pos[1] = py->height/2 - f->gheight*4 + f->gheight*1.5f*row;
+	thisw->m_pos[2] = py->width;
+	thisw->m_pos[3] = py->height;
 }
 
 void Resize_LoadingStatus(Widget* thisw)
@@ -157,6 +167,16 @@ void Resize_WinText(Widget* thisw)
 	thisw->m_pos[1] = parent->m_pos[1];
 	thisw->m_pos[2] = thisw->m_pos[0] + 400;
 	thisw->m_pos[3] = thisw->m_pos[1] + 2000;
+}
+
+void Click_HostGame()
+{
+	g_mode = APPMODE_PLAY;
+
+}
+
+void Click_JoinGame()
+{
 }
 
 void Click_NewGame()
@@ -335,10 +355,14 @@ void FillMenuGUI()
 	GUI* gui = &py->gui;
 
 	// Main ViewLayer
-	gui->add(new ViewLayer(gui, "mainmenu"));
-	ViewLayer* mainmenuview = (ViewLayer*)gui->get("mainmenu");
+	gui->add(new ViewLayer(gui, "main"));
+	ViewLayer* mainview = (ViewLayer*)gui->get("main");
 
-	mainmenuview->add(new Link(NULL, "new game link", RichText("New Game"), MAINFONT8, Resize_NewGameLink, Click_NewGame));
+	mainview->add(new Image(mainview, "gui/mmbg.jpg", true, Resize_Fullscreen));
+	
+	mainview->add(new Link(mainview, "0", RichText("New Game"), FONT_EUROSTILE16, Resize_MenuItem, Click_NewGame));
+	mainview->add(new Link(mainview, "1", RichText("Host Game"), FONT_EUROSTILE16, Resize_MenuItem, Click_HostGame));
+	mainview->add(new Link(mainview, "2", RichText("Join Game"), FONT_EUROSTILE16, Resize_MenuItem, Click_JoinGame));
 }
 
 void StartRoadPlacement()

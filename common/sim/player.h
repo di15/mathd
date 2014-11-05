@@ -7,6 +7,7 @@
 #include "../math/camera.h"
 #include "selection.h"
 #include "../../libs/objectscript/objectscript.h"
+#include "../net/netconn.h"
 
 struct PlayerColor
 {
@@ -29,6 +30,7 @@ public:
 
 	float colorcode[4];
 	RichText name;
+	NetConn conn;	//for server
 
 	Camera camera;
 	GUI gui;

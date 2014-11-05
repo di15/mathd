@@ -352,6 +352,8 @@ void Click_NextBuildButton(int nextpage)
 		BuildMenu_OpenPage1();
 	else if(nextpage == 2)
 		BuildMenu_OpenPage2();
+	else if(nextpage == 3)
+		BuildMenu_OpenPage3();
 }
 
 void BuildMenu_OpenPage1()

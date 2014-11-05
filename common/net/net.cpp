@@ -2,25 +2,16 @@
 #include "../platform.h"
 #include "net.h"
 #include "readpackets.h"
+#include "packets.h"
 #include "../utils.h"
 
-#ifdef _SERVER
-#include "../server/svmain.h"
-#endif
-
-SOCKET g_socket;
-list<OldPacket> g_sent;
-list<OldPacket> g_recv;
-struct sockaddr_in g_sockaddr;
-
-#ifndef _SERVER
-unsigned int g_recvack = 0;
-unsigned int g_sendack = 0;
+#ifndef MATCHMAKER
 long long g_lastS;  //last sent
 long long g_lastR;  //last recieved
+int g_netmode = NET_SINGLE;
 #endif
 
-unsigned int NextAck(unsigned int ack)
+unsigned short NextAck(unsigned short ack)
 {
 	//if(ack == UINT_MAX)
 	//	ack = 0;
@@ -32,7 +23,7 @@ unsigned int NextAck(unsigned int ack)
 	return ack;
 }
 
-unsigned int PrevAck(unsigned int ack)
+unsigned short PrevAck(unsigned short ack)
 {
 	//if(ack == 0)
 	//	ack = UINT_MAX;
@@ -44,16 +35,19 @@ unsigned int PrevAck(unsigned int ack)
 	return ack;
 }
 
-bool PastAck(unsigned int test, unsigned int current)
+bool PastAck(unsigned short test, unsigned short current)
 {
-	return ((current >= test) && (current - test <= UINT_MAX/2))
-	       || ((test > current) && (test - current > UINT_MAX/2));
+	return ((current >= test) && (current - test <= USHRT_MAX/2))
+	       || ((test > current) && (test - current > USHRT_MAX/2));
 }
+
+
+#if 0
 
 void InitNet()
 {
 
-#ifdef _SERVER
+#ifdef MATCHMAKER
 	g_socket = socket(AF_INET, SOCK_DGRAM, 0);
 
 	if(g_socket < 0)
@@ -138,7 +132,7 @@ void InitNet()
 
 void DeinitNet()
 {
-#ifdef _SERVER
+#ifdef MATCHMAKER
 	close(g_socket);
 #else
 #ifdef _WIN
@@ -149,30 +143,52 @@ void DeinitNet()
 #endif
 }
 
+#endif
+
 //Net input
 void NetIn()
 {
-	struct sockaddr_in from;
-	socklen_t fromlen = sizeof(struct sockaddr_in);
+	//struct sockaddr_in from;
+	//socklen_t fromlen = sizeof(struct sockaddr_in);
 	char buffer[1024];
 	int bytes;
 
+	UDPpacket *in;
+
+	in = SDLNet_AllocPacket(65535);
+
+	unsigned int svipaddr = SDL_SwapBE32(g_sockaddr.host);
+	unsigned short svport = SDL_SwapBE16(g_sockaddr.port);
+
 	do
 	{
-		bytes = recvfrom(g_socket, buffer, 1024, 0, (struct sockaddr *)&from, &fromlen);
+		in->data[0] = 0;
+		//bytes = recvfrom(g_socket, buffer, 1024, 0, (struct sockaddr *)&from, &fromlen);
+		bytes = SDLNet_UDP_Recv(g_socket, in);
+
+		IPaddress ip;
+
+		memcpy(&ip, &in->address, sizeof(IPaddress));
+		//const char* host = SDLNet_ResolveIP(&ip);
+		unsigned int ipaddr = SDL_SwapBE32(ip.host);
+		unsigned short port = SDL_SwapBE16(ip.port);
 
 		if(bytes > 0)
 		{
-#ifdef _SERVER
+#ifdef MATCHMAKER
 			TranslatePacket(buffer, bytes, from, true);
 #else
-			if(memcmp((void*)&from, (void*)&g_sockaddr, sizeof(struct sockaddr_in)) != 0)
+			//if(memcmp((void*)&from, (void*)&g_sockaddr, sizeof(struct sockaddr_in)) != 0)
+			if(ipaddr != svipaddr)
 				continue;
-
-			TranslatePacket(buffer, bytes, true);
+			
+			//TranslatePacket(buffer, bytes, true);
+			TranslatePacket((char*)in->data, bytes, true);
 #endif
 		}
 	} while(bytes > 0);
+
+	SDLNet_FreePacket(in);
 }
 
 void ClearPackets()
@@ -183,4 +199,3 @@ void ClearPackets()
 	for(auto i=g_recv.begin(); i!=g_recv.end(); i++)
 		i->freemem();
 }
-

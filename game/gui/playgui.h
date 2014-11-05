@@ -6,6 +6,7 @@ class Widget;
 void FillPlayGUI();
 void BuildMenu_OpenPage1();
 void BuildMenu_OpenPage2();
+void BuildMenu_OpenPage3();
 void Click_RightMenu_BackToOpener();
 void UpdateResTicker();
 void ShowMessage(const RichText& msg);

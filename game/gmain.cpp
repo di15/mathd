@@ -82,6 +82,8 @@ void UpdLogo()
 void UpdLoad()
 {
 	static int stage = 0;
+	Player* py = &g_player[g_curP];
+	GUI* gui = &py->gui;
 
 	switch(stage)
 	{
@@ -92,8 +94,10 @@ void UpdLoad()
 		if(!Load1Texture())
 		{
 			g_mode = APPMODE_MENU;
+			gui->closeall();
+			gui->open("main");
 			//g_mode = APPMODE_PLAY;
-			Click_NewGame();
+			//Click_NewGame();
 			//Click_OpenEditor();
 		}
 		break;
@@ -816,7 +820,18 @@ void Init()
 	signal(SIGINT, SignalCallback);
 #endif
 
-	SDL_Init(SDL_INIT_VIDEO);
+	if(SDL_Init(SDL_INIT_VIDEO) == -1)
+	{
+		char msg[1280];
+		sprintf(msg, "SDL_Init: %s\n", SDL_GetError());
+		ErrorMessage("Error", msg);
+	}
+
+	if(SDLNet_Init() == -1) {
+		char msg[1280];
+		sprintf(msg, "SDLNet_Init: %s\n", SDLNet_GetError());
+		ErrorMessage("Error", msg);
+	}
 
 	OpenLog("log.txt", VERSION);
 
@@ -846,6 +861,7 @@ void Deinit()
 	WriteProfiles(-1, 0);
 	DestroyWindow(TITLE);
 	// Clean up
+	SDLNet_Quit();
 	SDL_Quit();
 }
 

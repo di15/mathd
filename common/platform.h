@@ -104,6 +104,7 @@
 #pragma comment(lib, "x86/SDL2main.lib")
 //#pragma comment(lib, "SDL.lib")
 //#pragma comment(lib, "SDLmain.lib")
+#pragma comment(lib, "x86/SDL2_net.lib")
 #pragma comment(lib, "glew32.lib")
 #pragma comment(lib, "opengl32.lib")
 #pragma comment(lib, "ws2_32.lib")

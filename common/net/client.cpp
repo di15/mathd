@@ -3,7 +3,7 @@
 
 #include "../platform.h"
 
-#ifdef _SERVER
+#ifdef MATCHMAKER
 #include "client.h"
 #include "sendpackets.h"
 #include "net.h"

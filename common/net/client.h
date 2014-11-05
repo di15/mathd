@@ -1,7 +1,7 @@
 
 #include "../platform.h"
 
-#ifdef _SERVER
+#ifdef MATCHMAKER
 #include "net.h"
 
 #define CLIENT_TIMEOUT	(60*1000)

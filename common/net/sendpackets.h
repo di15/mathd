@@ -8,15 +8,15 @@
 #define RESEND_DELAY	200
 #define RESEND_EXPIRE	(3*60*1000)
 
-#ifdef _SERVER
+#ifdef MATCHMAKER
 class Client;
-void SendData(char* data, int size, struct sockaddr_in* paddr, bool reliable, Client* c);
-void Acknowledge(unsigned int ack, struct sockaddr_in from);
+void SendData(char* data, int size, struct IPaddress * paddr, bool reliable, Client* c);
+void Acknowledge(unsigned int ack, struct IPaddress  from);
 void ResendPackets();
 void SendAll(int player, char* data, int size, bool reliable);
 void JoinInfo(Client* c);
 #else
-void SendData(char* data, int size, struct sockaddr_in* paddr, bool reliable);
+void SendData(char* data, int size, struct IPaddress * paddr, bool reliable);
 void Acknowledge(unsigned int ack);
 void ResendPackets();
 void Register(char* username, char* password, char* email);

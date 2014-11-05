@@ -437,6 +437,21 @@
     <ClCompile Include="..\common\sys\mempool.cpp">
       <Filter>Source Files\common\sys</Filter>
     </ClCompile>
+    <ClCompile Include="..\common\net\net.cpp">
+      <Filter>Source Files\common\net</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\net\client.cpp">
+      <Filter>Source Files\common\net</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\net\readpackets.cpp">
+      <Filter>Source Files\common\net</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\net\sendpackets.cpp">
+      <Filter>Source Files\common\net</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\net\netconn.cpp">
+      <Filter>Source Files\common\net</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="gmain.h">
@@ -819,6 +834,24 @@
     </ClInclude>
     <ClInclude Include="..\common\sys\mempool.h">
       <Filter>Source Files\common\sys</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\net\net.h">
+      <Filter>Source Files\common\net</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\net\client.h">
+      <Filter>Source Files\common\net</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\net\packets.h">
+      <Filter>Source Files\common\net</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\net\readpackets.h">
+      <Filter>Source Files\common\net</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\net\sendpackets.h">
+      <Filter>Source Files\common\net</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\net\netconn.h">
+      <Filter>Source Files\common\net</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

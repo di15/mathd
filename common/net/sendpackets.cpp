@@ -8,25 +8,27 @@
 #include "../sim/player.h"
 #include "packets.h"
 
-#ifdef _SERVER
+#ifdef MATCHMAKER
 #include "../server/svmain.h"
 #include "client.h"
 #include "../utils.h"
 #endif
 
-#ifdef _SERVER
-void SendData(char* data, int size, struct sockaddr_in* paddr, bool reliable, Client* c)
+#ifdef MATCHMAKER
+void SendData(char* data, int size, struct IPaddress * paddr, bool reliable, Client* c)
 #else
-void SendData(char* data, int size, struct sockaddr_in* paddr, bool reliable)
+void SendData(char* data, int size, struct IPaddress * paddr, bool reliable)
 #endif
 {
-#ifndef _SERVER
+	UDPpacket *out = SDLNet_AllocPacket(65535);
+
+#ifndef MATCHMAKER
 	g_lastS = GetTickCount64();
 #endif
 
 	if(reliable)
 	{
-#ifdef _SERVER
+#ifdef MATCHMAKER
 		((PacketHeader*)data)->ack = c->m_sendack;
 #else
 		((PacketHeader*)data)->ack = g_sendack;
@@ -35,20 +37,23 @@ void SendData(char* data, int size, struct sockaddr_in* paddr, bool reliable)
 		p.buffer = new char[ size ];
 		p.len = size;
 		memcpy(p.buffer, data, size);
-#ifdef _SERVER
+#ifdef MATCHMAKER
 		memcpy((void*)&p.addr, (void*)paddr, sizeof(struct sockaddr_in));
 #endif
 		p.last = GetTickCount64();
 		p.first = p.last;
 		g_sent.push_back(p);
-#ifdef _SERVER
+#ifdef MATCHMAKER
 		c->m_sendack = NextAck(c->m_sendack);
 #else
 		g_sendack = NextAck(g_sendack);
 #endif
 	}
 
-#ifdef _SERVER
+	memcpy(out->data, data, size);
+	out->data[size] = 0;
+
+#ifdef MATCHMAKER
 	sendto(g_socket, data, size, 0, (struct sockaddr *)paddr, sizeof(struct sockaddr_in));
 #elif defined( _IOS )
 	// Address is NULL and the data is automatically sent to g_hostAddr by virtue of the fact that the socket is connected to that address
@@ -69,8 +74,10 @@ void SendData(char* data, int size, struct sockaddr_in* paddr, bool reliable)
 	if (err != 0)
 		NetError([NSError errorWithDomain:NSPOSIXErrorDomain code:err userInfo:nil]);
 #else
-	sendto(g_socket, data, size, 0, (struct sockaddr *)paddr, sizeof(struct sockaddr_in));
+	//sendto(g_socket, data, size, 0, (struct sockaddr *)paddr, sizeof(struct sockaddr_in));
+	SDLNet_UDP_Send(g_socket, 0, out);
 #endif
+	SDLNet_FreePacket(out);
 }
 
 void ResendPackets()
@@ -91,7 +98,7 @@ void ResendPackets()
 		{
 			i = g_sent.erase(i);
 
-#ifdef _SERVER
+#ifdef MATCHMAKER
 			g_log<<"expire at "<<DateTime()<<" dt="<<expire<<"-"<<p->first<<"="<<(expire-p->first)<<"(>"<<RESEND_EXPIRE<<") left = "<<g_sent.size()<<endl;
 			g_log.flush();
 #endif
@@ -99,7 +106,7 @@ void ResendPackets()
 			continue;
 		}
 
-#ifdef _SERVER
+#ifdef MATCHMAKER
 		SendData(p->buffer, p->len, &p->addr, false, NULL);
 #else
 		SendData(p->buffer, p->len, &g_sockaddr, false);
@@ -109,7 +116,7 @@ void ResendPackets()
 		NSLog(@"Resent at %lld", now);
 #endif
 
-#ifdef _SERVER
+#ifdef MATCHMAKER
 		g_log<<"resent at "<<DateTime()<<" left = "<<g_sent.size()<<endl;
 		g_log.flush();
 #endif
@@ -118,7 +125,7 @@ void ResendPackets()
 	}
 }
 
-#ifdef _SERVER
+#ifdef MATCHMAKER
 void Acknowledge(unsigned int ack, struct sockaddr_in from)
 #else
 void Acknowledge(unsigned int ack)
@@ -128,14 +135,14 @@ void Acknowledge(unsigned int ack)
 	p.header.type = PACKET_ACKNOWLEDGMENT;
 	p.header.ack = ack;
 
-#ifdef _SERVER
+#ifdef MATCHMAKER
 	SendData((char*)&p, sizeof(AcknowledgmentPacket), &from, false, NULL);
 #else
 	SendData((char*)&p, sizeof(AcknowledgmentPacket), &g_sockaddr, false);
 #endif
 }
 
-#ifdef _SERVER
+#ifdef MATCHMAKER
 
 void SendAll(int player, char* data, int size, bool reliable)
 {

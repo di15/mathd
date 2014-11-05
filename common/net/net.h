@@ -13,22 +13,19 @@
 #define SV_ADDR			"192.168.1.103"		//home local server ip
 //#define SV_ADDR			"174.6.61.178"		//home public server ip
 
-unsigned int NextAck(unsigned int ack);
-unsigned int PrevAck(unsigned int ack);
-bool PastAck(unsigned int test, unsigned int current);
+unsigned short NextAck(unsigned short ack);
+unsigned short PrevAck(unsigned short ack);
+bool PastAck(unsigned short test, unsigned short current);
 
-class OldPacket;
-
-extern SOCKET g_socket;
-extern list<OldPacket> g_sent;
-extern list<OldPacket> g_recv;
-extern struct sockaddr_in g_sockaddr;
-
-#ifndef _SERVER
-extern unsigned int g_recvack;
-extern unsigned int g_sendack;
+#ifndef MATCHMAKER
 extern long long g_lastS;  //last sent
 extern long long g_lastR;  //last recieved
+
+extern int g_netmode;
+
+#define NET_SINGLE			0	//single player
+#define NET_HOST			1	//hosting
+#define NET_CLIENT			2	//client
 #endif
 
 void InitNet();

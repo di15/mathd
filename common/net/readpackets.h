@@ -4,7 +4,7 @@
 
 #include "../platform.h"
 
-#ifdef _SERVER
+#ifdef MATCHMAKER
 #include <sys/types.h>
 #include <unistd.h>
 #include <sys/socket.h>
@@ -14,14 +14,14 @@
 
 #include "packets.h"
 
-#ifdef _SERVER
+#ifdef MATCHMAKER
 class Client;
 void TranslatePacket(char* buffer, int bytes, struct sockaddr_in from, bool checkprev);
 void PacketSwitch(int type, char* buffer, int bytes, struct sockaddr_in from, Client* c);
 void ReadLoginPacket(LoginPacket* p, struct sockaddr_in from, Client* c);
 void ReadRegistrationPacket(RegistrationPacket* p, struct sockaddr_in from, Client* c);
 void ReadAcknowledgmentPacket(AcknowledgmentPacket* ap, struct sockaddr_in from, Client* c);
-#else	//_SERVER
+#else	//MATCHMAKER
 void TranslatePacket(char* buffer, int bytes, bool checkprev);
 void PacketSwitch(int type, char* buffer, int bytes);
 void ReadAcknowledgmentPacket(AcknowledgmentPacket* ap);
@@ -42,6 +42,6 @@ void ReadTooManyClientsPacket(TooManyClientsPacket* tmcp);
 void ReadRegDBErrorPacket(RegDBErrorPacket* rdbep);
 void ReadConnectionResetPacket(ConnectionResetPacket* crp);
 void ReadDisconnectPacket(DisconnectPacket* dp);
-#endif	//_SERVER
+#endif	//MATCHMAKER
 
 #endif	//READPACKETS_H

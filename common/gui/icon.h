@@ -51,7 +51,7 @@ public:
 
 extern Icon g_icon[ICONS];
 
-#ifndef _SERVER
+#ifndef MATCHMAKER
 void DefI(int type, const char* relative, const UString tag);
 #endif
 
