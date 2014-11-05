@@ -33,12 +33,11 @@ recvack up to the latest one once a continuous range has been received, with no 
 is thus the last executed received packet.
 */
 
-#if 0
 
 #ifdef MATCHMAKER
-void ParseRecieved(unsigned int first, unsigned int last, struct sockaddr_in addr, Client* c)
+void ParseRecieved(unsigned int first, unsigned int last, NetConn* nc, struct sockaddr_in addr, Client* c)
 #else
-void ParseRecieved(unsigned int first, unsigned int last)
+void ParseRecieved(unsigned int first, unsigned int last, NetConn* nc)
 #endif
 {
 	OldPacket* p;
@@ -54,6 +53,12 @@ void ParseRecieved(unsigned int first, unsigned int last)
 			header = (PacketHeader*)&p->buffer;
 
 			if(header->ack != current)
+				continue;
+
+			if(p->ipaddr != nc->addr)
+				continue;
+			
+			if(p->port != nc->port)
 				continue;
 
 #ifdef MATCHMAKER
@@ -72,6 +77,8 @@ void ParseRecieved(unsigned int first, unsigned int last)
 		}
 	} while(current != afterlast);
 }
+
+#if 0
 
 #ifdef MATCHMAKER
 bool Recieved(unsigned int first, unsigned int last, struct sockaddr_in addr)

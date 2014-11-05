@@ -16,9 +16,10 @@ public:
 	int len;
 	long long last;
 	long long first;
-#ifdef MATCHMAKER
-	IPaddress addr;
-#endif
+
+	//sender
+	unsigned int ipaddr;
+	unsigned short port;
 
 	void freemem()
 	{
@@ -51,7 +52,9 @@ public:
 			last = original.last;
 			first = original.first;
 #ifdef MATCHMAKER
-			addr = original.addr;
+			ipaddr = original.ipaddr;
+			port = original.port;
+			//addr = original.addr;
 			//memcpy((void*)&addr, (void*)&original.addr, sizeof(struct sockaddr_in));
 #endif
 		}

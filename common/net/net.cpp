@@ -147,7 +147,7 @@ void DeinitNet()
 #endif
 
 //Net input
-void NetIn(NetConn* nc)
+void NetIn(UDPsocket* sock)
 {
 	//struct sockaddr_in from;
 	//socklen_t fromlen = sizeof(struct sockaddr_in);
@@ -158,16 +158,16 @@ void NetIn(NetConn* nc)
 
 	in = SDLNet_AllocPacket(65535);
 
-	IPaddress* addr = &nc->addr;
+	//IPaddress* addr = &nc->addr;
 
-	unsigned int svipaddr = SDL_SwapBE32(addr->host);
-	unsigned short svport = SDL_SwapBE16(addr->port);
+	//unsigned int svipaddr = SDL_SwapBE32(addr->host);
+	//unsigned short svport = SDL_SwapBE16(addr->port);
 
 	do
 	{
 		in->data[0] = 0;
 		//bytes = recvfrom(g_socket, buffer, 1024, 0, (struct addr *)&from, &fromlen);
-		bytes = SDLNet_UDP_Recv(nc->socket, in);
+		bytes = SDLNet_UDP_Recv(*sock, in);
 
 		IPaddress ip;
 
@@ -182,8 +182,8 @@ void NetIn(NetConn* nc)
 			TranslatePacket(buffer, bytes, from, true);
 #else
 			//if(memcmp((void*)&from, (void*)&g_sockaddr, sizeof(struct sockaddr_in)) != 0)
-			if(ipaddr != svipaddr)
-				continue;
+			//if(ipaddr != svipaddr)
+			//	continue;
 			
 			//TranslatePacket(buffer, bytes, true);
 			//TranslatePacket((char*)in->data, bytes, true);

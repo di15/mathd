@@ -173,10 +173,50 @@ void Click_HostGame()
 {
 	g_mode = APPMODE_PLAY;
 
+	g_netmode = NET_HOST;
+
+	if(!(g_svsock = SDLNet_UDP_Open(PORT)))
+	{
+		char msg[1280];
+		sprintf(msg, "SDLNet_UDP_Open: %s\n", SDLNet_GetError());
+		ErrorMessage("Error", msg);
+		return;
+	}
+
+	//contact matcher TO DO
 }
 
 void Click_JoinGame()
 {
+	g_mode = APPMODE_PLAY;
+
+	g_netmode = NET_HOST;
+
+	IPaddress ip;
+
+	if(SDLNet_ResolveHost(&ip, "localhost", PORT) == -1)
+	{
+		char msg[1280];
+		sprintf(msg, "SDLNet_ResolveHost: %s\n", SDLNet_GetError());
+		ErrorMessage("Error", msg);
+		return;
+	}
+
+	if(!(g_svsock = SDLNet_UDP_Open(0)))
+	{
+		char msg[1280];
+		sprintf(msg, "SDLNet_UDP_Open: %s\n", SDLNet_GetError());
+		ErrorMessage("Error", msg);
+		return;
+	}
+
+	if(SDLNet_UDP_Bind(g_svsock, 0, &ip) == -1)
+	{
+		char msg[1280];
+		sprintf(msg, "SDLNet_UDP_Bind: %s\n", SDLNet_GetError());
+		ErrorMessage("Error", msg);
+		return;
+	}
 }
 
 void Click_NewGame()

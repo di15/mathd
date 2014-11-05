@@ -7,15 +7,18 @@
 #include "net.h"
 #include "packets.h"
 
+extern UDPsocket g_svsock;
+extern UDPsocket g_svsock2;	//for server list
+
+extern std::list<OldPacket> g_sent;
+extern std::list<OldPacket> g_recv;
+
 class NetConn
 {
 public:
-	bool connected;
 	unsigned short sendack;
 	unsigned short recvack;
-	UDPsocket socket;
-	std::list<OldPacket> sent;
-	std::list<OldPacket> recv;
+	bool connected;
 	IPaddress addr;
 
 	NetConn()
@@ -26,6 +29,6 @@ public:
 	}
 };
 
-extern NetConn g_svconn;
+extern std::list<NetConn> g_conn;
 
 #endif
