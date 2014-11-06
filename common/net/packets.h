@@ -71,11 +71,20 @@ public:
 #define PACKET_DISCONNECT				1
 #define PACKET_CONNECT					2
 #define	PACKET_ACKNOWLEDGMENT			3
+#define PACKET_PLACEBL					4
 
 struct PacketHeader
 {
 	int type;
 	unsigned short ack;
+};
+
+struct PlaceBlPacket
+{
+	PacketHeader header;
+	int btype;
+	Vec2i tpos;
+	int player;
 };
 
 struct DisconnectPacket

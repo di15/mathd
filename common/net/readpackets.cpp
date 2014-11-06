@@ -8,6 +8,7 @@
 #include "../sim/unit.h"
 #include "../sim/building.h"
 #include "../utils.h"
+#include "../sim/build.h"
 
 /*
 What this function does is take a range of packet ack's (acknowledgment number for reliable UDP transmission)
@@ -61,7 +62,7 @@ void ParseRecieved(unsigned int first, unsigned int last, NetConn* nc)
 #ifdef MATCHMAKER
 			PacketSwitch(header->type, p->buffer, p->len, addr, c);
 #else
-			PacketSwitch(header->type, p->buffer, p->len, nc, &p->addr, &g_svsock, true);
+			PacketSwitch(header->type, p->buffer, p->len, nc, &p->addr, &g_sock, true);
 #endif
 
 			p->freemem();
@@ -128,7 +129,7 @@ void AddRecieved(char* buffer, int len, NetConn* nc)
 #ifdef MATCHMAKER
 void TranslatePacket(char* buffer, int bytes, NetConn* nc, struct sockaddr_in from, bool checkprev, NetConn* nc, UDPsocket* sock)
 #else
-void TranslatePacket(char* buffer, int bytes, bool checkprev, NetConn* nc, UDPsocket* sock, IPaddress* from)
+void TranslatePacket(char* buffer, int bytes, bool checkprev, UDPsocket* sock, IPaddress* from)
 #endif
 {
 	PacketHeader* header = (PacketHeader*)buffer;
@@ -154,42 +155,19 @@ void TranslatePacket(char* buffer, int bytes, bool checkprev, NetConn* nc, UDPso
 	g_log.flush();
 #endif
 
-	bool bindaddr;
+	NetConn* nc = Match(from);
+	if(nc)
+		nc->lastrecv = GetTickCount64();
 
-#ifdef MATCHMAKER
-	bindaddr = true;
-#else
-	switch(header->type)
-	{
-	case PACKET_CONNECT:
-	case PACKET_DISCONNECT:
-		bindaddr = true;
-		break;
-	default:
-		bindaddr = false;
-		break;
-	}
-#endif
+	bool bindaddr = true;
 
 	switch(header->type)
 	{
-#ifdef MATCHMAKER
-	case PACKET_ACKNOWLEDGMENT:
-	case PACKET_REGISTRATION:
-	case PACKET_LOGIN:
-	{
-		checkprev = false;
-		break;
-	}
-#else
 	case PACKET_ACKNOWLEDGMENT:
 	case PACKET_CONNECT:
 	case PACKET_DISCONNECT:
-	{
 		checkprev = false;
 		break;
-	}
-#endif
 	default:
 		break;
 	}
@@ -209,55 +187,32 @@ void TranslatePacket(char* buffer, int bytes, bool checkprev, NetConn* nc, UDPso
 	if(checkprev)
 #endif
 	{
-#ifdef MATCHMAKER
-		if(PastAck(header->ack, c->m_recvack) || Recieved(header->ack, header->ack, from))
-#else
 		if(PastAck(header->ack, nc->recvack) || Recieved(header->ack, header->ack, nc))
-#endif
 		{
-#ifdef MATCHMAKER
-			Acknowledge(header->ack, nc, from);
-#else
 			Acknowledge(header->ack, nc, from, sock, bindaddr);
-#endif
 			//g_log<<"ack "<<header->ack<<endl;
 			return;
 		}
 
-#ifdef MATCHMAKER
-		unsigned int next = NextAck(c->m_recvack);
-#else
-		unsigned int next = NextAck(nc->recvack);
-#endif
+		unsigned short next = NextAck(nc->recvack);
 
 		if(header->ack == next) {}  // Translate packet
 		else  // More than +1 after recvack?
 		{
-			unsigned int last = PrevAck(header->ack);
-#ifdef MATCHMAKER
-			if(Recieved(next, last, from))
-				ParseRecieved(next, last, from, c);  // Translate in order
-#else
+			unsigned short last = PrevAck(header->ack);
+
 			if(Recieved(next, last, nc))
 				ParseRecieved(next, last, nc);  // Translate in order
-#endif
+
 			else
 			{
-#ifdef MATCHMAKER
-				AddRecieved(buffer, bytes, nc, from);
-#else
 				AddRecieved(buffer, bytes, nc);
-#endif
 				return;
 			}
 		}
 	}
 
-#ifdef MATCHMAKER
-	PacketSwitch(header->type, buffer, bytes, from, c);
-#else
 	PacketSwitch(header->type, buffer, bytes, nc, from, sock, bindaddr);
-#endif
 
 	if(header->type != PACKET_ACKNOWLEDGMENT)
 	{
@@ -297,17 +252,6 @@ void PacketSwitch(int type, char* buffer, int bytes, NetConn* nc, IPaddress* fro
 {
 	switch(type)
 	{
-#ifdef MATCHMAKER
-	case PACKET_LOGIN:
-		ReadLoginPacket((LoginPacket*)buffer, from, c);
-		break;
-	case PACKET_REGISTRATION:
-		ReadRegistrationPacket((RegistrationPacket*)buffer, from, c);
-		break;
-	case PACKET_ACKNOWLEDGMENT:
-		ReadAcknowledgmentPacket((AcknowledgmentPacket*)buffer, from, c);
-		break;
-#else
 	case PACKET_ACKNOWLEDGMENT:
 		ReadAcknowledgmentPacket((AcknowledgmentPacket*)buffer, nc, from, sock, bindaddr);
 		break;
@@ -317,11 +261,13 @@ void PacketSwitch(int type, char* buffer, int bytes, NetConn* nc, IPaddress* fro
 	case PACKET_DISCONNECT:
 		ReadDisconnectPacket((DisconnectPacket*)buffer, nc, from, sock, bindaddr);
 		break;
+	case PACKET_PLACEBL:
+		ReadPlaceBlPacket((PlaceBlPacket*)buffer, nc, from, sock, bindaddr);
+		break;
 		/*
 		case PACKET_CONNECTION_RESET:  ReadConnectionResetPacket((ConnectionResetPacket*)buffer);  break;
 		case PACKET_DISCONNECT:        ReadDisconnectPacket((DisconnectPacket*)buffer);            break;
 		*/
-#endif
 	default:
 		break;
 	}
@@ -357,16 +303,59 @@ void ReadAcknowledgmentPacket(AcknowledgmentPacket* ap, NetConn* nc, IPaddress* 
 	}
 }
 
+
+void ReadPlaceBlPacket(PlaceBlPacket* pbp, NetConn* nc, IPaddress* from, UDPsocket* sock, bool bindaddr)
+{
+	//InfoMessage("polk", "p");
+	PlaceBl(pbp->btype, pbp->tpos, false, pbp->player, NULL);
+}
+
 void ReadDisconnectPacket(DisconnectPacket* dp, NetConn* nc, IPaddress* from, UDPsocket* sock, bool bindaddr)
 {
-	char msg[128];
-	sprintf(msg, "dis %u:%u", from->host, (unsigned int)from->port);
-	InfoMessage("d", msg);
+	//char msg[128];
+	//sprintf(msg, "dis %u:%u", from->host, (unsigned int)from->port);
+	//InfoMessage("d", msg);
+	
+	if(!nc)
+		nc = Match(from);
+
+	if(!nc)
+		return;
+
+	if(nc->ctype == CONN_HOST)
+		g_svconn = NULL;
+	else if(nc->ctype == CONN_MATCHER)
+		g_mcconn = NULL;
+
+	for(auto ci=g_conn.begin(); ci!=g_conn.end(); ci++)
+		if(&*ci == nc)
+		{
+			g_conn.erase(ci);
+			break;
+		}
 }
 
 void ReadConnectPacket(ConnectPacket* cp, NetConn* nc, IPaddress* from, UDPsocket* sock, bool bindaddr)
 {
-	char msg[128];
-	sprintf(msg, "con %u:%u", from->host, (unsigned int)from->port);
-	InfoMessage("d", msg);
+	//char msg[128];
+	//sprintf(msg, "con %u:%u", from->host, (unsigned int)from->port);
+	//InfoMessage("d", msg);
+
+	if(!nc)
+	{
+		nc = Match(from);
+
+		if(!nc)
+		{
+			NetConn newnc;
+			newnc.addr = *from;
+			newnc.connected = true;
+			newnc.recvack = cp->header.ack;
+			newnc.sendack = 0;
+			g_conn.push_back(newnc);
+			nc = &*g_conn.rbegin();
+		}
+	}
+
+
 }

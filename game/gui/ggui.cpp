@@ -9,6 +9,7 @@
 #include "../../common/save/savemap.h"
 #include "editorgui.h"
 #include "playgui.h"
+#include "ggui.h"
 #include "../../common/sim/unit.h"
 #include "../../common/sim/unittype.h"
 #include "../../common/sim/building.h"
@@ -173,10 +174,11 @@ void Resize_WinText(Widget* thisw)
 void Click_HostGame()
 {
 	//g_mode = APPMODE_PLAY;
+	Click_NewGame();
 
 	g_netmode = NET_HOST;
 
-	if(!(g_svsock = SDLNet_UDP_Open(PORT)))
+	if(!(g_sock = SDLNet_UDP_Open(PORT)))
 	{
 		char msg[1280];
 		sprintf(msg, "SDLNet_UDP_Open: %s\n", SDLNet_GetError());
@@ -190,6 +192,7 @@ void Click_HostGame()
 void Click_JoinGame()
 {
 	//g_mode = APPMODE_PLAY;
+	Click_NewGame();
 
 	g_netmode = NET_CLIENT;
 
@@ -203,7 +206,7 @@ void Click_JoinGame()
 		return;
 	}
 
-	if(!(g_svsock = SDLNet_UDP_Open(0)))
+	if(!(g_sock = SDLNet_UDP_Open(0)))
 	{
 		char msg[1280];
 		sprintf(msg, "SDLNet_UDP_Open: %s\n", SDLNet_GetError());
@@ -211,7 +214,7 @@ void Click_JoinGame()
 		return;
 	}
 
-	if(SDLNet_UDP_Bind(g_svsock, 0, &ip) == -1)
+	if(SDLNet_UDP_Bind(g_sock, 0, &ip) == -1)
 	{
 		char msg[1280];
 		sprintf(msg, "SDLNet_UDP_Bind: %s\n", SDLNet_GetError());
@@ -221,11 +224,13 @@ void Click_JoinGame()
 
 	NetConn nc;
 	nc.addr = ip;
+	nc.ctype = CONN_HOST;
 	g_conn.push_back(nc);
+	g_svconn = &*g_conn.rbegin();
 
 	ConnectPacket cp;
 	cp.header.type = PACKET_CONNECT;
-	SendData((char*)&cp, sizeof(ConnectPacket), &ip, true, &*g_conn.begin(), &g_svsock, true);
+	SendData((char*)&cp, sizeof(ConnectPacket), &ip, true, &*g_conn.begin(), &g_sock, true);
 }
 
 void Click_NewGame()
@@ -580,7 +585,34 @@ void MouseLUp()
 		{
 			if(py->canplace)
 			{
-				PlaceBl(py->build, Vec2i(py->vdrag[0].x/TILE_SIZE, py->vdrag[0].z/TILE_SIZE), false, g_localP, NULL);
+				int bid;
+				PlaceBl(py->build, Vec2i(py->vdrag[0].x/TILE_SIZE, py->vdrag[0].z/TILE_SIZE), false, g_localP, &bid);
+
+				//InfoMessage("pl", "pl");
+
+				if(g_netmode != NET_SINGLE)
+				{
+					PlaceBlPacket pbp;
+					pbp.header.type = PACKET_PLACEBL;
+					pbp.player = g_curP;
+					pbp.btype = py->build;
+					pbp.tpos = g_building[bid].tilepos;
+					
+					if(g_netmode == NET_HOST)
+					{
+						NetConn* nc = &*g_conn.begin();
+
+						if(nc)
+							SendData((char*)&pbp, sizeof(PlaceBlPacket), &nc->addr, true, nc, &g_sock, true);
+					}
+					else if(g_netmode == NET_CLIENT)
+					{
+						NetConn* nc = g_svconn;
+
+						if(nc)
+							SendData((char*)&pbp, sizeof(PlaceBlPacket), &nc->addr, true, nc, &g_sock, true);
+					}
+				}
 			}
 			else
 			{

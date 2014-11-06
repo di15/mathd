@@ -78,8 +78,14 @@ void SendData(char* data, int size, IPaddress * paddr, bool reliable, NetConn* n
 		}
 	}
 
-	//g_log<<"send t"<<((PacketHeader*)data)->type<<std::endl;
-	//g_log.flush();
+#if 0
+	g_log<<"send t"<<((PacketHeader*)data)->type<<std::endl;
+	g_log.flush();
+
+			char msg[128];
+			sprintf(msg, "send ack%u t%d", (unsigned int)((PacketHeader*)out->data)->ack, ((PacketHeader*)out->data)->type);
+			InfoMessage("send", msg);
+#endif
 
 	//sendto(g_socket, data, size, 0, (struct addr *)paddr, sizeof(struct sockaddr_in));
 	SDLNet_UDP_Send(*sock, 0, out);
@@ -116,7 +122,7 @@ void ResendPackets()
 #ifdef MATCHMAKER
 		SendData(p->buffer, p->len, &p->addr, false, NULL);
 #else
-		SendData(p->buffer, p->len, &p->addr, false, Match(&p->addr), &g_svsock, true);
+		SendData(p->buffer, p->len, &p->addr, false, Match(&p->addr), &g_sock, true);
 #endif
 		p->last = now;
 #ifdef _IOS

@@ -163,7 +163,7 @@ void NetIn()
 	//unsigned int svipaddr = SDL_SwapBE32(addr->host);
 	//unsigned short svport = SDL_SwapBE16(addr->port);
 
-	UDPsocket* sock = &g_svsock;
+	UDPsocket* sock = &g_sock;
 
 	do
 	{
@@ -197,8 +197,14 @@ void NetIn()
 			//	g_log.flush();
 			//}
 
+#if 0
+			char msg[128];
+			sprintf(msg, "recv ack%u t%d", (unsigned int)((PacketHeader*)in->data)->ack, ((PacketHeader*)in->data)->type);
+			InfoMessage("recv", msg);
+#endif
+
 			//TranslatePacket(buffer, bytes, true);
-			TranslatePacket((char*)in->data, bytes, true, Match(&ip), &g_svsock, &ip);
+			TranslatePacket((char*)in->data, bytes, true, &g_sock, &ip);
 #endif
 		}
 	} while(bytes > 0);
