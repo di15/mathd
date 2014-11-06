@@ -17,7 +17,7 @@ public:
 	long long last;
 	long long first;
 
-	//sender
+	//sender/reciever
 	IPaddress addr;
 
 	void freemem()

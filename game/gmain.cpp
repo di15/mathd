@@ -215,6 +215,9 @@ void UpdEd()
 
 void Update()
 {
+	if(g_netmode != NET_SINGLE)
+		NetIn();
+
 	if(g_mode == APPMODE_LOGO)
 		UpdLogo();
 	//else if(g_mode == APPMODE_INTRO)

@@ -147,7 +147,7 @@ void DeinitNet()
 #endif
 
 //Net input
-void NetIn(UDPsocket* sock)
+void NetIn()
 {
 	//struct sockaddr_in from;
 	//socklen_t fromlen = sizeof(struct sockaddr_in);
@@ -162,6 +162,8 @@ void NetIn(UDPsocket* sock)
 
 	//unsigned int svipaddr = SDL_SwapBE32(addr->host);
 	//unsigned short svport = SDL_SwapBE16(addr->port);
+
+	UDPsocket* sock = &g_svsock;
 
 	do
 	{
@@ -185,8 +187,18 @@ void NetIn(UDPsocket* sock)
 			//if(ipaddr != svipaddr)
 			//	continue;
 			
+			//g_log<<"r t"<<((PacketHeader*)in->data)->type<<std::endl;
+			//g_log.flush();
+			
+			//for(int i=0; i<bytes; i++)
+			//for(int i=0; i<4; i++)
+			//{
+			//	g_log<<"r"<<i<<": "<<(unsigned int)(in->data[i])<<std::endl;
+			//	g_log.flush();
+			//}
+
 			//TranslatePacket(buffer, bytes, true);
-			//TranslatePacket((char*)in->data, bytes, true);
+			TranslatePacket((char*)in->data, bytes, true, Match(&ip), &g_svsock, &ip);
 #endif
 		}
 	} while(bytes > 0);

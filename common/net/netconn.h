@@ -31,4 +31,6 @@ public:
 
 extern std::list<NetConn> g_conn;
 
+NetConn* Match(IPaddress* addr);
+
 #endif

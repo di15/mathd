@@ -27,6 +27,7 @@
 #include "../../common/debug.h"
 #include "../../common/script/console.h"
 #include "../../common/window.h"
+#include "../../common/net/sendpackets.h"
 
 //bool g_canselect = true;
 
@@ -171,7 +172,7 @@ void Resize_WinText(Widget* thisw)
 
 void Click_HostGame()
 {
-	g_mode = APPMODE_PLAY;
+	//g_mode = APPMODE_PLAY;
 
 	g_netmode = NET_HOST;
 
@@ -188,9 +189,9 @@ void Click_HostGame()
 
 void Click_JoinGame()
 {
-	g_mode = APPMODE_PLAY;
+	//g_mode = APPMODE_PLAY;
 
-	g_netmode = NET_HOST;
+	g_netmode = NET_CLIENT;
 
 	IPaddress ip;
 
@@ -217,6 +218,14 @@ void Click_JoinGame()
 		ErrorMessage("Error", msg);
 		return;
 	}
+
+	NetConn nc;
+	nc.addr = ip;
+	g_conn.push_back(nc);
+
+	ConnectPacket cp;
+	cp.header.type = PACKET_CONNECT;
+	SendData((char*)&cp, sizeof(ConnectPacket), &ip, true, &*g_conn.begin(), &g_svsock, true);
 }
 
 void Click_NewGame()
