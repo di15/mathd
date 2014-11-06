@@ -213,6 +213,7 @@
     <ClCompile Include="..\common\math\vec3i.cpp" />
     <ClCompile Include="..\common\math\vec4f.cpp" />
     <ClCompile Include="..\common\net\client.cpp" />
+    <ClCompile Include="..\common\net\lockstep.cpp" />
     <ClCompile Include="..\common\net\net.cpp" />
     <ClCompile Include="..\common\net\netconn.cpp" />
     <ClCompile Include="..\common\net\readpackets.cpp" />
@@ -346,6 +347,7 @@
     <ClInclude Include="..\common\math\vec3i.h" />
     <ClInclude Include="..\common\math\vec4f.h" />
     <ClInclude Include="..\common\net\client.h" />
+    <ClInclude Include="..\common\net\lockstep.h" />
     <ClInclude Include="..\common\net\net.h" />
     <ClInclude Include="..\common\net\netconn.h" />
     <ClInclude Include="..\common\net\packets.h" />

@@ -72,11 +72,20 @@ public:
 #define PACKET_CONNECT					2
 #define	PACKET_ACKNOWLEDGMENT			3
 #define PACKET_PLACEBL					4
+#define PACKET_NETTURN					5
 
 struct PacketHeader
 {
 	int type;
 	unsigned short ack;
+};
+
+struct NetTurnPacket
+{
+	PacketHeader header;
+	unsigned int curnetfr;	//curr net fr
+	unsigned short loadsz;
+	//commands go after
 };
 
 struct PlaceBlPacket

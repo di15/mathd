@@ -452,6 +452,9 @@
     <ClCompile Include="..\common\net\netconn.cpp">
       <Filter>Source Files\common\net</Filter>
     </ClCompile>
+    <ClCompile Include="..\common\net\lockstep.cpp">
+      <Filter>Source Files\common\net</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="gmain.h">
@@ -851,6 +854,9 @@
       <Filter>Source Files\common\net</Filter>
     </ClInclude>
     <ClInclude Include="..\common\net\netconn.h">
+      <Filter>Source Files\common\net</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\net\lockstep.h">
       <Filter>Source Files\common\net</Filter>
     </ClInclude>
   </ItemGroup>
