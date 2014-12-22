@@ -6,12 +6,12 @@
 #include "../render/model.h"
 #include "../render/vertexarray.h"
 #include "../math/vec3i.h"
-#include "infrastructure.h"
+#include "conduit.h"
 
-class CrPipeTile : public ConduitTile
+class CrPipeTile : public CdTile
 {
 public:
-	unsigned char condtype();
+	//unsigned char cdtype();
 };
 
 #endif

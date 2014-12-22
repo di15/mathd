@@ -1,11 +1,11 @@
-#ifndef GMAIN_H
+﻿#ifndef GMAIN_H
 #define GMAIN_H
 
 #include "../common/window.h"
 
 #define VERSION				3
 #define CONFIGFILE			"config.ini"
-#define TITLE				"Corporation-States"
+#define TITLE				"Economic Prosperity"
 #define SERVER_ADDR			"corpstates.com"
 
 //#define TRUCK_DEBUG
@@ -24,11 +24,9 @@ class Heightmap;
 #define APPMODE_PLAY		5
 #define APPMODE_PAUSE		6
 #define APPMODE_EDITOR		7
+#define APPMODE_JOINING		8
 extern int g_mode;
 extern int g_reStage;
-
-extern double g_instantupdfps;
-extern double g_updfrinterval;
 
 void WriteConfig();
 void DrawScene(Matrix projection, Matrix viewmat, Matrix modelmat, Matrix modelviewinv, float lightpos[3], float lightdir[3]);

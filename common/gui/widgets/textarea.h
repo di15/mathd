@@ -32,9 +32,10 @@ public:
 	void copyval();
 	void pasteval();
 	void selectall();
-	void placestr(const char* str);
+	//void placestr(const char* str);
+	void placestr(const RichText* str);
 	void placechar(unsigned int k);
-	void inev(InEv* ev);
+	void inev(InEv* ie);
 	void close();
 	void gainfocus();
 	void losefocus();

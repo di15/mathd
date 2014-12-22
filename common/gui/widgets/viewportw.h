@@ -3,7 +3,7 @@
 
 #include "../widget.h"
 
-class ViewportW : public Widget
+class Viewport : public Widget
 {
 public:
 	void (*drawfunc)(int p, int x, int y, int w, int h);
@@ -16,9 +16,9 @@ public:
 	bool (*mdownfunc)(int p, int relx, int rely, int w, int h);
 	bool (*mupfunc)(int p, int relx, int rely, int w, int h);
 
-	ViewportW();
+	Viewport();
 
-	ViewportW(Widget* parent, const char* n, void (*reframef)(Widget* thisw),
+	Viewport(Widget* parent, const char* n, void (*reframef)(Widget* thisw),
 	          void (*drawf)(int p, int x, int y, int w, int h),
 	          bool (*ldownf)(int p, int relx, int rely, int w, int h),
 	          bool (*lupf)(int p, int relx, int rely, int w, int h),
@@ -27,7 +27,7 @@ public:
 	          bool (*rupf)(int p, int relx, int rely, int w, int h),
 	          bool (*mousewf)(int p, int d),
 	          int parm);
-	void inev(InEv* ev);
+	void inev(InEv* ie);
 	void draw();
 };
 

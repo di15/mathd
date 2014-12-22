@@ -7,7 +7,7 @@
 float ConvertHeight(unsigned char brightness);
 void LoadJPGMap(const char* relative);
 void FreeMap();
-bool LoadMap(const char* fullpath);
-bool SaveMap(const char* fullpath);
+bool LoadMap(const char* name);
+bool SaveMap(const char* name);
 
 #endif

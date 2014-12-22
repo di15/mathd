@@ -14,9 +14,9 @@ void MouseMidButtonDown()
 {
 	if(g_mode == APPMODE_PLAY || g_mode == APPMODE_EDITOR)
 	{
-		Player* py = &g_player[g_curP];
+		Player* py = &g_player[g_localP];
 
-		if(py->mousekeys[MOUSE_MIDDLE])
+		if(g_mousekeys[MOUSE_MIDDLE])
 		{
 			CenterMouse();
 		}
@@ -31,20 +31,20 @@ void MouseWheel(int delta)
 {
 	if(g_mode == APPMODE_PLAY || g_mode == APPMODE_EDITOR)
 	{
-		Player* py = &g_player[g_curP];
-		Camera* c = &py->camera;
+		Player* py = &g_player[g_localP];
+		Camera* c = &g_cam;
 
-		if(py->zoom <= MIN_ZOOM && delta < 0)
+		if(g_zoom <= MIN_ZOOM && delta < 0)
 			return;
 
-		if(py->zoom >= MAX_ZOOM && delta > 0)
+		if(g_zoom >= MAX_ZOOM && delta > 0)
 			return;
 
-		float oldzoom = py->zoom;
+		float oldzoom = g_zoom;
 		Vec3f line[2];
 		line[0] = c->zoompos();
 
-		py->zoom *= 1.0f + (float)delta / 10.0f;
+		g_zoom *= 1.0f + (float)delta / 10.0f;
 		line[1] = c->zoompos();
 
 		Vec3f ray = Normalize( line[1] - line[0] );
@@ -58,7 +58,7 @@ void MouseWheel(int delta)
 #else
 		if(FastMapIntersect(&g_hmap, line, &clip))
 #endif
-			py->zoom = oldzoom;
+			g_zoom = oldzoom;
 		//else
 		//	CalcMapView();
 	}
@@ -75,6 +75,21 @@ void ZoomOut()
 	MouseWheel(1);
 }
 
+void Escape()
+{
+	if(g_mode == APPMODE_PLAY)
+	{
+		Player* py = &g_player[g_localP];
+		GUI* gui = &g_gui;
+		Widget* ingame = gui->get("ingame");
+
+		if(ingame->m_opened)
+			gui->close("ingame");
+		else
+			gui->open("ingame");
+	}
+}
+
 void MapKeys()
 {
 #if 0
@@ -86,12 +101,13 @@ void MapKeys()
 	for(int i=0; i<PLAYERS; i++)
 	{
 		Player* py = &g_player[i];
-		GUI* gui = &py->gui;
+		GUI* gui = &g_gui;
 		gui->assignmousewheel(&MouseWheel);
 		gui->assignmbutton(MouseMidButtonDown, MouseMidButtonUp);
 		gui->assignkey(SDL_SCANCODE_R, ZoomOut, NULL);
 		gui->assignkey(SDL_SCANCODE_F, ZoomIn, NULL);
 		gui->assignkey(SDL_SCANCODE_GRAVE, NULL, ToggleConsole);
+		gui->assignkey(SDL_SCANCODE_ESCAPE, NULL, Escape);
 	}
 
 	/*
@@ -136,7 +152,7 @@ void MapKeys()
 		else if(stricmp(keystr, "'C'") == 0)			key = 'C';
 		else if(stricmp(keystr, "'D'") == 0)			key = 'D';
 		else if(stricmp(keystr, "'E'") == 0)			key = 'E';
-		else if(stricmp(keystr, "'F'") == 0)			key = 'F';
+		else if(stricmp(keystr, "'score'") == 0)			key = 'score';
 		else if(stricmp(keystr, "'G'") == 0)			key = 'G';
 		else if(stricmp(keystr, "'H'") == 0)			key = 'H';
 		else if(stricmp(keystr, "'I'") == 0)			key = 'I';

@@ -57,6 +57,7 @@ int Magnitude(Vec2i vec)
 	//return sqrt( vec.x*vec.x + vec.y*vec.y );
 
 	// Custom sqrt for determinism
+	//return isqrt( (long long)vec.x*(long long)vec.x + (long long)vec.y*(long long)vec.y );
 	return isqrt( vec.x*vec.x + vec.y*vec.y );
 }
 
@@ -234,8 +235,8 @@ bool WithinYaw(Camera* c, Vec3f p, float angle)
 {
 	Vec3f d = p - c->m_pos;
 	float yaw = GetYaw(d.x, d.z);
-	float yaw2 = yaw - DEGTORAD(360.0f);
-	float yaw3 = yaw + DEGTORAD(360.0f);
+	float yaw2 = yaw - (float)DEGTORAD(360.0f);
+	float yaw3 = yaw + (float)DEGTORAD(360.0f);
 
 	if(fabs(c->yaw() - yaw) <= angle || fabs(c->yaw() - yaw2) <= angle || fabs(c->yaw() - yaw3) <= angle)
 		return true;
@@ -247,8 +248,8 @@ float DYaw(Camera* c, Vec3f p)
 {
 	Vec3f d = p - c->m_pos;
 	float yaw = GetYaw(d.x, d.z);
-	float yaw2 = yaw - DEGTORAD(360.0f);
-	float yaw3 = yaw + DEGTORAD(360.0f);
+	float yaw2 = yaw - (float)DEGTORAD(360.0f);
+	float yaw3 = yaw + (float)DEGTORAD(360.0f);
 
 	float dyaw = yaw - c->yaw();
 	float dyaw2 = yaw2 - c->yaw();
@@ -357,7 +358,7 @@ Vec3f RotateAround(Vec3f v, Vec3f around, float rad, float x, float y, float z)
 
 float GetYaw(float dx, float dz)
 {
-	return RADTODEG( atan2(dx, dz) );
+	return (float)RADTODEG( atan2(dx, dz) );
 }
 
 /*
@@ -660,7 +661,7 @@ Matrix PerspProj(float fov, float aspect, float znear, float zfar)
 {
 	float m[16];
 
-	float xymax = znear * tan(fov * PI_OVER_360);
+	float xymax = znear * (float)tan(fov * PI_OVER_360);
 	float ymin = -xymax;
 	float xmin = -xymax;
 
@@ -724,11 +725,11 @@ Vec4f ScreenPos(Matrix* mvp, Vec3f vec, float width, float height, bool persp)
 
 Vec3f OnNear(int x, int y, int width, int height, Vec3f posvec, Vec3f sidevec, Vec3f upvec)
 {
-	Player* py = &g_player[g_curP];
+	Player* py = &g_player[g_localP];
 
 	/*
-	float halfWidth = py->width / 2.0f;
-	float halfHeight = py->height / 2.0f;
+	float halfWidth = g_width / 2.0f;
+	float halfHeight = g_height / 2.0f;
 
 	float ratioX = (x - halfWidth) / halfWidth;
 
@@ -737,7 +738,7 @@ Vec3f OnNear(int x, int y, int width, int height, Vec3f posvec, Vec3f sidevec, V
 	Vec3f direction = Normalize( c->m_view - c->m_pos );
 
 	float Hnear = 2 * tan( DEGTORAD(FIELD_OF_VIEW) / 2) * MIN_DISTANCE;
-	float Wnear = Hnear * py->width/py->height;
+	float Wnear = Hnear * g_width/g_height;
 
 	return ( direction * MIN_DISTANCE + c->m_strafe * ratioX * Wnear/2.0f + c->up2() * ratioY * Hnear/2.0f );
 	*/
@@ -751,13 +752,13 @@ Vec3f OnNear(int x, int y, int width, int height, Vec3f posvec, Vec3f sidevec, V
 
 	//Vec3f direction = Normalize( c->m_view - c->m_pos );
 
-	//-PROJ_RIGHT*aspect/py->zoom, PROJ_RIGHT*aspect/py->zoom, PROJ_RIGHT/py->zoom, -PROJ_RIGHT/py->zoom
-	//PROJ_RIGHT*aspect/py->zoom + PROJ_RIGHT*aspect/py->zoom = 2.0f*PROJ_RIGHT*aspect/py->zoom
+	//-PROJ_RIGHT*aspect/g_zoom, PROJ_RIGHT*aspect/g_zoom, PROJ_RIGHT/g_zoom, -PROJ_RIGHT/g_zoom
+	//PROJ_RIGHT*aspect/g_zoom + PROJ_RIGHT*aspect/g_zoom = 2.0f*PROJ_RIGHT*aspect/g_zoom
 	//
 
 	float aspect = fabsf((float)width / (float)height);
-	float Wnear = PROJ_RIGHT * aspect / py->zoom;
-	float Hnear = PROJ_RIGHT / py->zoom;
+	float Wnear = PROJ_RIGHT * aspect / g_zoom;
+	float Hnear = PROJ_RIGHT / g_zoom;
 
 	//return ( c->m_pos + c->m_strafe * ratioX * Wnear + c->up2() * ratioY * Hnear );
 	Vec3f result = posvec + sidevec * ratiox * Wnear + upvec * ratioy * Hnear;
@@ -781,7 +782,7 @@ Vec3f OnNearPersp(int x, int y, int width, int height, Vec3f posvec, Vec3f sidev
 	float ratioy = -(y - halfHeight) / halfHeight;
 
 	float aspect = fabsf((float)width / (float)height);
-	float Hnear = 2 * tan( DEGTORAD(fov) / 2) * mind;
+	float Hnear = 2 * (float)tan( DEGTORAD(fov) / 2) * mind;
 	float Wnear = Hnear * aspect;
 
 	//return ( c->m_pos + c->m_strafe * ratioX * Wnear + c->up2() * ratioY * Hnear );
@@ -805,14 +806,14 @@ Vec3f ScreenPerspRay(int x, int y, int width, int height, Vec3f posvec, Vec3f si
 	float ratioy = -(y - halfHeight) / halfHeight;
 
 	float aspect = fabsf((float)width / (float)height);
-	float Hnear = 2.0f * tan( DEGTORAD(fov) / 2.0f );
+	float Hnear = 2.0f * (float)tan( DEGTORAD(fov) / 2.0f );
 	float Wnear = Hnear * aspect;
 
 	return Normalize(viewdir) + sidevec * ratiox * Wnear/2.0f + upvec * ratioy * Hnear/2.0f;
 
 #if 0
-	float halfWidth = py->width / 2.0f;
-	float halfHeight = py->height / 2.0f;
+	float halfWidth = g_width / 2.0f;
+	float halfHeight = g_height / 2.0f;
 
 	float ratioX = (x - halfWidth) / halfWidth;
 
@@ -821,7 +822,7 @@ Vec3f ScreenPerspRay(int x, int y, int width, int height, Vec3f posvec, Vec3f si
 	Vec3f direction = Normalize( c->m_view - c->m_pos );
 
 	float Hnear = 2 * tan( DEGTORAD(FIELD_OF_VIEW) / 2) * MIN_DISTANCE;
-	float Wnear = Hnear * py->width/py->height;
+	float Wnear = Hnear * g_width/g_height;
 
 	return ( direction * MIN_DISTANCE + c->m_strafe * ratioX * Wnear/2.0f + c->up2() * ratioY * Hnear/2.0f );
 #endif
@@ -829,14 +830,14 @@ Vec3f ScreenPerspRay(int x, int y, int width, int height, Vec3f posvec, Vec3f si
 
 float Snap(float base, float value)
 {
-	int count = value / base;
+	int count = (int)( value / base );
 
 	return count * base;
 }
 
 float SnapNearest(float base, float value)
 {
-	int count = (value + base/2.0f) / base;
+	int count = (int)( (value + base/2.0f) / base );
 
 	return count * base;
 }

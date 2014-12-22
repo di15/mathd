@@ -3,7 +3,7 @@
 #include "button.h"
 #include "checkbox.h"
 #include "editbox.h"
-#include "dropdowns.h"
+#include "droplist.h"
 #include "image.h"
 #include "insdraw.h"
 #include "link.h"

@@ -3,7 +3,7 @@
 #include "button.h"
 #include "checkbox.h"
 #include "editbox.h"
-#include "dropdowns.h"
+#include "droplist.h"
 #include "image.h"
 #include "insdraw.h"
 #include "link.h"
@@ -29,7 +29,7 @@ Button::Button() : Widget()
 	//    length += g_font[f].glyph[t[i]].w;
 	//m_tpos[0] = (left+right)/2.0f - length/2.0f;
 	//m_tpos[1] = (top+bottom)/2.0f - g_font[f].gheight/2.0f;
-	m_style = BUTTON_LINEBASED;
+	m_style = BUST_LINEBASED;
 	m_over = false;
 	m_ldown = false;
 	CreateTexture(m_tex, "gui/transp.png", true, false);
@@ -64,7 +64,7 @@ Button::Button(Widget* parent, const char* name, const char* filepath, const Ric
 	m_ldown = false;
 	CreateTexture(m_tex, filepath, true, false);
 
-	if(style == BUTTON_CORRODE)
+	if(style == BUST_CORRODE)
 	{
 		CreateTexture(m_bgtex, "gui/corrodbutton.png", true, false);
 		CreateTexture(m_bgovertex, "gui/corrodbuttonover.png", true, false);
@@ -84,13 +84,32 @@ void Button::reframe()
 {
 	if(reframefunc)
 		reframefunc(this);
+
+	if(m_parent)
+	{
+		float* parp = m_parent->m_pos;
+		
+		//must be bounded by the parent's frame
+
+		m_pos[0] = fmax(parp[0], m_pos[0]);
+		m_pos[0] = fmin(parp[2], m_pos[0]);
+		m_pos[2] = fmax(parp[0], m_pos[2]);
+		m_pos[2] = fmin(parp[2], m_pos[2]);
+		m_pos[1] = fmax(parp[1], m_pos[1]);
+		m_pos[1] = fmin(parp[3], m_pos[1]);
+		m_pos[3] = fmax(parp[1], m_pos[3]);
+		m_pos[3] = fmin(parp[3], m_pos[3]);
+
+		m_pos[1] = fmin(m_pos[1], m_pos[3]);
+		m_pos[0] = fmin(m_pos[0], m_pos[2]);
+	}
 }
 
-void Button::inev(InEv* ev)
+void Button::inev(InEv* ie)
 {
-	Player* py = &g_player[g_curP];
+	Player* py = &g_player[g_localP];
 
-	if(ev->type == INEV_MOUSEUP && ev->key == MOUSE_LEFT && !ev->intercepted)
+	if(ie->type == INEV_MOUSEUP && ie->key == MOUSE_LEFT && !ie->intercepted)
 	{
 		//mousemove();
 
@@ -102,36 +121,36 @@ void Button::inev(InEv* ev)
 			if(clickfunc2 != NULL)
 				clickfunc2(m_param);
 
-			m_over = false;
+			//m_over = false;
 			m_ldown = false;
 
-			ev->intercepted = true;
+			ie->intercepted = true;
 			return;	// intercept mouse event
 		}
 
 		if(m_ldown)
 		{
 			m_ldown = false;
-			ev->intercepted = true;
+			ie->intercepted = true;
 			return;
 		}
 
 		m_over = false;
 	}
-	else if(ev->type == INEV_MOUSEDOWN && ev->key == MOUSE_LEFT && !ev->intercepted)
+	else if(ie->type == INEV_MOUSEDOWN && ie->key == MOUSE_LEFT && !ie->intercepted)
 	{
 		//mousemove();
 
 		if(m_over)
 		{
 			m_ldown = true;
-			ev->intercepted = true;
+			ie->intercepted = true;
 			return;	// intercept mouse event
 		}
 	}
-	else if(ev->type == INEV_MOUSEMOVE)
+	else if(ie->type == INEV_MOUSEMOVE)
 	{
-		if(py->mouse.x >= m_pos[0] && py->mouse.x <= m_pos[2] && py->mouse.y >= m_pos[1] && py->mouse.y <= m_pos[3])
+		if(g_mouse.x >= m_pos[0] && g_mouse.x <= m_pos[2] && g_mouse.y >= m_pos[1] && g_mouse.y <= m_pos[3])
 		{
 		}
 		else
@@ -142,9 +161,9 @@ void Button::inev(InEv* ev)
 			m_over = false;
 		}
 
-		if(!ev->intercepted)
+		if(!ie->intercepted)
 		{
-			if(py->mouse.x >= m_pos[0] && py->mouse.x <= m_pos[2] && py->mouse.y >= m_pos[1] && py->mouse.y <= m_pos[3])
+			if(g_mouse.x >= m_pos[0] && g_mouse.x <= m_pos[2] && g_mouse.y >= m_pos[1] && g_mouse.y <= m_pos[3])
 			{
 				if(overfunc != NULL)
 					overfunc();
@@ -153,7 +172,7 @@ void Button::inev(InEv* ev)
 
 				m_over = true;
 
-				ev->intercepted = true;
+				ie->intercepted = true;
 				return;
 			}
 		}
@@ -162,7 +181,7 @@ void Button::inev(InEv* ev)
 
 void Button::draw()
 {
-	if(m_style == BUTTON_CORRODE)
+	if(m_style == BUST_CORRODE)
 	{
 		if(m_over)
 			DrawImage(g_texture[m_bgovertex].texname, m_pos[0], m_pos[1], m_pos[2], m_pos[3]);
@@ -173,15 +192,16 @@ void Button::draw()
 
 		DrawShadowedText(m_font, m_tpos[0], m_tpos[1], &m_label);
 	}
-	else if(m_style == BUTTON_LEFTIMAGE)
+	else if(m_style == BUST_LEFTIMAGE)
 	{
-		Player* py = &g_player[g_curP];
+		//InfoMess("li", "li");
+		Player* py = &g_player[g_localP];
 
 		EndS();
 
 		UseS(SHADER_COLOR2D);
-		glUniform1f(g_shader[g_curS].m_slot[SSLOT_WIDTH], (float)py->currw);
-		glUniform1f(g_shader[g_curS].m_slot[SSLOT_HEIGHT], (float)py->currh);
+		glUniform1f(g_shader[g_curS].m_slot[SSLOT_WIDTH], (float)g_currw);
+		glUniform1f(g_shader[g_curS].m_slot[SSLOT_HEIGHT], (float)g_currh);
 
 		float midcolor[] = {0.7f,0.7f,0.7f,0.8f};
 		float lightcolor[] = {0.8f,0.8f,0.8f,0.8f};
@@ -207,7 +227,7 @@ void Button::draw()
 
 		EndS();
 		CheckGLError(__FILE__, __LINE__);
-		Ortho(py->currw, py->currh, 1, 1, 1, 1);
+		Ortho(g_currw, g_currh, 1, 1, 1, 1);
 
 		float w = m_pos[2]-m_pos[0]-2;
 		float h = m_pos[3]-m_pos[1]-2;
@@ -221,15 +241,16 @@ void Button::draw()
 
 		DrawShadowedText(m_font, textleft, texttop, &m_label);
 	}
-	else if(m_style == BUTTON_LINEBASED)
+	else if(m_style == BUST_LINEBASED)
 	{
-		Player* py = &g_player[g_curP];
+		//InfoMess("lb", "lb");
+		Player* py = &g_player[g_localP];
 
 		EndS();
 
 		UseS(SHADER_COLOR2D);
-		glUniform1f(g_shader[g_curS].m_slot[SSLOT_WIDTH], (float)py->currw);
-		glUniform1f(g_shader[g_curS].m_slot[SSLOT_HEIGHT], (float)py->currh);
+		glUniform1f(g_shader[g_curS].m_slot[SSLOT_WIDTH], (float)g_currw);
+		glUniform1f(g_shader[g_curS].m_slot[SSLOT_HEIGHT], (float)g_currh);
 
 		float midcolor[] = {0.7f,0.7f,0.7f,0.8f};
 		float lightcolor[] = {0.8f,0.8f,0.8f,0.8f};
@@ -255,19 +276,15 @@ void Button::draw()
 
 		EndS();
 		CheckGLError(__FILE__, __LINE__);
-		Ortho(py->currw, py->currh, 1, 1, 1, 1);
+		Ortho(g_currw, g_currh, 1, 1, 1, 1);
 
 		float w = m_pos[2]-m_pos[0]-2;
 		float h = m_pos[3]-m_pos[1]-2;
 		float minsz = fmin(w, h);
 
 		//DrawImage(g_texture[m_tex].texname, m_pos[0]+1, m_pos[1]+1, m_pos[0]+minsz, m_pos[1]+minsz);
-
-		float gheight = g_font[m_font].gheight;
-		float texttop = m_pos[1] + h/2.0f - gheight/2.0f;
-		float textleft = m_pos[0]+minsz+1;
-
-		DrawShadowedText(m_font, textleft, texttop, &m_label);
+		CenterLabel(this);
+		DrawShadowedTextF(m_font, m_tpos[0], m_tpos[1], m_pos[0], m_pos[1], m_pos[2], m_pos[3], &m_label);
 	}
 	
 	//if(_stricmp(m_name.c_str(), "choose texture") == 0)
@@ -278,9 +295,9 @@ void Button::drawover()
 {
 	if(m_over)
 	{
-		Player* py = &g_player[g_curP];
+		Player* py = &g_player[g_localP];
 		//DrawShadowedText(m_font, m_tpos[0], m_tpos[1], m_text.c_str());
-		DrawShadowedText(m_font, py->mouse.x, py->mouse.y-g_font[m_font].gheight, &m_text);
+		DrawShadowedText(m_font, g_mouse.x, g_mouse.y-g_font[m_font].gheight, &m_text);
 	}
 }
 

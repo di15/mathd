@@ -41,8 +41,8 @@ void NewProjectile(Vec3f start, Vec3f end, int type)
 
 void DrawProjectiles()
 {
-	Player* py = &g_player[g_curP];
-	Camera* cam = &py->camera;
+	Player* py = &g_player[g_localP];
+	Camera* cam = &g_cam;
 
 	Projectile* proj;
 	ProjectileType* t;

@@ -13,18 +13,20 @@
 #include "../sim/player.h"
 #include "../debug.h"
 
+GUI g_gui;
+
 void GUI::draw()
 {
-	Player* py = &g_player[g_curP];
+	Player* py = &g_player[g_localP];
 
 	glClear(GL_DEPTH_BUFFER_BIT);
 	glDisable(GL_DEPTH_TEST);
 	CheckGLError(__FILE__, __LINE__);
-	Ortho(py->width, py->height, 1, 1, 1, 1);
+	Ortho(g_width, g_height, 1, 1, 1, 1);
 	CheckGLError(__FILE__, __LINE__);
 
 #if 0
-	DrawImage(g_texture[0].texname, py->width - 300, 0, py->width, 300, 0, 1, 1, 0);
+	DrawImage(g_texture[0].texname, g_width - 300, 0, g_width, 300, 0, 1, 1, 0);
 #endif
 
 	for(auto i=m_subwidg.begin(); i!=m_subwidg.end(); i++)
@@ -43,7 +45,7 @@ void GUI::draw()
 		(*i)->drawover();
 
 #if 0
-	DrawImage(g_depth, py->width - 300, 0, py->width, 300, 0, 1, 1, 0);
+	DrawImage(g_depth, g_width - 300, 0, g_width, 300, 0, 1, 1, 0);
 #endif
 
 #if 0
@@ -56,8 +58,8 @@ void GUI::draw()
 		DrawImage(g_tiletexs[TILE_PRERENDER], 0, 0, 150, 150, 0, 1, 1, 0);
 #endif
 
-	Sprite* sp = &g_cursor[py->curst];
-	DrawImage(g_texture[sp->texindex].texname, py->mouse.x-sp->offset[0], py->mouse.y-sp->offset[1], py->mouse.x-sp->offset[0]+32, py->mouse.y-sp->offset[1]+32);
+	Sprite* sp = &g_cursor[g_curst];
+	DrawImage(g_texture[sp->texindex].texname, g_mouse.x-sp->offset[0], g_mouse.y-sp->offset[1], g_mouse.x-sp->offset[0]+32, g_mouse.y-sp->offset[1]+32);
 
 	CheckGLError(__FILE__, __LINE__);
 
@@ -65,8 +67,8 @@ void GUI::draw()
 	CheckGLError(__FILE__, __LINE__);
 
 	UseS(SHADER_COLOR2D);
-	glUniform1f(g_shader[SHADER_COLOR2D].m_slot[SSLOT_WIDTH], (float)py->width);
-	glUniform1f(g_shader[SHADER_COLOR2D].m_slot[SSLOT_HEIGHT], (float)py->height);
+	glUniform1f(g_shader[SHADER_COLOR2D].m_slot[SSLOT_WIDTH], (float)g_width);
+	glUniform1f(g_shader[SHADER_COLOR2D].m_slot[SSLOT_HEIGHT], (float)g_height);
 	glUniform4f(g_shader[SHADER_COLOR2D].m_slot[SSLOT_COLOR], 0, 1, 0, 0.75f);
 	//glEnable(GL_DEPTH_TEST);
 	//DrawSelector();
@@ -79,32 +81,51 @@ void GUI::draw()
 	glEnable(GL_DEPTH_TEST);
 }
 
-void GUI::inev(InEv* ev)
+void GUI::inev(InEv* ie)
 {
+#if 0
 	for(auto w=m_subwidg.rbegin(); w!=m_subwidg.rend(); w++)
-		(*w)->inev(ev);
-
-	if(!ev->intercepted)
+		(*w)->inev(ie);
+#else
+	//safe, may shift during call
+	int win = 0;
+	while(win < m_subwidg.size())
 	{
-		//if(ev->type == INEV_MOUSEUP && ev->key == MOUSE_LEFT) g_log<<"mouse up l"<<std::endl;
+		int win2 = 0;
+		for(auto wit=m_subwidg.rbegin(); wit!=m_subwidg.rend(); wit++, win2++)
+		{
+			if(win2 < win)
+				continue;
 
-		if(ev->type == INEV_MOUSEMOVE && mousemovefunc) mousemovefunc();
-		else if(ev->type == INEV_MOUSEDOWN && ev->key == MOUSE_LEFT && lbuttondownfunc) lbuttondownfunc();
-		else if(ev->type == INEV_MOUSEUP && ev->key == MOUSE_LEFT && lbuttonupfunc) lbuttonupfunc();
-		else if(ev->type == INEV_MOUSEDOWN && ev->key == MOUSE_MIDDLE && mbuttondownfunc) mbuttondownfunc();
-		else if(ev->type == INEV_MOUSEUP && ev->key == MOUSE_MIDDLE && mbuttonupfunc) mbuttonupfunc();
-		else if(ev->type == INEV_MOUSEDOWN && ev->key == MOUSE_RIGHT && rbuttondownfunc) rbuttondownfunc();
-		else if(ev->type == INEV_MOUSEUP && ev->key == MOUSE_RIGHT && rbuttonupfunc) rbuttonupfunc();
-		else if(ev->type == INEV_MOUSEWHEEL && mousewheelfunc) mousewheelfunc(ev->amount);
-		else if(ev->type == INEV_KEYDOWN && keydownfunc[ev->scancode]) keydownfunc[ev->scancode]();
-		else if(ev->type == INEV_KEYUP && keyupfunc[ev->scancode]) keyupfunc[ev->scancode]();
+			(*wit)->inev(ie);
+			break;
+		}
+		win++;
+	}
+#endif
+
+
+	if(!ie->intercepted)
+	{
+		//if(ie->type == INEV_MOUSEUP && ie->key == MOUSE_LEFT) g_log<<"mouse up l"<<std::endl;
+
+		if(ie->type == INEV_MOUSEMOVE && mousemovefunc) mousemovefunc();
+		else if(ie->type == INEV_MOUSEDOWN && ie->key == MOUSE_LEFT && lbuttondownfunc) lbuttondownfunc();
+		else if(ie->type == INEV_MOUSEUP && ie->key == MOUSE_LEFT && lbuttonupfunc) lbuttonupfunc();
+		else if(ie->type == INEV_MOUSEDOWN && ie->key == MOUSE_MIDDLE && mbuttondownfunc) mbuttondownfunc();
+		else if(ie->type == INEV_MOUSEUP && ie->key == MOUSE_MIDDLE && mbuttonupfunc) mbuttonupfunc();
+		else if(ie->type == INEV_MOUSEDOWN && ie->key == MOUSE_RIGHT && rbuttondownfunc) rbuttondownfunc();
+		else if(ie->type == INEV_MOUSEUP && ie->key == MOUSE_RIGHT && rbuttonupfunc) rbuttonupfunc();
+		else if(ie->type == INEV_MOUSEWHEEL && mousewheelfunc) mousewheelfunc(ie->amount);
+		else if(ie->type == INEV_KEYDOWN && keydownfunc[ie->scancode]) keydownfunc[ie->scancode]();
+		else if(ie->type == INEV_KEYUP && keyupfunc[ie->scancode]) keyupfunc[ie->scancode]();
 	}
 }
 
 void GUI::closeall()
 {
 	for(auto i=m_subwidg.begin(); i!=m_subwidg.end(); i++)
-		(*i)->m_opened = false;
+		(*i)->close();
 }
 
 void GUI::close(const char* name)
@@ -120,17 +141,20 @@ void GUI::open(const char* name)
 {
 	for(auto i=m_subwidg.begin(); i!=m_subwidg.end(); i++)
 		if(stricmp((*i)->m_name.c_str(), name) == 0)
-			(*i)->m_opened = true;
+		{
+			(*i)->open();
+			break;	//important - list may shift after open() and tofront() call
+		}
 }
 
 void GUI::reframe()
 {
-	Player* py = &g_player[g_curP];
+	Player* py = &g_player[g_localP];
 
 	m_pos[0] = 0;
 	m_pos[1] = 0;
-	m_pos[2] = py->width-1;
-	m_pos[3] = py->height-1;
+	m_pos[2] = g_width-1;
+	m_pos[3] = g_height-1;
 
 	for(auto w=m_subwidg.begin(); w!=m_subwidg.end(); w++)
 		(*w)->reframe();
@@ -157,10 +181,10 @@ void Status(const char* status, bool logthis)
 	}
 	upper[i] = '\0';*/
 
-	Player* py = &g_player[g_curP];
-	GUI* gui = &py->gui;
+	Player* py = &g_player[g_localP];
+	GUI* gui = &g_gui;
 
-	//gui->get("loading")->get("status", WIDGET_TEXT)->m_text = upper;
+	//gui->get("load")->get("status", WIDGET_TEXT)->m_text = upper;
 	ViewLayer* loadingview = (ViewLayer*)gui->get("loading");
 
 	if(!loadingview)
@@ -176,12 +200,12 @@ void Status(const char* status, bool logthis)
 
 bool MousePosition()
 {
-	Player* py = &g_player[g_curP];
+	Player* py = &g_player[g_localP];
 
-	Vec2i old = py->mouse;
-	SDL_GetMouseState(&py->mouse.x, &py->mouse.y);
+	Vec2i old = g_mouse;
+	SDL_GetMouseState(&g_mouse.x, &g_mouse.y);
 
-	if(py->mouse.x == old.x && py->mouse.y == old.y)
+	if(g_mouse.x == old.x && g_mouse.y == old.y)
 		return false;
 
 	return true;
@@ -189,17 +213,17 @@ bool MousePosition()
 
 void CenterMouse()
 {
-	Player* py = &g_player[g_curP];
+	Player* py = &g_player[g_localP];
 
-	py->mouse.x = py->width/2;
-	py->mouse.y = py->height/2;
-	SDL_WarpMouseInWindow(g_window, py->mouse.x, py->mouse.y);
+	g_mouse.x = g_width/2;
+	g_mouse.y = g_height/2;
+	SDL_WarpMouseInWindow(g_window, g_mouse.x, g_mouse.y);
 }
 
 void Ortho(int width, int height, float r, float g, float b, float a)
 {
 	CheckGLError(__FILE__, __LINE__);
-	Player* py = &g_player[g_curP];
+	Player* py = &g_player[g_localP];
 	UseS(SHADER_ORTHO);
 	Shader* s = &g_shader[g_curS];
 	glUniform1f(g_shader[SHADER_ORTHO].m_slot[SSLOT_WIDTH], (float)width);
@@ -208,7 +232,7 @@ void Ortho(int width, int height, float r, float g, float b, float a)
 	//glEnableVertexAttribArray(s->m_slot[SSLOT_POSITION]);
 	//glEnableVertexAttribArray(g_shader[SHADER_ORTHO].m_slot[SSLOT_TEXCOORD0]);
 	//glEnableVertexAttribArray(g_shader[SHADER_ORTHO].m_slot[SSLOT_NORMAL]);
-	py->currw = width;
-	py->currh = height;
+	g_currw = width;
+	g_currh = height;
 	CheckGLError(__FILE__, __LINE__);
 }

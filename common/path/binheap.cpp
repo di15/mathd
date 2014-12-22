@@ -2,21 +2,22 @@
 #include "pathnode.h"
 #include "../utils.h"
 
-Heap::Heap()
+BinHeap::BinHeap(bool (*comparef)(void* a, void* b))
 {
 #if 0
 	heap = NULL;
 	allocsz = 0;
 	nelements = 0;
 #endif
+	comparefunc = comparef;
 }
 
-Heap::~Heap()
+BinHeap::~BinHeap()
 {
 	freemem();
 }
 
-void Heap::alloc(int ncells)
+void BinHeap::alloc(int ncells)
 {
 #if 0
 	freemem();
@@ -27,7 +28,7 @@ void Heap::alloc(int ncells)
 #endif
 }
 
-void Heap::freemem()
+void BinHeap::freemem()
 {
 #if 0
 	if(heap)
@@ -43,7 +44,7 @@ void Heap::freemem()
 #endif
 }
 
-void Heap::resetelems()
+void BinHeap::resetelems()
 {
 #if 0
 	nelements = 0;
@@ -52,7 +53,7 @@ void Heap::resetelems()
 #endif
 }
 
-bool Heap::insert(PathNode* element)
+bool BinHeap::insert(void* element)
 {
 #if 0
 
@@ -70,7 +71,7 @@ bool Heap::insert(PathNode* element)
 	return true;
 }
 
-bool Heap::hasmore()
+bool BinHeap::hasmore()
 {
 #if 0
 	return nelements > 0;
@@ -79,7 +80,7 @@ bool Heap::hasmore()
 #endif
 }
 
-PathNode* Heap::deletemin()
+void* BinHeap::deletemin()
 {
 #if 0
 	PathNode* pmin = heap[0];
@@ -88,7 +89,7 @@ PathNode* Heap::deletemin()
 	heapifydown(0);
 	return pmin;
 #else
-	PathNode* pmin = heap.front();
+	void* pmin = heap.front();
 	heap[0] = heap.at(heap.size() - 1);
 	heap.pop_back();
 	heapifydown(0);
@@ -96,7 +97,7 @@ PathNode* Heap::deletemin()
 #endif
 }
 
-void Heap::heapify(PathNode* element)
+void BinHeap::heapify(void* element)
 {
 #if 1
 	if(heap.size() <= 0)
@@ -121,7 +122,7 @@ void Heap::heapify(PathNode* element)
 		}
 		return;
 	}
-	for(int i = floor(heap.size()/2); i; i--)
+	for(int i = (int)floor(heap.size()/2); i; i--)
 	{
 		heapifydown(i);
 	}
@@ -130,10 +131,10 @@ void Heap::heapify(PathNode* element)
 }
 
 #if 0
-void Heap::print()
+void BinHeap::print()
 {
 	std::vector<int>::iterator pos = heap.begin();
-	cout << "Heap = ";
+	cout << "BinHeap = ";
 	while ( pos != heap.end() )
 	{
 		cout << *pos << " ";
@@ -143,43 +144,43 @@ void Heap::print()
 }
 #endif
 
-void Heap::heapifyup(int index)
+void BinHeap::heapifyup(int index)
 {
 	//cout << "index=" << index << std::endl;
 	//cout << "parent(index)=" << parent(index) << std::endl;
 	//cout << "heap[parent(index)]=" << heap[parent(index)] << std::endl;
 	//cout << "heap[index]=" << heap[index] << std::endl;
-	while ( ( index > 0 ) && ( parent(index) >= 0 ) &&
-	                ( heap[parent(index)]->F > heap[index]->F ) )
+	while ( ( index > 0 ) && ( parent(index) >= 0 ) && comparefunc(heap[parent(index)], heap[index])
+	                /* ( heap[parent(index)]->score > heap[index]->score ) */ )
 	{
-		PathNode* tmp = heap[parent(index)];
+		void* tmp = heap[parent(index)];
 		heap[parent(index)] = heap[index];
 		heap[index] = tmp;
 		index = parent(index);
 	}
 }
 
-void Heap::heapifydown(int index)
+void BinHeap::heapifydown(int index)
 {
 	//cout << "index=" << index << std::endl;
 	//cout << "left(index)=" << left(index) << std::endl;
 	//cout << "right(index)=" << right(index) << std::endl;
 	int child = left(index);
-	if ( ( child > 0 ) && ( right(index) > 0 ) &&
-	                ( heap[child]->F > heap[right(index)]->F ) )
+	if ( ( child > 0 ) && ( right(index) > 0 ) && comparefunc(heap[child], heap[right(index)])
+	              /*  ( heap[child]->score > heap[right(index)]->score ) */ )
 	{
 		child = right(index);
 	}
 	if ( child > 0 )
 	{
-		PathNode* tmp = heap[index];
+		void* tmp = heap[index];
 		heap[index] = heap[child];
 		heap[child] = tmp;
 		heapifydown(child);
 	}
 }
 
-int Heap::left(int parent)
+int BinHeap::left(int parent)
 {
 	int i = ( parent << 1 ) + 1; // 2 * parent + 1
 #if 0
@@ -189,7 +190,7 @@ int Heap::left(int parent)
 #endif
 }
 
-int Heap::right(int parent)
+int BinHeap::right(int parent)
 {
 	int i = ( parent << 1 ) + 2; // 2 * parent + 2
 #if 0
@@ -199,7 +200,7 @@ int Heap::right(int parent)
 #endif
 }
 
-int Heap::parent(int child)
+int BinHeap::parent(int child)
 {
 	if (child != 0)
 	{
@@ -213,7 +214,7 @@ int Heap::parent(int child)
 int main()
 {
 	// Create the heap
-	Heap* myheap = new Heap();
+	BinHeap* myheap = new BinHeap();
 	myheap->insert(700);
 	myheap->print();
 	myheap->insert(500);

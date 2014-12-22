@@ -3,9 +3,9 @@
 #include "../math/vec2i.h"
 #include "../math/3dmath.h"
 #include "../sim/unit.h"
-#include "../sim/unittype.h"
+#include "../sim/utype.h"
 #include "../sim/building.h"
-#include "../sim/buildingtype.h"
+#include "../sim/bltype.h"
 #include "../render/heightmap.h"
 #include "../math/hmapmath.h"
 #include "../phys/collision.h"
@@ -21,24 +21,25 @@
 #include "pathnode.h"
 #include "../render/shader.h"
 #include "../sim/player.h"
+#include "pathdebug.h"
 
-static std::vector<Vec3f> gridvecs;
+std::vector<Vec3f> g_gridvecs;
 Unit* g_pathunit = NULL;
 
 void DrawSteps()
 {
 	Shader* s = &g_shader[g_curS];
-	Player* py = &g_player[g_curP];
+	Player* py = &g_player[g_localP];
 
-	if(py->sel.units.size() <= 0)
-		return;
+	//if(g_sel.units.size() <= 0)
+	//	return;
 
-	int ui = *py->sel.units.begin();
-	Unit* u = &g_unit[ui];
+	//int ui = *g_sel.units.begin();
+	//Unit* u = &g_unit[ui];
 
 	std::vector<Vec3f> lines;
 
-#if 1
+#if 0
 
 	Vec2i npos = Vec2i( u->cmpos.x / PATHNODE_SIZE, u->cmpos.y / PATHNODE_SIZE );
 	int nminx = imax(0, npos.x-50);
@@ -70,7 +71,36 @@ void DrawSteps()
 			lines.push_back(from);
 			lines.push_back(to);
 		}
+#elif 1
+	int nminx = 0;
+	int nminz = 0;
+	int nmaxx = g_pathdim.x-1;
+	int nmaxz = g_pathdim.y-1;
 
+	for(int x = nminx; x <= nmaxx; x ++)
+		for(int z = nminz; z <= nmaxz; z++)
+		{
+			PathNode* n = PathNodeAt(x, z);
+
+			if(!n->previous)
+				continue;
+
+			Vec2i nprevpos = PathNodePos(n->previous);
+
+			Vec3f to;
+			Vec3f from;
+
+			to.x = x * PATHNODE_SIZE + PATHNODE_SIZE/2;
+			to.z = z * PATHNODE_SIZE + PATHNODE_SIZE/2;
+			to.y = g_hmap.accheight(to.x, to.z) + TILE_SIZE/20;
+
+			from.x = nprevpos.x * PATHNODE_SIZE + PATHNODE_SIZE/2;
+			from.z = nprevpos.y * PATHNODE_SIZE + PATHNODE_SIZE/2;
+			from.y = g_hmap.accheight(from.x, from.z) + TILE_SIZE/20;
+
+			lines.push_back(from);
+			lines.push_back(to);
+		}
 #else
 	int si = 0;
 	auto siter = wt->openlist.begin();
@@ -114,27 +144,27 @@ void DrawGrid()
 	Shader* s = &g_shader[g_curS];
 
 #if 1
-	if(gridvecs.size() > 0)
+	if(g_gridvecs.size() > 0)
 	{
 		glUniform4f(s->m_slot[SSLOT_COLOR], 1, 1, 1, 1);
 		//glBegin(GL_LINES);
 
-		//glVertexAttribPointer(s->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, &gridvecs[0]);
-		glVertexPointer(3, GL_FLOAT, 0, &gridvecs[0]);
+		//glVertexAttribPointer(s->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, &g_gridvecs[0]);
+		glVertexPointer(3, GL_FLOAT, 0, &g_gridvecs[0]);
 
-		if(s->m_slot[SSLOT_TEXCOORD0] != -1)    glVertexAttribPointer(s->m_slot[SSLOT_TEXCOORD0], 2, GL_FLOAT, GL_FALSE, 0, &gridvecs[0]);
-		glDrawArrays(GL_LINES, 0, gridvecs.size());
+		if(s->m_slot[SSLOT_TEXCOORD0] != -1)    glVertexAttribPointer(s->m_slot[SSLOT_TEXCOORD0], 2, GL_FLOAT, GL_FALSE, 0, &g_gridvecs[0]);
+		glDrawArrays(GL_LINES, 0, g_gridvecs.size());
 	}
 #endif
 
 #if 1
 	glUniform4f(s->m_slot[SSLOT_COLOR],  0.5f, 0, 0, 1);
 
-	Player* py = &g_player[g_curP];
+	Player* py = &g_player[g_localP];
 
-	if(py->sel.units.size() > 0)
+	if(g_sel.units.size() > 0)
 	{
-		int i = *py->sel.units.begin();
+		int i = *g_sel.units.begin();
 		Unit* u = &g_unit[i];
 
 		bool roadVeh = false;
@@ -148,17 +178,40 @@ void DrawGrid()
 		int ux = u->cmpos.x / PATHNODE_SIZE;
 		int uz = u->cmpos.y / PATHNODE_SIZE;
 
+#if 0
+		//debug pathing
+		double unminx = (u->cmpos.x - t->size.x/2) / (double)PATHNODE_SIZE;
+		double unminz = (u->cmpos.y - t->size.z/2) / (double)PATHNODE_SIZE;
+
+		static bool first = false;
+
+		if(!first)
+		{
+			first = true;
+			char msg[128];
+			sprintf(msg, "nxd,y:%lf,%lf", unminx, unminz);
+			InfoMess(msg, msg);
+		}
+#endif
+
 		for(int x=imax(0, ux-50); x<imin(ux+50, g_pathdim.x); x++)
 			for(int z=imax(0, uz-50); z<imin(uz+50, g_pathdim.y); z++)
 			{
-				ColliderTile* cell = ColliderTileAt(x, z);
+				ColliderTile* cell = ColliderAt(x, z);
 
 				bool blocked = false;
-
-				if(roadVeh && !(cell->flags & FLAG_HASROAD))
+				
+				//if(roadVeh && !(cell->flags & FLAG_HASROAD))
+				if(roadVeh)
 				{
-					blocked = true;
+					CdTile* cdtile = GetCd(CONDUIT_ROAD, u->cmpos.x / TILE_SIZE, u->cmpos.y / TILE_SIZE, false);
+
+					if(!(cdtile->on && cdtile->finished))
+						blocked = true;
 				}
+
+				if(cell->flags & FLAG_ABRUPT)
+					blocked = true;
 
 				bool foundother = false;
 
@@ -169,14 +222,21 @@ void DrawGrid()
 
 					short uindex = cell->units[uiter];
 
-					if(&g_unit[uindex] != u)
+					Unit* u2 = &g_unit[uindex];
+
+					if(u2 != u && !u2->hidden())
 					{
 						foundother = true;
 						break;
 					}
 				}
 
-				if(!foundother && !blocked)
+				bool foundbl = false;
+
+				if(cell->building >= 0)
+					foundbl = true;
+
+				if(!foundother && !blocked && !foundbl)
 					continue;
 
 				std::vector<Vec3f> vecs;
@@ -185,10 +245,10 @@ void DrawGrid()
 				vecs.push_back(Vec3f((x+1)*PATHNODE_SIZE, 1, z*PATHNODE_SIZE));
 				vecs.push_back(Vec3f(x*PATHNODE_SIZE, 1, (z+1)*PATHNODE_SIZE));
 
-				vecs[0].y = g_hmap.accheight(vecs[0].x, vecs[0].z) + TILE_SIZE/100;
-				vecs[1].y = g_hmap.accheight(vecs[1].x, vecs[1].z) + TILE_SIZE/100;
-				vecs[2].y = g_hmap.accheight(vecs[2].x, vecs[2].z) + TILE_SIZE/100;
-				vecs[3].y = g_hmap.accheight(vecs[3].x, vecs[3].z) + TILE_SIZE/100;
+				vecs[0].y = g_hmap.accheight(vecs[0].x, vecs[0].z) + TILE_SIZE/20;
+				vecs[1].y = g_hmap.accheight(vecs[1].x, vecs[1].z) + TILE_SIZE/20;
+				vecs[2].y = g_hmap.accheight(vecs[2].x, vecs[2].z) + TILE_SIZE/20;
+				vecs[3].y = g_hmap.accheight(vecs[3].x, vecs[3].z) + TILE_SIZE/20;
 
 				//glVertexAttribPointer(s->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, &vecs[0]);
 				glVertexPointer(3, GL_FLOAT, 0, &vecs[0]);
@@ -197,19 +257,23 @@ void DrawGrid()
 	}
 #endif
 
-	if(gridvecs.size() > 0)
+	if(g_gridvecs.size() > 0)
 		return;
+
+	return;
+
+	//g_gridvecs.reserve( g_pathdim.x * g_pathdim.y );
 
 	for(int x=0; x<g_pathdim.x-1; x++)
 	{
 		for(int z=0; z<g_pathdim.y-1; z++)
 		{
-			int i = gridvecs.size();
+			int i = g_gridvecs.size();
 
-			gridvecs.push_back(Vec3f(x*PATHNODE_SIZE, 0 + 1, z*PATHNODE_SIZE));
-			gridvecs.push_back(Vec3f(x*PATHNODE_SIZE, 0 + 1, (z+1)*PATHNODE_SIZE));
-			gridvecs[i+0].y = g_hmap.accheight(gridvecs[i+0].x, gridvecs[i+0].z) + TILE_SIZE/10;
-			gridvecs[i+1].y = g_hmap.accheight(gridvecs[i+1].x, gridvecs[i+1].z) + TILE_SIZE/10;
+			g_gridvecs.push_back(Vec3f(x*PATHNODE_SIZE, 0 + 1, z*PATHNODE_SIZE));
+			g_gridvecs.push_back(Vec3f(x*PATHNODE_SIZE, 0 + 1, (z+1)*PATHNODE_SIZE));
+			g_gridvecs[i+0].y = g_hmap.accheight(g_gridvecs[i+0].x, g_gridvecs[i+0].z) + TILE_SIZE/20;
+			g_gridvecs[i+1].y = g_hmap.accheight(g_gridvecs[i+1].x, g_gridvecs[i+1].z) + TILE_SIZE/20;
 			//glVertex3f(x*(MIN_RADIUS*2.0f), 0 + 1, 0);
 			//glVertex3f(x*(MIN_RADIUS*2.0f), 0 + 1, g_map.m_widthZ*TILE_SIZE);
 		}
@@ -219,11 +283,11 @@ void DrawGrid()
 	{
 		for(int x=0; x<g_pathdim.x-1; x++)
 		{
-			int i = gridvecs.size();
-			gridvecs.push_back(Vec3f(x*PATHNODE_SIZE, 0 + 1, z*PATHNODE_SIZE));
-			gridvecs.push_back(Vec3f((x+1)*PATHNODE_SIZE, 0 + 1, z*PATHNODE_SIZE));
-			gridvecs[i+0].y = g_hmap.accheight(gridvecs[i+0].x, gridvecs[i+0].z) + TILE_SIZE/10;
-			gridvecs[i+1].y = g_hmap.accheight(gridvecs[i+1].x, gridvecs[i+1].z) + TILE_SIZE/10;
+			int i = g_gridvecs.size();
+			g_gridvecs.push_back(Vec3f(x*PATHNODE_SIZE, 0 + 1, z*PATHNODE_SIZE));
+			g_gridvecs.push_back(Vec3f((x+1)*PATHNODE_SIZE, 0 + 1, z*PATHNODE_SIZE));
+			g_gridvecs[i+0].y = g_hmap.accheight(g_gridvecs[i+0].x, g_gridvecs[i+0].z) + TILE_SIZE/20;
+			g_gridvecs[i+1].y = g_hmap.accheight(g_gridvecs[i+1].x, g_gridvecs[i+1].z) + TILE_SIZE/20;
 			//glVertex3f(0, 0 + 1, z*(MIN_RADIUS*2.0f));
 			//glVertex3f(g_map.m_widthX*TILE_SIZE, 0 + 1, z*(MIN_RADIUS*2.0f));
 		}
@@ -276,11 +340,11 @@ void DrawUnitSquares()
 		vecs.push_back(Vec3f(vmin.x + t->size.x, 0 + 1, vmin.z));
 		vecs.push_back(Vec3f(vmin.x, 0 + 1, vmin.z));
 
-		vecs[0].y = g_hmap.accheight(vecs[0].x, vecs[0].z) + TILE_SIZE/100;
-		vecs[1].y = g_hmap.accheight(vecs[1].x, vecs[1].z) + TILE_SIZE/100;
-		vecs[2].y = g_hmap.accheight(vecs[2].x, vecs[2].z) + TILE_SIZE/100;
-		vecs[3].y = g_hmap.accheight(vecs[3].x, vecs[3].z) + TILE_SIZE/100;
-		vecs[4].y = g_hmap.accheight(vecs[4].x, vecs[4].z) + TILE_SIZE/100;
+		vecs[0].y = g_hmap.accheight(vecs[0].x, vecs[0].z) + TILE_SIZE/20;
+		vecs[1].y = g_hmap.accheight(vecs[1].x, vecs[1].z) + TILE_SIZE/20;
+		vecs[2].y = g_hmap.accheight(vecs[2].x, vecs[2].z) + TILE_SIZE/20;
+		vecs[3].y = g_hmap.accheight(vecs[3].x, vecs[3].z) + TILE_SIZE/20;
+		vecs[4].y = g_hmap.accheight(vecs[4].x, vecs[4].z) + TILE_SIZE/20;
 
 		//glVertexAttribPointer(s->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, &vecs[0]);
 		glVertexPointer(3, GL_FLOAT, 0, &vecs[0]);
@@ -292,15 +356,15 @@ void DrawUnitSquares()
 void DrawPaths()
 {
 #if 1
-	Player* py = &g_player[g_curP];
+	Player* py = &g_player[g_localP];
 	Shader* s = &g_shader[g_curS];
 
 	int i = 0;
 
-	if(py->sel.units.size() <= 0)
+	if(g_sel.units.size() <= 0)
 		return;
 
-	i = *py->sel.units.begin();
+	i = *g_sel.units.begin();
 #else
 	for(int i=0; i<UNITS; i++)
 #endif
@@ -315,6 +379,15 @@ void DrawPaths()
 #endif
 
 		std::vector<Vec3f> vecs;
+		
+		glUniform4f(s->m_slot[SSLOT_COLOR], 1, 1, 0, 1);
+		vecs.push_back(Vec3f(u->cmpos.x, g_hmap.accheight(u->cmpos.x, u->cmpos.y) + TILE_SIZE/20, u->cmpos.y));
+		vecs.push_back(Vec3f(u->goal.x, g_hmap.accheight(u->goal.x, u->goal.y) + TILE_SIZE/20, u->goal.y));
+		glVertexPointer(3, GL_FLOAT, 0, &vecs[0]);
+		//glDrawArrays(GL_LINE_STRIP, 0, vecs.size());
+		vecs.clear();
+		
+		glUniform4f(s->m_slot[SSLOT_COLOR], 0, 1, 0, 1);
 
 		Vec3f p;
 		p.x = u->cmpos.x;
@@ -337,6 +410,8 @@ void DrawPaths()
 		p.y = g_hmap.accheight(p.x, p.z) + TILE_SIZE/100;
 #endif
 
+		vecs.clear();	//temp
+
 		if(vecs.size() > 1)
 		{
 			//glVertexAttribPointer(s->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, &vecs[0]);
@@ -354,6 +429,33 @@ void DrawPaths()
 			glVertexAttribPointer(s->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, &vecs[0]);
 			glDrawArrays(GL_LINE_STRIP, 0, vecs.size());
 #endif
+		}
+
+		vecs.clear();
+
+		glUniform4f(s->m_slot[SSLOT_COLOR], 0.5f, 1, 0.5f, 1);
+
+		for(auto titer = u->tpath.begin(); titer != u->tpath.end(); titer++)
+		{
+			p.x = titer->x * TILE_SIZE + TILE_SIZE/2;
+			p.z = titer->y * TILE_SIZE + TILE_SIZE/2;
+			p.y = g_hmap.accheight(p.x, p.z) + TILE_SIZE/20;
+			//glVertex3f(p->x, p->y + 5, p->z);
+			vecs.push_back(p);
+			//vecs.push_back(p+Vec3f(0,10,0));
+		}
+
+#if 0
+		p.x = u->goal.x;
+		p.z = u->goal.y;
+		p.y = g_hmap.accheight(p.x, p.z) + TILE_SIZE/100;
+#endif
+
+		if(vecs.size() > 1)
+		{
+			//glVertexAttribPointer(s->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, &vecs[0]);
+			glVertexPointer(3, GL_FLOAT, 0, &vecs[0]);
+			glDrawArrays(GL_LINE_STRIP, 0, vecs.size());
 		}
 	}
 }
@@ -404,12 +506,12 @@ void LogPathDebug()
 		return;
 	}
 
-	Player* py = &g_player[g_curP];
+	Player* py = &g_player[g_localP];
 
-	if(py->sel.units.size() <= 0)
+	if(g_sel.units.size() <= 0)
 		return;
 
-	int i = *py->sel.units.begin();
+	int i = *g_sel.units.begin();
 
 	g_pathunit = &g_unit[i];
 }

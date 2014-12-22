@@ -29,7 +29,7 @@ void FreeDeposits()
 
 void DrawDeposits(const Matrix projection, const Matrix viewmat)
 {
-	if(g_hmap.m_widthx <= 0 || g_hmap.m_widthz <= 0)
+	if(g_hmap.m_widthx <= 0 || g_hmap.m_widthy <= 0)
 		return;
 
 	Shader* s = &g_shader[g_curS];
@@ -42,7 +42,7 @@ void DrawDeposits(const Matrix projection, const Matrix viewmat)
 	mvp.set(projection.m_matrix);
 	mvp.postmult(viewmat);
 
-	Player* py = &g_player[g_curP];
+	Player* py = &g_player[g_localP];
 
 	for(int i=0; i<DEPOSITS; i++)
 	{
@@ -61,7 +61,7 @@ void DrawDeposits(const Matrix projection, const Matrix viewmat)
 		pos.y = Bilerp(&g_hmap, pos.x, pos.z);
 #endif
 		//Vec4f ScreenPos(Matrix* mvp, Vec3f vec, float width, float height)
-		Vec4f spos = ScreenPos(&mvp, pos, py->currw, py->currh, true);
+		Vec4f spos = ScreenPos(&mvp, pos, g_currw, g_currh, true);
 
 		Resource* res = &g_resource[d->restype];
 		Icon* ic = &g_icon[res->icon];

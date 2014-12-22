@@ -13,6 +13,6 @@ class Building;
 class PathNode;
 class PathJob;
 
-void IdentifySuccessors_JPS(PathJob* pj, PathNode* node);
+void Expand_JPS(PathJob* pj, PathNode* node);
 
 #endif

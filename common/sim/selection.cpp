@@ -4,9 +4,9 @@
 #include "../math/plane3f.h"
 #include "../math/frustum.h"
 #include "../math/brush.h"
-#include "unittype.h"
+#include "utype.h"
 #include "unit.h"
-#include "buildingtype.h"
+#include "bltype.h"
 #include "building.h"
 #include "../render/shader.h"
 #include "../texture.h"
@@ -15,8 +15,9 @@
 #include "../../game/gmain.h"
 #include "build.h"
 #include "player.h"
-#include "../gui/widgets/spez/constructionview.h"
-#include "../gui/widgets/spez/buildingview.h"
+#include "../gui/widgets/spez/cstrview.h"
+#include "../gui/widgets/spez/blview.h"
+#include "../gui/widgets/spez/truckmgr.h"
 #include "../gui/gui.h"
 #include "powl.h"
 #include "crpipe.h"
@@ -48,16 +49,16 @@ static Frustum g_selfrust;	//selection frustum
 
 void DrawMarquee()
 {
-	Player* py = &g_player[g_curP];
+	Player* py = &g_player[g_localP];
 
-	if(!py->mousekeys[0] || py->keyintercepted || g_mode != APPMODE_PLAY || py->build != BL_NONE)
+	if(!g_mousekeys[0] || g_keyintercepted || g_mode != APPMODE_PLAY || g_build != BL_NONE)
 		return;
 
 #if 0
 	EndS();
 	UseS(SHADER_COLOR2D);
-	glUniform1f(g_shader[SHADER_COLOR2D].m_slot[SSLOT_WIDTH], (float)py->width);
-	glUniform1f(g_shader[SHADER_COLOR2D].m_slot[SSLOT_HEIGHT], (float)py->height);
+	glUniform1f(g_shader[SHADER_COLOR2D].m_slot[SSLOT_WIDTH], (float)g_width);
+	glUniform1f(g_shader[SHADER_COLOR2D].m_slot[SSLOT_HEIGHT], (float)g_height);
 	glUniform4f(g_shader[SHADER_COLOR2D].m_slot[SSLOT_COLOR], 0, 1, 0, 0.75f);
 	glEnableVertexAttribArray(g_shader[SHADER_COLOR2D].m_slot[SSLOT_POSITION]);
 	glEnableVertexAttribArray(g_shader[SHADER_COLOR2D].m_slot[SSLOT_TEXCOORD0]);
@@ -66,12 +67,12 @@ void DrawMarquee()
 	float vertices[] =
 	{
 		//posx, posy    texx, texy
-		(float)py->mousestart.x,	(float)py->mousestart.y, 0,			0, 0,
-		(float)py->mousestart.x,	(float)py->mouse.y,0,				1, 0,
-		(float)py->mouse.x,			(float)py->mouse.y,0,				1, 1,
+		(float)g_mousestart.x,	(float)g_mousestart.y, 0,			0, 0,
+		(float)g_mousestart.x,	(float)g_mouse.y,0,				1, 0,
+		(float)g_mouse.x,			(float)g_mouse.y,0,				1, 1,
 
-		(float)py->mouse.x,			(float)py->mousestart.y,0,			1, 1,
-		(float)py->mousestart.x,	(float)py->mousestart.y,0,			0, 1
+		(float)g_mouse.x,			(float)g_mousestart.y,0,			1, 1,
+		(float)g_mousestart.x,	(float)g_mousestart.y,0,			0, 1
 	};
 
 	//glVertexAttribPointer(g_shader[SHADER_COLOR2D].m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, sizeof(float)*5, &vertices[0]);
@@ -83,7 +84,7 @@ void DrawMarquee()
 #if 1
 void DrawSel(Matrix* projection, Matrix* modelmat, Matrix* viewmat)
 {
-
+	//glBlendFunc(GL_SRC_ALPHA, GL_ONE);
 	UseS(SHADER_COLOR3D);
 	Shader* s = &g_shader[g_curS];
 	glUniformMatrix4fv(s->m_slot[SSLOT_PROJECTION], 1, 0, projection->m_matrix);
@@ -104,23 +105,23 @@ void DrawSel(Matrix* projection, Matrix* modelmat, Matrix* viewmat)
 #endif
 	glUniformMatrix4fv(s->m_slot[SSLOT_MVP], 1, 0, mvp.m_matrix);
 
-	float* color = g_player[g_localP].colorcode;
+	float* color = g_player[g_localP].color;
 	glUniform4f(s->m_slot[SSLOT_COLOR], color[0], color[1], color[2], 0.5f);
 
-	Player* py = &g_player[g_curP];
+	Player* py = &g_player[g_localP];
 
 	glLineWidth(3);
 
-	for(auto seliter = py->sel.buildings.begin(); seliter != py->sel.buildings.end(); seliter++)
+	for(auto seliter = g_sel.buildings.begin(); seliter != g_sel.buildings.end(); seliter++)
 	{
 		const int bi = *seliter;
 		const Building* b = &g_building[bi];
 		const BlType* t = &g_bltype[b->type];
 
 		const int tminx = b->tilepos.x - t->widthx/2;
-		const int tminz = b->tilepos.y - t->widthz/2;
+		const int tminz = b->tilepos.y - t->widthy/2;
 		const int tmaxx = tminx + t->widthx;
-		const int tmaxz = tminz + t->widthz;
+		const int tmaxz = tminz + t->widthy;
 
 		const int cmminx = tminx*TILE_SIZE;
 		const int cmminz = tminz*TILE_SIZE;
@@ -168,7 +169,7 @@ void DrawSel(Matrix* projection, Matrix* modelmat, Matrix* viewmat)
 	glUniformMatrix4fv(s->m_slot[SSLOT_MODELMAT], 1, 0, modelmat->m_matrix);
 	glUniformMatrix4fv(s->m_slot[SSLOT_VIEWMAT], 1, 0, viewmat->m_matrix);
 
-	color = g_player[g_localP].colorcode;
+	color = g_player[g_localP].color;
 	glUniform4f(s->m_slot[SSLOT_COLOR], color[0], color[1], color[2], 1.0f);
 
 	//glEnableVertexAttribArray(s->m_slot[SSLOT_POSITION]);
@@ -179,7 +180,7 @@ void DrawSel(Matrix* projection, Matrix* modelmat, Matrix* viewmat)
 	glBindTexture(GL_TEXTURE_2D, g_texture[ g_circle ].texname);
 	glUniform1i(s->m_slot[SSLOT_TEXTURE0], 0);
 
-	for(auto seliter = py->sel.units.begin(); seliter != py->sel.units.end(); seliter++)
+	for(auto seliter = g_sel.units.begin(); seliter != g_sel.units.end(); seliter++)
 	{
 		Unit* u = &g_unit[ *seliter ];
 		//Entity* e = g_entity[ 0 ];
@@ -230,7 +231,9 @@ void DrawSel(Matrix* projection, Matrix* modelmat, Matrix* viewmat)
 
 		glDrawArrays(GL_TRIANGLES, 0, 6);
 	}
+
 	EndS();
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }
 #endif
 
@@ -249,9 +252,9 @@ int SelectOneBuilding(Vec3f *line)
 		BlType* t = &g_bltype[ b->type ];
 
 		const int tminx = b->tilepos.x - t->widthx/2;
-		const int tminz = b->tilepos.y - t->widthz/2;
+		const int tminz = b->tilepos.y - t->widthy/2;
 		const int tmaxx = tminx + t->widthx;
-		const int tmaxz = tminz + t->widthz;
+		const int tmaxz = tminz + t->widthy;
 
 		const int cmminx = tminx*TILE_SIZE;
 		const int cmminz = tminz*TILE_SIZE;
@@ -263,7 +266,7 @@ int SelectOneBuilding(Vec3f *line)
 
 		const float y = g_hmap.accheight(cmx, cmz);
 
-		const int maxy = y + imax(t->widthx, t->widthz) * TILE_SIZE;
+		const int maxy = (int)y + imax(t->widthx, t->widthy) * TILE_SIZE;
 
 		Vec3f normals[6];
 		float dists[6];
@@ -358,9 +361,9 @@ int SelectOneUnit(Vec3f *line)
 
 Selection SelectOne(Vec3f campos, Vec3f camside, Vec3f camup2, Vec3f viewdir)
 {
-	Player* py = &g_player[g_curP];
+	Player* py = &g_player[g_localP];
 
-	Vec3f ray = ScreenPerspRay(py->mouse.x, py->mouse.y, py->width, py->height, campos, camside, camup2, viewdir, FIELD_OF_VIEW);
+	Vec3f ray = ScreenPerspRay(g_mouse.x, g_mouse.y, g_width, g_height, campos, camside, camup2, viewdir, FIELD_OF_VIEW);
 	Vec3f line[2];
 	line[0] = campos;
 	line[1] = campos + (ray * 1000000.0f);
@@ -369,13 +372,13 @@ Selection SelectOne(Vec3f campos, Vec3f camside, Vec3f camup2, Vec3f viewdir)
 
 	int sel = SelectOneUnit(line);
 #if 0
-	InfoMessage("sel one", "a");
+	InfoMess("sel one", "a");
 #endif
 
 	if(sel >= 0)
 	{
 #if 0
-		InfoMessage("sel one", "b");
+		InfoMess("sel one", "b");
 #endif
 		selection.units.push_back( sel );
 	}
@@ -421,6 +424,9 @@ std::list<int> SelectAreaUnits()
 {
 	std::list<int> unitsel;
 
+	bool haveowned = false;
+	bool haveowmili = false;
+
 	for(int i=0; i<UNITS; i++)
 	{
 		Unit* u = &g_unit[i];
@@ -441,6 +447,73 @@ std::list<int> SelectAreaUnits()
 			continue;
 
 		unitsel.push_back(i);
+
+		if(u->owner == g_localP && u->type != UNIT_LABOURER)
+		{
+			haveowned = true;
+
+			if(t->military)
+				haveowmili = true;
+		}
+	}
+
+	//filter units....
+
+	if(haveowmili)
+	{
+		//only owned military
+
+		auto uit=unitsel.begin();
+		while(uit!=unitsel.end())
+		{
+			Unit* u = &g_unit[*uit];
+
+			if(u->type == UNIT_LABOURER)
+			{
+				uit = unitsel.erase(uit);
+				continue;
+			}
+
+			if(u->owner != g_localP)
+			{
+				uit = unitsel.erase(uit);
+				continue;
+			}
+
+			UType* t = &g_utype[u->type];
+
+			if(!t->military)
+			{
+				uit = unitsel.erase(uit);
+				continue;
+			}
+
+			uit++;
+		}
+	}
+	else if(haveowned)
+	{
+		//only owned (no labourers)
+		
+		auto uit=unitsel.begin();
+		while(uit!=unitsel.end())
+		{
+			Unit* u = &g_unit[*uit];
+
+			if(u->type == UNIT_LABOURER)
+			{
+				uit = unitsel.erase(uit);
+				continue;
+			}
+
+			if(u->owner != g_localP)
+			{
+				uit = unitsel.erase(uit);
+				continue;
+			}
+
+			uit++;
+		}
 	}
 
 	return unitsel;
@@ -448,34 +521,34 @@ std::list<int> SelectAreaUnits()
 
 Selection SelectAreaPersp(Vec3f campos, Vec3f camside, Vec3f camup2, Vec3f viewdir)
 {
-	Player* py = &g_player[g_curP];
+	Player* py = &g_player[g_localP];
 
-	int minx = imin(py->mousestart.x, py->mouse.x);
-	int maxx = imax(py->mousestart.x, py->mouse.x);
-	int miny = imin(py->mousestart.y, py->mouse.y);
-	int maxy = imax(py->mousestart.y, py->mouse.y);
+	int minx = imin(g_mousestart.x, g_mouse.x);
+	int maxx = imax(g_mousestart.x, g_mouse.x);
+	int miny = imin(g_mousestart.y, g_mouse.y);
+	int maxy = imax(g_mousestart.y, g_mouse.y);
 
 	//Vec3f campos = c->m_pos;
 	//Vec3f camside = c->m_strafe;
 	//Vec3f camup2 = c->up2();
 	//Vec3f viewdir = Normalize( c->m_view - c->m_pos );
 
-	Vec3f topLeftRay = ScreenPerspRay(minx, miny, py->width, py->height, campos, camside, camup2, viewdir, FIELD_OF_VIEW);
+	Vec3f topLeftRay = ScreenPerspRay(minx, miny, g_width, g_height, campos, camside, camup2, viewdir, FIELD_OF_VIEW);
 	Vec3f lineTopLeft[2];
 	lineTopLeft[0] = campos;
 	lineTopLeft[1] = campos + (topLeftRay * 10000.0f);
 
-	Vec3f topRightRay = ScreenPerspRay(maxx, miny, py->width, py->height, campos, camside, camup2, viewdir, FIELD_OF_VIEW);
+	Vec3f topRightRay = ScreenPerspRay(maxx, miny, g_width, g_height, campos, camside, camup2, viewdir, FIELD_OF_VIEW);
 	Vec3f lineTopRight[2];
 	lineTopRight[0] = campos;
 	lineTopRight[1] = campos + (topRightRay * 10000.0f);
 
-	Vec3f bottomLeftRay = ScreenPerspRay(minx, maxy, py->width, py->height, campos, camside, camup2, viewdir, FIELD_OF_VIEW);
+	Vec3f bottomLeftRay = ScreenPerspRay(minx, maxy, g_width, g_height, campos, camside, camup2, viewdir, FIELD_OF_VIEW);
 	Vec3f lineBottomLeft[2];
 	lineBottomLeft[0] = campos;
 	lineBottomLeft[1] = campos + (bottomLeftRay * 10000.0f);
 
-	Vec3f bottomRightRay = ScreenPerspRay(maxx, maxy, py->width, py->height, campos, camside, camup2, viewdir, FIELD_OF_VIEW);
+	Vec3f bottomRightRay = ScreenPerspRay(maxx, maxy, g_width, g_height, campos, camside, camup2, viewdir, FIELD_OF_VIEW);
 	Vec3f lineBottomRight[2];
 	lineBottomRight[0] = campos;
 	lineBottomRight[1] = campos + (bottomRightRay * 10000.0f);
@@ -501,10 +574,10 @@ Selection SelectAreaPersp(Vec3f campos, Vec3f camside, Vec3f camup2, Vec3f viewd
 	GetMapIntersection(&g_hmap, lineBottomLeft, &interBottomLeft);
 	GetMapIntersection(&g_hmap, lineBottomRight, &interBottomRight);
 
-	PlaceUnit(UNIT_ROBOSOLDIER, Vec3i(interTopLeft.x, interTopLeft.y, interTopLeft.z), 2, -1, -1);
-	PlaceUnit(UNIT_ROBOSOLDIER, Vec3i(interTopRight.x, interTopRight.y, interTopRight.z), 2, -1, -1);
-	PlaceUnit(UNIT_ROBOSOLDIER, Vec3i(interBottomLeft.x, interBottomLeft.y, interBottomLeft.z), 2, -1, -1);
-	PlaceUnit(UNIT_ROBOSOLDIER, Vec3i(interBottomRight.x, interBottomRight.y, interBottomRight.z), 2, -1, -1);
+	PlaceUnit(UNIT_BATTLECOMP, Vec3i(interTopLeft.x, interTopLeft.y, interTopLeft.z), 2, -1, -1);
+	PlaceUnit(UNIT_BATTLECOMP, Vec3i(interTopRight.x, interTopRight.y, interTopRight.z), 2, -1, -1);
+	PlaceUnit(UNIT_BATTLECOMP, Vec3i(interBottomLeft.x, interBottomLeft.y, interBottomLeft.z), 2, -1, -1);
+	PlaceUnit(UNIT_BATTLECOMP, Vec3i(interBottomRight.x, interBottomRight.y, interBottomRight.z), 2, -1, -1);
 #endif
 
 	Vec3f leftPoly[3];
@@ -591,9 +664,9 @@ Selection SelectAreaPersp(Vec3f campos, Vec3f camside, Vec3f camup2, Vec3f viewd
 Selection DoSel(Vec3f campos, Vec3f camside, Vec3f camup2, Vec3f viewdir)
 {
 	Selection sel;
-	Player* py = &g_player[g_curP];
+	Player* py = &g_player[g_localP];
 
-	if(py->mousestart.x == py->mouse.x && py->mousestart.y == py->mouse.y)
+	if(g_mousestart.x == g_mouse.x && g_mousestart.y == g_mouse.y)
 		sel = SelectOne(campos, camside, camup2, viewdir);
 	else
 		sel = SelectAreaPersp(campos, camside, camup2, viewdir);
@@ -614,6 +687,7 @@ void AfterSel(Selection* s)
 {
 	bool haveconstr = false;
 	bool havefini = false;
+	bool havetruck = false;
 
 	for(auto seliter = s->buildings.begin(); seliter != s->buildings.end(); seliter++)
 	{
@@ -630,6 +704,15 @@ void AfterSel(Selection* s)
 			havefini = true;
 			break;
 		}
+	}
+
+	if(!havefini && !haveconstr && s->units.size() > 0)
+	{
+		auto seliter = s->units.begin();
+		int ui = *seliter;
+		Unit* u = &g_unit[ui];
+		if(u->type == UNIT_TRUCK)
+			havetruck = true;
 	}
 
 #if 0
@@ -667,21 +750,44 @@ void AfterSel(Selection* s)
 		}
 	}
 #endif
+	
+	Player* py = &g_player[g_localP];
+	GUI* gui = &g_gui;
 
 	if(haveconstr)
 	{
-		Player* py = &g_player[g_curP];
-		GUI* gui = &py->gui;
-		ConstructionView* cv = (ConstructionView*)gui->get("construction view");
+		CstrView* cv = (CstrView*)gui->get("cstr view");
 		cv->regen(s);
-		gui->open("construction view");
+		gui->open("cstr view");
 	}
 	else if(havefini)
 	{
-		Player* py = &g_player[g_curP];
-		GUI* gui = &py->gui;
-		BuildingView* bv = (BuildingView*)gui->get("building view");
+		BlView* bv = (BlView*)gui->get("bl view");
 		bv->regen(s);
-		gui->open("building view");
+		gui->open("bl view");
 	}
+	else if(havetruck)
+	{
+		TruckMgr* tm = (TruckMgr*)gui->get("truck mgr");
+		tm->regen(s);
+		gui->open("truck mgr");
+	}
+
+#if 1
+	//35
+	//2
+	//15
+	//39
+	//12
+	if(s->units.size() > 0)
+	{
+		char msg[128];
+		sprintf(msg, "sel %d u \n target=%d \n dgoal=%d,%d", 
+			*s->units.begin(), 
+			g_unit[*s->units.begin()].target,
+			g_unit[*s->units.begin()].goal.x - g_unit[*s->units.begin()].cmpos.x,
+			g_unit[*s->units.begin()].goal.y - g_unit[*s->units.begin()].cmpos.y);
+		InfoMess(msg, msg);
+	}
+#endif
 }

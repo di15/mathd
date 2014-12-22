@@ -20,7 +20,7 @@
 #include "../common/sim/unit.h"
 #include "../common/sim/building.h"
 #include "../common/sim/build.h"
-#include "../common/sim/buildingtype.h"
+#include "../common/sim/bltype.h"
 #include "../common/render/foliage.h"
 #include "../common/render/water.h"
 #include "../common/sim/road.h"
@@ -34,34 +34,40 @@
 #include "../common/path/collidertile.h"
 #include "../common/path/pathdebug.h"
 #include "gui/playgui.h"
-#include "../common/gui/widgets/spez/bottompanel.h"
+#include "../common/gui/widgets/spez/botpan.h"
 #include "../common/texture.h"
 #include "../common/render/skybox.h"
 #include "../common/script/script.h"
 #include "../common/ai/ai.h"
+#include "../common/net/lockstep.h"
+#include "../common/sim/simflow.h"
+#include "../common/sim/transport.h"
+#include "../common/render/infoov.h"
+#include "../common/sound/soundch.h"
+#include "../common/net/netconn.h"
+#include "../common/econ/demand.h"
+#include "../common/save/savemap.h"
+#include "../common/render/graph.h"
 
 int g_mode = APPMODE_LOADING;
-
-double g_instantupdfps = 0;
-double g_updfrinterval = 0;
 
 //static long long g_lasttime = GetTickCount();
 
 void SkipLogo()
 {
 	g_mode = APPMODE_LOADING;
-	Player* py = &g_player[g_curP];
-	GUI* gui = &py->gui;
+	Player* py = &g_player[g_localP];
+	GUI* gui = &g_gui;
 	gui->closeall();
-	gui->open("loading");
+	gui->open("load");
 }
 
 void UpdLogo()
 {
 	static int stage = 0;
 
-	Player* py = &g_player[g_curP];
-	GUI* gui = &py->gui;
+	Player* py = &g_player[g_localP];
+	GUI* gui = &g_gui;
 
 	if(stage < 60)
 	{
@@ -82,8 +88,8 @@ void UpdLogo()
 void UpdLoad()
 {
 	static int stage = 0;
-	Player* py = &g_player[g_curP];
-	GUI* gui = &py->gui;
+	Player* py = &g_player[g_localP];
+	GUI* gui = &g_gui;
 
 	switch(stage)
 	{
@@ -118,92 +124,113 @@ void UpdReload()
 	}
 }
 
-void CalcUpdRate()
-{
-	static unsigned int frametime = 0;				// This stores the last frame's time
-	static int framecounter = 0;
-	static unsigned int lasttime;
-
-	// Get the current time in seconds
-	unsigned int currtime = timeGetTime();
-
-	// We added a small value to the frame interval to account for some video
-	// cards (Radeon's) with fast computers falling through the floor without it.
-
-	// Here we store the elapsed time between the current and last frame,
-	// then keep the current frame in our static variable for the next frame.
-	g_updfrinterval = (currtime - frametime) / 1000.0f;	// + 0.005f;
-
-	//g_instantdrawfps = 1.0f / (g_currentTime - frameTime);
-	//g_instantdrawfps = 1.0f / g_drawfrinterval;
-
-	frametime = currtime;
-
-	// Increase the frame counter
-	++framecounter;
-
-	// Now we want to subtract the current time by the last time that was stored
-	// to see if the time elapsed has been over a second, which means we found our FPS.
-	if( currtime - lasttime > 1000 )
-	{
-		g_instantupdfps = framecounter;
-
-		// Here we set the lastTime to the currentTime
-		lasttime = currtime;
-
-		// Reset the frames per second
-		framecounter = 0;
-	}
-}
-
-bool UpdNextFrame(int desiredFrameRate)
-{
-	static long long lastTime = GetTickCount64();
-	static long long elapsedTime = 0;
-
-	long long currentTime = GetTickCount64(); // Get the time (milliseconds = seconds * .001)
-	long long deltaTime = currentTime - lastTime; // Get the slice of time
-	int desiredFPS = 1000 / (float)desiredFrameRate; // Store 1 / desiredFrameRate
-
-	elapsedTime += deltaTime; // Add to the elapsed time
-	lastTime = currentTime; // Update lastTime
-
-	// Check if the time since we last checked is greater than our desiredFPS
-	if( elapsedTime > desiredFPS )
-	{
-		elapsedTime -= desiredFPS; // Adjust the elapsed time
-
-		// Return true, to animate the next frame of animation
-		return true;
-	}
-
-	// We don't animate right now.
-	return false;
-	/*
-	long long currentTime = GetTickCount();
-	float desiredFPMS = 1000.0f/(float)desiredFrameRate;
-	int deltaTime = currentTime - g_lasttime;
-
-	if(deltaTime >= desiredFPMS)
-	{
-	g_lasttime = currentTime;
-	return true;
-	}
-
-	return false;*/
-}
-
 void UpdSim()
 {
-	g_simframe ++;
+	if(!CanTurn())
+		return;
+	
+#ifdef FREEZE_DEBUG
+		g_log<<"updturn"<<std::endl;
+		g_log.flush();
+#endif
+	
+#if 1
+	//if(g_netframe%100==0)
+	//	g_log<<"numlab: "<<CountU(UNIT_LABOURER)<<std::endl;
+	if(CountU(UNIT_LABOURER) <= 0 && !g_gameover)
+	{
+		g_gameover = true;
+		char msg[128];
+		sprintf(msg, "lasted %u simframes / %fs / %fm / %fh", 
+			g_simframe, 
+			(float)g_simframe / (float)SIM_FRAME_RATE,
+			(float)g_simframe / (float)SIM_FRAME_RATE / 60.0f,
+			(float)g_simframe / (float)SIM_FRAME_RATE / 60.0f / 60.0f);
+		InfoMess("Game Over", msg);
+#if 0
+		EndSess();
+		FreeMap();
+		Player* py = &g_player[g_localP];
+		GUI* gui = &g_gui;
+		gui->closeall();
+		gui->open("main");
+		g_mode = APPMODE_MENU;
+		//g_quit = true;
+#endif
+	}
+#endif
+
+	if(g_speed == SPEED_PAUSE)
+	{
+		UpdTurn();
+		g_netframe ++;
+		return;
+	}
+	
+	UpdTurn();
+
+#ifdef FREEZE_DEBUG
+		g_log<<"updai"<<std::endl;
+		g_log.flush();
+#endif
 
 	UpdAI();
+	
+#ifdef FREEZE_DEBUG
+		g_log<<"managetrips"<<std::endl;
+		g_log.flush();
+#endif
+
+	ManageTrips();
 	StartTimer(TIMER_UPDATEUNITS);
+
+#ifdef FREEZE_DEBUG
+		g_log<<"updunits"<<std::endl;
+		g_log.flush();
+#endif
+
 	UpdUnits();
 	StopTimer(TIMER_UPDATEUNITS);
 	StartTimer(TIMER_UPDATEBUILDINGS);
+
+#ifdef FREEZE_DEBUG
+		g_log<<"updbls"<<std::endl;
+		g_log.flush();
+#endif
+
 	UpdBls();
 	StopTimer(TIMER_UPDATEBUILDINGS);
+
+	Tally();
+	
+#ifdef FREEZE_DEBUG
+		g_log<<"/updsim"<<std::endl;
+		g_log.flush();
+#endif
+	
+
+	static long long tick = GetTickCount64();
+
+	//must do this after UpdTurn
+	g_simframe ++;
+	g_netframe ++;
+
+	if(g_simframe == 4344000)
+	{
+		long long off = GetTickCount64() - tick;
+		char msg[128];
+		sprintf(msg, "atf4,344,000 \n min %f \n s %f", (float)(off)/(float)SIM_FRAME_RATE/(float)60, (float)(off)/(float)SIM_FRAME_RATE);
+		InfoMess(msg, msg);
+	}
+	
+#if 1
+	if(g_simframe % (SIM_FRAME_RATE * 60 * 30) == 0 && g_simframe > 0)
+	{
+		char fn[MAX_PATH+1];
+		sprintf(fn, "saves/%s autosave.sav", FileDateTime().c_str());
+		SaveMap(fn);
+	}
+#endif
 }
 
 void UpdEd()
@@ -215,8 +242,9 @@ void UpdEd()
 
 void Update()
 {
-	if(g_netmode != NET_SINGLE)
-		NetIn();
+	//if(g_netmode != NETM_SINGLE)
+	if(g_sock)
+		UpdNet();
 
 	if(g_mode == APPMODE_LOGO)
 		UpdLogo();
@@ -234,8 +262,10 @@ void Update()
 
 void DrawScene(Matrix projection, Matrix viewmat, Matrix modelmat, Matrix modelviewinv, float lightpos[3], float lightdir[3])
 {
-	Player* py = &g_player[g_curP];
-	Camera* c = &py->camera;
+	//return;	//temp
+
+	Player* py = &g_player[g_localP];
+	Camera* c = &g_cam;
 
 #if 1
 	Matrix mvpmat;
@@ -320,6 +350,11 @@ void DrawScene(Matrix projection, Matrix viewmat, Matrix modelmat, Matrix modelv
 	CheckGLError(__FILE__, __LINE__);
 #endif
 
+#ifdef FREEZE_DEBUG
+	g_log<<"drawunits"<<std::endl;
+	g_log.flush();
+#endif
+
 	StartTimer(TIMER_DRAWUNITS);
 #if 1
 	UseShadow(SHADER_UNIT, projection, viewmat, modelmat, modelviewinv, lightpos, lightdir);
@@ -334,6 +369,12 @@ void DrawScene(Matrix projection, Matrix viewmat, Matrix modelmat, Matrix modelv
 	StopTimer(TIMER_DRAWUNITS);
 	CheckGLError(__FILE__, __LINE__);
 
+	
+#ifdef FREEZE_DEBUG
+	g_log<<"drawfol"<<std::endl;
+	g_log.flush();
+#endif
+
 #if 1
 	StartTimer(TIMER_DRAWFOLIAGE);
 	UseShadow(SHADER_FOLIAGE, projection, viewmat, modelmat, modelviewinv, lightpos, lightdir);
@@ -341,7 +382,7 @@ void DrawScene(Matrix projection, Matrix viewmat, Matrix modelmat, Matrix modelv
 	glBindTexture(GL_TEXTURE_2D, g_depth);
 	glUniform1i(g_shader[g_curS].m_slot[SSLOT_SHADOWMAP], 5);
 	glUniform4f(g_shader[g_curS].m_slot[SSLOT_COLOR], 1, 1, 1, 1);
-	DrawFoliage(c->zoompos(), c->m_up, c->m_strafe);
+	DrawFol(c->zoompos(), c->m_up, c->m_strafe);
 	EndS();
 	StopTimer(TIMER_DRAWFOLIAGE);
 #endif
@@ -357,20 +398,41 @@ void DrawScene(Matrix projection, Matrix viewmat, Matrix modelmat, Matrix modelv
 	DrawBorderLines();
 #endif
 
-#if 0
-	UseShadow(SHADER_COLOR3D, projection, viewmat, modelmat, modelviewinv, lightpos, lightdir);
-	DrawGrid();
-	DrawUnitSquares();
-	DrawPaths();
-	DrawSteps();
-	DrawVelocities();
-	EndS();
+	
+#ifdef FREEZE_DEBUG
+	g_log<<"drawdebug"<<std::endl;
+	g_log.flush();
+#endif
+
+#if 1
+	if(g_debuglines)
+	{
+		UseShadow(SHADER_COLOR3D, projection, viewmat, modelmat, modelviewinv, lightpos, lightdir);
+		DrawGrid();
+		DrawUnitSquares();
+		DrawPaths();
+		//DrawSteps();
+		//DrawVelocities();
+		EndS();
+	}
+#endif
+
+	
+#ifdef FREEZE_DEBUG
+	g_log<<"drawselorders"<<std::endl;
+	g_log.flush();
 #endif
 
 	DrawSel(&projection, &modelmat, &viewmat);
 	CheckGLError(__FILE__, __LINE__);
 	DrawOrders(&projection, &modelmat, &viewmat);
 	CheckGLError(__FILE__, __LINE__);
+
+	
+#ifdef FREEZE_DEBUG
+	g_log<<"drawbillbs"<<std::endl;
+	g_log.flush();
+#endif
 
 #if 1
 	//UseShadow(SHADER_BILLBOARD, projection, viewmat, modelmat, modelviewinv, lightpos, lightdir);
@@ -395,14 +457,20 @@ void DrawScene(Matrix projection, Matrix viewmat, Matrix modelmat, Matrix modelv
 	EndS();
 #endif
 
+	
+#ifdef FREEZE_DEBUG
+	g_log<<"drawtransactions"<<std::endl;
+	g_log.flush();
+#endif
+
 #if 1
 	StartTimer(TIMER_DRAWGUI);
 	CheckGLError(__FILE__, __LINE__);
-	Ortho(py->width, py->height, 1, 1, 1, 1);
+	Ortho(g_width, g_height, 1, 1, 1, 1);
 	glDisable(GL_DEPTH_TEST);
 	//DrawDeposits(projection, viewmat);
 	DrawTransactions(mvpmat);
-	DrawBReason(&mvpmat, py->width, py->height, true);
+	DrawBReason(&mvpmat, g_width, g_height, true);
 	glEnable(GL_DEPTH_TEST);
 	EndS();
 	StopTimer(TIMER_DRAWGUI);
@@ -411,22 +479,28 @@ void DrawScene(Matrix projection, Matrix viewmat, Matrix modelmat, Matrix modelv
 
 #if 0
 	CheckGLError(__FILE__, __LINE__);
-	Ortho(py->width, py->height, 1, 1, 1, 1);
+	Ortho(g_width, g_height, 1, 1, 1, 1);
 	glDisable(GL_DEPTH_TEST);
-	FoliageT* t = &g_foliageT[FOLIAGE_TREE1];
+	FlType* t = &g_fltype[FL_TREE1];
 	Model* m = &g_model[t->model];
 	for(int i=0; i<30000; i++)
 	{
 		m->usetex();
 		Texture* tex = &g_texture[m->m_diffusem];
 
-		int x = rand()%py->width;
-		int y = rand()%py->height;
+		int x = rand()%g_width;
+		int y = rand()%g_height;
 
 		DrawImage(tex->texname, x, y, x+2, y+4, 0, 0, 1, 1);
 	}
 	glEnable(GL_DEPTH_TEST);
 	EndS();
+#endif
+
+	
+#ifdef FREEZE_DEBUG
+	g_log<<"/draw"<<std::endl;
+	g_log.flush();
 #endif
 }
 
@@ -435,7 +509,7 @@ void DrawSceneDepth()
 	StartTimer(TIMER_DRAWSCENEDEPTH);
 
 #if 1
-	Player* py = &g_player[g_curP];
+	Player* py = &g_player[g_localP];
 
 	CheckGLError(__FILE__, __LINE__);
 	//if(rand()%2 == 1)
@@ -464,7 +538,7 @@ void DrawSceneDepth()
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 	CheckGLError(__FILE__, __LINE__);
 #if 1
-	DrawFoliage(g_lightpos, Vec3f(0,1,0), Cross(Vec3f(0,1,0), Normalize(g_lighteye - g_lightpos)));
+	DrawFol(g_lightpos, Vec3f(0,1,0), Cross(Vec3f(0,1,0), Normalize(g_lighteye - g_lightpos)));
 	CheckGLError(__FILE__, __LINE__);
 #endif
 #endif
@@ -480,9 +554,9 @@ void Draw()
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	CheckGLError(__FILE__, __LINE__);
 
-	Player* py = &g_player[g_curP];
-	GUI* gui = &py->gui;
-	Camera* c = &py->camera;
+	Player* py = &g_player[g_localP];
+	GUI* gui = &g_gui;
+	Camera* c = &g_cam;
 
 	StopTimer(TIMER_DRAWSETUP);
 
@@ -496,9 +570,9 @@ void Draw()
 	{
 		StartTimer(TIMER_DRAWSETUP);
 
-		float aspect = fabsf((float)py->width / (float)py->height);
-		Matrix projection = PerspProj(FIELD_OF_VIEW, aspect, MIN_DISTANCE, MAX_DISTANCE/py->zoom);
-		//Matrix projection = OrthoProj(-PROJ_RIGHT*aspect/py->zoom, PROJ_RIGHT*aspect/py->zoom, PROJ_RIGHT/py->zoom, -PROJ_RIGHT/py->zoom, MIN_DISTANCE, MAX_DISTANCE);
+		float aspect = fabsf((float)g_width / (float)g_height);
+		Matrix projection = PerspProj(FIELD_OF_VIEW, aspect, MIN_DISTANCE, MAX_DISTANCE/g_zoom);
+		//Matrix projection = OrthoProj(-PROJ_RIGHT*aspect/g_zoom, PROJ_RIGHT*aspect/g_zoom, PROJ_RIGHT/g_zoom, -PROJ_RIGHT/g_zoom, MIN_DISTANCE, MAX_DISTANCE);
 
 		g_camproj = projection;
 
@@ -527,7 +601,7 @@ void Draw()
 		Vec3f focus;
 		Vec3f vLine[2];
 		Vec3f ray = Normalize(c->m_view - posvec);
-		Vec3f onnear = posvec;	//OnNear(py->width/2, py->height/2);
+		Vec3f onnear = posvec;	//OnNear(g_width/2, g_height/2);
 		vLine[0] = onnear;
 		vLine[1] = onnear + (ray * 10000000.0f);
 		//if(!GetMapIntersection(&g_hmap, vLine, &focus))
@@ -541,13 +615,15 @@ void Draw()
 
 		StopTimer(TIMER_DRAWSETUP);
 
-		RenderToShadowMap(projection, viewmat, modelmat, focus, focus + g_lightoff / py->zoom, DrawSceneDepth);
+#if 1
+		RenderToShadowMap(projection, viewmat, modelmat, focus, focus + g_lightoff / g_zoom, DrawSceneDepth);
+#endif
 		CheckGLError(__FILE__, __LINE__);
 		RenderShadowedScene(projection, viewmat, modelmat, modelview, DrawScene);
 		CheckGLError(__FILE__, __LINE__);
 		
-		Ortho(py->width, py->height, 1, 1, 1, 1);
-		DrawUOv(&mvpmat);
+		Ortho(g_width, g_height, 1, 1, 1, 1);
+		DrawOv(&mvpmat);
 		EndS();
 	}
 	CheckGLError(__FILE__, __LINE__);
@@ -573,8 +649,8 @@ void Draw()
 #if 0
 	for(int i=0; i<30; i++)
 	{
-		int x = rand()%py->width;
-		int y = rand()%py->height;
+		int x = rand()%g_width;
+		int y = rand()%g_height;
 
 		Blit(blittex, &blitscreen, Vec2i(x,y));
 	}
@@ -583,7 +659,7 @@ void Draw()
 #endif
 
 	CheckGLError(__FILE__, __LINE__);
-	Ortho(py->width, py->height, 1, 1, 1, 1);
+	Ortho(g_width, g_height, 1, 1, 1, 1);
 	CheckGLError(__FILE__, __LINE__);
 	glDisable(GL_DEPTH_TEST);
 	CheckGLError(__FILE__, __LINE__);
@@ -598,7 +674,7 @@ void Draw()
 	}
 
 	float color[] = {1,1,1,1};
-	DrawBoxShadText(MAINFONT8, 0, 0, py->width, py->height, &uni, color, 0, -1);
+	DrawBoxShadText(MAINFONT8, 0, 0, g_width, g_height, &uni, color, 0, -1);
 #endif
 
 #ifdef DEBUG
@@ -607,15 +683,19 @@ void Draw()
 #endif
 
 #if 1
-	char fpsstr[256];
-	sprintf(fpsstr, "draw fps: %lf (%lf s/frame), upd fps: %lf (%lf s/frame), zoom: %f, simframe: %d", g_instantdrawfps, 1.0/g_instantdrawfps, g_instantupdfps, 1.0/g_instantupdfps, py->zoom, g_simframe);
-	RichText fpsrstr(fpsstr);
-	DrawShadowedText(MAINFONT8, 0, py->height-MINIMAP_SIZE-32-10, &fpsrstr);
-	CheckGLError(__FILE__, __LINE__);
+	if(g_debuglines)
+	{
+		char fpsstr[256];
+		sprintf(fpsstr, "drw:%lf (%lf s/frame), upd:%lf (%lf s/frame), simfr:%s", g_instantdrawfps, 1.0/g_instantdrawfps, g_instantupdfps, 1.0/g_instantupdfps, iform(g_simframe).c_str());
+		RichText fpsrstr(fpsstr);
+		//fpsrstr = ParseTags(fpsrstr, NULL);
+		DrawShadowedText(MAINFONT8, 0, g_height-MINIMAP_SIZE-32, &fpsrstr);
+		CheckGLError(__FILE__, __LINE__);
+	}
+#endif
 	glEnable(GL_DEPTH_TEST);
 	EndS();
 	CheckGLError(__FILE__, __LINE__);
-#endif
 
 #ifdef DEBUG
 	g_log<<"draw "<<__FILE__<<" "<<__LINE__<<std::endl;
@@ -636,37 +716,37 @@ void Scroll()
 {
 	//return;	//disable for now
 
-	Player* py = &g_player[g_curP];
-	Camera* c = &py->camera;
+	Player* py = &g_player[g_localP];
+	Camera* c = &g_cam;
 
-	if(py->mouseout)
+	if(g_mouseout)
 		return;
 
 	bool moved = false;
 
 	//const Uint8 *keys = SDL_GetKeyboardState(NULL);
 	//SDL_BUTTON_LEFT;
-	if((!py->keyintercepted && (py->keys[SDL_SCANCODE_UP] || py->keys[SDL_SCANCODE_W])) || (py->mouse.y <= SCROLL_BORDER))
+	if((!g_keyintercepted && (g_keys[SDL_SCANCODE_UP] || g_keys[SDL_SCANCODE_W])) || (g_mouse.y <= SCROLL_BORDER))
 	{
-		c->accelerate(CAMERA_SPEED / py->zoom * g_drawfrinterval);
+		c->accelerate(CAMERA_SPEED / g_zoom * g_drawfrinterval);
 		moved = true;
 	}
 
-	if((!py->keyintercepted && (py->keys[SDL_SCANCODE_DOWN] || py->keys[SDL_SCANCODE_S])) || (py->mouse.y >= py->height-SCROLL_BORDER))
+	if((!g_keyintercepted && (g_keys[SDL_SCANCODE_DOWN] || g_keys[SDL_SCANCODE_S])) || (g_mouse.y >= g_height-SCROLL_BORDER))
 	{
-		c->accelerate(-CAMERA_SPEED / py->zoom * g_drawfrinterval);
+		c->accelerate(-CAMERA_SPEED / g_zoom * g_drawfrinterval);
 		moved = true;
 	}
 
-	if((!py->keyintercepted && (py->keys[SDL_SCANCODE_LEFT] || py->keys[SDL_SCANCODE_A])) || (py->mouse.x <= SCROLL_BORDER))
+	if((!g_keyintercepted && (g_keys[SDL_SCANCODE_LEFT] || g_keys[SDL_SCANCODE_A])) || (g_mouse.x <= SCROLL_BORDER))
 	{
-		c->accelstrafe(-CAMERA_SPEED / py->zoom * g_drawfrinterval);
+		c->accelstrafe(-CAMERA_SPEED / g_zoom * g_drawfrinterval);
 		moved = true;
 	}
 
-	if((!py->keyintercepted && (py->keys[SDL_SCANCODE_RIGHT] || py->keys[SDL_SCANCODE_D])) || (py->mouse.x >= py->width-SCROLL_BORDER))
+	if((!g_keyintercepted && (g_keys[SDL_SCANCODE_RIGHT] || g_keys[SDL_SCANCODE_D])) || (g_mouse.x >= g_width-SCROLL_BORDER))
 	{
-		c->accelstrafe(CAMERA_SPEED / py->zoom * g_drawfrinterval);
+		c->accelstrafe(CAMERA_SPEED / g_zoom * g_drawfrinterval);
 		moved = true;
 	}
 
@@ -686,14 +766,14 @@ void Scroll()
 			c->move(Vec3f(-d, 0, 0));
 		}
 
-		if(c->zoompos().z < -g_hmap.m_widthz*TILE_SIZE)
+		if(c->zoompos().z < -g_hmap.m_widthy*TILE_SIZE)
 		{
-			float d = -g_hmap.m_widthz*TILE_SIZE - c->zoompos().z;
+			float d = -g_hmap.m_widthy*TILE_SIZE - c->zoompos().z;
 			c->move(Vec3f(0, 0, d));
 		}
-		else if(c->zoompos().z > g_hmap.m_widthz*TILE_SIZE)
+		else if(c->zoompos().z > g_hmap.m_widthy*TILE_SIZE)
 		{
-			float d = c->zoompos().z - g_hmap.m_widthz*TILE_SIZE;
+			float d = c->zoompos().z - g_hmap.m_widthy*TILE_SIZE;
 			c->move(Vec3f(0, 0, -d));
 		}
 #else
@@ -714,9 +794,9 @@ void Scroll()
 			float d = 0 - c->m_view.z;
 			c->move(Vec3f(0, 0, d));
 		}
-		else if(c->m_view.z > g_hmap.m_widthz*TILE_SIZE)
+		else if(c->m_view.z > g_hmap.m_widthy*TILE_SIZE)
 		{
-			float d = c->m_view.z - g_hmap.m_widthz*TILE_SIZE;
+			float d = c->m_view.z - g_hmap.m_widthy*TILE_SIZE;
 			c->move(Vec3f(0, 0, -d));
 		}
 #endif
@@ -724,12 +804,12 @@ void Scroll()
 #if 0
 		UpdateMouse3D();
 
-		if(g_mode == APPMODE_EDITOR && py->mousekeys[MOUSEKEY_LEFT])
+		if(g_mode == APPMODE_EDITOR && g_mousekeys[MOUSEKEY_LEFT])
 		{
 			EdApply();
 		}
 
-		if(!py->mousekeys[MOUSEKEY_LEFT])
+		if(!g_mousekeys[MOUSEKEY_LEFT])
 		{
 			g_vStart = g_vTile;
 			g_vMouseStart = g_vMouse;
@@ -759,6 +839,10 @@ void Scroll()
 	}
 
 	c->friction2();
+
+#ifdef RANDOM8DEBUG
+	//c->moveto( g_unit[14].drawpos - (c->m_view-c->m_pos) );
+#endif
 }
 
 void LoadConfig()
@@ -775,7 +859,7 @@ void LoadConfig()
 	char keystr[128];
 	char actstr[128];
 
-	Player* py = &g_player[g_curP];
+	Player* py = &g_player[g_localP];
 
 	while(!f.eof())
 	{
@@ -791,18 +875,18 @@ void LoadConfig()
 
 		float valuef = StrToFloat(actstr);
 		int valuei = StrToInt(actstr);
-		bool valueb = (bool)valuei;
+		bool valueb = valuei ? true : false;
 
 		if(stricmp(keystr, "fullscreen") == 0)					g_fullscreen = valueb;
-		else if(stricmp(keystr, "client_width") == 0)			py->width = g_selectedRes.width = valuei;
-		else if(stricmp(keystr, "client_height") == 0)			py->height = g_selectedRes.height = valuei;
-		else if(stricmp(keystr, "screen_bpp") == 0)				py->bpp = valuei;
+		else if(stricmp(keystr, "client_width") == 0)			g_width = g_selectedRes.width = valuei;
+		else if(stricmp(keystr, "client_height") == 0)			g_height = g_selectedRes.height = valuei;
+		else if(stricmp(keystr, "screen_bpp") == 0)				g_bpp = valuei;
 	}
 }
 
 int testfunc(ObjectScript::OS* os, int nparams, int closure_values, int need_ret_values, void * param)
 {
-	InfoMessage("os", "test");
+	InfoMess("os", "test");
 	return 1;
 }
 
@@ -827,18 +911,63 @@ void Init()
 	{
 		char msg[1280];
 		sprintf(msg, "SDL_Init: %s\n", SDL_GetError());
-		ErrorMessage("Error", msg);
+		ErrMess("Error", msg);
 	}
 
-	if(SDLNet_Init() == -1) {
+	if(SDLNet_Init() == -1)
+	{
 		char msg[1280];
 		sprintf(msg, "SDLNet_Init: %s\n", SDLNet_GetError());
-		ErrorMessage("Error", msg);
+		ErrMess("Error", msg);
 	}
+
+	SDL_version compile_version;
+	const SDL_version *link_version=Mix_Linked_Version();
+	SDL_MIXER_VERSION(&compile_version);
+	printf("compiled with SDL_mixer version: %d.%d.%d\n", 
+			compile_version.major,
+			compile_version.minor,
+			compile_version.patch);
+	printf("running with SDL_mixer version: %d.%d.%d\n", 
+			link_version->major,
+			link_version->minor,
+			link_version->patch);
+
+	// load support for the OGG and MOD sample/music formats
+	//int flags=MIX_INIT_OGG|MIX_INIT_MOD|MIX_INIT_MP3;
+	int flags=MIX_INIT_OGG|MIX_INIT_MP3;
+	int initted=Mix_Init(flags);
+	if( (initted & flags) != flags)
+	{
+		char msg[1280];
+		sprintf(msg, "Mix_Init: Failed to init required ogg and mod support!\nMix_Init: %s", Mix_GetError());
+		ErrMess("Error", msg);
+		// handle error
+	}
+
+	// start SDL with audio support
+	if(SDL_Init(SDL_INIT_AUDIO)==-1) {
+		char msg[1280];
+		sprintf(msg, "SDL_Init: %s\n", SDL_GetError());
+		ErrMess("Error", msg);
+		// handle error
+		//exit(1);
+	}
+	// open 44.1KHz, signed 16bit, system byte order,
+	//      stereo audio, using 1024 byte chunks
+	if(Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 1024)==-1) {
+		char msg[1280];
+		printf("Mix_OpenAudio: %s\n", Mix_GetError());
+		ErrMess("Error", msg);
+		// handle error
+		//exit(2);
+	}
+
+	Mix_AllocateChannels(SOUND_CHANNELS);
 
 	OpenLog("log.txt", VERSION);
 
-	srand(GetTickCount64());
+	srand((unsigned int)GetTickCount64());
 
 	LoadConfig();
 
@@ -863,7 +992,24 @@ void Deinit()
 {
 	WriteProfiles(-1, 0);
 	DestroyWindow(TITLE);
-	// Clean up
+
+	// Clean up	
+	
+	if(g_sock)
+	{
+		SDLNet_UDP_Close(g_sock);
+		g_sock = NULL;
+	}
+
+	FreeSounds();
+
+	Mix_CloseAudio();
+
+	// force a quit
+	//while(Mix_Init(0))
+	//	Mix_Quit();
+	Mix_Quit();
+
 	SDLNet_Quit();
 	SDL_Quit();
 }
@@ -890,8 +1036,8 @@ void EventLoop()
 
 	//SDL_EnableUNICODE(SDL_ENABLE);
 
-	Player* py = &g_player[g_curP];
-	GUI* gui = &py->gui;
+	Player* py = &g_player[g_localP];
+	GUI* gui = &g_gui;
 
 	while (!g_quit)
 	{
@@ -899,43 +1045,68 @@ void EventLoop()
 		StartTimer(TIMER_EVENT);
 
 		SDL_Event e;
-		while (SDL_PollEvent(&e)) {
-			InEv ev;
-			ev.intercepted = false;
+		while (SDL_PollEvent(&e))
+		{
+			InEv ie;
+			ie.intercepted = false;
+			ie.curst = CU_DEFAULT;
 
-			switch(e.type) {
+			switch(e.type)
+			{
 			case SDL_QUIT:
 				g_quit = true;
 				break;
 			case SDL_KEYDOWN:
-				ev.type = INEV_KEYDOWN;
-				ev.key = e.key.keysym.sym;
-				ev.scancode = e.key.keysym.scancode;
+				ie.type = INEV_KEYDOWN;
+				ie.key = e.key.keysym.sym;
+				ie.scancode = e.key.keysym.scancode;
 
-				gui->inev(&ev);
+				//Handle copy
+				if( e.key.keysym.sym == SDLK_c && SDL_GetModState() & KMOD_CTRL )
+				{
+					//SDL_SetClipboardText( inputText.c_str() );
+					ie.type = INEV_COPY;
+				}
+				//Handle paste
+				if( e.key.keysym.sym == SDLK_v && SDL_GetModState() & KMOD_CTRL )
+				{
+					//inputText = SDL_GetClipboardText();
+					//renderText = true;
+					ie.type = INEV_PASTE;
+				}
+				//Select all
+				if( e.key.keysym.sym == SDLK_a && SDL_GetModState() & KMOD_CTRL )
+				{
+					//inputText = SDL_GetClipboardText();
+					//renderText = true;
+					ie.type = INEV_SELALL;
+				}
 
-				if(!ev.intercepted)
-					py->keys[e.key.keysym.scancode] = true;
+				gui->inev(&ie);
 
-				py->keyintercepted = ev.intercepted;
+				if(!ie.intercepted)
+					g_keys[e.key.keysym.scancode] = true;
+
+				g_keyintercepted = ie.intercepted;
 				break;
 			case SDL_KEYUP:
-				ev.type = INEV_KEYUP;
-				ev.key = e.key.keysym.sym;
-				ev.scancode = e.key.keysym.scancode;
+				ie.type = INEV_KEYUP;
+				ie.key = e.key.keysym.sym;
+				ie.scancode = e.key.keysym.scancode;
 
-				gui->inev(&ev);
+				gui->inev(&ie);
 
-				if(!ev.intercepted)
-					py->keys[e.key.keysym.scancode] = false;
+				if(!ie.intercepted)
+					g_keys[e.key.keysym.scancode] = false;
 
-				py->keyintercepted = ev.intercepted;
+				g_keyintercepted = ie.intercepted;
 				break;
 			case SDL_TEXTINPUT:
 				//g_GUI.charin(e.text.text);	//UTF8
-				ev.type = INEV_TEXTIN;
-				ev.text = e.text.text;
+				ie.type = INEV_TEXTIN;
+				ie.text = e.text.text;
 
+#if 0
 				g_log<<"SDL_TEXTINPUT:";
 				for(int i=0; i<strlen(e.text.text); i++)
 				{
@@ -943,16 +1114,18 @@ void EventLoop()
 				}
 				g_log<<std::endl;
 				g_log.flush();
+#endif
 
-				gui->inev(&ev);
+				gui->inev(&ie);
 				break;
 			case SDL_TEXTEDITING:
 				//g_GUI.charin(e.text.text);	//UTF8
-				ev.type = INEV_TEXTED;
-				ev.text = e.text.text;
-				ev.cursor = e.edit.start;
-				ev.sellen = e.edit.length;
+				ie.type = INEV_TEXTED;
+				ie.text = e.text.text;
+				ie.cursor = e.edit.start;
+				ie.sellen = e.edit.length;
 
+#if 0
 				g_log<<"SDL_TEXTEDITING:";
 				for(int i=0; i<strlen(e.text.text); i++)
 				{
@@ -961,16 +1134,17 @@ void EventLoop()
 				g_log<<std::endl;
 				g_log.flush();
 
-				g_log<<"texted: cursor:"<<ev.cursor<<" sellen:"<<ev.sellen<<std::endl;
+				g_log<<"texted: cursor:"<<ie.cursor<<" sellen:"<<ie.sellen<<std::endl;
 				g_log.flush();
+#endif
 
-				gui->inev(&ev);
+				gui->inev(&ie);
 #if 0
-				ev.intercepted = false;
-				ev.type = INEV_TEXTIN;
-				ev.text = e.text.text;
+				ie.intercepted = false;
+				ie.type = INEV_TEXTIN;
+				ie.text = e.text.text;
 
-				gui->inev(&ev);
+				gui->inev(&ie);
 #endif
 				break;
 #if 0
@@ -978,11 +1152,11 @@ void EventLoop()
 				/* Add new text onto the end of our text */
 				strcat(text, event.text.text);
 #if 0
-				ev.type = INEV_CHARIN;
-				ev.key = wParam;
-				ev.scancode = 0;
+				ie.type = INEV_CHARIN;
+				ie.key = wParam;
+				ie.scancode = 0;
 
-				gui->inev(&ev);
+				gui->inev(&ie);
 #endif
 				break;
 			case SDL_TEXTEDITING:
@@ -1000,104 +1174,106 @@ void EventLoop()
 			//{
 			//}
 			case SDL_MOUSEWHEEL:
-				ev.type = INEV_MOUSEWHEEL;
-				ev.amount = e.wheel.y;
+				ie.type = INEV_MOUSEWHEEL;
+				ie.amount = e.wheel.y;
 
-				gui->inev(&ev);
+				gui->inev(&ie);
 				break;
 			case SDL_MOUSEBUTTONDOWN:
 				switch (e.button.button) {
 				case SDL_BUTTON_LEFT:
-					py->mousekeys[MOUSE_LEFT] = true;
-					py->moved = false;
+					g_mousekeys[MOUSE_LEFT] = true;
+					g_moved = false;
 
-					ev.type = INEV_MOUSEDOWN;
-					ev.key = MOUSE_LEFT;
-					ev.amount = 1;
-					ev.x = py->mouse.x;
-					ev.y = py->mouse.y;
+					ie.type = INEV_MOUSEDOWN;
+					ie.key = MOUSE_LEFT;
+					ie.amount = 1;
+					ie.x = g_mouse.x;
+					ie.y = g_mouse.y;
 
-					gui->inev(&ev);
+					gui->inev(&ie);
 
-					py->keyintercepted = ev.intercepted;
+					g_keyintercepted = ie.intercepted;
 					break;
 				case SDL_BUTTON_RIGHT:
-					py->mousekeys[MOUSE_RIGHT] = true;
+					g_mousekeys[MOUSE_RIGHT] = true;
 
-					ev.type = INEV_MOUSEDOWN;
-					ev.key = MOUSE_RIGHT;
-					ev.amount = 1;
-					ev.x = py->mouse.x;
-					ev.y = py->mouse.y;
+					ie.type = INEV_MOUSEDOWN;
+					ie.key = MOUSE_RIGHT;
+					ie.amount = 1;
+					ie.x = g_mouse.x;
+					ie.y = g_mouse.y;
 
-					gui->inev(&ev);
+					gui->inev(&ie);
 					break;
 				case SDL_BUTTON_MIDDLE:
-					py->mousekeys[MOUSE_MIDDLE] = true;
+					g_mousekeys[MOUSE_MIDDLE] = true;
 
-					ev.type = INEV_MOUSEDOWN;
-					ev.key = MOUSE_MIDDLE;
-					ev.amount = 1;
-					ev.x = py->mouse.x;
-					ev.y = py->mouse.y;
+					ie.type = INEV_MOUSEDOWN;
+					ie.key = MOUSE_MIDDLE;
+					ie.amount = 1;
+					ie.x = g_mouse.x;
+					ie.y = g_mouse.y;
 
-					gui->inev(&ev);
+					gui->inev(&ie);
 					break;
 				}
 				break;
 			case SDL_MOUSEBUTTONUP:
 				switch (e.button.button) {
 				case SDL_BUTTON_LEFT:
-					py->mousekeys[MOUSE_LEFT] = false;
+					g_mousekeys[MOUSE_LEFT] = false;
 
-					ev.type = INEV_MOUSEUP;
-					ev.key = MOUSE_LEFT;
-					ev.amount = 1;
-					ev.x = py->mouse.x;
-					ev.y = py->mouse.y;
+					ie.type = INEV_MOUSEUP;
+					ie.key = MOUSE_LEFT;
+					ie.amount = 1;
+					ie.x = g_mouse.x;
+					ie.y = g_mouse.y;
 
-					gui->inev(&ev);
+					gui->inev(&ie);
 					break;
 				case SDL_BUTTON_RIGHT:
-					py->mousekeys[MOUSE_RIGHT] = false;
+					g_mousekeys[MOUSE_RIGHT] = false;
 
-					ev.type = INEV_MOUSEUP;
-					ev.key = MOUSE_RIGHT;
-					ev.amount = 1;
-					ev.x = py->mouse.x;
-					ev.y = py->mouse.y;
+					ie.type = INEV_MOUSEUP;
+					ie.key = MOUSE_RIGHT;
+					ie.amount = 1;
+					ie.x = g_mouse.x;
+					ie.y = g_mouse.y;
 
-					gui->inev(&ev);
+					gui->inev(&ie);
 					break;
 				case SDL_BUTTON_MIDDLE:
-					py->mousekeys[MOUSE_MIDDLE] = false;
+					g_mousekeys[MOUSE_MIDDLE] = false;
 
-					ev.type = INEV_MOUSEUP;
-					ev.key = MOUSE_MIDDLE;
-					ev.amount = 1;
-					ev.x = py->mouse.x;
-					ev.y = py->mouse.y;
+					ie.type = INEV_MOUSEUP;
+					ie.key = MOUSE_MIDDLE;
+					ie.amount = 1;
+					ie.x = g_mouse.x;
+					ie.y = g_mouse.y;
 
-					gui->inev(&ev);
+					gui->inev(&ie);
 					break;
 				}
 				break;
 			case SDL_MOUSEMOTION:
-				//py->mouse.x = e.motion.x;
-				//py->mouse.y = e.motion.y;
+				//g_mouse.x = e.motion.x;
+				//g_mouse.y = e.motion.y;
 
-				if(py->mouseout) {
+				if(g_mouseout) {
 					//TrackMouse();
-					py->mouseout = false;
+					g_mouseout = false;
 				}
 				if(MousePosition()) {
-					py->moved = true;
+					g_moved = true;
 
-					ev.type = INEV_MOUSEMOVE;
-					ev.x = py->mouse.x;
-					ev.y = py->mouse.y;
+					ie.type = INEV_MOUSEMOVE;
+					ie.x = g_mouse.x;
+					ie.y = g_mouse.y;
 
-					gui->inev(&ev);
+					gui->inev(&ie);
+
+					g_curst = ie.curst;
 				}
 				break;
 			}
@@ -1105,7 +1281,8 @@ void EventLoop()
 
 		StopTimer(TIMER_EVENT);
 #if 1
-		if ((g_mode == APPMODE_LOADING || g_mode == APPMODE_RELOADING) || true /* DrawNextFrame(DRAW_FRAME_RATE) */ )
+		//if ((g_mode == APPMODE_LOADING || g_mode == APPMODE_RELOADING) || true /* DrawNextFrame(DRAW_FRAME_RATE) */ )
+		if ((g_mode == APPMODE_LOADING || g_mode == APPMODE_RELOADING) || DrawNextFrame(DRAW_FRAME_RATE) )
 #endif
 		{
 			StartTimer(TIMER_DRAW);
@@ -1137,12 +1314,13 @@ void EventLoop()
 				g_log<<"main "<<__FILE__<<" "<<__LINE__<<std::endl;
 				g_log.flush();
 #endif
-				UpdateResTicker();
+				UpdResTicker();
 			}
 
 			StopTimer(TIMER_DRAW);
 		}
-
+		
+		//if((g_mode == APPMODE_LOADING || g_mode == APPMODE_RELOADING) || true /* UpdNextFrame(SIM_FRAME_RATE) */ )
 		if((g_mode == APPMODE_LOADING || g_mode == APPMODE_RELOADING) || UpdNextFrame(SIM_FRAME_RATE) )
 		{
 			StartTimer(TIMER_UPDATE);

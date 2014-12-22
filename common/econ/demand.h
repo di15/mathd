@@ -4,14 +4,12 @@
 #include "../math/vec2i.h"
 #include "../platform.h"
 #include "../sim/resources.h"
-#include "../sim/unittype.h"
-#include "../sim/buildingtype.h"
+#include "../sim/utype.h"
+#include "../sim/bltype.h"
 #include "../sim/build.h"
 #include "../sim/player.h"
 #include "../debug.h"
-
-#define AVG_DIST		(TILE_SIZE*6)
-#define CYCLE_FRAMES	(SIM_FRAME_RATE*60)
+#include "../sim/simdef.h"
 
 //debug output for demand calcs?
 //#define DEBUGDEM
@@ -372,5 +370,7 @@ void AddReq(DemGraph* dm, Player* p, std::list<DemNode*>* nodes, DemNode* parent
 void ApplyDem(DemGraph* dm, DemGraphMod* dmod);
 void AddDemMod(DemGraphMod* src, DemGraphMod* dest);
 void IniDmMod(DemGraph* dm, DemGraphMod* dmod);
+int CountU(int utype);
+int CountB(int btype);
 
 #endif

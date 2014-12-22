@@ -10,7 +10,7 @@ public:
 
 	void draw();
 	void drawover();
-	void inev(InEv* ev);
+	void inev(InEv* ie);
 	void frameupd();
 };
 

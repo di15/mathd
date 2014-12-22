@@ -17,9 +17,9 @@ public:
 	void draw();
 	RichText drawvalue();
 	void frameupd();
-	void inev(InEv* ev);
+	void inev(InEv* ie);
 	void placestr(const RichText* str);
-	void changevalue(const char* str);
+	void changevalue(const RichText* str);
 	bool delnext();
 	bool delprev();
 	void copyval();

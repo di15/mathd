@@ -7,18 +7,18 @@ class PathNode;
 
 // http://www.sourcetricks.com/2011/06/c-heaps.html
 
-class Heap
+class BinHeap
 {
 public:
-	Heap();
-	~Heap();
-	bool insert(PathNode* element);
-	PathNode* deletemin();
+	BinHeap(bool (*comparef)(void* a, void* b));
+	~BinHeap();
+	bool insert(void* element);
+	void* deletemin();
 	bool hasmore();
 	void alloc(int ncells);
 	void freemem();
 	void resetelems();
-	void heapify(PathNode* element);
+	void heapify(void* element);
 #if 0
 	void print();
 #endif
@@ -34,7 +34,8 @@ private:
 	int nelements;
 	int allocsz;
 #else
-	std::vector<PathNode*> heap;
+	std::vector<void*> heap;
+	bool (*comparefunc)(void* a, void* b);
 #endif
 };
 

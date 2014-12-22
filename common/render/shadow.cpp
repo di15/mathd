@@ -231,7 +231,7 @@ bool Inverse2(Matrix mat, Matrix &invMat)
 
 	if (det == 0)
 	{
-		//ErrorMessage("d", "De 0");
+		//ErrMess("d", "De 0");
 		return false;
 	}
 
@@ -375,7 +375,7 @@ void RenderToShadowMap(Matrix projection, Matrix viewmat, Matrix modelmat, Vec3f
 	glDisable(GL_POLYGON_OFFSET_FILL);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-	//glViewport(0, 0, py->width, py->height);
+	//glViewport(0, 0, g_width, g_height);
 	glViewport(viewport[0], viewport[1], viewport[2], viewport[3]);
 	glEnable(GL_CULL_FACE);
 
@@ -416,14 +416,14 @@ void UseShadow(int shader, Matrix projection, Matrix viewmat, Matrix modelmat, M
 
 void RenderShadowedScene(Matrix projection, Matrix viewmat, Matrix modelmat, Matrix modelview, void (*drawscenefunc)(Matrix projection, Matrix viewmat, Matrix modelmat, Matrix modelviewinv, float lightpos[3], float lightdir[3]))
 {
-	//glViewport(0, 0, py->width, py->height);
+	//glViewport(0, 0, g_width, g_height);
 	glClearColor(0.0, 0.0, 0.0, 1.0);
 	//glClearColor(1.0, 1.0, 1.0, 1.0);
 
 	//glMatrixMode(GL_PROJECTION);
 	//glLoadIdentity();
-	//gluPerspective(FIELD_OF_VIEW, double(py->width) / double(py->height), MIN_DISTANCE, MAX_DISTANCE);
-	//g_camproj = PerspProj(FIELD_OF_VIEW, double(py->width) / double(py->height), MIN_DISTANCE, MAX_DISTANCE);
+	//gluPerspective(FIELD_OF_VIEW, double(g_width) / double(g_height), MIN_DISTANCE, MAX_DISTANCE);
+	//g_camproj = PerspProj(FIELD_OF_VIEW, double(g_width) / double(g_height), MIN_DISTANCE, MAX_DISTANCE);
 	//glMatrixMode(GL_MODELVIEW);
 	//glLoadIdentity();
 	//c->Look();

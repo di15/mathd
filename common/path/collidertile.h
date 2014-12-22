@@ -5,9 +5,9 @@
 #include "../math/vec2i.h"
 
 
-#define FLAG_HASROAD	1
-#define FLAG_HASLAND	2
-#define FLAG_ABRUPT		4
+//#define FLAG_HASROAD	4
+#define FLAG_HASLAND	1
+#define FLAG_ABRUPT		2
 
 #define LARGEST_UNIT_NODES		4
 #define MAX_COLLIDER_UNITS		4
@@ -24,7 +24,7 @@ public:
 	unsigned char flags;
 	short building;
 	short units[MAX_COLLIDER_UNITS];
-	std::list<int> foliage;
+	unsigned short foliage;
 
 	ColliderTile();
 };
@@ -36,12 +36,13 @@ class Unit;
 class Building;
 class PathJob;
 
-ColliderTile* ColliderTileAt(int nx, int nz);
+ColliderTile* ColliderAt(int nx, int nz);
 Vec2i PathNodePos(int cmposx, int cmposz);
 void FreePathGrid();
 void AllocPathGrid(int cmwx, int cmwz);
 void FillColliderGrid();
 bool Standable(const PathJob* pj, const int nx, const int nz);
-bool Walkable2(PathJob* pj, int cmposx, int cmposz);
+bool Standable2(const PathJob* pj, int cmposx, int cmposz);
+bool TileStandable(const PathJob* pj, const int nx, const int nz);
 
 #endif

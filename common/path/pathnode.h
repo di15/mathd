@@ -3,28 +3,42 @@
 
 #include "../platform.h"
 #include "../math/vec2i.h"
+#include "../math/vec2s.h"
+#include "../math/fixmath.h"
 #include "../render/heightmap.h"
 
-#define PATHNODE_SIZE	(TILE_SIZE/8)
-#define PATHNODE_DIAG	(sqrt(PATHNODE_SIZE*PATHNODE_SIZE*2))
+//must divide tiles evenly into integers,
+//so they line up.
+//#define PATHNODE_SIZE	(TILE_SIZE/8)
+#define PATHNODE_SIZE	(TILE_SIZE/20)
+#define PATHNODE_DIAG	(isqrt(PATHNODE_SIZE*PATHNODE_SIZE*2))
+
+//straight dirs
+#define SDIR_E	0
+#define SDIR_W	1
+#define SDIR_S	2
+#define SDIR_N	3
+#define SDIRS	4
 
 // Offsets for straights moves
-const Vec2i straightoffsets[4] =
+const Vec2s straightoffsets[4] =
 {
-	Vec2i(1, 0), //E
-	Vec2i(-1, 0), //W
-	Vec2i(0, 1), //S
-	Vec2i(0, -1) //N
+	Vec2s(1, 0), //E
+	Vec2s(-1, 0), //W
+	Vec2s(0, 1), //S
+	Vec2s(0, -1) //N
 };
 
 // Offsets for diagonal moves
-const Vec2i diagonaloffsets[4] =
+const Vec2s diagonaloffsets[4] =
 {
-	Vec2i(-1, -1), //NW
-	Vec2i(1, -1), //NE
-	Vec2i(-1, 1), //SW
-	Vec2i(1, 1) //SE
+	Vec2s(-1, -1), //NW
+	Vec2s(1, -1), //NE
+	Vec2s(-1, 1), //SW
+	Vec2s(1, 1) //SE
 };
+
+//TODO check for memleak because app is taking too long to exit.
 
 #define DIR_NW      0
 #define DIR_N       1
@@ -36,18 +50,20 @@ const Vec2i diagonaloffsets[4] =
 #define DIR_W       7
 #define DIRS        8
 
-const Vec2i offsets[DIRS] =
+const Vec2s offsets[DIRS] =
 {
-	Vec2i(-1, -1), //NW
-	Vec2i(0, -1), //N
-	Vec2i(1, -1), //NE
-	Vec2i(1, 0), //E
-	Vec2i(1, 1), //SE
-	Vec2i(0, 1), //S
-	Vec2i(-1, 1), //SW
-	Vec2i(-1, 0) //W
+	Vec2s(-1, -1), //NW
+	Vec2s(0, -1), //N
+	Vec2s(1, -1), //NE
+	Vec2s(1, 0), //E
+	Vec2s(1, 1), //SE
+	Vec2s(0, 1), //S
+	Vec2s(-1, 1), //SW
+	Vec2s(-1, 0) //W
 };
 
+#if 0
+//big error: pathnode score and G factors count pathnodes, not centimeters
 const int stepdist[DIRS] =
 {
 	(int)PATHNODE_DIAG, //NW
@@ -59,6 +75,24 @@ const int stepdist[DIRS] =
 	(int)PATHNODE_DIAG, //SW
 	(int)PATHNODE_SIZE //W
 };
+#else
+//now totalD and stepD should be multiplied by two 
+//(each PATHNODE_SIZE will count as two).
+//multiply by 2 to give granularity
+//(needed for diagonal moves).
+//e.g., int H = Manhattan(Vec2i(endx-nx,endz-nz)) << 1;
+const unsigned char stepdist[DIRS] =
+{
+	(unsigned char)3, //NW
+	(unsigned char)2, //N
+	(unsigned char)3, //NE
+	(unsigned char)2, //E
+	(unsigned char)3, //SE
+	(unsigned char)2, //S
+	(unsigned char)3, //SW
+	(unsigned char)2 //W
+};
+#endif
 
 // byte-align structures
 #pragma pack(push, 1)
@@ -66,10 +100,10 @@ const int stepdist[DIRS] =
 class PathNode
 {
 public:
-	int F;
-	short nx;
-	short nz;
-	int totalD;
+	unsigned short score;
+	//short nx;
+	//short nz;
+	unsigned short totalD;
 	//unsigned char expansion;
 	PathNode* previous;
 	//bool tried;
@@ -88,13 +122,14 @@ public:
 
 #pragma pack(pop)
 
-class Heap;
+class BinHeap;
 class PathJob;
 
 extern Vec2i g_pathdim;
 extern PathNode* g_pathnode;
-extern Heap g_openlist;
+extern BinHeap g_openlist;
 
+bool CompareNodes(void* a, void* b);
 Vec2i PathNodePos(PathNode* node);
 PathNode* PathNodeAt(int nx, int nz);
 int PathNodeIndex(int nx, int nz);

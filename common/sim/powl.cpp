@@ -5,12 +5,14 @@
 #include "road.h"
 #include "../render/shader.h"
 #include "../../game/gui/ggui.h"
-#include "buildingtype.h"
+#include "bltype.h"
 #include "../phys/collision.h"
 #include "../../game/gmain.h"
 #include "building.h"
 
-unsigned char PowlTile::condtype()
+#if 0
+unsigned char PowlTile::cdtype()
 {
 	return CONDUIT_POWL;
 }
+#endif

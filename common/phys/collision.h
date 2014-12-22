@@ -27,5 +27,6 @@ bool BlAdj(int i, int j);
 bool CoAdj(char ctype, int i, int x, int z);
 bool CollidesWithBuildings(int minx, int minz, int maxx, int maxz, int ignore=-1);
 bool CollidesWithUnits(int minx, int minz, int maxx, int maxz, bool isunit=false, Unit* thisu=NULL, Unit* ignore=NULL);
+bool OffMap(int cmminx, int cmminz, int cmmaxx, int cmmaxz);
 
 #endif

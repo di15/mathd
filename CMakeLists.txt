@@ -1,5 +1,5 @@
 cmake_minimum_required (VERSION 3.0)
-project (corpstatesc) 
+project (csmm) 
 
 set (CORP_VERSION_MAJOR 0)
 set (CORP_VERSION_MINOR 0)
@@ -143,6 +143,7 @@ INCLUDE_DIRECTORIES( ${SDL2_INCLUDE_DIRS} ${GLEW_INCLUDE_DIRS})
 TARGET_LINK_LIBRARIES(
         ${PROJECT_NAME}
         ${SDL2_LIBRARIES}
+        ${SDL2_NET_LIBRARIES}
         ${GLEW_LIBRARIES}
         ${GL_LIBRARIES}
         ${GLU_LIBRARIES}

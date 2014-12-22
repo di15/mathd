@@ -21,7 +21,7 @@ public:
 	}
 
 	void draw();
-	void inev(InEv* ev);
+	void inev(InEv* ie);
 };
 
 #endif

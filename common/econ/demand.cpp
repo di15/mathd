@@ -641,7 +641,7 @@ void AddInf(DemGraph* dm, std::list<DemNode*>* cdarr, DemNode* parent, DemNode* 
 	}
 
 	unsigned char ctype = r->conduit;
-	ConduitType* ct = &g_cotype[ctype];
+	CdType* ct = &g_cdtype[ctype];
 
 
 }
@@ -686,7 +686,7 @@ DemsAtB* BestAcSup(DemGraph* dm, Vec2i demtpos, Vec2i demcmpos, int rtype, int* 
 		{
 			Building* b = &g_building[demb->bi];
 			btpos = b->tilepos;
-			margpr = b->prodprice[rtype];
+			margpr = b->price[rtype];
 		}
 
 		//check if distance is better or if there's no best yet
@@ -754,7 +754,7 @@ DemsAtB* BestPrSup(DemGraph* dm, Vec2i demtpos, Vec2i demcmpos, int rtype, int* 
 		//if(dist > bestdist && bestdemb)
 		//	continue;
 
-		int margpr = b->prodprice[rtype];
+		int margpr = b->price[rtype];
 
 		int util = r->physical ? PhUtil(margpr, dist) : GlUtil(margpr);
 
@@ -810,7 +810,7 @@ bool AddLoad(Player* p, Vec2i demcmpos, std::list<DemNode*>* nodes, DemGraph* dm
 	if(demb->bi >= 0)
 	{
 		Building* b = &g_building[demb->bi];
-		margpr = b->prodprice[rtype];
+		margpr = b->price[rtype];
 		suptpos = b->tilepos;
 		supcmpos = b->tilepos * TILE_SIZE + Vec2i(TILE_SIZE,TILE_SIZE)/2;
 	}
@@ -912,7 +912,7 @@ void AddReq(DemGraph* dm, Player* p, std::list<DemNode*>* nodes, DemNode* parent
 	Resource* r = &g_resource[rtype];
 
 #if 0
-	Vec2i demtpos = Vec2i(g_hmap.m_widthx, g_hmap.m_widthz)/2;
+	Vec2i demtpos = Vec2i(g_hmap.m_widthx, g_hmap.m_widthy)/2;
 	Vec2i demcmpos = demtpos * TILE_SIZE + Vec2i(TILE_SIZE,TILE_SIZE)/2;
 	DemsAtB* pardemb = NULL;
 	DemsAtU* pardemu = NULL;
@@ -1219,7 +1219,7 @@ void LabDemH(DemGraph* dm, Unit* u, int* fundsleft, DemsAtU* pardemu)
 			break;
 		}
 
-		int homepr = homeb->prodprice[RES_HOUSING];
+		int homepr = homeb->price[RES_HOUSING];
 		int homedist = Magnitude(homeb->tilepos * TILE_SIZE + Vec2i(TILE_SIZE/2,TILE_SIZE/2) - u->cmpos);
 
 		// As long as it's at least -1 cheaper and/or -1 units closer,
@@ -1278,7 +1278,7 @@ void LabDemH(DemGraph* dm, Unit* u, int* fundsleft, DemsAtU* pardemu)
 				bt = &g_bltype[b->type];
 				bcmpos = b->tilepos * TILE_SIZE + Vec2i(TILE_SIZE/2, TILE_SIZE/2);
 				btpos = b->tilepos;
-				marginpr = b->prodprice[RES_HOUSING];
+				marginpr = b->price[RES_HOUSING];
 			}
 
 			if(bt->output[RES_HOUSING] <= 0)
@@ -1439,7 +1439,7 @@ void LabDemF(DemGraph* dm, Unit* u, int* fundsleft, DemsAtU* pardemu)
 				bt = &g_bltype[b->type];
 				bcmpos = b->tilepos * TILE_SIZE + Vec2i(TILE_SIZE/2, TILE_SIZE/2);
 				btpos = b->tilepos;
-				marginpr = b->prodprice[RES_RETFOOD];
+				marginpr = b->price[RES_RETFOOD];
 			}
 
 			if(bt->output[RES_RETFOOD] <= 0)
@@ -1549,11 +1549,11 @@ void LabDemF(DemGraph* dm, Unit* u, int* fundsleft, DemsAtU* pardemu)
 			{
 				Building* b = &g_building[bi];
 				pi = b->owner;
-				margpr = b->prodprice[ri];
+				margpr = b->price[ri];
 			}
 
 			sprintf(msg, "found food p%d %s b%d margpr%d minutil%d ramt%d cmdist%d", pi, g_resource[ri].name.c_str(), bi, margpr, rdem->bid.minutil, rdem->ramt, cmdist);
-			InfoMessage("ff", msg);
+			InfoMess("ff", msg);
 		}
 #endif
 
@@ -1594,7 +1594,7 @@ void LabDemF(DemGraph* dm, Unit* u, int* fundsleft, DemsAtU* pardemu)
 			{
 				char msg[128];
 				sprintf(msg, "reqfood remain %d util<=0 fundsleft2=%d", reqfood, fundsleft2);
-				InfoMessage("blah", msg);
+				InfoMess("blah", msg);
 			}
 #endif
 
@@ -1665,7 +1665,7 @@ void LabDemF3(DemGraph* dm, Unit* u, int* fundsleft, DemsAtU* pardemu)
 				bt = &g_bltype[b->type];
 				bcmpos = b->tilepos * TILE_SIZE + Vec2i(TILE_SIZE/2, TILE_SIZE/2);
 				btpos = b->tilepos;
-				marginpr = b->prodprice[RES_RETFOOD];
+				marginpr = b->price[RES_RETFOOD];
 			}
 
 			if(bt->output[RES_RETFOOD] <= 0)
@@ -1775,11 +1775,11 @@ void LabDemF3(DemGraph* dm, Unit* u, int* fundsleft, DemsAtU* pardemu)
 			{
 				Building* b = &g_building[bi];
 				pi = b->owner;
-				margpr = b->prodprice[ri];
+				margpr = b->price[ri];
 			}
 
 			sprintf(msg, "found food p%d %s b%d margpr%d minutil%d ramt%d cmdist%d", pi, g_resource[ri].name.c_str(), bi, margpr, rdem->bid.minutil, rdem->ramt, cmdist);
-			InfoMessage("ff", msg);
+			InfoMess("ff", msg);
 		}
 #endif
 
@@ -1820,7 +1820,7 @@ void LabDemF3(DemGraph* dm, Unit* u, int* fundsleft, DemsAtU* pardemu)
 			{
 				char msg[128];
 				sprintf(msg, "reqfood remain %d util<=0 fundsleft2=%d", reqfood, fundsleft2);
-				InfoMessage("blah", msg);
+				InfoMess("blah", msg);
 			}
 #endif
 
@@ -1888,7 +1888,7 @@ void LabDemF2(DemGraph* dm, Unit* u, int* fundsleft, DemsAtU* pardemu)
 				bt = &g_bltype[b->type];
 				bcmpos = b->tilepos * TILE_SIZE + Vec2i(TILE_SIZE/2, TILE_SIZE/2);
 				btpos = b->tilepos;
-				marginpr = b->prodprice[RES_RETFOOD];
+				marginpr = b->price[RES_RETFOOD];
 			}
 
 			if(bt->output[RES_RETFOOD] <= 0)
@@ -2066,7 +2066,7 @@ void LabDemE(DemGraph* dm, Unit* u, int* fundsleft, DemsAtU* pardemu)
 				bt = &g_bltype[b->type];
 				bcmpos = b->tilepos * TILE_SIZE + Vec2i(TILE_SIZE/2, TILE_SIZE/2);
 				btpos = b->tilepos;
-				marginpr = b->prodprice[RES_ENERGY];
+				marginpr = b->price[RES_ENERGY];
 			}
 
 			if(bt->output[RES_ENERGY] <= 0)
@@ -2824,7 +2824,7 @@ void CombCo(int btype, Bid* bid, int rtype, int ramt)
 			if(bt->input[ri] <= 0)
 				continue;
 
-			//int rstep = Ceili(minstep * bt->input[ri], RATIO_DENOM);
+			//int rstep = iceil(minstep * bt->input[ri], RATIO_DENOM);
 			int rstep = minstep * bt->input[ri] / RATIO_DENOM;
 			rstep = imin(rstep, stepleft[ri]);
 			stepcounted[ri] += rstep;
@@ -2859,7 +2859,7 @@ void CheckBlType(DemGraph* dm, Player* p, int btype, int rtype, int ramt, Vec2i 
 
 	BlType* bt = &g_bltype[btype];
 
-	int prodlevel = Ceili(RATIO_DENOM * ramt, bt->output[rtype]);
+	int prodlevel = iceil(RATIO_DENOM * ramt, bt->output[rtype]);
 
 	if(prodlevel > RATIO_DENOM)
 		prodlevel = RATIO_DENOM;
@@ -2896,7 +2896,7 @@ void CheckBlType(DemGraph* dm, Player* p, int btype, int rtype, int ramt, Vec2i 
 		if(bt->input[ri] <= 0)
 			continue;
 
-		int reqr = Ceili(prodlevel * bt->input[ri], RATIO_DENOM);
+		int reqr = iceil(prodlevel * bt->input[ri], RATIO_DENOM);
 
 		if(reqr <= 0)
 			continue;
@@ -3090,7 +3090,7 @@ void CheckBlTile(DemGraph* dm, Player* p, int ri, RDemNode* pt, int x, int z, in
 #if 0
 		char msg[128];
 		sprintf(msg, "maxpr%d requtil%d", maxpr, requtil);
-		InfoMessage("sea", msg);
+		InfoMess("sea", msg);
 #endif
 
 #if 0
@@ -3254,7 +3254,7 @@ void CheckBlTile(DemGraph* dm, Player* p, int ri, RDemNode* pt, int x, int z, in
 			//find max profit based on cost composition and price
 			bool mpr = MaxPro(bid->costcompo, leastnext, demramt, &proramt, maxbudg, &currev, &curprofit);
 
-			//int ofmax = Ceili(proramt * RATIO_DENOM, bestmaxr);	//how much of max demanded is
+			//int ofmax = iceil(proramt * RATIO_DENOM, bestmaxr);	//how much of max demanded is
 			//curprofit += ofmax * bestrecur / RATIO_DENOM;	//bl recurring costs, scaled to demanded qty
 
 #if 0
@@ -3368,7 +3368,7 @@ void CheckBl(DemGraph* dm, Player* p, int* fixcost, int* recurprof, bool* succes
 		//if(!r->physical)
 		//	continue;
 
-		for(int z=0; z<g_hmap.m_widthz; z++)
+		for(int z=0; z<g_hmap.m_widthy; z++)
 			for(int x=0; x<g_hmap.m_widthx; x++)
 			{
 				char msg[128];
@@ -3510,7 +3510,7 @@ bool DemCmPos(DemNode* pardem, Vec2i* demcmpos)
 	if(pardem->demtype == DEM_CDNODE)
 	{
 		CdDem* demcd = (CdDem*)pardem;
-		ConduitType* ct = &g_cotype[demcd->cdtype];
+		CdType* ct = &g_cdtype[demcd->cdtype];
 
 		if(demcd->tpos.x >= 0 && demcd->tpos.y >= 0)
 		{
@@ -3606,11 +3606,11 @@ void CalcDem2(Player* p, bool blopp)
 	RDemNode* rd = (RDemNode*)*dm->rdemcopy.begin();
 	char msg[128];
 	sprintf(msg, "cd2 first r:%s bi%d ramt%d minutil%d maxbid%d margpr%d", g_resource[rd->rtype].name.c_str(), rd->bi, rd->ramt, rd->bid.minutil, rd->bid.marginpr);
-	InfoMessage("calcdem2 f", msg);
+	InfoMess("calcdem2 f", msg);
 
 	rd = (RDemNode*)*dm->rdemcopy.rbegin();
 	sprintf(msg, "cd2 last r:%s bi%d ramt%d minutil%d maxbid%d margpr%d", g_resource[rd->rtype].name.c_str(), rd->bi, rd->ramt, rd->bid.minutil, rd->bid.marginpr);
-	InfoMessage("calcdem2 l", msg);
+	InfoMess("calcdem2 l", msg);
 #endif
 
 	//return;
@@ -3658,7 +3658,7 @@ void CalcDem2(Player* p, bool blopp)
 			BlType* bt = &g_bltype[((DemsAtB*)(*bldm.supbpcopy.rbegin()))->btype];
 			g_log<<"suc pi "<<pi<<" "<<bt->name<<std::endl;
 			g_log.flush();
-			//InfoMessage("suc", "suc");
+			//InfoMess("suc", "suc");
 	#endif
 			dm->free();
 			DupDm(&bldm, dm);
@@ -3668,7 +3668,7 @@ void CalcDem2(Player* p, bool blopp)
 		{
 			g_log<<"fail pi "<<pi<<std::endl;
 			g_log.flush();
-			//InfoMessage("f", "f");
+			//InfoMess("f", "f");
 		}
 	#endif
 

@@ -5,11 +5,21 @@
 #include "../math/vec3f.h"
 #include "../platform.h"
 #include "resources.h"
-#include "buildingtype.h"
+#include "bltype.h"
 #include "../render/vertexarray.h"
-#include "unittype.h"
+#include "utype.h"
 
 class VertexArray;
+
+//#define PROD_DEBUG	//bl's production debug output
+
+//unit manufacturing job
+class ManufJob
+{
+public:
+	int utype;
+	int owner;
+};
 
 class Building
 {
@@ -37,7 +47,7 @@ public:
 	int conmat[RESOURCES];
 	bool inoperation;
 
-	int prodprice[RESOURCES];	//price of produced goods
+	int price[RESOURCES];	//price of produced goods
 	int propprice;	//price of this property
 
 	std::list<int> occupier;
@@ -45,18 +55,30 @@ public:
 	int conwage;
 	int opwage;
 	int cydelay;	//the frame delay between production cycles, when production target is renewed
-	int prodlevel;	//production target level of max RATIO_DENOM
-	int cymet;	//used to keep track of what was produced this cycle, out of max of prodlevel
-	int lastcy;	//last simframe of last production cycle
+	short prodlevel;	//production target level of max RATIO_DENOM
+	short cymet;	//used to keep track of what was produced this cycle, out of max of prodlevel
+	unsigned int lastcy;	//last simframe of last production cycle
 	std::list<CapSup> capsup;	//capacity suppliers
 
 	int manufprc[UNIT_TYPES];
+	std::list<ManufJob> manufjob;
+	short transporter[RESOURCES];
+
+	int hp;
 
 	bool excin(int rtype);	//excess input resource right now?
 	bool metout();	//met production target for now?
-	int stillreq(int rtype);	//how much of an input is still required to meet production target
+	int netreq(int rtype);	//how much of an input is still required to meet production target
 	bool hasworker(int ui);
 	bool tryprod();
+	bool trymanuf();
+	int maxprod();
+	void adjcaps();
+	void spawn(int utype, int uowner);
+	void morecap(int rtype, int amt);
+	void lesscap(int rtype, int amt);
+	void getether();
+	void getether(int rtype, int amt);
 
 	void destroy();
 	void fillcollider();
@@ -69,6 +91,7 @@ public:
 };
 
 #define BUILDINGS	256
+//#define BUILDINGS	64
 
 extern Building g_building[BUILDINGS];
 class Unit;

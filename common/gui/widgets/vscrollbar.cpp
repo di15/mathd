@@ -14,6 +14,8 @@ VScroll::VScroll() : Widget()
 	m_mousescroll = false;
 	m_ldown = false;
 	m_ldownbar = false;
+	m_ldownup = false;
+	m_ldowndown = false;
 	m_domain = 1;
 	CreateTexture(m_uptex, "gui/up.jpg", true, false);
 	changefunc = NULL;
@@ -31,6 +33,8 @@ VScroll::VScroll(Widget* parent, const char* n) : Widget()
 	m_mousescroll = false;
 	m_ldown = false;
 	m_ldownbar = false;
+	m_ldownup = false;
+	m_ldowndown = false;
 	m_domain = 0.5f;
 	CreateTexture(m_uptex, "gui/up.jpg", true, false);
 	changefunc = NULL;
@@ -40,13 +44,32 @@ VScroll::VScroll(Widget* parent, const char* n) : Widget()
 
 void VScroll::reframe()
 {
-	int w = m_pos[2]-m_pos[0];
-
 #if 0
 	float m_barpos[4];
 	float m_uppos[4];
 	float m_downpos[4];
 #endif
+
+	if(m_parent)
+	{
+		float* parp = m_parent->m_pos;
+
+		//must be bounded by the parent's frame
+
+		m_pos[0] = fmax(parp[0], m_pos[0]);
+		m_pos[0] = fmin(parp[2], m_pos[0]);
+		m_pos[2] = fmax(parp[0], m_pos[2]);
+		m_pos[2] = fmin(parp[2], m_pos[2]);
+		m_pos[1] = fmax(parp[1], m_pos[1]);
+		m_pos[1] = fmin(parp[3], m_pos[1]);
+		m_pos[3] = fmax(parp[1], m_pos[3]);
+		m_pos[3] = fmin(parp[3], m_pos[3]);
+
+		m_pos[1] = fmin(m_pos[1], m_pos[3]);
+		m_pos[0] = fmin(m_pos[0], m_pos[2]);
+	}
+
+	int w = (int)( m_pos[2]-m_pos[0] );
 
 	m_uppos[0] = m_pos[0];
 	m_uppos[1] = m_pos[1];
@@ -61,9 +84,49 @@ void VScroll::reframe()
 	m_barpos[0] = m_pos[0];
 	m_barpos[1] = m_uppos[3] + (m_downpos[1]-m_uppos[3])*m_scroll[1];
 	m_barpos[2] = m_pos[2];
-	m_barpos[3] = m_barpos[1] + fmax(w, m_domain*(m_downpos[1]-m_uppos[3]));
+	//m_barpos[3] = m_barpos[1] + fmax(w, m_domain*(m_downpos[1]-m_uppos[3]));
+	m_barpos[3] = m_barpos[1] + m_domain*(m_downpos[1]-m_uppos[3]);
 
+	if(m_parent)
+	{
+		float* parp = m_parent->m_pos;
 
+		//must be bounded by the parent's frame
+
+		m_uppos[0] = fmax(parp[0], m_uppos[0]);
+		m_uppos[0] = fmin(parp[2], m_uppos[0]);
+		m_uppos[2] = fmax(parp[0], m_uppos[2]);
+		m_uppos[2] = fmin(parp[2], m_uppos[2]);
+		m_uppos[1] = fmax(parp[1], m_uppos[1]);
+		m_uppos[1] = fmin(parp[3], m_uppos[1]);
+		m_uppos[3] = fmax(parp[1], m_uppos[3]);
+		m_uppos[3] = fmin(parp[3], m_uppos[3]);
+
+		m_downpos[0] = fmax(parp[0], m_downpos[0]);
+		m_downpos[0] = fmin(parp[2], m_downpos[0]);
+		m_downpos[2] = fmax(parp[0], m_downpos[2]);
+		m_downpos[2] = fmin(parp[2], m_downpos[2]);
+		m_downpos[1] = fmax(parp[1], m_downpos[1]);
+		m_downpos[1] = fmin(parp[3], m_downpos[1]);
+		m_downpos[3] = fmax(parp[1], m_downpos[3]);
+		m_downpos[3] = fmin(parp[3], m_downpos[3]);
+
+		//bar must be vertically between the two arrow buttons
+		m_barpos[0] = fmax(parp[0], m_barpos[0]);
+		m_barpos[0] = fmin(parp[2], m_barpos[0]);
+		m_barpos[2] = fmax(parp[0], m_barpos[2]);
+		m_barpos[2] = fmin(parp[2], m_barpos[2]);
+
+		m_barpos[1] = fmax(parp[1], m_barpos[1]);
+		m_barpos[1] = fmin(parp[3], m_barpos[1]);
+		m_barpos[3] = fmax(m_pos[1], m_barpos[3]);
+		m_barpos[3] = fmin(m_pos[3], m_barpos[3]);
+
+		m_barpos[1] = fmax(m_barpos[1], m_uppos[3]);
+		m_barpos[1] = fmin(m_barpos[1], m_downpos[1]);
+		m_barpos[3] = fmax(m_barpos[3], m_uppos[3]);
+		m_barpos[3] = fmin(m_barpos[3], m_downpos[1]);
+	}
 
 	for(auto w=m_subwidg.begin(); w!=m_subwidg.end(); w++)
 		(*w)->reframe();
@@ -75,13 +138,13 @@ void VScroll::draw()
 	DrawImage(g_texture[ m_uptex ].texname, m_uppos[0], m_uppos[1], m_uppos[2], m_uppos[3], 0, 0, 1, 1);
 	DrawImage(g_texture[ m_uptex ].texname, m_downpos[0], m_downpos[1], m_downpos[2], m_downpos[3], 0, 1, 1, 0);
 
-	Player* py = &g_player[g_curP];
+	Player* py = &g_player[g_localP];
 
 	EndS();
 
 	UseS(SHADER_COLOR2D);
-	glUniform1f(g_shader[g_curS].m_slot[SSLOT_WIDTH], (float)py->currw);
-	glUniform1f(g_shader[g_curS].m_slot[SSLOT_HEIGHT], (float)py->currh);
+	glUniform1f(g_shader[g_curS].m_slot[SSLOT_WIDTH], (float)g_currw);
+	glUniform1f(g_shader[g_curS].m_slot[SSLOT_HEIGHT], (float)g_currh);
 
 	float midcolor[] = {0.7f,0.7f,0.7f,0.8f};
 	float lightcolor[] = {0.8f,0.8f,0.8f,0.8f};
@@ -107,7 +170,7 @@ void VScroll::draw()
 
 	EndS();
 	CheckGLError(__FILE__, __LINE__);
-	Ortho(py->currw, py->currh, 1, 1, 1, 1);
+	Ortho(g_currw, g_currh, 1, 1, 1, 1);
 
 	for(auto w=m_subwidg.begin(); w!=m_subwidg.end(); w++)
 		(*w)->draw();
@@ -122,44 +185,118 @@ void VScroll::drawover()
 		(*w)->drawover();
 }
 
-void VScroll::inev(InEv* ev)
+void VScroll::frameupd()
 {
-	for(auto w=m_subwidg.rbegin(); w!=m_subwidg.rend(); w++)
-		(*w)->inev(ev);
+	if(m_ldownup)
+	{
+		float dy = -g_drawfrinterval * m_domain;
 
-	Player* py = &g_player[g_curP];
+		float origscroll = m_scroll[1];
+
+		m_scroll[1] += (float)dy;
+
+		int w = (int)( m_pos[2]-m_pos[0] );
+
+		m_barpos[1] = m_uppos[3] + (m_downpos[1]-m_uppos[3])*m_scroll[1];
+		//m_barpos[3] = m_barpos[1] + fmax(w, m_domain*(m_downpos[1]-m_uppos[3]));
+		m_barpos[3] = m_barpos[1] + m_domain*(m_downpos[1]-m_uppos[3]);
+
+		float overy = m_barpos[3] - m_downpos[1];
+
+		if(overy > 0)
+		{
+			m_barpos[1] -= overy;
+			m_barpos[3] -= overy;
+			m_scroll[1] = (m_barpos[1] - m_uppos[3]) / (m_downpos[1] - m_uppos[3]);
+		}
+
+		float undery = m_uppos[3] - m_barpos[1];
+
+		if(undery > 0)
+		{
+			m_barpos[1] += undery;
+			m_barpos[3] += undery;
+			m_scroll[1] = (m_barpos[1] - m_uppos[3]) / (m_downpos[1] - m_uppos[3]);
+		}
+	}
+
+	else if(m_ldowndown)
+	{
+		float dy = g_drawfrinterval * m_domain;
+
+		float origscroll = m_scroll[1];
+
+		m_scroll[1] += (float)dy;
+
+		int w = (int)( m_pos[2]-m_pos[0] );
+
+		m_barpos[1] = m_uppos[3] + (m_downpos[1]-m_uppos[3])*m_scroll[1];
+		//m_barpos[3] = m_barpos[1] + fmax(w, m_domain*(m_downpos[1]-m_uppos[3]));
+		m_barpos[3] = m_barpos[1] + m_domain*(m_downpos[1]-m_uppos[3]);
+
+		float overy = m_barpos[3] - m_downpos[1];
+
+		if(overy > 0)
+		{
+			m_barpos[1] -= overy;
+			m_barpos[3] -= overy;
+			m_scroll[1] = (m_barpos[1] - m_uppos[3]) / (m_downpos[1] - m_uppos[3]);
+		}
+
+		float undery = m_uppos[3] - m_barpos[1];
+
+		if(undery > 0)
+		{
+			m_barpos[1] += undery;
+			m_barpos[3] += undery;
+			m_scroll[1] = (m_barpos[1] - m_uppos[3]) / (m_downpos[1] - m_uppos[3]);
+		}
+	}
+}
+
+void VScroll::inev(InEv* ie)
+{
+	//for(auto w=m_subwidg.rbegin(); w!=m_subwidg.rend(); w++)
+	//	(*w)->inev(ie);
+
+	Player* py = &g_player[g_localP];
+
+	//return;
 
 #if 1
 	if(m_ldown)
 	{
-		if(ev->type == INEV_MOUSEMOVE ||
-		                ( (ev->type == INEV_MOUSEDOWN || ev->type == INEV_MOUSEUP) && ev->key == MOUSE_LEFT) )
-			ev->intercepted = true;
+		if(ie->type == INEV_MOUSEMOVE ||
+			( (ie->type == INEV_MOUSEDOWN || ie->type == INEV_MOUSEUP) && ie->key == MOUSE_LEFT) )
+			ie->intercepted = true;
 
-		if(ev->type == INEV_MOUSEUP && ev->key == MOUSE_LEFT)
+		if(ie->type == INEV_MOUSEUP && ie->key == MOUSE_LEFT)
 		{
 			m_ldown = false;
 			m_ldownbar = false;
+			m_ldownup = false;
+			m_ldowndown = false;
 		}
 
-		if(ev->type == INEV_MOUSEMOVE && m_ldownbar)
+		if(ie->type == INEV_MOUSEMOVE && m_ldownbar)
 		{
-			if(py->mouse.y < m_barpos[1] || py->mouse.y > m_barpos[3])
+			if(g_mouse.y < m_barpos[1] || g_mouse.y > m_barpos[3])
 				return;
 
-			int dx = py->mouse.x - m_mousedown[0];
-			int dy = py->mouse.y - m_mousedown[1];
-			m_mousedown[0] = py->mouse.x;
-			m_mousedown[1] = py->mouse.y;
+			int dx = g_mouse.x - m_mousedown[0];
+			int dy = g_mouse.y - m_mousedown[1];
+			m_mousedown[0] = g_mouse.x;
+			m_mousedown[1] = g_mouse.y;
 
 			float origscroll = m_scroll[1];
 
 			m_scroll[1] += (float)dy / (m_downpos[1] - m_uppos[3]);
 
-			int w = m_pos[2]-m_pos[0];
+			int w = (int)( m_pos[2]-m_pos[0] );
 
 			m_barpos[1] = m_uppos[3] + (m_downpos[1]-m_uppos[3])*m_scroll[1];
-			m_barpos[3] = m_barpos[1] + fmax(w, m_domain*(m_downpos[1]-m_uppos[3]));
+			//m_barpos[3] = m_barpos[1] + fmax(w, m_domain*(m_downpos[1]-m_uppos[3]));
+			m_barpos[3] = m_barpos[1] + m_domain*(m_downpos[1]-m_uppos[3]);
 
 			float overy = m_barpos[3] - m_downpos[1];
 
@@ -185,74 +322,115 @@ void VScroll::inev(InEv* ev)
 				sev.delta = m_scroll[1] - origscroll;
 				sev.newpos = m_scroll[1];
 
-				m_parent->chcall(this, CHCALL_VSCROLL, (void*)&sev);
+				//m_parent->chcall(this, CHCALL_VSCROLL, (void*)&sev);
 			}
 		}
 	}
 #endif
 
-	if(m_over && ev->type == INEV_MOUSEDOWN && !ev->intercepted)
+	//return;
+
+	if(m_over && ie->type == INEV_MOUSEDOWN && !ie->intercepted)
 	{
-		if(ev->key == MOUSE_LEFT)
+		if(ie->key == MOUSE_LEFT)
 		{
 			m_ldown = true;
 
-			if(py->mouse.x >= m_barpos[0] &&
-			                py->mouse.y >= m_barpos[1] &&
-			                py->mouse.x <= m_barpos[2] &&
-			                py->mouse.y <= m_barpos[3])
+			if(g_mouse.x >= m_barpos[0] &&
+				g_mouse.y >= m_barpos[1] &&
+				g_mouse.x <= m_barpos[2] &&
+				g_mouse.y <= m_barpos[3])
 			{
 				m_ldownbar = true;
-				m_mousedown[0] = py->mouse.x;
-				m_mousedown[1] = py->mouse.y;
-				ev->intercepted = true;
+				m_mousedown[0] = g_mouse.x;
+				m_mousedown[1] = g_mouse.y;
+				ie->intercepted = true;
+
+				//ie->curst = CU_RESZT;
+			}
+
+			if(g_mouse.x >= m_uppos[0] &&
+				g_mouse.y >= m_uppos[1] &&
+				g_mouse.x <= m_uppos[2] &&
+				g_mouse.y <= m_uppos[3])
+			{
+				m_ldownup = true;
+				ie->intercepted = true;
+
+				//ie->curst = CU_RESZT;
+			}
+
+			if(g_mouse.x >= m_downpos[0] &&
+				g_mouse.y >= m_downpos[1] &&
+				g_mouse.x <= m_downpos[2] &&
+				g_mouse.y <= m_downpos[3])
+			{
+				m_ldowndown = true;
+				ie->intercepted = true;
+
+				//ie->curst = CU_RESZT;
 			}
 		}
 	}
 
-	if(ev->type == INEV_MOUSEMOVE)
+	//return;
+
+	if(ie->type == INEV_MOUSEMOVE)
 	{
 		if(m_ldown)
 		{
-			ev->intercepted = true;
+			ie->intercepted = true;
 			return;
 		}
 
-		if(!ev->intercepted &&
-		                py->mouse.x >= m_pos[0] &&
-		                py->mouse.y >= m_pos[1] &&
-		                py->mouse.x <= m_pos[2] &&
-		                py->mouse.y <= m_pos[3])
+		//return;
+
+#if 1
+		if(!ie->intercepted &&
+			g_mouse.x >= m_pos[0] &&
+			g_mouse.y >= m_pos[1] &&
+			g_mouse.x <= m_pos[2] &&
+			g_mouse.y <= m_pos[3])
 		{
 			m_over = true;
 
-			if(py->mousekeys[MOUSE_MIDDLE])
+			if(g_mousekeys[MOUSE_MIDDLE])
 				return;
 
-			ev->intercepted = true;
+			//return;
+			ie->intercepted = true;
 
-			if(py->curst == CU_DRAG)
-				return;
+			//InfoMess("in", "i");
 
-			py->curst = CU_DEFAULT;
+#if 0
+			//if(g_curst == CU_RESZT)
+			//	return;
+
+			if(g_mouse.x >= m_barpos[0] &&
+				g_mouse.y >= m_barpos[1] &&
+				g_mouse.x <= m_barpos[2] &&
+				g_mouse.y <= m_barpos[3])
+				ie->curst = CU_RESZT;
+#endif
 		}
 		else
 		{
-			if(!ev->intercepted)
+			if(!ie->intercepted)
 			{
 				if(m_over)
 				{
-					py->curst = CU_DEFAULT;
+					//g_curst = CU_DEFAULT;
 				}
 			}
 			else
 			{
 				// to do: this will be replaced by code in other
 				//widgets that will set the cursor
-				py->curst = CU_DEFAULT;
+				//ie->curst = CU_DEFAULT;
 			}
 
 			m_over = false;
 		}
 	}
+#endif
 }

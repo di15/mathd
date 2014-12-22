@@ -131,11 +131,17 @@ RichPart RichPart::substr(int start, int length) const
 
 RichText::RichText(const RichPart& part)
 {
+	m_part.clear();
 	m_part.push_back(part);
 }
 
 RichText::RichText(const RichText& original)
 {
+#ifdef USTR_DEBUG
+	g_log<<"RichText::RichText(const RichText& original) = "<<original.rawstr()<<std::endl;
+	g_log.flush();
+#endif
+	
 	*this = original;
 }
 
@@ -146,6 +152,7 @@ RichText::RichText(const char* cstr)
 	g_log.flush();
 #endif
 
+	m_part.clear();
 	m_part.push_back( RichPart(cstr) );
 }
 
@@ -201,7 +208,10 @@ RichText RichText::operator+(const RichText &other)
 			}
 		}
 
-		if(last1->m_type == RICHTEXT_TEXT && first2->m_type == RICHTEXT_TEXT)
+		if(last1 && 
+			first2 &&
+			last1->m_type == RICHTEXT_TEXT && 
+			first2->m_type == RICHTEXT_TEXT)
 		{
 			twopart.m_type = RICHTEXT_TEXT;
 			twopart.m_text = last1->m_text + first2->m_text;
@@ -386,6 +396,150 @@ RichText ParseTags(RichText original, int* caret)
 	//if(parsedepth > 10)
 	//	return original;
 #endif
+	
+	for(auto i=original.m_part.begin(); i!=original.m_part.end(); i++)
+	{
+		if(i->m_type == RICHTEXT_TEXT)
+		{
+			bool foundtag = false;
+
+			std::string num;
+			int firstof = -1;
+			int hashoff = -1;
+			int lastof = -1;
+
+			RichPart* p = &*i;
+			UString* s = &p->m_text;
+			unsigned int* u = s->m_data;
+
+			for(int j=0; j<s->m_length; j++)
+			{
+				if(u[j] == '&' &&
+					!foundtag)
+				{
+					firstof = j;
+					lastof = j;
+					num.clear();
+				}
+				else if(u[j] == '#' &&
+					!foundtag &&
+					firstof == j-1 &&
+					firstof >= 0)
+				{
+					hashoff = j;
+					lastof = j;
+					num.clear();
+				}
+				else if(u[j] == ';' && 
+					firstof >= 0 && 
+					hashoff == firstof+1 &&
+					!foundtag && 
+					lastof > firstof &&
+					num.length() > 0)
+				{
+					lastof = j;
+					foundtag = true;
+				}
+				else if(u[j] >= '0' &&
+					u[j] <= '9' &&
+					firstof >= 0 &&
+					hashoff == firstof+1 &&
+					!foundtag)
+				{
+					num += (char)u[j];
+				}
+				else if(!foundtag)
+				{
+					num.clear();
+					firstof = -1;
+					hashoff = -1;
+					lastof = -1;
+				}
+			}
+
+			if(!foundtag)
+			{
+				parsed = parsed + *i;
+				continue;
+			}
+
+#ifdef USTR_DEBUG
+			g_log<<"ParseTags found tag \""<<icon->m_tag.rawstr()<<"\" in \""<<i->m_text.rawstr()<<"\""<<std::endl;
+			g_log.flush();
+#endif
+
+			if(firstof > 0)
+			{
+				RichPart before = i->substr(0, firstof);
+
+#ifdef USTR_DEBUG
+				g_log<<"ParseTags before str at "<<firstof<<" \""<<before.m_text.rawstr()<<"\""<<std::endl;
+				g_log.flush();
+#endif
+
+				parsed = parsed + RichText(before);
+
+#ifdef USTR_DEBUG
+				g_log<<"\tparsed now = \""<<parsed.rawstr()<<"\""<<std::endl;
+				g_log.flush();
+#endif
+			}
+
+			unsigned int addi = StrToInt(num.c_str());
+			RichPart addp(addi);
+			parsed = parsed + RichText(addp);
+
+			int taglen = lastof - firstof + 1;
+			int partlen =  i->m_text.m_length;
+
+#ifdef USTR_DEBUG
+			g_log<<"\tparsed now = \""<<parsed.rawstr()<<"\""<<std::endl;
+			g_log.flush();
+#endif
+
+			if(firstof+taglen < partlen)
+			{
+				RichPart after = i->substr(firstof+taglen, partlen-(firstof+taglen));
+
+#ifdef USTR_DEBUG
+				g_log<<"ParseTags after str at "<<(firstof+taglen)<<" \""<<after.m_text.rawstr()<<"\""<<std::endl;
+				g_log.flush();
+#endif
+
+				parsed = parsed + RichText(after);
+
+#ifdef USTR_DEBUG
+				g_log<<"\tparsed now = \""<<parsed.rawstr()<<"\""<<std::endl;
+				g_log.flush();
+#endif
+			}
+
+			if(caret != NULL)
+			{
+				if(currplace+firstof < *caret)
+				{
+					*caret -= taglen-1;
+					currplace += partlen-taglen+1;
+				}
+			}
+
+			foundtag = true;
+			changed = true;
+		}
+		else
+		{
+			parsed = parsed + *i;
+		}
+
+		if(!changed && caret != NULL)
+			currplace += i->texlen();
+	}
+
+	if(changed)
+		return ParseTags(parsed, caret);
+
+	//reset
+	parsed = RichText("");
 
 	for(auto i=original.m_part.begin(); i!=original.m_part.end(); i++)
 	{
@@ -479,15 +633,14 @@ RichText ParseTags(RichText original, int* caret)
 		if(!changed && caret != NULL)
 			currplace += i->texlen();
 	}
+	
+	if(changed)
+		return ParseTags(parsed, caret);
 
-	if(!changed)
-	{
 #ifdef USTR_DEBUG
-		g_log<<"ParseTags final = "<<original.rawstr()<<std::endl;
-		g_log.flush();
+	g_log<<"ParseTags final = "<<original.rawstr()<<std::endl;
+	g_log.flush();
 #endif
-		return original;
-	}
 
-	return ParseTags(parsed, caret);
+	return original;
 }

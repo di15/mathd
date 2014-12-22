@@ -6,13 +6,13 @@
 
 void SaveScreenshot()
 {
-	Player* py = &g_player[g_curP];
+	Player* py = &g_player[g_localP];
 
 	LoadedTex screenshot;
 	screenshot.channels = 3;
-	screenshot.sizeX = py->width;
-	screenshot.sizeY = py->height;
-	screenshot.data = (unsigned char*)malloc( sizeof(unsigned char) * py->width * py->height * 3 );
+	screenshot.sizeX = g_width;
+	screenshot.sizeY = g_height;
+	screenshot.data = (unsigned char*)malloc( sizeof(unsigned char) * g_width * g_height * 3 );
 
 	if(!screenshot.data)
 	{
@@ -20,9 +20,9 @@ void SaveScreenshot()
 		return;
 	}
 
-	memset(screenshot.data, 0, py->width * py->height * 3);
+	memset(screenshot.data, 0, g_width * g_height * 3);
 
-	glReadPixels(0, 0, py->width, py->height, GL_RGB, GL_UNSIGNED_BYTE, screenshot.data);
+	glReadPixels(0, 0, g_width, g_height, GL_RGB, GL_UNSIGNED_BYTE, screenshot.data);
 
 	FlipImage(&screenshot);
 

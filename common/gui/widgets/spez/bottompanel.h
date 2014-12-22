@@ -1,3 +1,4 @@
+
 #ifndef BOTTOMPANEL_H
 #define BOTTOMPANEL_H
 

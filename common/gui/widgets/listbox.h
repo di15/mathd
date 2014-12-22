@@ -12,7 +12,7 @@ public:
 	ListBox(Widget* parent, const char* n, int f, void (*reframef)(Widget* thisw), void (*change)());
 
 	void draw();
-	void inev(InEv* ev);
+	void inev(InEv* ie);
 	int rowsshown();
 	int square();
 	void erase(int which);

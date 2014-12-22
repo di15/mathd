@@ -8,7 +8,7 @@
 #include "../phys/collision.h"
 #include "../window.h"
 #include "../math/camera.h"
-
+#include "../sim/player.h"
 
 float Bilerp(Heightmap* hmap, float x, float z)
 {
@@ -28,7 +28,7 @@ float Bilerp(Heightmap* hmap, float x, float z)
 	float hR1 = hmap->getheight(x1,z1)*x2fac + hmap->getheight(x2,z1)*x1fac;
 	float hR2 = hmap->getheight(x1,z2)*x2fac + hmap->getheight(x2,z2)*x1fac;
 
-	float zdenom = z2-z1;
+	float zdenom = (float)(z2-z1);
 
 	return hR1*(z2-z)/zdenom + hR2*(z-z1)/zdenom;
 }
@@ -40,15 +40,15 @@ bool GetMapIntersection2(Heightmap* hmap, Vec3f* vLine, Vec3f* vIntersection)
 	//map bottom
 
 #if 1
-	vQuad[0] = Vec3f((float)-10*hmap->m_widthx*TILE_SIZE, WATER_LEVEL*2.0f, (float)-10*hmap->m_widthz*TILE_SIZE);
-	vQuad[1] = Vec3f((float)10*hmap->m_widthx*TILE_SIZE, WATER_LEVEL*2.0f, (float)-10*hmap->m_widthz*TILE_SIZE);
-	vQuad[2] = Vec3f((float)10*hmap->m_widthx*TILE_SIZE, WATER_LEVEL*2.0f, (float)10*hmap->m_widthz*TILE_SIZE);
-	vQuad[3] = Vec3f((float)-10*hmap->m_widthx*TILE_SIZE, WATER_LEVEL*2.0f, (float)10*hmap->m_widthz*TILE_SIZE);
+	vQuad[0] = Vec3f((float)-10*hmap->m_widthx*TILE_SIZE, WATER_LEVEL*2.0f, (float)-10*hmap->m_widthy*TILE_SIZE);
+	vQuad[1] = Vec3f((float)10*hmap->m_widthx*TILE_SIZE, WATER_LEVEL*2.0f, (float)-10*hmap->m_widthy*TILE_SIZE);
+	vQuad[2] = Vec3f((float)10*hmap->m_widthx*TILE_SIZE, WATER_LEVEL*2.0f, (float)10*hmap->m_widthy*TILE_SIZE);
+	vQuad[3] = Vec3f((float)-10*hmap->m_widthx*TILE_SIZE, WATER_LEVEL*2.0f, (float)10*hmap->m_widthy*TILE_SIZE);
 #else
-	vQuad[3] = Vec3f(-10*hmap->m_widthx*TILE_SIZE, WATER_LEVEL*2.0f, -10*hmap->m_widthz*TILE_SIZE);
-	vQuad[2] = Vec3f(10*hmap->m_widthx*TILE_SIZE, WATER_LEVEL*2.0f, -10*hmap->m_widthz*TILE_SIZE);
-	vQuad[1] = Vec3f(10*hmap->m_widthx*TILE_SIZE, WATER_LEVEL*2.0f, 10*hmap->m_widthz*TILE_SIZE);
-	vQuad[0] = Vec3f(-10*hmap->m_widthx*TILE_SIZE, WATER_LEVEL*2.0f, 10*hmap->m_widthz*TILE_SIZE);
+	vQuad[3] = Vec3f(-10*hmap->m_widthx*TILE_SIZE, WATER_LEVEL*2.0f, -10*hmap->m_widthy*TILE_SIZE);
+	vQuad[2] = Vec3f(10*hmap->m_widthx*TILE_SIZE, WATER_LEVEL*2.0f, -10*hmap->m_widthy*TILE_SIZE);
+	vQuad[1] = Vec3f(10*hmap->m_widthx*TILE_SIZE, WATER_LEVEL*2.0f, 10*hmap->m_widthy*TILE_SIZE);
+	vQuad[0] = Vec3f(-10*hmap->m_widthx*TILE_SIZE, WATER_LEVEL*2.0f, 10*hmap->m_widthy*TILE_SIZE);
 #endif
 
 	if(InterPoly(vQuad, vLine, 4, vIntersection))
@@ -56,34 +56,34 @@ bool GetMapIntersection2(Heightmap* hmap, Vec3f* vLine, Vec3f* vIntersection)
 
 	//map sides, necessary for the frustum outline on the minimap (player's view outline) to not have corners stretching to origin if they're out of map bounds
 
-	vQuad[0] = Vec3f((float)-10*hmap->m_widthx*TILE_SIZE, WATER_LEVEL*2.0f, (float)-10*hmap->m_widthz*TILE_SIZE);
-	vQuad[1] = Vec3f((float)-10*hmap->m_widthx*TILE_SIZE, (float)TILE_SIZE*500, (float)-10*hmap->m_widthz*TILE_SIZE);
-	vQuad[2] = Vec3f((float)-10*hmap->m_widthx*TILE_SIZE, (float)TILE_SIZE*500, (float)10*hmap->m_widthz*TILE_SIZE);
-	vQuad[3] = Vec3f((float)-10*hmap->m_widthx*TILE_SIZE, WATER_LEVEL*2.0f, (float)10*hmap->m_widthz*TILE_SIZE);
+	vQuad[0] = Vec3f((float)-10*hmap->m_widthx*TILE_SIZE, WATER_LEVEL*2.0f, (float)-10*hmap->m_widthy*TILE_SIZE);
+	vQuad[1] = Vec3f((float)-10*hmap->m_widthx*TILE_SIZE, (float)TILE_SIZE*500, (float)-10*hmap->m_widthy*TILE_SIZE);
+	vQuad[2] = Vec3f((float)-10*hmap->m_widthx*TILE_SIZE, (float)TILE_SIZE*500, (float)10*hmap->m_widthy*TILE_SIZE);
+	vQuad[3] = Vec3f((float)-10*hmap->m_widthx*TILE_SIZE, WATER_LEVEL*2.0f, (float)10*hmap->m_widthy*TILE_SIZE);
 
 	if(InterPoly(vQuad, vLine, 4, vIntersection))
 		return true;
 
-	vQuad[0] = Vec3f((float)10*hmap->m_widthx*TILE_SIZE, (float)TILE_SIZE*500, (float)-10*hmap->m_widthz*TILE_SIZE);
-	vQuad[1] = Vec3f((float)10*hmap->m_widthx*TILE_SIZE, WATER_LEVEL*2.0f, (float)-10*hmap->m_widthz*TILE_SIZE);
-	vQuad[2] = Vec3f((float)10*hmap->m_widthx*TILE_SIZE, WATER_LEVEL*2.0f, (float)10*hmap->m_widthz*TILE_SIZE);
-	vQuad[3] = Vec3f((float)10*hmap->m_widthx*TILE_SIZE, (float)TILE_SIZE*500, (float)10*hmap->m_widthz*TILE_SIZE);
+	vQuad[0] = Vec3f((float)10*hmap->m_widthx*TILE_SIZE, (float)TILE_SIZE*500, (float)-10*hmap->m_widthy*TILE_SIZE);
+	vQuad[1] = Vec3f((float)10*hmap->m_widthx*TILE_SIZE, WATER_LEVEL*2.0f, (float)-10*hmap->m_widthy*TILE_SIZE);
+	vQuad[2] = Vec3f((float)10*hmap->m_widthx*TILE_SIZE, WATER_LEVEL*2.0f, (float)10*hmap->m_widthy*TILE_SIZE);
+	vQuad[3] = Vec3f((float)10*hmap->m_widthx*TILE_SIZE, (float)TILE_SIZE*500, (float)10*hmap->m_widthy*TILE_SIZE);
 
 	if(InterPoly(vQuad, vLine, 4, vIntersection))
 		return true;
 
-	vQuad[0] = Vec3f(-10*hmap->m_widthx*TILE_SIZE, WATER_LEVEL*2.0f, -10*hmap->m_widthz*TILE_SIZE);
-	vQuad[1] = Vec3f(-10*hmap->m_widthx*TILE_SIZE, (float)TILE_SIZE*500, -10*hmap->m_widthz*TILE_SIZE);
-	vQuad[2] = Vec3f(10*hmap->m_widthx*TILE_SIZE, (float)TILE_SIZE*500, -10*hmap->m_widthz*TILE_SIZE);
-	vQuad[3] = Vec3f(10*hmap->m_widthx*TILE_SIZE, WATER_LEVEL*2.0f, -10*hmap->m_widthz*TILE_SIZE);
+	vQuad[0] = Vec3f((float)-10*hmap->m_widthx*TILE_SIZE, WATER_LEVEL*2.0f, (float)-10*hmap->m_widthy*TILE_SIZE);
+	vQuad[1] = Vec3f((float)-10*hmap->m_widthx*TILE_SIZE, (float)TILE_SIZE*500, (float)-10*hmap->m_widthy*TILE_SIZE);
+	vQuad[2] = Vec3f((float)10*hmap->m_widthx*TILE_SIZE, (float)TILE_SIZE*500, (float)-10*hmap->m_widthy*TILE_SIZE);
+	vQuad[3] = Vec3f((float)10*hmap->m_widthx*TILE_SIZE, WATER_LEVEL*2.0f, (float)-10*hmap->m_widthy*TILE_SIZE);
 
 	if(InterPoly(vQuad, vLine, 4, vIntersection))
 		return true;
 
-	vQuad[0] = Vec3f((float)-10*hmap->m_widthx*TILE_SIZE, (float)TILE_SIZE*500, (float)10*hmap->m_widthz*TILE_SIZE);
-	vQuad[1] = Vec3f((float)-10*hmap->m_widthx*TILE_SIZE, WATER_LEVEL*2.0f, (float)10*hmap->m_widthz*TILE_SIZE);
-	vQuad[2] = Vec3f((float)10*hmap->m_widthx*TILE_SIZE, WATER_LEVEL*2.0f, (float)10*hmap->m_widthz*TILE_SIZE);
-	vQuad[3] = Vec3f((float)10*hmap->m_widthx*TILE_SIZE, (float)TILE_SIZE*500, (float)10*hmap->m_widthz*TILE_SIZE);
+	vQuad[0] = Vec3f((float)-10*hmap->m_widthx*TILE_SIZE, (float)TILE_SIZE*500, (float)10*hmap->m_widthy*TILE_SIZE);
+	vQuad[1] = Vec3f((float)-10*hmap->m_widthx*TILE_SIZE, WATER_LEVEL*2.0f, (float)10*hmap->m_widthy*TILE_SIZE);
+	vQuad[2] = Vec3f((float)10*hmap->m_widthx*TILE_SIZE, WATER_LEVEL*2.0f, (float)10*hmap->m_widthy*TILE_SIZE);
+	vQuad[3] = Vec3f((float)10*hmap->m_widthx*TILE_SIZE, (float)TILE_SIZE*500, (float)10*hmap->m_widthy*TILE_SIZE);
 
 	if(InterPoly(vQuad, vLine, 4, vIntersection))
 		return true;
@@ -97,14 +97,14 @@ bool GetMapIntersection(Heightmap* hmap, Vec3f* vLine, Vec3f* vIntersection)
 
 	Vec3f* v = hmap->m_collverts;
 	int wx = hmap->m_widthx;
-	int wz = hmap->m_widthz;
+	int wy = hmap->m_widthy;
 
 	Vec3f tempint;
 	bool intercepted = false;
 	float closestint = 0;
 
 	for(int x=0; x<wx; x++)
-		for(int z=0; z<wz; z++)
+		for(int z=0; z<wy; z++)
 		{
 			/*
 			vTri[0] = v[ (z * wx + x) * 3 * 2 + 0 ];
@@ -191,7 +191,7 @@ bool MoveIntoMap(Vec3f& point, Vec3f ray, Heightmap* hmap)
 	if(point.x >= 1
 	                && point.x < (hmap->m_widthx-1) * TILE_SIZE - 1
 	                && point.z >= 1
-	                && point.z < (hmap->m_widthz-1) * TILE_SIZE - 1)
+	                && point.z < (hmap->m_widthy-1) * TILE_SIZE - 1)
 		return true;
 
 	// Get x distance off the map.
@@ -213,8 +213,8 @@ bool MoveIntoMap(Vec3f& point, Vec3f ray, Heightmap* hmap)
 
 	if(point.z < 0)	// If start z is behind the map
 		zdif = point.z - 5;	// Add padding to make sure we're within the map
-	else if(point.z >= (hmap->m_widthz-1) * TILE_SIZE)	// If start z is in front of the map
-		zdif = (hmap->m_widthz-1) * TILE_SIZE - point.z + 5;	// Add padding to make sure we're within the map
+	else if(point.z >= (hmap->m_widthy-1) * TILE_SIZE)	// If start z is in front of the map
+		zdif = (hmap->m_widthy-1) * TILE_SIZE - point.z + 5;	// Add padding to make sure we're within the map
 
 	// Ray is of unit length, so this gives us how much we travel along the ray to get z to within the map border.
 	float z0moveratio = -zdif / ray.z;
@@ -226,7 +226,7 @@ bool MoveIntoMap(Vec3f& point, Vec3f ray, Heightmap* hmap)
 	if(point.x < 1
 	                || point.x >= (hmap->m_widthx-1) * TILE_SIZE - 1
 	                || point.z < 1
-	                || point.z >= (hmap->m_widthz-1) * TILE_SIZE - 1)
+	                || point.z >= (hmap->m_widthy-1) * TILE_SIZE - 1)
 		return false;
 
 	return true;
@@ -236,7 +236,7 @@ bool TileIntersect(Heightmap* hmap, Vec3f* line, int x, int z, Vec3f* intersecti
 {
 	Vec3f tri[3];
 	const int wx = hmap->m_widthx;
-	const int wz = hmap->m_widthz;
+	const int wy = hmap->m_widthy;
 	Vec3f* v = hmap->m_collverts;
 
 	tri[0] = v[ (z * wx + x) * 3 * 2 + 0 ];
@@ -262,13 +262,13 @@ bool FastMapIntersect(Heightmap* hmap, Vec3f* line, Vec3f* intersection)
 	Vec3f tilestart = line[0] / TILE_SIZE;
 	Vec3f tileray = ray / TILE_SIZE;
 
-	int len = Magnitude(tileray);
+	int len = (int)Magnitude(tileray);
 
 	for(int i=0; i<len; i++)
 	{
 		Vec3f pos = tilestart + tileray * (float)i / (float)len;
-		int tx = pos.x;
-		int tz = pos.z;
+		int tx = (int)pos.x;
+		int tz = (int)pos.z;
 
 		if(tx < 0)
 			continue;
@@ -279,7 +279,7 @@ bool FastMapIntersect(Heightmap* hmap, Vec3f* line, Vec3f* intersection)
 		if(tx >= hmap->m_widthx)
 			continue;
 
-		if(tz >= hmap->m_widthz)
+		if(tz >= hmap->m_widthy)
 			continue;
 
 		if(TileIntersect(hmap, line, tx, tz, intersection))
@@ -287,6 +287,59 @@ bool FastMapIntersect(Heightmap* hmap, Vec3f* line, Vec3f* intersection)
 	}
 
 	return false;
+}
+
+void MapFrust(Vec3f* interTopLeft,
+	Vec3f* interTopRight,
+	Vec3f* interBottomLeft,
+	Vec3f* interBottomRight)
+{
+	Player* py = &g_player[g_localP];
+	Camera* c = &g_cam;
+
+	Vec3f campos = c->zoompos();
+	Vec3f camside = c->m_strafe;
+	Vec3f camup2 = c->up2();
+	Vec3f viewdir = Normalize(c->m_view - c->m_pos);
+
+	int minx = 0;
+	int maxx = g_width;
+	int miny = 0;
+	int maxy = g_height;
+
+	//Vec3f campos = c->m_pos;
+	//Vec3f camside = c->m_strafe;
+	//Vec3f camup2 = c->up2();
+	//Vec3f viewdir = Normalize( c->m_view - c->m_pos );
+
+	Vec3f topLeftRay = ScreenPerspRay(minx, miny, g_width, g_height, campos, camside, camup2, viewdir, FIELD_OF_VIEW);
+	Vec3f lineTopLeft[2];
+	lineTopLeft[0] = campos;
+	lineTopLeft[1] = campos + (topLeftRay * 1000000.0f);
+
+	Vec3f topRightRay = ScreenPerspRay(maxx, miny, g_width, g_height, campos, camside, camup2, viewdir, FIELD_OF_VIEW);
+	Vec3f lineTopRight[2];
+	lineTopRight[0] = campos;
+	lineTopRight[1] = campos + (topRightRay * 1000000.0f);
+
+	Vec3f bottomLeftRay = ScreenPerspRay(minx, maxy, g_width, g_height, campos, camside, camup2, viewdir, FIELD_OF_VIEW);
+	Vec3f lineBottomLeft[2];
+	lineBottomLeft[0] = campos;
+	lineBottomLeft[1] = campos + (bottomLeftRay * 1000000.0f);
+
+	Vec3f bottomRightRay = ScreenPerspRay(maxx, maxy, g_width, g_height, campos, camside, camup2, viewdir, FIELD_OF_VIEW);
+	Vec3f lineBottomRight[2];
+	lineBottomRight[0] = campos;
+	lineBottomRight[1] = campos + (bottomRightRay * 1000000.0f);
+
+	if(!FastMapIntersect(&g_hmap, lineTopLeft, interTopLeft))
+		GetMapIntersection2(&g_hmap, lineTopLeft, interTopLeft);
+	if(!FastMapIntersect(&g_hmap, lineTopRight, interTopRight))
+		GetMapIntersection2(&g_hmap, lineTopRight, interTopRight);
+	if(!FastMapIntersect(&g_hmap, lineBottomLeft, interBottomLeft))
+		GetMapIntersection2(&g_hmap, lineBottomLeft, interBottomLeft);
+	if(!FastMapIntersect(&g_hmap, lineBottomRight, interBottomRight))
+		GetMapIntersection2(&g_hmap, lineBottomRight, interBottomRight);
 }
 
 float Highest(int minx, int minz, int maxx, int maxz)
@@ -343,7 +396,7 @@ bool TileUnclimablei(int tx, int tz)
 	if(fabs(maxh - minh) > MAX_CLIMB_INCLINE)
 	{
 #if 0
-		g_log<<tx<<","<<tz<<" ("<<g_hmap.m_widthx<<","<<g_hmap.m_widthz<<" incline "<<fabs(maxh - minh)<<std::endl;
+		g_log<<tx<<","<<tz<<" ("<<g_hmap.m_widthx<<","<<g_hmap.m_widthy<<" incline "<<fabs(maxh - minh)<<std::endl;
 		g_log.flush();
 #endif
 #if 0
@@ -357,8 +410,8 @@ bool TileUnclimablei(int tx, int tz)
 
 bool TileUnclimable(float px, float pz)
 {
-	int tx = px / TILE_SIZE;
-	int tz = pz / TILE_SIZE;
+	int tx = (int)( px / TILE_SIZE );
+	int tz = (int)( pz / TILE_SIZE );
 
 	return TileUnclimablei(tx, tz);
 }

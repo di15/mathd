@@ -10,6 +10,7 @@
 extern std::ofstream g_log;
 
 const std::string DateTime();
+const std::string Time();
 const std::string FileDateTime();
 void FullPath(const char* filename, char* full);
 std::string MakePathRelative(const char* full);
@@ -24,16 +25,16 @@ int HexToInt(const char* s);
 int StrToInt(const char *s);
 void CorrectSlashes(char* corrected);
 void BackSlashes(char* corrected);
-void ErrorMessage(const char* title, const char* message);
-void InfoMessage(const char* title, const char* message);
-void WarningMessage(const char* title, const char* message);
+void ErrMess(const char* title, const char* message);
+void InfoMess(const char* title, const char* message);
+void WarnMess(const char* title, const char* message);
 void OutOfMem(const char* file, int line);
 
 #ifndef PLATFORM_WIN
 
-long timeGetTime();
-long GetTickCount();
-long long GetTickCount64();
+unsigned long long timeGetTime();
+unsigned long long GetTickCount();
+unsigned long long GetTickCount64();
 void Sleep(int ms);
 
 #endif
@@ -59,7 +60,7 @@ inline int imin(const int a, const int b)
 }
 
 //deterministic ceil
-inline int Ceili(const int num, const int denom)
+inline int iceil(const int num, const int denom)
 {
 	if(denom  == 0)
 		return 0;
@@ -73,5 +74,9 @@ inline int Ceili(const int num, const int denom)
 
 	return div;
 }
+
+std::string iform(int n);
+
+void ListFiles(const char* fullpath, std::list<std::string>& files);
 
 #endif	//UTILS_H

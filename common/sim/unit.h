@@ -5,6 +5,7 @@
 #include "../platform.h"
 #include "../math/vec3i.h"
 #include "../math/vec2i.h"
+#include "../math/vec2s.h"
 #include "resources.h"
 
 #define BODY_LOWER	0
@@ -45,13 +46,16 @@ public:
 	Vec2i prevpos;
 	int taskframe;
 	bool pathblocked;
-	int frameslookjobago;
+	int jobframes;
 	int supplier;
 	int reqamt;
 	int targtype;
 	int home;
 	int car;
 	//std::vector<TransportJob> bids;
+	int cargoamt;
+	int cargotype;
+	int cargoreq;	//req amt
 
 	float frame[2];
 
@@ -59,18 +63,22 @@ public:
 
 	unsigned char mode;
 	int pathdelay;
-	long long lastpath;
+	unsigned long long lastpath;
 
 	bool threadwait;
 
 	// used for debugging - don't save to file
 	bool collided;
 
-	unsigned char cdtype;	//conduit type for mode (going to construction)
+	signed char cdtype;	//conduit type for mode (going to construction)
 	int driver;
 	//short framesleft;
 	short cyframes;	//cycle frames (unit cycle of consumption and work)
-	int transpwage;	//transport driver wage
+	int opwage;	//transport driver wage	//edit: NOT USED, set globally in Player class
+	//std::list<TransportJob> bids;	//for trucks
+
+	//TO DO: save/read
+	std::list<Vec2s> tpath;	//tile path
 
 	Unit();
 	virtual ~Unit();
@@ -82,6 +90,7 @@ public:
 };
 
 #define UNITS	(4096)
+//#define UNITS	256
 
 extern Unit g_unit[UNITS];
 
@@ -96,8 +105,8 @@ extern Unit g_unit[UNITS];
 #define UMODE_SHOPPING				8
 #define UMODE_GOREST				9
 #define UMODE_RESTING				10
-#define	UMODE_GOTRANSP				11	//going to transport job
-#define UMODE_DRTRANSP				12	//driving transport
+#define	UMODE_GODRIVE				11	//going to transport job
+#define UMODE_DRIVE				12	//driving transport
 #define UMODE_GOSUP					13	//transporter going to supplier
 #define UMODE_GODEMB				14	//transporter going to demander bl
 #define UMODE_GOREFUEL				15
@@ -107,10 +116,14 @@ extern Unit g_unit[UNITS];
 #define UMODE_GODEMCD				19	//going to demander conduit
 #define UMODE_ATDEMCD				20	//at demander conduit, unloading
 
-#define TARG_NONE		0
+#define TARG_NONE		-1
 #define TARG_BL			1	//building
 #define TARG_U			2	//unit
 #define TARG_CD			3	//conduit
+
+#ifdef RANDOM8DEBUG
+extern int thatunit;
+#endif
 
 void DrawUnits();
 bool PlaceUnit(int type, Vec2i cmpos, int owner, int *reti);
@@ -121,6 +134,5 @@ void ResetGoal(Unit* u);
 void ResetMode(Unit* u);
 void ResetTarget(Unit* u);
 void StartBel(Unit* u);
-void DrawUOv(Matrix* mvp);
 
 #endif

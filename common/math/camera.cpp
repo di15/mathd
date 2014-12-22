@@ -369,9 +369,9 @@ void Camera::calcstrafe()
 
 Vec3f Camera::zoompos()
 {
-	Player* py = &g_player[g_curP];
+	Player* py = &g_player[g_localP];
 	Vec3f dir = Normalize( m_view - m_pos );
-	Vec3f posvec = m_view - dir * 1000.0f / py->zoom;
+	Vec3f posvec = m_view - dir * 1000.0f / g_zoom;
 	//return Vec3f(0,0,0);
 	return posvec;
 }

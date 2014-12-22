@@ -2,9 +2,10 @@
 #include "../render/shader.h"
 #include "selection.h"
 #include "unit.h"
-#include "unittype.h"
+#include "utype.h"
 #include "../render/heightmap.h"
 #include "simdef.h"
+#include "simflow.h"
 #include "../window.h"
 #include "../texture.h"
 #include "../utils.h"
@@ -120,7 +121,7 @@ void DrawOrders(Matrix* projection, Matrix* modelmat, Matrix* viewmat)
 void Order(int mousex, int mousey, int viewwidth, int viewheight, Vec3f campos, Vec3f camfocus, Vec3f camviewdir, Vec3f camside, Vec3f camup2)
 {
 #if 0
-	InfoMessage("asd", "ord");
+	InfoMess("asd", "ord");
 #endif
 
 	Vec3f line[2];
@@ -128,49 +129,46 @@ void Order(int mousex, int mousey, int viewwidth, int viewheight, Vec3f campos, 
 	Vec3f ray = ScreenPerspRay(mousex, mousey, viewwidth, viewheight, campos, camside, camup2, camviewdir, FIELD_OF_VIEW);
 
 	line[0] = campos;
-	line[1] = campos + (ray * 100000.0f);
+	line[1] = campos + (ray * 1000000.0f);
 
 	Vec3f mapgoal;
 
-#if 0
-	if(!GetMapIntersection(&g_hmap, line, &mapgoal))
-#else
 	if(!FastMapIntersect(&g_hmap, line, &mapgoal))
-#endif
-		return;
+		if(!GetMapIntersection(&g_hmap, line, &mapgoal))
+			return;
 
 #if 0
-	InfoMessage("asd", "found surf");
+	InfoMess("asd", "found surf");
 #endif
 
-	//std::vector<int> selection = py->sel;
+	//std::vector<int> selection = g_sel;
 	//int selecttype = g_selectType;
 
-	//py->sel.clear();
+	//g_sel.clear();
 
 	//SelectOne();
 
-	//std::vector<int> targets = py->sel;
+	//std::vector<int> targets = g_sel;
 	//int targettype = g_selectType;
 
-	//py->sel = selection;
+	//g_sel = selection;
 	//g_selectType = selecttype;
 
 	//char msg[128];
-	//sprintf(msg, "s.size()=%d, stype=%d", (int)py->sel.size(), g_selectType);
+	//sprintf(msg, "s.size()=%d, stype=%d", (int)g_sel.size(), g_selectType);
 	//Chat(msg);
 
 	Vec3f vmin = Vec3f(0,0,0);
-	Vec3f vmax = Vec3f(g_hmap.m_widthx*TILE_SIZE, 0, g_hmap.m_widthz*TILE_SIZE);
+	Vec3f vmax = Vec3f(g_hmap.m_widthx*TILE_SIZE, 0, g_hmap.m_widthy*TILE_SIZE);
 	Vec3f center(0,0,0);
 
 #if 0
 	char msg[256];
 	sprintf(msg, "mapmaxmin:(%f,%f)->(%f,%f)", vmin.x, vmin.z, vmax.x, vmax.z);
-	InfoMessage("asd", msg);
+	InfoMess("asd", msg);
 #endif
 
-	Player* py = &g_player[g_curP];
+	Player* py = &g_player[g_localP];
 
 	//if(targets.size() <= 0 || (targettype != SELECT_UNIT && targettype != SELECT_BUILDING))
 	{
@@ -188,17 +186,31 @@ void Order(int mousex, int mousey, int viewwidth, int viewheight, Vec3f campos, 
 		//order.z = Clip(order.z, 0, g_hmap.m_widthZ*TILE_SIZE);
 		Vec3f p;
 
-		auto selitr = py->sel.units.begin();
+		auto selitr = g_sel.units.begin();
 		int counted = 0;
 
-		while(selitr != py->sel.units.end())
+		while(selitr != g_sel.units.end())
 		{
 			u = &g_unit[*selitr];
+
+			if(u->owner != g_localP)
+			{
+				selitr++;
+				continue;
+			}
+
+			UType* ut = &g_utype[u->type];
+
+			if(!ut->military)
+			{
+				selitr++;
+				continue;
+			}
 
 #if 0
 			if(e->hp <= 0.0f)
 			{
-				py->sel.erase( selitr );
+				g_sel.erase( selitr );
 				continue;
 			}
 #endif
@@ -223,13 +235,16 @@ void Order(int mousex, int mousey, int viewwidth, int viewheight, Vec3f campos, 
 			selitr++;
 		}
 
-		//center = center / (float)py->sel.size();
+		if(counted <= 0)
+			return;
+
+		//center = center / (float)g_sel.size();
 		//Vec3f half = (std::min + std::max) / 2.0f;
 
 #if 0
 		char msg[256];
 		sprintf(msg, "minmax:(%f,%f)->(%f,%f),order:(%f,%f)", vmin.x, vmin.z, vmax.x, vmax.z, order.x, order.z);
-		InfoMessage("asd", msg);
+		InfoMess("asd", msg);
 #endif
 
 		// All units to one goal
@@ -237,16 +252,31 @@ void Order(int mousex, int mousey, int viewwidth, int viewheight, Vec3f campos, 
 		if(order.x <= vmax.x && order.x >= vmin.x && order.z <= vmax.z && order.z >= vmin.z)
 		{
 #if 0
-			InfoMessage("asd", "typ 1");
+			InfoMess("asd", "typ 1");
 #endif
 
 			int radius = 0;
-			selitr = py->sel.units.begin();
+			selitr = g_sel.units.begin();
 
 			// Get the biggest unit width/radius
-			while(selitr != py->sel.units.end())
+			while(selitr != g_sel.units.end())
 			{
 				u = &g_unit[*selitr];
+
+				if(u->owner != g_localP)
+				{
+					selitr++;
+					continue;
+				}
+
+				UType* ut = &g_utype[u->type];
+
+				if(!ut->military)
+				{
+					selitr++;
+					continue;
+				}
+
 				u->resetpath();
 				u->goal = Vec2i(order.x, order.z);
 				u->underorder = true;
@@ -269,16 +299,31 @@ void Order(int mousex, int mousey, int viewwidth, int viewheight, Vec3f campos, 
 		else
 		{
 #if 0
-			InfoMessage("asd", "typ 2");
+			InfoMess("asd", "typ 2");
 #endif
 
 			Vec3f offset;
 
-			selitr = py->sel.units.begin();
+			selitr = g_sel.units.begin();
 
-			while(selitr != py->sel.units.end())
+			while(selitr != g_sel.units.end())
 			{
 				u = &g_unit[*selitr];
+				
+				if(u->owner != g_localP)
+				{
+					selitr++;
+					continue;
+				}
+
+				UType* ut = &g_utype[u->type];
+
+				if(!ut->military)
+				{
+					selitr++;
+					continue;
+				}
+
 				p = Vec3f(u->cmpos.x, 0, u->cmpos.y);
 				offset = p - center;
 				Vec3f goal = order + offset;
@@ -314,9 +359,9 @@ void Order(int mousex, int mousey, int viewwidth, int viewheight, Vec3f campos, 
 
 		MakeWar(g_localP, targu->owner);
 
-		for(int j=0; j<py->sel.size(); j++)
+		for(int j=0; j<g_sel.size(); j++)
 		{
-			int i = py->sel[j];
+			int i = g_sel[j];
 			CUnit* u = &g_unit[i];
 			u->goal = p;
 			u->underOrder = true;
@@ -337,9 +382,9 @@ void Order(int mousex, int mousey, int viewwidth, int viewheight, Vec3f campos, 
 
 		MakeWar(g_localP, targb->owner);
 
-		for(int j=0; j<py->sel.size(); j++)
+		for(int j=0; j<g_sel.size(); j++)
 		{
-			int i = py->sel[j];
+			int i = g_sel[j];
 			CUnit* u = &g_unit[i];
 			u->goal = p;
 			u->underOrder = true;

@@ -1,0 +1,7 @@
+libs required
+
+unixODBC
+unixODBC-devel
+mysql-connector-odbc
+libgcrypt
+libgcrypt-devel

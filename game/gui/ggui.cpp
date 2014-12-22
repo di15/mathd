@@ -7,13 +7,10 @@
 #include "../../common/render/shadow.h"
 #include "../../common/render/screenshot.h"
 #include "../../common/save/savemap.h"
-#include "editorgui.h"
-#include "playgui.h"
-#include "ggui.h"
 #include "../../common/sim/unit.h"
-#include "../../common/sim/unittype.h"
+#include "../../common/sim/utype.h"
 #include "../../common/sim/building.h"
-#include "../../common/sim/buildingtype.h"
+#include "../../common/sim/bltype.h"
 #include "../../common/sim/selection.h"
 #include "../../common/sim/road.h"
 #include "../../common/sim/powl.h"
@@ -28,7 +25,17 @@
 #include "../../common/debug.h"
 #include "../../common/script/console.h"
 #include "../../common/window.h"
+#include "../../common/net/lockstep.h"
 #include "../../common/net/sendpackets.h"
+#include "../../common/gui/widgets/spez/svlist.h"
+#include "../../common/gui/widgets/spez/newhost.h"
+#include "../../common/gui/widgets/spez/loadview.h"
+#include "../../common/gui/widgets/spez/lobby.h"
+
+//not engine
+#include "editorgui.h"
+#include "playgui.h"
+#include "ggui.h"
 
 //bool g_canselect = true;
 
@@ -36,12 +43,12 @@ char g_lastsave[MAX_PATH+1];
 
 void Resize_Fullscreen(Widget* thisw)
 {
-	Player* py = &g_player[g_curP];
+	Player* py = &g_player[g_localP];
 
 	thisw->m_pos[0] = 0;
 	thisw->m_pos[1] = 0;
-	thisw->m_pos[2] = py->width-1;
-	thisw->m_pos[3] = py->height-1;
+	thisw->m_pos[2] = (float)g_width-1;
+	thisw->m_pos[3] = (float)g_height-1;
 }
 
 void Click_LoadMapButton()
@@ -141,24 +148,25 @@ void Resize_MenuItem(Widget* thisw)
 	sscanf(thisw->m_name.c_str(), "%d", &row);
 	Font* f = &g_font[thisw->m_font];
 
-	Player* py = &g_player[g_curP];
+	Player* py = &g_player[g_localP];
 	
-	thisw->m_pos[0] = py->width/2 - f->gheight*4;
-	thisw->m_pos[1] = py->height/2 - f->gheight*4 + f->gheight*1.5f*row;
-	thisw->m_pos[2] = py->width;
-	thisw->m_pos[3] = py->height;
+	//thisw->m_pos[0] = g_width/2 - f->gheight*4;
+	thisw->m_pos[0] = f->gheight*4;
+	thisw->m_pos[1] = g_height/2 - f->gheight*4 + f->gheight*1.5f*row;
+	thisw->m_pos[2] = g_width;
+	thisw->m_pos[3] = g_height;
 }
 
 void Resize_LoadingStatus(Widget* thisw)
 {
-	Player* py = &g_player[g_curP];
+	Player* py = &g_player[g_localP];
 
-	thisw->m_pos[0] = py->width/2;
-	thisw->m_pos[1] = py->height/2;
-	thisw->m_pos[2] = py->width;
-	thisw->m_pos[3] = py->height;
-	thisw->m_tpos[0] = py->width/2;
-	thisw->m_tpos[1] = py->height/2;
+	thisw->m_pos[0] = g_width/2 - 64;
+	thisw->m_pos[1] = g_height/2;
+	thisw->m_pos[2] = g_width;
+	thisw->m_pos[3] = g_height;
+	thisw->m_tpos[0] = g_width/2;
+	thisw->m_tpos[1] = g_height/2;
 }
 
 void Resize_WinText(Widget* thisw)
@@ -173,75 +181,48 @@ void Resize_WinText(Widget* thisw)
 
 void Click_HostGame()
 {
-	//g_mode = APPMODE_PLAY;
-	Click_NewGame();
-
-	g_netmode = NET_HOST;
-
-	if(!(g_sock = SDLNet_UDP_Open(PORT)))
-	{
-		char msg[1280];
-		sprintf(msg, "SDLNet_UDP_Open: %s\n", SDLNet_GetError());
-		ErrorMessage("Error", msg);
-		return;
-	}
-
-	//contact matcher TO DO
+	Player* py = &g_player[g_localP];
+	GUI* gui = &g_gui;
+	gui->open("new host");
 }
 
-void Click_JoinGame()
+void Click_ListHosts()
 {
 	//g_mode = APPMODE_PLAY;
-	Click_NewGame();
 
-	g_netmode = NET_CLIENT;
+	//g_netmode = NETM_CLIENT;
+	//g_needsvlist = true;
+	//g_reqdsvlist = false;
 
-	IPaddress ip;
+	//Connect("localhost", PORT, false, true, false, false);
+	//Connect(SV_ADDR, PORT, true, false, false, false);
+	
+	//BegSess();
 
-	if(SDLNet_ResolveHost(&ip, "localhost", PORT) == -1)
-	{
-		char msg[1280];
-		sprintf(msg, "SDLNet_ResolveHost: %s\n", SDLNet_GetError());
-		ErrorMessage("Error", msg);
-		return;
-	}
+	//g_canturn = true;	//temp, assuming no clients were handshook to server when netfr0 turn happened and server didn't have any cl's to send NetTurnPacket to
 
-	if(!(g_sock = SDLNet_UDP_Open(0)))
-	{
-		char msg[1280];
-		sprintf(msg, "SDLNet_UDP_Open: %s\n", SDLNet_GetError());
-		ErrorMessage("Error", msg);
-		return;
-	}
+	Player* py = &g_player[g_localP];
+	GUI* gui = &g_gui;
+	gui->open("sv list");
+}
 
-	if(SDLNet_UDP_Bind(g_sock, 0, &ip) == -1)
-	{
-		char msg[1280];
-		sprintf(msg, "SDLNet_UDP_Bind: %s\n", SDLNet_GetError());
-		ErrorMessage("Error", msg);
-		return;
-	}
-
-	NetConn nc;
-	nc.addr = ip;
-	nc.ctype = CONN_HOST;
-	g_conn.push_back(nc);
-	g_svconn = &*g_conn.rbegin();
-
-	ConnectPacket cp;
-	cp.header.type = PACKET_CONNECT;
-	SendData((char*)&cp, sizeof(ConnectPacket), &ip, true, &*g_conn.begin(), &g_sock, true);
+void Click_EndGame()
+{
+	EndSess();
 }
 
 void Click_NewGame()
 {
 	CheckGLError(__FILE__, __LINE__);
-#if 1
+#if 0
 	//LoadJPGMap("heightmaps/heightmap0e2s.jpg");
 	//LoadJPGMap("heightmaps/heightmap0e2.jpg");
-	LoadJPGMap("heightmaps/heightmap0e.jpg");
+	//LoadJPGMap("heightmaps/heightmap0e.jpg");
+	LoadJPGMap("heightmaps/heightmap0e4.jpg");
+	//LoadJPGMap("heightmaps/water.jpg");
 #elif 1
-	LoadJPGMap("heightmaps/heightmap0c.jpg");
+	//LoadJPGMap("heightmaps/heightmap0c.jpg");
+	LoadJPGMap("heightmaps/heightmap0d.jpg");
 #else
 	char fullpath[MAX_PATH+1];
 	FullPath("maps/testmap", fullpath);
@@ -249,25 +230,32 @@ void Click_NewGame()
 	LoadMap(fullpath);
 #endif
 
+	//return;
+
 	CheckGLError(__FILE__, __LINE__);
 
+
+
 	for(int i=0; i<10; i++)
-		for(int j=0; j<10; j++)
+		//for(int j=0; j<10; j++)
 	//for(int i=0; i<15; i++)
 	//	for(int j=0; j<1; j++)
 	//for(int i=0; i<1; i++)
-		//for(int j=0; j<1; j++)
+		for(int j=0; j<1; j++)
 		{
 
-			//Vec3i cmpos((g_hmap.m_widthx+4)*TILE_SIZE/2 + (i+2)*PATHNODE_SIZE, 0, g_hmap.m_widthz*TILE_SIZE/2 + (j+2)*PATHNODE_SIZE);
+			//Vec3i cmpos((g_hmap.m_widthx+4)*TILE_SIZE/2 + (i+2)*PATHNODE_SIZE, 0, g_hmap.m_widthy*TILE_SIZE/2 + (j+2)*PATHNODE_SIZE);
 			//cmpos.y = g_hmap.accheight(cmpos.x, cmpos.z);
-			Vec2i cmpos((g_hmap.m_widthx+4)*TILE_SIZE/2 + (i+2)*PATHNODE_SIZE*4, g_hmap.m_widthz*TILE_SIZE/2 + (j+2)*PATHNODE_SIZE*4);
+			Vec2i cmpos((g_hmap.m_widthx+4)*TILE_SIZE/2 + (i+2)*PATHNODE_SIZE*4, g_hmap.m_widthy*TILE_SIZE/2 + (j+2)*PATHNODE_SIZE*4);
 
 			//if(rand()%2 == 1)
-			//	PlaceUnit(UNIT_ROBOSOLDIER, cmpos, 0);
+			//	PlaceUnit(UNIT_BATTLECOMP, cmpos, 0);
 			//else
-			PlaceUnit(UNIT_LABOURER, cmpos, -1, NULL);
+			PlaceUnit(UNIT_LABOURER, cmpos, 0, NULL);
+			//PlaceUnit(UNIT_TRUCK, cmpos, rand()%PLAYERS, NULL);
 		}
+
+	//return;
 
 	CheckGLError(__FILE__, __LINE__);
 
@@ -278,12 +266,16 @@ void Click_NewGame()
 		p->on = true;
 		p->ai = (i == g_localP) ? false : true;
 
-		p->global[RES_DOLLARS] = 4000;
+		p->global[RES_DOLLARS] = 40 * 1000 * 1000;
 		p->global[RES_FARMPRODUCTS] = 4000;
 		p->global[RES_RETFOOD] = 4000;
 		p->global[RES_CEMENT] = 4000;
+		p->global[RES_STONE] = 4000;
 		p->global[RES_FUEL] = 4000;
 		p->global[RES_URANIUM] = 4000;
+		p->global[RES_ELECTRONICS] = 4000;
+		p->global[RES_METAL] = 4000;
+		p->global[RES_PRODUCTION] = 40;
 
 #if 0
 #define RES_DOLLARS			0
@@ -303,52 +295,52 @@ void Click_NewGame()
 	}
 
 #if 0
-	PlaceBl(BL_HARBOUR, Vec2i(g_hmap.m_widthx/2-1, g_hmap.m_widthz/2-3), true, 0);
-	PlaceBl(BL_APARTMENT, Vec2i(g_hmap.m_widthx/2+2, g_hmap.m_widthz/2-2), true, 0);
-	PlaceBl(BL_APARTMENT, Vec2i(g_hmap.m_widthx/2+4, g_hmap.m_widthz/2-3), true, 0);
-	PlaceBl(BL_APARTMENT, Vec2i(g_hmap.m_widthx/2+6, g_hmap.m_widthz/2-3), true, 0);
-	PlaceRoad(g_hmap.m_widthx/2+1, g_hmap.m_widthz/2-1, 1, false);
-	PlaceRoad(g_hmap.m_widthx/2+2, g_hmap.m_widthz/2-1, 1, false);
-	PlaceRoad(g_hmap.m_widthx/2+3, g_hmap.m_widthz/2-1, 1, false);
-	PlaceRoad(g_hmap.m_widthx/2+3, g_hmap.m_widthz/2-2, 1, false);
-	PlaceRoad(g_hmap.m_widthx/2+4, g_hmap.m_widthz/2-2, 1, false);
-	PlaceRoad(g_hmap.m_widthx/2+5, g_hmap.m_widthz/2-2, 1, false);
-	PlaceRoad(g_hmap.m_widthx/2+6, g_hmap.m_widthz/2-2, 1, false);
-	PlaceRoad(g_hmap.m_widthx/2+7, g_hmap.m_widthz/2-2, 1, false);
-	PlaceRoad(g_hmap.m_widthx/2+7, g_hmap.m_widthz/2-3, 1, false);
-	PlaceRoad(g_hmap.m_widthx/2+7, g_hmap.m_widthz/2-4, 1, false);
-	PlaceRoad(g_hmap.m_widthx/2+7, g_hmap.m_widthz/2-5, 1, false);
-	PlaceRoad(g_hmap.m_widthx/2+7, g_hmap.m_widthz/2-6, 1, false);
-	PlaceRoad(g_hmap.m_widthx/2+7, g_hmap.m_widthz/2-7, 1, false);
-	PlaceRoad(g_hmap.m_widthx/2+8, g_hmap.m_widthz/2-2, 1, false);
-	PlaceRoad(g_hmap.m_widthx/2+9, g_hmap.m_widthz/2-2, 1, false);
-	PlaceRoad(g_hmap.m_widthx/2+10, g_hmap.m_widthz/2-2, 1, false);
-	PlaceBl(BL_FACTORY, Vec2i(g_hmap.m_widthx/2+9, g_hmap.m_widthz/2-3), true, 0);
-	PlaceBl(BL_REFINERY, Vec2i(g_hmap.m_widthx/2+11, g_hmap.m_widthz/2-3), true, 0);
-	PlaceBl(BL_NUCPOW, Vec2i(g_hmap.m_widthx/2+13, g_hmap.m_widthz/2-3), true, 0);
-	PlaceRoad(g_hmap.m_widthx/2+11, g_hmap.m_widthz/2-2, 1, false);
-	PlaceRoad(g_hmap.m_widthx/2+12, g_hmap.m_widthz/2-2, 1, false);
-	PlaceRoad(g_hmap.m_widthx/2+13, g_hmap.m_widthz/2-2, 1, false);
-	PlaceRoad(g_hmap.m_widthx/2+14, g_hmap.m_widthz/2-2, 1, false);
-	PlaceRoad(g_hmap.m_widthx/2+14, g_hmap.m_widthz/2-3, 1, false);
-	PlaceRoad(g_hmap.m_widthx/2+14, g_hmap.m_widthz/2-4, 1, false);
-	PlaceRoad(g_hmap.m_widthx/2+14, g_hmap.m_widthz/2-5, 1, false);
-	PlaceRoad(g_hmap.m_widthx/2+14, g_hmap.m_widthz/2-6, 1, false);
-	PlaceRoad(g_hmap.m_widthx/2+14, g_hmap.m_widthz/2-7, 1, false);
-	PlaceRoad(g_hmap.m_widthx/2+15, g_hmap.m_widthz/2-2, 1, false);
-	PlaceBl(BL_FARM, Vec2i(g_hmap.m_widthx/2+6, g_hmap.m_widthz/2-0), true, 0);
-	PlaceRoad(g_hmap.m_widthx/2+10, g_hmap.m_widthz/2-1, 1, false);
-	PlaceRoad(g_hmap.m_widthx/2+10, g_hmap.m_widthz/2-0, 1, false);
-	PlaceRoad(g_hmap.m_widthx/2+10, g_hmap.m_widthz/2+1, 1, false);
-	PlaceBl(BL_STORE, Vec2i(g_hmap.m_widthx/2+9, g_hmap.m_widthz/2-1), true, 0);
-	PlaceBl(BL_OILWELL, Vec2i(g_hmap.m_widthx/2+9, g_hmap.m_widthz/2-0), true, 0);
-	PlaceBl(BL_MINE, Vec2i(g_hmap.m_widthx/2+11, g_hmap.m_widthz/2-0), true, 0);
-	PlaceBl(BL_MINE, Vec2i(g_hmap.m_widthx/2+12, g_hmap.m_widthz/2-0), true, 0);
-	PlaceRoad(g_hmap.m_widthx/2+13, g_hmap.m_widthz/2-1, 1, false);
-	PlaceRoad(g_hmap.m_widthx/2+13, g_hmap.m_widthz/2-0, 1, false);
-	PlaceRoad(g_hmap.m_widthx/2+13, g_hmap.m_widthz/2+1, 1, false);
+	PlaceBl(BL_HARBOUR, Vec2i(g_hmap.m_widthx/2-1, g_hmap.m_widthy/2-3), true, 0);
+	PlaceBl(BL_APARTMENT, Vec2i(g_hmap.m_widthx/2+2, g_hmap.m_widthy/2-2), true, 0);
+	PlaceBl(BL_APARTMENT, Vec2i(g_hmap.m_widthx/2+4, g_hmap.m_widthy/2-3), true, 0);
+	PlaceBl(BL_APARTMENT, Vec2i(g_hmap.m_widthx/2+6, g_hmap.m_widthy/2-3), true, 0);
+	PlaceRoad(g_hmap.m_widthx/2+1, g_hmap.m_widthy/2-1, 1, false);
+	PlaceRoad(g_hmap.m_widthx/2+2, g_hmap.m_widthy/2-1, 1, false);
+	PlaceRoad(g_hmap.m_widthx/2+3, g_hmap.m_widthy/2-1, 1, false);
+	PlaceRoad(g_hmap.m_widthx/2+3, g_hmap.m_widthy/2-2, 1, false);
+	PlaceRoad(g_hmap.m_widthx/2+4, g_hmap.m_widthy/2-2, 1, false);
+	PlaceRoad(g_hmap.m_widthx/2+5, g_hmap.m_widthy/2-2, 1, false);
+	PlaceRoad(g_hmap.m_widthx/2+6, g_hmap.m_widthy/2-2, 1, false);
+	PlaceRoad(g_hmap.m_widthx/2+7, g_hmap.m_widthy/2-2, 1, false);
+	PlaceRoad(g_hmap.m_widthx/2+7, g_hmap.m_widthy/2-3, 1, false);
+	PlaceRoad(g_hmap.m_widthx/2+7, g_hmap.m_widthy/2-4, 1, false);
+	PlaceRoad(g_hmap.m_widthx/2+7, g_hmap.m_widthy/2-5, 1, false);
+	PlaceRoad(g_hmap.m_widthx/2+7, g_hmap.m_widthy/2-6, 1, false);
+	PlaceRoad(g_hmap.m_widthx/2+7, g_hmap.m_widthy/2-7, 1, false);
+	PlaceRoad(g_hmap.m_widthx/2+8, g_hmap.m_widthy/2-2, 1, false);
+	PlaceRoad(g_hmap.m_widthx/2+9, g_hmap.m_widthy/2-2, 1, false);
+	PlaceRoad(g_hmap.m_widthx/2+10, g_hmap.m_widthy/2-2, 1, false);
+	PlaceBl(BL_FACTORY, Vec2i(g_hmap.m_widthx/2+9, g_hmap.m_widthy/2-3), true, 0);
+	PlaceBl(BL_REFINERY, Vec2i(g_hmap.m_widthx/2+11, g_hmap.m_widthy/2-3), true, 0);
+	PlaceBl(BL_NUCPOW, Vec2i(g_hmap.m_widthx/2+13, g_hmap.m_widthy/2-3), true, 0);
+	PlaceRoad(g_hmap.m_widthx/2+11, g_hmap.m_widthy/2-2, 1, false);
+	PlaceRoad(g_hmap.m_widthx/2+12, g_hmap.m_widthy/2-2, 1, false);
+	PlaceRoad(g_hmap.m_widthx/2+13, g_hmap.m_widthy/2-2, 1, false);
+	PlaceRoad(g_hmap.m_widthx/2+14, g_hmap.m_widthy/2-2, 1, false);
+	PlaceRoad(g_hmap.m_widthx/2+14, g_hmap.m_widthy/2-3, 1, false);
+	PlaceRoad(g_hmap.m_widthx/2+14, g_hmap.m_widthy/2-4, 1, false);
+	PlaceRoad(g_hmap.m_widthx/2+14, g_hmap.m_widthy/2-5, 1, false);
+	PlaceRoad(g_hmap.m_widthx/2+14, g_hmap.m_widthy/2-6, 1, false);
+	PlaceRoad(g_hmap.m_widthx/2+14, g_hmap.m_widthy/2-7, 1, false);
+	PlaceRoad(g_hmap.m_widthx/2+15, g_hmap.m_widthy/2-2, 1, false);
+	PlaceBl(BL_FARM, Vec2i(g_hmap.m_widthx/2+6, g_hmap.m_widthy/2-0), true, 0);
+	PlaceRoad(g_hmap.m_widthx/2+10, g_hmap.m_widthy/2-1, 1, false);
+	PlaceRoad(g_hmap.m_widthx/2+10, g_hmap.m_widthy/2-0, 1, false);
+	PlaceRoad(g_hmap.m_widthx/2+10, g_hmap.m_widthy/2+1, 1, false);
+	PlaceBl(BL_STORE, Vec2i(g_hmap.m_widthx/2+9, g_hmap.m_widthy/2-1), true, 0);
+	PlaceBl(BL_OILWELL, Vec2i(g_hmap.m_widthx/2+9, g_hmap.m_widthy/2-0), true, 0);
+	PlaceBl(BL_MINE, Vec2i(g_hmap.m_widthx/2+11, g_hmap.m_widthy/2-0), true, 0);
+	PlaceBl(BL_MINE, Vec2i(g_hmap.m_widthx/2+12, g_hmap.m_widthy/2-0), true, 0);
+	PlaceRoad(g_hmap.m_widthx/2+13, g_hmap.m_widthy/2-1, 1, false);
+	PlaceRoad(g_hmap.m_widthx/2+13, g_hmap.m_widthy/2-0, 1, false);
+	PlaceRoad(g_hmap.m_widthx/2+13, g_hmap.m_widthy/2+1, 1, false);
 	CheckGLError(__FILE__, __LINE__);
-	PlaceBl(BL_GASSTATION, Vec2i(g_hmap.m_widthx/2+14, g_hmap.m_widthz/2-1), true, 0);
+	PlaceBl(BL_GASSTATION, Vec2i(g_hmap.m_widthx/2+14, g_hmap.m_widthy/2-1), true, 0);
 	g_hmap.genvbo();
 #endif
 
@@ -356,15 +348,18 @@ void Click_NewGame()
 
 	g_mode = APPMODE_PLAY;
 
-	Player* py = &g_player[g_curP];
-	GUI* gui = &py->gui;
+	Player* py = &g_player[g_localP];
+	GUI* gui = &g_gui;
+
+	//return;
 
 	gui->closeall();
-	gui->open("play gui");
+	gui->open("play");
 	gui->open("play right opener");
 
 	CheckGLError(__FILE__, __LINE__);
 
+#if 0
 	gui->add(new WindowW(gui, "window", Resize_Window));
 	//gui->open("window");
 
@@ -381,8 +376,11 @@ void Click_NewGame()
 	}
 
 	win->add(new TextBlock(win, "text block", bigtext, MAINFONT16, Resize_WinText));
+#endif
 
 	g_lastsave[0] = '\0';
+	BegSess();
+	g_netmode = NETM_SINGLE;
 }
 
 void Click_OpenEditor()
@@ -394,8 +392,8 @@ void Click_OpenEditor()
 	g_mode = APPMODE_EDITOR;
 
 
-	Player* py = &g_player[g_curP];
-	GUI* gui = &py->gui;
+	Player* py = &g_player[g_localP];
+	GUI* gui = &g_gui;
 
 	gui->closeall();
 	gui->open("editor gui");
@@ -403,10 +401,65 @@ void Click_OpenEditor()
 	g_lastsave[0] = '\0';
 }
 
-void FillMenuGUI()
+void Resize_CenterWin(Widget* thisw)
 {
-	Player* py = &g_player[g_curP];
-	GUI* gui = &py->gui;
+	Player* py = &g_player[g_localP];
+	
+	thisw->m_pos[0] = g_width/2 - 150;
+	thisw->m_pos[1] = g_height/2 - 150;
+	thisw->m_pos[2] = g_width/2 + 200;
+	thisw->m_pos[3] = g_height/2 + 150;
+}
+
+void Resize_CenterWin2(Widget* thisw)
+{
+	Player* py = &g_player[g_localP];
+	
+	thisw->m_pos[0] = g_width/2 - 150 + 60;
+	thisw->m_pos[1] = g_height/2 - 150 + 30;
+	thisw->m_pos[2] = g_width/2 + 200 + 60;
+	thisw->m_pos[3] = g_height/2 + 150 + 30;
+}
+
+void Click_LoadGame()
+{
+	Player* py = &g_player[g_localP];
+	GUI* gui = &g_gui;
+	
+	gui->open("load");
+	((LoadView*)gui->get("load"))->regen();
+}
+
+void Click_Options()
+{
+}
+
+void Click_Quit()
+{
+	EndSess();
+	FreeMap();
+	FreeGrid();
+	g_quit = true;
+}
+
+void Resize_JoinCancel(Widget* thisw)
+{
+	thisw->m_pos[0] = g_width/2 - 75;
+	thisw->m_pos[1] = g_height/2 + 100 - 30;
+	thisw->m_pos[2] = g_width/2 + 75;
+	thisw->m_pos[3] = g_height/2 + 100 - 0;
+	CenterLabel(thisw);
+}
+	
+void Click_JoinCancel()
+{
+
+}
+
+void FillMenu()
+{
+	Player* py = &g_player[g_localP];
+	GUI* gui = &g_gui;
 
 	// Main ViewLayer
 	gui->add(new ViewLayer(gui, "main"));
@@ -415,25 +468,38 @@ void FillMenuGUI()
 	mainview->add(new Image(mainview, "gui/mmbg.jpg", true, Resize_Fullscreen));
 	
 	mainview->add(new Link(mainview, "0", RichText("New Game"), FONT_EUROSTILE16, Resize_MenuItem, Click_NewGame));
-	mainview->add(new Link(mainview, "1", RichText("Host Game"), FONT_EUROSTILE16, Resize_MenuItem, Click_HostGame));
-	mainview->add(new Link(mainview, "2", RichText("Join Game"), FONT_EUROSTILE16, Resize_MenuItem, Click_JoinGame));
+	mainview->add(new Link(mainview, "1", RichText("Load Game"), FONT_EUROSTILE16, Resize_MenuItem, Click_LoadGame));
+	mainview->add(new Link(mainview, "2", RichText("Host Game"), FONT_EUROSTILE16, Resize_MenuItem, Click_HostGame));
+	mainview->add(new Link(mainview, "3", RichText("Join Game"), FONT_EUROSTILE16, Resize_MenuItem, Click_ListHosts));
+	mainview->add(new Link(mainview, "4", RichText("Options"), FONT_EUROSTILE16, Resize_MenuItem, Click_Options));
+	mainview->add(new Link(mainview, "5", RichText("Quit"), FONT_EUROSTILE16, Resize_MenuItem, Click_Quit));
+
+	gui->add(new SvList(gui, "sv list", Resize_CenterWin));
+	gui->add(new NewHost(gui, "new host", Resize_CenterWin2));
+	gui->add(new Lobby(gui, "lobby"));
+	
+	gui->add(new ViewLayer(gui, "join"));
+	ViewLayer* joinview = (ViewLayer*)gui->get("join");
+	joinview->add(new Image(joinview, "gui/mmbg.jpg", true, Resize_Fullscreen));
+	joinview->add(new Text(joinview, "status", RichText("Joining..."), MAINFONT16, Resize_LoadingStatus));
+	joinview->add(new Button(joinview, "cancel", "gui/transp.png", RichText("Cancel"), RichText(), MAINFONT16, BUST_LINEBASED, Resize_JoinCancel, Click_JoinCancel, NULL, NULL, NULL, NULL, -1));
 }
 
 void StartRoadPlacement()
 {
-	Player* py = &g_player[g_curP];
-	Camera* c = &py->camera;
+	Player* py = &g_player[g_localP];
+	Camera* c = &g_cam;
 
-	py->vdrag[0] = Vec3f(-1,-1,-1);
-	py->vdrag[1] = Vec3f(-1,-1,-1);
+	g_vdrag[0] = Vec3f(-1,-1,-1);
+	g_vdrag[1] = Vec3f(-1,-1,-1);
 
-	Vec3f ray = ScreenPerspRay(py->mouse.x, py->mouse.y, py->width, py->height, c->zoompos(), c->m_strafe, c->up2(), c->m_view - c->m_pos, FIELD_OF_VIEW);
+	Vec3f ray = ScreenPerspRay(g_mouse.x, g_mouse.y, g_width, g_height, c->zoompos(), c->m_strafe, c->up2(), c->m_view - c->m_pos, FIELD_OF_VIEW);
 
 	Vec3f intersection;
 
 	Vec3f line[2];
 	line[0] = c->zoompos();
-	line[1] = line[0] + ray * MAX_DISTANCE / 3 / py->zoom;
+	line[1] = line[0] + ray * MAX_DISTANCE / 3 / g_zoom;
 
 #if 1
 	if(!FastMapIntersect(&g_hmap, line, &intersection))
@@ -442,8 +508,8 @@ void StartRoadPlacement()
 #endif
 		return;
 
-	py->vdrag[0] = intersection;
-	py->vdrag[1] = intersection;
+	g_vdrag[0] = intersection;
+	g_vdrag[1] = intersection;
 }
 
 void MouseLDown()
@@ -461,23 +527,23 @@ void MouseLDown()
 	}
 	else if(g_mode == APPMODE_PLAY)
 	{
-		Player* py = &g_player[g_curP];
-		py->mousestart = py->mouse;
+		Player* py = &g_player[g_localP];
+		g_mousestart = g_mouse;
 	}
 }
 
 void EdPlaceUnit()
 {
-	Player* py = &g_player[g_curP];
-	Camera* c = &py->camera;
+	Player* py = &g_player[g_localP];
+	Camera* c = &g_cam;
 
-	Vec3f ray = ScreenPerspRay(py->mouse.x, py->mouse.y, py->width, py->height, c->zoompos(), c->m_strafe, c->up2(), c->m_view - c->m_pos, FIELD_OF_VIEW);
+	Vec3f ray = ScreenPerspRay(g_mouse.x, g_mouse.y, g_width, g_height, c->zoompos(), c->m_strafe, c->up2(), c->m_view - c->m_pos, FIELD_OF_VIEW);
 
 	Vec3f intersection;
 
 	Vec3f line[2];
 	line[0] = c->zoompos();
-	line[1] = line[0] + ray * MAX_DISTANCE / 3 / py->zoom;
+	line[1] = line[0] + ray * MAX_DISTANCE / 3 / g_zoom;
 
 #if 1
 	if(!FastMapIntersect(&g_hmap, line, &intersection))
@@ -501,16 +567,16 @@ void EdPlaceUnit()
 
 void EdPlaceBuilding()
 {
-	Player* py = &g_player[g_curP];
-	Camera* c = &py->camera;
+	Player* py = &g_player[g_localP];
+	Camera* c = &g_cam;
 
-	Vec3f ray = ScreenPerspRay(py->mouse.x, py->mouse.y, py->width, py->height, c->zoompos(), c->m_strafe, c->up2(), c->m_view - c->m_pos, FIELD_OF_VIEW);
+	Vec3f ray = ScreenPerspRay(g_mouse.x, g_mouse.y, g_width, g_height, c->zoompos(), c->m_strafe, c->up2(), c->m_view - c->m_pos, FIELD_OF_VIEW);
 
 	Vec3f intersection;
 
 	Vec3f line[2];
 	line[0] = c->zoompos();
-	line[1] = line[0] + ray * MAX_DISTANCE / 3 / py->zoom;
+	line[1] = line[0] + ray * MAX_DISTANCE / 3 / g_zoom;
 
 #if 1
 	if(!FastMapIntersect(&g_hmap, line, &intersection))
@@ -537,8 +603,8 @@ void EdPlaceBuilding()
 
 void EdDeleteObject()
 {
-	Player* py = &g_player[g_curP];
-	Camera* c = &py->camera;
+	Player* py = &g_player[g_localP];
+	Camera* c = &g_cam;
 
 	Selection sel = DoSel(c->zoompos(), c->m_strafe, c->up2(), c->m_view - c->m_pos);
 
@@ -570,47 +636,65 @@ void MouseLUp()
 	}
 	else if(g_mode == APPMODE_PLAY)
 	{
-		Player* py = &g_player[g_curP];
-		Camera* c = &py->camera;
-		GUI* gui = &py->gui;
+		Player* py = &g_player[g_localP];
+		Camera* c = &g_cam;
+		GUI* gui = &g_gui;
 
-		if(py->build == BL_NONE)
+		if(g_build == BL_NONE)
 		{
-			gui->close("construction view");
-			gui->close("building view");
-			py->sel = DoSel(c->zoompos(), c->m_strafe, c->up2(), Normalize(c->m_view - c->zoompos()));
-			AfterSel(&py->sel);
+			gui->close("cstr view");
+			gui->close("bl view");
+			gui->close("truck mgr");
+			gui->close("save");
+			gui->close("load");
+			g_sel = DoSel(c->zoompos(), c->m_strafe, c->up2(), Normalize(c->m_view - c->zoompos()));
+			AfterSel(&g_sel);
 		}
-		else if(py->build < BL_TYPES)
+		else if(g_build < BL_TYPES)
 		{
-			if(py->canplace)
+			if(g_canplace)
 			{
-				int bid;
-				PlaceBl(py->build, Vec2i(py->vdrag[0].x/TILE_SIZE, py->vdrag[0].z/TILE_SIZE), false, g_localP, &bid);
+				//int bid;
+				//PlaceBl(g_build, Vec2i(g_vdrag[0].x/TILE_SIZE, g_vdrag[0].z/TILE_SIZE), false, g_localP, &bid);
 
-				//InfoMessage("pl", "pl");
+				//InfoMess("pl", "pl");
 
-				if(g_netmode != NET_SINGLE)
+				//if(g_netmode != NETM_SINGLE)
 				{
 					PlaceBlPacket pbp;
 					pbp.header.type = PACKET_PLACEBL;
-					pbp.player = g_curP;
-					pbp.btype = py->build;
-					pbp.tpos = g_building[bid].tilepos;
+					pbp.player = g_localP;
+					pbp.btype = g_build;
+					pbp.tpos = Vec2i(g_vdrag[0].x/TILE_SIZE, g_vdrag[0].z/TILE_SIZE);
 					
-					if(g_netmode == NET_HOST)
+					if(g_netmode == NETM_HOST)
 					{
+						PlaceBlPacket* newpbp = (PlaceBlPacket*)malloc(sizeof(PlaceBlPacket));
+						memcpy(newpbp, &pbp, sizeof(PlaceBlPacket));
+						g_localcmd.push_back((PacketHeader*)newpbp);
+
+#if 0
 						NetConn* nc = &*g_conn.begin();
 
 						if(nc)
-							SendData((char*)&pbp, sizeof(PlaceBlPacket), &nc->addr, true, nc, &g_sock, true);
+							SendData((char*)&pbp, sizeof(PlaceBlPacket), &nc->addr, true, nc, &g_sock);
+#endif
 					}
-					else if(g_netmode == NET_CLIENT)
+					else if(g_netmode == NETM_CLIENT)
 					{
 						NetConn* nc = g_svconn;
 
 						if(nc)
-							SendData((char*)&pbp, sizeof(PlaceBlPacket), &nc->addr, true, nc, &g_sock, true);
+							SendData((char*)&pbp, sizeof(PlaceBlPacket), &nc->addr, true, false, nc, &g_sock, 0);
+					}
+					else if(g_netmode == NETM_SINGLE)
+					{
+#if 0
+		char msg[128];
+		sprintf(msg, "send %d at %d,%d", pbp.btype, pbp.tpos.x, pbp.tpos.y);
+		InfoMess("polk", msg);
+#endif
+						AppendCmd(&g_nextcmdq, (PacketHeader*)&pbp, sizeof(PlaceBlPacket));
 					}
 				}
 			}
@@ -618,30 +702,30 @@ void MouseLUp()
 			{
 			}
 
-			py->build = -1;
+			g_build = -1;
 		}
-		else if(py->build >= BL_TYPES && py->build < BL_TYPES+CONDUIT_TYPES)
+		else if(g_build >= BL_TYPES && g_build < BL_TYPES+CONDUIT_TYPES)
 		{
 			//g_log<<"place r"<<std::endl;
-			PlaceCo(py->build - BL_TYPES);
-			py->build = -1;
+			PlaceCo(g_build - BL_TYPES);
+			g_build = -1;
 		}
 	}
 }
 
 void RotateAbout()
 {
-	Player* py = &g_player[g_curP];
-	Camera* c = &py->camera;
+	Player* py = &g_player[g_localP];
+	Camera* c = &g_cam;
 
-	float dx = py->mouse.x - py->width/2;
-	float dy = py->mouse.y - py->height/2;
+	float dx = (float)( g_mouse.x - g_width/2 );
+	float dy = (float)( g_mouse.y - g_height/2 );
 
-	Camera oldcam = py->camera;
+	Camera oldcam = g_cam;
 	Vec3f line[2];
 	line[0] = c->zoompos();
 
-	c->rotateabout(c->m_view, dy / 100.0f, c->m_strafe.x, c->m_strafe.y, c->m_strafe.z);
+	//c->rotateabout(c->m_view, dy / 100.0f, c->m_strafe.x, c->m_strafe.y, c->m_strafe.z);
 	c->rotateabout(c->m_view, dx / 100.0f, c->m_up.x, c->m_up.y, c->m_up.z);
 
 	line[1] = c->zoompos();
@@ -658,7 +742,7 @@ void RotateAbout()
 #else
 	if(FastMapIntersect(&g_hmap, line, &clip))
 #endif
-		py->camera = oldcam;
+		g_cam = oldcam;
 	//else
 	//	CalcMapView();
 
@@ -666,18 +750,18 @@ void RotateAbout()
 
 void UpdateRoadPlans()
 {
-	Player* py = &g_player[g_curP];
-	Camera* c = &py->camera;
+	Player* py = &g_player[g_localP];
+	Camera* c = &g_cam;
 
-	py->vdrag[1] = py->vdrag[0];
+	g_vdrag[1] = g_vdrag[0];
 
-	Vec3f ray = ScreenPerspRay(py->mouse.x, py->mouse.y, py->width, py->height, c->zoompos(), c->m_strafe, c->up2(), c->m_view - c->m_pos, FIELD_OF_VIEW);
+	Vec3f ray = ScreenPerspRay(g_mouse.x, g_mouse.y, g_width, g_height, c->zoompos(), c->m_strafe, c->up2(), c->m_view - c->m_pos, FIELD_OF_VIEW);
 
 	Vec3f intersection;
 
 	Vec3f line[2];
 	line[0] = c->zoompos();
-	line[1] = line[0] + ray * MAX_DISTANCE / 3 / py->zoom;
+	line[1] = line[0] + ray * MAX_DISTANCE / 3 / g_zoom;
 
 #if 1
 	if(!FastMapIntersect(&g_hmap, line, &intersection))
@@ -686,25 +770,25 @@ void UpdateRoadPlans()
 #endif
 		return;
 
-	py->vdrag[1] = intersection;
+	g_vdrag[1] = intersection;
 
-	UpdCoPlans(CONDUIT_ROAD, 0, py->vdrag[0], py->vdrag[1]);
+	UpdCoPlans(CONDUIT_ROAD, 0, g_vdrag[0], g_vdrag[1]);
 }
 
 void UpdateCrPipePlans()
 {
-	Player* py = &g_player[g_curP];
-	Camera* c = &py->camera;
+	Player* py = &g_player[g_localP];
+	Camera* c = &g_cam;
 
-	py->vdrag[1] = py->vdrag[0];
+	g_vdrag[1] = g_vdrag[0];
 
-	Vec3f ray = ScreenPerspRay(py->mouse.x, py->mouse.y, py->width, py->height, c->zoompos(), c->m_strafe, c->up2(), c->m_view - c->m_pos, FIELD_OF_VIEW);
+	Vec3f ray = ScreenPerspRay(g_mouse.x, g_mouse.y, g_width, g_height, c->zoompos(), c->m_strafe, c->up2(), c->m_view - c->m_pos, FIELD_OF_VIEW);
 
 	Vec3f intersection;
 
 	Vec3f line[2];
 	line[0] = c->zoompos();
-	line[1] = line[0] + ray * MAX_DISTANCE / 3 / py->zoom;
+	line[1] = line[0] + ray * MAX_DISTANCE / 3 / g_zoom;
 
 #if 1
 	if(!FastMapIntersect(&g_hmap, line, &intersection))
@@ -713,25 +797,25 @@ void UpdateCrPipePlans()
 #endif
 		return;
 
-	py->vdrag[1] = intersection;
+	g_vdrag[1] = intersection;
 
-	UpdCoPlans(CONDUIT_CRPIPE, 0, py->vdrag[0], py->vdrag[1]);
+	UpdCoPlans(CONDUIT_CRPIPE, 0, g_vdrag[0], g_vdrag[1]);
 }
 
 void UpdatePowlPlans()
 {
-	Player* py = &g_player[g_curP];
-	Camera* c = &py->camera;
+	Player* py = &g_player[g_localP];
+	Camera* c = &g_cam;
 
-	py->vdrag[1] = py->vdrag[0];
+	g_vdrag[1] = g_vdrag[0];
 
-	Vec3f ray = ScreenPerspRay(py->mouse.x, py->mouse.y, py->width, py->height, c->zoompos(), c->m_strafe, c->up2(), c->m_view - c->m_pos, FIELD_OF_VIEW);
+	Vec3f ray = ScreenPerspRay(g_mouse.x, g_mouse.y, g_width, g_height, c->zoompos(), c->m_strafe, c->up2(), c->m_view - c->m_pos, FIELD_OF_VIEW);
 
 	Vec3f intersection;
 
 	Vec3f line[2];
 	line[0] = c->zoompos();
-	line[1] = line[0] + ray * MAX_DISTANCE / 3 / py->zoom;
+	line[1] = line[0] + ray * MAX_DISTANCE / 3 / g_zoom;
 
 #if 1
 	if(!FastMapIntersect(&g_hmap, line, &intersection))
@@ -740,18 +824,18 @@ void UpdatePowlPlans()
 #endif
 		return;
 
-	py->vdrag[1] = intersection;
+	g_vdrag[1] = intersection;
 
-	UpdCoPlans(CONDUIT_POWL, 0, py->vdrag[0], py->vdrag[1]);
+	UpdCoPlans(CONDUIT_POWL, 0, g_vdrag[0], g_vdrag[1]);
 }
 
 void MouseMove()
 {
 	if(g_mode == APPMODE_PLAY || g_mode == APPMODE_EDITOR)
 	{
-		Player* py = &g_player[g_curP];
+		Player* py = &g_player[g_localP];
 
-		if(py->mousekeys[MOUSE_MIDDLE])
+		if(g_mousekeys[MOUSE_MIDDLE])
 		{
 			RotateAbout();
 			CenterMouse();
@@ -759,7 +843,7 @@ void MouseMove()
 
 		UpdSBl();
 
-		if(py->mousekeys[MOUSE_LEFT])
+		if(g_mousekeys[MOUSE_LEFT])
 		{
 			int edtool = GetEdTool();
 
@@ -787,12 +871,12 @@ void MouseRUp()
 {
 	if(g_mode == APPMODE_PLAY)
 	{
-		Player* py = &g_player[g_curP];
-		Camera* c = &py->camera;
+		Player* py = &g_player[g_localP];
+		Camera* c = &g_cam;
 
-		if(!py->keyintercepted)
+		//if(!g_keyintercepted)
 		{
-			Order(py->mouse.x, py->mouse.y, py->width, py->height, c->zoompos(), c->m_view, Normalize(c->m_view - c->zoompos()), c->m_strafe, c->up2());
+			Order(g_mouse.x, g_mouse.y, g_width, g_height, c->zoompos(), c->m_view, Normalize(c->m_view - c->zoompos()), c->m_strafe, c->up2());
 		}
 	}
 }
@@ -811,7 +895,7 @@ void FillGUI()
 		g_log.flush();
 
 		Player* py = &g_player[i];
-		GUI* gui = &py->gui;
+		GUI* gui = &g_gui;
 
 		g_log<<"2.1.2"<<std::endl;
 		g_log.flush();
@@ -830,8 +914,8 @@ void FillGUI()
 	g_log.flush();
 
 	// Loading ViewLayer
-	Player* py = &g_player[g_curP];
-	GUI* gui = &py->gui;
+	Player* py = &g_player[g_localP];
+	GUI* gui = &g_gui;
 
 	g_log<<"2.2"<<std::endl;
 	g_log.flush();
@@ -851,17 +935,17 @@ void FillGUI()
 	g_log<<"2.4"<<std::endl;
 	g_log.flush();
 
-	FillMenuGUI();
+	FillMenu();
 
 	g_log<<"2.5"<<std::endl;
 	g_log.flush();
 
-	FillEditorGUI();
+	FillEd();
 
 	g_log<<"2.6"<<std::endl;
 	g_log.flush();
 
-	FillPlayGUI();
+	FillPlay();
 
 	g_log<<"2.7"<<std::endl;
 	g_log.flush();

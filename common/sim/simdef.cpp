@@ -1,10 +1,11 @@
 #include "simdef.h"
 #include "../script/console.h"
-#include "infrastructure.h"
+#include "conduit.h"
 #include "road.h"
 #include "building.h"
-
-int g_simframe = 0;
+#include "truck.h"
+#include "labourer.h"
+#include "../sound/sound.h"
 
 // Queue all the game resources and define objects
 void Queue()
@@ -80,41 +81,42 @@ void Queue()
 #define ICONS				31
 #endif
 
-	DefI(ICON_DOLLARS, "gui/icons/dollars.png", ":dollar:");
-	DefI(ICON_PESOS, "gui/icons/pesos.png", ":peso:");
-	DefI(ICON_EUROS, "gui/icons/euros.png", ":euro:");
-	DefI(ICON_POUNDS, "gui/icons/pounds.png", ":pound:");
-	DefI(ICON_FRANCS, "gui/icons/francs.png", ":franc:");
-	DefI(ICON_YENS, "gui/icons/yens.png", ":yen:");
-	DefI(ICON_RUPEES, "gui/icons/rupees.png", ":rupee:");
-	DefI(ICON_ROUBLES, "gui/icons/roubles.png", ":rouble:");
-	DefI(ICON_LABOUR, "gui/icons/labour.png", ":labour:");
-	DefI(ICON_HOUSING, "gui/icons/housing.png", ":housing:");
-	DefI(ICON_FARMPRODUCT, "gui/icons/farmproducts.png", ":farmprod:");
-	DefI(ICON_WSFOOD, "gui/icons/wsfood.png", ":wsfood:");
-	DefI(ICON_RETFOOD, "gui/icons/retfood.png", ":retfood:");
-	DefI(ICON_CHEMICALS, "gui/icons/chemicals.png", ":chemicals:");
-	DefI(ICON_ELECTRONICS, "gui/icons/electronics.png", ":electronics:");
-	DefI(ICON_RESEARCH, "gui/icons/research.png", ":research:");
-	DefI(ICON_PRODUCTION, "gui/icons/production.png", ":production:");
-	DefI(ICON_IRONORE, "gui/icons/ironore.png", ":ironore:");
-	DefI(ICON_URANIUMORE, "gui/icons/uraniumore.png", ":uraniumore:");
-	DefI(ICON_STEEL, "gui/icons/steel.png", ":steel:");
-	DefI(ICON_CRUDEOIL, "gui/icons/crudeoil.png", ":crudeoil:");
-	DefI(ICON_WSFUEL, "gui/icons/fuelwholesale.png", ":wsfuel:");
-	DefI(ICON_STONE, "gui/icons/stone.png", ":stone:");
-	DefI(ICON_CEMENT, "gui/icons/cement.png", ":cement:");
-	DefI(ICON_ENERGY, "gui/icons/energy.png", ":energy:");
-	DefI(ICON_ENRICHEDURAN, "gui/icons/uranium.png", ":enricheduran:");
-	DefI(ICON_COAL, "gui/icons/coal.png", ":coal:");
-	DefI(ICON_TIME, "gui/icons/time.png", ":time:");
-	DefI(ICON_RETFUEL, "gui/icons/fuelretail.png", ":retfuel:");
-	DefI(ICON_LOGS, "gui/icons/logs.png", ":logs:");
-	DefI(ICON_LUMBER, "gui/icons/lumber.png", ":lumber:");
-	DefI(ICON_WATER, "gui/icons/water.png", ":water:");
-	DefI(ICON_EXCLAMATION, "gui/icons/exclamation.png", ":exclam:");
-	DefI(ICON_CENTS, "gui/icons/cents.png", ":cent:");
+	DefI(ICON_DOLLARS, "gui/icons/dollars.png", "\\$");
+	DefI(ICON_PESOS, "gui/icons/pesos.png", "\\peso");
+	DefI(ICON_EUROS, "gui/icons/euros.png", "\\euro");
+	DefI(ICON_POUNDS, "gui/icons/pounds.png", "\\pound");
+	DefI(ICON_FRANCS, "gui/icons/francs.png", "\\franc");
+	DefI(ICON_YENS, "gui/icons/yens.png", "\\yen");
+	DefI(ICON_RUPEES, "gui/icons/rupees.png", "\\rupee");
+	DefI(ICON_ROUBLES, "gui/icons/roubles.png", "\\ruble");
+	DefI(ICON_LABOUR, "gui/icons/labour.png", "\\labour");
+	DefI(ICON_HOUSING, "gui/icons/housing.png", "\\housing");
+	DefI(ICON_FARMPRODUCT, "gui/icons/farmproducts.png", "\\farmprod");
+	DefI(ICON_WSFOOD, "gui/icons/wsfood.png", "\\wsfood");
+	DefI(ICON_RETFOOD, "gui/icons/retfood.png", "\\retfood");
+	DefI(ICON_CHEMICALS, "gui/icons/chemicals.png", "\\chemicals");
+	DefI(ICON_ELECTRONICS, "gui/icons/electronics.png", "\\electronics");
+	DefI(ICON_RESEARCH, "gui/icons/research.png", "\\research");
+	DefI(ICON_PRODUCTION, "gui/icons/production.png", "\\production");
+	DefI(ICON_IRONORE, "gui/icons/ironore.png", "\\ironore");
+	DefI(ICON_URANIUMORE, "gui/icons/uraniumore.png", "\\uraniumore");
+	DefI(ICON_STEEL, "gui/icons/steel.png", "\\steel");
+	DefI(ICON_CRUDEOIL, "gui/icons/crudeoil.png", "\\crudeoil");
+	DefI(ICON_WSFUEL, "gui/icons/fuelwholesale.png", "\\wsfuel");
+	DefI(ICON_STONE, "gui/icons/stone.png", "\\stone");
+	DefI(ICON_CEMENT, "gui/icons/cement.png", "\\cement");
+	DefI(ICON_ENERGY, "gui/icons/energy.png", "\\energy");
+	DefI(ICON_ENRICHEDURAN, "gui/icons/uranium.png", "\\enricheduran");
+	DefI(ICON_COAL, "gui/icons/coal.png", "\\coal");
+	DefI(ICON_TIME, "gui/icons/time.png", "\\time");
+	DefI(ICON_RETFUEL, "gui/icons/fuelretail.png", "\\retfuel");
+	DefI(ICON_LOGS, "gui/icons/logs.png", "\\logs");
+	DefI(ICON_LUMBER, "gui/icons/lumber.png", "\\lumber");
+	DefI(ICON_WATER, "gui/icons/water.png", "\\water");
+	DefI(ICON_EXCLAMATION, "gui/icons/exclamation.png", "\\exclam");
+	DefI(ICON_CENTS, "gui/icons/cents.png", "\\cent");
 
+	//return;
 
 	// Resource types
 
@@ -210,17 +212,33 @@ void Queue()
 
 	// Unit types
 
-	DefU(UNIT_ROBOSOLDIER, "models/battlecomp2011simp/battlecomp.ms3d", Vec3f(1,1,1)*182.0f/70.0f, Vec3f(0,0,0)*182.0f/70.0f, Vec3i(125, 250, 125), "Robot Soldier", 100, true, true, false, false, false, 6, true);
-	DefU(UNIT_LABOURER, "models/labourer/labourer.ms3d", Vec3f(1,1,1)*182.0f/70.0f, Vec3f(0,0,0)*182.0f/70.0f, Vec3i(125, 250, 125), "Labourer", 100, true, true, false, false, false, 6, false);
+	DefU(UNIT_BATTLECOMP, "models/battlecomp2011simp/battlecomp.ms3d", Vec3f(1,1,1)*182.0f/72.0f, Vec3f(0,0,0)*182.0f/72.0f, Vec3i(125, 250, 125), "Droid", 100, true, true, false, false, false, 6, true);
+	UCost(UNIT_BATTLECOMP, RES_PRODUCTION, 10);
+	
+	DefU(UNIT_CARLYLE, "models/carlyle/carlyle.ms3d", Vec3f(1,1,1)*220.0f/72.0f, Vec3f(0,0,0)*182.0f/72.0f, Vec3i(250, 250, 250), "Tank", 100, true, true, false, false, false, 16, true);
+	UCost(UNIT_CARLYLE, RES_PRODUCTION, 15);
+	
+	//DefU(UNIT_LABOURER, "models/labourer/labourer.ms3d", Vec3f(1,1,1)*182.0f/100.0f, Vec3f(0,0,0)*182.0f/100.0f, Vec3i(125, 250, 125), "Labourer", 100, true, true, false, false, false, 6, false);
+	DefU(UNIT_LABOURER, "models/labourer/labourer.ms3d", Vec3f(1,1,1)*182.0f/100.0f, Vec3f(0,0,0)*182.0f/100.0f, Vec3i(50, 100, 50), "Labourer", 100, true, true, false, false, false, 6, false);
+	
 	DefU(UNIT_TRUCK, "models/truck/truck.ms3d", Vec3f(1,1,1)*30.0f, Vec3f(0,0,0), Vec3i(125, 250, 125), "Truck", 100, true, false, true, false, false, 30, false);
-
+	UCost(UNIT_TRUCK, RES_PRODUCTION, 1);
 
 	// Foliage types
 
-	DefF(FOLIAGE_TREE1, "models/pine/pine.ms3d", Vec3f(200,200,200), Vec3f(0,0,0), Vec3i(40, 60, 500)*20);
-	DefF(FOLIAGE_TREE2, "models/pine/pine.ms3d", Vec3f(200,200,200), Vec3f(0,0,0), Vec3i(40, 60, 500)*20);
-	DefF(FOLIAGE_TREE3, "models/pine/pine.ms3d", Vec3f(200,200,200), Vec3f(0,0,0), Vec3i(40, 60, 500)*20);
-
+#if 0
+	DefF(FL_TREE1, "models/pine/pine.ms3d", Vec3f(200,200,200), Vec3f(0,0,0), Vec3i(40, 60, 500)*20);
+	DefF(FL_TREE2, "models/pine/pine.ms3d", Vec3f(200,200,200), Vec3f(0,0,0), Vec3i(40, 60, 500)*20);
+	DefF(FL_TREE3, "models/pine/pine.ms3d", Vec3f(200,200,200), Vec3f(0,0,0), Vec3i(40, 60, 500)*20);
+#elif 1
+	DefF(FL_TREE1, "models/spruce1/spruce1.ms3d", Vec3f(20,20,20), Vec3f(0,0,0), Vec3i(125, 200, 125)*3);
+	DefF(FL_TREE2, "models/spruce1/spruce1.ms3d", Vec3f(20,20,20), Vec3f(0,0,0), Vec3i(125, 200, 125)*3);
+	DefF(FL_TREE3, "models/spruce1/spruce1.ms3d", Vec3f(20,20,20), Vec3f(0,0,0), Vec3i(125, 200, 125)*3);
+#elif 1
+	DefF(FL_TREE1, "models/trees/tree1/tree1.ms3d", Vec3f(20,20,20)*8, Vec3f(0,0,0), Vec3i(40, 60, 500)*20);
+	DefF(FL_TREE2, "models/trees/tree2/tree2.ms3d", Vec3f(20,20,20)*8, Vec3f(0,0,0), Vec3i(40, 60, 500)*20);
+	DefF(FL_TREE3, "models/trees/tree3/tree3.ms3d", Vec3f(20,20,20)*8, Vec3f(0,0,0), Vec3i(40, 60, 500)*20);
+#endif
 
 	// Building types
 
@@ -394,15 +412,48 @@ void Queue()
 	BOut(RESEARCH, 1);			// 118/1+1+3*12 = 155
 #endif
 
-	//DefB(BL_APARTMENT, "Apartment Building", Vec2i(2,1), "models/apartment1/basebuilding.ms3d", Vec3f(100,100,100), Vec3f(0,0,0), "models/apartment1/basebuilding.ms3d", Vec3f(100,100,100), Vec3f(0,0,0), FOUNDATION_LAND, RES_NONE);
-	DefB(BL_APARTMENT, "Apartment Building", Vec2i(2,2),  false, "models/apartment2/b1911", Vec3f(1,1,1), Vec3f(0,0,0), "models/apartment2/b1911", Vec3f(1,1,1), Vec3f(0,0,0), FOUNDATION_LAND, RES_NONE);
+	//DefB(BL_APARTMENT, "Apartments", Vec2i(2,1), "models/apartment1/basebuilding.ms3d", Vec3f(100,100,100), Vec3f(0,0,0), "models/apartment1/basebuilding.ms3d", Vec3f(100,100,100), Vec3f(0,0,0), FOUNDATION_LAND, RES_NONE);
+#if 1
+	DefB(BL_APARTMENT, "Apartments", 
+		Vec2i(2,2),  false, 
+		"models/apartment2/b1911", 
+		Vec3f(1,1,1), Vec3f(0,0,0), 
+		"models/apartment2/b1911", 
+		Vec3f(1,1,1), Vec3f(0,0,0), 
+		FOUNDATION_LAND, RES_NONE, 1000);
+#else
+	DefB(BL_APARTMENT, "Apartments", 
+		Vec2i(2,2),  false, 
+		"models/box/apartment/basebuilding.ms3d", 
+		Vec3f(1,1,1)*200, Vec3f(0,0,0), 
+		"models/box/apartment_c/basebuilding.ms3d", 
+		Vec3f(1,1,1)*200, Vec3f(0,0,0), 
+		FOUNDATION_LAND, RES_NONE, 1000);
+#endif
 	BMat(BL_APARTMENT, RES_CEMENT, 4);
 	BMat(BL_APARTMENT, RES_LABOUR, 4);
 	BMat(BL_APARTMENT, RES_STONE, 2);
 	BOut(BL_APARTMENT, RES_HOUSING, 15);
 	BDesc(BL_APARTMENT, "Apartments collect rent from labourers. They are required by the labourers to regenerate labour power.");
+	BSnd(BL_APARTMENT, BLSND_FINI, "sounds/notif/beep-22.wav");
 
-	DefB(BL_FACTORY, "Factory", Vec2i(1,1),  false, "models/factory3/factory3", Vec3f(1,1,1)/2, Vec3f(0,0,0), "models/factory3/factory3", Vec3f(1,1,1)/2, Vec3f(0,0,0), FOUNDATION_LAND, RES_NONE);
+#if 1
+	DefB(BL_FACTORY, "Factory", 
+		Vec2i(1,1),  false, 
+		"models/factory3/factory3", 
+		Vec3f(1,1,1)/2, Vec3f(0,0,0), 
+		"models/factory3/factory3", 
+		Vec3f(1,1,1)/2, Vec3f(0,0,0), 
+		FOUNDATION_LAND, RES_NONE, 1000);
+#else
+	DefB(BL_FACTORY, "Factory", 
+		Vec2i(1,1),  false, 
+		"models/box/factory/basebuilding.ms3d", 
+		Vec3f(1,1,1)/200, Vec3f(0,0,0), 
+		"models/box/factory_c/basebuilding.ms3d", 
+		Vec3f(1,1,1)/200, Vec3f(0,0,0), 
+		FOUNDATION_LAND, RES_NONE, 1000);
+#endif
 	BMat(BL_FACTORY, RES_LABOUR, 4);
 	BMat(BL_FACTORY, RES_METAL, 2);
 	BMat(BL_FACTORY, RES_CEMENT, 3);
@@ -413,21 +464,45 @@ void Queue()
 	BIn(BL_FACTORY, RES_METAL, 3);
 	BOut(BL_FACTORY, RES_PRODUCTION, 18);
 	BDesc(BL_FACTORY, "Factories produce units. They generate production necessary for the processing and packaging of farm products to create retail food.");
-
-	DefB(BL_REFINERY, "Oil Refinery", Vec2i(2,2),  false, "models/refinery2/refinery2", Vec3f(1,1,1), Vec3f(0,0,0), "models/refinery2/refinery2", Vec3f(1,1,1), Vec3f(0,0,0), FOUNDATION_LAND, RES_NONE);
+	BSnd(BL_FACTORY, BLSND_PROD, "sounds/notif/button-39.wav");
+	BSnd(BL_FACTORY, BLSND_FINI, "sounds/notif/beep-22.wav");
+	
+#if 1
+	DefB(BL_REFINERY, "Oil Refinery", 
+		Vec2i(2,2),  false, 
+		"models/refinery2/refinery2", 
+		Vec3f(1,1,1), Vec3f(0,0,0), 
+		"models/refinery2/refinery2", 
+		Vec3f(1,1,1), Vec3f(0,0,0), 
+		FOUNDATION_LAND, RES_NONE, 1000);
+#else
+	DefB(BL_REFINERY, "Oil Refinery", 
+		Vec2i(2,2),  false, 
+		"models/box/refinery/basebuilding.ms3d", 
+		Vec3f(1,1,1)*200, Vec3f(0,0,0), 
+		"models/box/refinery_c/basebuilding.ms3d", 
+		Vec3f(1,1,1)*200, Vec3f(0,0,0), 
+		FOUNDATION_LAND, RES_NONE, 1000);
+#endif
 	BMat(BL_REFINERY, RES_CEMENT, 5);
 	BMat(BL_REFINERY, RES_LABOUR, 10);
-	BIn(BL_REFINERY, RES_ENERGY, 50);
-	BIn(BL_REFINERY, RES_CRUDEOIL, 5);
-	BOut(BL_REFINERY, RES_FUEL, 5);
-	BEmitter(BL_REFINERY, 0, PARTICLE_EXHAUST, Vec3f(TILE_SIZE*5.7/10, TILE_SIZE*3/2, TILE_SIZE*-5/10));
-	BEmitter(BL_REFINERY, 1, PARTICLE_EXHAUST2, Vec3f(TILE_SIZE*5.7/10, TILE_SIZE*3/2, TILE_SIZE*-5/10));
-	BEmitter(BL_REFINERY, 2, PARTICLE_EXHAUST, Vec3f(TILE_SIZE*-4.5/10, TILE_SIZE*1.75, TILE_SIZE*3.0f/10));
-	BEmitter(BL_REFINERY, 3, PARTICLE_EXHAUST2, Vec3f(TILE_SIZE*-4.5/10, TILE_SIZE*1.75, TILE_SIZE*3.0f/10));
+	BIn(BL_REFINERY, RES_LABOUR, 10);
+	BIn(BL_REFINERY, RES_ENERGY, 5);
+	BIn(BL_REFINERY, RES_CRUDEOIL, 100);
+	BOut(BL_REFINERY, RES_FUEL, 6000);
+	//BEmitter(BL_REFINERY, 0, PARTICLE_EXHAUST, Vec3f(TILE_SIZE*5.7/10, TILE_SIZE*3/2, TILE_SIZE*-5/10));
+	//BEmitter(BL_REFINERY, 1, PARTICLE_EXHAUST2, Vec3f(TILE_SIZE*5.7/10, TILE_SIZE*3/2, TILE_SIZE*-5/10));
+	//BEmitter(BL_REFINERY, 2, PARTICLE_EXHAUST, Vec3f(TILE_SIZE*-4.5/10, TILE_SIZE*1.75, TILE_SIZE*3.0f/10));
+	//BEmitter(BL_REFINERY, 3, PARTICLE_EXHAUST2, Vec3f(TILE_SIZE*-4.5/10, TILE_SIZE*1.75, TILE_SIZE*3.0f/10));
 	BDesc(BL_REFINERY, "Turn crude oil into wholesale fuel.");
+	BSnd(BL_REFINERY, BLSND_PROD, "sounds/notif/beep-23.wav");
+	BSnd(BL_REFINERY, BLSND_FINI, "sounds/notif/beep-22.wav");
 	
 #if 0
-	DefB(BL_REFINERY, "Gas Station", Vec2i(2,2),  false, "models/refinery2/refinery2", Vec3f(1,1,1), Vec3f(0,0,0), "models/refinery2/refinery2", Vec3f(1,1,1), Vec3f(0,0,0), FOUNDATION_LAND, RES_NONE);
+	DefB(BL_REFINERY, "Gas Station", 
+		Vec2i(2,2),  false, "models/refinery2/refinery2", 
+		Vec3f(1,1,1), Vec3f(0,0,0), "models/refinery2/refinery2", 
+		Vec3f(1,1,1), Vec3f(0,0,0), FOUNDATION_LAND, RES_NONE, 1000);
 	BMat(BL_REFINERY, RES_CEMENT, 5);
 	BMat(BL_REFINERY, RES_LABOUR, 10);
 	BIn(BL_REFINERY, RES_ENERGY, 50);
@@ -436,47 +511,160 @@ void Queue()
 	BDesc(BL_REFINERY, "Turn wholesale fuel into retail fuel, generated at refineries.");
 #endif
 
-	DefB(BL_COALPOW, "Coal Powerplant", Vec2i(2,2), true, "models/coalpow/combustor.ms3d", Vec3f(1,1,1)/32.0f*TILE_SIZE*2, Vec3f(0,0,0), "models/coalpow/combustor.ms3d", Vec3f(1,1,1)/32.0f*TILE_SIZE*2, Vec3f(0,0,0), FOUNDATION_LAND, RES_NONE);
+#if 1
+	DefB(BL_COALPOW, "Coal Powerplant", 
+		Vec2i(2,2), true, 
+		"models/coalpow/combustor.ms3d", 
+		Vec3f(1,1,1)/32.0f*TILE_SIZE*2, Vec3f(0,0,0), 
+		"models/coalpow/combustor.ms3d", 
+		Vec3f(1,1,1)/32.0f*TILE_SIZE*2, Vec3f(0,0,0), 
+		FOUNDATION_LAND, RES_NONE, 1000);
+#else
+	DefB(BL_COALPOW, "Coal Powerplant", 
+		Vec2i(2,2), false, 
+		"models/box/coalpow/basebuilding.ms3d", 
+		Vec3f(1,1,1)*200, Vec3f(0,0,0), 
+		"models/box/coalpow_c/basebuilding.ms3d", 
+		Vec3f(1,1,1)*200, Vec3f(0,0,0), 
+		FOUNDATION_LAND, RES_NONE, 1000);
+#endif
 	BMat(BL_COALPOW, RES_CEMENT, 5);
 	BMat(BL_COALPOW, RES_LABOUR, 10);
 	BIn(BL_COALPOW, RES_COAL, 5);
-	BOut(BL_COALPOW, RES_ENERGY, 1000);
-	BEmitter(BL_COALPOW, 0, PARTICLE_EXHAUST, Vec3f(-9.5f, 23.4f, 10.6f)*TILE_SIZE/32.0f);
-	BEmitter(BL_COALPOW, 1, PARTICLE_EXHAUST, Vec3f(-9.9f, 23.4f, -10.0f)*TILE_SIZE/32.0f);
+	BIn(BL_COALPOW, RES_LABOUR, 5);
+	BOut(BL_COALPOW, RES_ENERGY, 45);
+	//BEmitter(BL_COALPOW, 0, PARTICLE_EXHAUST2, Vec3f(-9.5f + 1, 23.4f, 10.6f + 1)*TILE_SIZE/32.0f*2.0f);
+	//BEmitter(BL_COALPOW, 1, PARTICLE_EXHAUST2, Vec3f(-9.9f - 1, 23.4f, -10.0f + 1)*TILE_SIZE/32.0f*2.0f);
+	//BEmitter(BL_COALPOW, 2, PARTICLE_EXHAUST2, Vec3f(-9.5f - 1, 23.4f, 10.6f - 1)*TILE_SIZE/32.0f*2.0f);
+	//BEmitter(BL_COALPOW, 3, PARTICLE_EXHAUST2, Vec3f(-9.9f + 1, 23.4f, -10.0f - 1)*TILE_SIZE/32.0f*2.0f);
 	BDesc(BL_COALPOW, "Generates electricity from coal.");
+	BSnd(BL_COALPOW, BLSND_PROD, "sounds/notif/beep-24.wav");
+	BSnd(BL_COALPOW, BLSND_FINI, "sounds/notif/beep-22.wav");
 	
-	DefB(BL_CHEMPLANT, "Chemical Plant", Vec2i(2,2), true, "models/chemplant/chemplant.ms3d", Vec3f(1,1,1)/32.0f*TILE_SIZE*2, Vec3f(0,0,0), "models/chemplant/chemplant.ms3d", Vec3f(1,1,1)/32.0f*TILE_SIZE*2, Vec3f(0,0,0), FOUNDATION_LAND, RES_NONE);
+#if 1
+	DefB(BL_CHEMPLANT, "Chemical Plant", 
+		Vec2i(2,2), true, 
+		"models/chemplant/chemplant.ms3d", 
+		Vec3f(1,1,1)/32.0f*TILE_SIZE*2, Vec3f(0,0,0), 
+		"models/chemplant/chemplant.ms3d", 
+		Vec3f(1,1,1)/32.0f*TILE_SIZE*2, Vec3f(0,0,0), 
+		FOUNDATION_LAND, RES_NONE, 1000);
+#else
+	DefB(BL_CHEMPLANT, "Chemical Plant", 
+		Vec2i(2,2), false, 
+		"models/box/chemplant/basebuilding.ms3d", 
+		Vec3f(1,1,1)*200, Vec3f(0,0,0), 
+		"models/box/chemplant_c/basebuilding.ms3d", 
+		Vec3f(1,1,1)*200, Vec3f(0,0,0), 
+		FOUNDATION_LAND, RES_NONE, 1000);
+#endif
 	BMat(BL_CHEMPLANT, RES_CEMENT, 5);
 	BMat(BL_CHEMPLANT, RES_LABOUR, 10);
 	BIn(BL_CHEMPLANT, RES_IRONORE, 5);
 	BIn(BL_CHEMPLANT, RES_ENERGY, 5);
+	BIn(BL_CHEMPLANT, RES_LABOUR, 5);
 	BOut(BL_CHEMPLANT, RES_CHEMICALS, 10);
 	BDesc(BL_CHEMPLANT, "Generates chemicals necessary for farming and petrol refining.");
+	BSnd(BL_CHEMPLANT, BLSND_PROD, "sounds/notif/beep-25.wav");
+	BSnd(BL_CHEMPLANT, BLSND_FINI, "sounds/notif/beep-22.wav");
 	
-	DefB(BL_ELECPLANT, "Electronics Plant", Vec2i(2,2), true, "models/elecplant/elecplant.ms3d", Vec3f(1,1,1)/32.0f*TILE_SIZE*2, Vec3f(0,0,0), "models/elecplant/elecplant.ms3d", Vec3f(1,1,1)/32.0f*TILE_SIZE*2, Vec3f(0,0,0), FOUNDATION_LAND, RES_NONE);
+#if 1
+	DefB(BL_ELECPLANT, "Electronics Plant", 
+		Vec2i(2,2), true, 
+		"models/elecplant/elecplant.ms3d", 
+		Vec3f(1,1,1)/32.0f*TILE_SIZE*2, Vec3f(0,0,0), 
+		"models/elecplant/elecplant.ms3d", 
+		Vec3f(1,1,1)/32.0f*TILE_SIZE*2, Vec3f(0,0,0), 
+		FOUNDATION_LAND, RES_NONE, 1000);
+#else
+	DefB(BL_ELECPLANT, "Electronics Plant", 
+		Vec2i(2,2), false, 
+		"models/box/elecplant/basebuilding.ms3d", 
+		Vec3f(1,1,1)*200, Vec3f(0,0,0), 
+		"models/box/elecplant_c/basebuilding.ms3d", 
+		Vec3f(1,1,1)*200, Vec3f(0,0,0), 
+		FOUNDATION_LAND, RES_NONE, 1000);
+#endif
 	BMat(BL_ELECPLANT, RES_CEMENT, 5);
 	BMat(BL_ELECPLANT, RES_LABOUR, 10);
 	BIn(BL_ELECPLANT, RES_IRONORE, 5);
 	BIn(BL_ELECPLANT, RES_ENERGY, 5);
+	BIn(BL_ELECPLANT, RES_LABOUR, 5);
 	BOut(BL_ELECPLANT, RES_ELECTRONICS, 10);
 	BDesc(BL_ELECPLANT, "Produces electronics necessary for units.");
+	BSnd(BL_ELECPLANT, BLSND_PROD, "sounds/notif/beep-26.wav");
+	BSnd(BL_ELECPLANT, BLSND_FINI, "sounds/notif/beep-22.wav");
 
-	DefB(BL_CEMPLANT, "Cement Plant", Vec2i(1,1), true, "models/cemplant/cemplant.ms3d", Vec3f(1,1,1)/32.0f*TILE_SIZE*2, Vec3f(0,0,0), "models/cemplant/cemplant.ms3d", Vec3f(1,1,1)/32.0f*TILE_SIZE*2, Vec3f(0,0,0), FOUNDATION_LAND, RES_NONE);
+#if 1
+	DefB(BL_CEMPLANT, "Cement Plant", 
+		Vec2i(1,1), true, 
+		"models/cemplant/cemplant.ms3d", 
+		Vec3f(1,1,1)/32.0f*TILE_SIZE*2, Vec3f(0,0,0), 
+		"models/cemplant/cemplant.ms3d", 
+		Vec3f(1,1,1)/32.0f*TILE_SIZE*2, Vec3f(0,0,0), 
+		FOUNDATION_LAND, RES_NONE, 1000);
+#else
+	DefB(BL_CEMPLANT, "Cement Plant", 
+		Vec2i(1,1), false, 
+		"models/box/cemplant/basebuilding.ms3d", 
+		Vec3f(1,1,1)*100, Vec3f(0,0,0), 
+		"models/box/cemplant_c/basebuilding.ms3d", 
+		Vec3f(1,1,1)*100, Vec3f(0,0,0), 
+		FOUNDATION_LAND, RES_NONE, 1000);
+#endif
 	BMat(BL_CEMPLANT, RES_CEMENT, 5);
 	BMat(BL_CEMPLANT, RES_LABOUR, 10);
 	BIn(BL_CEMPLANT, RES_STONE, 5);
 	BIn(BL_CEMPLANT, RES_ENERGY, 5);
+	BIn(BL_CEMPLANT, RES_LABOUR, 5);
 	BOut(BL_CEMPLANT, RES_CEMENT, 10);
 	BDesc(BL_CEMPLANT, "Produces cement from stone.");
+	BSnd(BL_CEMPLANT, BLSND_PROD, "sounds/notif/beep-027.wav");
+	BSnd(BL_CEMPLANT, BLSND_FINI, "sounds/notif/beep-22.wav");
 	
-	DefB(BL_QUARRY, "Quarry", Vec2i(1,1), true, "models/quarry/quarry.ms3d", Vec3f(1,1,1)/32.0f*TILE_SIZE, Vec3f(0,0,0), "models/quarry/quarry.ms3d", Vec3f(1,1,1)/32.0f*TILE_SIZE, Vec3f(0,0,0), FOUNDATION_LAND, RES_NONE);
+#if 1
+	DefB(BL_QUARRY, "Quarry", 
+		Vec2i(1,1), true, 
+		"models/quarry/quarry.ms3d", 
+		Vec3f(1,1,1)/32.0f*TILE_SIZE, Vec3f(0,0,0), 
+		"models/quarry/quarry.ms3d", 
+		Vec3f(1,1,1)/32.0f*TILE_SIZE, Vec3f(0,0,0), 
+		FOUNDATION_LAND, RES_NONE, 1000);
+#else
+	DefB(BL_QUARRY, "Quarry", 
+		Vec2i(1,1), false, 
+		"models/box/quarry/basebuilding.ms3d", 
+		Vec3f(1,1,1)*100, Vec3f(0,0,0), 
+		"models/box/quarry_c/basebuilding.ms3d", 
+		Vec3f(1,1,1)*100, Vec3f(0,0,0), 
+		FOUNDATION_LAND, RES_NONE, 1000);
+#endif
 	BMat(BL_QUARRY, RES_CEMENT, 5);
 	BMat(BL_QUARRY, RES_LABOUR, 10);
 	BIn(BL_QUARRY, RES_ENERGY, 5);
+	BIn(BL_QUARRY, RES_LABOUR, 5);
 	BOut(BL_QUARRY, RES_STONE, 10);
 	BDesc(BL_QUARRY, "Extracts stone.");
+	BSnd(BL_QUARRY, BLSND_PROD, "sounds/notif/beep-28.wav");
+	BSnd(BL_QUARRY, BLSND_FINI, "sounds/notif/beep-22.wav");
 
-	DefB(BL_SMELTER, "Smelter", Vec2i(2,2), true, "models/smelter/smelter.ms3d", Vec3f(1,1,1)/32.0f*TILE_SIZE*2, Vec3f(0,0,0), "models/smelter/smelter.ms3d", Vec3f(1,1,1)/32.0f*TILE_SIZE*2, Vec3f(0,0,0), FOUNDATION_LAND, RES_NONE);
+#if 1
+	DefB(BL_SMELTER, "Smelter", 
+		Vec2i(2,2), true, 
+		"models/smelter/smelter.ms3d", 
+		Vec3f(1,1,1)/32.0f*TILE_SIZE*2, Vec3f(0,0,0), 
+		"models/smelter/smelter.ms3d", 
+		Vec3f(1,1,1)/32.0f*TILE_SIZE*2, Vec3f(0,0,0), 
+		FOUNDATION_LAND, RES_NONE, 1000);
+#else
+	DefB(BL_SMELTER, "Smelter", 
+		Vec2i(2,2), false, 
+		"models/box/smelter/basebuilding.ms3d", 
+		Vec3f(1,1,1)*200, Vec3f(0,0,0), 
+		"models/box/smelter_c/basebuilding.ms3d", 
+		Vec3f(1,1,1)*200, Vec3f(0,0,0), 
+		FOUNDATION_LAND, RES_NONE, 1000);
+#endif
 	BMat(BL_SMELTER, RES_LABOUR, 4);
 	BMat(BL_SMELTER, RES_CEMENT, 3);
 	BMat(BL_SMELTER, RES_STONE, 1);
@@ -485,50 +673,146 @@ void Queue()
 	BIn(BL_SMELTER, RES_CHEMICALS, 10);
 	BOut(BL_SMELTER, RES_METAL, 10);
 	BDesc(BL_SMELTER, "Turns iron ore into metal.");
+	BSnd(BL_SMELTER, BLSND_PROD, "sounds/notif/beep-29.wav");
+	BSnd(BL_SMELTER, BLSND_FINI, "sounds/notif/beep-22.wav");
 
-	DefB(BL_NUCPOW, "Nuclear Powerplant", Vec2i(2,2), false, "models/nucpow2/nucpow2", Vec3f(1,1,1), Vec3f(0,0,0), "models/nucpow2/nucpow2", Vec3f(1,1,1), Vec3f(0,0,0), FOUNDATION_LAND, RES_NONE);
+#if 1
+	DefB(BL_NUCPOW, "Nuclear Powerplant", 
+		Vec2i(2,2), false, 
+		"models/nucpow2/nucpow2", 
+		Vec3f(1,1,1), Vec3f(0,0,0), 
+		"models/nucpow2/nucpow2", 
+		Vec3f(1,1,1), Vec3f(0,0,0), 
+		FOUNDATION_LAND, RES_NONE, 1000);
+#else
+	DefB(BL_NUCPOW, "Nuclear Powerplant", 
+		Vec2i(2,2), false, 
+		"models/box/nucpow/basebuilding.ms3d", 
+		Vec3f(1,1,1)*200, Vec3f(0,0,0), 
+		"models/box/nucpow_c/basebuilding.ms3d", 
+		Vec3f(1,1,1)*200, Vec3f(0,0,0), 
+		FOUNDATION_LAND, RES_NONE, 1000);
+#endif
 	BMat(BL_NUCPOW, RES_CEMENT, 5);
 	BMat(BL_NUCPOW, RES_LABOUR, 10);
 	BIn(BL_NUCPOW, RES_URANIUM, 5);
-	BOut(BL_NUCPOW, RES_ENERGY, 1000);
-	BEmitter(BL_NUCPOW, 0, PARTICLE_EXHAUSTBIG, Vec3f(TILE_SIZE*-0.63f, TILE_SIZE*1.5f, TILE_SIZE*0));
-	BEmitter(BL_NUCPOW, 1, PARTICLE_EXHAUSTBIG, Vec3f(TILE_SIZE*0.17f, TILE_SIZE*1.5f, TILE_SIZE*-0.64f));
+	BIn(BL_NUCPOW, RES_LABOUR, 5);
+	BOut(BL_NUCPOW, RES_ENERGY, 45);
+	//BEmitter(BL_NUCPOW, 0, PARTICLE_EXHAUSTBIG, Vec3f(TILE_SIZE*-0.63f, TILE_SIZE*1.5f, TILE_SIZE*0));
+	//BEmitter(BL_NUCPOW, 1, PARTICLE_EXHAUSTBIG, Vec3f(TILE_SIZE*0.17f, TILE_SIZE*1.5f, TILE_SIZE*-0.64f));
 	BDesc(BL_NUCPOW, "Generates electricity from uranium.");
+	BSnd(BL_NUCPOW, BLSND_PROD, "sounds/notif/beep-30b.wav");
+	BSnd(BL_NUCPOW, BLSND_FINI, "sounds/notif/beep-22.wav");
 
-	DefB(BL_FARM, "Farm", Vec2i(4,2), true, "models/farm2/farm2", Vec3f(1,1,1), Vec3f(0,0,0), "models/farm2/farm2", Vec3f(1,1,1), Vec3f(0,0,0), FOUNDATION_LAND, RES_NONE);
+#if 1
+	DefB(BL_FARM, "Farm", 
+		Vec2i(4,2), true, 
+		"models/farm2/farm2", 
+		Vec3f(1,1,1), Vec3f(0,0,0), 
+		"models/farm2/farm2", 
+		Vec3f(1,1,1), Vec3f(0,0,0), 
+		FOUNDATION_LAND, RES_NONE, 1000);
+#else
+	DefB(BL_FARM, "Farm", 
+		Vec2i(4,2), false, 
+		"models/box/farm/basebuilding.ms3d", 
+		Vec3f(2,1,1)*200, Vec3f(0,0,0), 
+		"models/box/farm_c/basebuilding.ms3d", 
+		Vec3f(2,1,1)*200, Vec3f(0,0,0), 
+		FOUNDATION_LAND, RES_NONE, 1000);
+#endif
 	BMat(BL_FARM, RES_LABOUR, 4);
 	BIn(BL_FARM, RES_LABOUR, 10);
 	BIn(BL_FARM, RES_ENERGY, 1);
 	BIn(BL_FARM, RES_CHEMICALS, 1);
 	BOut(BL_FARM, RES_FARMPRODUCTS, 1900);
 	BDesc(BL_FARM, "Produces farm products, necessary for the production of retail food.");
+	BSnd(BL_FARM, BLSND_PROD, "sounds/notif/button-16.wav");
+	BSnd(BL_FARM, BLSND_FINI, "sounds/notif/beep-22.wav");
 
-	DefB(BL_STORE, "Store", Vec2i(2,1), true, "models/store1/hugterr.ms3d", Vec3f(100,100,100), Vec3f(0,0,0), "models/store1/hugterr.ms3d", Vec3f(100,100,100), Vec3f(0,0,0), FOUNDATION_LAND, RES_NONE);
+#if 1
+	DefB(BL_STORE, "Store", 
+		Vec2i(2,1), true, 
+		"models/store1/hugterr.ms3d", 
+		Vec3f(100,100,100), Vec3f(0,0,0), 
+		"models/store1/hugterr.ms3d", 
+		Vec3f(100,100,100), Vec3f(0,0,0), 
+		FOUNDATION_LAND, RES_NONE, 1000);
+#else
+	DefB(BL_STORE, "Store", 
+		Vec2i(2,1), false, 
+		"models/box/store/basebuilding.ms3d", 
+		Vec3f(2,1,1)*100, Vec3f(0,0,0), 
+		"models/box/store_c/basebuilding.ms3d", 
+		Vec3f(2,1,1)*100, Vec3f(0,0,0), 
+		FOUNDATION_LAND, RES_NONE, 1000);
+#endif
 	BMat(BL_STORE, RES_CEMENT, 5);
 	BMat(BL_STORE, RES_LABOUR, 10);
-	BIn(BL_STORE, RES_ENERGY, 50);
+	BIn(BL_STORE, RES_LABOUR, 5);
+	BIn(BL_STORE, RES_ENERGY, 10);
 	//BIn(BL_STORE, RES_FARMPRODUCTS, 3600);
-	BIn(BL_STORE, RES_FARMPRODUCTS, 3600);
+	BIn(BL_STORE, RES_FARMPRODUCTS, 1600);
 	BIn(BL_STORE, RES_PRODUCTION, 5);
 	//BOut(BL_STORE, RES_RETFOOD, 3600);
 	BOut(BL_STORE, RES_RETFOOD, 3600);
 	BDesc(BL_STORE, "Generates retail food from farm products and production, necessary for labourers to survive and multiply.");
+	BSnd(BL_STORE, BLSND_PROD, "sounds/notif/button-19.wav");
+	BSnd(BL_STORE, BLSND_FINI, "sounds/notif/beep-22.wav");
 
-	DefB(BL_OILWELL, "Oil Well", Vec2i(1,1), false, "models/oilwell2/oilwell2", Vec3f(1,1,1), Vec3f(0,0,0), "models/oilwell2/oilwell2", Vec3f(1,1,1), Vec3f(0,0,0), FOUNDATION_LAND, RES_CRUDEOIL);
+#if 1
+	DefB(BL_OILWELL, "Oil Well", 
+		Vec2i(1,1), false, 
+		"models/oilwell2/oilwell2", 
+		Vec3f(1,1,1), Vec3f(0,0,0), 
+		"models/oilwell2/oilwell2", 
+		Vec3f(1,1,1), Vec3f(0,0,0), 
+		FOUNDATION_LAND, RES_CRUDEOIL, 1000);
+#else
+	DefB(BL_OILWELL, "Oil Well", 
+		Vec2i(1,1), false, 
+		"models/box/oilwell/basebuilding.ms3d", 
+		Vec3f(1,1,1)*100, Vec3f(0,0,0), 
+		"models/box/oilwell_c/basebuilding.ms3d", 
+		Vec3f(1,1,1)*100, Vec3f(0,0,0), 
+		FOUNDATION_LAND, RES_CRUDEOIL, 1000);
+#endif
 	BMat(BL_OILWELL, RES_CEMENT, 5);
 	BMat(BL_OILWELL, RES_LABOUR, 10);
-	BIn(BL_OILWELL, RES_ENERGY, 50);
-	BOut(BL_OILWELL, RES_CRUDEOIL, 5);
+	BIn(BL_OILWELL, RES_ENERGY, 5);
+	BIn(BL_OILWELL, RES_LABOUR, 5);
+	BOut(BL_OILWELL, RES_CRUDEOIL, 100);
 	BDesc(BL_OILWELL, "Pumps up crude oil, necessary for fuel, which is consumed by all road vehicles.");
+	BSnd(BL_OILWELL, BLSND_PROD, "sounds/notif/button-31.wav");
+	BSnd(BL_OILWELL, BLSND_FINI, "sounds/notif/beep-22.wav");
 
-	DefB(BL_MINE, "Mine", Vec2i(1,1), false, "models/mine/nobottom.ms3d", Vec3f(1,1,1)/32.0f*TILE_SIZE, Vec3f(0,0,0), "models/mine/nobottom.ms3d", Vec3f(1,1,1)/32.0f*TILE_SIZE, Vec3f(0,0,0), FOUNDATION_LAND, -1);
+#if 1
+	DefB(BL_MINE, "Mine", 
+		Vec2i(1,1), false, 
+		"models/mine/nobottom.ms3d", 
+		Vec3f(1,1,1)/32.0f*TILE_SIZE, Vec3f(0,0,0), 
+		"models/mine/nobottom.ms3d", 
+		Vec3f(1,1,1)/32.0f*TILE_SIZE, Vec3f(0,0,0), 
+		FOUNDATION_LAND, -1, 1000);
+#else
+	DefB(BL_MINE, "Mine", 
+		Vec2i(1,1), false, 
+		"models/box/mine/basebuilding.ms3d", 
+		Vec3f(1,1,1)*100, Vec3f(0,0,0), 
+		"models/box/mine_c/basebuilding.ms3d", 
+		Vec3f(1,1,1)*100, Vec3f(0,0,0), 
+		FOUNDATION_LAND, -1, 1000);
+#endif
 	BMat(BL_MINE, RES_LABOUR, 4);
 	BMat(BL_MINE, RES_CEMENT, 3);
 	BIn(BL_MINE, RES_LABOUR, 10);
-	BOut(BL_MINE, RES_IRONORE, 5);
+	BIn(BL_MINE, RES_LABOUR, 5);
+	BOut(BL_MINE, RES_IRONORE, 7);
 	BOut(BL_MINE, RES_URANIUM, 5);
 	BOut(BL_MINE, RES_COAL, 5);
 	BDesc(BL_MINE, "Digs up minerals necessary for production at factories, and uranium, necessary for electricity generation at nuclear powerplants.");
+	BSnd(BL_MINE, BLSND_PROD, "sounds/notif/button-32.wav");
+	BSnd(BL_MINE, BLSND_FINI, "sounds/notif/beep-22.wav");
 
 
 	// Conduit types
@@ -536,7 +820,7 @@ void Queue()
 	Vec3f scale(TILE_SIZE/16.0f, TILE_SIZE/16.0f, TILE_SIZE/16.0f);
 	Vec3f trans(0,0,0);
 
-	DefCo(CONDUIT_ROAD, "Road", offsetof(Building,roadnetw), offsetof(Selection,roads), ROAD_MAX_FOREW_INCLINE, ROAD_MAX_SIDEW_INCLINE, false, false, Vec2i(TILE_SIZE/2, TILE_SIZE/2), Vec3f(TILE_SIZE/2, 0, TILE_SIZE/2));
+	DefCo(CONDUIT_ROAD, "Road", offsetof(Building,roadnetw), offsetof(Selection,roads), ROAD_MAX_FOREW_INCLINE, ROAD_MAX_SIDEW_INCLINE, false, false, Vec2i(TILE_SIZE/2, TILE_SIZE/2), Vec3f(TILE_SIZE/2, 0, TILE_SIZE/2), "gui/hover/noroad.png");
 	CoDesc(CONDUIT_ROAD, "Necessary for the transportation of all physical resources between buildings.");
 	CoConMat(CONDUIT_ROAD, RES_LABOUR, 1);
 	CoConMat(CONDUIT_ROAD, RES_CEMENT, 1);
@@ -573,7 +857,7 @@ void Queue()
 	DefConn(CONDUIT_ROAD, CONNECTION_NORTHEASTSOUTH, FINISHED, "models/road/nes.ms3d", scale, trans);
 	DefConn(CONDUIT_ROAD, CONNECTION_NORTHEASTSOUTHWEST, FINISHED, "models/road/nesw.ms3d", scale, trans);
 
-	DefCo(CONDUIT_POWL, "Powerline", offsetof(Building,pownetw), offsetof(Selection,powls), TILE_SIZE*2, TILE_SIZE*2, true, true, Vec2i(0, 0), Vec3f(0, 0, 0));
+	DefCo(CONDUIT_POWL, "Powerline", offsetof(Building,pownetw), offsetof(Selection,powls), TILE_SIZE*2, TILE_SIZE*2, true, true, Vec2i(0, 0), Vec3f(0, 0, 0), "gui/hover/noelec.png");
 	CoDesc(CONDUIT_POWL, "Necessary to conduct electricity between buildings.");
 	CoConMat(CONDUIT_POWL, RES_LABOUR, 1);
 	CoConMat(CONDUIT_POWL, RES_CEMENT, 1);
@@ -611,7 +895,7 @@ void Queue()
 	DefConn(CONDUIT_POWL, CONNECTION_NORTHEASTSOUTHWEST, FINISHED, "models/powl/nesw.ms3d", scale, trans);
 
 	trans = Vec3f(-TILE_SIZE/2, 0, TILE_SIZE/2);
-	DefCo(CONDUIT_CRPIPE, "Crude Oil Pipeline", offsetof(Building,crpipenetw), offsetof(Selection,crpipes), TILE_SIZE*2, TILE_SIZE*2, true, true, Vec2i(0, 0), Vec3f(0, 0, 0));
+	DefCo(CONDUIT_CRPIPE, "Crude Oil Pipeline", offsetof(Building,crpipenetw), offsetof(Selection,crpipes), TILE_SIZE*2, TILE_SIZE*2, true, true, Vec2i(0, 0), Vec3f(0, 0, 0), "gui/hover/nocrude.png");
 	CoDesc(CONDUIT_CRPIPE, "Pumps crude oil between oil wells and refineries.");
 	CoConMat(CONDUIT_CRPIPE, RES_LABOUR, 1);
 	CoConMat(CONDUIT_CRPIPE, RES_CEMENT, 1);
@@ -651,10 +935,35 @@ void Queue()
 
 	// Sounds
 
+#if 0
+#define TRSND_NEWJOB	0
+#define TRSND_DONEJOB	1
+#define TRSND_WORK		2
+#define TR_SOUNDS		3
+
+extern short g_trsnd[TR_SOUNDS];
+#endif
+
+	LoadSound("sounds/notif/button-33a.wav", &g_trsnd[TRSND_NEWJOB]);
+	LoadSound("sounds/notif/button-34.wav", &g_trsnd[TRSND_DONEJOB]);
+	LoadSound("sounds/notif/button-35.wav", &g_trsnd[TRSND_WORK]);
+	
+	//LoadSound("sounds/notif/button-37.wav", &g_labsnd[LABSND_WORK]);
+	LoadSound("sounds/notif/button-41.wav", &g_labsnd[LABSND_WORK]);
+	LoadSound("sounds/notif/button-38.wav", &g_labsnd[LABSND_SHOP]);
+	LoadSound("sounds/notif/beep-22.wav", &g_labsnd[LABSND_REST]);
+
+#if 0
 	g_ordersnd.clear();
 	g_ordersnd.push_back(Sound("sounds/aaa000/gogogo.wav"));
 	g_ordersnd.push_back(Sound("sounds/aaa000/moveout2.wav"));
 	g_ordersnd.push_back(Sound("sounds/aaa000/spreadout.wav"));
 	g_ordersnd.push_back(Sound("sounds/aaa000/wereunderattack3.wav"));
 	//g_zpainSnd.push_back(Sound("sounds/zpain.wav"));
+#endif
+#if 0
+	g_ordersnd.clear();
+	g_ordersnd.push_back(Sound());
+	g_ordersnd[0] = Sound("sounds/aaa000/gogogo.wav");
+#endif
 }

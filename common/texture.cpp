@@ -48,7 +48,7 @@ LoadedTex *LoadBMP(const char *fullpath)
 	{
 		char msg[MAX_PATH+1];
 		sprintf(msg, "Unable to load BMP File: %s", fullpath);
-		ErrorMessage("Error", msg);
+		ErrMess("Error", msg);
 		return NULL;
 	}
 
@@ -129,7 +129,7 @@ LoadedTex *LoadTGA(const char *fullpath)
 	{
 		char msg[MAX_PATH+1];
 		sprintf(msg, "Unable to load TGA File: %s", fullpath);
-		ErrorMessage("Error", msg);
+		ErrMess("Error", msg);
 		return NULL;
 	}
 
@@ -436,7 +436,7 @@ LoadedTex *LoadJPG(const char *fullpath)
 		// Display an error message saying the file was not found, then return NULL
 		char msg[MAX_PATH+1];
 		sprintf(msg, "Unable to load JPG File: %s", fullpath);
-		ErrorMessage("Error", msg);
+		ErrMess("Error", msg);
 		return NULL;
 	}
 

@@ -108,8 +108,8 @@ void PlaceBillboard(int type, Vec3f pos, float size, int particle)
 
 void SortBillboards()
 {
-	Player* py = &g_player[g_curP];
-	Camera* c = &py->camera;
+	Player* py = &g_player[g_localP];
+	Camera* c = &g_cam;
 
 	Vec3f pos = c->m_pos;
 	Vec3f dir = Normalize( c->m_view - c->m_pos );
@@ -166,8 +166,8 @@ void DrawBillboards()
 	BillboardT* t;
 	float size;
 
-	Player* py = &g_player[g_curP];
-	Camera* cam = &py->camera;
+	Player* py = &g_player[g_localP];
+	Camera* cam = &g_cam;
 
 	Vec3f vertical = cam->up2();
 	Vec3f horizontal = cam->m_strafe;
@@ -175,7 +175,7 @@ void DrawBillboards()
 	Vec3f vert, horiz;
 
 	Particle* part;
-	ParticleT* pT;
+	PlType* pT;
 
 	Shader* s = &g_shader[SHADER_BILLBOARD];
 

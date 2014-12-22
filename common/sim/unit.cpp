@@ -1,6 +1,6 @@
 #include "unit.h"
 #include "../render/shader.h"
-#include "unittype.h"
+#include "utype.h"
 #include "../texture.h"
 #include "../utils.h"
 #include "player.h"
@@ -8,13 +8,20 @@
 #include "../math/hmapmath.h"
 #include "unitmove.h"
 #include "simdef.h"
+#include "simflow.h"
 #include "labourer.h"
 #include "../debug.h"
 #include "../math/frustum.h"
 #include "building.h"
 #include "labourer.h"
+#include "truck.h"
 #include "../econ/demand.h"
 #include "../math/vec4f.h"
+#include "../path/pathjob.h"
+
+#ifdef RANDOM8DEBUG
+int thatunit = -1;
+#endif
 
 Unit g_unit[UNITS];
 
@@ -33,6 +40,68 @@ void Unit::destroy()
 {
 	on = false;
 	threadwait = false;
+
+	if(home >= 0)
+		Evict(this);
+
+	if(mode == UMODE_GOSUP
+		//|| mode == GOINGTOREFUEL
+			//|| mode == GOINGTODEMANDERB || mode == GOINGTODEMROAD || mode == GOINGTODEMPIPE || mode == GOINGTODEMPOWL
+				)
+	{
+		if(supplier >= 0)
+		{
+			//Building* b = &g_building[supplier];
+			//b->transporter[cargotype] = -1;
+		}
+	}
+
+	if(type == UNIT_TRUCK)
+	{
+		bool targbl = false;
+		bool targcd = false;
+
+		if( (mode == UMODE_GOSUP || mode == UMODE_ATSUP || mode == UMODE_GOREFUEL || mode == UMODE_REFUELING) && targtype == TARG_BL )
+			targbl = true;
+
+		if( (mode == UMODE_GOSUP || mode == UMODE_ATSUP || mode == UMODE_GOREFUEL || mode == UMODE_REFUELING) && targtype == TARG_CD )
+			targbl = true;
+
+		if(mode == UMODE_GODEMB)
+			targbl = true;
+
+		if(mode == UMODE_ATDEMB)
+			targbl = true;
+
+		if(mode == UMODE_GODEMCD)
+			targcd = true;
+
+		if(mode == UMODE_ATDEMCD)
+			targcd = true;
+
+		if(targtype == TARG_BL)
+			targbl = true;
+		
+		if(targtype == TARG_CD)
+			targcd = true;
+
+		if( targbl )
+		{
+			if(target >= 0)
+			{
+				Building* b = &g_building[target];
+				b->transporter[cargotype] = -1;
+			}
+		}
+		else if( targcd )
+		{
+			if(target >= 0 && target2 >= 0 && cdtype >= 0)
+			{
+				CdTile* ctile = GetCd(cdtype, target, target2, false);
+				ctile->transporter[cargotype] = -1;
+			}
+		}
+	}
 }
 
 void Unit::resetpath()
@@ -45,6 +114,8 @@ void Unit::resetpath()
 
 void DrawUnits()
 {
+	Shader* s = &g_shader[g_curS];
+
 	for(int i=0; i<UNITS; i++)
 	{
 		StartTimer(TIMER_DRAWUMAT);
@@ -64,6 +135,10 @@ void DrawUnits()
 
 		if(!g_frustum.boxin2(vmin.x, vmin.y, vmin.z, vmax.x, vmax.y, vmax.z))
 			continue;
+
+		Player* py = &g_player[u->owner];
+		float* color = py->color;
+		glUniform4f(s->m_slot[SSLOT_OWNCOLOR], color[0], color[1], color[2], color[3]);
 
 		Model* m = &g_model[t->model];
 
@@ -100,6 +175,10 @@ void StartBel(Unit* u)
 
 		u->belongings[ RES_RETFOOD ] = STARTING_RETFOOD;
 		u->belongings[ RES_LABOUR ] = STARTING_LABOUR;
+	}
+	else if(u->type == UNIT_TRUCK)
+	{
+		u->belongings[ RES_FUEL ] = STARTING_FUEL;
 	}
 }
 
@@ -147,7 +226,7 @@ bool PlaceUnit(int type, Vec2i cmpos, int owner, int *reti)
 	Vec2i prevpos;
 	int taskframe;
 	bool pathblocked;
-	int frameslookjobago;
+	int jobframes;
 	int supplier;
 	int reqamt;
 	int targtype;
@@ -173,6 +252,7 @@ bool PlaceUnit(int type, Vec2i cmpos, int owner, int *reti)
 	u->targetu = false;
 	u->underorder = false;
 	u->fuelstation = -1;
+	u->targtype = TARG_NONE;
 	//u->home = -1;
 	StartBel(u);
 	u->hp = t->starthp;
@@ -180,7 +260,7 @@ bool PlaceUnit(int type, Vec2i cmpos, int owner, int *reti)
 	u->prevpos = u->cmpos;
 	u->taskframe = 0;
 	u->pathblocked = false;
-	u->frameslookjobago = 0;
+	u->jobframes = 0;
 	u->supplier = -1;
 	u->reqamt = 0;
 	u->targtype = -1;
@@ -196,6 +276,8 @@ bool PlaceUnit(int type, Vec2i cmpos, int owner, int *reti)
 	u->driver = -1;
 	//u->framesleft = 0;
 	u->cyframes = WORK_DELAY-1;
+	u->cargoamt = 0;
+	u->cargotype = -1;
 
 	u->fillcollider();
 
@@ -220,7 +302,7 @@ bool Unit::hidden() const
 	case UMODE_CDJOB:
 	case UMODE_SHOPPING:
 	case UMODE_RESTING:
-	case UMODE_DRTRANSP:
+	case UMODE_DRIVE:
 	//case UMODE_REFUELING:
 	//case UMODE_ATDEMB:
 	//case UMODE_ATDEMCD:
@@ -235,7 +317,7 @@ void AnimUnit(Unit* u)
 {
 	UType* t = &g_utype[u->type];
 
-	if(u->type == UNIT_ROBOSOLDIER || u->type == UNIT_LABOURER)
+	if(u->type == UNIT_BATTLECOMP || u->type == UNIT_LABOURER)
 	{
 		if(u->prevpos == u->cmpos)
 		{
@@ -253,6 +335,14 @@ void UpdAI(Unit* u)
 
 	if(u->type == UNIT_LABOURER)
 		UpdLab(u);
+	else if(u->type == UNIT_TRUCK)
+		UpdTruck(u);
+}
+
+void UpdCheck(Unit* u)
+{
+	if(u->type == UNIT_LABOURER)
+		UpdLab2(u);
 }
 
 void UpdUnits()
@@ -277,6 +367,8 @@ void UpdUnits()
 		StartTimer(TIMER_MOVEUNIT);
 		MoveUnit(u);
 		StopTimer(TIMER_MOVEUNIT);
+		//must be called after Move... labs without paths are stuck
+		UpdCheck(u);
 		StartTimer(TIMER_ANIMUNIT);
 		AnimUnit(u);
 		StopTimer(TIMER_ANIMUNIT);
@@ -285,17 +377,70 @@ void UpdUnits()
 
 void ResetPath(Unit* u)
 {
+#ifdef HIERDEBUG
+	//if(pathnum == 73)
+	if(u - g_unit == 42)
+	{
+		g_log<<"the 13th unit:"<<std::endl;
+		g_log<<"path reset"<<std::endl;
+		InfoMess("pr", "pr");
+	}
+#endif
+
 	u->path.clear();
+	u->tpath.clear();
+
+#ifdef RANDOM8DEBUG
+	if(u - g_unit == thatunit)
+	{
+		g_log<<"ResetPath u=thatunit"<<std::endl;
+	}
+#endif
 }
 
 void ResetGoal(Unit* u)
 {
+#ifdef HIERDEBUG
+	//if(pathnum == 73)
+	if(u - g_unit == 42)
+	{
+		g_log<<"the 13th unit:"<<std::endl;
+		g_log<<"g reset"<<std::endl;
+		InfoMess("rg", "rg");
+	}
+#endif
+
 	u->goal = u->subgoal = u->cmpos;
 	ResetPath(u);
 }
 
 void ResetMode(Unit* u)
 {
+#ifdef RANDOM8DEBUG
+	if(u - g_unit == thatunit)
+	{
+		g_log<<"\tResetMode u=thatunit"<<std::endl;
+	}
+#endif
+
+#ifdef HIERDEBUG
+	if(u - g_unit == 5 && u->mode == UMODE_GOBLJOB && u->target == 5)
+	{
+		InfoMess("rsu5", "rsu5");
+	}
+#endif
+
+#ifdef HIERDEBUG
+	//if(pathnum == 73)
+	if(u - g_unit == 42)
+	{
+		g_log<<"the 13th unit:"<<std::endl;
+		g_log<<"mode reset"<<std::endl;
+		InfoMess("rm", "rm");
+	}
+#endif
+
+#if 0
 	switch(u->mode)
 	{
 	case UMODE_BLJOB:
@@ -303,7 +448,7 @@ void ResetMode(Unit* u)
 	case UMODE_CDJOB:
 	case UMODE_SHOPPING:
 	case UMODE_RESTING:
-	case UMODE_DRTRANSP:
+	case UMODE_DRIVE:
 	//case UMODE_REFUELING:
 	//case UMODE_ATDEMB:
 	//case UMODE_ATDEMCD:
@@ -312,6 +457,34 @@ void ResetMode(Unit* u)
 		u->fillcollider();
 	default:break;
 	}
+#else
+	if(u->hidden())
+	{
+		u->freecollider();
+		PlaceUAb(u->type, u->cmpos, &u->cmpos);
+		u->drawpos.x = u->cmpos.x;
+		u->drawpos.z = u->cmpos.y;
+		u->drawpos.y = g_hmap.accheight(u->cmpos.x, u->cmpos.y);
+		u->fillcollider();
+	}
+#endif
+
+#if 0
+	//URAN_DEBUG
+	if(u-g_unit == 42)
+	{
+		Building* b = &g_building[5];
+		char msg[1280];
+		sprintf(msg, "ResetMode u13truck culprit \n ur tr:%d tr's mode:%d tr's tar:%d thisb%d targtyp%d \n u->cargotype=%d", 
+			(int)b->transporter[RES_URANIUM], 
+			(int)g_unit[b->transporter[RES_URANIUM]].mode,
+			(int)g_unit[b->transporter[RES_URANIUM]].target,
+			5,
+			(int)g_unit[b->transporter[RES_URANIUM]].targtype,
+			(int)g_unit[b->transporter[RES_URANIUM]].cargotype);
+		InfoMess(msg, msg);
+	}
+#endif
 
 	//LastNum("resetmode 1");
 	if(u->type == UNIT_LABOURER)
@@ -325,7 +498,7 @@ void ResetMode(Unit* u)
 	}
 	else if(u->type == UNIT_TRUCK)
 	{
-#if 0
+#if 1
 		if(u->mode == UMODE_GOSUP
 		                //|| mode == GOINGTOREFUEL
 		                //|| mode == GOINGTODEMANDERB || mode == GOINGTODEMROAD || mode == GOINGTODEMPIPE || mode == GOINGTODEMPOWL
@@ -333,29 +506,54 @@ void ResetMode(Unit* u)
 		{
 			if(u->supplier >= 0)
 			{
+				//necessary?
 				Building* b = &g_building[u->supplier];
-				b->transporter[u->transportRes] = -1;
+				b->transporter[u->cargotype] = -1;
 			}
 		}
-		if((mode == GOINGTOSUPPLIER || mode == GOINGTODEMANDERB) && targtype == GOINGTODEMANDERB)
+
+		bool targbl = false;
+		bool targcd = false;
+
+		if( (u->mode == UMODE_GOSUP || u->mode == UMODE_ATSUP || u->mode == UMODE_GOREFUEL || u->mode == UMODE_REFUELING) && u->targtype == TARG_BL )
+			targbl = true;
+		
+		if( (u->mode == UMODE_GOSUP || u->mode == UMODE_ATSUP || u->mode == UMODE_GOREFUEL || u->mode == UMODE_REFUELING) && u->targtype == TARG_CD )
+			targbl = true;
+		
+		if(u->mode == UMODE_GODEMB)
+			targbl = true;
+
+		if(u->mode == UMODE_ATDEMB)
+			targbl = true;
+
+		if(u->mode == UMODE_GODEMCD)
+			targcd = true;
+
+		if(u->mode == UMODE_ATDEMCD)
+			targcd = true;
+		
+		if(u->targtype == TARG_BL)
+			targbl = true;
+		
+		if(u->targtype == TARG_CD)
+			targcd = true;
+
+		if( targbl )
 		{
-			if(target >= 0)
+			if(u->target >= 0)
 			{
-				CBuilding* b = &g_building[target];
-				b->transporter[transportRes] = -1;
+				Building* b = &g_building[u->target];
+				b->transporter[u->cargotype] = -1;
 			}
 		}
-		else if((mode == GOINGTOSUPPLIER || mode == GOINGTODEMROAD) && targtype == GOINGTODEMROAD)
+		else if( targcd )
 		{
-			RoadAt(target, target2)->transporter[transportRes] = -1;
-		}
-		else if((mode == GOINGTOSUPPLIER || mode == GOINGTODEMPOWL) && targtype == GOINGTODEMPOWL)
-		{
-			PowlAt(target, target2)->transporter[transportRes] = -1;
-		}
-		else if((mode == GOINGTOSUPPLIER || mode == GOINGTODEMPIPE) && targtype == GOINGTODEMPIPE)
-		{
-			PipeAt(target, target2)->transporter[transportRes] = -1;
+			if(u->target >= 0 && u->target2 >= 0 && u->cdtype >= 0)
+			{
+				CdTile* ctile = GetCd(u->cdtype, u->target, u->target2, false);
+				ctile->transporter[u->cargotype] = -1;
+			}
 		}
 #endif
 		u->targtype = TARG_NONE;
@@ -371,172 +569,35 @@ void ResetMode(Unit* u)
 	//LastNum("resetmode 2");
 
 	//transportAmt = 0;
+	u->targtype = TARG_NONE;
 	u->target = u->target2 = -1;
 	u->supplier = -1;
 	u->mode = UMODE_NONE;
 	ResetGoal(u);
+
+	
+#if 0
+	//URAN_DEBUG
+	if(u-g_unit == 42)
+	{
+		Building* b = &g_building[5];
+		char msg[1280];
+		sprintf(msg, "/ResetMode u13truck culprit \n ur tr:%d tr's mode:%d tr's tar:%d thisb%d targtyp%d \n cargty%d", 
+			(int)b->transporter[RES_URANIUM], 
+			(int)g_unit[b->transporter[RES_URANIUM]].mode,
+			(int)g_unit[b->transporter[RES_URANIUM]].target,
+			5,
+			(int)g_unit[b->transporter[RES_URANIUM]].targtype,
+			(int)g_unit[b->transporter[RES_URANIUM]].cargotype);
+		InfoMess(msg, msg);
+	}
+#endif
 
 	//LastNum("resetmode 3");
 }
 
 void ResetTarget(Unit* u)
 {
-	u->target = -1;
 	ResetMode(u);
-}
-
-//draw unit info overlay
-void DrawUOv(Matrix* mvp)
-{
-	Player* py = &g_player[g_curP];
-
-	if(py->zoom < 0.6f)
-		return;
-
-	for(int i=0; i<UNITS; i++)
-	{
-		Unit* u = &g_unit[i];
-
-		if(!u->on)
-			continue;
-
-		if(u->type != UNIT_LABOURER && u->type != UNIT_TRUCK)
-			continue;
-		
-		if(u->hidden())
-			continue;
-
-		if(!g_frustum.pointin(u->drawpos.x, u->drawpos.y, u->drawpos.z))
-			continue;
-
-		Vec4f screenpos = ScreenPos(mvp, u->drawpos, py->width, py->height, true);
-		RichText rt;
-
-		std::string mode;
-		Building* b;
-		BlType* bt;
-		ConduitType* ct;
-
-		switch(u->mode)
-		{
-		case UMODE_NONE:
-			mode = "Idle";	
-			break;
-		case UMODE_GOBLJOB:
-			b = &g_building[u->target];
-			bt = &g_bltype[b->type];
-			mode = "To job (" + std::string(bt->name) + ")";	
-			break;
-		case UMODE_BLJOB:
-			b = &g_building[u->target];
-			bt = &g_bltype[b->type];
-			mode = "At job (" + std::string(bt->name) + ")";	
-			break;
-		case UMODE_GOCSTJOB:
-			b = &g_building[u->target];
-			bt = &g_bltype[b->type];
-			mode = "To job (" + std::string(bt->name) + " construction)";
-			break;
-		case UMODE_CSTJOB:
-			b = &g_building[u->target];
-			bt = &g_bltype[b->type];
-			mode = "At job (" + std::string(bt->name) + " construction)";
-			break;
-		case UMODE_GOCDJOB:
-			ct = &g_cotype[u->cdtype];
-			mode = "To job (" + std::string(ct->name) + " construction)";
-			break;
-		case UMODE_CDJOB:
-			ct = &g_cotype[u->cdtype];
-			mode = "At job (" + std::string(ct->name) + " construction)";
-			break;
-		case UMODE_GOSHOP:
-			mode = "To store";
-			break;
-		case UMODE_SHOPPING:
-			mode = "At store";
-			break;
-		case UMODE_GOREST:
-			mode = "To home";
-			break;
-		case UMODE_RESTING:
-			mode = "At home";
-			break;
-		case UMODE_GOTRANSP:
-			mode = "To job (Trucking)";
-			break;
-		case UMODE_DRTRANSP:
-			mode = "At job (Trucking)";
-			break;
-		case UMODE_GOSUP:
-			b = &g_building[u->target];
-			bt = &g_bltype[b->type];
-			mode = "To supplier (" + std::string(bt->name) + ")";
-			break;
-		case UMODE_GODEMB:
-			b = &g_building[u->target];
-			bt = &g_bltype[b->type];
-			mode = "To demander (" + std::string(bt->name) + ")";
-			break;
-		case UMODE_GOREFUEL:
-			mode = "To refuel";
-			break;
-		case UMODE_REFUELING:
-			mode = "Refueling";
-			break;
-		case UMODE_ATDEMB:
-			b = &g_building[u->target];
-			bt = &g_bltype[b->type];
-			mode = "Offloading (" + std::string(bt->name) + ")";
-			break;
-		case UMODE_ATSUP:
-			b = &g_building[u->target];
-			bt = &g_bltype[b->type];
-			mode = "Loading up (" + std::string(bt->name) + ")";
-			break;
-		case UMODE_GODEMCD:
-			ct = &g_cotype[u->cdtype];
-			mode = "To demander (" + std::string(ct->name) + ")";
-			break;
-		case UMODE_ATDEMCD:
-			ct = &g_cotype[u->cdtype];
-			mode = "Offloading (" + std::string(ct->name) + ")";
-			break;
-		default: 
-			mode = "?";
-			break;
-		}
-
-		rt.m_part.push_back(RichPart(UString(mode.c_str())));
-		DrawCenterShadText(MAINFONT8, screenpos.x, screenpos.y, &rt);
-		
-		RichText rt2;
-		
-		if(u->type == UNIT_LABOURER)
-		{
-			char food[16];
-			char labour[16];
-			char funds[16];
-			
-			sprintf(food, "%d ", u->belongings[RES_RETFOOD]);
-			sprintf(labour, "%d ", u->belongings[RES_LABOUR]);
-			sprintf(funds, "%d ", u->belongings[RES_DOLLARS]);
-			
-			rt2.m_part.push_back(RichPart(RICHTEXT_ICON, ICON_RETFOOD));
-			rt2.m_part.push_back(RichPart(UString(food)));
-			rt2.m_part.push_back(RichPart(RICHTEXT_ICON, ICON_LABOUR));
-			rt2.m_part.push_back(RichPart(UString(labour)));
-			rt2.m_part.push_back(RichPart(RICHTEXT_ICON, ICON_DOLLARS));
-			rt2.m_part.push_back(RichPart(UString(funds)));
-		}
-		else if(u->type == UNIT_TRUCK)
-		{
-		}
-
-		Font* f = &g_font[MAINFONT8];
-		DrawCenterShadText(MAINFONT8, screenpos.x, screenpos.y + f->gheight, &rt2);
-	}
-
-	RichText rt("lkajslkdlads");
-	DrawCenterShadText(MAINFONT32, 100,100, &rt);
+	u->target = -1;
 }

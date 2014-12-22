@@ -5,7 +5,7 @@
 #include "../math/vec3f.h"
 #include "../window.h"
 
-ParticleT g_particleT[PARTICLE_TYPES];
+PlType g_particleT[PARTICLE_TYPES];
 Particle g_particle[PARTICLES];
 
 int NewParticle()
@@ -19,7 +19,7 @@ int NewParticle()
 
 void DefineParticle(int i, char* texpath, int del, float dec, Vec3f minV, Vec3f maxV, Vec3f minA, Vec3f maxA, float minS, float maxS, void (*collision)(Particle* part, Billboard* billb, Vec3f trace, Vec3f normal))
 {
-	ParticleT* t = &g_particleT[i];
+	PlType* t = &g_particleT[i];
 
 	t->billbT = IdentifyBillboard(texpath);
 	t->delay = del;
@@ -63,7 +63,7 @@ void LoadParticles()
 
 void Particle::update(Billboard* billb)
 {
-	ParticleT* t = &g_particleT[type];
+	PlType* t = &g_particleT[type];
 #if 1
 	life -= t->decay * g_drawfrinterval;
 #else
@@ -105,7 +105,7 @@ void EmitParticle(int type, Vec3f pos)
 	if(i < 0)
 		return;
 
-	ParticleT* t = &g_particleT[type];
+	PlType* t = &g_particleT[type];
 	PlaceBillboard(t->billbT, pos, t->minsize, i);
 
 	Particle* p = &g_particle[i];
@@ -116,6 +116,25 @@ void EmitParticle(int type, Vec3f pos)
 	p->vel.y = t->minvelocity.y + t->velvariation.y * (float)(rand()%1000)/1000.0f;
 	p->vel.z = t->minvelocity.z + t->velvariation.z * (float)(rand()%1000)/1000.0f;
 	p->type = type;
+}
+
+void FreeParts()
+{
+	Billboard* b;
+	Particle* p;
+
+	for(int i=0; i<BILLBOARDS; i++)
+	{
+		b = &g_billb[i];
+
+		if(b->particle < 0)
+			continue;
+
+		p = &g_particle[b->particle];
+
+		p->on = false;
+		b->on = false;
+	}
 }
 
 void UpdateParticles()

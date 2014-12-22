@@ -1,2 +1,2 @@
-#define IDI_TRIGEAR  101
+#define IDI_ECON  101
 

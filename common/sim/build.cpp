@@ -1,5 +1,5 @@
 #include "build.h"
-#include "buildingtype.h"
+#include "bltype.h"
 #include "road.h"
 #include "powl.h"
 #include "crpipe.h"
@@ -11,7 +11,7 @@
 #include "../math/hmapmath.h"
 #include "building.h"
 #include "../utils.h"
-#include "unittype.h"
+#include "utype.h"
 #include "unit.h"
 #include "../render/water.h"
 #include "../phys/collision.h"
@@ -23,30 +23,33 @@
 #include "../../game/gmain.h"
 #include "../gui/gui.h"
 #include "../gui/widget.h"
-#include "../gui/widgets/spez/constructionview.h"
+#include "../gui/widgets/spez/cstrview.h"
 #include "../render/foliage.h"
 #include "unitmove.h"
 #include "simdef.h"
+#include "simflow.h"
 #include "../math/fixmath.h"
+#include "../path/pathnode.h"
+#include "job.h"
 
 void UpdSBl()
 {
-	Player* py = &g_player[g_curP];
-	Camera* c = &py->camera;
+	Player* py = &g_player[g_localP];
+	Camera* c = &g_cam;
 
-	if(py->build == BL_NONE)
+	if(g_build == BL_NONE)
 		return;
 
-	//py->vdrag[0] = Vec3f(-1,-1,-1);
-	//py->vdrag[1] = Vec3f(-1,-1,-1);
+	//g_vdrag[0] = Vec3f(-1,-1,-1);
+	//g_vdrag[1] = Vec3f(-1,-1,-1);
 
-	Vec3f ray = ScreenPerspRay(py->mouse.x, py->mouse.y, py->width, py->height, c->zoompos(), c->m_strafe, c->up2(), c->m_view - c->m_pos, FIELD_OF_VIEW);
+	Vec3f ray = ScreenPerspRay(g_mouse.x, g_mouse.y, g_width, g_height, c->zoompos(), c->m_strafe, c->up2(), c->m_view - c->m_pos, FIELD_OF_VIEW);
 
 	Vec3f intersection;
 
 	Vec3f line[2];
 	line[0] = c->zoompos();
-	line[1] = line[0] + ray * MAX_DISTANCE / 3 / py->zoom;
+	line[1] = line[0] + ray * MAX_DISTANCE / 3 / g_zoom;
 
 #if 1
 	if(!FastMapIntersect(&g_hmap, line, &intersection))
@@ -55,100 +58,100 @@ void UpdSBl()
 #endif
 		return;
 
-	if(!py->mousekeys[0])
-		py->vdrag[0] = intersection;
+	if(!g_mousekeys[0])
+		g_vdrag[0] = intersection;
 	else
-		py->vdrag[1] = intersection;
+		g_vdrag[1] = intersection;
 
-	py->canplace = true;
+	g_canplace = true;
 
-	if(py->build < BL_TYPES)
+	if(g_build < BL_TYPES)
 	{
 		Vec2i tilepos (intersection.x/TILE_SIZE, intersection.z/TILE_SIZE);
 
-		py->vdrag[0].x = tilepos.x * TILE_SIZE;
-		py->vdrag[0].z = tilepos.y * TILE_SIZE;
+		g_vdrag[0].x = tilepos.x * TILE_SIZE;
+		g_vdrag[0].z = tilepos.y * TILE_SIZE;
 
-		BlType* t = &g_bltype[py->build];
+		BlType* t = &g_bltype[g_build];
 
 		if(t->widthx%2 == 1)
-			py->vdrag[0].x += TILE_SIZE/2;
-		if(t->widthz%2 == 1)
-			py->vdrag[0].z += TILE_SIZE/2;
+			g_vdrag[0].x += TILE_SIZE/2;
+		if(t->widthy%2 == 1)
+			g_vdrag[0].z += TILE_SIZE/2;
 
-		py->vdrag[0].y = Lowest(tilepos.x, tilepos.y, tilepos.x, tilepos.y);
+		g_vdrag[0].y = Lowest(tilepos.x, tilepos.y, tilepos.x, tilepos.y);
 
-		if(!CheckCanPlace(py->build, tilepos))
+		if(!CheckCanPlace(g_build, tilepos))
 		{
-			py->canplace = false;
-			py->bpcol = g_collidertype;
+			g_canplace = false;
+			g_bpcol = g_collidertype;
 		}
 		//PlaceBl(type, tilepos, true, -1, -1, -1);
 	}
-	else if(py->build >= BL_TYPES && py->build < BL_TYPES+CONDUIT_TYPES)
+	else if(g_build >= BL_TYPES && g_build < BL_TYPES+CONDUIT_TYPES)
 	{
-		int ctype = py->build - BL_TYPES;
+		int ctype = g_build - BL_TYPES;
 
-		if(py->mousekeys[0])
-			UpdCoPlans(ctype, g_localP, py->vdrag[0], py->vdrag[1]);
+		if(g_mousekeys[0])
+			UpdCoPlans(ctype, g_localP, g_vdrag[0], g_vdrag[1]);
 		else
 		{
 			ClearCoPlans(ctype);
-			UpdCoPlans(ctype, g_localP, py->vdrag[0], py->vdrag[0]);
+			UpdCoPlans(ctype, g_localP, g_vdrag[0], g_vdrag[0]);
 		}
 	}
 }
 
 void DrawSBl()
 {
-	Player* py = &g_player[g_curP];
+	Player* py = &g_player[g_localP];
 
-	if(py->build == BL_NONE)
+	if(g_build == BL_NONE)
 		return;
 
 	Shader* s = &g_shader[g_curS];
 
-	if(py->build < BL_TYPES)
+	if(g_build < BL_TYPES)
 	{
 		//g_log<<"dr"<<std::endl;
 
-		if(py->canplace)
+		if(g_canplace)
 			glUniform4f(s->m_slot[SSLOT_COLOR], 1, 1, 1, 0.5f);
 		else
 			glUniform4f(s->m_slot[SSLOT_COLOR], 1, 0, 0, 0.5f);
 
-		const BlType* t = &g_bltype[py->build];
+		const BlType* t = &g_bltype[g_build];
 		Model* m = &g_model[ t->model ];
-		m->draw(0, py->vdrag[0], 0);
+		m->draw(0, g_vdrag[0], 0);
 	}
-	else if(py->build == BL_ROAD)
+	else if(g_build == BL_ROAD)
 	{
 	}
-	else if(py->build == BL_POWL)
+	else if(g_build == BL_POWL)
 	{
 	}
-	else if(py->build == BL_CRPIPE)
+	else if(g_build == BL_CRPIPE)
 	{
 	}
 }
 
 void DrawBReason(Matrix* mvp, float width, float height, bool persp)
 {
-	Player* py = &g_player[g_curP];
+	Player* py = &g_player[g_localP];
 
-	if(py->canplace || py->build == BL_NONE)
+	if(g_canplace || g_build == BL_NONE)
 		return;
 
-	Vec3f pos3 = py->vdrag[0];
+	Vec3f pos3 = g_vdrag[0];
 
-	if(py->build >= BL_TYPES)
-		pos3 = py->vdrag[1];
+	if(g_build >= BL_TYPES)
+		pos3 = g_vdrag[1];
 
 	RichText reason;
 
 	Vec4f pos4 = ScreenPos(mvp, pos3, width, height, persp);
 
-	switch(py->bpcol)
+	switch(g_bpcol)
 	{
 	case COLLIDER_NONE:
 		reason.m_part.push_back(RichPart(UString("")));
@@ -194,7 +197,7 @@ void DrawBReason(Matrix* mvp, float width, float height, bool persp)
 		break;
 	}
 
-	float color[] = {0.9,0.7,0.2,0.8};
+	float color[] = {0.9f,0.7f,0.2f,0.8f};
 	//DrawCenterShadText(MAINFONT32, pos4.x, pos4.y-64, &reason, color, -1);
 	DrawBoxShadText(MAINFONT32, pos4.x-200, pos4.y-64-100, 400, 200, &reason, color, 0, -1);
 }
@@ -208,9 +211,9 @@ bool BlLevel(int type, Vec2i tpos)
 	Vec2i tmax;
 
 	tmin.x = tpos.x - t->widthx/2;
-	tmin.y = tpos.y - t->widthz/2;
+	tmin.y = tpos.y - t->widthy/2;
 	tmax.x = tmin.x + t->widthx;
-	tmax.y = tmin.y + t->widthz;
+	tmax.y = tmin.y + t->widthy;
 
 	float miny = g_hmap.getheight(tmin.x, tmin.y);
 	float maxy = g_hmap.getheight(tmin.x, tmin.y);
@@ -236,7 +239,7 @@ bool BlLevel(int type, Vec2i tpos)
 				if((z==tmin.y || z==tmax.y) && x+1 <= g_hmap.m_widthx && x+1 <= tmax.x && g_hmap.getheight(x+1, z) < WATER_LEVEL)
 					haswater = true;
 				// If x is along building edge and z and z+1 are water tiles
-				if((x==tmin.x || x==tmax.x) && z+1 <= g_hmap.m_widthz && z+1 <= tmax.y && g_hmap.getheight(x, z+1) < WATER_LEVEL)
+				if((x==tmin.x || x==tmax.x) && z+1 <= g_hmap.m_widthy && z+1 <= tmax.y && g_hmap.getheight(x, z+1) < WATER_LEVEL)
 					haswater = true;
 			}
 			// Must have two adjacent land tiles to be road-accessible
@@ -246,7 +249,7 @@ bool BlLevel(int type, Vec2i tpos)
 				if((z==tmin.y || z==tmax.y) && x+1 <= g_hmap.m_widthx && x+1 <= tmax.x && g_hmap.getheight(x+1, z) > WATER_LEVEL)
 					hasland = true;
 				// If x is along building edge and z and z+1 are land tiles
-				if((x==tmin.x || x==tmax.x) && z+1 <= g_hmap.m_widthz && z+1 <= tmax.y && g_hmap.getheight(x, z+1) > WATER_LEVEL)
+				if((x==tmin.x || x==tmax.x) && z+1 <= g_hmap.m_widthy && z+1 <= tmax.y && g_hmap.getheight(x, z+1) > WATER_LEVEL)
 					hasland = true;
 			}
 		}
@@ -325,7 +328,7 @@ bool Offmap(int minx, int minz, int maxx, int maxz)
 {
 	if(minx < 0 || minz < 0
 	                || maxx >= g_hmap.m_widthx*TILE_SIZE
-	                || maxz >= g_hmap.m_widthz*TILE_SIZE)
+	                || maxz >= g_hmap.m_widthy*TILE_SIZE)
 	{
 		g_collidertype = COLLIDER_OFFMAP;
 		return true;
@@ -342,9 +345,9 @@ bool BlCollides(int type, Vec2i tpos)
 	Vec2i tmax;
 
 	tmin.x = tpos.x - t->widthx/2;
-	tmin.y = tpos.y - t->widthz/2;
+	tmin.y = tpos.y - t->widthy/2;
 	tmax.x = tmin.x + t->widthx - 1;
-	tmax.y = tmin.y + t->widthz - 1;
+	tmax.y = tmin.y + t->widthy - 1;
 
 	Vec2i cmmin;
 	Vec2i cmmax;
@@ -352,14 +355,14 @@ bool BlCollides(int type, Vec2i tpos)
 	cmmin.x = tmin.x * TILE_SIZE;
 	cmmin.y = tmin.y * TILE_SIZE;
 	cmmax.x = cmmin.x + t->widthx*TILE_SIZE - 1;
-	cmmax.y = cmmin.y + t->widthz*TILE_SIZE - 1;
+	cmmax.y = cmmin.y + t->widthy*TILE_SIZE - 1;
 
 	if(Offmap(cmmin.x, cmmin.y, cmmax.x, cmmax.y))
 		return true;
 
 	for(int x=tmin.x; x<=tmax.x; x++)
 		for(int z=tmin.y; z<=tmax.y; z++)
-			if(GetCo(CONDUIT_ROAD, x, z, false)->on)
+			if(GetCd(CONDUIT_ROAD, x, z, false)->on)
 			{
 				g_collidertype = COLLIDER_ROAD;
 				return true;
@@ -408,9 +411,9 @@ bool PlaceBl(int type, Vec2i pos, bool finished, int owner, int* bid)
 	Vec2i tmax;
 
 	tmin.x = pos.x - t->widthx/2;
-	tmin.y = pos.y - t->widthz/2;
+	tmin.y = pos.y - t->widthy/2;
 	tmax.x = tmin.x + t->widthx;
-	tmax.y = tmin.y + t->widthz;
+	tmax.y = tmin.y + t->widthy;
 
 	b->drawpos = Vec3f(pos.x*TILE_SIZE, Lowest(tmin.x, tmin.y, tmax.x, tmax.y), pos.y*TILE_SIZE);
 
@@ -421,7 +424,7 @@ bool PlaceBl(int type, Vec2i pos, bool finished, int owner, int* bid)
 	if(t->widthx % 2 == 1)
 		b->drawpos.x += TILE_SIZE/2;
 
-	if(t->widthz % 2 == 1)
+	if(t->widthy % 2 == 1)
 		b->drawpos.z += TILE_SIZE/2;
 
 	b->owner = owner;
@@ -430,7 +433,7 @@ bool PlaceBl(int type, Vec2i pos, bool finished, int owner, int* bid)
 
 	Zero(b->conmat);
 	Zero(b->stocked);
-	Zero(b->prodprice);
+	Zero(b->price);
 	b->propprice = 0;
 	for(int ui=0; ui<UNIT_TYPES; ui++)
 		b->manufprc[ui] = 0;
@@ -445,12 +448,24 @@ bool PlaceBl(int type, Vec2i pos, bool finished, int owner, int* bid)
 	b->prodlevel = RATIO_DENOM;
 	b->capsup.clear();
 
-	int cmminx = tmin.x*TILE_SIZE;
-	int cmminz = tmin.y*TILE_SIZE;
-	int cmmaxx = cmminx + t->widthx*TILE_SIZE;
-	int cmmaxz = cmminz + t->widthz*TILE_SIZE;
+	for(signed char ri=0; ri<RESOURCES; ri++)
+		b->transporter[ri] = -1;
 
-	ClearFol(cmminx, cmminz, cmmaxx, cmmaxz);
+	b->hp = 1;
+
+#if 0
+	int cmminx = tmin.x*TILE_SIZE;
+	int cmminy = tmin.y*TILE_SIZE;
+	int cmmaxx = cmminx + t->widthx*TILE_SIZE;
+	int cmmaxy = cmminy + t->widthy*TILE_SIZE;
+
+	ClearFol(cmminx, cmminy, cmmaxx, cmmaxy);
+#endif
+	for(unsigned char ctype=0; ctype<CONDUIT_TYPES; ctype++)
+	{
+		PruneCo(ctype);
+		ReNetw(ctype);
+	}
 #if 0
 	ClearPowerlines(cmminx, cmminz, cmmaxx, cmmaxz);
 	ClearPipelines(cmminx, cmminz, cmmaxx, cmmaxz);
@@ -462,31 +477,32 @@ bool PlaceBl(int type, Vec2i pos, bool finished, int owner, int* bid)
 #endif
 
 	b->remesh();
+	b->fillcollider();
 
 	if(g_mode == APPMODE_PLAY)
 	{
 		b->allocres();
 		b->inoperation = false;
 
-		if(!b->finished && owner == g_curP)
+		if(!b->finished && owner == g_localP)
 		{
-			Player* py = &g_player[g_curP];
+			Player* py = &g_player[g_localP];
 
-			ClearSel(&py->sel);
-			py->sel.buildings.push_back(i);
+			ClearSel(&g_sel);
+			g_sel.buildings.push_back(i);
 
-			GUI* gui = &py->gui;
-			ConstructionView* cv = (ConstructionView*)gui->get("construction view");
-			cv->regen(&py->sel);
-			gui->open("construction view");
+			GUI* gui = &g_gui;
+			CstrView* cv = (CstrView*)gui->get("cstr view");
+			cv->regen(&g_sel);
+			gui->open("cstr view");
+
+			NewJob(UMODE_GOCSTJOB, i, -1, CONDUIT_NONE);
 		}
 	}
 	else
 	{
 		b->inoperation = true;
 	}
-
-	b->fillcollider();
 
 	return true;
 }
@@ -524,17 +540,17 @@ bool PlaceBAb(int btype, Vec2i tabout, Vec2i* tplace)
 
 			int cmstartx = ttry.x*TILE_SIZE - t->widthx/2;
 			int cmendx = cmstartx + t->widthx - 1;
-			int cmstartz = ttry.y*TILE_SIZE - t->widthz/2;
-			int cmendz = cmstartz + t->widthz - 1;
+			int cmstarty = ttry.y*TILE_SIZE - t->widthy/2;
+			int cmendz = cmstarty + t->widthy - 1;
 
 			if(t->widthx%2 == 1)
 			{
 				cmstartx += TILE_SIZE/2;
 				cmendx += TILE_SIZE/2;
 			}
-			if(t->widthz%2 == 1)
+			if(t->widthy%2 == 1)
 			{
-				cmstartz += TILE_SIZE/2;
+				cmstarty += TILE_SIZE/2;
 				cmendz += TILE_SIZE/2;
 			}
 
@@ -542,9 +558,9 @@ bool PlaceBAb(int btype, Vec2i tabout, Vec2i* tplace)
 				continue;
 			else if(cmendx >= g_hmap.m_widthx * TILE_SIZE)
 				continue;
-			if(cmstartz < 0)
+			if(cmstarty < 0)
 				continue;
-			else if(cmendz >= g_hmap.m_widthz * TILE_SIZE)
+			else if(cmendz >= g_hmap.m_widthy * TILE_SIZE)
 				continue;
 
 			//char msg[128];
@@ -563,17 +579,17 @@ bool PlaceBAb(int btype, Vec2i tabout, Vec2i* tplace)
 
 			int cmstartx = ttry.x*TILE_SIZE - t->widthx/2;
 			int cmendx = cmstartx + t->widthx - 1;
-			int cmstartz = ttry.y*TILE_SIZE - t->widthz/2;
-			int cmendz = cmstartz + t->widthz - 1;
+			int cmstarty = ttry.y*TILE_SIZE - t->widthy/2;
+			int cmendz = cmstarty + t->widthy - 1;
 
 			if(t->widthx%2 == 1)
 			{
 				cmstartx += TILE_SIZE/2;
 				cmendx += TILE_SIZE/2;
 			}
-			if(t->widthz%2 == 1)
+			if(t->widthy%2 == 1)
 			{
-				cmstartz += TILE_SIZE/2;
+				cmstarty += TILE_SIZE/2;
 				cmendz += TILE_SIZE/2;
 			}
 
@@ -581,9 +597,9 @@ bool PlaceBAb(int btype, Vec2i tabout, Vec2i* tplace)
 				continue;
 			else if(cmendx >= g_hmap.m_widthx * TILE_SIZE)
 				continue;
-			if(cmstartz < 0)
+			if(cmstarty < 0)
 				continue;
-			else if(cmendz >= g_hmap.m_widthz * TILE_SIZE)
+			else if(cmendz >= g_hmap.m_widthy * TILE_SIZE)
 				continue;
 
 			//char msg[128];
@@ -602,17 +618,17 @@ bool PlaceBAb(int btype, Vec2i tabout, Vec2i* tplace)
 
 			int cmstartx = ttry.x*TILE_SIZE - t->widthx/2;
 			int cmendx = cmstartx + t->widthx - 1;
-			int cmstartz = ttry.y*TILE_SIZE - t->widthz/2;
-			int cmendz = cmstartz + t->widthz - 1;
+			int cmstarty = ttry.y*TILE_SIZE - t->widthy/2;
+			int cmendz = cmstarty + t->widthy - 1;
 
 			if(t->widthx%2 == 1)
 			{
 				cmstartx += TILE_SIZE/2;
 				cmendx += TILE_SIZE/2;
 			}
-			if(t->widthz%2 == 1)
+			if(t->widthy%2 == 1)
 			{
-				cmstartz += TILE_SIZE/2;
+				cmstarty += TILE_SIZE/2;
 				cmendz += TILE_SIZE/2;
 			}
 
@@ -620,9 +636,9 @@ bool PlaceBAb(int btype, Vec2i tabout, Vec2i* tplace)
 				continue;
 			else if(cmendx >= g_hmap.m_widthx * TILE_SIZE)
 				continue;
-			if(cmstartz < 0)
+			if(cmstarty < 0)
 				continue;
-			else if(cmendz >= g_hmap.m_widthz * TILE_SIZE)
+			else if(cmendz >= g_hmap.m_widthy * TILE_SIZE)
 				continue;
 
 			//char msg[128];
@@ -641,17 +657,17 @@ bool PlaceBAb(int btype, Vec2i tabout, Vec2i* tplace)
 
 			int cmstartx = ttry.x*TILE_SIZE - t->widthx/2;
 			int cmendx = cmstartx + t->widthx - 1;
-			int cmstartz = ttry.y*TILE_SIZE - t->widthz/2;
-			int cmendz = cmstartz + t->widthz - 1;
+			int cmstarty = ttry.y*TILE_SIZE - t->widthy/2;
+			int cmendz = cmstarty + t->widthy - 1;
 
 			if(t->widthx%2 == 1)
 			{
 				cmstartx += TILE_SIZE/2;
 				cmendx += TILE_SIZE/2;
 			}
-			if(t->widthz%2 == 1)
+			if(t->widthy%2 == 1)
 			{
-				cmstartz += TILE_SIZE/2;
+				cmstarty += TILE_SIZE/2;
 				cmendz += TILE_SIZE/2;
 			}
 
@@ -659,9 +675,9 @@ bool PlaceBAb(int btype, Vec2i tabout, Vec2i* tplace)
 				continue;
 			else if(cmendx >= g_hmap.m_widthx * TILE_SIZE)
 				continue;
-			if(cmstartz < 0)
+			if(cmstarty < 0)
 				continue;
-			else if(cmendz >= g_hmap.m_widthz * TILE_SIZE)
+			else if(cmendz >= g_hmap.m_widthy * TILE_SIZE)
 				continue;
 
 			//char msg[128];
@@ -689,7 +705,7 @@ bool PlaceBAb(int btype, Vec2i tabout, Vec2i* tplace)
 		//Chat(msg);
 
 		shell++;
-	} while(shell < g_hmap.m_widthx || shell < g_hmap.m_widthz);
+	} while(shell < g_hmap.m_widthx || shell < g_hmap.m_widthy);
 
 	return false;
 }
@@ -698,7 +714,11 @@ bool PlaceBAb(int btype, Vec2i tabout, Vec2i* tplace)
 bool PlaceUAb(int utype, Vec2i cmabout, Vec2i* cmplace)
 {
 	UType* t = &g_utype[utype];
-	int shell = 0;
+	int shell = 1;
+	//important: units must be occupying a single free pathnode,
+	//or have a space of free pathnodes about them
+	int size = imax(t->size.x, PATHNODE_SIZE)*2;
+	//int size = PATHNODE_SIZE * 2;
 
 	do
 	{
@@ -706,30 +726,33 @@ bool PlaceUAb(int utype, Vec2i cmabout, Vec2i* cmplace)
 		Vec2i cmtry;
 		int cmx, cmz;
 		int left, right, top, bottom;
-		left = cmabout.x - shell*t->size.x;
-		top = cmabout.y - shell*t->size.z;
-		right = cmabout.x + shell*t->size.x;
-		bottom = cmabout.y + shell*t->size.z;
+		left = cmabout.x - shell*size;
+		top = cmabout.y - shell*size;
+		right = cmabout.x + shell*size;
+		bottom = cmabout.y + shell*size;
 
-		//canplace.reserve( (right-left)*2/t->size.x + (bottom-top)*2/t->size.z );
+		//canplace.reserve( (right-left)*2/size + (bottom-top)*2/size );
 
 		cmz = top;
-		for(cmx=left; cmx<right; cmx++)
+		for(cmx=left; cmx<right; cmx+=size)
 		{
 			cmtry = Vec2i(cmx, cmz);
+			//align to boundary. only works for odd multiple of PATHNODE_SIZE.
+			//cmtry = cmtry / PATHNODE_SIZE;
+			//cmtry = cmtry * PATHNODE_SIZE;
 
-			int cmstartx = cmtry.x - t->size.x/2;
-			int cmendx = cmstartx + t->size.x - 1;
-			int cmstartz = cmtry.y - t->size.z/2;
-			int cmendz = cmstartz + t->size.z - 1;
+			int cmstartx = cmtry.x - size/2;
+			int cmendx = cmstartx + size - 1;
+			int cmstarty = cmtry.y - size/2;
+			int cmendz = cmstarty + size - 1;
 
 			if(cmstartx < 0)
 				continue;
 			else if(cmendx >= g_hmap.m_widthx * TILE_SIZE)
 				continue;
-			if(cmstartz < 0)
+			if(cmstarty < 0)
 				continue;
-			else if(cmendz >= g_hmap.m_widthz * TILE_SIZE)
+			else if(cmendz >= g_hmap.m_widthy * TILE_SIZE)
 				continue;
 
 			//if(!CheckCanPlace(btype, cmtry))
@@ -739,22 +762,24 @@ bool PlaceUAb(int utype, Vec2i cmabout, Vec2i* cmplace)
 		}
 
 		cmx = right;
-		for(cmz=top; cmz<bottom; cmz++)
+		for(cmz=top; cmz<bottom; cmz+=size)
 		{
 			cmtry = Vec2i(cmx, cmz);
+			//cmtry = cmtry / PATHNODE_SIZE;
+			//cmtry = cmtry * PATHNODE_SIZE;
 
-			int cmstartx = cmtry.x - t->size.x/2;
-			int cmendx = cmstartx + t->size.x - 1;
-			int cmstartz = cmtry.y - t->size.z/2;
-			int cmendz = cmstartz + t->size.z - 1;
+			int cmstartx = cmtry.x - size/2;
+			int cmendx = cmstartx + size - 1;
+			int cmstarty = cmtry.y - size/2;
+			int cmendz = cmstarty + size - 1;
 
 			if(cmstartx < 0)
 				continue;
 			else if(cmendx >= g_hmap.m_widthx * TILE_SIZE)
 				continue;
-			if(cmstartz < 0)
+			if(cmstarty < 0)
 				continue;
-			else if(cmendz >= g_hmap.m_widthz * TILE_SIZE)
+			else if(cmendz >= g_hmap.m_widthy * TILE_SIZE)
 				continue;
 
 			if(UnitCollides(NULL, cmtry, utype))
@@ -763,22 +788,24 @@ bool PlaceUAb(int utype, Vec2i cmabout, Vec2i* cmplace)
 		}
 
 		cmz = bottom;
-		for(cmx=right; cmx>left; cmx--)
+		for(cmx=right; cmx>left; cmx-=size)
 		{
 			cmtry = Vec2i(cmx, cmz);
+			//cmtry = cmtry / PATHNODE_SIZE;
+			//cmtry = cmtry * PATHNODE_SIZE;
 
-			int cmstartx = cmtry.x - t->size.x/2;
-			int cmendx = cmstartx + t->size.x - 1;
-			int cmstartz = cmtry.y - t->size.z/2;
-			int cmendz = cmstartz + t->size.z - 1;
+			int cmstartx = cmtry.x - size/2;
+			int cmendx = cmstartx + size - 1;
+			int cmstarty = cmtry.y - size/2;
+			int cmendz = cmstarty + size - 1;
 
 			if(cmstartx < 0)
 				continue;
 			else if(cmendx >= g_hmap.m_widthx * TILE_SIZE)
 				continue;
-			if(cmstartz < 0)
+			if(cmstarty < 0)
 				continue;
-			else if(cmendz >= g_hmap.m_widthz * TILE_SIZE)
+			else if(cmendz >= g_hmap.m_widthy * TILE_SIZE)
 				continue;
 
 			if(UnitCollides(NULL, cmtry, utype))
@@ -787,22 +814,24 @@ bool PlaceUAb(int utype, Vec2i cmabout, Vec2i* cmplace)
 		}
 
 		cmx = left;
-		for(cmz=bottom; cmz>top; cmz--)
+		for(cmz=bottom; cmz>top; cmz-=size)
 		{
 			cmtry = Vec2i(cmx, cmz);
+			//cmtry = cmtry / PATHNODE_SIZE;
+			//cmtry = cmtry * PATHNODE_SIZE;
 
-			int cmstartx = cmtry.x - t->size.x/2;
-			int cmendx = cmstartx + t->size.x - 1;
-			int cmstartz = cmtry.y - t->size.z/2;
-			int cmendz = cmstartz + t->size.z - 1;
+			int cmstartx = cmtry.x - size/2;
+			int cmendx = cmstartx + size - 1;
+			int cmstarty = cmtry.y - size/2;
+			int cmendz = cmstarty + size - 1;
 
 			if(cmstartx < 0)
 				continue;
 			else if(cmendx >= g_hmap.m_widthx * TILE_SIZE)
 				continue;
-			if(cmstartz < 0)
+			if(cmstarty < 0)
 				continue;
-			else if(cmendz >= g_hmap.m_widthz * TILE_SIZE)
+			else if(cmendz >= g_hmap.m_widthy * TILE_SIZE)
 				continue;
 
 			if(UnitCollides(NULL, cmtry, utype))
@@ -818,7 +847,7 @@ bool PlaceUAb(int utype, Vec2i cmabout, Vec2i* cmplace)
 		}
 
 		shell++;
-	} while(shell < g_hmap.m_widthx || shell < g_hmap.m_widthz);
+	} while(shell < g_hmap.m_widthx || shell < g_hmap.m_widthy);
 
 	return false;
 }

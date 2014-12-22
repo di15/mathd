@@ -3,9 +3,9 @@
 #include "../math/vec2i.h"
 #include "../math/3dmath.h"
 #include "../sim/unit.h"
-#include "../sim/unittype.h"
+#include "../sim/utype.h"
 #include "../sim/building.h"
-#include "../sim/buildingtype.h"
+#include "../sim/bltype.h"
 #include "../render/heightmap.h"
 #include "../math/hmapmath.h"
 #include "../phys/collision.h"
@@ -24,9 +24,9 @@
 #include "pathjob.h"
 
 // Calculates a path.
-void JPSPartPath(int utype, int umode, int cmstartx, int cmstartz, int target, int target2, int targtype,
+void JPSPartPath(int utype, int umode, int cmstartx, int cmstarty, int target, int target2, int targtype,
                  std::list<Vec2i> *path, Vec2i *subgoal, Unit* thisu, Unit* ignoreu, Building* ignoreb,
-                 int cmgoalx, int cmgoalz, int cmgoalminx, int cmgoalminz, int cmgoalmaxx, int cmgoalmaxz,
+                 int cmgoalx, int cmgoalz, int cmgoalminx, int cmgoalminy, int cmgoalmaxx, int cmgoalmaxy,
                  int maxsearch)
 {
 	UType* ut = &g_utype[utype];
@@ -35,7 +35,7 @@ void JPSPartPath(int utype, int umode, int cmstartx, int cmstartz, int target, i
 	pj->utype = utype;
 	pj->umode = umode;
 	pj->cmstartx = cmstartx;
-	pj->cmstartz = cmstartz;
+	pj->cmstarty = cmstarty;
 	pj->target = target;
 	pj->target2 = target2;
 	pj->targtype = targtype;
@@ -44,14 +44,14 @@ void JPSPartPath(int utype, int umode, int cmstartx, int cmstartz, int target, i
 	pj->thisu = thisu ? thisu - g_unit : -1;
 	pj->ignoreu = ignoreu ? ignoreu - g_unit : -1;
 	pj->ignoreb = ignoreb ? ignoreb - g_building : -1;
-	pj->cmgoalx = (cmgoalminx+cmgoalmaxx)/2;
-	pj->cmgoalz = (cmgoalminz+cmgoalmaxz)/2;
-	pj->ngoalx = pj->cmgoalx / PATHNODE_SIZE;
-	pj->ngoalz = pj->cmgoalz / PATHNODE_SIZE;
-	pj->cmgoalminx = cmgoalminx;
-	pj->cmgoalminz = cmgoalminz;
-	pj->cmgoalmaxx = cmgoalmaxx;
-	pj->cmgoalmaxz = cmgoalmaxz;
+	pj->goalx = (cmgoalminx+cmgoalmaxx)/2;
+	pj->goalz = (cmgoalminy+cmgoalmaxy)/2;
+	pj->goalx = pj->goalx / PATHNODE_SIZE;
+	pj->goalz = pj->goalz / PATHNODE_SIZE;
+	pj->goalminx = cmgoalminx;
+	pj->goalminy = cmgoalminy;
+	pj->goalmaxx = cmgoalmaxx;
+	pj->goalmaxy = cmgoalmaxy;
 	pj->roaded = ut->roaded;
 	pj->landborne = ut->landborne;
 	pj->seaborne = ut->seaborne;
@@ -59,13 +59,16 @@ void JPSPartPath(int utype, int umode, int cmstartx, int cmstartz, int target, i
 	pj->callback = Callback_UnitPath;
 	pj->pjtype = PATHJOB_JPSPART;
 	pj->maxsearch = maxsearch;
+	pj->cmgoal = Vec2i(cmgoalx, cmgoalz);
 
+#if 0
 	int sqmax = sqrt(maxsearch);
 	int diagw = (sqmax - 1) / 2;
 
 	pj->maxsubdiag = diagw;
 	pj->maxsubdiagstraight = diagw;
 	pj->maxsubstraight = diagw;
+#endif
 
 	// Returns the path from location `<startX, startY>` to location `<endX, endY>`.
 	//return function(finder, startNode, endNode, clearance, toClear)

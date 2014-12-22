@@ -35,7 +35,15 @@
 #define TIMER_DRAWUMAT			28
 #define TIMER_DRAWUTEXBIND		29
 #define TIMER_DRAWUGL			30
-#define TIMERS					31
+#define TIMER_MANAGETRIPS		31
+#define TIMER_UPDLAB			32
+#define TIMER_UPDTRUCK			33
+#define TIMER_FINDJOB			34
+#define TIMER_JOBLIST			35
+#define TIMER_JOBSORT			36
+#define TIMER_JOBPATH			37
+#define TIMER_RESETPATHNODES	38
+#define TIMERS					39
 
 class Timer
 {
@@ -45,7 +53,7 @@ public:
 	int lastframe;
 	int frames;
 	//double framems;
-	long long starttick;
+	unsigned long long starttick;
 	//double timescountedperframe;
 	//double lastframeaverage;
 	int lastframeelapsed;
@@ -62,6 +70,7 @@ public:
 };
 
 extern Timer g_profile[TIMERS];
+extern bool g_debuglines;
 
 void StartTimer(int id);
 void StopTimer(int id);
@@ -83,6 +92,8 @@ void CheckGLError(const char* file, int line);
 #define CheckMem(a,b,c) (void)0
 #endif
 
+#ifndef MATCHMAKER
 GLvoid APIENTRY GLMessageHandler(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, GLvoid* userParam);
+#endif
 
 #endif	//DEBUG_H

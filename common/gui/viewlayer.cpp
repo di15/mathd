@@ -9,6 +9,8 @@ void ViewLayer::draw()
 
 	for(auto w=m_subwidg.begin(); w!=m_subwidg.end(); w++)
 		(*w)->draw();
+
+	subdraw();
 }
 
 void ViewLayer::drawover()
@@ -18,29 +20,35 @@ void ViewLayer::drawover()
 
 	for(auto w=m_subwidg.begin(); w!=m_subwidg.end(); w++)
 		(*w)->drawover();
+
+	subdrawover();
 }
 
-void ViewLayer::inev(InEv* ev)
+void ViewLayer::inev(InEv* ie)
 {
 	if(!m_opened)
 		return;
 
 	for(auto w=m_subwidg.rbegin(); w!=m_subwidg.rend(); w++)
-		(*w)->inev(ev);
+		(*w)->inev(ie);
+
+	subinev(ie);
 }
 
 void ViewLayer::reframe()
 {
-	Player* py = &g_player[g_curP];
+	Player* py = &g_player[g_localP];
 
 	m_pos[0] = 0;
 	m_pos[1] = 0;
-	m_pos[2] = py->width-(float)1;
-	m_pos[3] = py->height-(float)1;
+	m_pos[2] = g_width-(float)1;
+	m_pos[3] = g_height-(float)1;
 
 	if(reframefunc)
 		reframefunc(this);
 
 	for(auto w=m_subwidg.begin(); w!=m_subwidg.end(); w++)
 		(*w)->reframe();
+
+	subreframe();
 }

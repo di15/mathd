@@ -8,7 +8,7 @@
 #include "widgets/barbutton.h"
 #include "widgets/button.h"
 #include "widgets/checkbox.h"
-#include "widgets/dropdowns.h"
+#include "widgets/droplist.h"
 #include "widgets/editbox.h"
 #include "widgets/insdraw.h"
 #include "widgets/link.h"
@@ -92,12 +92,14 @@ public:
 	}
 
 	void draw();
-	void inev(InEv* ev);
+	void inev(InEv* ie);
 	void closeall();
 	void close(const char* name);
 	void open(const char* name);
 	void reframe();
 };
+
+extern GUI g_gui;
 
 bool MousePosition();
 void CenterMouse();

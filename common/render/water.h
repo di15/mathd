@@ -15,7 +15,7 @@ extern unsigned int g_water;
 void DrawWater();
 void DrawWater2();
 void DrawWater3();
-void AllocWater(int wx, int wz);
+void AllocWater(int wx, int wy);
 void FreeWater();
 
 #endif

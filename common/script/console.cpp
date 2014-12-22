@@ -5,32 +5,32 @@
 void Resize_ConsoleLine(Widget* thisw)
 {
 	Font* f = &g_font[thisw->m_font];
-	Player* py = &g_player[g_curP];
+	Player* py = &g_player[g_localP];
 
 	int i = 0;
 	sscanf(thisw->m_name.c_str(), "%d", &i);
 
 	thisw->m_pos[0] = 0;
 	thisw->m_pos[1] = 30 + f->gheight * i;
-	thisw->m_pos[2] = py->width;
+	thisw->m_pos[2] = g_width;
 	thisw->m_pos[3] = 30 + f->gheight * (i+1);
 }
 
 void Resize_Console(Widget* thisw)
 {
 	Font* f = &g_font[thisw->m_font];
-	Player* py = &g_player[g_curP];
+	Player* py = &g_player[g_localP];
 	int i = CONSOLE_LINES;
 	thisw->m_pos[0] = 0;
 	thisw->m_pos[1] = 30 + f->gheight * i;
-	thisw->m_pos[2] = py->width;
+	thisw->m_pos[2] = g_width;
 	thisw->m_pos[3] = 30 + f->gheight * (i+1);
 }
 
 void Change_Console(unsigned int key, unsigned int scancode, bool down, int parm)
 {
-	Player* py = &g_player[g_curP];
-	GUI* gui = &py->gui;
+	Player* py = &g_player[g_localP];
+	GUI* gui = &g_gui;
 	ViewLayer* conview = (ViewLayer*)gui->get("console");
 	EditBox* con = (EditBox*)conview->get("console");
 
@@ -43,7 +43,7 @@ void Change_Console(unsigned int key, unsigned int scancode, bool down, int parm
 	unsigned int enter = con->m_value.substr(caret-1, 1).m_part.begin()->m_text.m_data[0];
 
 	if(enter == '\n' || enter == '\r')
-		InfoMessage("console", "enter");
+		InfoMess("console", "enter");
 #endif
 
 	if(scancode == SDL_SCANCODE_ESCAPE && !down)
@@ -52,13 +52,16 @@ void Change_Console(unsigned int key, unsigned int scancode, bool down, int parm
 
 void SubmitConsole(RichText* rt)
 {
-	Player* py = &g_player[g_curP];
-	GUI* gui = &py->gui;
+	//return;
+
+	Player* py = &g_player[g_localP];
+	GUI* gui = &g_gui;
 
 	gui->add(new ViewLayer(gui, "console"));
 	ViewLayer* con = (ViewLayer*)gui->get("console");
 
 	auto witer = con->m_subwidg.begin();
+	witer++;	//skip bg image widget
 	for(int i=0; i<CONSOLE_LINES-1; i++)
 	{
 		auto witer2 = witer;
@@ -74,24 +77,45 @@ void SubmitConsole(RichText* rt)
 
 void Submit_Console()
 {
-	Player* py = &g_player[g_curP];
-	GUI* gui = &py->gui;
+	Player* py = &g_player[g_localP];
+	GUI* gui = &g_gui;
 
 	gui->add(new ViewLayer(gui, "console"));
 	ViewLayer* con = (ViewLayer*)gui->get("console");
 
 	EditBox* coned = (EditBox*)con->get("console");
 	SubmitConsole(&coned->m_value);
-	coned->changevalue("");
+	RichText blank("");
+	coned->changevalue(&blank);
+}
+
+void Resize_Con_BG(Widget* thisw)
+{
+	Player* py = &g_player[g_localP];
+	Font* f = &g_font[MAINFONT16];
+
+	thisw->m_pos[0] = 0;
+	thisw->m_pos[1] = 0;
+	thisw->m_pos[2] = g_width;
+	thisw->m_pos[3] = CONSOLE_LINES * f->gheight + 30;
+
+	Texture* bg = &g_texture[ thisw->m_tex ];
+
+	thisw->m_texc[0] = 0;
+	thisw->m_texc[1] = 0;
+	thisw->m_texc[2] = (thisw->m_pos[2] - thisw->m_pos[0]) / (float)bg->width;
+	thisw->m_texc[3] = (thisw->m_pos[3] - thisw->m_pos[1]) / (float)bg->height;
 }
 
 void FillConsole()
 {
-	Player* py = &g_player[g_curP];
-	GUI* gui = &py->gui;
+	Player* py = &g_player[g_localP];
+	GUI* gui = &g_gui;
 
 	gui->add(new ViewLayer(gui, "console"));
 	ViewLayer* con = (ViewLayer*)gui->get("console");
+
+	con->add(new Image(gui, "gui/backg/svlistbg.jpg", false, Resize_Con_BG, 1, 1, 1, 0.7f));
 
 	int y = 30;
 	for(int i=0; i<CONSOLE_LINES; i++)
@@ -106,8 +130,8 @@ void FillConsole()
 
 void ToggleConsole()
 {
-	Player* py = &g_player[g_curP];
-	GUI* gui = &py->gui;
+	Player* py = &g_player[g_localP];
+	GUI* gui = &g_gui;
 	ViewLayer* con = (ViewLayer*)gui->get("console");
 	con->get("console")->m_opened = true;
 	con->m_opened =! con->m_opened;

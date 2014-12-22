@@ -23,5 +23,6 @@ class Matrix;
 
 void DrawTransactions(Matrix projmodlview);
 void NewTransx(Vec3f pos, const RichText* rtext);
+void FreeTransx();
 
 #endif

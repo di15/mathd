@@ -9,12 +9,13 @@
 //#include "building.h"
 #include "gui/gui.h"
 #include "gui/widget.h"
-#include "gui/widgets/spez/constructionview.h"
+#include "gui/widgets/spez/cstrview.h"
 #include "sim/player.h"
 #include "window.h"
 #include "../game/gmain.h"
 
 Timer g_profile[TIMERS];
+ bool g_debuglines = false;
 std::ofstream g_profF;
 
 void StartTimer(int id)
@@ -41,7 +42,7 @@ void StopTimer(int id)
 	}
 #endif
 
-	unsigned int elapsed = GetTickCount() - g_profile[id].starttick;
+	unsigned long long elapsed = GetTickCount64() - g_profile[id].starttick;
 	g_profile[id].starttick = GetTickCount();
 	g_profile[id].lastframeelapsed += elapsed;
 
@@ -162,9 +163,17 @@ void InitProfiles()
 	DefTimer(TIMER_DRAWGUI, TIMER_DRAW, "DrawGUI();");
 	DefTimer(TIMER_DRAWMINIMAP, TIMER_DRAW, "DrawMinimap();");
 	DefTimer(TIMER_UPDATE, TIMER_FRAME, "Update();");
+	DefTimer(TIMER_RESETPATHNODES, TIMER_UPDATE, "ResetPathNodes();");
+	DefTimer(TIMER_MANAGETRIPS, TIMER_UPDATE, "ManageTrips();");
 	DefTimer(TIMER_UPDATEUNITS, TIMER_UPDATE, "UpdUnits();");
 	DefTimer(TIMER_UPDUONCHECK, TIMER_UPDATEUNITS, "Upd U On Ch");
 	DefTimer(TIMER_UPDUNITAI, TIMER_UPDATEUNITS, "Upd Unit AI");
+	DefTimer(TIMER_UPDLAB, TIMER_UPDUNITAI, "UpdLab();");
+	DefTimer(TIMER_UPDTRUCK, TIMER_UPDUNITAI, "UpdTruck();");
+	DefTimer(TIMER_FINDJOB, TIMER_UPDLAB, "FindJob();");
+	DefTimer(TIMER_JOBLIST, TIMER_FINDJOB, "Job list collection");
+	DefTimer(TIMER_JOBSORT, TIMER_FINDJOB, "Job list sort");
+	DefTimer(TIMER_JOBPATH, TIMER_FINDJOB, "Job prepathing");
 	DefTimer(TIMER_MOVEUNIT, TIMER_UPDATEUNITS, "Move Unit");
 	DefTimer(TIMER_ANIMUNIT, TIMER_UPDATEUNITS, "Anim Unit");
 	DefTimer(TIMER_UPDATEBUILDINGS, TIMER_UPDATE, "UpdBls();");
@@ -174,7 +183,7 @@ void InitProfiles()
 	DefTimer(TIMER_DRAWWATER, TIMER_DRAW, "DrawWater();");
 	DefTimer(TIMER_DRAWCRPIPES, TIMER_DRAW, "DrawCrPipes();");
 	DefTimer(TIMER_DRAWPOWLS, TIMER_DRAW, "DrawPowls();");
-	DefTimer(TIMER_DRAWFOLIAGE, TIMER_DRAW, "DrawFoliage();");
+	DefTimer(TIMER_DRAWFOLIAGE, TIMER_DRAW, "DrawFol();");
 	DefTimer(TIMER_SORTPARTICLES, TIMER_DRAW, "SortParticles();");
 	DefTimer(TIMER_DRAWPARTICLES, TIMER_DRAW, "DrawParticles();");
 	DefTimer(TIMER_DRAWMAP, TIMER_DRAW, "DrawMap();");
@@ -212,7 +221,7 @@ void CheckGLError(const char* file, int line)
 {
 	//char msg[2048];
 	//sprintf(msg, "Failed to allocate memory in %s on line %d.", file, line);
-	//ErrorMessage("Out of memory", msg);
+	//ErrMess("Out of memory", msg);
 	int error = glGetError();
 
 	if(error == GL_NO_ERROR)
@@ -310,6 +319,6 @@ void CheckMem(const char* file, int line, const char* sep)
 
 GLvoid APIENTRY GLMessageHandler(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, GLvoid* userParam)
 {
-	//ErrorMessage("GL Error", message);
+	//ErrMess("GL Error", message);
 	g_log<<"GL Message: "<<message<<std::endl;
 }

@@ -1,3 +1,4 @@
+
 #include "../widget.h"
 #include "barbutton.h"
 #include "button.h"
@@ -41,7 +42,7 @@ void DropDownS::erase(int which)
 		m_selected = -1;
 
 	if(m_scroll[1] + rowsshown() > m_options.size())
-		m_scroll[1] = m_options.size() - (float)rowsshown();
+		m_scroll[1] = m_options.size() - rowsshown();
 
 	if(m_scroll[1] < 0)
 		m_scroll[1] = 0;
@@ -59,7 +60,7 @@ int DropDownS::rowsshown()
 
 int DropDownS::square()
 {
-	return (int)g_font[m_font].gheight;
+	return g_font[m_font].gheight;
 }
 
 float DropDownS::scrollspace()
@@ -90,7 +91,7 @@ void DropDownS::draw()
 		return;
 	}
 
-	if(m_selected >= (int)m_options.size())
+	if(m_selected >= m_options.size())
 		return;
 
 	DrawShadowedText(m_font, m_pos[0]+3, m_pos[1], &m_options[m_selected]);
@@ -156,7 +157,7 @@ void DropDownS::inev(InEv* ev)
 		}
 		else if(m_scroll[1] + rowsshown() > m_options.size())
 		{
-			m_scroll[1] = m_options.size() - (float)rowsshown();
+			m_scroll[1] = m_options.size() - rowsshown();
 			ev->intercepted = true;
 			return;
 		}
@@ -172,7 +173,7 @@ void DropDownS::inev(InEv* ev)
 			{
 				// std::list item?
 				if(py->mouse.x >= m_pos[0] && py->mouse.x <= m_pos[2]-square() && py->mouse.y >= m_pos[3]+g_font[m_font].gheight*(i-(int)m_scroll[1])
-				                && py->mouse.y <= m_pos[3]+g_font[m_font].gheight*(i-(int)m_scroll[1]+1))
+						&& py->mouse.y <= m_pos[3]+g_font[m_font].gheight*(i-(int)m_scroll[1]+1))
 				{
 					m_ldown = true;
 					ev->intercepted = true;
@@ -182,7 +183,7 @@ void DropDownS::inev(InEv* ev)
 
 			// scroll bar?
 			if(py->mouse.x >= m_pos[2]-square() && py->mouse.y >= m_pos[3]+scrollspace()*topratio() && py->mouse.x <= m_pos[2] &&
-			                py->mouse.y <= m_pos[3]+scrollspace()*bottomratio())
+					py->mouse.y <= m_pos[3]+scrollspace()*bottomratio())
 			{
 				m_ldown = true;
 				m_mousescroll = true;
@@ -245,7 +246,7 @@ void DropDownS::inev(InEv* ev)
 			{
 				// std::list item?
 				if(py->mouse.x >= m_pos[0] && py->mouse.x <= m_pos[2]-square() && py->mouse.y >= m_pos[3]+g_font[m_font].gheight*(i-(int)m_scroll[1])
-				                && py->mouse.y <= m_pos[3]+g_font[m_font].gheight*(i-(int)m_scroll[1]+1))
+						&& py->mouse.y <= m_pos[3]+g_font[m_font].gheight*(i-(int)m_scroll[1]+1))
 				{
 					m_selected = i;
 					m_opened = false;

@@ -1,12 +1,17 @@
 #include "window.h"
+#include "math/3dmath.h"
+#include "sim/player.h"
+
+#ifndef MATCHMAKER
 #include "texture.h"
-#include "render/shader.h"
 #include "gui/gui.h"
 #include "gui/font.h"
 #include "render/shadow.h"
-#include "math/3dmath.h"
 #include "gui/cursor.h"
-#include "sim/player.h"
+#include "render/shader.h"
+#include "sim/simflow.h"
+#include "sim/bltype.h"
+#endif
 
 bool g_quit = false;
 double g_drawfrinterval = 0.0f;
@@ -21,6 +26,36 @@ double g_framesPerSecond = 0.0f;		// This will store our fps
 #endif
 double g_instantdrawfps = 0.0f;
 long long g_lasttime = GetTickCount();
+double g_instantupdfps = 0;
+double g_updfrinterval = 0;
+
+#ifndef MATCHMAKER
+Camera g_cam;
+int g_currw;
+int g_currh;
+int g_width = INI_WIDTH;
+int g_height = INI_HEIGHT;
+int g_bpp = INI_BPP;
+Vec2i g_mouse;
+Vec2i g_mousestart;
+bool g_keyintercepted = false;
+bool g_keys[SDL_NUM_SCANCODES] = {0};
+bool g_mousekeys[5] = {0};
+float g_zoom = INI_ZOOM;
+bool g_mouseout = false;
+bool g_moved = false;
+bool g_canplace = false;
+int g_bpcol = -1;
+int g_build = BL_NONE;
+Vec3f g_vdrag[2];
+Camera g_bpcam;
+int g_bptype = -1;
+float g_bpyaw = 0;
+Selection g_sel;
+bool g_mouseoveraction = false;
+int g_curst = CU_DEFAULT;	//cursor state
+int g_kbfocus = 0;	//keyboad focus counter
+#endif
 
 void AddRes(int w, int h)
 {
@@ -74,6 +109,8 @@ void EnumerateDisplay()
 #endif // PLATFORM_WIN
 }
 
+#ifndef MATCHMAKER
+
 void Resize(int width, int height)
 {
 	if(height == 0)
@@ -81,13 +118,13 @@ void Resize(int width, int height)
 
 	glViewport(0, 0, width, height);
 
-	Player* py = &g_player[g_curP];
-	GUI* gui = &py->gui;
+	Player* py = &g_player[g_localP];
+	GUI* gui = &g_gui;
 
-	if(py->width != width || py->height != height)
+	if(g_width != width || g_height != height)
 	{
-		py->width = width;
-		py->height = height;
+		g_width = width;
+		g_height = height;
 
 		//if(g_fullscreen)
 		//Reload();
@@ -96,9 +133,11 @@ void Resize(int width, int height)
 	}
 }
 
+#endif
+
 void CalcDrawRate()
 {
-	static unsigned int frametime = 0.0f;				// This stores the last frame's time
+	static unsigned int frametime = 0;				// This stores the last frame's time
 	static int framecounter = 0;
 	static unsigned int lasttime;
 
@@ -134,22 +173,33 @@ void CalcDrawRate()
 	}
 }
 
-bool DrawNextFrame(int desiredFrameRate)
+bool DrawNextFrame(int desiredfps)
 {
-	static long long lastTime = GetTickCount64();
-	static long long elapsedTime = 0;
+	static long long lastdrawtick = GetTickCount64();
+	static long long elapseddrawtime = 0;
+
+#ifndef MATCHMAKER
+	if(g_speed == SPEED_PLAY ||
+		g_speed == SPEED_PAUSE)
+	{
+		//no speed limit
+		lastdrawtick = GetTickCount64();
+		elapseddrawtime = 0;
+		return true;
+	}
+#endif
 
 	long long currentTime = GetTickCount64(); // Get the time (milliseconds = seconds * .001)
-	long long deltaTime = currentTime - lastTime; // Get the slice of time
-	int desiredFPS = 1000 / (float)desiredFrameRate; // Store 1 / desiredFrameRate
+	long long deltaTime = currentTime - lastdrawtick; // Get the slice of time
+	int framedelay = 1000 / desiredfps; // Store 1 / desiredfps
 
-	elapsedTime += deltaTime; // Add to the elapsed time
-	lastTime = currentTime; // Update lastTime
+	elapseddrawtime += deltaTime; // Add to the elapsed time
+	lastdrawtick = currentTime; // Update lastdrawtick
 
-	// Check if the time since we last checked is greater than our desiredFPS
-	if( elapsedTime > desiredFPS )
+	// Check if the time since we last checked is greater than our framedelay
+	if( elapseddrawtime > framedelay )
 	{
-		elapsedTime -= desiredFPS; // Adjust the elapsed time
+		elapseddrawtime -= framedelay; // Adjust the elapsed time
 
 		// Return true, to animate the next frame of animation
 		return true;
@@ -159,7 +209,7 @@ bool DrawNextFrame(int desiredFrameRate)
 	return false;
 	/*
 	long long currentTime = GetTickCount();
-	float desiredFPMS = 1000.0f/(float)desiredFrameRate;
+	float desiredFPMS = 1000.0f/(float)desiredfps;
 	int deltaTime = currentTime - g_lasttime;
 
 	if(deltaTime >= desiredFPMS)
@@ -171,6 +221,104 @@ bool DrawNextFrame(int desiredFrameRate)
 	return false;*/
 }
 
+
+void CalcUpdRate()
+{
+	static unsigned int frametime = 0;				// This stores the last frame's time
+	static int framecounter = 0;
+	static unsigned int lasttime;
+
+	// Get the current time in seconds
+	unsigned int currtime = timeGetTime();
+
+	// We added a small value to the frame interval to account for some video
+	// cards (Radeon's) with fast computers falling through the floor without it.
+
+	// Here we store the elapsed time between the current and last frame,
+	// then keep the current frame in our static variable for the next frame.
+	g_updfrinterval = (currtime - frametime) / 1000.0f;	// + 0.005f;
+
+	//g_instantdrawfps = 1.0f / (g_currentTime - frameTime);
+	//g_instantdrawfps = 1.0f / g_drawfrinterval;
+
+	frametime = currtime;
+
+	// Increase the frame counter
+	++framecounter;
+
+	// Now we want to subtract the current time by the last time that was stored
+	// to see if the time elapsed has been over a second, which means we found our FPS.
+	if( currtime - lasttime > 1000 )
+	{
+		g_instantupdfps = framecounter;
+
+		// Here we set the lastTime to the currentTime
+		lasttime = currtime;
+
+		// Reset the frames per second
+		framecounter = 0;
+	}
+}
+
+bool UpdNextFrame(int desiredfps)
+{
+	static long long lastupdtick = GetTickCount64();
+	static long long elapsedupdtime = 0;
+
+#ifndef MATCHMAKER
+	if(g_speed == SPEED_FAST)
+	{
+		lastupdtick = GetTickCount64();
+		elapsedupdtime = 0;
+		return true;
+	}
+#endif
+
+#if 0
+	//needs to be done elsewhere in UpdSim
+	if(g_speed == SPEED_PAUSE)
+	{
+		lastupdtick = GetTickCount64();
+		elapsedupdtime = 0;
+		return false;
+	}
+#endif
+
+	long long currentTime = GetTickCount64(); // Get the time (milliseconds = seconds * .001)
+	long long deltaTime = currentTime - lastupdtick; // Get the slice of time
+	int framedelay = 1000 / desiredfps; // Store 1 / desiredfps
+
+	elapsedupdtime += deltaTime; // Add to the elapsed time
+	lastupdtick = currentTime; // Update lastupdtick
+
+	// Check if the time since we last checked is greater than our framedelay
+	if( elapsedupdtime > framedelay )
+	{
+		elapsedupdtime -= framedelay; // Adjust the elapsed time
+
+		// Return true, to animate the next frame of animation
+
+		return true;
+	}
+
+	// We don't animate right now.
+	return false;
+	/*
+	long long currentTime = GetTickCount();
+	float desiredFPMS = 1000.0f/(float)desiredfps;
+	int deltaTime = currentTime - g_lasttime;
+
+	if(deltaTime >= desiredFPMS)
+	{
+	g_lasttime = currentTime;
+	return true;
+	}
+
+	return false;*/
+}
+
+#ifndef MATCHMAKER
+
 bool InitWindow()
 {
 	g_log<<"Renderer1: "<<(char*)glGetString(GL_RENDERER)<<std::endl;
@@ -178,30 +326,30 @@ bool InitWindow()
 	g_log.flush();
 
 	char path[MAX_PATH+1];
-	FullPath("gui/trigear-64x64.png", path);
+	FullPath("gui/econ-64x64.png", path);
 	LoadedTex* pixels = LoadPNG(path);
 
 	if(!pixels)
 	{
-		ErrorMessage("Error", "Couldn't load icon");
+		ErrMess("Error", "Couldn't load icon");
 	}
 
 	SDL_Surface* surf = SDL_CreateRGBSurfaceFrom(pixels->data, pixels->sizeX, pixels->sizeY, pixels->channels*8, pixels->channels*pixels->sizeX, 0x000000FF, 0x0000FF00, 0x00FF0000, 0xFF000000);
-
-	delete pixels;
 
 	if(!surf)
 	{
 		char message[256];
 		sprintf(message, "Couldn't create icon: %s", SDL_GetError());
-		ErrorMessage("Error", message);
+		ErrMess("Error", message);
 	}
 
 	// The icon is attached to the window pointer
 	SDL_SetWindowIcon(g_window, surf);
 
+	delete pixels;
+
 	// ...and the surface containing the icon pixel data is no longer required.
-	SDL_FreeSurface(surf);
+	//SDL_FreeSurface(surf);
 
 	glShadeModel(GL_SMOOTH);
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
@@ -305,7 +453,7 @@ bool MakeWindow(const char* title)
 		// In the event that the window could not be made...
 		char msg[256];
 		sprintf(msg, "Could not create window: %s\n", SDL_GetError());
-		ErrorMessage("Error", msg);
+		ErrMess("Error", msg);
 		return false;
 	}
 
@@ -317,7 +465,7 @@ bool MakeWindow(const char* title)
 		// In the event that the window could not be made...
 		char msg[256];
 		sprintf(msg, "Could not create renderer: %s\n", SDL_GetError());
-		ErrorMessage("Error", msg);
+		ErrMess("Error", msg);
 		return false;
 	}
 #endif
@@ -331,7 +479,7 @@ bool MakeWindow(const char* title)
 	if(!g_glcontext)
 	{
 		DestroyWindow(title);
-		ErrorMessage("Error", "Couldn't create GL context");
+		ErrMess("Error", "Couldn't create GL context");
 		return false;
 	}
 
@@ -348,9 +496,11 @@ bool MakeWindow(const char* title)
 	if(!InitWindow())
 	{
 		DestroyWindow(title);
-		ErrorMessage("Error", "Initialization failed");
+		ErrMess("Error", "Initialization failed");
 		return false;
 	}
 
 	return true;
 }
+
+#endif

@@ -18,9 +18,11 @@
 #define ELEV_GRASSONLYMAXY	(600 * TILE_Y_SCALE_2)
 #define ELEV_GRASSROCKMAXY	(990 * TILE_Y_SCALE_2)
 #define MAPMINZ				(0)
-#define MAPMAXZ				(m_widthz*TILE_SIZE)
+#define MAPMAXZ				(m_widthy*TILE_SIZE)
 
-#define MAX_MAP				256
+//#define MAX_MAP				256
+//#define MAX_MAP				128
+#define MAX_MAP				64
 
 class Vec2f;
 class Vec3f;
@@ -55,7 +57,7 @@ public:
 	Number of height points/corners is +1.
 	*/
 	int m_widthx;
-	int m_widthz;
+	int m_widthy;
 
 	float *m_heightpoints;
 	Vec3f *m_drawverts;
@@ -72,12 +74,12 @@ public:
 	Heightmap()
 	{
 		m_widthx = 0;
-		m_widthz = 0;
+		m_widthy = 0;
 		for(int i=0; i<VBOS; i++)
 			m_vbo[i] = -1;
 	}
 
-	void allocate(int wx, int wz);
+	void allocate(int wx, int wy);
 	void remesh(float tilescale);
 	void genvbo();
 	void delvbo();
@@ -113,7 +115,7 @@ extern Heightmap g_hmap2;
 extern Heightmap g_hmap4;
 extern Heightmap g_hmap8;
 
-void AllocGrid(int wx, int wz);
+void AllocGrid(int wx, int wy);
 void FreeGrid();
 
 #endif

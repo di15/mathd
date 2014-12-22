@@ -16,12 +16,12 @@ Vec3f* g_waterverts = NULL;
 Vec2f* g_watertexcos = NULL;
 Vec3f* g_waternorms = NULL;
 
-void AllocWater(int wx, int wz)
+void AllocWater(int wx, int wy)
 {
 	FreeWater();
-	g_waterverts = new Vec3f[ (wx) * (wz) * 6 ];
-	g_watertexcos = new Vec2f[ (wx) * (wz) * 6 ];
-	g_waternorms = new Vec3f[ (wx) * (wz) * 6 ];
+	g_waterverts = new Vec3f[ (wx) * (wy) * 6 ];
+	g_watertexcos = new Vec2f[ (wx) * (wy) * 6 ];
+	g_waternorms = new Vec3f[ (wx) * (wy) * 6 ];
 
 	if(!g_waterverts)
 		OutOfMem(__FILE__, __LINE__);
@@ -33,7 +33,7 @@ void AllocWater(int wx, int wz)
 		OutOfMem(__FILE__, __LINE__);
 
 	for(int x=0; x<wx; x++)
-		for(int z=0; z<wz; z++)
+		for(int z=0; z<wy; z++)
 		{
 			g_waterverts[ z*(wx) * 6 + x * 6 + 0 ] = Vec3f(x*TILE_SIZE, WATER_LEVEL, z*TILE_SIZE);
 			g_waterverts[ z*(wx) * 6 + x * 6 + 1 ] = Vec3f((x+1)*TILE_SIZE, WATER_LEVEL, z*TILE_SIZE);
@@ -123,10 +123,10 @@ void DrawWater3()
 	glBindTexture(GL_TEXTURE_2D, g_texture[ g_watertex[WATER_TEX_NORMAL] ].texname);
 	glUniform1i(s->m_slot[SSLOT_NORMALMAP], 3);
 
-	Player* py = &g_player[g_curP];
+	Player* py = &g_player[g_localP];
 
 	glUniform1f(s->m_slot[SSLOT_MIND], MIN_DISTANCE);
-	glUniform1f(s->m_slot[SSLOT_MAXD], MAX_DISTANCE / py->zoom);
+	glUniform1f(s->m_slot[SSLOT_MAXD], MAX_DISTANCE / g_zoom);
 	glUniform1i(s->m_slot[SSLOT_WAVEPHASE], wavephase);
 
 	Matrix modelmat;
@@ -160,7 +160,7 @@ void DrawWater3()
 #if 0
 	glEnable(GL_POLYGON_OFFSET_FILL);
 	//glPolygonOffset(2.0, 500.0);
-	glPolygonOffset(1.0, 0.001/(py->zoom));
+	glPolygonOffset(1.0, 0.001/(g_zoom));
 	//glPolygonOffset(1.0, 250.0);
 #endif
 
@@ -171,7 +171,7 @@ void DrawWater3()
 	//glVertexAttribPointer(s->m_slot[SSLOT_NORMAL], 3, GL_FLOAT, GL_FALSE, 0, g_waternorms);
 	glNormalPointer(GL_FLOAT, 0, g_waternorms);
 
-	glDrawArrays(GL_TRIANGLES, 0, g_hmap.m_widthx * g_hmap.m_widthz * 6 );
+	glDrawArrays(GL_TRIANGLES, 0, g_hmap.m_widthx * g_hmap.m_widthy * 6 );
 
 #if 0
 	glDisable(GL_POLYGON_OFFSET_FILL);
@@ -242,10 +242,10 @@ void DrawWater()
 	Vec3f a, b, c, d;
 
 	int wx = g_hmap.m_widthx;
-	int wz = g_hmap.m_widthz;
+	int wy = g_hmap.m_widthy;
 
-	a = Vec3f(wx * TILE_SIZE, WATER_LEVEL, wz * TILE_SIZE);
-	b = Vec3f(0, WATER_LEVEL, wz * TILE_SIZE);
+	a = Vec3f(wx * TILE_SIZE, WATER_LEVEL, wy * TILE_SIZE);
+	b = Vec3f(0, WATER_LEVEL, wy * TILE_SIZE);
 	c = Vec3f(0, WATER_LEVEL, 0);
 	d = Vec3f(wx * TILE_SIZE, WATER_LEVEL, 0);
 
@@ -261,11 +261,11 @@ void DrawWater()
 
 	const float texcoords0[] =
 	{
-		(float)(wx+1), (float)(wz+1),
-		0, (float)(wz+1),
+		(float)(wx+1), (float)(wy+1),
+		0, (float)(wy+1),
 		0, 0,
 		(float)(wx+1), 0,
-		(float)(wx+1), (float)(wz+1),
+		(float)(wx+1), (float)(wy+1),
 		0, 0
 	};
 
@@ -279,15 +279,15 @@ void DrawWater()
 		0, 1, 0
 	};
 
-	Player* py = &g_player[g_curP];
+	Player* py = &g_player[g_localP];
 
 	glUniform1f(s->m_slot[SSLOT_MIND], MIN_DISTANCE);
-	glUniform1f(s->m_slot[SSLOT_MAXD], MAX_DISTANCE / py->zoom);
+	glUniform1f(s->m_slot[SSLOT_MAXD], MAX_DISTANCE / g_zoom);
 
 #if 0
 	glEnable(GL_POLYGON_OFFSET_FILL);
 	//glPolygonOffset(2.0, 500.0);
-	glPolygonOffset(1.0, 0.001/(py->zoom));
+	glPolygonOffset(1.0, 0.001/(g_zoom));
 	//glPolygonOffset(1.0, 250.0);
 #endif
 
@@ -342,12 +342,12 @@ void DrawWater2()
 	Vec3f a, b, c, d;
 
 	int wx = g_hmap.m_widthx;
-	int wz = g_hmap.m_widthz;
+	int wy = g_hmap.m_widthy;
 
 	glUniform1f(s->m_slot[SSLOT_MAPMINZ], 0);
-	glUniform1f(s->m_slot[SSLOT_MAPMAXZ], wx*TILE_SIZE);
+	glUniform1f(s->m_slot[SSLOT_MAPMAXZ], (float)wx*TILE_SIZE);
 	glUniform1f(s->m_slot[SSLOT_MAPMINX], 0);
-	glUniform1f(s->m_slot[SSLOT_MAPMAXX], wz*TILE_SIZE);
+	glUniform1f(s->m_slot[SSLOT_MAPMAXX], (float)wy*TILE_SIZE);
 	glUniform1f(s->m_slot[SSLOT_MAPMINY], ConvertHeight(0));
 	glUniform1f(s->m_slot[SSLOT_MAPMAXY], ConvertHeight(255));
 
@@ -383,8 +383,8 @@ void DrawWater2()
 
 	CheckGLError(__FILE__, __LINE__);
 
-	a = Vec3f(wx * TILE_SIZE, WATER_LEVEL, wz * TILE_SIZE);
-	b = Vec3f(0, WATER_LEVEL, wz * TILE_SIZE);
+	a = Vec3f(wx * TILE_SIZE, WATER_LEVEL, wy * TILE_SIZE);
+	b = Vec3f(0, WATER_LEVEL, wy * TILE_SIZE);
 	c = Vec3f(0, WATER_LEVEL, 0);
 	d = Vec3f(wx * TILE_SIZE, WATER_LEVEL, 0);
 
@@ -400,11 +400,11 @@ void DrawWater2()
 
 	float texcoords0[] =
 	{
-		(float)(wx+1), (float)(wz+1),
-		0, (float)(wz+1),
+		(float)(wx+1), (float)(wy+1),
+		0, (float)(wy+1),
 		0, 0,
 		(float)(wx+1), 0,
-		(float)(wx+1), (float)(wz+1),
+		(float)(wx+1), (float)(wy+1),
 		0, 0
 	};
 
@@ -418,11 +418,11 @@ void DrawWater2()
 		0, 1, 0
 	};
 
-	Player* py = &g_player[g_curP];
+	Player* py = &g_player[g_localP];
 
 	glEnable(GL_POLYGON_OFFSET_FILL);
 	//glPolygonOffset(2.0, 500.0);
-	glPolygonOffset(1.0, 0.01/(py->zoom));
+	glPolygonOffset(1.0, 0.01/(g_zoom));
 	//glPolygonOffset(1.0, 250.0);
 
 	CheckGLError(__FILE__, __LINE__);

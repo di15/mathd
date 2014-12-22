@@ -17,6 +17,19 @@ const std::string DateTime()
 	return buf;
 }
 
+const std::string Time()
+{
+	time_t     now = time(0);
+	struct tm  tstruct;
+	char       buf[80];
+	tstruct = *localtime(&now);
+	// Visit http://www.cplusplus.com/reference/clibrary/ctime/strftime/
+	// for more information about date/time format
+	strftime(buf, sizeof(buf), "%X", &tstruct);
+
+	return buf;
+}
+
 const std::string FileDateTime()
 {
 	time_t     now = time(0);
@@ -226,21 +239,21 @@ void BackSlashes(char* corrected)
 			corrected[i] = '\\';
 }
 
-void ErrorMessage(const char* title, const char* message)
+void ErrMess(const char* title, const char* message)
 {
 	SDL_ShowCursor(true);
 	SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, title, message, NULL);
 	SDL_ShowCursor(false);
 }
 
-void InfoMessage(const char* title, const char* message)
+void InfoMess(const char* title, const char* message)
 {
 	SDL_ShowCursor(true);
 	SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_INFORMATION, title, message, NULL);
 	SDL_ShowCursor(false);
 }
 
-void WarningMessage(const char* title, const char* message)
+void WarnMess(const char* title, const char* message)
 {
 	SDL_ShowCursor(true);
 	SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_WARNING, title, message, NULL);
@@ -251,19 +264,70 @@ void OutOfMem(const char* file, int line)
 {
 	char msg[2048];
 	sprintf(msg, "Failed to allocate memory in %s on line %d.", file, line);
-	ErrorMessage("Out of memory", msg);
+	ErrMess("Out of memory", msg);
 	g_quit = true;
+}
+
+void ListFiles(const char* fullpath, std::list<std::string>& files)
+{
+	DIR *dp;
+	struct dirent *dirp;
+
+	if((dp  = opendir(fullpath)) == NULL)
+	{
+		g_log << "Error opening " << fullpath << std::endl;
+		return;
+	}
+
+	while ((dirp = readdir(dp)) != NULL)
+	{
+		if(dirp->d_type != DT_REG)
+			continue;
+
+		files.push_back(std::string(dirp->d_name));
+	}
+
+	closedir(dp);
+	return;
+}
+
+//add thousands separators
+std::string iform(int n)
+{
+	std::string s;
+
+	char first[32];
+	sprintf(first, "%d", n);
+
+	for(int i=strlen(first)-3; i>=0; i-=3)
+	{
+		if(first[i] == '-' || i == 0 || first[i-1] == '-')
+			break;
+
+		int newl = strlen(first)+1;
+
+		for(int j=newl; j>=i; j--)
+		{
+			first[j+1] = first[j];
+		}
+
+		first[i] = ',';
+	}
+
+	s = first;
+
+	return s;
 }
 
 #ifndef PLATFORM_WIN
 
-static long long g_starttick = -1;
-long timeGetTime()
+static unsigned long long g_starttick = -1;
+unsigned long long timeGetTime()
 {
 	return GetTickCount();
 }
 
-long GetTickCount()
+unsigned long long GetTickCount()
 {
 	if(g_starttick < 0)
 		g_starttick = GetTickCount64();
@@ -271,7 +335,7 @@ long GetTickCount()
 	return (long)(GetTickCount64() - g_starttick);
 }
 
-long long GetTickCount64()
+unsigned long long GetTickCount64()
 {
 	return SDL_GetTicks();
 }
@@ -281,4 +345,3 @@ void Sleep(int ms)
 	SDL_Delay(ms);
 }
 #endif
-

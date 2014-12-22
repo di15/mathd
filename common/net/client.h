@@ -1,46 +1,32 @@
 
-#include "../platform.h"
 
-#ifdef MATCHMAKER
-#include "net.h"
+#ifndef CLIENT_H
+#define CLIENT_H
 
-#define CLIENT_TIMEOUT	(60*1000)
+#include "../gui/richtext.h"
+#include "../sim/player.h"
+#include "netconn.h"
 
+//a client is like a player, but concerns networking.
+//a client must be a human player.
+//a client controls a player slot.
 class Client
 {
 public:
-	bool m_on;
-	struct sockaddr_in m_addr;
-	unsigned int m_sendack;
-	unsigned int m_recvack;
-	long long m_last;
-	int m_player;
-
-	Client()
-	{
-		m_on = false;
-		m_sendack = 0;
-		m_recvack = 0;
-		m_player = -1;
-	}
+	bool on;
+	int player;
+	RichText name;
+	//unsigned char color;
+	NetConn* nc;
 };
 
-#define CLIENTS		256
+#define CLIENTS	PLAYERS
 
 extern Client g_client[CLIENTS];
+extern int g_localC;
+extern RichText g_name;
 
-int MatchClient(struct sockaddr_in from);
-int MatchClient(Client* c);
-int PlayerClient(int id);
-Client* NewClient(struct sockaddr_in from);
-void CheckPackets();
-void CheckClients();
-//void UnloadPlayer(int i);
-void DisconnectClient(int i);
-void DisconnectPlayer(int i);	//For use when the player is dissociated from the client
-void ClearClientPackets(Client* c);
-void DisconnectClients();
+void ResetClients();
+bool AddClient(NetConn* nc, RichText name, int* retci);
 
 #endif
-
-

@@ -35,40 +35,40 @@ Heightmap g_hmap4;
 Heightmap g_hmap8;
 unsigned int g_rimtexs[TEX_TYPES];
 
-void AllocGrid(int wx, int wz)
+void AllocGrid(int wx, int wy)
 {
-	g_log<<"allocating class arrays "<<wx<<","<<wz<<std::endl;
+	g_log<<"allocating class arrays "<<wx<<","<<wy<<std::endl;
 	g_log.flush();
 
-	if( !(g_cotype[CONDUIT_ROAD].cotiles[0] = new RoadTile [ (wx * wz) ]) ) OutOfMem(__FILE__, __LINE__);
-	if( !(g_cotype[CONDUIT_ROAD].cotiles[1] = new RoadTile [ (wx * wz) ]) ) OutOfMem(__FILE__, __LINE__);
-	if( !(g_cotype[CONDUIT_POWL].cotiles[0] = new PowlTile [ (wx * wz) ]) ) OutOfMem(__FILE__, __LINE__);
-	if( !(g_cotype[CONDUIT_POWL].cotiles[1] = new PowlTile [ (wx * wz) ]) ) OutOfMem(__FILE__, __LINE__);
-	if( !(g_cotype[CONDUIT_CRPIPE].cotiles[0] = new CrPipeTile [ (wx * wz) ]) ) OutOfMem(__FILE__, __LINE__);
-	if( !(g_cotype[CONDUIT_CRPIPE].cotiles[1] = new CrPipeTile [ (wx * wz) ]) ) OutOfMem(__FILE__, __LINE__);
+	if( !(g_cdtype[CONDUIT_ROAD].cdtiles[0] = new CdTile [ (wx * wy) ]) ) OutOfMem(__FILE__, __LINE__);
+	if( !(g_cdtype[CONDUIT_ROAD].cdtiles[1] = new CdTile [ (wx * wy) ]) ) OutOfMem(__FILE__, __LINE__);
+	if( !(g_cdtype[CONDUIT_POWL].cdtiles[0] = new CdTile [ (wx * wy) ]) ) OutOfMem(__FILE__, __LINE__);
+	if( !(g_cdtype[CONDUIT_POWL].cdtiles[1] = new CdTile [ (wx * wy) ]) ) OutOfMem(__FILE__, __LINE__);
+	if( !(g_cdtype[CONDUIT_CRPIPE].cdtiles[0] = new CdTile [ (wx * wy) ]) ) OutOfMem(__FILE__, __LINE__);
+	if( !(g_cdtype[CONDUIT_CRPIPE].cdtiles[1] = new CdTile [ (wx * wy) ]) ) OutOfMem(__FILE__, __LINE__);
 }
 
 /*
 allocate room for a number of tiles, not height points.
 */
-void Heightmap::allocate(int wx, int wz)
+void Heightmap::allocate(int wx, int wy)
 {
 	destroy();
 
 	// Vertices aren't shared between tiles or triangles.
-	int numverts = wx * wz * 3 * 2;
+	int numverts = wx * wy * 3 * 2;
 
 	m_widthx = wx;
-	m_widthz = wz;
+	m_widthy = wy;
 
-	m_heightpoints = new float [ (wx+1) * (wz+1) ];
+	m_heightpoints = new float [ (wx+1) * (wy+1) ];
 	m_drawverts = new Vec3f [ numverts ];
 	m_collverts = new Vec3f [ numverts ];
 	m_normals = new Vec3f [ numverts ];
 	m_texcoords0 = new Vec2f [ numverts ];
-	//m_countryowner = new int [ wx * wz ];
-	m_triconfig = new bool [ wx * wz ];
-	m_tridivider = new Plane3f [ wx * wz ];
+	//m_countryowner = new int [ wx * wy ];
+	m_triconfig = new bool [ wx * wy ];
+	m_tridivider = new Plane3f [ wx * wy ];
 
 	if(!m_heightpoints) OutOfMem(__FILE__, __LINE__);
 	if(!m_drawverts) OutOfMem(__FILE__, __LINE__);
@@ -84,23 +84,24 @@ void Heightmap::allocate(int wx, int wz)
 
 	// Set to initial height.
 	for(int x=0; x<=wx; x++)
-		for(int z=0; z<=wz; z++)
+		for(int z=0; z<=wy; z++)
 			//m_heightpoints[ z*(wx+1) + x ] = rand()%1000;
 			m_heightpoints[ z*(wx+1) + x ] = 0;
 
 	remesh(1);
 	//retexture();
 
-	AllocWater(wx, wz);
+	AllocWater(wx, wy);
 }
 
 void FreeGrid()
 {
 	for(unsigned char ctype=0; ctype<CONDUIT_TYPES; ctype++)
 	{
-		ConduitType* ct = &g_cotype[ctype];
-		ConduitTile*& actual = ct->cotiles[(int)false];
-		ConduitTile*& planned = ct->cotiles[(int)true];
+		CdType* ct = &g_cdtype[ctype];
+		//nice
+		CdTile*& actual = ct->cdtiles[(int)false];
+		CdTile*& planned = ct->cdtiles[(int)true];
 
 		if(planned)
 		{
@@ -118,7 +119,7 @@ void FreeGrid()
 
 void Heightmap::destroy()
 {
-	if(m_widthx <= 0 || m_widthz <= 0)
+	if(m_widthx <= 0 || m_widthy <= 0)
 		return;
 
 	g_log<<"deleting [] g_open"<<std::endl;
@@ -140,7 +141,7 @@ void Heightmap::destroy()
 	delvbo();
 
 	m_widthx = 0;
-	m_widthz = 0;
+	m_widthy = 0;
 
 	FreeWater();
 
@@ -166,8 +167,8 @@ float Heightmap::accheight(int x, int z)
 	if(tx >= g_hmap.m_widthx)
 		tx = g_hmap.m_widthx-1;
 
-	if(tz >= g_hmap.m_widthz)
-		tz = g_hmap.m_widthz-1;
+	if(tz >= g_hmap.m_widthy)
+		tz = g_hmap.m_widthy-1;
 #endif
 
 	int tileindex = tz*m_widthx + tx;
@@ -214,7 +215,7 @@ float Heightmap::accheight(int x, int z)
 	g_log<<"y = "<<y<<std::endl;
 #endif
 
-	if(GetCo(CONDUIT_ROAD, tx, tz, false)->on)
+	if(GetCd(CONDUIT_ROAD, tx, tz, false)->on)
 		y += TILE_SIZE/30;
 
 	return y;
@@ -234,8 +235,8 @@ float Heightmap::accheight2(int x, int z)
 	if(tx >= g_hmap.m_widthx)
 		tx = g_hmap.m_widthx-1;
 
-	if(tz >= g_hmap.m_widthz)
-		tz = g_hmap.m_widthz-1;
+	if(tz >= g_hmap.m_widthy)
+		tz = g_hmap.m_widthy-1;
 
 	int tileindex = tz*m_widthx + tx;
 	int tileindex6v = tileindex * 6;
@@ -291,6 +292,7 @@ void Heightmap::hidetile(int x, int z)
 		tileverts[i] = Vec3f(0,0,0);
 
 	//genvbo();
+	//important: call genvbo(); after you're done hiding all the tiles
 }
 
 void Heightmap::unhidetile(int x, int z)
@@ -302,6 +304,7 @@ void Heightmap::unhidetile(int x, int z)
 		tileverts[i] = origtileverts[i];
 
 	//genvbo();
+	//important: call genvbo(); after you're done unhiding all the tiles
 }
 
 /*
@@ -348,7 +351,7 @@ void Heightmap::remesh(float tilescale)
 	We need pointers for this because we construct the normals as we go along,
 	and only blend them in the end.
 	*/
-	std::vector<Vec3f**> *addedvertnormals = new std::vector<Vec3f**>[ m_widthx * m_widthz * 6 ];
+	std::vector<Vec3f**> *addedvertnormals = new std::vector<Vec3f**>[ m_widthx * m_widthy * 6 ];
 
 	if(!addedvertnormals) OutOfMem(__FILE__, __LINE__);
 
@@ -387,12 +390,12 @@ void Heightmap::remesh(float tilescale)
 	(0,1)      (1,1)
 	*/
 
-	TileNormals *tilenormals = new TileNormals[ m_widthx * m_widthz ];
+	TileNormals *tilenormals = new TileNormals[ m_widthx * m_widthy ];
 
 	if(!tilenormals) OutOfMem(__FILE__, __LINE__);
 
 	for(int x=0; x<m_widthx; x++)
-		for(int z=0; z<m_widthz; z++)
+		for(int z=0; z<m_widthy; z++)
 		{
 			heights[0] = getheight(x+1, z+1);
 			heights[1] = getheight(x, z+1);
@@ -693,7 +696,7 @@ void Heightmap::remesh(float tilescale)
 				//If there's a tile in the z+1 direction, add its normal to corners b(1) and a(0).
 				// b(1) is the vertex index 1 and 3 of the two triangles vertices.
 				// a(0) is the vertex index 0 of the two triangles.
-				if(z < m_widthz-1)
+				if(z < m_widthy-1)
 				{
 					int nearbytileindex = ((z+1) * m_widthx + x);
 					TileNormals* nearbytilenormals = &tilenormals[ nearbytileindex ];
@@ -757,7 +760,7 @@ void Heightmap::remesh(float tilescale)
 
 				//If there's a tile in the x+1,z+1 direction, add its normal to corner a(0).
 				// a(0) is the vertex index 0 of the two triangles.
-				if(x+1 < m_widthx && z+1 < m_widthz)
+				if(x+1 < m_widthx && z+1 < m_widthy)
 				{
 					int nearbytileindex = ((z+1) * m_widthx + x+1);
 					TileNormals* nearbytilenormals = &tilenormals[ nearbytileindex ];
@@ -784,7 +787,7 @@ void Heightmap::remesh(float tilescale)
 
 				//If there's a tile in the x-1,z+1 direction, add its normal to corner b(1).
 				// b(1) is the vertex index 1,3 of the two triangles.
-				if(x-1 >= 0 && z+1 < m_widthz)
+				if(x-1 >= 0 && z+1 < m_widthy)
 				{
 					int nearbytileindex = ((z+1) * m_widthx + x-1);
 					TileNormals* nearbytilenormals = &tilenormals[ nearbytileindex ];
@@ -971,7 +974,7 @@ void Heightmap::remesh(float tilescale)
 				//If there's a tile in the z+1 direction, add its normal to corners b(1) and a(0).
 				// b(1) is the vertex index 1 of the two triangles vertices.
 				// a(0) is the vertex index 0 and 4 of the two triangles.
-				if(z < m_widthz-1)
+				if(z < m_widthy-1)
 				{
 					int nearbytileindex = ((z+1) * m_widthx + x);
 					TileNormals* nearbytilenormals = &tilenormals[ nearbytileindex ];
@@ -1037,7 +1040,7 @@ void Heightmap::remesh(float tilescale)
 
 				//If there's a tile in the x+1,z+1 direction, add its normal to corner a(0).
 				// a(0) is the vertex index 0,4 of the two triangles.
-				if(x+1 < m_widthx && z+1 < m_widthz)
+				if(x+1 < m_widthx && z+1 < m_widthy)
 				{
 					int nearbytileindex = ((z+1) * m_widthx + x+1);
 					TileNormals* nearbytilenormals = &tilenormals[ nearbytileindex ];
@@ -1066,7 +1069,7 @@ void Heightmap::remesh(float tilescale)
 
 				//If there's a tile in the x-1,z+1 direction, add its normal to corner b(1).
 				// b(1) is the vertex index 1 of the two triangles.
-				if(x-1 >= 0 && z+1 < m_widthz)
+				if(x-1 >= 0 && z+1 < m_widthy)
 				{
 					int nearbytileindex = ((z+1) * m_widthx + x-1);
 					TileNormals* nearbytilenormals = &tilenormals[ nearbytileindex ];
@@ -1097,13 +1100,13 @@ void Heightmap::remesh(float tilescale)
 			m_normals[ (z * m_widthx + x) * 3 * 2 + 5 ] = norm1;
 		}
 
-	Vec3f* tempnormals = new Vec3f[ m_widthx * m_widthz * 3 * 2 ];
+	Vec3f* tempnormals = new Vec3f[ m_widthx * m_widthy * 3 * 2 ];
 
 	if(!tempnormals) OutOfMem(__FILE__, __LINE__);
 
 	// Average the added up normals and store them in tempnormals.
 	for(int x=0; x<m_widthx; x++)
-		for(int z=0; z<m_widthz; z++)
+		for(int z=0; z<m_widthy; z++)
 			for(int trivert = 0; trivert < 6; trivert++)
 			{
 				int tileindex6v = (z * m_widthx + x) * 3 * 2 + trivert;
@@ -1149,7 +1152,7 @@ void Heightmap::remesh(float tilescale)
 
 	// Transfer the normals from tempnormals to m_normals.
 	for(int x=0; x<m_widthx; x++)
-		for(int z=0; z<m_widthz; z++)
+		for(int z=0; z<m_widthy; z++)
 			for(int trivert = 0; trivert < 6; trivert ++)
 			{
 				int tileindex6v = (z * m_widthx + x) * 3 * 2 + trivert;
@@ -1162,7 +1165,7 @@ void Heightmap::remesh(float tilescale)
 	delete [] tilenormals;
 
 	// Now to remesh the rim (underground)
-	m_rimva.alloc( 3 * 2 * (m_widthx + m_widthz) * 2 + 6 );
+	m_rimva.alloc( 3 * 2 * (m_widthx + m_widthy) * 2 + 6 );
 	float lowy = ConvertHeight(0);
 
 	// North side
@@ -1170,13 +1173,13 @@ void Heightmap::remesh(float tilescale)
 	{
 		int index = 3 * 2 * x + 0;
 
-		m_rimva.vertices[index + 0] = Vec3f((x+1)*TILE_SIZE, getheight(x+1, 0), 0);
-		m_rimva.vertices[index + 1] = Vec3f((x+0)*TILE_SIZE, getheight(x+0, 0), 0);
-		m_rimva.vertices[index + 2] = Vec3f((x+0)*TILE_SIZE, lowy, 0);
+		m_rimva.vertices[index + 0] = Vec3f((float)(x+1)*TILE_SIZE, getheight(x+1, 0), (float)0);
+		m_rimva.vertices[index + 1] = Vec3f((float)(x+0)*TILE_SIZE, getheight(x+0, 0), (float)0);
+		m_rimva.vertices[index + 2] = Vec3f((float)(x+0)*TILE_SIZE, lowy, (float)0);
 
-		m_rimva.vertices[index + 3] = Vec3f((x+1)*TILE_SIZE, getheight(x+1, 0), 0);
-		m_rimva.vertices[index + 4] = Vec3f((x+0)*TILE_SIZE, lowy, 0);
-		m_rimva.vertices[index + 5] = Vec3f((x+1)*TILE_SIZE, lowy, 0);
+		m_rimva.vertices[index + 3] = Vec3f((float)(x+1)*TILE_SIZE, getheight(x+1, 0), (float)0);
+		m_rimva.vertices[index + 4] = Vec3f((float)(x+0)*TILE_SIZE, lowy, (float)0);
+		m_rimva.vertices[index + 5] = Vec3f((float)(x+1)*TILE_SIZE, lowy, (float)0);
 
 		m_rimva.vertices[index + 0].y = fmax(m_rimva.vertices[index + 0].y, WATER_LEVEL);
 		m_rimva.vertices[index + 1].y = fmax(m_rimva.vertices[index + 1].y, WATER_LEVEL);
@@ -1194,13 +1197,13 @@ void Heightmap::remesh(float tilescale)
 	{
 		int index = 3 * 2 * x + 3*2*m_widthx + 0;
 
-		m_rimva.vertices[index + 0] = Vec3f((x+0)*TILE_SIZE, getheight(x+0, m_widthz), (m_widthz)*TILE_SIZE);
-		m_rimva.vertices[index + 1] = Vec3f((x+1)*TILE_SIZE, getheight(x+1, m_widthz), (m_widthz)*TILE_SIZE);
-		m_rimva.vertices[index + 2] = Vec3f((x+1)*TILE_SIZE, lowy, (m_widthz)*TILE_SIZE);
+		m_rimva.vertices[index + 0] = Vec3f((x+0)*TILE_SIZE, getheight(x+0, m_widthy), (m_widthy)*TILE_SIZE);
+		m_rimva.vertices[index + 1] = Vec3f((x+1)*TILE_SIZE, getheight(x+1, m_widthy), (m_widthy)*TILE_SIZE);
+		m_rimva.vertices[index + 2] = Vec3f((x+1)*TILE_SIZE, lowy, (m_widthy)*TILE_SIZE);
 
-		m_rimva.vertices[index + 3] = Vec3f((x+0)*TILE_SIZE, getheight(x+0, m_widthz), (m_widthz)*TILE_SIZE);
-		m_rimva.vertices[index + 4] = Vec3f((x+1)*TILE_SIZE, lowy, (m_widthz)*TILE_SIZE);
-		m_rimva.vertices[index + 5] = Vec3f((x+0)*TILE_SIZE, lowy, (m_widthz)*TILE_SIZE);
+		m_rimva.vertices[index + 3] = Vec3f((x+0)*TILE_SIZE, getheight(x+0, m_widthy), (m_widthy)*TILE_SIZE);
+		m_rimva.vertices[index + 4] = Vec3f((x+1)*TILE_SIZE, lowy, (m_widthy)*TILE_SIZE);
+		m_rimva.vertices[index + 5] = Vec3f((x+0)*TILE_SIZE, lowy, (m_widthy)*TILE_SIZE);
 
 		m_rimva.vertices[index + 0].y = fmax(m_rimva.vertices[index + 0].y, WATER_LEVEL);
 		m_rimva.vertices[index + 1].y = fmax(m_rimva.vertices[index + 1].y, WATER_LEVEL);
@@ -1214,7 +1217,7 @@ void Heightmap::remesh(float tilescale)
 	}
 
 	// West side
-	for(int z=0; z<m_widthz; z++)
+	for(int z=0; z<m_widthy; z++)
 	{
 		int index = 3 * 2 * z + 3*2*m_widthx*2 + 0;
 
@@ -1238,9 +1241,9 @@ void Heightmap::remesh(float tilescale)
 	}
 
 	// East side
-	for(int z=0; z<m_widthz; z++)
+	for(int z=0; z<m_widthy; z++)
 	{
-		int index = 3 * 2 * z + 3*2*m_widthx*2 + 3*2*m_widthz;
+		int index = 3 * 2 * z + 3*2*m_widthx*2 + 3*2*m_widthy;
 
 		m_rimva.vertices[index + 0] = Vec3f((m_widthx)*TILE_SIZE, getheight(m_widthx, z+1), (z+1)*TILE_SIZE);
 		m_rimva.vertices[index + 1] = Vec3f((m_widthx)*TILE_SIZE, getheight(m_widthx, z+0), (z+0)*TILE_SIZE);
@@ -1263,15 +1266,15 @@ void Heightmap::remesh(float tilescale)
 
 	// Bottom side
 	{
-		int index = 3*2*m_widthx*2 + 3*2*m_widthz*2;
+		int index = 3*2*m_widthx*2 + 3*2*m_widthy*2;
 
-		m_rimva.vertices[index + 0] = Vec3f((m_widthx)*TILE_SIZE, lowy, (m_widthz)*TILE_SIZE);
+		m_rimva.vertices[index + 0] = Vec3f((m_widthx)*TILE_SIZE, lowy, (m_widthy)*TILE_SIZE);
 		m_rimva.vertices[index + 1] = Vec3f((m_widthx)*TILE_SIZE, lowy, (0)*TILE_SIZE);
 		m_rimva.vertices[index + 2] = Vec3f((0)*TILE_SIZE, lowy, (0)*TILE_SIZE);
 
-		m_rimva.vertices[index + 3] = Vec3f((m_widthx)*TILE_SIZE, lowy, (m_widthz)*TILE_SIZE);
+		m_rimva.vertices[index + 3] = Vec3f((m_widthx)*TILE_SIZE, lowy, (m_widthy)*TILE_SIZE);
 		m_rimva.vertices[index + 4] = Vec3f((0)*TILE_SIZE, lowy, (0)*TILE_SIZE);
-		m_rimva.vertices[index + 5] = Vec3f((0)*TILE_SIZE, lowy, (m_widthz)*TILE_SIZE);
+		m_rimva.vertices[index + 5] = Vec3f((0)*TILE_SIZE, lowy, (m_widthy)*TILE_SIZE);
 
 		for(int i=0; i<6; i++)
 		{
@@ -1289,19 +1292,19 @@ void Heightmap::genvbo()
 
 	glGenBuffersARB(VBOS, m_vbo);
 	glBindBufferARB(GL_ARRAY_BUFFER_ARB, m_vbo[VBO_POSITION]);
-	glBufferDataARB(GL_ARRAY_BUFFER_ARB, sizeof(Vec3f)*m_widthx*m_widthz*6, m_drawverts, GL_STATIC_DRAW_ARB);
+	glBufferDataARB(GL_ARRAY_BUFFER_ARB, sizeof(Vec3f)*m_widthx*m_widthy*6, m_drawverts, GL_STATIC_DRAW_ARB);
 	glBindBufferARB(GL_ARRAY_BUFFER_ARB, m_vbo[VBO_TEXCOORD]);
-	glBufferDataARB(GL_ARRAY_BUFFER_ARB, sizeof(Vec2f)*m_widthx*m_widthz*6, m_texcoords0, GL_STATIC_DRAW_ARB);
+	glBufferDataARB(GL_ARRAY_BUFFER_ARB, sizeof(Vec2f)*m_widthx*m_widthy*6, m_texcoords0, GL_STATIC_DRAW_ARB);
 	glBindBufferARB(GL_ARRAY_BUFFER_ARB, m_vbo[VBO_NORMAL]);
-	glBufferDataARB(GL_ARRAY_BUFFER_ARB, sizeof(Vec3f)*m_widthx*m_widthz*6, m_normals, GL_STATIC_DRAW_ARB);
+	glBufferDataARB(GL_ARRAY_BUFFER_ARB, sizeof(Vec3f)*m_widthx*m_widthy*6, m_normals, GL_STATIC_DRAW_ARB);
 
 	glGenBuffersARB(VBOS, m_fullvbo);
 	glBindBufferARB(GL_ARRAY_BUFFER_ARB, m_fullvbo[VBO_POSITION]);
-	glBufferDataARB(GL_ARRAY_BUFFER_ARB, sizeof(Vec3f)*m_widthx*m_widthz*6, m_collverts, GL_STATIC_DRAW_ARB);
+	glBufferDataARB(GL_ARRAY_BUFFER_ARB, sizeof(Vec3f)*m_widthx*m_widthy*6, m_collverts, GL_STATIC_DRAW_ARB);
 	glBindBufferARB(GL_ARRAY_BUFFER_ARB, m_fullvbo[VBO_TEXCOORD]);
-	glBufferDataARB(GL_ARRAY_BUFFER_ARB, sizeof(Vec2f)*m_widthx*m_widthz*6, m_texcoords0, GL_STATIC_DRAW_ARB);
+	glBufferDataARB(GL_ARRAY_BUFFER_ARB, sizeof(Vec2f)*m_widthx*m_widthy*6, m_texcoords0, GL_STATIC_DRAW_ARB);
 	glBindBufferARB(GL_ARRAY_BUFFER_ARB, m_fullvbo[VBO_NORMAL]);
-	glBufferDataARB(GL_ARRAY_BUFFER_ARB, sizeof(Vec3f)*m_widthx*m_widthz*6, m_normals, GL_STATIC_DRAW_ARB);
+	glBufferDataARB(GL_ARRAY_BUFFER_ARB, sizeof(Vec3f)*m_widthx*m_widthy*6, m_normals, GL_STATIC_DRAW_ARB);
 
 	glBindBufferARB(GL_ARRAY_BUFFER_ARB, 0);
 
@@ -1329,7 +1332,7 @@ void Heightmap::delvbo()
 
 void Heightmap::draw()
 {
-	if(m_widthx <= 0 || m_widthz <= 0)
+	if(m_widthx <= 0 || m_widthy <= 0)
 		return;
 	//return;
 	Shader* s = &g_shader[g_curS];
@@ -1362,7 +1365,7 @@ void Heightmap::draw()
 	glUniform1f(s->m_slot[SSLOT_GRASSONLYMAXY], ELEV_GRASSONLYMAXY);
 	glUniform1f(s->m_slot[SSLOT_GRASSROCKMAXY], ELEV_GRASSROCKMAXY);
 	glUniform1f(s->m_slot[SSLOT_MAPMINZ], 0);
-	glUniform1f(s->m_slot[SSLOT_MAPMAXZ], m_widthz*TILE_SIZE*m_tilescale);
+	glUniform1f(s->m_slot[SSLOT_MAPMAXZ], m_widthy*TILE_SIZE*m_tilescale);
 	glUniform1f(s->m_slot[SSLOT_MAPMINX], 0);
 	glUniform1f(s->m_slot[SSLOT_MAPMAXX], m_widthx*TILE_SIZE*m_tilescale);
 	glUniform1f(s->m_slot[SSLOT_MAPMINY], ConvertHeight(0));
@@ -1399,7 +1402,7 @@ void Heightmap::draw()
 
 	/*
 	for(int x=0; x<m_widthx; x++)
-		for(int z=0; z<m_widthz; z++)
+		for(int z=0; z<m_widthy; z++)
 		{
 			glVertexAttribPointer(s->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, &m_drawverts[ (z * m_widthx + x) * 3 * 2 + 0 ]);
 			glVertexAttribPointer(s->m_slot[SSLOT_TEXCOORD0], 2, GL_FLOAT, GL_FALSE, 0, &m_texcoords0[ (z * m_widthx + x) * 3 * 2 + 0 ]);
@@ -1413,7 +1416,7 @@ void Heightmap::draw()
 	glVertexAttribPointer(s->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, m_drawverts);
 	glVertexAttribPointer(s->m_slot[SSLOT_TEXCOORD0], 2, GL_FLOAT, GL_FALSE, 0, m_texcoords0);
 	glVertexAttribPointer(s->m_slot[SSLOT_NORMAL], 3, GL_FLOAT, GL_FALSE, 0, m_normals);
-	glDrawArrays(GL_TRIANGLES, 0, (m_widthx) * (m_widthz) * 3 * 2);
+	glDrawArrays(GL_TRIANGLES, 0, (m_widthx) * (m_widthy) * 3 * 2);
 
 #elif 1
 
@@ -1426,7 +1429,7 @@ void Heightmap::draw()
 	glBindBuffer(GL_ARRAY_BUFFER, m_vbo[VBO_NORMAL]);
 	//glVertexAttribPointer(s->m_slot[SSLOT_NORMAL], 3, GL_FLOAT, GL_FALSE, 0, 0);
 	glNormalPointer(GL_FLOAT, 0, 0);
-	glDrawArrays(GL_TRIANGLES, 0, (m_widthx) * (m_widthz) * 3 * 2);
+	glDrawArrays(GL_TRIANGLES, 0, (m_widthx) * (m_widthy) * 3 * 2);
 
 #else
 	int tilescale = m_tilescale;
@@ -1450,7 +1453,7 @@ void Heightmap::draw()
 
 void Heightmap::draw2()
 {
-	if(m_widthx <= 0 || m_widthz <= 0)
+	if(m_widthx <= 0 || m_widthy <= 0)
 		return;
 
 	Shader* s = &g_shader[g_curS];
@@ -1503,7 +1506,7 @@ void Heightmap::draw2()
 	glUniform1f(s->m_slot[SSLOT_GRASSONLYMAXY], ELEV_GRASSONLYMAXY);
 	glUniform1f(s->m_slot[SSLOT_GRASSROCKMAXY], ELEV_GRASSROCKMAXY);
 	glUniform1f(s->m_slot[SSLOT_MAPMINZ], 0);
-	glUniform1f(s->m_slot[SSLOT_MAPMAXZ], m_widthz*TILE_SIZE*m_tilescale);
+	glUniform1f(s->m_slot[SSLOT_MAPMAXZ], m_widthy*TILE_SIZE*m_tilescale);
 	glUniform1f(s->m_slot[SSLOT_MAPMINX], 0);
 	glUniform1f(s->m_slot[SSLOT_MAPMAXX], m_widthx*TILE_SIZE*m_tilescale);
 	glUniform1f(s->m_slot[SSLOT_MAPMINY], ConvertHeight(0));
@@ -1543,7 +1546,7 @@ void Heightmap::draw2()
 
 	/*
 	for(int x=0; x<m_widthx; x++)
-		for(int z=0; z<m_widthz; z++)
+		for(int z=0; z<m_widthy; z++)
 		{
 			glVertexAttribPointer(s->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, &m_drawverts[ (z * m_widthx + x) * 3 * 2 + 0 ]);
 			glVertexAttribPointer(s->m_slot[SSLOT_TEXCOORD0], 2, GL_FLOAT, GL_FALSE, 0, &m_texcoords0[ (z * m_widthx + x) * 3 * 2 + 0 ]);
@@ -1568,7 +1571,7 @@ void Heightmap::draw2()
 
 	CheckGLError(__FILE__, __LINE__);
 
-	glDrawArrays(GL_TRIANGLES, 0, (m_widthx) * (m_widthz) * 3 * 2);
+	glDrawArrays(GL_TRIANGLES, 0, (m_widthx) * (m_widthy) * 3 * 2);
 
 	CheckGLError(__FILE__, __LINE__);
 
@@ -1583,7 +1586,7 @@ void Heightmap::draw2()
 	glBindBuffer(GL_ARRAY_BUFFER, m_fullvbo[VBO_NORMAL]);
 	//glVertexAttribPointer(s->m_slot[SSLOT_NORMAL], 3, GL_FLOAT, GL_FALSE, 0, 0);
 	glNormalPointer(GL_FLOAT, 0, 0);
-	glDrawArrays(GL_TRIANGLES, 0, (m_widthx) * (m_widthz) * 3 * 2);
+	glDrawArrays(GL_TRIANGLES, 0, (m_widthx) * (m_widthy) * 3 * 2);
 #else
 	int tilescale = m_tilescale;
 
@@ -1606,7 +1609,7 @@ void Heightmap::draw2()
 
 void Heightmap::drawrim()
 {
-	if(m_widthx <= 0 || m_widthz <= 0)
+	if(m_widthx <= 0 || m_widthy <= 0)
 		return;
 	//return;
 	Shader* s = &g_shader[g_curS];
@@ -1628,7 +1631,7 @@ void Heightmap::drawrim()
 	glUniform1f(s->m_slot[SSLOT_GRASSONLYMAXY], ELEV_GRASSONLYMAXY);
 	glUniform1f(s->m_slot[SSLOT_GRASSROCKMAXY], ELEV_GRASSROCKMAXY);
 	glUniform1f(s->m_slot[SSLOT_MAPMINZ], 0);
-	glUniform1f(s->m_slot[SSLOT_MAPMAXZ], m_widthz*TILE_SIZE*m_tilescale);
+	glUniform1f(s->m_slot[SSLOT_MAPMAXZ], m_widthy*TILE_SIZE*m_tilescale);
 	glUniform1f(s->m_slot[SSLOT_MAPMINX], 0);
 	glUniform1f(s->m_slot[SSLOT_MAPMAXX], m_widthx*TILE_SIZE*m_tilescale);
 	glUniform1f(s->m_slot[SSLOT_MAPMINY], ConvertHeight(0));
@@ -1665,7 +1668,7 @@ void Heightmap::drawrim()
 
 	/*
 	for(int x=0; x<m_widthx; x++)
-		for(int z=0; z<m_widthz; z++)
+		for(int z=0; z<m_widthy; z++)
 		{
 			glVertexAttribPointer(s->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, &m_drawverts[ (z * m_widthx + x) * 3 * 2 + 0 ]);
 			glVertexAttribPointer(s->m_slot[SSLOT_TEXCOORD0], 2, GL_FLOAT, GL_FALSE, 0, &m_texcoords0[ (z * m_widthx + x) * 3 * 2 + 0 ]);

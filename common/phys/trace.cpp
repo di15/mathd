@@ -2,9 +2,9 @@
 #include "../math/vec2i.h"
 #include "../math/3dmath.h"
 #include "../sim/unit.h"
-#include "../sim/unittype.h"
+#include "../sim/utype.h"
 #include "../sim/building.h"
-#include "../sim/buildingtype.h"
+#include "../sim/bltype.h"
 #include "../render/heightmap.h"
 #include "../math/hmapmath.h"
 #include "collision.h"
@@ -101,7 +101,7 @@ bool PassUnits(Vec2i vstart, Vec2i vend,
 					tw->trytostep = true;
 
 					//if(debugb)
-					//	InfoMessage("asd", "try step");
+					//	InfoMess("asd", "try step");
 				}
 
 				if(tw->collisionnormal.y > 0.2f)
@@ -111,7 +111,7 @@ bool PassUnits(Vec2i vstart, Vec2i vend,
 		}
 		else
 		{
-			float ratio = (startdistance + EPSILON_I) / (startdistance - enddistance);
+			float ratio = (float)( (startdistance + EPSILON_I) / (startdistance - enddistance) );
 
 			if(ratio < endratio)
 				endratio = ratio;
@@ -177,7 +177,7 @@ int Trace(int utype, int umode,
 	for(int nx = cminx; nx <= cmaxx; nx++)
 		for(int nz = cminz; nz <= cmaxz; nz++)
 		{
-			ColliderTile* cell = ColliderTileAt(nx, nz);
+			ColliderTile* cell = ColliderAt(nx, nz);
 
 			for(short uiter = 0; uiter < 4; uiter++)
 			{

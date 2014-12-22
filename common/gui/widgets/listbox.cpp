@@ -3,7 +3,7 @@
 #include "button.h"
 #include "checkbox.h"
 #include "editbox.h"
-#include "dropdowns.h"
+#include "droplist.h"
 #include "image.h"
 #include "insdraw.h"
 #include "link.h"
@@ -93,16 +93,16 @@ void ListBox::draw()
 		DrawShadowedText(m_font, m_pos[0]+3, m_pos[1]+g_font[m_font].gheight*(i-(int)m_scroll[1]), &m_options[i]);
 }
 
-void ListBox::inev(InEv* ev)
+void ListBox::inev(InEv* ie)
 {
-	Player* py = &g_player[g_curP];
+	Player* py = &g_player[g_localP];
 
-	if(ev->type == INEV_MOUSEMOVE && !ev->intercepted)
+	if(ie->type == INEV_MOUSEMOVE && !ie->intercepted)
 	{
 		if(!m_mousescroll)
 			return;
 
-		int dy = py->mouse.y - m_mousedown[1];
+		int dy = g_mouse.y - m_mousedown[1];
 
 		float topy = m_pos[3]+square()+scrollspace()*topratio();
 		float newtopy = topy + dy;
@@ -118,21 +118,21 @@ void ListBox::inev(InEv* ev)
 		if(m_scroll[1] < 0)
 		{
 			m_scroll[1] = 0;
-			ev->intercepted = true;
+			ie->intercepted = true;
 			return;
 		}
 		else if(m_scroll[1] + rowsshown() > m_options.size())
 		{
 			m_scroll[1] = m_options.size() - (float)rowsshown();
-			ev->intercepted = true;
+			ie->intercepted = true;
 			return;
 		}
 
-		m_mousedown[1] = py->mouse.y;
+		m_mousedown[1] = g_mouse.y;
 
-		ev->intercepted = true;
+		ie->intercepted = true;
 	}
-	else if(ev->type == INEV_MOUSEDOWN && ev->key == MOUSE_LEFT && !ev->intercepted)
+	else if(ie->type == INEV_MOUSEDOWN && ie->key == MOUSE_LEFT && !ie->intercepted)
 	{
 		Font* f = &g_font[m_font];
 
@@ -140,43 +140,43 @@ void ListBox::inev(InEv* ev)
 		{
 			int row = i-(int)m_scroll[1];
 			// std::list item?
-			if(py->mouse.x >= m_pos[0] && py->mouse.x <= m_pos[2]-square() && py->mouse.y >= m_pos[1]+f->gheight*row
-			                && py->mouse.y <= m_pos[1]+f->gheight*(row+1))
+			if(g_mouse.x >= m_pos[0] && g_mouse.x <= m_pos[2]-square() && g_mouse.y >= m_pos[1]+f->gheight*row
+			                && g_mouse.y <= m_pos[1]+f->gheight*(row+1))
 			{
 				m_ldown = true;
-				ev->intercepted = true;
+				ie->intercepted = true;
 				return;	// intercept mouse event
 			}
 		}
 
 		// scroll bar?
-		if(py->mouse.x >= m_pos[2]-square() && py->mouse.y >= m_pos[1]+square()+scrollspace()*topratio() && py->mouse.x <= m_pos[2] &&
-		                py->mouse.y <= m_pos[1]+square()+scrollspace()*bottomratio())
+		if(g_mouse.x >= m_pos[2]-square() && g_mouse.y >= m_pos[1]+square()+scrollspace()*topratio() && g_mouse.x <= m_pos[2] &&
+		                g_mouse.y <= m_pos[1]+square()+scrollspace()*bottomratio())
 		{
 			m_ldown = true;
 			m_mousescroll = true;
-			m_mousedown[1] = py->mouse.y;
-			ev->intercepted = true;
+			m_mousedown[1] = g_mouse.y;
+			ie->intercepted = true;
 			return;	// intercept mouse event
 		}
 
 		// up button?
-		if(py->mouse.x >= m_pos[2]-square() && py->mouse.y >= m_pos[1] && py->mouse.x <= m_pos[2] && py->mouse.y <= m_pos[1]+square())
+		if(g_mouse.x >= m_pos[2]-square() && g_mouse.y >= m_pos[1] && g_mouse.x <= m_pos[2] && g_mouse.y <= m_pos[1]+square())
 		{
 			m_ldown = true;
-			ev->intercepted = true;
+			ie->intercepted = true;
 			return;
 		}
 
 		// down button?
-		if(py->mouse.x >= m_pos[2]-square() && py->mouse.y >= m_pos[3]-square() && py->mouse.x <= m_pos[2] && py->mouse.y <= m_pos[3])
+		if(g_mouse.x >= m_pos[2]-square() && g_mouse.y >= m_pos[3]-square() && g_mouse.x <= m_pos[2] && g_mouse.y <= m_pos[3])
 		{
 			m_ldown = true;
-			ev->intercepted = true;
+			ie->intercepted = true;
 			return;
 		}
 	}
-	else if(ev->type == INEV_MOUSEUP && ev->key == MOUSE_LEFT && !ev->intercepted)
+	else if(ie->type == INEV_MOUSEUP && ie->key == MOUSE_LEFT && !ie->intercepted)
 	{
 		if(!m_ldown)
 			return;
@@ -186,7 +186,7 @@ void ListBox::inev(InEv* ev)
 		if(m_mousescroll)
 		{
 			m_mousescroll = false;
-			ev->intercepted = true;
+			ie->intercepted = true;
 			return;	// intercept mouse event
 		}
 
@@ -197,24 +197,24 @@ void ListBox::inev(InEv* ev)
 			int row = i-(int)m_scroll[1];
 
 			// std::list item?
-			if(py->mouse.x >= m_pos[0] && py->mouse.x <= m_pos[2]-square() && py->mouse.y >= m_pos[1]+f->gheight*row
-			                && py->mouse.y <= m_pos[1]+f->gheight*(row+1))
+			if(g_mouse.x >= m_pos[0] && g_mouse.x <= m_pos[2]-square() && g_mouse.y >= m_pos[1]+f->gheight*row
+			                && g_mouse.y <= m_pos[1]+f->gheight*(row+1))
 			{
 				m_selected = i;
 				if(changefunc != NULL)
 					changefunc();
 
-				ev->intercepted = true;
+				ie->intercepted = true;
 				return;	// intercept mouse event
 			}
 		}
 
 		// up button?
-		if(py->mouse.x >= m_pos[2]-square() && py->mouse.y >= m_pos[1] && py->mouse.x <= m_pos[2] && py->mouse.y <= m_pos[1]+square())
+		if(g_mouse.x >= m_pos[2]-square() && g_mouse.y >= m_pos[1] && g_mouse.x <= m_pos[2] && g_mouse.y <= m_pos[1]+square())
 		{
 			if(rowsshown() < (int)((m_pos[3]-m_pos[1])/f->gheight))
 			{
-				ev->intercepted = true;
+				ie->intercepted = true;
 				return;
 			}
 
@@ -222,22 +222,22 @@ void ListBox::inev(InEv* ev)
 			if(m_scroll[1] < 0)
 				m_scroll[1] = 0;
 
-			ev->intercepted = true;
+			ie->intercepted = true;
 			return;
 		}
 
 		// down button?
-		if(py->mouse.x >= m_pos[2]-square() && py->mouse.y >= m_pos[3]-square() && py->mouse.x <= m_pos[2] && py->mouse.y <= m_pos[3])
+		if(g_mouse.x >= m_pos[2]-square() && g_mouse.y >= m_pos[3]-square() && g_mouse.x <= m_pos[2] && g_mouse.y <= m_pos[3])
 		{
 			m_scroll[1]++;
 			if(m_scroll[1]+rowsshown() > m_options.size())
 				m_scroll[1] = m_options.size() - (float)rowsshown();
 
-			ev->intercepted = true;
+			ie->intercepted = true;
 			return;
 		}
 
-		ev->intercepted = true;	// intercept mouse event
+		ie->intercepted = true;	// intercept mouse event
 	}
 }
 

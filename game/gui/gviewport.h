@@ -9,7 +9,7 @@
 #define VIEWPORT_ENTVIEW		1
 #define VIEWPORT_TYPES			2
 
-class ViewportT
+class VpType
 {
 public:
 	Vec3f m_offset;
@@ -17,12 +17,13 @@ public:
 	char m_label[32];
 	bool m_axial;
 
-	ViewportT() {}
-	ViewportT(Vec3f offset, Vec3f up, const char* label, bool axial);
+	VpType() {}
+	VpType(Vec3f offset, Vec3f up, const char* label, bool axial);
 };
 
-extern ViewportT g_viewportT[VIEWPORT_TYPES];
+extern VpType g_vptype[VIEWPORT_TYPES];
 
+#if 0
 class Viewport
 {
 public:
@@ -46,13 +47,17 @@ public:
 
 extern Viewport g_viewport[4];
 //extern Vec3f g_focus;
+#endif
 
 void DrawViewport(int which, int x, int y, int width, int height);
+
+#if 0
 bool ViewportLDown(int which, int relx, int rely, int width, int height);
 bool ViewportLUp(int which, int relx, int rely, int width, int height);
 bool ViewportMousemove(int which, int relx, int rely, int width, int height);
 bool ViewportRDown(int which, int relx, int rely, int width, int height);
 bool ViewportRUp(int which, int relx, int rely, int width, int height);
-bool ViewportMousewheel(int which, int delta);
+bool NULL(int which, int delta);
+#endif
 
 #endif

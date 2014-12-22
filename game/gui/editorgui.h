@@ -11,7 +11,7 @@
 #define EDTOOL_PLACEPOWERLINES	5
 #define EDTOOL_PLACECRUDEPIPES	6
 
-void FillEditorGUI();
+void FillEd();
 int GetPlaceUnitType();
 int GetPlaceBuildingType();
 int GetEdTool();

@@ -79,7 +79,7 @@ void InitGLSL()
 	GLenum glewError = glewInit();
 	if( glewError != GLEW_OK )
 	{
-		ErrorMessage("Error initializing GLEW!", (const char*)glewGetErrorString( glewError ));
+		ErrMess("Error initializing GLEW!", (const char*)glewGetErrorString( glewError ));
 		return;
 	}
 
@@ -89,14 +89,14 @@ void InitGLSL()
 #if 0
 	if( !GLEW_VERSION_3_0 )
 	{
-		ErrorMessage("Error", "OpenGL 3.0 not supported!\n" );
+		ErrMess("Error", "OpenGL 3.0 not supported!\n" );
 		g_quit = true;
 		return;
 	}
 #else
-	if( !GLEW_VERSION_3_0 )
+	if( !GLEW_VERSION_1_4 )
 	{
-		ErrorMessage("Error", "OpenGL 1.4 not supported!\n" );
+		ErrMess("Error", "OpenGL 1.4 not supported!\n" );
 		g_quit = true;
 		return;
 	}
@@ -110,7 +110,7 @@ void InitGLSL()
 
 	if(!strstr(szGLExtensions, "GL_ARB_debug_output"))
 	{
-		//ErrorMessage("Error", "GL_ARB_debug_output extension not supported!");
+		//ErrMess("Error", "GL_ARB_debug_output extension not supported!");
 		//g_quit = true;
 		//return;
 		g_log<<"GL_ARB_debug_output extension not supported"<<std::endl;
@@ -125,14 +125,14 @@ void InitGLSL()
 
 	if(!strstr(szGLExtensions, "GL_ARB_shader_objects"))
 	{
-		ErrorMessage("Error", "GL_ARB_shader_objects extension not supported!");
+		ErrMess("Error", "GL_ARB_shader_objects extension not supported!");
 		g_quit = true;
 		return;
 	}
 
 	if(!strstr(szGLExtensions, "GL_ARB_shading_language_100"))
 	{
-		ErrorMessage("Error", "GL_ARB_shading_language_100 extension not supported!");
+		ErrMess("Error", "GL_ARB_shading_language_100 extension not supported!");
 		g_quit = true;
 		return;
 	}
@@ -144,13 +144,13 @@ void InitGLSL()
 #if 0
 	if(major < 3 || ( major == 3 && minor < 0 ))
 	{
-		ErrorMessage("Error", "OpenGL 3.0 is not supported!");
+		ErrMess("Error", "OpenGL 3.0 is not supported!");
 		g_quit = true;
 	}
 #else
 	if(major < 1 || ( major == 1 && minor < 4 ))
 	{
-		ErrorMessage("Error", "OpenGL 1.4 is not supported!");
+		ErrMess("Error", "OpenGL 1.4 is not supported!");
 		g_quit = true;
 	}
 #endif
@@ -352,7 +352,7 @@ void UseS(int shader)
 	glUseProgram(s->m_program);
 	CheckGLError(__FILE__, __LINE__);
 
-	Player* py = &g_player[g_curP];
+	Player* py = &g_player[g_localP];
 
 #if 0
 	//opengl 3 way
@@ -371,7 +371,7 @@ void UseS(int shader)
 #endif
 
 	if(s->m_slot[SSLOT_MIND] != -1) glUniform1f(s->m_slot[SSLOT_MIND], MIN_DISTANCE);
-	if(s->m_slot[SSLOT_MAXD] != -1) glUniform1f(s->m_slot[SSLOT_MAXD], MAX_DISTANCE / py->zoom);
+	if(s->m_slot[SSLOT_MAXD] != -1) glUniform1f(s->m_slot[SSLOT_MAXD], MAX_DISTANCE / g_zoom);
 
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);

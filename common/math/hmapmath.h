@@ -17,5 +17,9 @@ bool AnyWateri(int tx, int tz);
 bool AnyWater(int cmx, int cmz);
 bool AtWater(int cmx, int cmz);
 bool AtLand(int cmx, int cmz);
+void MapFrust(Vec3f* interTopLeft,
+	Vec3f* interTopRight,
+	Vec3f* interBottomLeft,
+	Vec3f* interBottomRight);
 
 #endif

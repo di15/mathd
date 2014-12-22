@@ -1,6 +1,7 @@
 #include "platform.h"
 #include "ustring.h"
 #include "utils.h"
+#include "sys/unicode.h"
 
 UString::UString()
 {
@@ -123,6 +124,10 @@ UString UString::substr(int start, int len) const
 	if(len <= 0)
 		return newstr;
 
+	//important fix
+	if(start < 0 || start >= m_length)
+		return newstr;
+
 	delete [] newstr.m_data;
 	newstr.m_length = len;
 	newstr.m_data = new unsigned int[len+1];
@@ -182,8 +187,15 @@ std::string UString::rawstr() const
 
 #endif
 
+#if 0
 	for(int i=0; i<m_length; i++)
 		finstr += (char)m_data[i];
+#else
+	//utf8
+	unsigned char* utf8 = ToUTF8(m_data);
+	finstr = (char*)utf8;
+	delete [] utf8;
+#endif
 
 	return finstr;
 }

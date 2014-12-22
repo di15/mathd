@@ -3,7 +3,7 @@
 #include "button.h"
 #include "checkbox.h"
 #include "editbox.h"
-#include "dropdowns.h"
+#include "droplist.h"
 #include "image.h"
 #include "insdraw.h"
 #include "link.h"
@@ -119,7 +119,7 @@ void EditBox::frameupd()
 	g_log.flush();
 #endif
 
-	Player* py = &g_player[g_curP];
+	Player* py = &g_player[g_localP];
 
 	if(m_ldown)
 	{
@@ -130,7 +130,7 @@ void EditBox::frameupd()
 		g_log.flush();
 #endif
 
-		if(py->mouse.x >= m_pos[2]-5)
+		if(g_mouse.x >= m_pos[2]-5)
 		{
 			m_scroll[0] -= fmax(1, g_font[m_font].gheight/4.0f);
 
@@ -147,7 +147,7 @@ void EditBox::frameupd()
 
 			movedcar = true;
 		}
-		else if(py->mouse.x <= m_pos[0]+5)
+		else if(g_mouse.x <= m_pos[0]+5)
 		{
 			m_scroll[0] += fmax(1, g_font[m_font].gheight/4.0f);
 
@@ -160,7 +160,7 @@ void EditBox::frameupd()
 		if(movedcar)
 		{
 			RichText val = drawvalue();
-			int newcaret = MatchGlyphF(&val, m_font, py->mouse.x, m_pos[0]+m_scroll[0], m_pos[1], m_pos[0], m_pos[1], m_pos[2], m_pos[3]);
+			int newcaret = MatchGlyphF(&val, m_font, g_mouse.x, m_pos[0]+m_scroll[0], m_pos[1], m_pos[0], m_pos[1], m_pos[2], m_pos[3]);
 
 			if(newcaret > m_caret)
 			{
@@ -176,23 +176,23 @@ void EditBox::frameupd()
 	}
 }
 
-void EditBox::inev(InEv* ev)
+void EditBox::inev(InEv* ie)
 {
 //#ifdef MOUSESC_DEBUG
 	//g_log<<"editbox mousemove"<<std::endl;
 	//g_log.flush();
 //#endif
 
-	Player* py = &g_player[g_curP];
+	Player* py = &g_player[g_localP];
 
-	if(ev->type == INEV_MOUSEMOVE)
+	if(ie->type == INEV_MOUSEMOVE)
 	{
-		if(!ev->intercepted)
+		if(!ie->intercepted)
 		{
 			if(m_ldown)
 			{
 				RichText val = drawvalue();
-				int newcaret = MatchGlyphF(&val, m_font, py->mouse.x, m_pos[0]+m_scroll[0], m_pos[1], m_pos[0], m_pos[1], m_pos[2], m_pos[3]);
+				int newcaret = MatchGlyphF(&val, m_font, g_mouse.x, m_pos[0]+m_scroll[0], m_pos[1], m_pos[0], m_pos[1], m_pos[2], m_pos[3]);
 
 				if(newcaret > m_caret)
 				{
@@ -209,17 +209,17 @@ void EditBox::inev(InEv* ev)
 					//g_log.flush();
 				}
 
-				ev->intercepted = true;
+				ie->intercepted = true;
 				return;
 			}
 
-			if(py->mouse.x >= m_pos[0] && py->mouse.x <= m_pos[2] && py->mouse.y >= m_pos[1] && py->mouse.y <= m_pos[3])
+			if(g_mouse.x >= m_pos[0] && g_mouse.x <= m_pos[2] && g_mouse.y >= m_pos[1] && g_mouse.y <= m_pos[3])
 			{
 				m_over = true;
 
-				py->mouseoveraction = true;
+				g_mouseoveraction = true;
 
-				ev->intercepted = true;
+				ie->intercepted = true;
 				return;
 			}
 			else
@@ -230,7 +230,7 @@ void EditBox::inev(InEv* ev)
 			}
 		}
 	}
-	else if(ev->type == INEV_MOUSEDOWN && ev->key == MOUSE_LEFT)
+	else if(ie->type == INEV_MOUSEDOWN && ie->key == MOUSE_LEFT)
 	{
 		if(m_opened)
 		{
@@ -238,7 +238,7 @@ void EditBox::inev(InEv* ev)
 			m_highl[0] = m_highl[1] = 0;
 		}
 
-		if(!ev->intercepted)
+		if(!ie->intercepted)
 		{
 			if(m_over)
 			{
@@ -249,17 +249,17 @@ void EditBox::inev(InEv* ev)
 				//m_highl[1] = MatchGlyphF(m_value.c_str(), m_font, m_pos[0]+m_scroll[0], m_pos[1], m_pos[0], m_pos[1], m_pos[2], m_pos[3]);
 				//m_highl[0] = m_highl[1];
 				//m_caret = m_highl[1];
-				m_caret = MatchGlyphF(&val, m_font, py->mouse.x, m_pos[0]+m_scroll[0], m_pos[1], m_pos[0], m_pos[1], m_pos[2], m_pos[3]);
+				m_caret = MatchGlyphF(&val, m_font, g_mouse.x, m_pos[0]+m_scroll[0], m_pos[1], m_pos[0], m_pos[1], m_pos[2], m_pos[3]);
 
 				m_highl[0] = 0;
 				m_highl[1] = 0;
 
-				ev->intercepted = true;
+				ie->intercepted = true;
 				return;
 			}
 		}
 	}
-	else if(ev->type == INEV_MOUSEUP && ev->key == MOUSE_LEFT && !ev->intercepted)
+	else if(ie->type == INEV_MOUSEUP && ie->key == MOUSE_LEFT && !ie->intercepted)
 	{
 		//if(m_over && m_ldown)
 		if(m_ldown)
@@ -271,7 +271,7 @@ void EditBox::inev(InEv* ev)
 				m_caret = -1;
 			}
 
-			ev->intercepted = true;
+			ie->intercepted = true;
 			gainfocus();
 
 			return;
@@ -281,11 +281,11 @@ void EditBox::inev(InEv* ev)
 
 		if(m_opened)
 		{
-			ev->intercepted = true;
+			ie->intercepted = true;
 			return;
 		}
 	}
-	else if(ev->type == INEV_KEYDOWN && !ev->intercepted)
+	else if(ie->type == INEV_KEYDOWN && !ie->intercepted)
 	{
 		if(!m_opened)
 			return;
@@ -295,10 +295,10 @@ void EditBox::inev(InEv* ev)
 		if(m_caret > len)
 			m_caret = len;
 
-		if(ev->key == SDLK_F1)
+		if(ie->key == SDLK_F1)
 			return;
 
-		if(ev->key == SDLK_LEFT)
+		if(ie->key == SDLK_LEFT)
 		{
 			if(m_highl[0] > 0 && m_highl[0] != m_highl[1])
 			{
@@ -307,7 +307,7 @@ void EditBox::inev(InEv* ev)
 			}
 			else if(m_caret <= 0)
 			{
-				ev->intercepted = true;
+				ie->intercepted = true;
 				return;
 			}
 			else
@@ -322,7 +322,7 @@ void EditBox::inev(InEv* ev)
 			if(endx <= m_pos[0])
 				m_scroll[0] += m_pos[0] - endx + 1;
 		}
-		else if(ev->key == SDLK_RIGHT)
+		else if(ie->key == SDLK_RIGHT)
 		{
 			int len = m_value.texlen();
 
@@ -333,7 +333,7 @@ void EditBox::inev(InEv* ev)
 			}
 			else if(m_caret >= len)
 			{
-				ev->intercepted = true;
+				ie->intercepted = true;
 				return;
 			}
 			else
@@ -345,7 +345,7 @@ void EditBox::inev(InEv* ev)
 			if(endx >= m_pos[2])
 				m_scroll[0] -= endx - m_pos[2] + 1;
 		}
-		else if(ev->key == SDLK_DELETE)
+		else if(ie->key == SDLK_DELETE)
 		{
 			len = m_value.texlen();
 
@@ -354,7 +354,7 @@ void EditBox::inev(InEv* ev)
 
 			if((m_highl[1] <= 0 || m_highl[0] == m_highl[1]) && m_caret >= len || len <= 0)
 			{
-				ev->intercepted = true;
+				ie->intercepted = true;
 				return;
 			}
 
@@ -363,13 +363,13 @@ void EditBox::inev(InEv* ev)
 			if(!m_passw)
 				m_value = ParseTags(m_value, &m_caret);
 		}
-		if(ev->key == SDLK_BACKSPACE)
+		if(ie->key == SDLK_BACKSPACE)
 		{
 			len = m_value.texlen();
 
 			if((m_highl[1] <= 0 || m_highl[0] == m_highl[1]) && len <= 0)
 			{
-				ev->intercepted = true;
+				ie->intercepted = true;
 				return;
 			}
 
@@ -378,7 +378,7 @@ void EditBox::inev(InEv* ev)
 			if(!m_passw)
 				m_value = ParseTags(m_value, &m_caret);
 		}/*
-		 else if(ev->key == SDLK_DELETE)
+		 else if(ie->key == SDLK_DELETE)
 		 {
 		 len = m_value.texlen();
 
@@ -393,25 +393,25 @@ void EditBox::inev(InEv* ev)
 		 if(!m_passw)
 		 m_value = ParseTags(m_value, &m_caret);
 		 }*/
-		else if(ev->key == SDLK_LSHIFT || ev->key == SDLK_RSHIFT)
+		else if(ie->key == SDLK_LSHIFT || ie->key == SDLK_RSHIFT)
 		{
-			ev->intercepted = true;
+			ie->intercepted = true;
 			return;
 		}
-		else if(ev->key == SDLK_CAPSLOCK)
+		else if(ie->key == SDLK_CAPSLOCK)
 		{
-			ev->intercepted = true;
+			ie->intercepted = true;
 			return;
 		}
-		else if(ev->key == SDLK_RETURN || ev->key == SDLK_RETURN2)
+		else if(ie->key == SDLK_RETURN || ie->key == SDLK_RETURN2)
 		{
-			ev->intercepted = true;
+			ie->intercepted = true;
 			if(submitfunc)
 				submitfunc();
 			return;
 		}
 #if 0
-		else if(ev->key == 190 && !py->keys[SDLK_SHIFT])
+		else if(ie->key == 190 && !g_keys[SDLK_SHIFT])
 		{
 			//placechar('.');
 		}
@@ -421,38 +421,38 @@ void EditBox::inev(InEv* ev)
 			changefunc2(m_param);
 
 		if(changefunc3 != NULL)
-			changefunc3(ev->key, ev->scancode, true, m_param);
+			changefunc3(ie->key, ie->scancode, true, m_param);
 
-		ev->intercepted = true;
+		ie->intercepted = true;
 	}
-	else if(ev->type == INEV_KEYUP && !ev->intercepted)
+	else if(ie->type == INEV_KEYUP && !ie->intercepted)
 	{
 		if(!m_opened)
 			return;
 
 		if(changefunc3 != NULL)
-			changefunc3(ev->key, ev->scancode, false, m_param);
+			changefunc3(ie->key, ie->scancode, false, m_param);
 
-		ev->intercepted = true;
+		ie->intercepted = true;
 	}
-	else if(ev->type == INEV_TEXTIN && !ev->intercepted)
+	else if(ie->type == INEV_TEXTIN && !ie->intercepted)
 	{
 		if(!m_opened)
 			return;
 
-		ev->intercepted = true;
+		ie->intercepted = true;
 
 		int len = m_value.texlen();
 
 		if(m_caret > len)
 			m_caret = len;
 
-		//g_log<<"vk "<<ev->key<<std::endl;
+		//g_log<<"vk "<<ie->key<<std::endl;
 		//g_log.flush();
 
 
 #if 0
-		if(ev->key == SDLK_SPACE)
+		if(ie->key == SDLK_SPACE)
 		{
 			placechar(' ');
 		}
@@ -460,29 +460,30 @@ void EditBox::inev(InEv* ev)
 #endif
 
 #ifdef PASTE_DEBUG
-			g_log<<"charin "<<(char)ev->key<<" ("<<ev->key<<")"<<std::endl;
+			g_log<<"charin "<<(char)ie->key<<" ("<<ie->key<<")"<<std::endl;
 		g_log.flush();
 #endif
 
 #if 0
-		//if(ev->key == 'C' && py->keys[SDLK_CONTROL])
-		if(ev->key == 3)	//copy
+		//if(ie->key == 'C' && g_keys[SDLK_CONTROL])
+		if(ie->key == 3)	//copy
 		{
 			copyval();
 		}
-		//else if(ev->key == 'V' && py->keys[SDLK_CONTROL])
-		else if(ev->key == 22)	//paste
+		//else if(ie->key == 'V' && g_keys[SDLK_CONTROL])
+		else if(ie->key == 22)	//paste
 		{
 			pasteval();
 		}
-		//else if(ev->key == 'A' && py->keys[SDLK_CONTROL])
-		else if(ev->key == 1)	//select all
+		//else if(ie->key == 'A' && g_keys[SDLK_CONTROL])
+		else if(ie->key == 1)	//select all
 		{
 			selectall();
 		}
 		else
 #endif
-		unsigned int* ustr = ToUTF32((const unsigned char*)ev->text.c_str(), ev->text.length());
+		//unsigned int* ustr = ToUTF32((const unsigned char*)ie->text.c_str(), ie->text.length());
+		unsigned int* ustr = ToUTF32((const unsigned char*)ie->text.c_str());
 		//RichText addstr(RichPart(UString(ustr)));	//Why does MSVS2012 not accept this?
 		RichText addstr = RichText(RichPart(UString(ustr)));
 		unsigned int first = ustr[0];
@@ -499,7 +500,49 @@ void EditBox::inev(InEv* ev)
 		if(changefunc3 != NULL)
 			changefunc3(first, 0, true, m_param);
 
-		ev->intercepted = true;
+		ie->intercepted = true;
+	}
+	else if(ie->type == INEV_PASTE && !ie->intercepted)
+	{
+		if(!m_opened)
+			return;
+
+		ie->intercepted = true;
+
+		int len = m_value.texlen();
+
+		if(m_caret > len)
+			m_caret = len;
+
+		pasteval();
+	}
+	else if(ie->type == INEV_COPY && !ie->intercepted)
+	{
+		if(!m_opened)
+			return;
+
+		ie->intercepted = true;
+
+		int len = m_value.texlen();
+
+		if(m_caret > len)
+			m_caret = len;
+
+		copyval();
+	}
+	else if(ie->type == INEV_SELALL && !ie->intercepted)
+	{
+		if(!m_opened)
+			return;
+
+		ie->intercepted = true;
+
+		int len = m_value.texlen();
+
+		if(m_caret > len)
+			m_caret = len;
+
+		selectall();
 	}
 }
 
@@ -521,7 +564,8 @@ void EditBox::placestr(const RichText* str)
 	if(m_highl[1] > 0 && m_highl[0] != m_highl[1])
 	{
 		RichText before = m_value.substr(0, m_highl[0]);
-		RichText after = m_value.substr(m_highl[1]-1, m_value.texlen()-m_highl[1]);
+		//RichText after = m_value.substr(m_highl[1]-1, m_value.texlen()-m_highl[1]);
+		RichText after = m_value.substr(m_highl[1], m_value.texlen()-m_highl[1]);
 		m_value = before + addstr + after;
 
 		m_caret = m_highl[0] + addlen;
@@ -539,8 +583,11 @@ void EditBox::placestr(const RichText* str)
 		m_value = before + addstr + after;
 		m_caret += addlen;
 
-		LogRich(&m_value);
+		//LogRich(&m_value);
 	}
+
+	if(!m_passw)
+		m_value = ParseTags(m_value, &m_caret);
 
 	RichText val = drawvalue();
 	int endx = EndX(&val, m_caret, m_font, m_pos[0]+m_scroll[0], m_pos[1]);
@@ -549,6 +596,7 @@ void EditBox::placestr(const RichText* str)
 		m_scroll[0] -= endx - m_pos[2] + 1;
 }
 
+#if 0
 void EditBox::changevalue(const char* str)
 {
 	int len = m_value.texlen();
@@ -575,6 +623,19 @@ void EditBox::changevalue(const char* str)
 
 	delete [] setstr;
 }
+#else
+
+void EditBox::changevalue(const RichText* str)
+{
+	int setlen = str->texlen();
+	if(setlen >= m_maxlen)
+		setlen = m_maxlen;
+
+	m_value = str->substr(0, setlen);
+	m_highl[0] = m_highl[1] = 0;
+	m_caret = 0;
+}
+#endif
 
 bool EditBox::delnext()
 {
@@ -658,78 +719,28 @@ void EditBox::copyval()
 	g_log.flush();
 #endif
 
-#ifdef PLATFORM_WIN
 	if(m_highl[1] > 0 && m_highl[0] != m_highl[1])
 	{
 		RichText highl = m_value.substr(m_highl[0], m_highl[1]-m_highl[0]);
-		std::string rawhighl = highl.rawstr();
-		const size_t len = strlen(rawhighl.c_str())+1;
-		HGLOBAL hMem = GlobalAlloc(GMEM_MOVEABLE, len);
-		memcpy(GlobalLock(hMem), rawhighl.c_str(), len);
-		GlobalUnlock(hMem);
-		OpenClipboard(0);
-		EmptyClipboard();
-		SetClipboardData(CF_TEXT, hMem);
-		CloseClipboard();
+		SDL_SetClipboardText( highl.rawstr().c_str() );
 	}
 	else
 	{
-		const char* output = "";
-		const size_t len = strlen(output)+1;
-		HGLOBAL hMem = GlobalAlloc(GMEM_MOVEABLE, len);
-		memcpy(GlobalLock(hMem), output, len);
-		GlobalUnlock(hMem);
-		OpenClipboard(0);
-		EmptyClipboard();
-		SetClipboardData(CF_TEXT, hMem);
-		CloseClipboard();
+		SDL_SetClipboardText( "" );
 	}
-#endif // PLATFORM_WIN
 
 	//return true;
 }
 
 void EditBox::pasteval()
 {
-#ifdef PLATFORM_WIN
-#ifdef PASTE_DEBUG
-	g_log<<"paste"<<std::endl;
-#endif
-	OpenClipboard(NULL);
-
-#ifdef PASTE_DEBUG
-	g_log<<"paste1"<<std::endl;
-#endif
-	HANDLE clip0 = GetClipboardData(CF_TEXT);
-
-#ifdef PASTE_DEBUG
-	g_log<<"paste2"<<std::endl;
-#endif
-	//HANDLE h = GlobalLock(clip0);
-	//placestr((char*)clip0);
-	char* str = (char*)GlobalLock(clip0);
-#ifdef PASTE_DEBUG
-	g_log<<"paste3"<<std::endl;
-	g_log<<str<<std::endl;
-#endif
-
-	//placestr(str);
-
-#ifdef PASTE_DEBUG
-	g_log<<"place str ";
-	g_log<<str<<std::endl;
-	g_log.flush();
-	g_log.flush();
-#endif
+	unsigned int* ustr = ToUTF32( (unsigned char*)SDL_GetClipboardText() ); 
+	RichText rstr = RichText(UString(ustr));
+	delete [] ustr;
+	placestr( &rstr );
 
 	if(!m_passw)
 		m_value = ParseTags(m_value, &m_caret);
-
-	GlobalUnlock(clip0);
-	CloseClipboard();
-
-	//return true;
-#endif // PLATFORM_WIN
 }
 
 void EditBox::selectall()
@@ -763,12 +774,12 @@ void EditBox::gainfocus()
 {
 	if(!m_opened)
 	{
-		Player* py = &g_player[g_curP];
+		Player* py = &g_player[g_localP];
 
-		if(py->kbfocus > 0)
+		if(g_kbfocus > 0)
 		{
 			SDL_StopTextInput();
-			py->kbfocus--;
+			g_kbfocus--;
 		}
 
 		m_opened = true;
@@ -776,10 +787,10 @@ void EditBox::gainfocus()
 		SDL_Rect r;
 		r.x = (int)m_pos[0];
 		r.y = (int)m_pos[3];
-		r.w = (int)(py->width - m_pos[0]);
-		r.h = (int)(py->height - m_pos[3]);
+		r.w = (int)(g_width - m_pos[0]);
+		r.h = (int)(g_height - m_pos[3]);
 		SDL_SetTextInputRect(&r);
-		py->kbfocus++;
+		g_kbfocus++;
 	}
 }
 
@@ -787,12 +798,12 @@ void EditBox::losefocus()
 {
 	if(m_opened)
 	{
-		Player* py = &g_player[g_curP];
+		Player* py = &g_player[g_localP];
 
-		if(py->kbfocus > 0)
+		if(g_kbfocus > 0)
 		{
 			SDL_StopTextInput();
-			py->kbfocus--;
+			g_kbfocus--;
 		}
 
 		m_opened = false;

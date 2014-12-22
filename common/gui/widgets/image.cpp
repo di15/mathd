@@ -3,7 +3,7 @@
 #include "button.h"
 #include "checkbox.h"
 #include "editbox.h"
-#include "dropdowns.h"
+#include "droplist.h"
 #include "image.h"
 #include "insdraw.h"
 #include "link.h"
@@ -73,6 +73,7 @@ Image::Image(Widget* parent, const char* filepath, bool clamp, void (*reframef)(
 	m_pos[1] = 0;
 	m_pos[2] = 0;
 	m_pos[3] = 0;
+	m_name = "";
 	reframe();
 }
 

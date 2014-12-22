@@ -8,7 +8,7 @@
 class Particle;
 class Billboard;
 
-class ParticleT
+class PlType
 {
 public:
 	int billbT;
@@ -34,12 +34,12 @@ public:
 #define PARTICLE_FLAME			8
 #define PARTICLE_PLUME			9
 #define PARTICLE_TYPES			10
-extern ParticleT g_particleT[PARTICLE_TYPES];
+extern PlType g_particleT[PARTICLE_TYPES];
 
 class EmitterCounter
 {
 public:
-	long long last;
+	unsigned long long last;
 
 	EmitterCounter()
 	{
@@ -47,7 +47,7 @@ public:
 	}
 	bool emitnext(int delay)
 	{
-		if(GetTickCount64()-last > (long long)delay)
+		if(GetTickCount64()-last > (unsigned long long)delay)
 		{
 			last = GetTickCount64();
 			return true;
@@ -106,5 +106,6 @@ void LoadParticles();
 void Particles();
 void EmitParticle(int type, Vec3f pos);
 void UpdateParticles();
+void FreeParts();
 
 #endif

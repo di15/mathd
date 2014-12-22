@@ -152,9 +152,6 @@
     <ClCompile Include="..\common\render\screenshot.cpp">
       <Filter>Source Files\common\render</Filter>
     </ClCompile>
-    <ClCompile Include="..\common\sim\buildingtype.cpp">
-      <Filter>Source Files\common\sim</Filter>
-    </ClCompile>
     <ClCompile Include="..\common\save\savemap.cpp">
       <Filter>Source Files\common\save</Filter>
     </ClCompile>
@@ -177,9 +174,6 @@
       <Filter>Source Files\common\sim</Filter>
     </ClCompile>
     <ClCompile Include="..\common\sim\unit.cpp">
-      <Filter>Source Files\common\sim</Filter>
-    </ClCompile>
-    <ClCompile Include="..\common\sim\unittype.cpp">
       <Filter>Source Files\common\sim</Filter>
     </ClCompile>
     <ClCompile Include="gui\ggui.cpp">
@@ -263,9 +257,6 @@
     <ClCompile Include="..\common\gui\widgets\checkbox.cpp">
       <Filter>Source Files\common\gui\widgets</Filter>
     </ClCompile>
-    <ClCompile Include="..\common\gui\widgets\dropdowns.cpp">
-      <Filter>Source Files\common\gui\widgets</Filter>
-    </ClCompile>
     <ClCompile Include="..\common\gui\widgets\editbox.cpp">
       <Filter>Source Files\common\gui\widgets</Filter>
     </ClCompile>
@@ -302,17 +293,11 @@
     <ClCompile Include="..\common\gui\widgets\spez\resticker.cpp">
       <Filter>Source Files\common\gui\widgets\spez</Filter>
     </ClCompile>
-    <ClCompile Include="..\common\gui\widgets\spez\bottompanel.cpp">
-      <Filter>Source Files\common\gui\widgets\spez</Filter>
-    </ClCompile>
     <ClCompile Include="gui\gviewport.cpp">
       <Filter>Source Files\gui</Filter>
     </ClCompile>
     <ClCompile Include="..\common\sim\player.cpp">
       <Filter>Source Files\common\sim</Filter>
-    </ClCompile>
-    <ClCompile Include="..\common\gui\widgets\spez\buildpreview.cpp">
-      <Filter>Source Files\common\gui\widgets\spez</Filter>
     </ClCompile>
     <ClCompile Include="..\common\render\dmdmodel.cpp">
       <Filter>Source Files\common\render</Filter>
@@ -325,9 +310,6 @@
     </ClCompile>
     <ClCompile Include="..\common\sim\build.cpp">
       <Filter>Source Files\common\sim</Filter>
-    </ClCompile>
-    <ClCompile Include="..\common\gui\widgets\spez\constructionview.cpp">
-      <Filter>Source Files\common\gui\widgets\spez</Filter>
     </ClCompile>
     <ClCompile Include="..\common\gui\cursor.cpp">
       <Filter>Source Files\common\gui</Filter>
@@ -367,9 +349,6 @@
     </ClCompile>
     <ClCompile Include="..\common\ai\ai.cpp">
       <Filter>Source Files\common\ai</Filter>
-    </ClCompile>
-    <ClCompile Include="..\common\sim\infrastructure.cpp">
-      <Filter>Source Files\common\sim</Filter>
     </ClCompile>
     <ClCompile Include="..\common\math\fixmath.cpp">
       <Filter>Source Files\common\math</Filter>
@@ -419,9 +398,6 @@
     <ClCompile Include="gui\chattext.cpp">
       <Filter>Source Files\gui</Filter>
     </ClCompile>
-    <ClCompile Include="..\common\gui\widgets\spez\buildingview.cpp">
-      <Filter>Source Files\common\gui\widgets\spez</Filter>
-    </ClCompile>
     <ClCompile Include="..\common\econ\balance.cpp">
       <Filter>Source Files\common\econ</Filter>
     </ClCompile>
@@ -440,9 +416,6 @@
     <ClCompile Include="..\common\net\net.cpp">
       <Filter>Source Files\common\net</Filter>
     </ClCompile>
-    <ClCompile Include="..\common\net\client.cpp">
-      <Filter>Source Files\common\net</Filter>
-    </ClCompile>
     <ClCompile Include="..\common\net\readpackets.cpp">
       <Filter>Source Files\common\net</Filter>
     </ClCompile>
@@ -454,6 +427,102 @@
     </ClCompile>
     <ClCompile Include="..\common\net\lockstep.cpp">
       <Filter>Source Files\common\net</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\sim\simflow.cpp">
+      <Filter>Source Files\common\sim</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\sim\bltype.cpp">
+      <Filter>Source Files\common\sim</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\sim\utype.cpp">
+      <Filter>Source Files\common\sim</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\gui\widgets\droplist.cpp">
+      <Filter>Source Files\common\gui\widgets</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\gui\widgets\spez\blview.cpp">
+      <Filter>Source Files\common\gui\widgets\spez</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\gui\widgets\spez\blpreview.cpp">
+      <Filter>Source Files\common\gui\widgets\spez</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\gui\widgets\spez\cstrview.cpp">
+      <Filter>Source Files\common\gui\widgets\spez</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\sim\truck.cpp">
+      <Filter>Source Files\common\sim</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\sim\conduit.cpp">
+      <Filter>Source Files\common\sim</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\sim\transport.cpp">
+      <Filter>Source Files\common\sim</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\gui\widgets\spez\truckmgr.cpp">
+      <Filter>Source Files\common\gui\widgets\spez</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\gui\widgets\spez\loadview.cpp">
+      <Filter>Source Files\common\gui\widgets\spez</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\gui\widgets\spez\saveview.cpp">
+      <Filter>Source Files\common\gui\widgets\spez</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\render\infoov.cpp">
+      <Filter>Source Files\common\render</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\sound\soundch.cpp">
+      <Filter>Source Files\common\sound</Filter>
+    </ClCompile>
+    <ClCompile Include="gui\gamover.cpp">
+      <Filter>Source Files\gui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\gui\widgets\spez\newhost.cpp">
+      <Filter>Source Files\common\gui\widgets\spez</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\gui\widgets\spez\lobby.cpp">
+      <Filter>Source Files\common\gui\widgets\spez</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\gui\widgets\spez\botpan.cpp">
+      <Filter>Source Files\common\gui\widgets\spez</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\render\graph.cpp">
+      <Filter>Source Files\common\render</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\path\anypath.cpp">
+      <Filter>Source Files\common\path</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\sys\utf8.cpp">
+      <Filter>Source Files\common\sys</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\sys\regress.cpp">
+      <Filter>Source Files\common\sys</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\net\client.cpp">
+      <Filter>Source Files\common\net</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\gui\widgets\spez\svlist.cpp">
+      <Filter>Source Files\common\gui\widgets\spez</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\sys\checksum.cpp">
+      <Filter>Source Files\common\sys</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\net\download.cpp">
+      <Filter>Source Files\common\net</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\path\tilepath.cpp">
+      <Filter>Source Files\common\path</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\path\itinerary.cpp">
+      <Filter>Source Files\common\path</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\path\groupmove.cpp">
+      <Filter>Source Files\common\path</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\sim\simstate.cpp">
+      <Filter>Source Files\common\sim</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\path\fillbodies.cpp">
+      <Filter>Source Files\common\path</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -553,9 +622,6 @@
     <ClInclude Include="..\common\render\screenshot.h">
       <Filter>Source Files\common\render</Filter>
     </ClInclude>
-    <ClInclude Include="..\common\sim\buildingtype.h">
-      <Filter>Source Files\common\sim</Filter>
-    </ClInclude>
     <ClInclude Include="..\common\save\savemap.h">
       <Filter>Source Files\common\save</Filter>
     </ClInclude>
@@ -578,9 +644,6 @@
       <Filter>Source Files\common\sim</Filter>
     </ClInclude>
     <ClInclude Include="..\common\sim\unit.h">
-      <Filter>Source Files\common\sim</Filter>
-    </ClInclude>
-    <ClInclude Include="..\common\sim\unittype.h">
       <Filter>Source Files\common\sim</Filter>
     </ClInclude>
     <ClInclude Include="gui\ggui.h">
@@ -664,9 +727,6 @@
     <ClInclude Include="..\common\gui\widgets\checkbox.h">
       <Filter>Source Files\common\gui\widgets</Filter>
     </ClInclude>
-    <ClInclude Include="..\common\gui\widgets\dropdowns.h">
-      <Filter>Source Files\common\gui\widgets</Filter>
-    </ClInclude>
     <ClInclude Include="..\common\gui\widgets\editbox.h">
       <Filter>Source Files\common\gui\widgets</Filter>
     </ClInclude>
@@ -703,17 +763,11 @@
     <ClInclude Include="..\common\gui\widgets\spez\resticker.h">
       <Filter>Source Files\common\gui\widgets\spez</Filter>
     </ClInclude>
-    <ClInclude Include="..\common\gui\widgets\spez\bottompanel.h">
-      <Filter>Source Files\common\gui\widgets\spez</Filter>
-    </ClInclude>
     <ClInclude Include="gui\gviewport.h">
       <Filter>Source Files\gui</Filter>
     </ClInclude>
     <ClInclude Include="..\common\sim\player.h">
       <Filter>Source Files\common\sim</Filter>
-    </ClInclude>
-    <ClInclude Include="..\common\gui\widgets\spez\buildpreview.h">
-      <Filter>Source Files\common\gui\widgets\spez</Filter>
     </ClInclude>
     <ClInclude Include="..\common\render\dmdmodel.h">
       <Filter>Source Files\common\render</Filter>
@@ -726,9 +780,6 @@
     </ClInclude>
     <ClInclude Include="..\common\sim\build.h">
       <Filter>Source Files\common\sim</Filter>
-    </ClInclude>
-    <ClInclude Include="..\common\gui\widgets\spez\constructionview.h">
-      <Filter>Source Files\common\gui\widgets\spez</Filter>
     </ClInclude>
     <ClInclude Include="..\common\gui\cursor.h">
       <Filter>Source Files\common\gui</Filter>
@@ -768,9 +819,6 @@
     </ClInclude>
     <ClInclude Include="..\common\ai\ai.h">
       <Filter>Source Files\common\ai</Filter>
-    </ClInclude>
-    <ClInclude Include="..\common\sim\infrastructure.h">
-      <Filter>Source Files\common\sim</Filter>
     </ClInclude>
     <ClInclude Include="..\common\math\fixmath.h">
       <Filter>Source Files\common\math</Filter>
@@ -820,9 +868,6 @@
     <ClInclude Include="gui\chattext.h">
       <Filter>Source Files\gui</Filter>
     </ClInclude>
-    <ClInclude Include="..\common\gui\widgets\spez\buildingview.h">
-      <Filter>Source Files\common\gui\widgets\spez</Filter>
-    </ClInclude>
     <ClInclude Include="..\common\econ\balance.h">
       <Filter>Source Files\common\econ</Filter>
     </ClInclude>
@@ -841,9 +886,6 @@
     <ClInclude Include="..\common\net\net.h">
       <Filter>Source Files\common\net</Filter>
     </ClInclude>
-    <ClInclude Include="..\common\net\client.h">
-      <Filter>Source Files\common\net</Filter>
-    </ClInclude>
     <ClInclude Include="..\common\net\packets.h">
       <Filter>Source Files\common\net</Filter>
     </ClInclude>
@@ -858,6 +900,102 @@
     </ClInclude>
     <ClInclude Include="..\common\net\lockstep.h">
       <Filter>Source Files\common\net</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\sim\simflow.h">
+      <Filter>Source Files\common\sim</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\sim\bltype.h">
+      <Filter>Source Files\common\sim</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\sim\utype.h">
+      <Filter>Source Files\common\sim</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\gui\widgets\droplist.h">
+      <Filter>Source Files\common\gui\widgets</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\gui\widgets\spez\blview.h">
+      <Filter>Source Files\common\gui\widgets\spez</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\gui\widgets\spez\blpreview.h">
+      <Filter>Source Files\common\gui\widgets\spez</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\gui\widgets\spez\cstrview.h">
+      <Filter>Source Files\common\gui\widgets\spez</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\sim\truck.h">
+      <Filter>Source Files\common\sim</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\sim\conduit.h">
+      <Filter>Source Files\common\sim</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\sim\transport.h">
+      <Filter>Source Files\common\sim</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\gui\widgets\spez\truckmgr.h">
+      <Filter>Source Files\common\gui\widgets\spez</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\gui\widgets\spez\loadview.h">
+      <Filter>Source Files\common\gui\widgets\spez</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\gui\widgets\spez\saveview.h">
+      <Filter>Source Files\common\gui\widgets\spez</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\render\infoov.h">
+      <Filter>Source Files\common\render</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\sound\soundch.h">
+      <Filter>Source Files\common\sound</Filter>
+    </ClInclude>
+    <ClInclude Include="gui\gameover.h">
+      <Filter>Source Files\gui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\gui\widgets\spez\newhost.h">
+      <Filter>Source Files\common\gui\widgets\spez</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\gui\widgets\spez\lobby.h">
+      <Filter>Source Files\common\gui\widgets\spez</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\gui\widgets\spez\botpan.h">
+      <Filter>Source Files\common\gui\widgets\spez</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\render\graph.h">
+      <Filter>Source Files\common\render</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\path\anypath.h">
+      <Filter>Source Files\common\path</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\sys\utf8.h">
+      <Filter>Source Files\common\sys</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\net\client.h">
+      <Filter>Source Files\common\net</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\gui\widgets\spez\svlist.h">
+      <Filter>Source Files\common\gui\widgets\spez</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\sys\checksum.h">
+      <Filter>Source Files\common\sys</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\net\download.h">
+      <Filter>Source Files\common\net</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\path\tilepath.h">
+      <Filter>Source Files\common\path</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\math\vec2s.h">
+      <Filter>Source Files\common\math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\path\itinerary.h">
+      <Filter>Source Files\common\path</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\path\groupmove.h">
+      <Filter>Source Files\common\path</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\sim\simstate.h">
+      <Filter>Source Files\common\sim</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\path\fillbodies.h">
+      <Filter>Source Files\common\path</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

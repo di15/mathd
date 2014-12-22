@@ -8,12 +8,14 @@
 #include "building.h"
 #include "road.h"
 #include "../math/hmapmath.h"
-#include "buildingtype.h"
+#include "bltype.h"
 #include "building.h"
 #include "../../game/gmain.h"
 #include "../../game/gui/ggui.h"
 
-unsigned char CrPipeTile::condtype()
+#if 0
+unsigned char CrPipeTile::cdtype()
 {
 	return CONDUIT_CRPIPE;
 }
+#endif

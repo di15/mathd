@@ -6,27 +6,27 @@
 void Resize_ChatLine(Widget* thisw)
 {
 	Font* f = &g_font[thisw->m_font];
-	Player* py = &g_player[g_curP];
+	Player* py = &g_player[g_localP];
 
 	int i = 0;
 	sscanf(thisw->m_name.c_str(), "%d", &i);
 
-	float topy = py->height - 200 - CHAT_LINES * f->gheight;
+	float topy = g_height - 200 - CHAT_LINES * f->gheight;
 
 	thisw->m_pos[0] = 0;
 	thisw->m_pos[1] = topy + f->gheight * i;
-	thisw->m_pos[2] = py->width;
+	thisw->m_pos[2] = g_width;
 	thisw->m_pos[3] = topy + f->gheight * (i+1);
 }
 
 void Resize_ChatPrompt(Widget* thisw)
 {
 	Font* f = &g_font[thisw->m_font];
-	Player* py = &g_player[g_curP];
+	Player* py = &g_player[g_localP];
 	int i = CHAT_LINES;
 	thisw->m_pos[0] = 0;
 	thisw->m_pos[1] = 30 + f->gheight * i;
-	thisw->m_pos[2] = py->width;
+	thisw->m_pos[2] = g_width;
 	thisw->m_pos[3] = 30 + f->gheight * (i+1);
 }
 
@@ -42,9 +42,9 @@ void AddChat(ViewLayer* playview)
 
 void AddChat(RichText* newl)
 {
-	Player* py = &g_player[g_curP];
-	GUI* gui = &py->gui;
-	ViewLayer* playview = (ViewLayer*)gui->get("play gui");
+	Player* py = &g_player[g_localP];
+	GUI* gui = &g_gui;
+	ViewLayer* playview = (ViewLayer*)gui->get("play");
 
 	for(int i=0; i<CHAT_LINES-1; i++)
 	{

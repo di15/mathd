@@ -4,6 +4,7 @@
 class Unit;
 
 extern Unit* g_pathunit;
+extern std::vector<Vec3f> g_gridvecs;
 
 void DrawSteps();
 void DrawGrid();

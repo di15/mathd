@@ -3,7 +3,7 @@
 #include "button.h"
 #include "checkbox.h"
 #include "editbox.h"
-#include "dropdowns.h"
+#include "droplist.h"
 #include "image.h"
 #include "insdraw.h"
 #include "link.h"
@@ -42,18 +42,18 @@ void BarButton::draw()
 
 	DrawImage(g_texture[m_tex].texname, m_pos[0], m_pos[1], m_pos[2], m_pos[3]);
 
-	Player* py = &g_player[g_curP];
+	Player* py = &g_player[g_localP];
 
 	EndS();
 	UseS(SHADER_COLOR2D);
-	glUniform1f(g_shader[SHADER_COLOR2D].m_slot[SSLOT_WIDTH], (float)py->currw);
-	glUniform1f(g_shader[SHADER_COLOR2D].m_slot[SSLOT_HEIGHT], (float)py->currh);
+	glUniform1f(g_shader[SHADER_COLOR2D].m_slot[SSLOT_WIDTH], (float)g_currw);
+	glUniform1f(g_shader[SHADER_COLOR2D].m_slot[SSLOT_HEIGHT], (float)g_currh);
 	DrawSquare(1, 0, 0, 1, m_pos[0], m_pos[3]-5, m_pos[2], m_pos[3]);
 	float bar = (m_pos[2] - m_pos[0]) * m_healthbar;
 	DrawSquare(0, 1, 0, 1, m_pos[0], m_pos[3]-5, m_pos[0]+bar, m_pos[3]);
 
 	EndS();
 	CheckGLError(__FILE__, __LINE__);
-	Ortho(py->currw, py->currh, 1, 1, 1, 1);
+	Ortho(g_currw, g_currh, 1, 1, 1, 1);
 }
 

@@ -12,15 +12,15 @@
 
 Font g_font[FONTS];
 
-static int gx;
-static int gy;
+static short gx;
+static short gy;
 static int nextlb;  //next [i] to skip line
 static int lastspace;
 static int j;
-static int x0;
+static short x0;
 static int i;
-static int x;
-static int y;
+static short x;
+static short y;
 static int w;
 static int h;
 static int size;
@@ -30,12 +30,13 @@ static RichText* g_rtext;
 static int g_currfont;
 static int startline;
 static int starti;
-static int gstartx;
-static int goffstartx;
+static short gstartx;
+static short goffstartx;
 static float frame[4];
-static std::list<RichPart>::const_iterator g_rtextp;
+static std::list<RichPart>::const_iterator g_rpartit;
 static int pi;	//RichText part's [i] index
 static float currcolor[4];
+static bool debugtest = false;
 
 void BreakLine()
 {
@@ -45,19 +46,14 @@ void BreakLine()
 	y += f->gheight;
 }
 
-void NextLineBreak()
+void PrepLineBreak()
 {
 	Font* f = &g_font[g_currfont];
 	Glyph* g2;
 
-	if(nextlb != starti)
-	{
-		BreakLine();
-	}
-
 	int lastspace = -1;
-	int x0 = gstartx;
-	auto p = g_rtextp;
+	short x0 = gstartx;
+	auto p = g_rpartit;
 
 	for(int pj=pi, j=i; j<size; j++)
 	{
@@ -67,6 +63,9 @@ void NextLineBreak()
 			if(k == '\n')
 			{
 				nextlb = j+1;
+
+				//if(debugtest)	InfoMess("j_1", "j+1");
+
 				return;
 			}
 
@@ -80,6 +79,13 @@ void NextLineBreak()
 
 			if(pj >= p->m_text.m_length)
 			{
+				//fixed?
+				if(p == g_rtext->m_part.end())
+				{
+					nextlb = -1;
+					return;
+				}
+
 				p++;
 				pj = 0;
 			}
@@ -100,6 +106,15 @@ void NextLineBreak()
 			{
 				nextlb = imax(j, i+1);
 
+#if 0
+				if(debugtest)
+				{
+					char msg[128];
+					//sprintf(msg, "x0 > w+gstartx \n w=%d"
+					InfoMess("x0 > w+gstartx", "x0 > w+gstartx");
+				}
+#endif
+
 				//if(w <= g2->w)
 				//	nextlb++;
 
@@ -112,39 +127,52 @@ void NextLineBreak()
 	}
 }
 
+void NextLineBreak()
+{
+	Font* f = &g_font[g_currfont];
+	Glyph* g2;
+
+	if(nextlb != starti)
+	{
+		BreakLine();
+	}
+
+	PrepLineBreak();
+}
+
 void DrawGlyph()
 {
 	Font* f = &g_font[g_currfont];
 
-	if(g_rtextp->m_type == RICHTEXT_ICON)
+	if(g_rpartit->m_type == RICHTEXT_ICON)
 	{
-		Icon* icon = &g_icon[g_rtextp->m_icon];
+		Icon* icon = &g_icon[g_rpartit->m_icon];
 		float hscale = f->gheight / (float)icon->m_height;
 
-		UseIconTex(g_rtextp->m_icon);
-		glUniform4f(g_shader[g_curS].m_slot[SSLOT_COLOR], 1, 1, 1, 1);
+		UseIconTex(g_rpartit->m_icon);
+		//glUniform4f(g_shader[g_curS].m_slot[SSLOT_COLOR], 1, 1, 1, 1);
 
-		int left = x;
-		int right = left + (float)icon->m_width * hscale;
-		int top = y;
-		int bottom = top + f->gheight;
-		DrawGlyph(left, top, right, bottom, 0, 0, 1, 1);
+		short left = x;
+		short right = (short)( left + (float)icon->m_width * hscale );
+		short top = y;
+		short bottom = top + (short)f->gheight;
+		DrawGlyph((float)left, (float)top, (float)right, (float)bottom, 0, 0, 1, 1);
 
 		UseFontTex();
-		glUniform4f(g_shader[g_curS].m_slot[SSLOT_COLOR], currcolor[0], currcolor[1], currcolor[2], currcolor[3]);
+		//glUniform4f(g_shader[g_curS].m_slot[SSLOT_COLOR], currcolor[0], currcolor[1], currcolor[2], currcolor[3]);
 
 		//g_log<<"color[3] = "<<currcolor[3]<<std::endl;
 	}
-	else if(g_rtextp->m_type == RICHTEXT_TEXT)
+	else if(g_rpartit->m_type == RICHTEXT_TEXT)
 	{
-		unsigned int k = g_rtextp->m_text.m_data[pi];
+		unsigned int k = g_rpartit->m_text.m_data[pi];
 		Glyph* g = &f->glyph[k];
 
-		int left = x + g->offset[0];
-		int right = left + g->texsize[0];
-		int top = y + g->offset[1];
-		int bottom = top + g->texsize[1];
-		DrawGlyph(left, top, right, bottom, g->texcoord[0], g->texcoord[1], g->texcoord[2], g->texcoord[3]);
+		short left = x + g->offset[0];
+		short right = left + g->texsize[0];
+		short top = y + g->offset[1];
+		short bottom = top + g->texsize[1];
+		DrawGlyph((float)left, (float)top, (float)right, (float)bottom, g->texcoord[0], g->texcoord[1], g->texcoord[2], g->texcoord[3]);
 	}
 }
 
@@ -152,35 +180,35 @@ void DrawGlyphF()
 {
 	Font* f = &g_font[g_currfont];
 
-	if(g_rtextp->m_type == RICHTEXT_ICON)
+	if(g_rpartit->m_type == RICHTEXT_ICON)
 	{
-		Icon* icon = &g_icon[g_rtextp->m_icon];
+		Icon* icon = &g_icon[g_rpartit->m_icon];
 		float hscale = f->gheight / (float)icon->m_height;
 
-		UseIconTex(g_rtextp->m_icon);
-		glUniform4f(g_shader[g_curS].m_slot[SSLOT_COLOR], 1, 1, 1, 1);
+		UseIconTex(g_rpartit->m_icon);
+		//glUniform4f(g_shader[g_curS].m_slot[SSLOT_COLOR], 1, 1, 1, 1);
 
-		int left = x;
-		int right = left + (float)icon->m_width * hscale;
-		int top = y;
-		int bottom = top + f->gheight;
-		DrawGlyphF(left, top, right, bottom, 0, 0, 1, 1);
+		short left = x;
+		short right = (short)( left + (float)icon->m_width * hscale );
+		short top = y;
+		short bottom = top + (short)f->gheight;
+		DrawGlyphF((float)left, (float)top, (float)right, (float)bottom, 0, 0, 1, 1);
 
 		UseFontTex();
-		glUniform4f(g_shader[g_curS].m_slot[SSLOT_COLOR], currcolor[0], currcolor[1], currcolor[2], currcolor[3]);
+		//glUniform4f(g_shader[g_curS].m_slot[SSLOT_COLOR], currcolor[0], currcolor[1], currcolor[2], currcolor[3]);
 
 		//g_log<<"color[3] = "<<currcolor[3]<<std::endl;
 	}
-	else if(g_rtextp->m_type == RICHTEXT_TEXT)
+	else if(g_rpartit->m_type == RICHTEXT_TEXT)
 	{
-		unsigned int k = g_rtextp->m_text.m_data[pi];
+		unsigned int k = g_rpartit->m_text.m_data[pi];
 		Glyph* g = &f->glyph[k];
 
-		int left = x + g->offset[0];
-		int right = left + g->texsize[0];
-		int top = y + g->offset[1];
-		int bottom = top + g->texsize[1];
-		DrawGlyphF(left, top, right, bottom, g->texcoord[0], g->texcoord[1], g->texcoord[2], g->texcoord[3]);
+		short left = x + g->offset[0];
+		short right = left + g->texsize[0];
+		short top = y + g->offset[1];
+		short bottom = top + g->texsize[1];
+		DrawGlyphF((float)left, (float)top, (float)right, (float)bottom, g->texcoord[0], g->texcoord[1], g->texcoord[2], g->texcoord[3]);
 	}
 }
 
@@ -198,31 +226,31 @@ void HighlGlyphF()
 
 	Font* f = &g_font[g_currfont];
 
-	if(g_rtextp->m_type == RICHTEXT_ICON)
+	if(g_rpartit->m_type == RICHTEXT_ICON)
 	{
-		Icon* icon = &g_icon[g_rtextp->m_icon];
+		Icon* icon = &g_icon[g_rpartit->m_icon];
 		float hscale = f->gheight / (float)icon->m_height;
 
-		UseIconTex(g_rtextp->m_icon);
+		UseIconTex(g_rpartit->m_icon);
 
-		int left = x;
-		int right = left + (float)icon->m_width * hscale;
-		int top = y;
-		int bottom = top + f->gheight;
-		HighlGlyphF(left, top, right, bottom);
+		short left = x;
+		short right = (short)( left + (float)icon->m_width * hscale );
+		short top = y;
+		short bottom = top + (short)f->gheight;
+		HighlGlyphF((float)left, (float)top, (float)right, (float)bottom);
 
 		UseFontTex();
 	}
-	else if(g_rtextp->m_type == RICHTEXT_TEXT)
+	else if(g_rpartit->m_type == RICHTEXT_TEXT)
 	{
-		unsigned int k = g_rtextp->m_text.m_data[pi];
+		unsigned int k = g_rpartit->m_text.m_data[pi];
 		Glyph* g = &f->glyph[k];
 
-		int left = x + g->offset[0];
-		int right = left + g->texsize[0];
-		int top = y + g->offset[1];
-		int bottom = top + g->texsize[1];
-		HighlGlyphF(left, top, right, bottom);
+		short left = x + g->offset[0];
+		short right = left + g->texsize[0];
+		short top = y + g->offset[1];
+		short bottom = top + g->texsize[1];
+		HighlGlyphF((float)left, (float)top, (float)right, (float)bottom);
 	}
 }
 
@@ -231,11 +259,11 @@ void DrawCaret()
 	Font* f = &g_font[g_currfont];
 	Glyph* g = &f->glyph['|'];
 
-	int left = x - g->origsize[1]/14;
-	int right = left + g->texsize[0];
-	int top = y + g->offset[1];
-	int bottom = top + g->texsize[1];
-	DrawGlyph(left, top, right, bottom, g->texcoord[0], g->texcoord[1], g->texcoord[2], g->texcoord[3]);
+	short left = x - g->origsize[1]/14;
+	short right = left + g->texsize[0];
+	short top = y + g->offset[1];
+	short bottom = top + g->texsize[1];
+	DrawGlyph((float)left, (float)top, (float)right, (float)bottom, g->texcoord[0], g->texcoord[1], g->texcoord[2], g->texcoord[3]);
 }
 
 void DrawCaretF()
@@ -243,42 +271,44 @@ void DrawCaretF()
 	Font* f = &g_font[g_currfont];
 	Glyph* g = &f->glyph['|'];
 
-	int left = x - g->origsize[1]/14;
-	int right = left + g->texsize[0];
-	int top = y + g->offset[1];
-	int bottom = top + g->texsize[1];
-	DrawGlyphF(left, top, right, bottom, g->texcoord[0], g->texcoord[1], g->texcoord[2], g->texcoord[3]);
+	short left = x - g->origsize[1]/14;
+	short right = left + g->texsize[0];
+	short top = y + g->offset[1];
+	short bottom = top + g->texsize[1];
+	DrawGlyphF((float)left, (float)top, (float)right, (float)bottom, g->texcoord[0], g->texcoord[1], g->texcoord[2], g->texcoord[3]);
 }
 
-void AdvanceGlyph()
+void AdvGlyph()
 {
 	Font* f = &g_font[g_currfont];
 	//Glyph* g = &f->glyph[g_str[i]];
 	//x += g->origsize[0];
 
-	if(g_rtextp->m_type == RICHTEXT_ICON)
+	if(g_rpartit->m_type == RICHTEXT_ICON)
 	{
-		Icon* icon = &g_icon[g_rtextp->m_icon];
+		Icon* icon = &g_icon[g_rpartit->m_icon];
 		float hscale = f->gheight / (float)icon->m_height;
 		x += (float)icon->m_width * hscale;
 
-		g_rtextp++;
+		g_rpartit++;
 		pi = 0;
 	}
-	else if(g_rtextp->m_type == RICHTEXT_TEXT)
+	else if(g_rpartit->m_type == RICHTEXT_TEXT)
 	{
-		unsigned int k = g_rtextp->m_text.m_data[pi];
+		unsigned int k = g_rpartit->m_text.m_data[pi];
 		Glyph* g = &f->glyph[k];
 		x += g->origsize[0];
 
 		pi++;
 
-		if(pi >= g_rtextp->m_text.m_length)
+		if(pi >= g_rpartit->m_text.m_length)
 		{
-			g_rtextp++;
+			g_rpartit++;
 			pi = 0;
 		}
 	}
+
+	//if(debugtest)	g_log<<"x adv "<<x<<std::endl;
 }
 
 void StartText(const RichText* text, int fnt, float width, float height, int ln, int realstartx)
@@ -293,7 +323,7 @@ void StartText(const RichText* text, int fnt, float width, float height, int ln,
 	startline = ln;
 	starti = 0;
 	gstartx = realstartx;
-	//g_rtextp = g_rtext->m_part.begin();
+	//g_rpartit = g_rtext->m_part.begin();
 	//pi = 0;
 }
 
@@ -325,11 +355,40 @@ void TextLayer(int offstartx, int offstarty)
 	x = offstartx;
 	y = offstarty;
 	goffstartx = offstartx;
-	nextlb = starti;  //next [i] to skip line
-	line = startline;
+	g_rpartit = g_rtext->m_part.begin();
+	line = 0;
 	i = starti;
-	g_rtextp = g_rtext->m_part.begin();
 	pi = 0;
+	nextlb = -1;  //next [i] to break line
+	PrepLineBreak();
+
+	for(; i<size && line < startline; i++)
+	{
+		if(i == nextlb)
+			NextLineBreak();
+
+		//if(caret == i)
+		//	DrawCaret();
+
+		//DrawGlyph();
+		AdvGlyph();
+	}
+
+	for(; i<size && i < starti; i++)
+	{
+		if(i == nextlb)
+			NextLineBreak();
+
+		//if(caret == i)
+		//	DrawCaret();
+
+		//DrawGlyph();
+		AdvGlyph();
+	}
+
+	x = offstartx;
+	y = offstarty;
+	goffstartx = offstartx;
 }
 
 void FSub(const char* substr)
@@ -673,7 +732,7 @@ void DrawLine(int caret)
 			DrawCaret();
 
 		DrawGlyph();
-		AdvanceGlyph();
+		AdvGlyph();
 	}
 	if(caret == size)
 		DrawCaret();
@@ -694,7 +753,7 @@ void DrawLineF(int caret)
 #endif
 
 		DrawGlyphF();
-		AdvanceGlyph();
+		AdvGlyph();
 	}
 	if(caret == size)
 		DrawCaretF();
@@ -715,8 +774,8 @@ void DrawLine(int fnt, float startx, float starty, const RichText* text, const f
 		for(int c=0; c<4; c++) currcolor[c] = color[c];
 	}
 
-	Player* py = &g_player[g_curP];
-	StartText(text, fnt, py->currw*2, py->currh*2, 0, startx);
+	Player* py = &g_player[g_localP];
+	StartText(text, fnt, (float)g_currw*2, (float)g_currh*2, 0, startx);
 	UseFontTex();
 	TextLayer(startx, starty);
 	DrawLine(caret);
@@ -732,8 +791,8 @@ void DrawShadowedText(int fnt, float startx, float starty, const RichText* text,
 	currcolor[2] = 0;
 	currcolor[3] = color != NULL ? color[3] : 1;
 
-	Player* py = &g_player[g_curP];
-	StartText(text, fnt, py->currw*2, py->currh*2, 0, startx);
+	Player* py = &g_player[g_localP];
+	StartText(text, fnt, (float)g_currw*2, (float)g_currh*2, 0, startx);
 	UseFontTex();
 	TextLayer(startx+1, starty);
 	DrawLine(caret);
@@ -777,8 +836,8 @@ void DrawLineF(int fnt, float startx, float starty, float framex1, float framey1
 		for(int c=0; c<4; c++) currcolor[c] = color[c];
 	}
 
-	Player* py = &g_player[g_curP];
-	StartTextF(text, fnt, py->currw*2, py->currh*2, 0, startx, framex1, framey1, framex2, framey2);
+	Player* py = &g_player[g_localP];
+	StartTextF(text, fnt, (float)g_currw*2, (float)g_currh*2, 0, startx, framex1, framey1, framex2, framey2);
 	UseFontTex();
 	TextLayer(startx, starty);
 	DrawLineF(caret);
@@ -792,8 +851,8 @@ void DrawShadowedTextF(int fnt, float startx, float starty, float framex1, float
 	currcolor[2] = 0;
 	currcolor[3] = color != NULL ? color[3] : 1;
 
-	Player* py = &g_player[g_curP];
-	StartTextF(text, fnt, py->currw*2, py->currh*2, 0, startx, framex1, framey1, framex2, framey2);
+	Player* py = &g_player[g_localP];
+	StartTextF(text, fnt, (float)g_currw*2, (float)g_currh*2, 0, startx, framex1, framey1, framex2, framey2);
 
 #ifdef DEBUG
 	g_log<<"text "<<__FILE__<<" "<<__LINE__<<std::endl;
@@ -835,11 +894,11 @@ void DrawShadowedTextF(int fnt, float startx, float starty, float framex1, float
 
 void HighlightF(int fnt, float startx, float starty, float framex1, float framey1, float framex2, float framey2, const RichText* text, int highlstarti, int highlendi)
 {
-	Player* py = &g_player[g_curP];
+	Player* py = &g_player[g_localP];
 	EndS();
 	UseS(SHADER_COLOR2D);
-	glUniform1f(g_shader[SHADER_COLOR2D].m_slot[SSLOT_WIDTH], (float)py->currw);
-	glUniform1f(g_shader[SHADER_COLOR2D].m_slot[SSLOT_HEIGHT], (float)py->currh);
+	glUniform1f(g_shader[SHADER_COLOR2D].m_slot[SSLOT_WIDTH], (float)g_currw);
+	glUniform1f(g_shader[SHADER_COLOR2D].m_slot[SSLOT_HEIGHT], (float)g_currh);
 	glUniform4f(g_shader[SHADER_COLOR2D].m_slot[SSLOT_COLOR], 1, 1, 1, 0.5f);
 
 	currcolor[0] = 1;
@@ -847,22 +906,22 @@ void HighlightF(int fnt, float startx, float starty, float framex1, float framey
 	currcolor[2] = 1;
 	currcolor[3] = 0.5f;
 
-	StartTextF(text, fnt, py->currw*2, py->currh*2, 0, startx, framex1, framey1, framex2, framey2);
+	StartTextF(text, fnt, g_currw*2, g_currh*2, 0, startx, framex1, framey1, framex2, framey2);
 
 	TextLayer(startx, starty);
 
 	for(i=0; i<highlstarti; i++)
-		AdvanceGlyph();
+		AdvGlyph();
 
 	for(; i<highlendi; i++)
 	{
 		HighlGlyphF();
-		AdvanceGlyph();
+		AdvGlyph();
 	}
 
 	EndS();
 	CheckGLError(__FILE__, __LINE__);
-	Ortho(py->currw, py->currh, 1, 1, 1, 1);
+	Ortho(g_currw, g_currh, 1, 1, 1, 1);
 }
 
 void DrawCenterShadText(int fnt, float startx, float starty, const RichText* text, const float* color, int caret)
@@ -909,8 +968,8 @@ void DrawCenterShadText(int fnt, float startx, float starty, const RichText* tex
 	currcolor[2] = 0.0f;
 	currcolor[3] = color != NULL ? color[3] : 1;
 
-	Player* py = &g_player[g_curP];
-	StartText(text, fnt, py->currw*2, py->currh*2, 0, startx);
+	Player* py = &g_player[g_localP];
+	StartText(text, fnt, g_currw*2, g_currh*2, 0, startx);
 	UseFontTex();
 	TextLayer(startx+1, starty);
 	DrawLine(caret);
@@ -934,7 +993,7 @@ void DrawCenterShadText(int fnt, float startx, float starty, const RichText* tex
 	for(; i<size; i++)
 	{
 		DrawGlyph();
-		AdvanceGlyph();
+		AdvGlyph();
 	}
 
 	glUniform4f(g_shader[SHADER_ORTHO].m_slot[SSLOT_COLOR], 1, 1, 1, 1);
@@ -963,7 +1022,7 @@ void DrawBoxShadText(int fnt, float startx, float starty, float width, float hei
 			DrawCaret();
 
 		DrawGlyph();
-		AdvanceGlyph();
+		AdvGlyph();
 	}
 	if(caret == size)
 	{
@@ -984,7 +1043,7 @@ void DrawBoxShadText(int fnt, float startx, float starty, float width, float hei
 			DrawCaret();
 
 		DrawGlyph();
-		AdvanceGlyph();
+		AdvGlyph();
 	}
 	if(caret == size)
 	{
@@ -1005,7 +1064,7 @@ void DrawBoxShadText(int fnt, float startx, float starty, float width, float hei
 			DrawCaret();
 
 		DrawGlyph();
-		AdvanceGlyph();
+		AdvGlyph();
 	}
 	if(caret == size)
 	{
@@ -1037,7 +1096,7 @@ void DrawBoxShadText(int fnt, float startx, float starty, float width, float hei
 			DrawCaret();
 
 		DrawGlyph();
-		AdvanceGlyph();
+		AdvGlyph();
 	}
 	if(caret == size)
 	{
@@ -1070,7 +1129,7 @@ void DrawBoxShadTextF(int fnt, float startx, float starty, float width, float he
 			DrawCaretF();
 
 		DrawGlyphF();
-		AdvanceGlyph();
+		AdvGlyph();
 	}
 	if(caret == size)
 	{
@@ -1091,7 +1150,7 @@ void DrawBoxShadTextF(int fnt, float startx, float starty, float width, float he
 			DrawCaretF();
 
 		DrawGlyphF();
-		AdvanceGlyph();
+		AdvGlyph();
 	}
 	if(caret == size)
 	{
@@ -1112,7 +1171,7 @@ void DrawBoxShadTextF(int fnt, float startx, float starty, float width, float he
 			DrawCaretF();
 
 		DrawGlyphF();
-		AdvanceGlyph();
+		AdvGlyph();
 	}
 	if(caret == size)
 	{
@@ -1144,7 +1203,7 @@ void DrawBoxShadTextF(int fnt, float startx, float starty, float width, float he
 			DrawCaretF();
 
 		DrawGlyphF();
-		AdvanceGlyph();
+		AdvGlyph();
 	}
 	if(caret == size)
 	{
@@ -1164,7 +1223,7 @@ int CountLines(const RichText* text, int fnt, float startx, float starty, float 
 		if(i == nextlb)
 			NextLineBreak();
 
-		AdvanceGlyph();
+		AdvGlyph();
 	}
 	if(g_str[size-1] == '\n')
 		BreakLine();
@@ -1174,38 +1233,54 @@ int CountLines(const RichText* text, int fnt, float startx, float starty, float 
 
 int EndX(const RichText* text, int lastc, int fnt, float startx, float starty)
 {
-	Player* py = &g_player[g_curP];
-	StartText(text, fnt, py->currw*100, py->currh*100, 0, startx);
+	//if(g_netmode == NETM_CLIENT && stricmp(text->rawstr().c_str(), "Join")==0) debugtest = true;
+
+	Player* py = &g_player[g_localP];
+	//StartText(text, fnt, g_currw*100, g_currh*100, 0, startx);
+	StartText(text, fnt, SHRT_MAX, SHRT_MAX, 0, startx);
 	TextLayer(startx, starty);
 
 	//g_log<<"size = "<<size<<std::endl;
 	//g_log<<"lastc = "<<lastc<<std::endl;
+	//g_log<<"g_localP= "<<g_localP<<" g_currw*100 = "<<g_currw*100<<"   g_width="<<g_width<<" "<<std::endl;
 
-	int highx = startx;
+	int highx = (int)startx;
 
 	for(i=0; i<size && i<lastc; i++)
 	{
 		if(i == nextlb)
+		{
+#if 0
+			if(g_netmode == NETM_CLIENT)
+			{
+				char msg[128];
+				sprintf(msg, "line break at i=%d, x=%d", i, (int)x);
+				InfoMess("lb", msg);
+			}
+#endif
 			NextLineBreak();
+		}
 
 		//g_log<<"g_str[i] = "<<g_str[i]<<std::endl;
-		AdvanceGlyph();
+		AdvGlyph();
 
 		if(x > highx)
 			highx = x;
 	}
+
+	//debugtest = false;
 
 	return highx;
 }
 
 int MatchGlyphF(const RichText* text, int fnt, int matchx, float startx, float starty, float framex1, float framey1, float framex2, float framey2)
 {
-	Player* py = &g_player[g_curP];
+	Player* py = &g_player[g_localP];
 
 	int lastclose = 0;
 
-	//StartTextF(text, fnt, py->currw*2, py->currh*2, 0, startx, framex1, framey1, framex2, framey2);
-	StartTextF(text, fnt, py->width*2, py->height*2, 0, startx, framex1, framey1, framex2, framey2);
+	//StartTextF(text, fnt, g_currw*2, g_currh*2, 0, startx, framex1, framey1, framex2, framey2);
+	StartTextF(text, fnt, g_width*2, g_height*2, 0, startx, framex1, framey1, framex2, framey2);
 	TextLayer(startx, starty);
 
 	if(x >= matchx || size <= 0)
@@ -1215,7 +1290,7 @@ int MatchGlyphF(const RichText* text, int fnt, int matchx, float startx, float s
 
 	for(i=0; i<size && x <= framex2; i++)
 	{
-		AdvanceGlyph();
+		AdvGlyph();
 
 		lastclose = i;
 
@@ -1237,8 +1312,11 @@ void LoadFonts()
 {
 	LoadFont(FONT_EUROSTILE32, "fonts/eurostile32");
 	LoadFont(FONT_MSUIGOTHIC16, "fonts/msuigothic16");
+	LoadFont(FONT_MSUIGOTHIC10, "fonts/msuigothic10");
 	LoadFont(FONT_SMALLFONTS8, "fonts/smallfonts8");
+	LoadFont(FONT_ARIAL8, "fonts/arial8s");
 	LoadFont(FONT_GULIM32, "fonts/gulim32");
 	LoadFont(FONT_EUROSTILE16, "fonts/eurostile16");
 	LoadFont(FONT_CALIBRILIGHT16, "fonts/calibrilight16s");
+	//LoadFont(FONT_CALIBRILIGHT16, "fonts/gulim16");
 }

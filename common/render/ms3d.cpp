@@ -119,6 +119,9 @@ void MS3DModel::loadtex(unsigned int& diffm, unsigned int& specm, unsigned int& 
 
 bool MS3DModel::load(const char *relative, unsigned int& diffm, unsigned int& specm, unsigned int& normm, unsigned int& ownm, bool dontqueue)
 {
+	g_log<<"load "<<relative<<std::endl;
+	g_log.flush();
+
 	char full[MAX_PATH+1];
 	FullPath(relative, full);
 
@@ -156,7 +159,7 @@ bool MS3DModel::load(const char *relative, unsigned int& diffm, unsigned int& sp
 	*/
 
 	inputFile.seekg( 0, std::ios::end );
-	long fileSize = inputFile.tellg();
+	long fileSize = (long)inputFile.tellg();
 	inputFile.seekg( 0, std::ios::beg );
 
 	char *pBuffer = new char[fileSize];
@@ -196,6 +199,7 @@ bool MS3DModel::load(const char *relative, unsigned int& diffm, unsigned int& sp
 	int nTriangles = *( word* )pPtr;
 	m_numTriangles = nTriangles;
 	m_pTriangles = new Triangle[nTriangles];
+	if(!m_pTriangles) OutOfMem(__FILE__,__LINE__);
 	pPtr += sizeof( word );
 
 	for ( i = 0; i < nTriangles; i++ )
@@ -213,6 +217,7 @@ bool MS3DModel::load(const char *relative, unsigned int& diffm, unsigned int& sp
 	int nGroups = *( word* )pPtr;
 	m_numMeshes = nGroups;
 	m_pMeshes = new Mesh[nGroups];
+	if(!m_pMeshes) OutOfMem(__FILE__,__LINE__);
 	pPtr += sizeof( word );
 	for ( i = 0; i < nGroups; i++ )
 	{
@@ -239,6 +244,7 @@ bool MS3DModel::load(const char *relative, unsigned int& diffm, unsigned int& sp
 	int nMaterials = *( word* )pPtr;
 	m_numMaterials = nMaterials;
 	m_pMaterials = new Material[nMaterials];
+	if(!m_pMaterials) OutOfMem(__FILE__,__LINE__);
 	pPtr += sizeof( word );
 	for ( i = 0; i < nMaterials; i++ )
 	{
@@ -285,6 +291,7 @@ bool MS3DModel::load(const char *relative, unsigned int& diffm, unsigned int& sp
 	pPtr += sizeof( word );
 
 	m_pJoints = new Joint[m_numJoints];
+	if(!m_pJoints) OutOfMem(__FILE__,__LINE__);
 
 	struct JointNameListRec
 	{
@@ -295,6 +302,7 @@ bool MS3DModel::load(const char *relative, unsigned int& diffm, unsigned int& sp
 	const char *pTempPtr = pPtr;
 
 	JointNameListRec *pNameList = new JointNameListRec[m_numJoints];
+	if(!pNameList) OutOfMem(__FILE__,__LINE__);
 	for ( i = 0; i < m_numJoints; i++ )
 	{
 		MS3DJoint *pJoint = ( MS3DJoint* )pTempPtr;
@@ -318,6 +326,8 @@ bool MS3DModel::load(const char *relative, unsigned int& diffm, unsigned int& sp
 				if ( _stricmp( pNameList[j].m_pName, pJoint->m_parentName ) == 0 )
 				{
 					parentIndex = pNameList[j].m_jointIndex;
+					g_log<<"parentIndex/m_numJoints = "<<parentIndex<<"/"<<m_numJoints<<std::endl;
+					g_log.flush();
 					break;
 				}
 			}
@@ -354,13 +364,24 @@ bool MS3DModel::load(const char *relative, unsigned int& diffm, unsigned int& sp
 	}
 	delete[] pNameList;
 
+	g_log<<"setupjo"<<std::endl;
+	g_log.flush();
+
 	setupjoints();
 
 	delete[] pBuffer;
 
+	
+	g_log<<"restart"<<std::endl;
+	g_log.flush();
+
 	restart();
 
+	g_log<<"/restart"<<std::endl;
+	g_log.flush();
+
 	g_log<<relative<<"\n\r";
+	g_log.flush();
 
 	return true;
 }
@@ -563,11 +584,15 @@ void MS3DModel::setupjoints()
 	int i;
 	for ( i = 0; i < m_numJoints; i++ )
 	{
+		g_log<<"setupj1 j#"<<i<<std::endl;
+		g_log.flush();
+
 		Joint& joint = m_pJoints[i];
 
 		joint.m_relative.rotrad( joint.m_localRotation );
 		joint.m_relative.translation( joint.m_localTranslation );
-		if ( joint.m_parent != -1 )
+		//if ( joint.m_parent != -1  )
+		if ( joint.m_parent >= 0 && joint.m_parent < m_numJoints )
 		{
 			joint.m_absolute.set( m_pJoints[joint.m_parent].m_absolute.m_matrix);
 			joint.m_absolute.postmult( joint.m_relative );
@@ -578,9 +603,13 @@ void MS3DModel::setupjoints()
 
 	for ( i = 0; i < m_numVertices; i++ )
 	{
-		Vertex& vertex = m_pVertices[i];
+		g_log<<"setupj2 v#"<<i<<std::endl;
+		g_log.flush();
 
-		if ( vertex.m_boneID != -1 )
+		Vertex& vertex = m_pVertices[i];
+		
+		//if ( vertex.m_boneID != -1 )
+		if( vertex.m_boneID >= 0 && vertex.m_boneID < m_numJoints )
 		{
 			Matrix& matrix = m_pJoints[vertex.m_boneID].m_absolute;
 
@@ -591,11 +620,15 @@ void MS3DModel::setupjoints()
 
 	for ( i = 0; i < m_numTriangles; i++ )
 	{
+		g_log<<"setupj3 t#"<<i<<std::endl;
+		g_log.flush();
+
 		Triangle& triangle = m_pTriangles[i];
 		for ( int j = 0; j < 3; j++ )
 		{
 			const Vertex& vertex = m_pVertices[triangle.m_vertexIndices[j]];
-			if ( vertex.m_boneID != -1 )
+			//if ( vertex.m_boneID != -1 )
+			if( vertex.m_boneID >= 0 && vertex.m_boneID < m_numJoints )
 			{
 				Matrix& matrix = m_pJoints[vertex.m_boneID].m_absolute;
 				matrix.inverseRotateVect( triangle.m_vertexNormals[j] );
@@ -642,13 +675,16 @@ void MS3DModel::advanceanim()
 #else
 			Matrix relativeFinal( pJoint->m_relative );
 
-			if ( pJoint->m_parent == -1 )
-				pJoint->m_final.set( relativeFinal.m_matrix );
-			else
+			//if ( pJoint->m_parent == -1 )
+			//	pJoint->m_final.set( relativeFinal.m_matrix );
+			//else
+			if( pJoint->m_parent >= 0 && pJoint->m_parent < m_numJoints )
 			{
 				pJoint->m_final.set( m_pJoints[pJoint->m_parent].m_final.m_matrix );
 				pJoint->m_final.postmult( relativeFinal );
 			}
+			else
+				pJoint->m_final.set( relativeFinal.m_matrix );
 #endif
 
 			continue;
@@ -719,12 +755,15 @@ void MS3DModel::advanceanim()
 		Matrix relativeFinal( pJoint->m_relative );
 		relativeFinal.postmult( transform );
 
-		if ( pJoint->m_parent == -1 )
-			pJoint->m_final.set( relativeFinal.m_matrix );
-		else
+		//if ( pJoint->m_parent == -1 )
+		//	pJoint->m_final.set( relativeFinal.m_matrix );
+		//else
+		if ( pJoint->m_parent >= 0 && pJoint->m_parent < m_numJoints )
 		{
 			pJoint->m_final.set( m_pJoints[pJoint->m_parent].m_final.m_matrix );
 			pJoint->m_final.postmult( relativeFinal );
 		}
+		else
+			pJoint->m_final.set( relativeFinal.m_matrix );
 	}
 }

@@ -1,3 +1,4 @@
+
 #include "../../widget.h"
 #include "../barbutton.h"
 #include "../button.h"
@@ -196,6 +197,7 @@ void BottomPanel::draw()
 
 	white_bg.draw();
 	left_minimap.draw();
+
 
 	for(int y=0; y<3; y++)
 	{

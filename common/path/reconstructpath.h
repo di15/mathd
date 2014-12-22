@@ -10,5 +10,6 @@ class PathNode;
 void ReconstructPath(std::list<Vec2i> &path, PathNode* bestS, Vec2i &subgoal, int cmgoalx, int cmgoalz);
 void ReconstructPathJPS(std::list<Vec2i> &path, PathNode* bestS, Vec2i &subgoal, int cmgoalx, int cmgoalz);
 void ReconstructPath(PathJob* pj, PathNode* endnode);
+void ReconstructBoundPath(PathJob* pj, PathNode* endnode);
 
 #endif

@@ -68,6 +68,7 @@ public:
 	unsigned char rtype;
 	int amt;
 	int src;
+	int dst;
 };
 
 void DefR(int resi, const char* n, const char* depn, int iconindex, bool phys, bool cap, bool glob, float r, float g, float b, float a, int conduit);

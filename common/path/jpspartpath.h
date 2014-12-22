@@ -11,9 +11,9 @@
 class Unit;
 class Building;
 
-void JPSPartPath(int utype, int umode, int cmstartx, int cmstartz, int target, int target2, int targtype,
+void JPSPartPath(int utype, int umode, int cmstartx, int cmstarty, int target, int target2, int targtype,
                  std::list<Vec2i> *path, Vec2i *subgoal, Unit* thisu, Unit* ignoreu, Building* ignoreb,
-                 int cmgoalx, int cmgoalz, int cmgoalminx, int cmgoalminz, int cmgoalmaxx, int cmgoalmaxz,
+                 int cmgoalx, int cmgoalz, int cmgoalminx, int cmgoalminy, int cmgoalmaxx, int cmgoalmaxy,
                  int maxsearch);
 
 #endif

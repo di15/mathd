@@ -3,9 +3,10 @@
 
 #include "../widget.h"
 
-#define BUTTON_CORRODE			0
-#define BUTTON_LINEBASED		1
-#define BUTTON_LEFTIMAGE		2
+//styles
+#define BUST_CORRODE			0
+#define BUST_LINEBASED		1
+#define BUST_LEFTIMAGE		2
 
 class Button : public Widget
 {
@@ -18,7 +19,7 @@ public:
 
 	virtual void draw();
 	virtual void drawover();
-	virtual void inev(InEv* ev);
+	virtual void inev(InEv* ie);
 	virtual void reframe();
 };
 

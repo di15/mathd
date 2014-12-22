@@ -13,7 +13,7 @@ WindowW::WindowW() : Widget()
 
 void WindowW::chcall(Widget* ch, int type, void* data)
 {
-	if(ch == &vscroll)
+	if(ch == &m_vscroll)
 	{
 
 	}
@@ -79,7 +79,7 @@ WindowW::WindowW(Widget* parent, const char* n, void (*reframef)(Widget* thisw))
 	inner_bottom_leftvblur_image = Image(this, "gui/frames/innervblur12x81.png", true, NULL, 1, 1, 1, alpha,		0, 0, 1, 1);
 	inner_bottom_rightvblur_image = Image(this, "gui/frames/innervblur12x81.png", true, NULL, 1, 1, 1, alpha,		1, 0, 0, 1);
 
-	vscroll = VScroll(this, "vscroll");
+	m_vscroll = VScroll(this, "m_vscroll");
 
 	title_text = Text(this, "title", RichText(""), FONT_EUROSTILE16, NULL, true, 1, 1, 1, 1.0f);
 
@@ -117,19 +117,19 @@ void WindowW::reframe()
 	float innerright = m_pos[2] + 45;
 	float innerbottom = m_pos[3] + 50;
 #else
-	float innerleft = m_pos[0] - 20;
-	float innertop = m_pos[1] - 20;
-	float innerright = m_pos[2] + 20;
-	float innerbottom = m_pos[3] + 20;
+	innerleft = m_pos[0] - 20;
+	innertop = m_pos[1] - 30;
+	innerright = m_pos[2] + 20;
+	innerbottom = m_pos[3] + 30;
 #endif
-
+	
 	float innerfree = innerright - innerleft - 32*2 - 12*2;
 
-	vscroll.m_pos[0] = innerright - 3 - 10;
-	vscroll.m_pos[1] = innertop + 27;
-	vscroll.m_pos[2] = innerright - 3;
-	vscroll.m_pos[3] = innerbottom - 27 - 10;
-	vscroll.reframe();
+	m_vscroll.m_pos[0] = innerright - 3 - 10;
+	m_vscroll.m_pos[1] = innertop + 27;
+	m_vscroll.m_pos[2] = innerright - 3;
+	m_vscroll.m_pos[3] = innerbottom - 27 - 10;
+	m_vscroll.reframe();
 
 	inner_top_mid_image.m_pos[0] = innerleft + 12 + innerfree/6.0f + 32;
 	inner_top_mid_image.m_pos[1] = innertop;
@@ -277,6 +277,8 @@ void WindowW::reframe()
 
 	for(auto w=m_subwidg.begin(); w!=m_subwidg.end(); w++)
 		(*w)->reframe();
+
+	subreframe();
 }
 
 void WindowW::draw()
@@ -315,11 +317,13 @@ void WindowW::draw()
 	inner_bottom_leftvblur_image.draw();
 	inner_bottom_rightvblur_image.draw();
 
-	//vscroll.draw();
+	//m_vscroll.draw();
 	title_text.draw();
 
 	for(auto w=m_subwidg.begin(); w!=m_subwidg.end(); w++)
 		(*w)->draw();
+
+	subdraw();
 }
 
 void WindowW::drawover()
@@ -327,41 +331,67 @@ void WindowW::drawover()
 	if(!m_opened)
 		return;
 
-	//vscroll.drawover();
+	//m_vscroll.drawover();
 
 	for(auto w=m_subwidg.begin(); w!=m_subwidg.end(); w++)
 		(*w)->drawover();
+
+	subdrawover();
 }
 
-void WindowW::inev(InEv* ev)
+void WindowW::tofront()
+{
+	//return;
+
+	if(!m_parent)
+		return;
+
+	//return;
+
+	auto subs = &m_parent->m_subwidg;
+
+	for(auto wi=subs->begin(); wi!=subs->end(); wi++)
+	{
+		if(*wi == this)
+		{
+			subs->erase(wi);
+			subs->push_back(this);
+			break;
+		}
+	}
+}
+
+void WindowW::inev(InEv* ie)
 {
 	if(!m_opened)
 		return;
 
+	subinev(ie);
+
 	for(auto w=m_subwidg.rbegin(); w!=m_subwidg.rend(); w++)
-		(*w)->inev(ev);
+		(*w)->inev(ie);
 
-	Player* py = &g_player[g_curP];
+	Player* py = &g_player[g_localP];
 
-	//vscroll.inev(ev);
+	//m_vscroll.inev(ie);
 
 	if(m_ldown)
 	{
-		if(ev->type == INEV_MOUSEMOVE ||
-		                ( (ev->type == INEV_MOUSEDOWN || ev->type == INEV_MOUSEUP) && ev->key == MOUSE_LEFT) )
-			ev->intercepted = true;
+		if(ie->type == INEV_MOUSEMOVE ||
+		                ( (ie->type == INEV_MOUSEDOWN || ie->type == INEV_MOUSEUP) && ie->key == MOUSE_LEFT) )
+			ie->intercepted = true;
 
-		if(ev->type == INEV_MOUSEUP && ev->key == MOUSE_LEFT)
+		if(ie->type == INEV_MOUSEUP && ie->key == MOUSE_LEFT)
 			m_ldown = false;
 
-		if(ev->type == INEV_MOUSEMOVE)
+		if(ie->type == INEV_MOUSEMOVE)
 		{
-			int dx = py->mouse.x - m_mousedown[0];
-			int dy = py->mouse.y - m_mousedown[1];
-			m_mousedown[0] = py->mouse.x;
-			m_mousedown[1] = py->mouse.y;
+			int dx = g_mouse.x - m_mousedown[0];
+			int dy = g_mouse.y - m_mousedown[1];
+			m_mousedown[0] = g_mouse.x;
+			m_mousedown[1] = g_mouse.y;
 
-			if(py->curst == CU_MOVE)
+			if(g_curst == CU_MOVE)
 			{
 				m_pos[0] += dx;
 				m_pos[1] += dy;
@@ -370,213 +400,224 @@ void WindowW::inev(InEv* ev)
 
 				if(m_pos[0]-64 < 0)
 				{
-					m_pos[2] -= m_pos[0] - 64;
-					m_pos[0] = 64;
+					m_pos[2] -= m_pos[0] - (float)64;
+					m_pos[0] = (float)64;
 				}
-				if(m_pos[2]+64 > py->width)
+				if(m_pos[2]+64 > (float)g_width)
 				{
-					m_pos[0] -= m_pos[2] + 64 - py->width;
-					m_pos[2] = py->width - 64;
+					m_pos[0] -= m_pos[2] + (float)64 - (float)g_width;
+					m_pos[2] = (float)(g_width - 64);
 				}
 				if(m_pos[1]-64 < 0)
 				{
 					m_pos[3] -= m_pos[1] - 64;
-					m_pos[1] = 64;
+					m_pos[1] = (float)64;
 				}
-				if(m_pos[3]+64 > py->height)
+				if(m_pos[3]+64 > g_height)
 				{
-					m_pos[1] -= m_pos[3] + 64 - py->height;
-					m_pos[3] = py->height - 64;
+					m_pos[1] -= m_pos[3] + 64 - g_height;
+					m_pos[3] = (float)(g_height - 64);
 				}
 
 				reframe();
 			}
-			else if(py->curst == CU_RESZT)
+			else if(g_curst == CU_RESZT)
 			{
-				int newh = m_pos[3]-m_pos[1]-dy;
+				int newh = (int)( m_pos[3]-m_pos[1]-dy );
 				if(newh < m_minsz[1]) newh = m_minsz[1];
 				m_pos[1] = m_pos[3] - newh;
-				if(m_pos[1]-64 < 0) m_pos[1] = 64;
-				if(m_pos[1]+64 > py->height) m_pos[1] = py->height-64;
+				if(m_pos[1]-64 < 0) m_pos[1] = (float)64;
+				if(m_pos[1]+64 > g_height) m_pos[1] = (float)(g_height-64);
 				reframe();
 			}
-			else if(py->curst == CU_RESZB)
+			else if(g_curst == CU_RESZB)
 			{
-				int newh = m_pos[3]-m_pos[1]+dy;
+				int newh = (int)( m_pos[3]-m_pos[1]+dy );
 				if(newh < m_minsz[1]) newh = m_minsz[1];
 				m_pos[3] = m_pos[1] + newh;
-				if(m_pos[3]-64 < 0) m_pos[3] = 64;
-				if(m_pos[3]+64 > py->height) m_pos[3] = py->height-64;
+				if(m_pos[3]-64 < 0) m_pos[3] = (float)64;
+				if(m_pos[3]+64 > g_height) m_pos[3] = (float)(g_height-64);
 				reframe();
 			}
-			else if(py->curst == CU_RESZL)
+			else if(g_curst == CU_RESZL)
 			{
-				int neww = m_pos[2]-m_pos[0]-dx;
+				int neww = (int)( m_pos[2]-m_pos[0]-dx );
 				if(neww < m_minsz[0]) neww = m_minsz[0];
 				m_pos[0] = m_pos[2] - neww;
-				if(m_pos[0]-64 < 0) m_pos[0] = 64;
-				if(m_pos[0]+64 > py->width) m_pos[0] = py->width-64;
+				if(m_pos[0]-64 < 0) m_pos[0] = (float)64;
+				if(m_pos[0]+64 > g_width) m_pos[0] = (float)(g_width-64);
 				reframe();
 			}
-			else if(py->curst == CU_RESZR)
+			else if(g_curst == CU_RESZR)
 			{
-				int neww = m_pos[2]-m_pos[0]+dx;
+				int neww = (int)( m_pos[2]-m_pos[0]+dx );
 				if(neww < m_minsz[0]) neww = m_minsz[0];
 				m_pos[2] = m_pos[0] + neww;
-				if(m_pos[2]-64 < 0) m_pos[2] = 64;
-				if(m_pos[2]+64 > py->width) m_pos[2] = py->width-64;
+				if(m_pos[2]-64 < 0) m_pos[2] = (float)64;
+				if(m_pos[2]+64 > g_width) m_pos[2] = (float)(g_width-64);
 				reframe();
 			}
-			else if(py->curst == CU_RESZTL)
+			else if(g_curst == CU_RESZTL)
 			{
-				int newh = m_pos[3]-m_pos[1]-dy;
+				int newh = (int)( m_pos[3]-m_pos[1]-dy );
 				if(newh < m_minsz[1]) newh = m_minsz[1];
 				m_pos[1] = m_pos[3] - newh;
-				if(m_pos[1]-64 < 0) m_pos[1] = 64;
-				if(m_pos[1]+64 > py->height) m_pos[1] = py->height-64;
+				if(m_pos[1]-64 < 0) m_pos[1] = (float)64;
+				if(m_pos[1]+64 > g_height) m_pos[1] = (float)(g_height-64);
 
-				int neww = m_pos[2]-m_pos[0]-dx;
+				int neww = (int)( m_pos[2]-m_pos[0]-dx );
 				if(neww < m_minsz[0]) neww = m_minsz[0];
 				m_pos[0] = m_pos[2] - neww;
-				if(m_pos[0]-64 < 0) m_pos[0] = 64;
-				if(m_pos[0]+64 > py->width) m_pos[0] = py->width-64;
+				if(m_pos[0]-64 < 0) m_pos[0] = (float)64;
+				if(m_pos[0]+64 > g_width) m_pos[0] = (float)(g_width-64);
 
 				reframe();
 			}
-			else if(py->curst == CU_RESZTR)
+			else if(g_curst == CU_RESZTR)
 			{
-				int newh = m_pos[3]-m_pos[1]-dy;
+				int newh = (int)( m_pos[3]-m_pos[1]-dy );
 				if(newh < m_minsz[1]) newh = m_minsz[1];
 				m_pos[1] = m_pos[3] - newh;
-				if(m_pos[1]-64 < 0) m_pos[1] = 64;
-				if(m_pos[1]+64 > py->height) m_pos[1] = py->height-64;
+				if(m_pos[1]-64 < 0) m_pos[1] = (float)64;
+				if(m_pos[1]+64 > g_height) m_pos[1] = (float)(g_height-64);
 
-				int neww = m_pos[2]-m_pos[0]+dx;
+				int neww = (int)( m_pos[2]-m_pos[0]+dx );
 				if(neww < m_minsz[0]) neww = m_minsz[0];
-				m_pos[2] = m_pos[0] + neww;
-				if(m_pos[2]-64 < 0) m_pos[2] = 64;
-				if(m_pos[2]+64 > py->width) m_pos[2] = py->width-64;
+				m_pos[2] = (int)( m_pos[0] + neww );
+				if(m_pos[2]-64 < 0) m_pos[2] = (float)64;
+				if(m_pos[2]+64 > g_width) m_pos[2] = (float)(g_width-64);
 
 				reframe();
 			}
-			else if(py->curst == CU_RESZBL)
+			else if(g_curst == CU_RESZBL)
 			{
-				int newh = m_pos[3]-m_pos[1]+dy;
+				int newh = (int)( m_pos[3]-m_pos[1]+dy );
 				if(newh < m_minsz[1]) newh = m_minsz[1];
 				m_pos[3] = m_pos[1] + newh;
-				if(m_pos[3]-64 < 0) m_pos[3] = 64;
-				if(m_pos[3]+64 > py->height) m_pos[3] = py->height-64;
+				if(m_pos[3]-64 < 0) m_pos[3] = (float)64;
+				if(m_pos[3]+64 > g_height) m_pos[3] = (float)(g_height-64);
 
-				int neww = m_pos[2]-m_pos[0]-dx;
+				int neww = (int)( m_pos[2]-m_pos[0]-dx );
 				if(neww < m_minsz[0]) neww = m_minsz[0];
 				m_pos[0] = m_pos[2] - neww;
-				if(m_pos[0]-64 < 0) m_pos[0] = 64;
-				if(m_pos[0]+64 > py->width) m_pos[0] = py->width-64;
+				if(m_pos[0]-64 < 0) m_pos[0] = (float)64;
+				if(m_pos[0]+64 > g_width) m_pos[0] = (float)(g_width-64);
 
 				reframe();
 			}
-			else if(py->curst == CU_RESZBR)
+			else if(g_curst == CU_RESZBR)
 			{
-				int newh = m_pos[3]-m_pos[1]+dy;
+				int newh = (int)( m_pos[3]-m_pos[1]+dy );
 				if(newh < m_minsz[1]) newh = m_minsz[1];
 				m_pos[3] = m_pos[1] + newh;
-				if(m_pos[3]-64 < 0) m_pos[3] = 64;
-				if(m_pos[3]+64 > py->height) m_pos[3] = py->height-64;
+				if(m_pos[3]-64 < 0) m_pos[3] = (float)64;
+				if(m_pos[3]+64 > g_height) m_pos[3] = (float)(g_height-64);
 
-				int neww = m_pos[2]-m_pos[0]+dx;
+				int neww = (int)( m_pos[2]-m_pos[0]+dx );
 				if(neww < m_minsz[0]) neww = m_minsz[0];
 				m_pos[2] = m_pos[0] + neww;
-				if(m_pos[2]-64 < 0) m_pos[2] = 64;
-				if(m_pos[2]+64 > py->width) m_pos[2] = py->width-64;
+				if(m_pos[2]-64 < 0) m_pos[2] = (float)64;
+				if(m_pos[2]+64 > g_width) m_pos[2] = (float)(g_width-64);
 
 				reframe();
 			}
 		}
 	}
 
-	if(m_over && ev->type == INEV_MOUSEDOWN && !ev->intercepted)
+	if(m_over && ie->type == INEV_MOUSEDOWN && !ie->intercepted)
 	{
-		if(ev->key == MOUSE_LEFT)
+		if(ie->key == MOUSE_LEFT)
 		{
-			m_mousedown[0] = py->mouse.x;
-			m_mousedown[1] = py->mouse.y;
+			m_mousedown[0] = g_mouse.x;
+			m_mousedown[1] = g_mouse.y;
 			m_ldown = true;
-			ev->intercepted = true;
+			ie->intercepted = true;
+			tofront();	//can't change list order, breaks iterators
 		}
 	}
 
-	if(ev->type == INEV_MOUSEMOVE)
+	if(ie->type == INEV_MOUSEMOVE)
 	{
 		if(m_ldown)
 		{
-			ev->intercepted = true;
+			ie->intercepted = true;
+			ie->curst = g_curst;
 			return;
 		}
 
-		if(!ev->intercepted &&
-		                py->mouse.x >= m_pos[0]-64 &&
-		                py->mouse.y >= m_pos[1]-64 &&
-		                py->mouse.x <= m_pos[2]+64 &&
-		                py->mouse.y <= m_pos[3]+64)
+		if(!ie->intercepted &&
+		                g_mouse.x >= m_pos[0]-64 &&
+		                g_mouse.y >= m_pos[1]-64 &&
+		                g_mouse.x <= m_pos[2]+64 &&
+		                g_mouse.y <= m_pos[3]+64)
 		{
 			m_over = true;
 
-			if(py->mousekeys[MOUSE_MIDDLE])
+			if(g_mousekeys[MOUSE_MIDDLE])
 				return;
 
-			ev->intercepted = true;
+			//ie->intercepted = true;
 
-			if(py->curst == CU_DRAG)
+			if(g_curst == CU_DRAG)
 				return;
 
-			if(py->mouse.x <= m_pos[0]-32)
+			if(g_mouse.x <= m_pos[0]-32)
 			{
-				if(py->mouse.y <= m_pos[1]-32)
-					py->curst = CU_RESZTL;
-				else if(py->mouse.y >= m_pos[3]+32)
-					py->curst = CU_RESZBL;
+				if(g_mouse.y <= m_pos[1]-32)
+					ie->curst = CU_RESZTL;
+				else if(g_mouse.y >= m_pos[3]+32)
+					ie->curst = CU_RESZBL;
 				else
-					py->curst = CU_RESZL;
+					ie->curst = CU_RESZL;
+
+				ie->intercepted = true;
 			}
-			else if(py->mouse.x >= m_pos[2]+32)
+			else if(g_mouse.x >= m_pos[2]+32)
 			{
-				if(py->mouse.y <= m_pos[1]-32)
-					py->curst = CU_RESZTR;
-				else if(py->mouse.y >= m_pos[3]+32)
-					py->curst = CU_RESZBR;
+				if(g_mouse.y <= m_pos[1]-32)
+					ie->curst = CU_RESZTR;
+				else if(g_mouse.y >= m_pos[3]+32)
+					ie->curst = CU_RESZBR;
 				else
-					py->curst = CU_RESZR;
+					ie->curst = CU_RESZR;
+
+				ie->intercepted = true;
 			}
-			else if(py->mouse.x >= m_pos[0]-32 &&
-			                py->mouse.x <= m_pos[2]+32)
+			else if(g_mouse.x >= m_pos[0]-32 &&
+			                g_mouse.x <= m_pos[2]+32)
 			{
-				if(py->mouse.y <= m_pos[1]-32)
-					py->curst = CU_RESZT;
-				else if(py->mouse.y >= m_pos[3]+32)
-					py->curst = CU_RESZB;
-				else if(py->mouse.x <= m_pos[0] ||
-				                py->mouse.y <= m_pos[1] ||
-				                py->mouse.x >= m_pos[2] ||
-				                py->mouse.y >= m_pos[3])
-					py->curst = CU_MOVE;
+				if(g_mouse.y <= m_pos[1]-32)
+					ie->curst = CU_RESZT;
+				else if(g_mouse.y >= m_pos[3]+32)
+					ie->curst = CU_RESZB;
+				else if(g_mouse.x <= m_pos[0] ||
+				                g_mouse.y <= m_pos[1] ||
+				                g_mouse.x >= m_pos[2] ||
+				                g_mouse.y >= m_pos[3])
+					ie->curst = CU_MOVE;
 				else
-					py->curst = CU_DEFAULT;
+					ie->curst = CU_DEFAULT;
+
+				ie->intercepted = true;
 			}
 		}
 		else
 		{
-			if(!ev->intercepted)
+			//cursor out of window area?
+			if(!ie->intercepted)
 			{
 				if(m_over)
 				{
-					py->curst = CU_DEFAULT;
+					//ie->intercepted = true;
+					//ie->curst = CU_DEFAULT;
 				}
 			}
+			//event intercepted but cursor in window rectangle (maybe covered up by something else)?
 			else
 			{
 				// to do: this will be replaced by code in other
 				//widgets that will set the cursor
-				py->curst = CU_DEFAULT;
+				//g_curst = CU_DEFAULT;
 			}
 
 			m_over = false;
