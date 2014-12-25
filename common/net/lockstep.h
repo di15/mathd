@@ -21,5 +21,6 @@ void AppendCmds(std::list<PacketHeader*>* q, NetTurnPacket* ntp);
 void AppendCmd(std::list<PacketHeader*>* q, PacketHeader* p, short sz);
 bool CanTurn();
 void UpdTurn();
+void LockCmd(PacketHeader* p, short sz);
 
 #endif

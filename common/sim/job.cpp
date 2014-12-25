@@ -528,6 +528,25 @@ bool FindJob(Unit* u)
 			j->goal.x, j->goal.y, j->goal.x, j->goal.y,
 			nminx, nminy, nmaxx, nmaxy))
 			continue;
+
+#if 0
+		if(j->jobtype == UMODE_GODRIVE &&
+			j->target == 15)
+		{
+			char msg[128];
+			sprintf(msg, "15j uw%d", (int)(u-g_unit));
+			InfoMess("15j", msg);
+		}
+#endif
+
+		if(j->jobtype == UMODE_GODRIVE &&
+			Trapped( &g_unit[j->target], u ))
+		{
+			//if(j->target == 15)
+			//	InfoMess("15t", "15t");
+
+			continue;
+		}
 #else
 		Vec2i subgoal;
 		std::list<Vec2i> path;
@@ -804,6 +823,11 @@ void NewJob(int jobtype, int target, int target2, int cdtype)
 				newgoal.x, newgoal.y,
 				newgoal.x, newgoal.y, newgoal.x, newgoal.y,
 				newgoal.x/PATHNODE_SIZE, newgoal.y/PATHNODE_SIZE, newgoal.x/PATHNODE_SIZE, newgoal.y/PATHNODE_SIZE))
+				continue;
+
+			
+			if(jobtype == UMODE_GODRIVE &&
+				Trapped( &g_unit[target], u ))
 				continue;
 
 			//otherwise, switch to new job

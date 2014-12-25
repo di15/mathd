@@ -125,6 +125,7 @@ bool CollidesWithBuildings(int minx, int minz, int maxx, int maxz, int ignore)
 	return false;
 }
 
+//TODO circular unit radius
 bool CollidesWithUnits(int minx, int minz, int maxx, int maxz, bool isunit, Unit* thisu, Unit* ignore)
 {
 	for(int i=0; i<UNITS; i++)

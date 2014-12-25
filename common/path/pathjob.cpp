@@ -75,24 +75,66 @@ bool Trapped(Unit* u, Unit* ignoreu)
 	pj.pjtype = PATHJOB_ANYPATH;
 	//pj.maxsearch = maxsearch;
 	//pj.cdtype = cdtype;
+	pj.goalx = u->goal.x;
+	pj.goalz = u->goal.y;
+	pj.goalx = pj.goalx / PATHNODE_SIZE;
+	pj.goalz = pj.goalz / PATHNODE_SIZE;
+	pj.goalminx = u->goal.x;
+	pj.goalminy = u->goal.y;
+	pj.goalmaxx = u->goal.x;
+	pj.goalmaxy = u->goal.y;
 
-	ResetPathNodes();
+	//ResetPathNodes();
 	SnapToNode(&pj);
 
 	if(!g_openlist.hasmore())
 	{
 		ClearNodes(g_toclear);
+
+#if 0
+		if(u - g_unit == 15)
+		{
+			static bool did = false;
+
+			if(!did)
+			{
+				did = true;
+				//if(!stand_s)
+				{
+					InfoMess("snap!","snap!");
+				}
+			}
+		}
+#endif
+
 		return true;
 	}
 
 	PathNode* node = (PathNode*)g_openlist.deletemin();
 	Vec2i npos = PathNodePos(node);
-	unsigned short noff = imax(1, ut->size.x / PATHNODE_SIZE);
+	//unsigned short noff = imax(1, ut->size.x / PATHNODE_SIZE);
+	unsigned short noff = 1;
 
 	bool stand_n = Standable(&pj, npos.x, npos.y - noff);
 	bool stand_s = Standable(&pj, npos.x, npos.y + noff);
 	bool stand_e = Standable(&pj, npos.x + noff, npos.y);
 	bool stand_w = Standable(&pj, npos.x - noff, npos.y);
+
+#if 0
+	if(u - g_unit == 15)
+	{
+		static bool did = false;
+
+		if(!did)
+		{
+			did = true;
+			if(!stand_s)
+			{
+				InfoMess("ss!","ss!");
+			}
+		}
+	}
+#endif
 
 	if(!stand_n && !stand_s && !stand_e && !stand_w)
 	{
@@ -258,11 +300,8 @@ bool PathJob::process()
 	}
 #endif
 
-			if(this->pjtype == PATHJOB_BOUNDJPS ||
-				this->pjtype == PATHJOB_BOUNDASTAR)
-				ReconstructBoundPath(this, node);
-			else
-				ReconstructPath(this, node);
+			ReconstructPath(this, node);
+
 			ClearNodes(g_toclear);
 
 			if(callback)
@@ -299,7 +338,8 @@ bool PathJob::process()
 
 	bool pathfound = false;
 
-	if((pjtype == PATHJOB_QUICKPARTIAL || pjtype == PATHJOB_JPSPART) && closestnode)
+	if((pjtype == PATHJOB_QUICKPARTIAL || pjtype == PATHJOB_JPSPART) && 
+		closestnode && allowpart)
 	{
 		pathfound = true;
 		ReconstructPath(this, closestnode);

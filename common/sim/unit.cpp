@@ -379,7 +379,7 @@ void ResetPath(Unit* u)
 {
 #ifdef HIERDEBUG
 	//if(pathnum == 73)
-	if(u - g_unit == 42)
+	if(u - g_unit == 19)
 	{
 		g_log<<"the 13th unit:"<<std::endl;
 		g_log<<"path reset"<<std::endl;
@@ -402,7 +402,7 @@ void ResetGoal(Unit* u)
 {
 #ifdef HIERDEBUG
 	//if(pathnum == 73)
-	if(u - g_unit == 42)
+	if(u - g_unit == 19)
 	{
 		g_log<<"the 13th unit:"<<std::endl;
 		g_log<<"g reset"<<std::endl;
@@ -432,11 +432,13 @@ void ResetMode(Unit* u)
 
 #ifdef HIERDEBUG
 	//if(pathnum == 73)
-	if(u - g_unit == 42)
+	if(u - g_unit == 19)
 	{
 		g_log<<"the 13th unit:"<<std::endl;
 		g_log<<"mode reset"<<std::endl;
-		InfoMess("rm", "rm");
+		char msg[128];
+		sprintf(msg, "rm %s prevm=%d", g_utype[u->type].name, (int)u->mode);
+		InfoMess("rm", msg);
 	}
 #endif
 
@@ -471,7 +473,7 @@ void ResetMode(Unit* u)
 
 #if 0
 	//URAN_DEBUG
-	if(u-g_unit == 42)
+	if(u-g_unit == 19)
 	{
 		Building* b = &g_building[5];
 		char msg[1280];
@@ -578,7 +580,7 @@ void ResetMode(Unit* u)
 	
 #if 0
 	//URAN_DEBUG
-	if(u-g_unit == 42)
+	if(u-g_unit == 19)
 	{
 		Building* b = &g_building[5];
 		char msg[1280];

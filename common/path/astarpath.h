@@ -17,7 +17,7 @@ void AStarPath(int utype, int umode, int cmstartx, int cmstarty, int target, int
                std::list<Vec2i> *path, Vec2i *subgoal, Unit* thisu, Unit* ignoreu, Building* ignoreb,
                int cmgoalx, int cmgoalz, int cmgoalminx, int cmgoalminy, int cmgoalmaxx, int cmgoalmaxy,
                int maxsearch,
-			   int nminx, int nminy, int nmaxx, int nmaxy, bool bounded);
+			   int nminx, int nminy, int nmaxx, int nmaxy, bool bounded, bool capend);
 
 void Expand_A(PathJob* pj, PathNode* node);
 

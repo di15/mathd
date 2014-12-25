@@ -773,7 +773,7 @@ void AfterSel(Selection* s)
 		gui->open("truck mgr");
 	}
 
-#if 1
+#if 0
 	//35
 	//2
 	//15

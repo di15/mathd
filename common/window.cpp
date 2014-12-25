@@ -347,6 +347,8 @@ bool InitWindow()
 	SDL_SetWindowIcon(g_window, surf);
 
 	delete pixels;
+	
+	//TODO check warnings
 
 	// ...and the surface containing the icon pixel data is no longer required.
 	//SDL_FreeSurface(surf);

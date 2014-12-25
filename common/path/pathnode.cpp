@@ -7,6 +7,7 @@
 #include "binheap.h"
 #include "../utils.h"
 #include "../debug.h"
+#include "../sim/unit.h"
 
 Vec2i g_pathdim(0,0);
 PathNode* g_pathnode = NULL;
@@ -110,9 +111,21 @@ bool AtGoal(PathJob* pj, PathNode* node)
 	return false;
 }
 
+/*
+This is very important not to create unwalkable paths.
+If you start from the pathnode that is gotten by rounding down the cmpos,
+you might be off. This is from experience of mass movement of military units
+and seeing repeating movement loops that units fail to break out of.
+*/
 void SnapToNode(PathJob* pj)
 {
 #if 1
+	//Is this correct? This was my first solution and I changed it to the second one for some time,
+	//but seeing an unresolvable truck position that remained trapped even though it could actually move out,
+	//changed it back, solving the trapped truck problem.
+	//Edit: No, the second method is correct. The only solution to the truck being stuck is to use more pathnode divisions.
+	//This is more realistic anyways (using PATHNODE_SIZE of 50 centimeters instead of 125, because a person has about 50 cm
+	//of personal space, and a 10x10 meter road tile divides to give 20x20 people worth of room).
 	//Vec2i npos = Vec2i( (pj->cmstartx+PATHNODE_SIZE/2) / PATHNODE_SIZE, (pj->cmstarty+PATHNODE_SIZE/2) / PATHNODE_SIZE );
 	Vec2i npos = Vec2i( (pj->cmstartx) / PATHNODE_SIZE, (pj->cmstarty) / PATHNODE_SIZE );
 
@@ -130,18 +143,32 @@ void SnapToNode(PathJob* pj)
 	Vec2i npos_ne = Vec2i( npos_max.x, npos_min.y );
 	Vec2i npos_sw = Vec2i( npos_min.x, npos_max.y );
 	Vec2i npos_se = Vec2i( npos_max.x, npos_max.y );
+	Vec2i npos_w = Vec2i( npos_min.x, npos.y );
+	Vec2i npos_e = Vec2i( npos_max.x, npos.y );
+	Vec2i npos_n = Vec2i( npos.x, npos_min.y );
+	Vec2i npos_s = Vec2i( npos.x, npos_max.y );
 
 #if 1
 	PathNode* node_nw = PathNodeAt(npos_nw.x, npos_nw.y);
 	PathNode* node_ne = PathNodeAt(npos_ne.x, npos_ne.y);
 	PathNode* node_sw = PathNodeAt(npos_sw.x, npos_sw.y);
 	PathNode* node_se = PathNodeAt(npos_se.x, npos_se.y);
+	PathNode* node_cen = PathNodeAt(npos.x, npos.y);
+	PathNode* node_w = PathNodeAt(npos_w.x, npos_w.y);
+	PathNode* node_e = PathNodeAt(npos_e.x, npos_e.y);
+	PathNode* node_n = PathNodeAt(npos_n.x, npos_n.y);
+	PathNode* node_s = PathNodeAt(npos_s.x, npos_s.y);
 #endif
 
 	bool walkable_nw = Standable(pj, npos_nw.x, npos_nw.y);
 	bool walkable_ne = Standable(pj, npos_ne.x, npos_ne.y);
 	bool walkable_sw = Standable(pj, npos_sw.x, npos_sw.y);
 	bool walkable_se = Standable(pj, npos_se.x, npos_se.y);
+	bool walkable_cen = Standable(pj, npos.x, npos.y);
+	bool walkable_w = Standable(pj, npos_w.x, npos_w.y);
+	bool walkable_e = Standable(pj, npos_e.x, npos_e.y);
+	bool walkable_n = Standable(pj, npos_n.x, npos_n.y);
+	bool walkable_s = Standable(pj, npos_s.x, npos_s.y);
 
 	Vec2i cmpos_nw = Vec2i( npos_nw.x * PATHNODE_SIZE + PATHNODE_SIZE/2, npos_nw.y * PATHNODE_SIZE + PATHNODE_SIZE/2 );
 	Vec2i cmpos_ne = Vec2i( npos_ne.x * PATHNODE_SIZE + PATHNODE_SIZE/2, npos_ne.y * PATHNODE_SIZE + PATHNODE_SIZE/2 );
@@ -156,6 +183,25 @@ void SnapToNode(PathJob* pj)
 	PathNode* startnode = NULL;
 
 	int nearest = -1;
+
+#if 0
+	if( walkable_cen && walkable_w && !startnode )
+	{
+		startnode = node_cen;
+	}
+	if( walkable_cen && walkable_e && !startnode )
+	{
+		startnode = node_cen;
+	}
+	if( walkable_cen && walkable_s && !startnode )
+	{
+		startnode = node_cen;
+	}
+	if( walkable_cen && walkable_n && !startnode )
+	{
+		startnode = node_cen;
+	}
+#endif
 
 	if( walkable_nw && walkable_ne && walkable_sw && (dist_nw < nearest || !startnode) )
 	{
@@ -291,7 +337,22 @@ void SnapToNode(PathJob* pj)
 		}
 
 		if(!startnode)
+		{
+#if 0
+			if(pj->thisu == 15)
+			{
+				static bool did = false;
+
+				if(!did)
+				{
+					did = true;
+					InfoMess("st!", "!st");
+				}
+			}
+#endif
+
 			return;
+		}
 	}
 
 foundnode:

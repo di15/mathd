@@ -943,26 +943,82 @@ bool CanDrive(Unit* op)
 {
 	Unit* tr = &g_unit[op->target];
 
+#ifdef HIERDEBUG
+	//if(pathnum == 73)
+	if(op - g_unit == 19)
+	{
+		g_log<<"the 13th unit: candrive1"<<std::endl;
+	}
+#endif
+
 	if(!tr->on)
 		return false;
+	
+#ifdef HIERDEBUG
+	//if(pathnum == 73)
+	if(op - g_unit == 19)
+	{
+		g_log<<"the 13th unit: candrive2"<<std::endl;
+	}
+#endif
 
 	if(tr->type != UNIT_TRUCK)
 		return false;
 
+#ifdef HIERDEBUG
+	//if(pathnum == 73)
+	if(op - g_unit == 19)
+	{
+		g_log<<"the 13th unit: candrive3"<<std::endl;
+	}
+#endif
+
 	if(tr->hp <= 0)
 		return false;
 
+#ifdef HIERDEBUG
+	//if(pathnum == 73)
+	if(op - g_unit == 19)
+	{
+		g_log<<"the 13th unit: candrive4"<<std::endl;
+	}
+#endif
+
 	if(tr->driver >= 0 && &g_unit[tr->driver] != op)
 		return false;
+	
+#ifdef HIERDEBUG
+	//if(pathnum == 73)
+	if(op - g_unit == 19)
+	{
+		g_log<<"the 13th unit: candrive5"<<std::endl;
+	}
+#endif
 
 	if(tr->mode != UMODE_GOSUP &&
 		tr->mode != UMODE_GODEMB &&
 		tr->mode != UMODE_GODEMCD &&
 		tr->mode != UMODE_GOREFUEL)
 		return false;
+	
+#ifdef HIERDEBUG
+	//if(pathnum == 73)
+	if(op - g_unit == 19)
+	{
+		g_log<<"the 13th unit: candrive6"<<std::endl;
+	}
+#endif
 
 	if(op->belongings[RES_LABOUR] <= 0)
 		return false;
+	
+#ifdef HIERDEBUG
+	//if(pathnum == 73)
+	if(op - g_unit == 19)
+	{
+		g_log<<"the 13th unit: candrive7"<<std::endl;
+	}
+#endif
 
 	Player* p = &g_player[tr->owner];
 	
@@ -972,10 +1028,26 @@ bool CanDrive(Unit* op)
 		Bankrupt(tr->owner, "truck expenses");
 		return false;
 	}
+	
+#ifdef HIERDEBUG
+	//if(pathnum == 73)
+	if(op - g_unit == 19)
+	{
+		g_log<<"the 13th unit: candrive8"<<std::endl;
+	}
+#endif
 
 	if(Trapped(tr, op))
 		return false;
-
+	
+#ifdef HIERDEBUG
+	//if(pathnum == 73)
+	if(op - g_unit == 19)
+	{
+		g_log<<"the 13th unit: candrive9"<<std::endl;
+	}
+#endif
+	
 	return true;
 }
 

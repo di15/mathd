@@ -32,6 +32,7 @@
 
 #define HIERPATH	//hierarchical pathfinding?
 
+//TODO circular unit radius
 bool UnitCollides(Unit* u, Vec2i cmpos, int utype)
 {
 	UType* t = &g_utype[utype];
@@ -121,7 +122,7 @@ bool UnitCollides(Unit* u, Vec2i cmpos, int utype)
 			{
 #ifdef HIERDEBUG
 	//if(pathnum == 73)
-	if(u - g_unit == 42)
+	if(u - g_unit == 19)
 	{
 		g_log<<"the 13th unit:"<<std::endl;
 		g_log<<"ucb reset bi="<<cell->building<<" bt="<<g_bltype[g_building[cell->building].type].name<<" uprevpos="<<u->prevpos.x<<","<<u->prevpos.y<<" ucmpos="<<u->cmpos.x<<","<<u->cmpos.y<<" usubgoal="<<u->subgoal.x<<","<<u->subgoal.y<<" "<<std::endl;
@@ -198,7 +199,7 @@ bool UnitCollides(Unit* u, Vec2i cmpos, int utype)
 
 #ifdef HIERDEBUG
 	//if(pathnum == 73)
-	if(u - g_unit == 42)
+	if(u - g_unit == 19)
 	{
 		g_log<<"the 13th unit:"<<std::endl;
 		g_log<<"ucu reset"<<std::endl;
@@ -225,7 +226,7 @@ void MoveUnit(Unit* u)
 	u->collided = false;
 
 #ifdef HIERDEBUG
-	if(u - g_unit == 42)
+	if(u - g_unit == 19)
 	{
 		if(UnitCollides(u, u->cmpos, u->type))
 			InfoMess("prec", "prec");
@@ -306,7 +307,7 @@ void MoveUnit(Unit* u)
 			            u->goal.x, u->goal.y,
 			            u->goal.x, u->goal.y, u->goal.x, u->goal.y,
 			            //nodesdist*nodesdist*1);
-			TILE_SIZE*TILE_SIZE*4/PATHNODE_SIZE/PATHNODE_SIZE);	//enough to move 3 tiles around a corner, filled with obstacles
+			TILE_SIZE*TILE_SIZE*4/PATHNODE_SIZE/PATHNODE_SIZE, true, true);	//enough to move 3 tiles around a corner, filled with obstacles
 
 #if 1
 			if(u->path.size() <= 0)
@@ -394,7 +395,7 @@ void MoveUnit(Unit* u)
 			            u->goal.x, u->goal.y,
 			            u->goal.x, u->goal.y, u->goal.x, u->goal.y,
 						0, 0, g_pathdim.x-1, g_pathdim.y-1, false);
-#elif 1
+#elif 0
 			AStarPath(u->type, u->mode,
 			            u->cmpos.x, u->cmpos.y, u->target, u->target2, u->targtype, u->cdtype,
 						&u->path, &u->subgoal,
@@ -402,7 +403,7 @@ void MoveUnit(Unit* u)
 			            u->goal.x, u->goal.y,
 			            u->goal.x, u->goal.y, u->goal.x, u->goal.y,
 						100000,
-						0, 0, g_pathdim.x-1, g_pathdim.y-1, false);
+						0, 0, g_pathdim.x-1, g_pathdim.y-1, false, true);
 #else
 			int nodesdist = PATHHEUR( (u->goal - u->cmpos) / PATHNODE_SIZE );
 
@@ -414,7 +415,7 @@ void MoveUnit(Unit* u)
 			            u->goal.x, u->goal.y,
 			            u->goal.x, u->goal.y, u->goal.x, u->goal.y,
 			            //nodesdist*nodesdist*1);
-			TILE_SIZE*TILE_SIZE*20/PATHNODE_SIZE/PATHNODE_SIZE);	
+			TILE_SIZE*TILE_SIZE*20/PATHNODE_SIZE/PATHNODE_SIZE, true, true);	
 			//Enough to move 19 tiles around a corner, filled with obstacles.
 #endif
 #else
@@ -506,8 +507,8 @@ void MoveUnit(Unit* u)
 						u, NULL, NULL,
 						u->goal.x, u->goal.y,
 						cmtminx, cmtminy, cmtmaxx, cmtmaxy,
-						nminx, nminy, nmaxx, nmaxy, true);
-#else
+						nminx, nminy, nmaxx, nmaxy, true, false);
+#elif 0
 					AStarPath(u->type, u->mode,
 			            u->cmpos.x, u->cmpos.y, u->target, u->target2, u->targtype, u->cdtype,
 						&u->path, &u->subgoal,
@@ -515,7 +516,18 @@ void MoveUnit(Unit* u)
 			            u->goal.x, u->goal.y,
 						cmtminx, cmtminy, cmtmaxx, cmtmaxy,
 						100000,
-						nminx, nminy, nmaxx, nmaxy, true);
+						nminx, nminy, nmaxx, nmaxy, true, false);
+#else
+					//Better to use PartialPath, setting a node search limit,
+					//instead of bounds, so it's able to get around corners.	
+					PartialPath(u->type, u->mode,
+						u->cmpos.x, u->cmpos.y, u->target, u->target2, u->targtype, u->cdtype, 
+						&u->path, &u->subgoal,
+						u, NULL, NULL,
+						u->goal.x, u->goal.y,
+						cmtminx, cmtminy, cmtmaxx, cmtmaxy,
+						//nodesdist*nodesdist*1);
+						TILE_SIZE*TILE_SIZE*3/PATHNODE_SIZE/PATHNODE_SIZE, false, false);	
 #endif
 				}
 				else
@@ -551,8 +563,8 @@ void MoveUnit(Unit* u)
 							u, NULL, NULL,
 							u->goal.x, u->goal.y,
 							u->goal.x, u->goal.y, u->goal.x, u->goal.y,
-							nminx, nminy, nmaxx, nmaxy, false);
-#else
+							nminx, nminy, nmaxx, nmaxy, true, true);
+#elif 0
 						AStarPath(u->type, u->mode,
 							u->cmpos.x, u->cmpos.y, u->target, u->target2, u->targtype, u->cdtype,
 							&u->path, &u->subgoal,
@@ -560,7 +572,16 @@ void MoveUnit(Unit* u)
 							u->goal.x, u->goal.y,
 							u->goal.x, u->goal.y, u->goal.x, u->goal.y,
 							100000,
-							nminx, nminy, nmaxx, nmaxy, false);
+							nminx, nminy, nmaxx, nmaxy, true, true);
+#else	
+						PartialPath(u->type, u->mode,
+							u->cmpos.x, u->cmpos.y, u->target, u->target2, u->targtype, u->cdtype, 
+							&u->path, &u->subgoal,
+							u, NULL, NULL,
+							u->goal.x, u->goal.y,
+							u->goal.x, u->goal.y, u->goal.x, u->goal.y,
+							//nodesdist*nodesdist*1);
+							TILE_SIZE*TILE_SIZE*3/PATHNODE_SIZE/PATHNODE_SIZE, true, false);	
 #endif
 					else
 #if 0
@@ -570,8 +591,8 @@ void MoveUnit(Unit* u)
 							u, NULL, NULL,
 							u->goal.x, u->goal.y,
 							cmtminx, cmtminy, cmtmaxx, cmtmaxy,
-							nminx, nminy, nmaxx, nmaxy, true);
-#else
+							nminx, nminy, nmaxx, nmaxy, true, false);
+elif 0
 						AStarPath(u->type, u->mode,
 							u->cmpos.x, u->cmpos.y, u->target, u->target2, u->targtype, u->cdtype,
 							&u->path, &u->subgoal,
@@ -579,7 +600,19 @@ void MoveUnit(Unit* u)
 							u->goal.x, u->goal.y,
 							cmtminx, cmtminy, cmtmaxx, cmtmaxy,
 							100000,
-							nminx, nminy, nmaxx, nmaxy, true);
+							nminx, nminy, nmaxx, nmaxy, true, false);
+#else
+						//Better to use PartialPath, setting a node search limit,
+						//instead of bounds, so it's able to get around corners.			
+						PartialPath(u->type, u->mode,
+							u->cmpos.x, u->cmpos.y, u->target, u->target2, u->targtype, u->cdtype, 
+							&u->path, &u->subgoal,
+							u, NULL, NULL,
+							u->goal.x, u->goal.y,
+							cmtminx, cmtminy, cmtmaxx, cmtmaxy,
+							//nodesdist*nodesdist*1);
+							TILE_SIZE*TILE_SIZE*3/PATHNODE_SIZE/PATHNODE_SIZE, false, false);	
+							//Enough to move 2 tiles around a corner, filled with obstacles.
 #endif
 				}
 				
@@ -622,7 +655,7 @@ void MoveUnit(Unit* u)
 							u, NULL, NULL,
 							u->goal.x, u->goal.y,
 							u->goal.x, u->goal.y, u->goal.x, u->goal.y,
-							nodesdist*nodesdist*10);
+							nodesdist*nodesdist*10, true, true);
 
 				u->pathblocked = true;
 			}
@@ -679,6 +712,7 @@ void MoveUnit(Unit* u)
 		Magnitude2(dir) <= t->cmspeed * t->cmspeed)
 	{
 		u->cmpos = u->subgoal;
+		dir = Vec2i(0,0);	//fixed; no overreach collision now.
 
 #ifdef RANDOM8DEBUG
 	if(u - g_unit == thatunit)
@@ -693,34 +727,76 @@ void MoveUnit(Unit* u)
 			u->subgoal = *u->path.begin();
 			dir = u->subgoal - u->cmpos;
 		}
+		else
+		{
 #ifdef HIERPATH
-		//Did we finish the local path? Have tpath?
-		else if(u->tpath.size() > 0)
-		{
-			u->path.clear();
+			//Did we finish the local path? Have tpath?
+			if(u->tpath.size() > 0)
+			{
+				
+				Vec2s tpos = *u->tpath.begin();
+				
+#ifdef HIERDEBUG
+				g_log<<"tpos pop "<<tpos.x<<","<<tpos.y<<std::endl;
+#endif
+
+				unsigned int cmtminx = tpos.x * TILE_SIZE;
+				unsigned int cmtminy = tpos.y * TILE_SIZE;
+				unsigned int cmtmaxx = (tpos.x+1) * TILE_SIZE - 1;
+				unsigned int cmtmaxy = (tpos.y+1) * TILE_SIZE - 1;
+
+				UType* ut = &g_utype[ u->type ];
+				
+				unsigned int ucmminx = u->cmpos.x - ut->size.x/2;
+				unsigned int ucmminy = u->cmpos.y - ut->size.z/2;
+				unsigned int ucmmaxx = ucmminx + ut->size.x - 1;
+				unsigned int ucmmaxy = ucmminy + ut->size.z - 1;
+				
+#ifdef HIERDEBUG
+				g_log<<"fini local"<<std::endl;
+				g_log<<"\tucmminx <= cmtmaxx = "<<(ucmminx <= cmtmaxx)<<std::endl;
+				g_log<<"\tucmminy <= cmtmaxy = "<<(ucmminy <= cmtmaxy)<<std::endl;
+				g_log<<"\tucmmaxx >= cmtminx = "<<(ucmmaxx >= cmtminx)<<std::endl;
+				g_log<<"\tucmmaxy >= cmtminy = "<<(ucmmaxy >= cmtminy)<<std::endl;
+#endif
+
+				if(/* u->cmpos/TILE_SIZE == Vec2i(tpos.x,tpos.y) */
+					ucmminx <= cmtmaxx &&
+					ucmminy <= cmtmaxy &&
+					ucmmaxx >= cmtminx &&
+					ucmmaxy >= cmtminy &&
+					u->tpath.size() > 1)
+				{
+					u->path.clear();
 			
-			if(*u->tpath.begin() == Vec2s(u->cmpos.x/TILE_SIZE,u->cmpos.y/TILE_SIZE))
-				u->tpath.erase( u->tpath.begin() );
-			//Advance
-		}
+					if(*u->tpath.begin() == Vec2s(u->cmpos.x/TILE_SIZE,u->cmpos.y/TILE_SIZE))
+						u->tpath.erase( u->tpath.begin() );
+					//Advance
+				}
+				else
+				{
+					ResetPath(u);
+				}
+			}
+			//necessary so units can get a real path if 
+			//this was just a temp partial or random 8 move
+			else
 #endif
-		//necessary so units can get a real path if 
-		//this was just a temp partial or random 8 move
-		else
-		{
-			ResetPath(u);
-		}
+			{
+				ResetPath(u);
+			}
 #if 0
-		else
-		{
-			u->fillcollider();
-			u->drawpos.x = u->cmpos.x;
-			u->drawpos.z = u->cmpos.y;
-			u->drawpos.y = g_hmap.accheight(u->drawpos.x, u->drawpos.z);
-			u->rotation.y = GetYaw(dir.x, dir.y);
-			return;
-		}
+			else
+			{
+				u->fillcollider();
+				u->drawpos.x = u->cmpos.x;
+				u->drawpos.z = u->cmpos.y;
+				u->drawpos.y = g_hmap.accheight(u->drawpos.x, u->drawpos.z);
+				u->rotation.y = GetYaw(dir.x, dir.y);
+				return;
+			}
 #endif
+		}
 	}
 	
 #if 0
@@ -873,6 +949,16 @@ void MoveUnit(Unit* u)
 		if(t->cmspeed >= mag)
 			speeddir = dir;
 
+#ifdef HIERDEBUG
+	//if(pathnum == 73)
+	if(u - g_unit == 19)
+	{
+		g_log<<"the 13th unit:"<<std::endl;
+		g_log<<"u cmpos="<<u->cmpos.x<<","<<u->cmpos.y<<" mag="<<mag<<" speeddir="<<speeddir.x<<","<<speeddir.y<<" t->cmspeed="<<t->cmspeed<<std::endl;
+		//InfoMess("uc", "uc");
+	}
+#endif
+
 #if 0
 		if(Magnitude(scaleddir) > TILE_SIZE)
 		{
@@ -880,7 +966,20 @@ void MoveUnit(Unit* u)
 		}
 #endif
 
+		//if(speeddir == Vec2i(0,0))
+		//	InfoMess("z","z");
+
 		u->cmpos = u->cmpos + speeddir;
+
+#ifdef HIERDEBUG
+	//if(pathnum == 73)
+	if(u - g_unit == 19)
+	{
+		g_log<<"the 13th unit:"<<std::endl;
+		g_log<<"newpos="<<u->cmpos.x<<","<<u->cmpos.y<<std::endl;
+		//InfoMess("uc", "uc");
+	}
+#endif
 
 #if 1
 		if(UnitCollides(u, u->cmpos, u->type))
@@ -900,10 +999,10 @@ void MoveUnit(Unit* u)
 
 #ifdef HIERDEBUG
 	//if(pathnum == 73)
-	if(u - g_unit == 42)
+	if(u - g_unit == 19)
 	{
 		g_log<<"the 13th unit:"<<std::endl;
-		g_log<<"uc reset"<<std::endl;
+		g_log<<"uc oihoih"<<std::endl;
 		InfoMess("uc", "uc");
 	}
 #endif
@@ -911,6 +1010,7 @@ void MoveUnit(Unit* u)
 			u->collided = true;
 			u->cmpos = u->prevpos;
 			u->path.clear();
+			u->tpath.clear();
 			u->subgoal = u->cmpos;
 			u->fillcollider();
 			ResetPath(u);

@@ -20,6 +20,9 @@
 #include "../gui/widgets/spez/svlist.h"
 #include "../gui/widgets/spez/lobby.h"
 #include "../../game/gui/ggui.h"
+
+//not engine
+#include "../../game/gui/chattext.h"
 #endif
 
 /*
@@ -331,39 +334,33 @@ void PacketSwitch(int type, char* buffer, int bytes, NetConn* nc, IPaddress* fro
 	case PACKET_GETSVINFO:
 		ReadGetSvInfoPacket((GetSvInfoPacket*)buffer, nc, from, sock);
 		break;
-		
 	case PACKET_ADDCLIENT:
 		ReadAddClPacket((AddClientPacket*)buffer, nc, from, sock);
 		break;
-
 	case PACKET_SELFCLIENT:
 		ReadSelfClPacket((SelfClientPacket*)buffer, nc, from, sock);
 		break;
-
 	case PACKET_SETCLNAME:
 		ReadSetClNamePacket((SetClNamePacket*)buffer, nc, from, sock);
 		break;
-
 	case PACKET_CLIENTLEFT:
 		ReadClientLeftPacket((ClientLeftPacket*)buffer, nc, from, sock);
 		break;
-		
 	case PACKET_CLIENTROLE:
 		ReadClientRolePacket((ClientRolePacket*)buffer, nc, from, sock);
 		break;
-
 	case PACKET_DONEJOIN:
 		ReadDoneJoinPacket((DoneJoinPacket*)buffer, nc, from, sock);
 		break;
-
 	case PACKET_TOOMANYCL:
 		ReadTooManyClPacket((TooManyClPacket*)buffer, nc, from, sock);
 		break;
-
 	case PACKET_MAPCHANGE:
 		ReadMapChangePacket((MapChangePacket*)buffer, nc, from, sock);
 		break;
-
+	case PACKET_CHVAL:
+		ReadChValPacket((ChValPacket*)buffer, nc, from, sock);
+		break;
 	default:
 		break;
 	}
@@ -514,7 +511,6 @@ void ReadNetTurnPacket(NetTurnPacket* ntp, NetConn* nc, IPaddress* from, UDPsock
 #endif
 }
 
-
 void ReadPlaceBlPacket(PlaceBlPacket* pbp, NetConn* nc, IPaddress* from, UDPsocket* sock)
 {
 #ifndef MATCHMAKER
@@ -536,6 +532,7 @@ void ReadPlaceBlPacket(PlaceBlPacket* pbp, NetConn* nc, IPaddress* from, UDPsock
 		AppendCmd(&g_localcmd, (PacketHeader*)pbp, sizeof(PlaceBlPacket));
 #endif
 	}
+#if 0	//no longer required, exec'd with NULL "from" addr
 #if 1	//cl can only exec command batch packets, but it will then call this func
 	else if(g_netmode == NETM_CLIENT)
 	{
@@ -558,6 +555,14 @@ void ReadPlaceBlPacket(PlaceBlPacket* pbp, NetConn* nc, IPaddress* from, UDPsock
 			PlaceBl(pbp->btype, pbp->tpos, false, pbp->player, NULL);
 #endif
 	}
+#endif
+#endif
+}
+
+void ReadClDisconnectedPacket(ClDisconnectedPacket* cdp, NetConn* nc, IPaddress* from, UDPsocket* sock)
+{
+#ifndef MATCHMAKER
+
 #endif
 }
 
@@ -594,6 +599,107 @@ void ReadDisconnectPacket(DisconnectPacket* dp, NetConn* nc, IPaddress* from, UD
 
 			break;
 		}
+
+	//TODO get rid of client, inform players
+	if(nc->client >= 0)
+	{
+		Client* c = &g_client[nc->client];
+		c->nc = NULL;
+		c->on = false;
+	}
+
+	nc->client = -1;
+}
+
+void ReadChValPacket(ChValPacket* cvp, NetConn* nc, IPaddress* from, UDPsocket* sock)
+{
+#ifndef MATCHMAKER
+	if(!from)
+	{
+		Building* b = NULL;
+		Player* py = &g_player[cvp->player];
+		CdTile* cdtile = NULL;
+		Resource* r = NULL;
+		BlType* bt = NULL;
+
+		RichText chat;
+
+		chat = chat + py->name;
+		char add[128];
+
+		switch(cvp->chtype)
+		{
+		//TODO verify that player owns this
+		case CHVAL_BLPRICE:
+			b = &g_building[cvp->bi];
+			b->price[cvp->res] = cvp->value;
+			r = &g_resource[cvp->res];
+			bt = &g_bltype[b->type];
+			sprintf(add, " set price ");
+			chat = chat + RichText(add);
+			chat = chat + RichText(RichPart(RICHTEXT_ICON, r->icon));
+			//chat = chat + RichText(r->name.c_str());
+			sprintf(add, " at %s to ", bt->name);
+			chat = chat + RichText(add);
+			r = &g_resource[RES_DOLLARS];
+			chat = chat + RichText(RichPart(RICHTEXT_ICON, r->icon));
+			sprintf(add, "%d", cvp->value);
+			chat = chat + RichText(add);
+			break;
+		case CHVAL_BLWAGE:
+			b = &g_building[cvp->bi];
+			b->opwage = cvp->value;
+			break;
+		case CHVAL_CSTWAGE:
+			b = &g_building[cvp->bi];
+			b->conwage = cvp->value;
+			break;
+		case CHVAL_TRPRICE:
+			py->transpcost = cvp->value;
+			break;
+		case CHVAL_TRWAGE:
+			py->truckwage = cvp->value;
+			break;
+		case CHVAL_PRODLEV:
+			b = &g_building[cvp->bi];
+			b->prodlevel = cvp->value;
+			break;
+		case CHVAL_CDWAGE:
+			//TODO verify that player owns this
+			cdtile = GetCd(cvp->cdtype, cvp->x, cvp->y, false);
+			cdtile->conwage = cvp->value;
+			break;
+		case CHVAL_MANPRICE:
+			b = &g_building[cvp->bi];
+			b->manufprc[cvp->utype] = cvp->value;
+			break;
+		default:
+			break;
+		};
+
+		AddChat(&chat);
+
+		return;
+	}
+
+	if(g_netmode == NETM_HOST)
+	{
+		if(!nc)
+			return;
+		if(!nc->isclient)
+			return;
+		if(nc->client < 0)
+			return;
+		
+		Client* c = &g_client[nc->client];
+
+		if(cvp->player != c->player)
+			return;
+
+		AppendCmd(&g_localcmd, (PacketHeader*)cvp, sizeof(ChValPacket));
+		//TODO change to LockCmd?
+	}
+#endif
 }
 
 void ReadAddSvPacket(AddSvPacket* asp, NetConn* nc, IPaddress* from, UDPsocket* sock)

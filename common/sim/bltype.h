@@ -43,7 +43,7 @@ public:
 
 	int sprite;
 	
-	std::vector<int> buildable;
+	std::list<unsigned char> manuf;
 
 	short sound[BL_SOUNDS];
 	int maxhp;
@@ -100,6 +100,7 @@ void BIn(int type, int res, int amt);
 void BOut(int type, int res, int amt);
 void BEmitter(int type, int emitterindex, int ptype, Vec3f offset);
 void BDesc(int type, const char* desc);
-void BSnd(int type, int stype, const char* relative);
+void BSound(int type, int stype, const char* relative);
+void BMan(int type, unsigned char utype);
 
 #endif

@@ -41,9 +41,16 @@ void DefB(int type,
 		t->sound[i] = -1;
 
 	t->maxhp = maxhp;
+	t->manuf.clear();
 }
 
-void BSnd(int type, int stype, const char* relative)
+void BMan(int type, unsigned char utype)
+{
+	BlType* t = &g_bltype[type];
+	t->manuf.push_back(utype);
+}
+
+void BSound(int type, int stype, const char* relative)
 {
 	BlType* t = &g_bltype[type];
 	LoadSound(relative, &t->sound[stype]);

@@ -29,8 +29,12 @@
 #include "blpreview.h"
 #include "../../icon.h"
 #include "../../../math/fixmath.h"
+#include "../../../net/lockstep.h"
+
+//Need a better way to organize buttons, text, etc.
 
 // change bl view prod price
+#if 0
 void Change_BV_PP(unsigned int key, unsigned int scancode, bool down, int parm)
 {
 	Player* py = &g_player[g_localP];
@@ -71,6 +75,7 @@ void Change_BV_PP(unsigned int key, unsigned int scancode, bool down, int parm)
 	ival = imax(ival, 0);
 	b->price[parm] = ival;
 }
+#endif
 
 //resize bl view column item
 void Resize_BV_Cl(Widget* thisw)
@@ -91,6 +96,7 @@ void Resize_BV_Cl(Widget* thisw)
 }
 
 //resize bl view stocked goods list
+//TODO regenvals
 void Resize_BV_SL(Widget* thisw)
 {
 	Player* py = &g_player[g_localP];
@@ -152,7 +158,7 @@ void Resize_BV_SL(Widget* thisw)
 }
 
 //resize bl view cancel button
-void Resize_BV_Cancel(Widget* thisw)
+void Resize_BV_Close(Widget* thisw)
 {
 	Player* py = &g_player[g_localP];
 	GUI* gui = &g_gui;
@@ -276,6 +282,7 @@ void Resize_BV_Set(Widget* thisw)
 }
 
 // change bl view manuf unit price
+#if 0
 void Change_BV_MP(unsigned int key, unsigned int scancode, bool down, int parm)
 {
 	Player* py = &g_player[g_localP];
@@ -322,8 +329,10 @@ void Change_BV_MP(unsigned int key, unsigned int scancode, bool down, int parm)
 	ival = imax(ival, 0);
 	b->manufprc[parm] = ival;
 }
+#endif
 
 // change bl view (op) wage
+#if 0
 void Change_BV_OW(unsigned int key, unsigned int scancode, bool down, int parm)
 {
 	Player* py = &g_player[g_localP];
@@ -365,8 +374,10 @@ void Change_BV_OW(unsigned int key, unsigned int scancode, bool down, int parm)
 	ival = imax(ival, 0);
 	b->opwage = ival;
 }
+#endif
 
 // change bl view production level
+#if 0
 void Change_BV_PL(unsigned int key, unsigned int scancode, bool down, int parm)
 {
 	Player* py = &g_player[g_localP];
@@ -409,6 +420,7 @@ void Change_BV_PL(unsigned int key, unsigned int scancode, bool down, int parm)
 	ival = imax(ival, 0);
 	b->prodlevel = ival;
 }
+#endif
 
 //bl view: build truck (at factory only)
 void Click_BV_Truck()
@@ -489,14 +501,173 @@ void Click_BV_Carlyle()
 	//bv->regen(&g_sel);
 }
 
-void Click_BV_Cancel()
+void Click_BV_Close()
 {
+	GUI* gui = &g_gui;
+	gui->close("bl view");
 }
 
 void Click_BV_Set()
 {
+	Player* py = &g_player[g_localP];
+	GUI* gui = &g_gui;
+	BlView* bv = (BlView*)gui->get("bl view");
+	Selection* sel = &g_sel;
+	
+	if(sel->buildings.size() <= 0)
+		return;
+
+	int bi = *sel->buildings.begin();
+	Building* b = &g_building[ bi ];
+	BlType* bt = &g_bltype[ b->type ];
+
+	int row = 0;
+	
+	// change bl view prod price
+
+	for(int ri=0; ri<RESOURCES; ri++)
+	{
+		if(bt->output[ri] <= 0)
+			continue;
+
+		char wn[32];
+		sprintf(wn, "%d 1", row);
+		EditBox* pp = (EditBox*)bv->get(wn);
+		std::string sval = pp->m_value.rawstr();
+
+		if(sval.length() <= 0)
+			return;
+
+		int ival;
+		sscanf(sval.c_str(), "%d", &ival);
+
+		//TO DO: this change needs to happen at the next net turn (next 200 netframe interval).
+		//Also needs to be sent to server and only executed when received back.
+		ival = imax(ival, 0);
+		//b->price[ri] = ival;
+
+		if(b->price[ri] != ival)
+		{
+			ChValPacket cvp;
+			cvp.header.type = PACKET_CHVAL;
+			cvp.chtype = CHVAL_BLPRICE;
+			cvp.bi = bi;
+			cvp.player = g_localP;
+			cvp.res = ri;
+			cvp.value = ival;
+			LockCmd((PacketHeader*)&cvp, sizeof(ChValPacket));
+		}
+
+		row++;
+	}
+	
+	// change bl view (op) wage
+
+	char wn[32];
+	sprintf(wn, "%d 1", row);
+	EditBox* cw = (EditBox*)bv->get(wn);
+	std::string sval = cw->m_value.rawstr();
+
+	if(sval.length() <= 0)
+		return;
+
+	int ival;
+	sscanf(sval.c_str(), "%d", &ival);
+
+	//TO DO: this change needs to happen at the next net turn (next 200 netframe interval).
+	//Also needs to be sent to server and only executed when received back.
+	ival = imax(ival, 0);
+	//b->opwage = ival;
+
+	if(b->opwage != ival)
+	{
+		ChValPacket cvp;
+		cvp.header.type = PACKET_CHVAL;
+		cvp.chtype = CHVAL_BLWAGE;
+		cvp.bi = bi;
+		cvp.player = g_localP;
+		cvp.value = ival;
+		LockCmd((PacketHeader*)&cvp, sizeof(ChValPacket));
+	}
+
+	// change bl view production level
+
+	sprintf(wn, "%d 1", row);
+	cw = (EditBox*)bv->get(wn);
+	sval = cw->m_value.rawstr();
+
+	if(sval.length() <= 0)
+		return;
+
+	sscanf(sval.c_str(), "%d", &ival);
+
+	//TO DO: this change needs to happen at the next net turn (next 200 netframe interval).
+	//Also needs to be sent to server and only executed when received back.
+	ival = imin(ival, RATIO_DENOM);
+	ival = imax(ival, 0);
+	//b->prodlevel = ival;
+	
+	if(b->prodlevel != ival)
+	{
+		ChValPacket cvp;
+		cvp.header.type = PACKET_CHVAL;
+		cvp.chtype = CHVAL_PRODLEV;
+		cvp.bi = bi;
+		cvp.player = g_localP;
+		cvp.value = ival;
+		LockCmd((PacketHeader*)&cvp, sizeof(ChValPacket));
+	}
+
+	// change bl view manuf unit price
+
+	for(int ui=0; ui<UNIT_TYPES; ui++)
+	{
+		//buildables set in bltype
+		bool found = false;
+
+		for(auto mit=bt->manuf.begin(); mit!=bt->manuf.end(); mit++)
+		{
+			if(*mit != ui)
+				continue;
+
+			found = true;
+			break;
+		}
+
+		if(!found)
+			continue;
+
+		char wn[32];
+		sprintf(wn, "%d 1", row);
+		EditBox* cw = (EditBox*)bv->get(wn);
+		std::string sval = cw->m_value.rawstr();
+
+		if(sval.length() <= 0)
+			return;
+
+		int ival;
+		sscanf(sval.c_str(), "%d", &ival);
+
+		//TO DO: this change needs to happen at the next net turn (next 200 netframe interval).
+		//Also needs to be sent to server and only executed when received back.
+		ival = imax(ival, 0);
+		//b->manufprc[ui] = ival;
+
+		if(b->manufprc[ui] != ival)
+		{
+			ChValPacket cvp;
+			cvp.header.type = PACKET_CHVAL;
+			cvp.chtype = CHVAL_MANPRICE;
+			cvp.bi = bi;
+			cvp.player = g_localP;
+			cvp.utype = ui;
+			cvp.value = ival;
+			LockCmd((PacketHeader*)&cvp, sizeof(ChValPacket));
+		}
+	}
 }
 
+//TODO mouseover manuf button resource costs
 BlView::BlView(Widget* parent, const char* n, void (*reframef)(Widget* thisw)) : WindowW(parent, n, reframef)
 {
 	m_parent = parent;
@@ -505,8 +676,8 @@ BlView::BlView(Widget* parent, const char* n, void (*reframef)(Widget* thisw)) :
 	reframefunc = reframef;
 	m_ldown = false;
 	
-	m_cancel = Button(this, "cancel", "gui/transp.png", RichText("Cancel"), RichText(), MAINFONT16, BUST_LINEBASED, Resize_BV_Cancel, Click_BV_Cancel, NULL, NULL, NULL, NULL, -1);
-	m_set = Button(this, "cancel", "gui/transp.png", RichText("Set"), RichText(), MAINFONT16, BUST_LINEBASED, Resize_BV_Set, Click_BV_Set, NULL, NULL, NULL, NULL, -1);
+	m_close = Button(this, "close", "gui/transp.png", RichText("Close"), RichText(), MAINFONT16, BUST_LINEBASED, Resize_BV_Close, Click_BV_Close, NULL, NULL, NULL, NULL, -1);
+	m_set = Button(this, "set", "gui/transp.png", RichText("Set"), RichText(), MAINFONT16, BUST_LINEBASED, Resize_BV_Set, Click_BV_Set, NULL, NULL, NULL, NULL, -1);
 
 	if(reframefunc)
 		reframefunc(this);
@@ -521,25 +692,25 @@ void BlView::regvals(Selection* sel)
 
 void BlView::subdraw()
 {
-	m_cancel.draw();
+	m_close.draw();
 	m_set.draw();
 }
 
 void BlView::subdrawover()
 {
-	m_cancel.drawover();
+	m_close.drawover();
 	m_set.drawover();
 }
 
 void BlView::subreframe()
 {
-	m_cancel.reframe();
+	m_close.reframe();
 	m_set.reframe();
 }
 
 void BlView::subinev(InEv* ie)
 {
-	m_cancel.inev(ie);
+	m_close.inev(ie);
 	m_set.inev(ie);
 }
 
@@ -642,7 +813,8 @@ void BlView::regen(Selection* sel)
 		sprintf(cwstr, "%d", b->price[ri]);
 
 		if(owned)
-			m_subwidg.push_back(new EditBox(this, rowname, RichText(UString(cwstr)), MAINFONT16, Resize_BV_Cl, false, 8, Change_BV_PP, NULL, ri));
+			//m_subwidg.push_back(new EditBox(this, rowname, RichText(UString(cwstr)), MAINFONT16, Resize_BV_Cl, false, 8, Change_BV_PP, NULL, ri));
+			m_subwidg.push_back(new EditBox(this, rowname, RichText(UString(cwstr)), MAINFONT16, Resize_BV_Cl, false, 8, NULL, NULL, ri));
 		else
 			m_subwidg.push_back(new Text(this, rowname, RichText(UString(cwstr)), MAINFONT16, Resize_BV_Cl));
 
@@ -664,7 +836,8 @@ void BlView::regen(Selection* sel)
 		sprintf(cwstr, "%d", b->opwage);
 
 		if(owned)
-			m_subwidg.push_back(new EditBox(this, rowname, RichText(UString(cwstr)), MAINFONT16, Resize_BV_Cl, false, 8, Change_BV_OW, NULL, RES_LABOUR));
+			//m_subwidg.push_back(new EditBox(this, rowname, RichText(UString(cwstr)), MAINFONT16, Resize_BV_Cl, false, 8, Change_BV_OW, NULL, RES_LABOUR));
+			m_subwidg.push_back(new EditBox(this, rowname, RichText(UString(cwstr)), MAINFONT16, Resize_BV_Cl, false, 8, NULL, NULL, RES_LABOUR));
 		else
 			m_subwidg.push_back(new Text(this, rowname, RichText(UString(cwstr)), MAINFONT16, Resize_BV_Cl));
 
@@ -687,13 +860,15 @@ void BlView::regen(Selection* sel)
 		sprintf(cplstr, "%d", b->prodlevel);
 
 		if(owned)
-			m_subwidg.push_back(new EditBox(this, rowname, RichText(UString(cplstr)), MAINFONT16, Resize_BV_Cl, false, 6, Change_BV_PL, NULL, RES_LABOUR));
+			//m_subwidg.push_back(new EditBox(this, rowname, RichText(UString(cplstr)), MAINFONT16, Resize_BV_Cl, false, 6, Change_BV_PL, NULL, RES_LABOUR));
+			m_subwidg.push_back(new EditBox(this, rowname, RichText(UString(cplstr)), MAINFONT16, Resize_BV_Cl, false, 6, NULL, NULL, RES_LABOUR));
 		else
 			m_subwidg.push_back(new Text(this, rowname, RichText(UString(cplstr)), MAINFONT16, Resize_BV_Cl));
 
 		row++;
 	}
 
+	//TODO buildables set in bltype
 	if(b->type == BL_FACTORY)
 	{
 		char rowname[32];
@@ -711,7 +886,8 @@ void BlView::regen(Selection* sel)
 		sprintf(clabel, "%d", b->manufprc[UNIT_TRUCK]);
 
 		if(owned)
-			m_subwidg.push_back(new EditBox(this, rowname, RichText(UString(clabel)), MAINFONT16, Resize_BV_Cl, false, 6, Change_BV_MP, NULL, UNIT_TRUCK));
+			//m_subwidg.push_back(new EditBox(this, rowname, RichText(UString(clabel)), MAINFONT16, Resize_BV_Cl, false, 6, Change_BV_MP, NULL, UNIT_TRUCK));
+			m_subwidg.push_back(new EditBox(this, rowname, RichText(UString(clabel)), MAINFONT16, Resize_BV_Cl, false, 6, NULL, NULL, UNIT_TRUCK));
 		else
 			m_subwidg.push_back(new Text(this, rowname, RichText(UString(clabel)), MAINFONT16, Resize_BV_Cl));
 
@@ -735,7 +911,8 @@ void BlView::regen(Selection* sel)
 		sprintf(clabel, "%d", b->manufprc[UNIT_BATTLECOMP]);
 
 		if(owned)
-			m_subwidg.push_back(new EditBox(this, rowname, RichText(UString(clabel)), MAINFONT16, Resize_BV_Cl, false, 6, Change_BV_MP, NULL, UNIT_BATTLECOMP));
+			//m_subwidg.push_back(new EditBox(this, rowname, RichText(UString(clabel)), MAINFONT16, Resize_BV_Cl, false, 6, Change_BV_MP, NULL, UNIT_BATTLECOMP));
+			m_subwidg.push_back(new EditBox(this, rowname, RichText(UString(clabel)), MAINFONT16, Resize_BV_Cl, false, 6, NULL, NULL, UNIT_BATTLECOMP));
 		else
 			m_subwidg.push_back(new Text(this, rowname, RichText(UString(clabel)), MAINFONT16, Resize_BV_Cl));
 
@@ -759,7 +936,8 @@ void BlView::regen(Selection* sel)
 		sprintf(clabel, "%d", b->manufprc[UNIT_CARLYLE]);
 
 		if(owned)
-			m_subwidg.push_back(new EditBox(this, rowname, RichText(UString(clabel)), MAINFONT16, Resize_BV_Cl, false, 6, Change_BV_MP, NULL, UNIT_CARLYLE));
+			//m_subwidg.push_back(new EditBox(this, rowname, RichText(UString(clabel)), MAINFONT16, Resize_BV_Cl, false, 6, Change_BV_MP, NULL, UNIT_CARLYLE));
+			m_subwidg.push_back(new EditBox(this, rowname, RichText(UString(clabel)), MAINFONT16, Resize_BV_Cl, false, 6, NULL, NULL, UNIT_CARLYLE));
 		else
 			m_subwidg.push_back(new Text(this, rowname, RichText(UString(clabel)), MAINFONT16, Resize_BV_Cl));
 

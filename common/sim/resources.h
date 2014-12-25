@@ -10,9 +10,9 @@ public:
 	bool physical;
 	bool capacity;
 	bool global;
-	std::string name;
+	std::string name;	//TODO change to char[]?
 	float rgba[4];
-	std::string depositn;
+	std::string depositn;	//TODO change to char[]?
 	int conduit;
 };
 

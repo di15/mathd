@@ -404,7 +404,7 @@ void DrawScene(Matrix projection, Matrix viewmat, Matrix modelmat, Matrix modelv
 	g_log.flush();
 #endif
 
-#if 1
+#if 0
 	if(g_debuglines)
 	{
 		UseShadow(SHADER_COLOR3D, projection, viewmat, modelmat, modelviewinv, lightpos, lightdir);

@@ -253,7 +253,7 @@ void TilePath(int utype, int umode, int cmstartx, int cmstarty, int target, int 
 	pathnum ++;
 
 	//if(pathnum == 73)
-	if(thisu - g_unit == 42)
+	if(thisu - g_unit == 19)
 	{
 		g_log<<"the 13th unit:"<<std::endl;
 		g_speed = SPEED_PAUSE;

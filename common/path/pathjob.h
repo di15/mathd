@@ -25,7 +25,7 @@ class PathNode;
 #define JOBHEUR Manhattan
 #define FUELHEUR Manhattan
 
-#define HIERDEBUG	//hierarchical pathfinding debug output
+//#define HIERDEBUG	//hierarchical pathfinding debug output
 
 //#define POWCD_DEBUG
 #ifdef POWCD_DEBUG
@@ -89,6 +89,8 @@ public:
 	int nmaxy;
 
 	Vec2i cmgoal;
+	bool capend;	//append cmgoal to path?
+	bool allowpart;	//allow incomplete (closest node) path?
 
 	void (*callback)(bool result, PathJob* pj);
 

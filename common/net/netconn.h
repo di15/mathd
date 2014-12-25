@@ -28,7 +28,7 @@ public:
 	bool ishostinfo;	//is this a host we're just getting info from for our sv list?
 	unsigned long long lastsent;
 	unsigned long long lastrecv;
-	short player;
+	short client;
 	float ping;
 	bool closed;
 	
@@ -42,7 +42,7 @@ public:
 
 	NetConn()
 	{
-		player = -1;
+		client = -1;
 		handshook = false;
 		sendack = 0;
 		//important - reply ConnectPacket with ack=0 will be 

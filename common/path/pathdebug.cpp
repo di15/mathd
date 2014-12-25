@@ -260,7 +260,7 @@ void DrawGrid()
 	if(g_gridvecs.size() > 0)
 		return;
 
-	return;
+	//return;
 
 	//g_gridvecs.reserve( g_pathdim.x * g_pathdim.y );
 

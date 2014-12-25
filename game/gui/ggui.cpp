@@ -667,35 +667,7 @@ void MouseLUp()
 					pbp.btype = g_build;
 					pbp.tpos = Vec2i(g_vdrag[0].x/TILE_SIZE, g_vdrag[0].z/TILE_SIZE);
 					
-					if(g_netmode == NETM_HOST)
-					{
-						PlaceBlPacket* newpbp = (PlaceBlPacket*)malloc(sizeof(PlaceBlPacket));
-						memcpy(newpbp, &pbp, sizeof(PlaceBlPacket));
-						g_localcmd.push_back((PacketHeader*)newpbp);
-
-#if 0
-						NetConn* nc = &*g_conn.begin();
-
-						if(nc)
-							SendData((char*)&pbp, sizeof(PlaceBlPacket), &nc->addr, true, nc, &g_sock);
-#endif
-					}
-					else if(g_netmode == NETM_CLIENT)
-					{
-						NetConn* nc = g_svconn;
-
-						if(nc)
-							SendData((char*)&pbp, sizeof(PlaceBlPacket), &nc->addr, true, false, nc, &g_sock, 0);
-					}
-					else if(g_netmode == NETM_SINGLE)
-					{
-#if 0
-		char msg[128];
-		sprintf(msg, "send %d at %d,%d", pbp.btype, pbp.tpos.x, pbp.tpos.y);
-		InfoMess("polk", msg);
-#endif
-						AppendCmd(&g_nextcmdq, (PacketHeader*)&pbp, sizeof(PlaceBlPacket));
-					}
+					LockCmd((PacketHeader*)&pbp, sizeof(PlaceBlPacket));
 				}
 			}
 			else

@@ -17,7 +17,7 @@
 #define CU_RESZBR	10	//resize bottom right corner
 #define CU_WAIT		11	//shows a hourglass?
 #define CU_DRAG		12	//drag some object between widgets?
-#define CU_STATES	42
+#define CU_STATES	13
 
 extern Sprite g_cursor[CU_STATES];
 

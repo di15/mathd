@@ -17,7 +17,7 @@ class BlView : public WindowW
 public:
 	BlView(Widget* parent, const char* n, void (*reframef)(Widget* thisw));
 
-	Button m_cancel;
+	Button m_close;
 	Button m_set;
 
 	//void draw();

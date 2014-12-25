@@ -191,6 +191,8 @@ void Queue()
 	LoadParticles();
 	LoadSkyBox("textures/terrain/default/skydome");
 
+	//return;
+
 	// Players
 
 #if 1
@@ -219,9 +221,10 @@ void Queue()
 	UCost(UNIT_CARLYLE, RES_PRODUCTION, 15);
 	
 	//DefU(UNIT_LABOURER, "models/labourer/labourer.ms3d", Vec3f(1,1,1)*182.0f/100.0f, Vec3f(0,0,0)*182.0f/100.0f, Vec3i(125, 250, 125), "Labourer", 100, true, true, false, false, false, 6, false);
-	DefU(UNIT_LABOURER, "models/labourer/labourer.ms3d", Vec3f(1,1,1)*182.0f/100.0f, Vec3f(0,0,0)*182.0f/100.0f, Vec3i(50, 100, 50), "Labourer", 100, true, true, false, false, false, 6, false);
+	DefU(UNIT_LABOURER, "models/labourer/labourer.ms3d", Vec3f(1,1,1)*182.0f/100.0f, Vec3f(0,0,0)*182.0f/100.0f, Vec3i(50, 150, 50), "Labourer", 100, true, true, false, false, false, 6, false);
 	
-	DefU(UNIT_TRUCK, "models/truck/truck.ms3d", Vec3f(1,1,1)*30.0f, Vec3f(0,0,0), Vec3i(125, 250, 125), "Truck", 100, true, false, true, false, false, 30, false);
+	//DefU(UNIT_TRUCK, "models/truck/truck.ms3d", Vec3f(1,1,1)*30.0f, Vec3f(0,0,0), Vec3i(125, 250, 125), "Truck", 100, true, false, true, false, false, 30, false);
+	DefU(UNIT_TRUCK, "models/truck/truck.ms3d", Vec3f(1,1,1)*30.0f, Vec3f(0,0,0), Vec3i(100, 250, 100), "Truck", 100, true, false, true, false, false, 30, false);
 	UCost(UNIT_TRUCK, RES_PRODUCTION, 1);
 
 	// Foliage types
@@ -386,7 +389,7 @@ void Queue()
 	BCost(METAL, 1);
 	BIn(LABOUR, 10);		//+10
 	BIn(ELECTRICITY, 10);	//+20
-	BOut(CHEMICALS, 42);	// 30/10+1 = 4
+	BOut(CHEMICALS, 13);	// 30/10+1 = 4
     
 	BDefine(ELECPLANT,	"Electronics Plant", "models\\elecplant\\elecplant.ms3d",		"models\\elecplant\\elecplant_c.ms3d",		2, 2,	100,	10);
 	BCost(LABOUR, 4);
@@ -435,7 +438,7 @@ void Queue()
 	BMat(BL_APARTMENT, RES_STONE, 2);
 	BOut(BL_APARTMENT, RES_HOUSING, 15);
 	BDesc(BL_APARTMENT, "Apartments collect rent from labourers. They are required by the labourers to regenerate labour power.");
-	BSnd(BL_APARTMENT, BLSND_FINI, "sounds/notif/beep-22.wav");
+	BSound(BL_APARTMENT, BLSND_FINI, "sounds/notif/beep-22.wav");
 
 #if 1
 	DefB(BL_FACTORY, "Factory", 
@@ -464,8 +467,11 @@ void Queue()
 	BIn(BL_FACTORY, RES_METAL, 3);
 	BOut(BL_FACTORY, RES_PRODUCTION, 18);
 	BDesc(BL_FACTORY, "Factories produce units. They generate production necessary for the processing and packaging of farm products to create retail food.");
-	BSnd(BL_FACTORY, BLSND_PROD, "sounds/notif/button-39.wav");
-	BSnd(BL_FACTORY, BLSND_FINI, "sounds/notif/beep-22.wav");
+	BSound(BL_FACTORY, BLSND_PROD, "sounds/notif/button-39.wav");
+	BSound(BL_FACTORY, BLSND_FINI, "sounds/notif/beep-22.wav");
+	BMan(BL_FACTORY, UNIT_TRUCK);
+	BMan(BL_FACTORY, UNIT_BATTLECOMP);
+	BMan(BL_FACTORY, UNIT_CARLYLE);
 	
 #if 1
 	DefB(BL_REFINERY, "Oil Refinery", 
@@ -495,8 +501,8 @@ void Queue()
 	//BEmitter(BL_REFINERY, 2, PARTICLE_EXHAUST, Vec3f(TILE_SIZE*-4.5/10, TILE_SIZE*1.75, TILE_SIZE*3.0f/10));
 	//BEmitter(BL_REFINERY, 3, PARTICLE_EXHAUST2, Vec3f(TILE_SIZE*-4.5/10, TILE_SIZE*1.75, TILE_SIZE*3.0f/10));
 	BDesc(BL_REFINERY, "Turn crude oil into wholesale fuel.");
-	BSnd(BL_REFINERY, BLSND_PROD, "sounds/notif/beep-23.wav");
-	BSnd(BL_REFINERY, BLSND_FINI, "sounds/notif/beep-22.wav");
+	BSound(BL_REFINERY, BLSND_PROD, "sounds/notif/beep-23.wav");
+	BSound(BL_REFINERY, BLSND_FINI, "sounds/notif/beep-22.wav");
 	
 #if 0
 	DefB(BL_REFINERY, "Gas Station", 
@@ -538,8 +544,8 @@ void Queue()
 	//BEmitter(BL_COALPOW, 2, PARTICLE_EXHAUST2, Vec3f(-9.5f - 1, 23.4f, 10.6f - 1)*TILE_SIZE/32.0f*2.0f);
 	//BEmitter(BL_COALPOW, 3, PARTICLE_EXHAUST2, Vec3f(-9.9f + 1, 23.4f, -10.0f - 1)*TILE_SIZE/32.0f*2.0f);
 	BDesc(BL_COALPOW, "Generates electricity from coal.");
-	BSnd(BL_COALPOW, BLSND_PROD, "sounds/notif/beep-24.wav");
-	BSnd(BL_COALPOW, BLSND_FINI, "sounds/notif/beep-22.wav");
+	BSound(BL_COALPOW, BLSND_PROD, "sounds/notif/beep-24.wav");
+	BSound(BL_COALPOW, BLSND_FINI, "sounds/notif/beep-22.wav");
 	
 #if 1
 	DefB(BL_CHEMPLANT, "Chemical Plant", 
@@ -565,8 +571,8 @@ void Queue()
 	BIn(BL_CHEMPLANT, RES_LABOUR, 5);
 	BOut(BL_CHEMPLANT, RES_CHEMICALS, 10);
 	BDesc(BL_CHEMPLANT, "Generates chemicals necessary for farming and petrol refining.");
-	BSnd(BL_CHEMPLANT, BLSND_PROD, "sounds/notif/beep-25.wav");
-	BSnd(BL_CHEMPLANT, BLSND_FINI, "sounds/notif/beep-22.wav");
+	BSound(BL_CHEMPLANT, BLSND_PROD, "sounds/notif/beep-25.wav");
+	BSound(BL_CHEMPLANT, BLSND_FINI, "sounds/notif/beep-22.wav");
 	
 #if 1
 	DefB(BL_ELECPLANT, "Electronics Plant", 
@@ -592,8 +598,8 @@ void Queue()
 	BIn(BL_ELECPLANT, RES_LABOUR, 5);
 	BOut(BL_ELECPLANT, RES_ELECTRONICS, 10);
 	BDesc(BL_ELECPLANT, "Produces electronics necessary for units.");
-	BSnd(BL_ELECPLANT, BLSND_PROD, "sounds/notif/beep-26.wav");
-	BSnd(BL_ELECPLANT, BLSND_FINI, "sounds/notif/beep-22.wav");
+	BSound(BL_ELECPLANT, BLSND_PROD, "sounds/notif/beep-26.wav");
+	BSound(BL_ELECPLANT, BLSND_FINI, "sounds/notif/beep-22.wav");
 
 #if 1
 	DefB(BL_CEMPLANT, "Cement Plant", 
@@ -619,8 +625,8 @@ void Queue()
 	BIn(BL_CEMPLANT, RES_LABOUR, 5);
 	BOut(BL_CEMPLANT, RES_CEMENT, 10);
 	BDesc(BL_CEMPLANT, "Produces cement from stone.");
-	BSnd(BL_CEMPLANT, BLSND_PROD, "sounds/notif/beep-027.wav");
-	BSnd(BL_CEMPLANT, BLSND_FINI, "sounds/notif/beep-22.wav");
+	BSound(BL_CEMPLANT, BLSND_PROD, "sounds/notif/beep-027.wav");
+	BSound(BL_CEMPLANT, BLSND_FINI, "sounds/notif/beep-22.wav");
 	
 #if 1
 	DefB(BL_QUARRY, "Quarry", 
@@ -645,8 +651,8 @@ void Queue()
 	BIn(BL_QUARRY, RES_LABOUR, 5);
 	BOut(BL_QUARRY, RES_STONE, 10);
 	BDesc(BL_QUARRY, "Extracts stone.");
-	BSnd(BL_QUARRY, BLSND_PROD, "sounds/notif/beep-28.wav");
-	BSnd(BL_QUARRY, BLSND_FINI, "sounds/notif/beep-22.wav");
+	BSound(BL_QUARRY, BLSND_PROD, "sounds/notif/beep-28.wav");
+	BSound(BL_QUARRY, BLSND_FINI, "sounds/notif/beep-22.wav");
 
 #if 1
 	DefB(BL_SMELTER, "Smelter", 
@@ -673,8 +679,8 @@ void Queue()
 	BIn(BL_SMELTER, RES_CHEMICALS, 10);
 	BOut(BL_SMELTER, RES_METAL, 10);
 	BDesc(BL_SMELTER, "Turns iron ore into metal.");
-	BSnd(BL_SMELTER, BLSND_PROD, "sounds/notif/beep-29.wav");
-	BSnd(BL_SMELTER, BLSND_FINI, "sounds/notif/beep-22.wav");
+	BSound(BL_SMELTER, BLSND_PROD, "sounds/notif/beep-29.wav");
+	BSound(BL_SMELTER, BLSND_FINI, "sounds/notif/beep-22.wav");
 
 #if 1
 	DefB(BL_NUCPOW, "Nuclear Powerplant", 
@@ -701,8 +707,8 @@ void Queue()
 	//BEmitter(BL_NUCPOW, 0, PARTICLE_EXHAUSTBIG, Vec3f(TILE_SIZE*-0.63f, TILE_SIZE*1.5f, TILE_SIZE*0));
 	//BEmitter(BL_NUCPOW, 1, PARTICLE_EXHAUSTBIG, Vec3f(TILE_SIZE*0.17f, TILE_SIZE*1.5f, TILE_SIZE*-0.64f));
 	BDesc(BL_NUCPOW, "Generates electricity from uranium.");
-	BSnd(BL_NUCPOW, BLSND_PROD, "sounds/notif/beep-30b.wav");
-	BSnd(BL_NUCPOW, BLSND_FINI, "sounds/notif/beep-22.wav");
+	BSound(BL_NUCPOW, BLSND_PROD, "sounds/notif/beep-30b.wav");
+	BSound(BL_NUCPOW, BLSND_FINI, "sounds/notif/beep-22.wav");
 
 #if 1
 	DefB(BL_FARM, "Farm", 
@@ -727,8 +733,8 @@ void Queue()
 	BIn(BL_FARM, RES_CHEMICALS, 1);
 	BOut(BL_FARM, RES_FARMPRODUCTS, 1900);
 	BDesc(BL_FARM, "Produces farm products, necessary for the production of retail food.");
-	BSnd(BL_FARM, BLSND_PROD, "sounds/notif/button-16.wav");
-	BSnd(BL_FARM, BLSND_FINI, "sounds/notif/beep-22.wav");
+	BSound(BL_FARM, BLSND_PROD, "sounds/notif/button-16.wav");
+	BSound(BL_FARM, BLSND_FINI, "sounds/notif/beep-22.wav");
 
 #if 1
 	DefB(BL_STORE, "Store", 
@@ -757,8 +763,8 @@ void Queue()
 	//BOut(BL_STORE, RES_RETFOOD, 3600);
 	BOut(BL_STORE, RES_RETFOOD, 3600);
 	BDesc(BL_STORE, "Generates retail food from farm products and production, necessary for labourers to survive and multiply.");
-	BSnd(BL_STORE, BLSND_PROD, "sounds/notif/button-19.wav");
-	BSnd(BL_STORE, BLSND_FINI, "sounds/notif/beep-22.wav");
+	BSound(BL_STORE, BLSND_PROD, "sounds/notif/button-19.wav");
+	BSound(BL_STORE, BLSND_FINI, "sounds/notif/beep-22.wav");
 
 #if 1
 	DefB(BL_OILWELL, "Oil Well", 
@@ -783,8 +789,8 @@ void Queue()
 	BIn(BL_OILWELL, RES_LABOUR, 5);
 	BOut(BL_OILWELL, RES_CRUDEOIL, 100);
 	BDesc(BL_OILWELL, "Pumps up crude oil, necessary for fuel, which is consumed by all road vehicles.");
-	BSnd(BL_OILWELL, BLSND_PROD, "sounds/notif/button-31.wav");
-	BSnd(BL_OILWELL, BLSND_FINI, "sounds/notif/beep-22.wav");
+	BSound(BL_OILWELL, BLSND_PROD, "sounds/notif/button-31.wav");
+	BSound(BL_OILWELL, BLSND_FINI, "sounds/notif/beep-22.wav");
 
 #if 1
 	DefB(BL_MINE, "Mine", 
@@ -811,8 +817,8 @@ void Queue()
 	BOut(BL_MINE, RES_URANIUM, 5);
 	BOut(BL_MINE, RES_COAL, 5);
 	BDesc(BL_MINE, "Digs up minerals necessary for production at factories, and uranium, necessary for electricity generation at nuclear powerplants.");
-	BSnd(BL_MINE, BLSND_PROD, "sounds/notif/button-32.wav");
-	BSnd(BL_MINE, BLSND_FINI, "sounds/notif/beep-22.wav");
+	BSound(BL_MINE, BLSND_PROD, "sounds/notif/button-32.wav");
+	BSound(BL_MINE, BLSND_FINI, "sounds/notif/beep-22.wav");
 
 
 	// Conduit types

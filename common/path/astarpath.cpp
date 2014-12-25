@@ -26,7 +26,7 @@ void AStarPath(int utype, int umode, int cmstartx, int cmstarty, int target, int
                std::list<Vec2i> *path, Vec2i *subgoal, Unit* thisu, Unit* ignoreu, Building* ignoreb,
                int cmgoalx, int cmgoalz, int cmgoalminx, int cmgoalminy, int cmgoalmaxx, int cmgoalmaxy,
                int maxsearch,
-			   int nminx, int nminy, int nmaxx, int nmaxy, bool bounded)
+			   int nminx, int nminy, int nmaxx, int nmaxy, bool bounded, bool capend)
 {
 	UType* ut = &g_utype[utype];
 
@@ -187,6 +187,7 @@ void AStarPath(int utype, int umode, int cmstartx, int cmstarty, int target, int
 	pj->nmaxx = nmaxx;
 	pj->nmaxy = nmaxy;
 	pj->cmgoal = Vec2i(cmgoalx, cmgoalz);
+	pj->capend = capend;
 
 	// Returns the path from location `<startX, startY>` to location `<endX, endY>`.
 	//return function(finder, startNode, endNode, clearance, toClear)

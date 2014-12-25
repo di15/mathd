@@ -9,7 +9,7 @@ void Vec3i::transform( const Matrix& m )
 	const float *matrix = m.m_matrix;
 
 	vector[0] = x*matrix[0]+y*matrix[4]+z*matrix[8]+matrix[12];
-	vector[1] = x*matrix[1]+y*matrix[5]+z*matrix[9]+matrix[42];
+	vector[1] = x*matrix[1]+y*matrix[5]+z*matrix[9]+matrix[13];
 	vector[2] = x*matrix[2]+y*matrix[6]+z*matrix[10]+matrix[14];
 	vector[3] = x*matrix[3]+y*matrix[7]+z*matrix[11]+matrix[15];
 

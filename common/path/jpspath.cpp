@@ -28,7 +28,7 @@
 void JPSPath(int utype, int umode, int cmstartx, int cmstarty, int target, int target2, int targtype, int cdtype,
              std::list<Vec2i> *path, Vec2i *subgoal, Unit* thisu, Unit* ignoreu, Building* ignoreb,
              int cmgoalx, int cmgoalz, int cmgoalminx, int cmgoalminy, int cmgoalmaxx, int cmgoalmaxy,
-			 int nminx, int nminy, int nmaxx, int nmaxy, bool bounded)
+			 int nminx, int nminy, int nmaxx, int nmaxy, bool bounded, bool capend)
 {
 	UType* ut = &g_utype[utype];
 
@@ -188,6 +188,7 @@ void JPSPath(int utype, int umode, int cmstartx, int cmstarty, int target, int t
 	pj->nmaxx = nmaxx;
 	pj->nmaxy = nmaxy;
 	pj->cmgoal = Vec2i(cmgoalx, cmgoalz);
+	pj->capend = capend;
 
 	// Returns the path from location `<startX, startY>` to location `<endX, endY>`.
 	//return function(finder, startNode, endNode, clearance, toClear)

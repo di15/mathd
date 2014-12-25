@@ -231,6 +231,13 @@ void AppendCmds(std::list<PacketHeader*>* q, NetTurnPacket* ntp)
 		InfoMess("appcmd", msg);
 #endif
 
+		/*
+		Must fill out all of these function switches with
+		packets that will be placed in NetTurnPacket's.
+		Some packets, like move orders, are of variable length,
+		depending on number of unit selected etc.
+		*/
+
 		switch(ph->type)
 		{
 			//some packets dont get bundled in NetTurnPacket's, but they're here anyway
@@ -267,6 +274,14 @@ void AppendCmds(std::list<PacketHeader*>* q, NetTurnPacket* ntp)
 			newp = NULL;
 			pload += sizeof(PlaceBlPacket);
 			break;
+		case PACKET_CHVAL:
+			newp = (unsigned char*)malloc(sizeof(ChValPacket));
+			if(!newp) OutOfMem(__FILE__, __LINE__);
+			memcpy(newp, ph, sizeof(ChValPacket));
+			q->push_back((PacketHeader*)newp);
+			newp = NULL;
+			pload += sizeof(ChValPacket);
+			break;
 		default:
 			break;
 		}
@@ -294,6 +309,9 @@ void FillNetTurnPacket(NetTurnPacket** pp, std::list<PacketHeader*>* q)
 			break;
 		case PACKET_PLACEBL:
 			loadsz += sizeof(PlaceBlPacket);
+			break;
+		case PACKET_CHVAL:
+			loadsz += sizeof(ChValPacket);
 			break;
 		default:
 			break;
@@ -330,6 +348,10 @@ void FillNetTurnPacket(NetTurnPacket** pp, std::list<PacketHeader*>* q)
 		case PACKET_PLACEBL:
 			memcpy(pload, *pi, sizeof(PlaceBlPacket));
 			pload += sizeof(PlaceBlPacket);
+			break;
+		case PACKET_CHVAL:
+			memcpy(pload, *pi, sizeof(ChValPacket));
+			pload += sizeof(ChValPacket);
 			break;
 		default:
 			break;
@@ -408,5 +430,42 @@ void FreeCmds(std::list<PacketHeader*>* q)
 		free(*it);
 		it = q->erase(it);
 	}
+}
+
+//Use for all commands that are in lockstep.
+//E.g., move orders, place building action, changing values.
+void LockCmd(PacketHeader* p, short sz)
+{
+#ifndef MATCHMAKER
+	if(g_netmode == NETM_HOST)
+	{
+		PacketHeader* newp = (PacketHeader*)malloc(sz);
+		memcpy(newp, p, sz);
+		g_localcmd.push_back((PacketHeader*)newp);
+
+#if 0
+		NetConn* nc = &*g_conn.begin();
+
+		if(nc)
+			SendData((char*)&pbp, sizeof(PlaceBlPacket), &nc->addr, true, nc, &g_sock);
+#endif
+	}
+	else if(g_netmode == NETM_CLIENT)
+	{
+		NetConn* nc = g_svconn;
+
+		if(nc)
+			SendData((char*)p, sz, &nc->addr, true, false, nc, &g_sock, 0);
+	}
+	else if(g_netmode == NETM_SINGLE)
+	{
+#if 0
+		char msg[128];
+		sprintf(msg, "send %d at %d,%d", pbp.btype, pbp.tpos.x, pbp.tpos.y);
+		InfoMess("polk", msg);
+#endif
+		AppendCmd(&g_nextcmdq, (PacketHeader*)p, sz);
+	}
+#endif
 }
 

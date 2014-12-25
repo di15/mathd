@@ -107,6 +107,8 @@ public:
 #define PACKET_DONEJOIN					22
 #define PACKET_TOOMANYCL				23
 #define PACKET_MAPCHANGE				24
+#define PACKET_CHVAL					25
+#define PACKET_CLDISCONNECTED			26
 
 // byte-align structures
 #pragma pack(push, 1)
@@ -132,6 +134,35 @@ typedef BasePacket KeepAlivePacket;
 typedef BasePacket AddSvPacket;
 typedef BasePacket AddedSvPacket;
 typedef BasePacket AckPacket;
+
+struct ClDisconnectedPacket
+{
+	PacketHeader header;
+	short client;
+};
+
+#define CHVAL_BLPRICE					0
+#define CHVAL_BLWAGE					1
+#define CHVAL_TRWAGE					2
+#define CHVAL_TRPRICE					3
+#define CHVAL_CSTWAGE					4
+#define CHVAL_PRODLEV					5
+#define CHVAL_CDWAGE					6
+#define CHVAL_MANPRICE					7
+
+struct ChValPacket
+{
+	PacketHeader header;
+	unsigned char chtype;
+	int value;
+	unsigned char player;
+	unsigned char res;
+	unsigned short bi;
+	unsigned char x;
+	unsigned char y;
+	unsigned char cdtype;
+	unsigned char utype;
+};
 
 //not counting null terminator
 #define MAPNAME_LEN		63
