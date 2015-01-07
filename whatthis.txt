@@ -1,4 +1,0 @@
-an attempt to upgrade existing corpstates with new terrain shading algorithms,
-water, etc. (reusing the original code).
-
-edit: it is now the low-3d (opengl 1.4 with shaders) version.
