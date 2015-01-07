@@ -19,7 +19,7 @@
 #include "../sound/sound.h"
 #include "../render/particle.h"
 #include "../render/skybox.h"
-#include "../gui/sprite.h"
+#include "../render/sprite.h"
 #include "../gui/cursor.h"
 #include "../sim/player.h"
 #endif

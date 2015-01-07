@@ -633,6 +633,7 @@ void ReadChValPacket(ChValPacket* cvp, NetConn* nc, IPaddress* from, UDPsocket* 
 		case CHVAL_BLPRICE:
 			b = &g_building[cvp->bi];
 			b->price[cvp->res] = cvp->value;
+#if 0
 			r = &g_resource[cvp->res];
 			bt = &g_bltype[b->type];
 			sprintf(add, " set price ");
@@ -645,6 +646,8 @@ void ReadChValPacket(ChValPacket* cvp, NetConn* nc, IPaddress* from, UDPsocket* 
 			chat = chat + RichText(RichPart(RICHTEXT_ICON, r->icon));
 			sprintf(add, "%d", cvp->value);
 			chat = chat + RichText(add);
+#endif
+			//TODO messages for the rest
 			break;
 		case CHVAL_BLWAGE:
 			b = &g_building[cvp->bi];
@@ -677,7 +680,7 @@ void ReadChValPacket(ChValPacket* cvp, NetConn* nc, IPaddress* from, UDPsocket* 
 			break;
 		};
 
-		AddChat(&chat);
+		//AddChat(&chat);
 
 		return;
 	}

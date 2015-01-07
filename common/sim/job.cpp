@@ -12,7 +12,7 @@
 #include "../path/anypath.h"
 #include "../path/pathnode.h"
 #include "../path/pathjob.h"
-#include "../path/binheap.h"
+#include "../sys/binheap.h"
 #include "../path/collidertile.h"
 
 //not engine

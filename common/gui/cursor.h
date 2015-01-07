@@ -1,7 +1,7 @@
 #ifndef CURSOR_H
 #define CURSOR_H
 
-#include "sprite.h"
+#include "../render/sprite.h"
 
 //cursor states
 #define CU_NONE		0	//cursor off?

@@ -168,7 +168,6 @@
     <ClCompile Include="..\common\gui\icon.cpp" />
     <ClCompile Include="..\common\gui\inevent.cpp" />
     <ClCompile Include="..\common\gui\richtext.cpp" />
-    <ClCompile Include="..\common\gui\sprite.cpp" />
     <ClCompile Include="..\common\gui\viewlayer.cpp" />
     <ClCompile Include="..\common\gui\widget.cpp" />
     <ClCompile Include="..\common\gui\widgets\barbutton.cpp" />
@@ -208,6 +207,7 @@
     <ClCompile Include="..\common\math\fixmath.cpp" />
     <ClCompile Include="..\common\math\frustum.cpp" />
     <ClCompile Include="..\common\math\hmapmath.cpp" />
+    <ClCompile Include="..\common\math\isomath.cpp" />
     <ClCompile Include="..\common\math\line.cpp" />
     <ClCompile Include="..\common\math\matrix.cpp" />
     <ClCompile Include="..\common\math\physics.cpp" />
@@ -227,7 +227,6 @@
     <ClCompile Include="..\common\net\sendpackets.cpp" />
     <ClCompile Include="..\common\path\anypath.cpp" />
     <ClCompile Include="..\common\path\astarpath.cpp" />
-    <ClCompile Include="..\common\path\binheap.cpp" />
     <ClCompile Include="..\common\path\collidertile.cpp" />
     <ClCompile Include="..\common\path\fillbodies.cpp" />
     <ClCompile Include="..\common\path\groupmove.cpp" />
@@ -243,11 +242,14 @@
     <ClCompile Include="..\common\path\reconstructpath.cpp" />
     <ClCompile Include="..\common\path\tilepath.cpp" />
     <ClCompile Include="..\common\path\trip.cpp" />
+    <ClCompile Include="..\common\phys\collidable.cpp" />
     <ClCompile Include="..\common\phys\collision.cpp" />
     <ClCompile Include="..\common\phys\trace.cpp" />
     <ClCompile Include="..\common\platform.cpp" />
     <ClCompile Include="..\common\render\billboard.cpp" />
+    <ClCompile Include="..\common\render\cell.cpp" />
     <ClCompile Include="..\common\render\dmdmodel.cpp" />
+    <ClCompile Include="..\common\render\drawqueue.cpp" />
     <ClCompile Include="..\common\render\foliage.cpp" />
     <ClCompile Include="..\common\render\graph.cpp" />
     <ClCompile Include="..\common\render\heightmap.cpp" />
@@ -260,6 +262,8 @@
     <ClCompile Include="..\common\render\shader.cpp" />
     <ClCompile Include="..\common\render\shadow.cpp" />
     <ClCompile Include="..\common\render\skybox.cpp" />
+    <ClCompile Include="..\common\render\sprite.cpp" />
+    <ClCompile Include="..\common\render\tile.cpp" />
     <ClCompile Include="..\common\render\transaction.cpp" />
     <ClCompile Include="..\common\render\vertexarray.cpp" />
     <ClCompile Include="..\common\render\water.cpp" />
@@ -275,6 +279,7 @@
     <ClCompile Include="..\common\sim\job.cpp" />
     <ClCompile Include="..\common\sim\labourer.cpp" />
     <ClCompile Include="..\common\sim\crpipe.cpp" />
+    <ClCompile Include="..\common\sim\map.cpp" />
     <ClCompile Include="..\common\sim\order.cpp" />
     <ClCompile Include="..\common\sim\player.cpp" />
     <ClCompile Include="..\common\sim\powl.cpp" />
@@ -291,7 +296,10 @@
     <ClCompile Include="..\common\sim\utype.cpp" />
     <ClCompile Include="..\common\sound\sound.cpp" />
     <ClCompile Include="..\common\sound\soundch.cpp" />
+    <ClCompile Include="..\common\sys\binheap.cpp" />
     <ClCompile Include="..\common\sys\checksum.cpp" />
+    <ClCompile Include="..\common\sys\dirent.c" />
+    <ClCompile Include="..\common\sys\list.cpp" />
     <ClCompile Include="..\common\sys\mempool.cpp" />
     <ClCompile Include="..\common\sys\regress.cpp" />
     <ClCompile Include="..\common\sys\unicode.cpp" />
@@ -322,7 +330,6 @@
     <ClInclude Include="..\common\gui\icon.h" />
     <ClInclude Include="..\common\gui\inevent.h" />
     <ClInclude Include="..\common\gui\richtext.h" />
-    <ClInclude Include="..\common\gui\sprite.h" />
     <ClInclude Include="..\common\gui\viewlayer.h" />
     <ClInclude Include="..\common\gui\widget.h" />
     <ClInclude Include="..\common\gui\widgets\barbutton.h" />
@@ -362,6 +369,7 @@
     <ClInclude Include="..\common\math\fixmath.h" />
     <ClInclude Include="..\common\math\frustum.h" />
     <ClInclude Include="..\common\math\hmapmath.h" />
+    <ClInclude Include="..\common\math\isomath.h" />
     <ClInclude Include="..\common\math\line.h" />
     <ClInclude Include="..\common\math\matrix.h" />
     <ClInclude Include="..\common\math\physics.h" />
@@ -386,7 +394,6 @@
     <ClInclude Include="..\common\net\sendpackets.h" />
     <ClInclude Include="..\common\path\anypath.h" />
     <ClInclude Include="..\common\path\astarpath.h" />
-    <ClInclude Include="..\common\path\binheap.h" />
     <ClInclude Include="..\common\path\collidertile.h" />
     <ClInclude Include="..\common\path\fillbodies.h" />
     <ClInclude Include="..\common\path\groupmove.h" />
@@ -402,11 +409,14 @@
     <ClInclude Include="..\common\path\reconstructpath.h" />
     <ClInclude Include="..\common\path\tilepath.h" />
     <ClInclude Include="..\common\path\trip.h" />
+    <ClInclude Include="..\common\phys\collidable.h" />
     <ClInclude Include="..\common\phys\collision.h" />
     <ClInclude Include="..\common\phys\trace.h" />
     <ClInclude Include="..\common\platform.h" />
     <ClInclude Include="..\common\render\billboard.h" />
+    <ClInclude Include="..\common\render\cell.h" />
     <ClInclude Include="..\common\render\dmdmodel.h" />
+    <ClInclude Include="..\common\render\drawqueue.h" />
     <ClInclude Include="..\common\render\foliage.h" />
     <ClInclude Include="..\common\render\graph.h" />
     <ClInclude Include="..\common\render\heightmap.h" />
@@ -419,6 +429,8 @@
     <ClInclude Include="..\common\render\shader.h" />
     <ClInclude Include="..\common\render\shadow.h" />
     <ClInclude Include="..\common\render\skybox.h" />
+    <ClInclude Include="..\common\render\sprite.h" />
+    <ClInclude Include="..\common\render\tile.h" />
     <ClInclude Include="..\common\render\transaction.h" />
     <ClInclude Include="..\common\render\vertexarray.h" />
     <ClInclude Include="..\common\render\water.h" />
@@ -434,6 +446,7 @@
     <ClInclude Include="..\common\sim\job.h" />
     <ClInclude Include="..\common\sim\labourer.h" />
     <ClInclude Include="..\common\sim\crpipe.h" />
+    <ClInclude Include="..\common\sim\map.h" />
     <ClInclude Include="..\common\sim\order.h" />
     <ClInclude Include="..\common\sim\player.h" />
     <ClInclude Include="..\common\sim\powl.h" />
@@ -450,7 +463,10 @@
     <ClInclude Include="..\common\sim\utype.h" />
     <ClInclude Include="..\common\sound\sound.h" />
     <ClInclude Include="..\common\sound\soundch.h" />
+    <ClInclude Include="..\common\sys\binheap.h" />
     <ClInclude Include="..\common\sys\checksum.h" />
+    <ClInclude Include="..\common\sys\dirent.h" />
+    <ClInclude Include="..\common\sys\list.h" />
     <ClInclude Include="..\common\sys\mempool.h" />
     <ClInclude Include="..\common\sys\unicode.h" />
     <ClInclude Include="..\common\sys\utf8.h" />

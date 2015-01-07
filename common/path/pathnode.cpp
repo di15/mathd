@@ -4,7 +4,7 @@
 #include "pathjob.h"
 #include "../sim/utype.h"
 #include "collidertile.h"
-#include "binheap.h"
+#include "../sys/binheap.h"
 #include "../utils.h"
 #include "../debug.h"
 #include "../sim/unit.h"

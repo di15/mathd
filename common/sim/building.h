@@ -98,7 +98,7 @@ class Unit;
 
 int NewBl();
 void FreeBls();
-void DrawBl();
+void DrawBls();
 void UpdBls();
 void StageCopyVA(VertexArray* to, VertexArray* from, float completion);
 void HeightCopyVA(VertexArray* to, VertexArray* from, float completion);

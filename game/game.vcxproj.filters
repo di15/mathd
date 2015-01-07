@@ -329,9 +329,6 @@
     <ClCompile Include="..\common\gui\widgets\windoww.cpp">
       <Filter>Source Files\common\gui\widgets</Filter>
     </ClCompile>
-    <ClCompile Include="..\common\gui\sprite.cpp">
-      <Filter>Source Files\common\gui</Filter>
-    </ClCompile>
     <ClCompile Include="..\common\sys\unicode.cpp">
       <Filter>Source Files\common\sys</Filter>
     </ClCompile>
@@ -354,9 +351,6 @@
       <Filter>Source Files\common\math</Filter>
     </ClCompile>
     <ClCompile Include="..\common\path\astarpath.cpp">
-      <Filter>Source Files\common\path</Filter>
-    </ClCompile>
-    <ClCompile Include="..\common\path\binheap.cpp">
       <Filter>Source Files\common\path</Filter>
     </ClCompile>
     <ClCompile Include="..\common\path\collidertile.cpp">
@@ -523,6 +517,36 @@
     </ClCompile>
     <ClCompile Include="..\common\path\fillbodies.cpp">
       <Filter>Source Files\common\path</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\render\cell.cpp">
+      <Filter>Source Files\common\render</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\render\drawqueue.cpp">
+      <Filter>Source Files\common\render</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\render\sprite.cpp">
+      <Filter>Source Files\common\render</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\render\tile.cpp">
+      <Filter>Source Files\common\render</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\phys\collidable.cpp">
+      <Filter>Source Files\common\phys</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\sys\binheap.cpp">
+      <Filter>Source Files\common\sys</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\sys\dirent.c">
+      <Filter>Source Files\common\sys</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\sys\list.cpp">
+      <Filter>Source Files\common\sys</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\math\isomath.cpp">
+      <Filter>Source Files\common\math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\sim\map.cpp">
+      <Filter>Source Files\common\sim</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -799,9 +823,6 @@
     <ClInclude Include="..\common\gui\widgets\windoww.h">
       <Filter>Source Files\common\gui\widgets</Filter>
     </ClInclude>
-    <ClInclude Include="..\common\gui\sprite.h">
-      <Filter>Source Files\common\gui</Filter>
-    </ClInclude>
     <ClInclude Include="..\common\sys\unicode.h">
       <Filter>Source Files\common\sys</Filter>
     </ClInclude>
@@ -824,9 +845,6 @@
       <Filter>Source Files\common\math</Filter>
     </ClInclude>
     <ClInclude Include="..\common\path\astarpath.h">
-      <Filter>Source Files\common\path</Filter>
-    </ClInclude>
-    <ClInclude Include="..\common\path\binheap.h">
       <Filter>Source Files\common\path</Filter>
     </ClInclude>
     <ClInclude Include="..\common\path\collidertile.h">
@@ -996,6 +1014,36 @@
     </ClInclude>
     <ClInclude Include="..\common\path\fillbodies.h">
       <Filter>Source Files\common\path</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\render\cell.h">
+      <Filter>Source Files\common\render</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\render\drawqueue.h">
+      <Filter>Source Files\common\render</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\render\sprite.h">
+      <Filter>Source Files\common\render</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\render\tile.h">
+      <Filter>Source Files\common\render</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\phys\collidable.h">
+      <Filter>Source Files\common\phys</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\sys\binheap.h">
+      <Filter>Source Files\common\sys</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\sys\dirent.h">
+      <Filter>Source Files\common\sys</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\sys\list.h">
+      <Filter>Source Files\common\sys</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\math\isomath.h">
+      <Filter>Source Files\common\math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\sim\map.h">
+      <Filter>Source Files\common\sim</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

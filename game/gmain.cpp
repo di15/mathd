@@ -334,7 +334,7 @@ void DrawScene(Matrix projection, Matrix viewmat, Matrix modelmat, Matrix modelv
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 	StartTimer(TIMER_DRAWBL);
-	DrawBl();
+	DrawBls();
 	StopTimer(TIMER_DRAWBL);
 	StartTimer(TIMER_DRAWROADS);
 	DrawCo(CONDUIT_ROAD);
@@ -522,7 +522,7 @@ void DrawSceneDepth()
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 	CheckGLError(__FILE__, __LINE__);
 	//g_hmap.draw2();
-	DrawBl();
+	DrawBls();
 	CheckGLError(__FILE__, __LINE__);
 	for(char i=0; i<CONDUIT_TYPES; i++)
 		DrawCo(i);
@@ -992,6 +992,16 @@ void Deinit()
 {
 	WriteProfiles(-1, 0);
 	DestroyWindow(TITLE);
+
+	const unsigned long long start = GetTickCount64();
+	//After quit, wait to send out quit packet to make sure host/clients recieve it.
+	while (GetTickCount64() - start < QUIT_DELAY)
+	{
+		if(NetQuit())
+			break;
+		if(g_sock)
+			UpdNet();
+	}
 
 	// Clean up	
 	

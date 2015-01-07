@@ -6,6 +6,7 @@
 #include "../math/vec2f.h"
 #include "../texture.h"
 #include "vertexarray.h"
+#include "tile.h"
 
 #define TILE_SIZE			1000
 #define TILE_Y_SCALE		20000.0f
@@ -70,6 +71,8 @@ public:
 	VertexArray m_rimva;
 	unsigned int m_vbo[VBOS];
 	unsigned int m_fullvbo[VBOS];
+	
+	Tile *m_surftile;
 
 	Heightmap()
 	{

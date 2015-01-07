@@ -1,5 +1,5 @@
-#include "binheap.h"
-#include "pathnode.h"
+#include "../sys/binheap.h"
+//#include "pathnode.h"
 #include "../utils.h"
 
 BinHeap::BinHeap(bool (*comparef)(void* a, void* b))

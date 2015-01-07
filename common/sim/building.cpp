@@ -1301,7 +1301,7 @@ bool Building::checkconstruction()
 	return finished;
 }
 
-void DrawBl()
+void DrawBls()
 {
 	Shader* s = &g_shader[g_curS];
 
