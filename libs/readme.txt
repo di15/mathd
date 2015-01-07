@@ -2,18 +2,26 @@
 
 includes:
 
-$(SolutionDir)\libs\jpeglib
-$(SolutionDir)\libs\lpng
-$(SolutionDir)\libs\libzip-0.11.1\lib
-$(SolutionDir)\libs\
+$(SolutionDir)..\libs\win\SDL2_mixer-2.0.0\include
+$(SolutionDir)..\libs\win\SDL2_net-2.0.0\include
+$(SolutionDir)..\libs\win\SDL2-2.0.3\include
+$(SolutionDir)..\libs\glew\include
+$(SolutionDir)..\libs\jpeglib
+$(SolutionDir)..\libs\lpng
+$(SolutionDir)..\libs\libzip-0.11.1\lib
+$(SolutionDir)..\libs\
 
 libs:
 
-$(SolutionDir)\libs\jpeglib
-$(SolutionDir)\libs\lpng\lib
-$(SolutionDir)\libs\libzip-0.11.1\build\lib\Release
-$(SolutionDir)\libs\zlib-1.2.5\build\Release
-$(SolutionDir)\libs\GL
+$(SolutionDir)..\libs\win\SDL2_mixer-2.0.0\lib
+$(SolutionDir)..\libs\win\SDL2_net-2.0.0\lib
+$(SolutionDir)..\libs\win\SDL2-2.0.3\lib
+$(SolutionDir)..\libs\glew\lib\Release\Win32
+$(SolutionDir)..\libs\jpeglib
+$(SolutionDir)..\libs\lpng\lib
+$(SolutionDir)..\libs\libzip-0.11.1\build\lib\Release
+$(SolutionDir)..\libs\zlib-1.2.5\build\Release
+$(SolutionDir)..\libs\GL
 
 
 

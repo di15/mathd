@@ -156,10 +156,14 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="gmain.h" />
     <ClInclude Include="gres.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="res.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="gmain.c" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
