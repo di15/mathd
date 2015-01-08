@@ -190,7 +190,7 @@ void TruckMgr::regen(Selection* sel)
 		wage = opy->truckwage;
 		cost = opy->transpcost;
 
-		uname = RichText(UString(ut->name));
+		uname = RichText(UStr(ut->name));
 	}
 
 	freech();
@@ -208,16 +208,16 @@ void TruckMgr::regen(Selection* sel)
 		sprintf(rowname, "%d %d", row, 0);
 		RichText label;
 
-		m_subwidg.push_back(new Text(this, rowname, RichText(UString("Driver wage ")) + RichText(RichPart(RICHTEXT_ICON, r->icon)) + RichText(UString("/second:")), MAINFONT16, Resize_BV_Cl, true, 1.0f,1.0f,1.0f,1.0f /*, 0.7f, 0.9f, 0.3f, 1*/));
+		m_subwidg.push_back(new Text(this, rowname, RichText(UStr("Driver wage ")) + RichText(RichPart(RICHTEXT_ICON, r->icon)) + RichText(UStr("/second:")), MAINFONT16, Resize_BV_Cl, true, 1.0f,1.0f,1.0f,1.0f /*, 0.7f, 0.9f, 0.3f, 1*/));
 
 		sprintf(rowname, "%d %d", row, 1);
 		char cwstr[32];
 		sprintf(cwstr, "%d", opy->truckwage);
 
 		if(owned)
-			m_subwidg.push_back(new EditBox(this, rowname, RichText(UString(cwstr)), MAINFONT16, Resize_BV_Cl, false, 6, Change_TM_DW, NULL, -1));
+			m_subwidg.push_back(new EditBox(this, rowname, RichText(UStr(cwstr)), MAINFONT16, Resize_BV_Cl, false, 6, Change_TM_DW, NULL, -1));
 		else
-			m_subwidg.push_back(new Text(this, rowname, RichText(UString(cwstr)), MAINFONT16, Resize_BV_Cl));
+			m_subwidg.push_back(new Text(this, rowname, RichText(UStr(cwstr)), MAINFONT16, Resize_BV_Cl));
 
 		row++;
 	}
@@ -229,16 +229,16 @@ void TruckMgr::regen(Selection* sel)
 		sprintf(rowname, "%d %d", row, 0);
 		RichText label;
 
-		m_subwidg.push_back(new Text(this, rowname, RichText(UString("Transport cost ")) + RichText(RichPart(RICHTEXT_ICON, r->icon)) + RichText(UString("/second:")), MAINFONT16, Resize_BV_Cl, true, 1.0f,1.0f,1.0f,1.0f /*, 0.7f, 0.9f, 0.3f, 1*/));
+		m_subwidg.push_back(new Text(this, rowname, RichText(UStr("Transport cost ")) + RichText(RichPart(RICHTEXT_ICON, r->icon)) + RichText(UStr("/second:")), MAINFONT16, Resize_BV_Cl, true, 1.0f,1.0f,1.0f,1.0f /*, 0.7f, 0.9f, 0.3f, 1*/));
 
 		sprintf(rowname, "%d %d", row, 1);
 		char cwstr[32];
 		sprintf(cwstr, "%d", opy->transpcost);
 
 		if(owned)
-			m_subwidg.push_back(new EditBox(this, rowname, RichText(UString(cwstr)), MAINFONT16, Resize_BV_Cl, false, 6, Change_TM_TC, NULL, -1));
+			m_subwidg.push_back(new EditBox(this, rowname, RichText(UStr(cwstr)), MAINFONT16, Resize_BV_Cl, false, 6, Change_TM_TC, NULL, -1));
 		else
-			m_subwidg.push_back(new Text(this, rowname, RichText(UString(cwstr)), MAINFONT16, Resize_BV_Cl));
+			m_subwidg.push_back(new Text(this, rowname, RichText(UStr(cwstr)), MAINFONT16, Resize_BV_Cl));
 
 		row++;
 	}

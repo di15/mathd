@@ -10,7 +10,7 @@ public:
 	unsigned int m_tex;
 	int m_width;
 	int m_height;
-	UString m_tag;
+	UStr m_tag;
 };
 
 #define ICON_DOLLARS		0
@@ -52,7 +52,7 @@ public:
 extern Icon g_icon[ICONS];
 
 #ifndef MATCHMAKER
-void DefI(int type, const char* relative, const UString tag);
+void DefI(int type, const char* relative, const UStr tag);
 #endif
 
 #endif

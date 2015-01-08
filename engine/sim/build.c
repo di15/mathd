@@ -154,46 +154,46 @@ void DrawBReason(Matrix* mvp, float width, float height, bool persp)
 	switch(g_bpcol)
 	{
 	case COLLIDER_NONE:
-		reason.m_part.push_back(RichPart(UString("")));
+		reason.m_part.push_back(RichPart(UStr("")));
 		break;
 	case COLLIDER_UNIT:
 		reason.m_part.push_back(RichPart(RICHTEXT_ICON, ICON_EXCLAMATION));
-		reason.m_part.push_back(RichPart(UString(" A unit is in the way.")));
+		reason.m_part.push_back(RichPart(UStr(" A unit is in the way.")));
 		break;
 	case COLLIDER_BUILDING:
 		reason.m_part.push_back(RichPart(RICHTEXT_ICON, ICON_EXCLAMATION));
-		reason.m_part.push_back(RichPart(UString(" Another building is in the way.")));
+		reason.m_part.push_back(RichPart(UStr(" Another building is in the way.")));
 		break;
 	case COLLIDER_TERRAIN:
 		reason.m_part.push_back(RichPart(RICHTEXT_ICON, ICON_EXCLAMATION));
-		reason.m_part.push_back(RichPart(UString(" Buildings must be placed on even terrain.")));
+		reason.m_part.push_back(RichPart(UStr(" Buildings must be placed on even terrain.")));
 		break;
 	case COLLIDER_NOROAD:
-		reason.m_part.push_back(RichPart(UString("")));
+		reason.m_part.push_back(RichPart(UStr("")));
 		break;
 	case COLLIDER_OTHER:
 		reason.m_part.push_back(RichPart(RICHTEXT_ICON, ICON_EXCLAMATION));
-		reason.m_part.push_back(RichPart(UString(" Can't place here.")));
+		reason.m_part.push_back(RichPart(UStr(" Can't place here.")));
 		break;
 	case COLLIDER_NOLAND:
 		reason.m_part.push_back(RichPart(RICHTEXT_ICON, ICON_EXCLAMATION));
-		reason.m_part.push_back(RichPart(UString(" This building must be placed on land.")));
+		reason.m_part.push_back(RichPart(UStr(" This building must be placed on land.")));
 		break;
 	case COLLIDER_NOSEA:
 		reason.m_part.push_back(RichPart(RICHTEXT_ICON, ICON_EXCLAMATION));
-		reason.m_part.push_back(RichPart(UString(" This structure must be placed in the sea.")));
+		reason.m_part.push_back(RichPart(UStr(" This structure must be placed in the sea.")));
 		break;
 	case COLLIDER_NOCOAST:
 		reason.m_part.push_back(RichPart(RICHTEXT_ICON, ICON_EXCLAMATION));
-		reason.m_part.push_back(RichPart(UString(" This building must be placed along the coast.")));
+		reason.m_part.push_back(RichPart(UStr(" This building must be placed along the coast.")));
 		break;
 	case COLLIDER_ROAD:
 		reason.m_part.push_back(RichPart(RICHTEXT_ICON, ICON_EXCLAMATION));
-		reason.m_part.push_back(RichPart(UString(" A road is in the way.")));
+		reason.m_part.push_back(RichPart(UStr(" A road is in the way.")));
 		break;
 	case COLLIDER_OFFMAP:
 		reason.m_part.push_back(RichPart(RICHTEXT_ICON, ICON_EXCLAMATION));
-		reason.m_part.push_back(RichPart(UString(" Building is out of bounds.")));
+		reason.m_part.push_back(RichPart(UStr(" Building is out of bounds.")));
 		break;
 	}
 

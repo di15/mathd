@@ -5,22 +5,22 @@
 
 //#define USTR_DEBUG
 
-class UString
+class UStr
 {
 public:
 	unsigned int m_length;	//length doesn't count null-terminator
 	unsigned int* m_data;
 
-	UString();
-	~UString();
-	UString(const UString& original);
-	UString(const char* cstr);
-	UString(unsigned int k);
-	UString(unsigned int* k);
-	UString& operator=(const UString &original);
-	UString operator+(const UString &other);
-	UString substr(int start, int len) const;
-	int firstof(UString find) const;
+	UStr();
+	~UStr();
+	UStr(const UStr& original);
+	UStr(const char* cstr);
+	UStr(unsigned int k);
+	UStr(unsigned int* k);
+	UStr& operator=(const UStr &original);
+	UStr operator+(const UStr &other);
+	UStr substr(int start, int len) const;
+	int firstof(UStr find) const;
 	std::string rawstr() const;
 };
 

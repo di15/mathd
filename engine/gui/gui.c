@@ -195,7 +195,7 @@ void Status(const char* status, bool logthis)
 	if(!statustext)
 		return;
 
-	statustext->m_text = RichText(UString(status));
+	statustext->m_text = RichText(UStr(status));
 }
 
 bool MousePosition()

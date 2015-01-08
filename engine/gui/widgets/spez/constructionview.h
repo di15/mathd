@@ -29,7 +29,7 @@ public:
 	ViewportW viewport;
 
 	Image white_bg;
-	TouchListener bg_touch;
+	TouchListen bg_touch;
 
 	Text titletext;
 

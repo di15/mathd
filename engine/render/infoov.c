@@ -150,7 +150,7 @@ void DrawOv(Matrix* mvp)
 			t += add;
 			sprintf(add, "%0.1f next\n", (CYCLE_FRAMES - (g_simframe - b->lastcy))/(float)SIM_FRAME_RATE);
 			t += add;
-			RichText rt(UString(t.c_str()));
+			RichText rt(UStr(t.c_str()));
 			//DrawCenterShadText(MAINFONT8, screenpos.x, screenpos.y, &rt);
 
 			if(g_zoom > 0.1f)
@@ -315,7 +315,7 @@ void DrawOv(Matrix* mvp)
 
 		//mode += "\n";
 
-		rt.m_part.push_back(RichPart(UString(mode.c_str())));
+		rt.m_part.push_back(RichPart(UStr(mode.c_str())));
 		DrawCenterShadText(MAINFONT8, screenpos.x, screenpos.y, &rt);
 		//DrawBoxShadText(MAINFONT8, screenpos.x, screenpos.y, g_width, g_height, &rt, color, 0, -1);
 		
@@ -336,16 +336,16 @@ void DrawOv(Matrix* mvp)
 			sprintf(funds, "%d \n", u->belongings[RES_DOLLARS]);
 			
 			rt2.m_part.push_back(RichPart(RICHTEXT_ICON, foodr->icon));
-			rt2.m_part.push_back(RichPart(UString(food)));
+			rt2.m_part.push_back(RichPart(UStr(food)));
 			rt2.m_part.push_back(RichPart(RICHTEXT_ICON, labourr->icon));
-			rt2.m_part.push_back(RichPart(UString(labour)));
+			rt2.m_part.push_back(RichPart(UStr(labour)));
 			rt2.m_part.push_back(RichPart(RICHTEXT_ICON, fundsr->icon));
-			rt2.m_part.push_back(RichPart(UString(funds)));
+			rt2.m_part.push_back(RichPart(UStr(funds)));
 			
 #if 0
 			char add[32];
 			sprintf(add, "t%d,t%d fr%d,%d\n", (int)(u->target), u->target2, u->cmpos.x/TILE_SIZE, u->cmpos.y/TILE_SIZE);
-			rt2.m_part.push_back(RichPart(UString(add)));
+			rt2.m_part.push_back(RichPart(UStr(add)));
 #endif
 		}
 		else if(u->type == UNIT_TRUCK)
@@ -357,7 +357,7 @@ void DrawOv(Matrix* mvp)
 			sprintf(fuel, "%d \n", u->belongings[RES_FUEL]);
 			
 			rt2.m_part.push_back(RichPart(RICHTEXT_ICON, fuelr->icon));
-			rt2.m_part.push_back(RichPart(UString(fuel)));
+			rt2.m_part.push_back(RichPart(UStr(fuel)));
 
 			if(u->cargotype >= 0 && u->cargoamt > 0)
 			{
@@ -368,13 +368,13 @@ void DrawOv(Matrix* mvp)
 				sprintf(carry, "%d \n", u->cargoamt);
 
 				rt2.m_part.push_back(RichPart(RICHTEXT_ICON, carryr->icon));
-				rt2.m_part.push_back(RichPart(UString(carry)));
+				rt2.m_part.push_back(RichPart(UStr(carry)));
 			}
 
 #if 0
 			char add[16];
 			sprintf(add, "this%d\n", (int)(u-g_unit));
-			rt2.m_part.push_back(RichPart(UString(add)));
+			rt2.m_part.push_back(RichPart(UStr(add)));
 #endif
 		}
 

@@ -203,7 +203,7 @@ void LoadView::regen()
 	for(auto fi=files.begin(); fi!=files.end(); fi++)
 	{
 		const char* fs = fi->c_str();
-		m_files.push_back(RichText(UString(fs)));
+		m_files.push_back(RichText(UStr(fs)));
 	}
 
 	reframe();

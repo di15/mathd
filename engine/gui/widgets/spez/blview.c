@@ -738,7 +738,7 @@ void BlView::regen(Selection* sel)
 		g_bptype = b->type;
 		price = b->price;
 
-		bname = RichText(UString(bt->name));
+		bname = RichText(UStr(bt->name));
 
 #if 0
 		if(b->type == BL_NUCPOW)
@@ -806,17 +806,17 @@ void BlView::regen(Selection* sel)
 		sprintf(rowname, "%d %d", row, 0);
 		RichText label;
 
-		m_subwidg.push_back(new Text(this, rowname, RichText(UString("Price of ")) + RichText(RichPart(RICHTEXT_ICON, r->icon)) + RichText(UString(r->name.c_str())) + RichText(UString(":")), MAINFONT16, Resize_BV_Cl, true, 1.0f,1.0f,1.0f,1.0f /*, 0.7f, 0.9f, 0.3f, 1*/));
+		m_subwidg.push_back(new Text(this, rowname, RichText(UStr("Price of ")) + RichText(RichPart(RICHTEXT_ICON, r->icon)) + RichText(UStr(r->name.c_str())) + RichText(UStr(":")), MAINFONT16, Resize_BV_Cl, true, 1.0f,1.0f,1.0f,1.0f /*, 0.7f, 0.9f, 0.3f, 1*/));
 
 		sprintf(rowname, "%d %d", row, 1);
 		char cwstr[32];
 		sprintf(cwstr, "%d", b->price[ri]);
 
 		if(owned)
-			//m_subwidg.push_back(new EditBox(this, rowname, RichText(UString(cwstr)), MAINFONT16, Resize_BV_Cl, false, 8, Change_BV_PP, NULL, ri));
-			m_subwidg.push_back(new EditBox(this, rowname, RichText(UString(cwstr)), MAINFONT16, Resize_BV_Cl, false, 8, NULL, NULL, ri));
+			//m_subwidg.push_back(new EditBox(this, rowname, RichText(UStr(cwstr)), MAINFONT16, Resize_BV_Cl, false, 8, Change_BV_PP, NULL, ri));
+			m_subwidg.push_back(new EditBox(this, rowname, RichText(UStr(cwstr)), MAINFONT16, Resize_BV_Cl, false, 8, NULL, NULL, ri));
 		else
-			m_subwidg.push_back(new Text(this, rowname, RichText(UString(cwstr)), MAINFONT16, Resize_BV_Cl));
+			m_subwidg.push_back(new Text(this, rowname, RichText(UStr(cwstr)), MAINFONT16, Resize_BV_Cl));
 
 		row++;
 	}
@@ -829,17 +829,17 @@ void BlView::regen(Selection* sel)
 
 		Resource* r = &g_resource[RES_DOLLARS];
 
-		m_subwidg.push_back(new Text(this, rowname, RichText(UString("Wage ")) + RichText(RichPart(RICHTEXT_ICON, r->icon)) + RichText(UString(":")), MAINFONT16, Resize_BV_Cl, true, 1.0f,1.0f,1.0f,1.0f /*, 0.7f, 0.9f, 0.3f, 1*/));
+		m_subwidg.push_back(new Text(this, rowname, RichText(UStr("Wage ")) + RichText(RichPart(RICHTEXT_ICON, r->icon)) + RichText(UStr(":")), MAINFONT16, Resize_BV_Cl, true, 1.0f,1.0f,1.0f,1.0f /*, 0.7f, 0.9f, 0.3f, 1*/));
 
 		sprintf(rowname, "%d %d", row, 1);
 		char cwstr[32];
 		sprintf(cwstr, "%d", b->opwage);
 
 		if(owned)
-			//m_subwidg.push_back(new EditBox(this, rowname, RichText(UString(cwstr)), MAINFONT16, Resize_BV_Cl, false, 8, Change_BV_OW, NULL, RES_LABOUR));
-			m_subwidg.push_back(new EditBox(this, rowname, RichText(UString(cwstr)), MAINFONT16, Resize_BV_Cl, false, 8, NULL, NULL, RES_LABOUR));
+			//m_subwidg.push_back(new EditBox(this, rowname, RichText(UStr(cwstr)), MAINFONT16, Resize_BV_Cl, false, 8, Change_BV_OW, NULL, RES_LABOUR));
+			m_subwidg.push_back(new EditBox(this, rowname, RichText(UStr(cwstr)), MAINFONT16, Resize_BV_Cl, false, 8, NULL, NULL, RES_LABOUR));
 		else
-			m_subwidg.push_back(new Text(this, rowname, RichText(UString(cwstr)), MAINFONT16, Resize_BV_Cl));
+			m_subwidg.push_back(new Text(this, rowname, RichText(UStr(cwstr)), MAINFONT16, Resize_BV_Cl));
 
 		row++;
 	}
@@ -853,17 +853,17 @@ void BlView::regen(Selection* sel)
 		char label[64];
 		sprintf(label, "Production level (max %d):", RATIO_DENOM);
 
-		m_subwidg.push_back(new Text(this, rowname, RichText(UString(label)), MAINFONT16, Resize_BV_Cl, true, 1.0f,1.0f,1.0f,1.0f /*, 0.7f, 0.9f, 0.3f, 1*/));
+		m_subwidg.push_back(new Text(this, rowname, RichText(UStr(label)), MAINFONT16, Resize_BV_Cl, true, 1.0f,1.0f,1.0f,1.0f /*, 0.7f, 0.9f, 0.3f, 1*/));
 
 		sprintf(rowname, "%d %d", row, 1);
 		char cplstr[32];
 		sprintf(cplstr, "%d", b->prodlevel);
 
 		if(owned)
-			//m_subwidg.push_back(new EditBox(this, rowname, RichText(UString(cplstr)), MAINFONT16, Resize_BV_Cl, false, 6, Change_BV_PL, NULL, RES_LABOUR));
-			m_subwidg.push_back(new EditBox(this, rowname, RichText(UString(cplstr)), MAINFONT16, Resize_BV_Cl, false, 6, NULL, NULL, RES_LABOUR));
+			//m_subwidg.push_back(new EditBox(this, rowname, RichText(UStr(cplstr)), MAINFONT16, Resize_BV_Cl, false, 6, Change_BV_PL, NULL, RES_LABOUR));
+			m_subwidg.push_back(new EditBox(this, rowname, RichText(UStr(cplstr)), MAINFONT16, Resize_BV_Cl, false, 6, NULL, NULL, RES_LABOUR));
 		else
-			m_subwidg.push_back(new Text(this, rowname, RichText(UString(cplstr)), MAINFONT16, Resize_BV_Cl));
+			m_subwidg.push_back(new Text(this, rowname, RichText(UStr(cplstr)), MAINFONT16, Resize_BV_Cl));
 
 		row++;
 	}
@@ -879,17 +879,17 @@ void BlView::regen(Selection* sel)
 #if 0
 		Button(Widget* parent, const char* name, const char* filepath, const RichText label, const RichText tooltip,int f, int style, void (*reframef)(Widget* thisw), void (*click)(), void (*click2)(int p), void (*overf)(), void (*overf2)(int p), void (*out)(), int parm);
 #endif
-		m_subwidg.push_back(new Button(this, rowname, "gui/transp.png", RichText(UString("Order Truck for ")) + RichText(RichPart(RICHTEXT_ICON, r->icon)) + RichText(UString(":")), RichText(), MAINFONT16, BUST_LINEBASED, Resize_BV_Cl, Click_BV_Truck, NULL, NULL, NULL, NULL, UNIT_TRUCK));
+		m_subwidg.push_back(new Button(this, rowname, "gui/transp.png", RichText(UStr("Order Truck for ")) + RichText(RichPart(RICHTEXT_ICON, r->icon)) + RichText(UStr(":")), RichText(), MAINFONT16, BUST_LINEBASED, Resize_BV_Cl, Click_BV_Truck, NULL, NULL, NULL, NULL, UNIT_TRUCK));
 	
 		sprintf(rowname, "%d %d", row, 1);
 		char clabel[64];
 		sprintf(clabel, "%d", b->manufprc[UNIT_TRUCK]);
 
 		if(owned)
-			//m_subwidg.push_back(new EditBox(this, rowname, RichText(UString(clabel)), MAINFONT16, Resize_BV_Cl, false, 6, Change_BV_MP, NULL, UNIT_TRUCK));
-			m_subwidg.push_back(new EditBox(this, rowname, RichText(UString(clabel)), MAINFONT16, Resize_BV_Cl, false, 6, NULL, NULL, UNIT_TRUCK));
+			//m_subwidg.push_back(new EditBox(this, rowname, RichText(UStr(clabel)), MAINFONT16, Resize_BV_Cl, false, 6, Change_BV_MP, NULL, UNIT_TRUCK));
+			m_subwidg.push_back(new EditBox(this, rowname, RichText(UStr(clabel)), MAINFONT16, Resize_BV_Cl, false, 6, NULL, NULL, UNIT_TRUCK));
 		else
-			m_subwidg.push_back(new Text(this, rowname, RichText(UString(clabel)), MAINFONT16, Resize_BV_Cl));
+			m_subwidg.push_back(new Text(this, rowname, RichText(UStr(clabel)), MAINFONT16, Resize_BV_Cl));
 
 		row++;
 	}
@@ -904,17 +904,17 @@ void BlView::regen(Selection* sel)
 #if 0
 		Button(Widget* parent, const char* name, const char* filepath, const RichText label, const RichText tooltip,int f, int style, void (*reframef)(Widget* thisw), void (*click)(), void (*click2)(int p), void (*overf)(), void (*overf2)(int p), void (*out)(), int parm);
 #endif
-		m_subwidg.push_back(new Button(this, rowname, "gui/transp.png", RichText(UString("Order Battle Computer for ")) + RichText(RichPart(RICHTEXT_ICON, r->icon)) + RichText(UString(":")), RichText(), MAINFONT16, BUST_LINEBASED, Resize_BV_Cl, Click_BV_BComp, NULL, NULL, NULL, NULL, UNIT_TRUCK));
+		m_subwidg.push_back(new Button(this, rowname, "gui/transp.png", RichText(UStr("Order Battle Computer for ")) + RichText(RichPart(RICHTEXT_ICON, r->icon)) + RichText(UStr(":")), RichText(), MAINFONT16, BUST_LINEBASED, Resize_BV_Cl, Click_BV_BComp, NULL, NULL, NULL, NULL, UNIT_TRUCK));
 	
 		sprintf(rowname, "%d %d", row, 1);
 		char clabel[64];
 		sprintf(clabel, "%d", b->manufprc[UNIT_BATTLECOMP]);
 
 		if(owned)
-			//m_subwidg.push_back(new EditBox(this, rowname, RichText(UString(clabel)), MAINFONT16, Resize_BV_Cl, false, 6, Change_BV_MP, NULL, UNIT_BATTLECOMP));
-			m_subwidg.push_back(new EditBox(this, rowname, RichText(UString(clabel)), MAINFONT16, Resize_BV_Cl, false, 6, NULL, NULL, UNIT_BATTLECOMP));
+			//m_subwidg.push_back(new EditBox(this, rowname, RichText(UStr(clabel)), MAINFONT16, Resize_BV_Cl, false, 6, Change_BV_MP, NULL, UNIT_BATTLECOMP));
+			m_subwidg.push_back(new EditBox(this, rowname, RichText(UStr(clabel)), MAINFONT16, Resize_BV_Cl, false, 6, NULL, NULL, UNIT_BATTLECOMP));
 		else
-			m_subwidg.push_back(new Text(this, rowname, RichText(UString(clabel)), MAINFONT16, Resize_BV_Cl));
+			m_subwidg.push_back(new Text(this, rowname, RichText(UStr(clabel)), MAINFONT16, Resize_BV_Cl));
 
 		row++;
 	}
@@ -929,17 +929,17 @@ void BlView::regen(Selection* sel)
 #if 0
 		Button(Widget* parent, const char* name, const char* filepath, const RichText label, const RichText tooltip,int f, int style, void (*reframef)(Widget* thisw), void (*click)(), void (*click2)(int p), void (*overf)(), void (*overf2)(int p), void (*out)(), int parm);
 #endif
-		m_subwidg.push_back(new Button(this, rowname, "gui/transp.png", RichText(UString("Order Carlyle Tank for ")) + RichText(RichPart(RICHTEXT_ICON, r->icon)) + RichText(UString(":")), RichText(), MAINFONT16, BUST_LINEBASED, Resize_BV_Cl, Click_BV_Carlyle, NULL, NULL, NULL, NULL, UNIT_TRUCK));
+		m_subwidg.push_back(new Button(this, rowname, "gui/transp.png", RichText(UStr("Order Carlyle Tank for ")) + RichText(RichPart(RICHTEXT_ICON, r->icon)) + RichText(UStr(":")), RichText(), MAINFONT16, BUST_LINEBASED, Resize_BV_Cl, Click_BV_Carlyle, NULL, NULL, NULL, NULL, UNIT_TRUCK));
 	
 		sprintf(rowname, "%d %d", row, 1);
 		char clabel[64];
 		sprintf(clabel, "%d", b->manufprc[UNIT_CARLYLE]);
 
 		if(owned)
-			//m_subwidg.push_back(new EditBox(this, rowname, RichText(UString(clabel)), MAINFONT16, Resize_BV_Cl, false, 6, Change_BV_MP, NULL, UNIT_CARLYLE));
-			m_subwidg.push_back(new EditBox(this, rowname, RichText(UString(clabel)), MAINFONT16, Resize_BV_Cl, false, 6, NULL, NULL, UNIT_CARLYLE));
+			//m_subwidg.push_back(new EditBox(this, rowname, RichText(UStr(clabel)), MAINFONT16, Resize_BV_Cl, false, 6, Change_BV_MP, NULL, UNIT_CARLYLE));
+			m_subwidg.push_back(new EditBox(this, rowname, RichText(UStr(clabel)), MAINFONT16, Resize_BV_Cl, false, 6, NULL, NULL, UNIT_CARLYLE));
 		else
-			m_subwidg.push_back(new Text(this, rowname, RichText(UString(clabel)), MAINFONT16, Resize_BV_Cl));
+			m_subwidg.push_back(new Text(this, rowname, RichText(UStr(clabel)), MAINFONT16, Resize_BV_Cl));
 
 		row++;
 	}

@@ -122,21 +122,21 @@ NewHost::NewHost(Widget* parent, const char* n, void (*reframef)(Widget* thisw))
 	m_joinbut = Button(this, "join but", "gui/transp.png", RichText("Join"), RichText("Join the currently selected game"), m_font, BUST_LINEBASED, Resize_SL_JoinBut, Click_SL_Join, NULL, NULL, NULL, NULL, -1);
 
 	SvInfo sv;
-	sv.name = RichText(UString("asdjasld9a0f09230jf3"));
-	sv.pingrt = RichText(UString("124"));
-	sv.nplayersrt = RichText(UString("3/32"));
-	sv.mapnamert = RichText(UString("wr_fluffy"));
+	sv.name = RichText(UStr("asdjasld9a0f09230jf3"));
+	sv.pingrt = RichText(UStr("124"));
+	sv.nplayersrt = RichText(UStr("3/32"));
+	sv.mapnamert = RichText(UStr("wr_fluffy"));
 	m_svlist.push_back(sv);
-	sv.name = RichText(UString("Joe's"));
-	sv.pingrt = RichText(UString("340"));
-	sv.nplayersrt = RichText(UString("4/48"));
-	sv.mapnamert = RichText(UString("bz_dunes"));
+	sv.name = RichText(UStr("Joe's"));
+	sv.pingrt = RichText(UStr("340"));
+	sv.nplayersrt = RichText(UStr("4/48"));
+	sv.mapnamert = RichText(UStr("bz_dunes"));
 	m_svlist.push_back(sv);
 	//m_selsv = &*m_svlist.rbegin();
-	sv.name = RichText(UString("Bob's"));
-	sv.pingrt = RichText(UString("15"));
-	sv.nplayersrt = RichText(UString("2/12"));
-	sv.mapnamert = RichText(UString("bz_hills"));
+	sv.name = RichText(UStr("Bob's"));
+	sv.pingrt = RichText(UStr("15"));
+	sv.nplayersrt = RichText(UStr("2/12"));
+	sv.mapnamert = RichText(UStr("bz_hills"));
 	m_svlist.push_back(sv);
 #endif
 	
@@ -179,16 +179,16 @@ void NewHost::regen()
 #if 0
 		Button(Widget* parent, const char* name, const char* filepath, const RichText label, const RichText tooltip,int f, int style, void (*reframef)(Widget* thisw), void (*click)(), void (*click2)(int p), void (*overf)(), void (*overf2)(int p), void (*out)(), int parm);
 #endif
-		m_subwidg.push_back(new Button(this, rowname, "gui/transp.png", RichText(UString("Order Truck for ")) + RichText(RichPart(RICHTEXT_ICON, r->icon)) + RichText(UString(":")), RichText(), m_font, BUST_LINEBASED, Resize_BV_Cl, NULL, NULL, NULL, NULL, NULL, UNIT_TRUCK));
+		m_subwidg.push_back(new Button(this, rowname, "gui/transp.png", RichText(UStr("Order Truck for ")) + RichText(RichPart(RICHTEXT_ICON, r->icon)) + RichText(UStr(":")), RichText(), m_font, BUST_LINEBASED, Resize_BV_Cl, NULL, NULL, NULL, NULL, NULL, UNIT_TRUCK));
 	
 		sprintf(rowname, "%d %d", col, 1);
 		char clabel[64];
 		sprintf(clabel, "%d", b->manufprc[UNIT_TRUCK]);
 
 		if(owned)
-			m_subwidg.push_back(new EditBox(this, rowname, RichText(UString(clabel)), m_font, Resize_BV_Cl, false, 6, Change_BV_MP, NULL, UNIT_TRUCK));
+			m_subwidg.push_back(new EditBox(this, rowname, RichText(UStr(clabel)), m_font, Resize_BV_Cl, false, 6, Change_BV_MP, NULL, UNIT_TRUCK));
 		else
-			m_subwidg.push_back(new Text(this, rowname, RichText(UString(clabel)), m_font, Resize_BV_Cl));
+			m_subwidg.push_back(new Text(this, rowname, RichText(UStr(clabel)), m_font, Resize_BV_Cl));
 
 		col++;
 	}

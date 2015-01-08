@@ -5,7 +5,6 @@
 #include "../../engine/render/heightmap.h"
 #include "../../engine/render/transaction.h"
 #include "../../engine/math/camera.h"
-#include "../../engine/render/shadow.h"
 #include "../../engine/render/screenshot.h"
 #include "../../engine/save/savemap.h"
 #include "appgui.h"
@@ -36,7 +35,7 @@ void Resize_ResTicker(Widget* thisw)
 	thisw->m_pos[0] = 0;
 	thisw->m_pos[1] = 0;
 	thisw->m_pos[2] = g_width;
-	thisw->m_pos[3] = g_font[MAINFONT16].gheight+5;
+	thisw->m_pos[3] = g_font[MAINFONT].gheight+5;
 	thisw->m_tpos[0] = 0;
 	thisw->m_tpos[1] = 0;
 }
@@ -49,6 +48,7 @@ void UpdResTicker()
 	ResTicker* restickerw;
 	Widget* restickertw;
 	RichText restext;
+	UStr ustr;
 	Resource* r;
 	RichPart richpart;
 	static float tickerpos = 0;
@@ -101,9 +101,15 @@ void UpdResTicker()
 		}
 
 		strcat(cstr1, cstr2);
-		restext.m_part.push_back(RichPart(cstr1));
+		UStr_Init_Str(&ustr, cstr1);
+		RichPart_Init_UStr(&richpart, &ustr);
+		List_PushBack(&restext.m_part, &richpart, sizeof(RichPart));
+		UStr_Free(&ustr);
 
-		restext.m_part.push_back(RichPart("    "));
+		UStr_Init_Str(&ustr, "    ");
+		RichPart_Init_UStr(&richpart, &ustr);
+		List_PushBack(&restext.m_part, &richpart, sizeof(RichPart));
+		UStr_Free(&ustr);
 	}
 
 	len = restext.texlen();
@@ -113,7 +119,7 @@ void UpdResTicker()
 	if((int)tickerpos > len)
 		tickerpos = 0;
 
-	endx = EndX(&restext, restext.rawlen(), MAINFONT16, 0, 0);
+	endx = EndX(&restext, restext.rawlen(), MAINFONT, 0, 0);
 
 	if(endx > g_width)
 	{
@@ -149,516 +155,240 @@ void Out_BuildButton()
 
 void Click_BuildButton(int bwhat)
 {
-	Player* py = &g_player[g_localP];
 	g_build = bwhat;
-	//g_log<<"b "<<g_build<<std::endl;
-	//char msg[128];
-	//sprintf(msg, "b %d", bwhat);
-	//InfoMess("t", msg);
-	Out_BuildButton();
 }
 
 void Over_BuildButton(int bwhat)
 {
-	Player* py = &g_player[g_localP];
-	GUI* gui = &g_gui;
+	GUI* gui;
+	BlPreview* bp;
+	Text* tl;
+	const char* bname;
+	RichText* cb;	//conmat block
+	RichText* ib;	//inputs block
+	RichText* ob;	//outputs block
+	RichText* db;	//description block
+	TextBlock* cbw;
+	TextBlock* ibw;
+	TextBlock* obw;
+	TextBlock* dbw;
+	BlType* bt;
+	int ns;	//number of stocked good types
+	int ri;	//res index
+	RichPart richpart;
+	Resource* r;
+	char num[32];
+	int ni;	//number of input good types
+	int no;	//number of out
 
-	if(gui->get("cstr view")->m_opened)
+	gui = &g_gui;
+
+	if(Widget_Get((Widget*)gui, "cstr view")->m_opened)
 		return;
 
-	if(gui->get("bl view")->m_opened)
+	if(Widget_Get((Widget*)gui, "bl view")->m_opened)
 		return;
 
 	g_bptype = bwhat;
 
-	gui->open("bl preview");
-	BuildPreview* bp = (BuildPreview*)gui->get("bl preview");
-	Text* tl = (Text*)bp->get("title");
+	Widget_Open((Widget*)gui, "bl preview");
+	bp = (BlPreview*)Widget_Get((Widget*)gui, "bl preview");
+	tl = (Text*)Widget_Get((Widget*)gui, "title");
 
-	std::string bname;
-	RichText cb;	//conmat block
-	RichText ib;	//inputs block
-	RichText ob;	//outputs block
-	RichText db;	//description block
-
-	TextBlock* cbw = (TextBlock*)bp->get("conmat block");
-	TextBlock* ibw = (TextBlock*)bp->get("input block");
-	TextBlock* obw = (TextBlock*)bp->get("output block");
-	TextBlock* dbw = (TextBlock*)bp->get("desc block");
-
-	cb.m_part.push_back(RichPart(UString("CONSTRUCTION REQUISITES:")));
+	cbw = (TextBlock*)Widget_Get((Widget*)bp, "conmat block");
+	ibw = (TextBlock*)Widget_Get((Widget*)bp, "input block");
+	obw = (TextBlock*)Widget_Get((Widget*)bp, "output block");
+	dbw = (TextBlock*)Widget_Get((Widget*)bp, "desc block");
+	
+	cb = &cbw->m_text;
+	ib = &ibw->m_text;
+	ob = &obw->m_text;
+	db = &dbw->m_text;
+	
+	RichText_Free(cb);
+	RichText_Init(cb);
+	RichText_QAppend_Str(cb, "CONSTRUCTION REQUISITES:");
 
 	if(bwhat < 0)
 		;
 	else if(bwhat < BL_TYPES)
 	{
-		ib.m_part.push_back(RichPart(UString("INPUTS:")));
-		ob.m_part.push_back(RichPart(UString("OUTPUTS:")));
+		//Set inputs
+		RichText_Free(ib);
+		RichText_Init(ib);
+		RichText_QAppend_Str(ib, "INPUTS:");
+		
+		//Set outputs
+		RichText_Free(ob);
+		RichText_Init(ob);
+		RichText_QAppend_Str(ob, "OUTPUTS:");
 
-		BlType* bt = &g_bltype[bwhat];
+		bt = &g_bltype[bwhat];
 		bname = bt->name;
 
-		db.m_part.push_back(RichPart(UString(bt->desc.c_str())));
+		//Set desc
+		RichText_Free(db);
+		RichText_Init(db);
+		RichText_QAppend_Str(db, bt->desc);
 
-		int ns = 0;
-		for(int ri=0; ri<RESOURCES; ri++)
+		ns = 0;
+		for(ri=0; ri<RESOURCES; ri++)
 		{
 			if(bt->conmat[ri] <= 0)
 				continue;
 
 			ns ++;
-			Resource* r = &g_resource[ri];
+			r = &g_resource[ri];
 
-			cb.m_part.push_back(RichPart(UString("\n")));
-			cb.m_part.push_back(RichPart(UString(r->name.c_str())));
-			cb.m_part.push_back(RichPart(UString(" ")));
-			cb.m_part.push_back(RichPart(RICHTEXT_ICON, r->icon));
-			cb.m_part.push_back(RichPart(UString(": ")));
+			RichText_QAppend_Str(cb, "\n");
+			RichText_QAppend_Str(cb, r->name);
+			RichText_QAppend_Str(cb, " ");
+			
+			RichPart_Init_Icon(&richpart, r->icon);
+			List_PushBack(&cb->m_part, sizeof(RichPart), &richpart);
 
-			char num[32];
+			RichText_QAppend_Str(cb, ": ");
+
 			sprintf(num, "%d", bt->conmat[ri]);
-			cb.m_part.push_back(RichPart(UString(num)));
+			RichText_QAppend_Str(cb, num);
 		}
 
 		if(ns <= 0)
-			cb.m_part.push_back(RichPart(UString("\nNone")));
+			RichText_QAppend_Str(cb, "\nNone");
 
-		int ni = 0;
-		for(int ri=0; ri<RESOURCES; ri++)
+		ni = 0;
+		for(ri=0; ri<RESOURCES; ri++)
 		{
 			if(bt->input[ri] <= 0)
 				continue;
 
 			ni ++;
-			Resource* r = &g_resource[ri];
+			r = &g_resource[ri];
+			
+			RichText_QAppend_Str(ib, "\n");
+			RichText_QAppend_Str(ib, r->name);
+			RichText_QAppend_Str(ib, " ");
+			
+			RichPart_Init_Icon(&richpart, r->icon);
+			List_PushBack(&ib->m_part, sizeof(RichPart), &richpart);
 
-			ib.m_part.push_back(RichPart(UString("\n")));
-			ib.m_part.push_back(RichPart(UString(r->name.c_str())));
-			ib.m_part.push_back(RichPart(UString(" ")));
-			ib.m_part.push_back(RichPart(RICHTEXT_ICON, r->icon));
-			ib.m_part.push_back(RichPart(UString(": ")));
+			RichText_QAppend_Str(ib, ": ");
 
-			char num[32];
 			sprintf(num, "%d", bt->input[ri]);
-			ib.m_part.push_back(RichPart(UString(num)));
+			RichText_QAppend_Str(ib, num);
 		}
 
 		if(ni <= 0)
-			ib.m_part.push_back(RichPart(UString("\nNone")));
+			RichText_QAppend_Str(ib, "\nNone");
 
-		int no = 0;
-		for(int ri=0; ri<RESOURCES; ri++)
+		no = 0;
+		for(ri=0; ri<RESOURCES; ri++)
 		{
 			if(bt->output[ri] <= 0)
 				continue;
 
 			no ++;
-			Resource* r = &g_resource[ri];
+			r = &g_resource[ri];
+			
+			RichText_QAppend_Str(ob, "\n");
+			RichText_QAppend_Str(ob, r->name);
+			RichText_QAppend_Str(ob, " ");
+			
+			RichPart_Init_Icon(&richpart, r->icon);
+			List_PushBack(&ob->m_part, sizeof(RichPart), &richpart);
+			
+			RichText_QAppend_Str(ob, ": ");
 
-			ob.m_part.push_back(RichPart(UString("\n")));
-			ob.m_part.push_back(RichPart(UString(r->name.c_str())));
-			ob.m_part.push_back(RichPart(UString(" ")));
-			ob.m_part.push_back(RichPart(RICHTEXT_ICON, r->icon));
-			ob.m_part.push_back(RichPart(UString(": ")));
-
-			char num[32];
 			sprintf(num, "%d", bt->output[ri]);
-			ob.m_part.push_back(RichPart(UString(num)));
+			RichText_QAppend_Str(ob, num);
 		}
 
 		if(no <= 0)
-			ob.m_part.push_back(RichPart(UString("\nNone")));
+			RichText_QAppend_Str(ob, "\nNone");
 	}
 	else if(bwhat < BL_TYPES + CONDUIT_TYPES)
 	{
 		CdType* ct = &g_cdtype[bwhat - BL_TYPES];
 		bname = ct->name;
 
-		db.m_part.push_back(RichPart(UString(ct->desc.c_str())));
+		//Set desc
+		RichText_Free(db);
+		RichText_Init(db);
+		RichText_QAppend_Str(db, ct->desc);
 
-		int ns = 0;
-		for(int ri=0; ri<RESOURCES; ri++)
+		ns = 0;
+		for(ri=0; ri<RESOURCES; ri++)
 		{
 			if(ct->conmat[ri] <= 0)
 				continue;
 
 			ns ++;
-			Resource* r = &g_resource[ri];
+			r = &g_resource[ri];
 
-			cb.m_part.push_back(RichPart(UString("\n")));
-			cb.m_part.push_back(RichPart(UString(r->name.c_str())));
-			cb.m_part.push_back(RichPart(UString(" ")));
-			cb.m_part.push_back(RichPart(RICHTEXT_ICON, r->icon));
-			cb.m_part.push_back(RichPart(UString(": ")));
+			RichText_QAppend_Str(cb, "\n");
+			RichText_QAppend_Str(cb, r->name);
+			RichText_QAppend_Str(cb, " ");
+			
+			RichPart_Init_Icon(&richpart, r->icon);
+			List_PushBack(&cb->m_part, sizeof(RichPart), &richpart);
+			
+			RichText_QAppend_Str(cb, ": ");
 
-			char num[32];
 			sprintf(num, "%d", ct->conmat[ri]);
-			cb.m_part.push_back(RichPart(UString(num)));
+			RichText_QAppend_Str(cb, num);
 		}
 
 		if(ns <= 0)
-			cb.m_part.push_back(RichPart(UString("\nNone")));
+			RichText_QAppend_Str(cb, "\nNone");
 	}
-
-	tl->m_text = RichText(UString(bname.c_str()));
-	cbw->m_text = cb;
-	ibw->m_text = ib;
-	obw->m_text = ob;
-	dbw->m_text = db;
-
-	g_bpcam.position(TILE_SIZE*3, TILE_SIZE*3, TILE_SIZE*3, 0, 0, 0, 0, 1, 0);
+	
+	RichText_Free(&tl->m_text);
+	RichText_Init(&tl->m_text);
+	RichText_QAppend_Str(&tl->m_text, bname);
 }
 
 void Click_NextBuildButton(int nextpage)
 {
-	Player* py = &g_player[g_localP];
-	GUI* gui = &g_gui;
-	ViewLayer* playview = (ViewLayer*)gui->get("play");
+	GUI* gui;
+	ViewLayer* playview;
+	BotPan* bp;
+	int i;
 
-	BotPan* bp = (BotPan*)playview->get("bottom panel");
+	gui = &g_gui;
+	playview = (ViewLayer*)Widget_Get((Widget*)gui, "play");
+	bp = (BotPan*)Widget_Get((Widget*)playview, "bottom panel");
 
-	for(int i=0; i<9; i++)
-		bp->bottomright_button_on[i] = false;
+	for(i=0; i<9; i++)
+		bp->bottomright_button_on[i] = FALSE;
 
 	if(nextpage == 1)
-		BuildMenu_OpenPage1();
+	{
+		//TODO set buttons
+	}
 	else if(nextpage == 2)
-		BuildMenu_OpenPage2();
+	{
+	}
 	else if(nextpage == 3)
-		BuildMenu_OpenPage3();
-}
+	{
+	}
 
-void BuildMenu_OpenPage1()
-{
-	Player* py = &g_player[g_localP];
-	GUI* gui = &g_gui;
-	ViewLayer* playview = (ViewLayer*)gui->get("play");
-
-	BotPan* bp = (BotPan*)playview->get("bottom panel");
-
-#if 0
-	Button(Widget* parent, const char* filepath, const RichText t, int f, int style, void (*reframef)(Widget* thisw), void (*click)(), void (*click2)(int p), void (*overf)(), void (*overf2)(int p), void (*out)(), int parm)
-#endif
-
-#if 0	//with gas station
-		bp->bottomright_button[0] = Button(bp, "name", "gui/brbut/apartment2.png", RichText(""), RichText(""), MAINFONT8, BUST_CORRODE, NULL, NULL, Click_BuildButton, NULL, Over_BuildButton, Out_BuildButton, BL_APARTMENT);
-	bp->bottomright_button_on[0] = true;
-
-	bp->bottomright_button[1] = Button(bp, "name", "gui/brbut/store1.png", RichText(""), RichText(""), MAINFONT8, BUST_CORRODE, NULL, NULL, Click_BuildButton, NULL, Over_BuildButton, Out_BuildButton, BL_STORE);
-	bp->bottomright_button_on[1] = true;
-
-	bp->bottomright_button[2] = Button(bp, "name", "gui/brbut/farm2.png", RichText(""), RichText(""), MAINFONT8, BUST_CORRODE, NULL, NULL, Click_BuildButton, NULL, Over_BuildButton, Out_BuildButton, BL_FARM);
-	bp->bottomright_button_on[2] = true;
-
-	bp->bottomright_button[3] = Button(bp, "name", "gui/brbut/oilwell2.png", RichText(""), RichText(""), MAINFONT8, BUST_CORRODE, NULL, NULL, Click_BuildButton, NULL, Over_BuildButton, Out_BuildButton, BL_OILWELL);
-	bp->bottomright_button_on[3] = true;
-
-	bp->bottomright_button[4] = Button(bp, "name", "gui/brbut/refinery2.png", RichText(""), RichText(""), MAINFONT8, BUST_CORRODE, NULL, NULL, Click_BuildButton, NULL, Over_BuildButton, Out_BuildButton, BL_REFINERY);
-	bp->bottomright_button_on[4] = true;
-
-	bp->bottomright_button[5] = Button(bp, "name", "gui/brbut/gasstation2.png", RichText(""), RichText(""), MAINFONT8, BUST_CORRODE, NULL, NULL, Click_BuildButton, NULL, Over_BuildButton, Out_BuildButton, BL_GASSTATION);
-	bp->bottomright_button_on[5] = true;
-
-	bp->bottomright_button[6] = Button(bp, "name", "gui/brbut/mine.png", RichText(""), RichText(""), MAINFONT8, BUST_CORRODE, NULL, NULL, Click_BuildButton, NULL, Over_BuildButton, Out_BuildButton, BL_MINE);
-	bp->bottomright_button_on[6] = true;
-
-	bp->bottomright_button[7] = Button(bp, "name", "gui/brbut/factory3.png", RichText(""), RichText(""), MAINFONT8, BUST_CORRODE, NULL, NULL, Click_BuildButton, NULL, Over_BuildButton, Out_BuildButton, BL_FACTORY);
-	bp->bottomright_button_on[7] = true;
-
-	bp->bottomright_button[8] = Button(bp, "name", "gui/next.png", RichText(""), RichText(""), MAINFONT8, BUST_CORRODE, NULL, NULL, Click_NextBuildButton, NULL, NULL, NULL, 2);
-	bp->bottomright_button_on[8] = true;
-#else
-		bp->bottomright_button[0] = Button(bp, "name", "gui/brbut/apartment2.png", RichText(""), RichText(""), MAINFONT8, BUST_CORRODE, NULL, NULL, Click_BuildButton, NULL, Over_BuildButton, Out_BuildButton, BL_APARTMENT);
-	bp->bottomright_button_on[0] = true;
-
-	bp->bottomright_button[1] = Button(bp, "name", "gui/brbut/store1.png", RichText(""), RichText(""), MAINFONT8, BUST_CORRODE, NULL, NULL, Click_BuildButton, NULL, Over_BuildButton, Out_BuildButton, BL_STORE);
-	bp->bottomright_button_on[1] = true;
-
-	bp->bottomright_button[2] = Button(bp, "name", "gui/brbut/farm2.png", RichText(""), RichText(""), MAINFONT8, BUST_CORRODE, NULL, NULL, Click_BuildButton, NULL, Over_BuildButton, Out_BuildButton, BL_FARM);
-	bp->bottomright_button_on[2] = true;
-
-	bp->bottomright_button[3] = Button(bp, "name", "gui/brbut/oilwell2.png", RichText(""), RichText(""), MAINFONT8, BUST_CORRODE, NULL, NULL, Click_BuildButton, NULL, Over_BuildButton, Out_BuildButton, BL_OILWELL);
-	bp->bottomright_button_on[3] = true;
-
-	bp->bottomright_button[4] = Button(bp, "name", "gui/brbut/refinery2.png", RichText(""), RichText(""), MAINFONT8, BUST_CORRODE, NULL, NULL, Click_BuildButton, NULL, Over_BuildButton, Out_BuildButton, BL_REFINERY);
-	bp->bottomright_button_on[4] = true;
-
-	bp->bottomright_button[5] = Button(bp, "name", "gui/brbut/mine.png", RichText(""), RichText(""), MAINFONT8, BUST_CORRODE, NULL, NULL, Click_BuildButton, NULL, Over_BuildButton, Out_BuildButton, BL_MINE);
-	bp->bottomright_button_on[5] = true;
-
-	bp->bottomright_button[6] = Button(bp, "name", "gui/brbut/factory3.png", RichText(""), RichText(""), MAINFONT8, BUST_CORRODE, NULL, NULL, Click_BuildButton, NULL, Over_BuildButton, Out_BuildButton, BL_FACTORY);
-	bp->bottomright_button_on[6] = true;
-
-	bp->bottomright_button[7] = Button(bp, "name", "gui/brbut/nucpow2.png", RichText(""), RichText(""), MAINFONT8, BUST_CORRODE, NULL, NULL, Click_BuildButton, NULL, Over_BuildButton, Out_BuildButton, BL_NUCPOW);
-	bp->bottomright_button_on[7] = true;
-
-	bp->bottomright_button[8] = Button(bp, "name", "gui/next.png", RichText(""), RichText(""), MAINFONT8, BUST_CORRODE, NULL, NULL, Click_NextBuildButton, NULL, NULL, NULL, 2);
-	bp->bottomright_button_on[8] = true;
-#endif
-
-	bp->reframe();
-}
-
-
-void BuildMenu_OpenPage2()
-{
-	Player* py = &g_player[g_localP];
-	GUI* gui = &g_gui;
-	ViewLayer* playview = (ViewLayer*)gui->get("play");
-
-	BotPan* bp = (BotPan*)playview->get("bottom panel");
-
-#if 0 //with gas station , c1
-	bp->bottomright_button[0] = Button(bp, "name", "gui/brbut/nucpow2.png", RichText(""), RichText(""), MAINFONT8, BUST_CORRODE, NULL, NULL, Click_BuildButton, NULL, Over_BuildButton, Out_BuildButton, BL_NUCPOW);
-	bp->bottomright_button_on[0] = true;
-
-	//bp->bottomright_button[1] = Button(bp, "name", "gui/brbut/harbour2.png", RichText(""), RichText(""), MAINFONT8, BUST_CORRODE, NULL, NULL, Click_BuildButton, NULL, Over_BuildButton, Out_BuildButton, BL_HARBOUR);
-	//bp->bottomright_button_on[1] = true;
-
-	bp->bottomright_button[2] = Button(bp, "name", "gui/brbut/road.png", RichText(""), RichText(""), MAINFONT8, BUST_CORRODE, NULL, NULL, Click_BuildButton, NULL, Over_BuildButton, Out_BuildButton, BL_ROAD);
-	bp->bottomright_button_on[2] = true;
-
-	bp->bottomright_button[3] = Button(bp, "name", "gui/brbut/crudepipeline.png", RichText(""), RichText(""), MAINFONT8, BUST_CORRODE, NULL, NULL, Click_BuildButton, NULL, Over_BuildButton, Out_BuildButton, BL_CRPIPE);
-	bp->bottomright_button_on[3] = true;
-
-	bp->bottomright_button[4] = Button(bp, "name", "gui/brbut/powerline.png", RichText(""), RichText(""), MAINFONT8, BUST_CORRODE, NULL, NULL, Click_BuildButton, NULL, Over_BuildButton, Out_BuildButton, BL_POWL);
-	bp->bottomright_button_on[4] = true;
-
-	bp->bottomright_button[5] = Button(bp, "name", "gui/next.png", RichText(""), RichText(""), MAINFONT8, BUST_CORRODE, NULL, NULL, Click_NextBuildButton, NULL, NULL, NULL, 1);
-	bp->bottomright_button_on[5] = true;
-#else
-	bp->bottomright_button[0] = Button(bp, "name", "gui/brbut/coalpow.png", RichText(""), RichText(""), MAINFONT8, BUST_CORRODE, NULL, NULL, Click_BuildButton, NULL, Over_BuildButton, Out_BuildButton, BL_COALPOW);
-	bp->bottomright_button_on[0] = true;
-
-	bp->bottomright_button[1] = Button(bp, "name", "gui/brbut/chemplant.png", RichText(""), RichText(""), MAINFONT8, BUST_CORRODE, NULL, NULL, Click_BuildButton, NULL, Over_BuildButton, Out_BuildButton, BL_CHEMPLANT);
-	bp->bottomright_button_on[1] = true;
-
-	bp->bottomright_button[2] = Button(bp, "name", "gui/brbut/elecplant.png", RichText(""), RichText(""), MAINFONT8, BUST_CORRODE, NULL, NULL, Click_BuildButton, NULL, Over_BuildButton, Out_BuildButton, BL_ELECPLANT);
-	bp->bottomright_button_on[2] = true;
-
-	bp->bottomright_button[3] = Button(bp, "name", "gui/brbut/cemplant.png", RichText(""), RichText(""), MAINFONT8, BUST_CORRODE, NULL, NULL, Click_BuildButton, NULL, Over_BuildButton, Out_BuildButton, BL_CEMPLANT);
-	bp->bottomright_button_on[3] = true;
-
-	bp->bottomright_button[4] = Button(bp, "name", "gui/brbut/quarry.png", RichText(""), RichText(""), MAINFONT8, BUST_CORRODE, NULL, NULL, Click_BuildButton, NULL, Over_BuildButton, Out_BuildButton, BL_QUARRY);
-	bp->bottomright_button_on[4] = true;
-
-	bp->bottomright_button[5] = Button(bp, "name", "gui/brbut/smelter.png", RichText(""), RichText(""), MAINFONT8, BUST_CORRODE, NULL, NULL, Click_BuildButton, NULL, Over_BuildButton, Out_BuildButton, BL_SMELTER);
-	bp->bottomright_button_on[5] = true;
-
-	bp->bottomright_button[8] = Button(bp, "name", "gui/next.png", RichText(""), RichText(""), MAINFONT8, BUST_CORRODE, NULL, NULL, Click_NextBuildButton, NULL, NULL, NULL, 3);
-	bp->bottomright_button_on[8] = true;
-#endif
-
-	bp->reframe();
-}
-
-void BuildMenu_OpenPage3()
-{
-	Player* py = &g_player[g_localP];
-	GUI* gui = &g_gui;
-	ViewLayer* playview = (ViewLayer*)gui->get("play");
-
-	BotPan* bp = (BotPan*)playview->get("bottom panel");
-
-	bp->bottomright_button[0] = Button(bp, "name", "gui/brbut/road.png", RichText(""), RichText(""), MAINFONT8, BUST_CORRODE, NULL, NULL, Click_BuildButton, NULL, Over_BuildButton, Out_BuildButton, BL_ROAD);
-	bp->bottomright_button_on[0] = true;
-
-	bp->bottomright_button[1] = Button(bp, "name", "gui/brbut/crudepipeline.png", RichText(""), RichText(""), MAINFONT8, BUST_CORRODE, NULL, NULL, Click_BuildButton, NULL, Over_BuildButton, Out_BuildButton, BL_CRPIPE);
-	bp->bottomright_button_on[1] = true;
-
-	bp->bottomright_button[2] = Button(bp, "name", "gui/brbut/powerline.png", RichText(""), RichText(""), MAINFONT8, BUST_CORRODE, NULL, NULL, Click_BuildButton, NULL, Over_BuildButton, Out_BuildButton, BL_POWL);
-	bp->bottomright_button_on[2] = true;
-
-	bp->bottomright_button[8] = Button(bp, "name", "gui/next.png", RichText(""), RichText(""), MAINFONT8, BUST_CORRODE, NULL, NULL, Click_NextBuildButton, NULL, NULL, NULL, 1);
-	bp->bottomright_button_on[8] = true;
-
-	bp->reframe();
+	Widget_Reframe((Widget*)bp);
 }
 
 void Resize_BuildPreview(Widget* thisw)
 {
-	Player* py = &g_player[g_localP];
-
-#if 0
-	int centerx = g_width/2;
-	int centery = g_height/2;
-
-	thisw->m_pos[0] = centerx-200;
-	thisw->m_pos[1] = centery-200;
-	thisw->m_pos[2] = centerx+200;
-	thisw->m_pos[3] = centery+200;
-#elif 1
-	thisw->m_pos[0] = g_width - 400 - 64;
-	thisw->m_pos[1] = g_height - MINIMAP_SIZE - 60 - 320;
-	thisw->m_pos[2] = g_width - 64;
-	thisw->m_pos[3] = g_height - MINIMAP_SIZE - 75;
-#endif
+	thisw->m_pos[0] = (float)(g_width - 400 - 64);
+	thisw->m_pos[1] = (float)(g_height - MINIMAP_SIZE - 60 - 320);
+	thisw->m_pos[2] = (float)(g_width - 64);
+	thisw->m_pos[3] = (float)(g_height - MINIMAP_SIZE - 75);
 }
 
 void Resize_ConstructionView(Widget* thisw)
 {
-	Player* py = &g_player[g_localP];
-
-	thisw->m_pos[0] = g_width/2 - 250;
-	thisw->m_pos[1] = g_height - MINIMAP_SIZE - 32 - 300;
-	thisw->m_pos[2] = g_width/2 + 100;
-	thisw->m_pos[3] = g_height - MINIMAP_SIZE - 32 - 100;
-}
-
-void Click_MoveConstruction()
-{
-	int alloced[RESOURCES];
-	Zero(alloced);
-	int totalloc = 0;
-
-	Player* py = &g_player[g_localP];
-	GUI* gui = &g_gui;
-
-	for(auto siter = g_sel.buildings.begin(); siter != g_sel.buildings.end(); siter++)
-	{
-		int bi = *siter;
-		Building* b = &g_building[bi];
-
-		for(int i=0; i<RESOURCES; i++)
-		{
-			alloced[i] += b->conmat[i];
-			totalloc += b->conmat[i];
-		}
-	}
-
-#if 0
-	for(auto siter = g_sel.roads.begin(); siter != g_sel.roads.end(); siter++)
-	{
-		Vec2i tpos = *siter;
-		RoadTile* r = RoadAt(tpos.x, tpos.y);
-
-		for(int i=0; i<RESOURCES; i++)
-		{
-			alloced[i] += r->conmat[i];
-			totalloc += r->conmat[i];
-		}
-	}
-
-	for(auto siter = g_sel.powls.begin(); siter != g_sel.powls.end(); siter++)
-	{
-		Vec2i tpos = *siter;
-		PowlTile* p = PowlAt(tpos.x, tpos.y);
-
-		for(int i=0; i<RESOURCES; i++)
-		{
-			alloced[i] += p->conmat[i];
-			totalloc += p->conmat[i];
-		}
-	}
-
-	for(auto siter = g_sel.crpipes.begin(); siter != g_sel.crpipes.end(); siter++)
-	{
-		Vec2i tpos = *siter;
-		CrPipeTile* p = CrPipeAt(tpos.x, tpos.y);
-
-		for(int i=0; i<RESOURCES; i++)
-		{
-			alloced[i] += p->conmat[i];
-			totalloc += p->conmat[i];
-		}
-	}
-#endif
-
-	if(totalloc <= 0)
-	{
-		for(auto siter = g_sel.buildings.begin(); siter != g_sel.buildings.end(); siter++)
-		{
-			int bi = *siter;
-			Building* b = &g_building[bi];
-			b->on = false;
-		}
-
-#if 0
-		for(auto siter = g_sel.roads.begin(); siter != g_sel.roads.end(); siter++)
-		{
-			Vec2i tpos = *siter;
-			RoadTile* r = RoadAt(tpos.x, tpos.y);
-			r->on = false;
-		}
-
-		for(auto siter = g_sel.powls.begin(); siter != g_sel.powls.end(); siter++)
-		{
-			Vec2i tpos = *siter;
-			PowlTile* p = PowlAt(tpos.x, tpos.y);
-			p->on = false;
-		}
-
-		for(auto siter = g_sel.crpipes.begin(); siter != g_sel.crpipes.end(); siter++)
-		{
-			Vec2i tpos = *siter;
-			CrPipeTile* p = CrPipeAt(tpos.x, tpos.y);
-			p->on = false;
-		}
-#endif
-
-		ClearSel(&g_sel);
-		gui->close("cstr view");
-	}
-	else
-	{
-		ShowMessage(RichText("You've already invested resources in this project."));
-	}
-}
-
-void Click_CancelConstruction()
-{
-	Player* py = &g_player[g_localP];
-	GUI* gui = &g_gui;
-
-	for(auto siter = g_sel.buildings.begin(); siter != g_sel.buildings.end(); siter++)
-	{
-		int bi = *siter;
-		Building* b = &g_building[bi];
-		b->on = false;
-	}
-
-#if 0
-	for(auto siter = g_sel.roads.begin(); siter != g_sel.roads.end(); siter++)
-	{
-		Vec2i tpos = *siter;
-		RoadTile* r = RoadAt(tpos.x, tpos.y);
-		r->on = false;
-	}
-
-	for(auto siter = g_sel.powls.begin(); siter != g_sel.powls.end(); siter++)
-	{
-		Vec2i tpos = *siter;
-		PowlTile* p = PowlAt(tpos.x, tpos.y);
-		p->on = false;
-	}
-
-	for(auto siter = g_sel.crpipes.begin(); siter != g_sel.crpipes.end(); siter++)
-	{
-		Vec2i tpos = *siter;
-		CrPipeTile* p = CrPipeAt(tpos.x, tpos.y);
-		p->on = false;
-	}
-#endif
-
-	ClearSel(&g_sel);
-	gui->close("cstr view");
-}
-
-void Click_ProceedConstruction()
-{
-	Player* py = &g_player[g_localP];
-	GUI* gui = &g_gui;
-
-	ClearSel(&g_sel);
-	gui->close("cstr view");
-}
-
-void Click_EstimateConstruction()
-{
-	Player* py = &g_player[g_localP];
-	ClearSel(&g_sel);
-	GUI* gui = &g_gui;
-	gui->close("cstr view");
+	thisw->m_pos[0] = (float)(g_width/2 - 250);
+	thisw->m_pos[1] = (float)(g_height - MINIMAP_SIZE - 32 - 300);
+	thisw->m_pos[2] = (float)(g_width/2 + 100);
+	thisw->m_pos[3] = (float)(g_height - MINIMAP_SIZE - 32 - 100);
 }
 
 void Resize_Message(Widget* thisw)
@@ -681,41 +411,26 @@ void Resize_MessageContinue(Widget* thisw)
 
 void Click_MessageContinue()
 {
-#if 0
-	auto viter = gui->view.begin();
-	while(viter != gui->view.end())
-	{
-		if(stricmp(viter->name.c_str(), "message view") == 0)
-		{
-			InfoMess("f", "view found");
-
-			viter = gui->view.erase(viter);
-
-			continue;
-		}
-
-		viter++;
-	}
-#endif
-
-	Player* py = &g_player[g_localP];
 	GUI* gui = &g_gui;
-	gui->close("message view");
+	Widget_Close((Widget*)gui, "message view");
 }
 
-void ShowMessage(const RichText& msg)
+void ShowMessage(const RichText* msg)
 {
-	Player* py = &g_player[g_localP];
-	GUI* gui = &g_gui;
-	ViewLayer* msgview = (ViewLayer*)gui->get("message view");
-	TextBlock* msgblock = (TextBlock*)msgview->get("message");
-	msgblock->m_text = msg;
-	gui->open("message view");
+	GUI* gui;
+	ViewLayer* msgview;
+	TextBlock* msgblock;
+
+	gui = &g_gui;
+	msgview = (ViewLayer*)Widget_Get((Widget*)gui, "message view");
+	msgblock = (TextBlock*)Widget_Get((Widget*)msgview, "message");
+	RichText_Free(&msgblock->m_text);
+	RichText_Copy(&msgblock->m_text, msg);
+	Widget_Open((Widget*)gui, "message view");
 }
 
 void Resize_Window(Widget* thisw)
 {
-	Player* py = &g_player[g_localP];
 	thisw->m_pos[0] = (float)(g_width/2 - 200);
 	thisw->m_pos[1] = (float)(g_height/2 - 200);
 	thisw->m_pos[2] = (float)(g_width/2 + 200);
@@ -724,7 +439,6 @@ void Resize_Window(Widget* thisw)
 
 void Resize_DebugLines(Widget* thisw)
 {
-	Player* py = &g_player[g_localP];
 	thisw->m_pos[0] = (float)(0);
 	thisw->m_pos[1] = (float)(g_height - MINIMAP_SIZE - 32 - 32);
 	thisw->m_pos[2] = (float)(32);
@@ -733,8 +447,7 @@ void Resize_DebugLines(Widget* thisw)
 
 void Resize_Transx(Widget* thisw)
 {
-	Player* py = &g_player[g_localP];
-	int i = 1;
+	const int i = 1;
 	thisw->m_pos[0] = (float)(0 + 32*i);
 	thisw->m_pos[1] = (float)(g_height - MINIMAP_SIZE - 32 - 32);
 	thisw->m_pos[2] = (float)(32 + 32*i);
@@ -743,8 +456,7 @@ void Resize_Transx(Widget* thisw)
 
 void Resize_Save(Widget* thisw)
 {
-	Player* py = &g_player[g_localP];
-	int i = 2;
+	const int i = 2;
 	thisw->m_pos[0] = (float)(0 + 32*i);
 	thisw->m_pos[1] = (float)(g_height - MINIMAP_SIZE - 32 - 32);
 	thisw->m_pos[2] = (float)(32 + 32*i);
@@ -753,8 +465,7 @@ void Resize_Save(Widget* thisw)
 
 void Resize_QSave(Widget* thisw)
 {
-	Player* py = &g_player[g_localP];
-	int i = 3;
+	const int i = 3;
 	thisw->m_pos[0] = (float)(0 + 32*i);
 	thisw->m_pos[1] = (float)(g_height - MINIMAP_SIZE - 32 - 32);
 	thisw->m_pos[2] = (float)(32 + 32*i);
@@ -763,8 +474,7 @@ void Resize_QSave(Widget* thisw)
 
 void Resize_Load(Widget* thisw)
 {
-	Player* py = &g_player[g_localP];
-	int i = 4;
+	const int i = 4;
 	thisw->m_pos[0] = (float)(0 + 32*i);
 	thisw->m_pos[1] = (float)(g_height - MINIMAP_SIZE - 32 - 32);
 	thisw->m_pos[2] = (float)(32 + 32*i);
@@ -773,8 +483,7 @@ void Resize_Load(Widget* thisw)
 
 void Resize_Pause(Widget* thisw)
 {
-	Player* py = &g_player[g_localP];
-	int i = 5;
+	const int i = 5;
 	thisw->m_pos[0] = (float)(0 + 32*i);
 	thisw->m_pos[1] = (float)(g_height - MINIMAP_SIZE - 32 - 32);
 	thisw->m_pos[2] = (float)(32 + 32*i);
@@ -783,8 +492,7 @@ void Resize_Pause(Widget* thisw)
 
 void Resize_Play(Widget* thisw)
 {
-	Player* py = &g_player[g_localP];
-	int i = 6;
+	const int i = 6;
 	thisw->m_pos[0] = (float)(0 + 32*i);
 	thisw->m_pos[1] = (float)(g_height - MINIMAP_SIZE - 32 - 32);
 	thisw->m_pos[2] = (float)(32 + 32*i);
@@ -793,12 +501,11 @@ void Resize_Play(Widget* thisw)
 
 void Resize_Fast(Widget* thisw)
 {
-	Player* py = &g_player[g_localP];
-	int i = 7;
-	thisw->m_pos[0] = 0 + 32*i;
-	thisw->m_pos[1] = g_height - MINIMAP_SIZE - 32 - 32;
-	thisw->m_pos[2] = 32 + 32*i;
-	thisw->m_pos[3] = g_height - MINIMAP_SIZE - 32;
+	const int i = 7;
+	thisw->m_pos[0] = (float)(0 + 32*i);
+	thisw->m_pos[1] = (float)(g_height - MINIMAP_SIZE - 32 - 32);
+	thisw->m_pos[2] = (float)(32 + 32*i);
+	thisw->m_pos[3] = (float)(g_height - MINIMAP_SIZE - 32);
 }
 
 void Click_Pause()
@@ -828,16 +535,17 @@ void Click_Transx()
 
 void Click_Save()
 {
-	Player* py = &g_player[g_localP];
-	GUI* gui = &g_gui;
-	gui->close("save");
-	gui->close("load");
-	gui->open("save");
-	((SaveView*)gui->get("save"))->regen();
+	GUI* gui;
+	gui = &g_gui;
+	Widget_Close((Widget*)gui, "load");
+	Widget_Open((Widget*)gui, "save");
+	Widget_SaveView_Regen((SaveView*)Widget_Get((Widget*)gui, "save"));
 }
 
 void Click_QSave()
 {
+	GUI* gui;
+
 	if(!g_lastsave[0])
 	{
 		Click_Save();
@@ -845,107 +553,192 @@ void Click_QSave()
 	}
 
 	SaveMap(g_lastsave);
-
-	Player* py = &g_player[g_localP];
-	GUI* gui = &g_gui;
-	gui->close("save");
-	gui->close("load");
+	
+	gui = &g_gui;
+	Widget_Close((Widget*)gui, "save");
+	Widget_Close((Widget*)gui, "load");
 }
 
 void Click_Load()
 {
-	Player* py = &g_player[g_localP];
-	GUI* gui = &g_gui;
-	gui->close("save");
-	gui->close("load");
-	gui->open("load");
-	((LoadView*)gui->get("load"))->regen();
+	GUI* gui;
+	gui = &g_gui;
+	Widget_Close((Widget*)gui, "save");
+	Widget_Open((Widget*)gui, "load");
+	Widget_LoadView_Regen((LoadView*)Widget_Get((Widget*)gui, "load"));
 }
 
 void Click_QuitToMenu()
 {
+	GUI* gui;
+
 	EndSess();
 	FreeMap();
-	FreeGrid();
-	Player* py = &g_player[g_localP];
-	GUI* gui = &g_gui;
-	gui->closeall();
-	gui->open("main");
+	gui = &g_gui;
+	Widget_CloseAll((Widget*)gui);
+	Widget_Open((Widget*)gui, "main");
 	g_mode = APPMODE_MENU;
 }
 
 void FillPlay()
 {
-	Player* py = &g_player[g_localP];
-	GUI* gui = &g_gui;
+	GUI* gui;
+	ViewLayer* playview;
+	ResTicker* resticker;
+	BotPan* botpan;
+	CstrView* cstrview;
+	BlPreview* blpreview;
+	BlView* blview;
+	TruckMgr* truckmgr;
+	SaveView* saveview;
+	LoadView* loadview;
+	Image* image;
+	Link* link;
+	ViewLayer* ingame;
+	RichText blank;
+	Button* debugbutton;
+	Button* transxbutton;
+	Button* savebutton;
+	Button* qsavebutton;
+	Button* loadbutton;
+	Button* pausebutton;
+	Button* playbutton;
+	Button* fastbutton;
+	RichText debugtip;
+	RichText transxtip;
+	RichText savetip;
+	RichText qsavetip;
+	RichText loadtip;
+	RichText pausetip;
+	RichText playtip;
+	RichText fasttip;
+	ViewLayer* ingame;
+	Image* whitebg;
+	Link* quitmenu;
+	Link* cancel;
+	RichText quitmenulabel;
+	RichText cancellabel;
+	ViewLayer* msgviewl;
+	TextBlock* msgtextbl;
+	TouchListen* msgtouchl;
+	Button* msgbutton;
+	RichText continuelabel;
 
-	g_vptype[VIEWPORT_MINIMAP] = VpType(Vec3f(0, 0, 0), Vec3f(0, 1, 0), "Minimap", true);
-	g_vptype[VIEWPORT_ENTVIEW] = VpType(Vec3f(0, MAX_DISTANCE/2, 0), Vec3f(0, 1, 0), "EntView", false);
+	gui = &g_gui;
 
-	//for(int i=0; i<25; i++)
-	//Sleep(6000);
+	//Play view-layer
+	playview = (ViewLayer*)malloc(sizeof(ViewLayer));
+	Widget_ViewLayer_Init(vl, (Widget*)gui, "play");
+	Widget_Add((Widget*)gui, vl);
+	
+	//Res. ticker and bottom panel
+	resticker = (ResTicker*)malloc(sizeof(ResTicker));
+	botpan = (BotPan*)malloc(sizeof(BotPan));
+	Widget_ResTicker_Init(resticker, (Widget*)playview, "res ticker", Resize_ResTicker);
+	Widget_BotPan_Init(botpan, (Widget*)playview, "bottom panel", Resize_BottomPanel);
+	Widget_Add((Widget*)gui, (Widget*)resticker);
+	Widget_Add((Widget*)gui, (Widget*)botpan);
 
-	gui->add(new ViewLayer(gui, "play"));
-	ViewLayer* playview = (ViewLayer*)gui->get("play");
-
-	//playview->add(new Image(NULL, "gui/backg/white.png", Resize_ResTicker));
-	//playview->add(new Text(NULL, "res ticker", RichText(" "), MAINFONT16, Resize_ResTicker, true, 1, 1, 1, 1));
-	playview->add(new ResTicker(playview, "res ticker", Resize_ResTicker));
-	playview->add(new BotPan(playview, "bottom panel", Resize_BottomPanel));
-
-	playview->add(new Button(playview, "debug lines", "gui/debuglines.png", RichText(), RichText("Show debug info"), MAINFONT16, BUST_LEFTIMAGE, Resize_DebugLines, Click_DebugLines, NULL, NULL, NULL, NULL, -1));
-	playview->add(new Button(playview, "show transactions", "gui/transx.png", RichText(), RichText("Show transactions"), MAINFONT16, BUST_LEFTIMAGE, Resize_Transx, Click_Transx, NULL, NULL, NULL, NULL, -1));
-	playview->add(new Button(playview, "save", "gui/edsave.png", RichText(), RichText("Save game"), MAINFONT16, BUST_LEFTIMAGE, Resize_Save, Click_Save, NULL, NULL, NULL, NULL, -1));
-	playview->add(new Button(playview, "qsave", "gui/qsave.png", RichText(), RichText("Quick save"), MAINFONT16, BUST_LEFTIMAGE, Resize_QSave, Click_QSave, NULL, NULL, NULL, NULL, -1));
-	playview->add(new Button(playview, "load", "gui/edload.png", RichText(), RichText("Load game"), MAINFONT16, BUST_LEFTIMAGE, Resize_Load, Click_Load, NULL, NULL, NULL, NULL, -1));
-	playview->add(new Button(playview, "pause", "gui/pause.png", RichText(), RichText("Pause"), MAINFONT16, BUST_LEFTIMAGE, Resize_Pause, Click_Pause, NULL, NULL, NULL, NULL, -1));
-	playview->add(new Button(playview, "play", "gui/play.png", RichText(), RichText("Play"), MAINFONT16, BUST_LEFTIMAGE, Resize_Play, Click_Play, NULL, NULL, NULL, NULL, -1));
-	playview->add(new Button(playview, "fast", "gui/fastforward.png", RichText(), RichText("Fast Forward"), MAINFONT16, BUST_LEFTIMAGE, Resize_Fast, Click_Fast, NULL, NULL, NULL, NULL, -1));
+	//Play view buttons panel
+	RichText_Init(&blank);
+	debugbutton = (Button*)malloc(sizeof(Button));
+	transxbutton = (Button*)malloc(sizeof(Button));
+	savebutton = (Button*)malloc(sizeof(Button));
+	qsavebutton = (Button*)malloc(sizeof(Button));
+	loadbutton = (Button*)malloc(sizeof(Button));
+	pausebutton = (Button*)malloc(sizeof(Button));
+	playbutton = (Button*)malloc(sizeof(Button));
+	fastbutton = (Button*)malloc(sizeof(Button));
+	RichText_Init_Str(&debugtip, "Show debug info");
+	RichText_Init_Str(&transxtip, "Show transactions");
+	RichText_Init_Str(&savetip, "Save game");
+	RichText_Init_Str(&qsavetip, "Quick save");
+	RichText_Init_Str(&loadtip, "Load game");
+	RichText_Init_Str(&pausetip, "Pause");
+	RichText_Init_Str(&playtip, "Play");
+	RichText_Init_Str(&fasttip, "Fast Forward");
+	Widget_Button_Init(debugbutton, (Widget*)playview, "debug lines", "gui/debuglines.png", &blank, &debugtip, MAINFONT, BUST_LINEBASED, Resize_DebugLines, Click_DebugLines, NULL, NULL, NULL, NULL, -1);
+	Widget_Button_Init(transxbutton, (Widget*)playview, "show transactions", "gui/transx.png", &blank, &transxtip, MAINFONT, BUST_LINEBASED, Resize_Transx, Click_Transx, NULL, NULL, NULL, NULL, -1);
+	Widget_Button_Init(savebutton, (Widget*)playview, "save", "gui/edsave.png", &blank, &savetip, MAINFONT, BUST_LINEBASED, Resize_Save, Click_Save, NULL, NULL, NULL, NULL, -1);
+	Widget_Button_Init(qsavebutton, (Widget*)playview, "qsave", "gui/qsave.png", &blank, &qsavetip, MAINFONT, BUST_LINEBASED, Resize_QSave, Click_QSave, NULL, NULL, NULL, NULL, -1);
+	Widget_Button_Init(loadbutton, (Widget*)playview, "load", "gui/edload.png", &blank, &loadtip, MAINFONT, BUST_LINEBASED, Resize_Load, Click_Load, NULL, NULL, NULL, NULL, -1);
+	Widget_Button_Init(pausebutton, (Widget*)playview, "pause", "gui/pause.png", &blank, &pausetip, MAINFONT, BUST_LINEBASED, Resize_Pause, Click_Pause, NULL, NULL, NULL, NULL, -1);
+	Widget_Button_Init(playbutton, (Widget*)playview, "play", "gui/play.png", &blank, &playtip, MAINFONT, BUST_LINEBASED, Resize_Play, Click_Play, NULL, NULL, NULL, NULL, -1);
+	Widget_Button_Init(fastbutton, (Widget*)playview, "fast", "gui/fastforward.png", &blank, &fasttip, MAINFONT, BUST_LINEBASED, Resize_Fast, Click_Fast, NULL, NULL, NULL, NULL, -1);
+	Widget_Add((Widget*)playview, (Widget*)debugbutton);
+	Widget_Add((Widget*)playview, (Widget*)transxbutton);
+	Widget_Add((Widget*)playview, (Widget*)savebutton);
+	Widget_Add((Widget*)playview, (Widget*)qsavebutton);
+	Widget_Add((Widget*)playview, (Widget*)loadbutton);
+	Widget_Add((Widget*)playview, (Widget*)pausebutton);
+	Widget_Add((Widget*)playview, (Widget*)playbutton);
+	Widget_Add((Widget*)playview, (Widget*)fastbutton);
+	RichText_Free(&debugtip);
+	RichText_Free(&transxtip);
+	RichText_Free(&savetip);
+	RichText_Free(&qsavetip);
+	RichText_Free(&loadtip);
+	RichText_Free(&pausetip);
+	RichText_Free(&playtip);
+	RichText_Free(&fasttip);
 
 	AddChat(playview);
 
-	//preload all the button images
-	BuildMenu_OpenPage3();
-	BuildMenu_OpenPage2();
-	BuildMenu_OpenPage1();
+	//TODO preload all the build button images
 
-	//gui->add(new ViewLayer(gui, "cstr view"));
-	gui->add(new CstrView(gui, "cstr view", Resize_ConstructionView, Click_MoveConstruction, Click_CancelConstruction, Click_ProceedConstruction, Click_EstimateConstruction));
-	//ViewLayer* constrview = (ViewLayer*)gui->get("cstr view");
+	cstrview = (CstrView*)malloc(sizeof(CstrView));
+	blpreview = (BlPreview*)malloc(sizeof(BlPreview));
+	blview = (BlView*)malloc(sizeof(BlView));
+	truckmgr = (TruckMgr*)malloc(sizeof(TruckMgr));
+	saveview = (SaveView*)malloc(sizeof(SaveView));
+	loadview = (LoadView*)malloc(sizeof(LoadView));
+	Widget_CstrView_Init(cstrview, (Widget*)gui, "cstr view", Resize_ConstructionView));
+	Widget_BlPreview_Init(blpreview, (Widget*)gui, "bl preview", Resize_BuildPreview));
+	Widget_BlView_Init(blview, (Widget*)gui, "bl view", Resize_BuildPreview));
+	Widget_TruckMgr_Init(truckmgr, (Widget*)gui, "truck mgr", Resize_BuildPreview));
+	Widget_SaveView_Init(saveview, (Widget*)gui, "save", Resize_BuildPreview));
+	Widget_LoadView_Init(loadview, (Widget*)gui, "load", Resize_BuildPreview));
+	Widget_Add((Widget*)gui, (Widget*)cstrview);
+	Widget_Add((Widget*)gui, (Widget*)blpreview);
+	Widget_Add((Widget*)gui, (Widget*)blview);
+	Widget_Add((Widget*)gui, (Widget*)truckmgr);
+	Widget_Add((Widget*)gui, (Widget*)saveview);
+	Widget_Add((Widget*)gui, (Widget*)loadview);
 
-	//constrview->add(new CstrView(NULL, "cstr view", Resize_ConstructionView, Click_MoveConstruction, Click_CancelConstruction, Click_ProceedConstruction, Click_EstimateConstruction));
+	//In-game menu
+	ingame = (ViewLayer*)malloc(sizeof(ViewLayer));
+	whitebg = (Image*)malloc(sizeof(Image));
+	quitmenu = (Link*)malloc(sizeof(Link));
+	cancel = (Link*)malloc(sizeof(Link));
+	RichText_Init_Str(&quitmenulabel, "Quit to Menu");
+	RichText_Init_Str(&cancellabel, "Cancel");
+	Widget_ViewLayer_Init(ingame, (Widget*)gui, "ingame");
+	Widget_Image_Init(whitebg, (Widget*)ingame, "gui/backg/white.jpg", true, Resize_Fullscreen, 0, 0, 0, 0.5f);
+	Widget_Link_Init(quitmenu, (Widget*)ingame, "0", &quitmenulabel, MAINFONT, Resize_MenuItem, Click_QuitToMenu);
+	Widget_Link_Init(cancel, (Widget*)ingame, "1", &cancellabel, MAINFONT, Resize_MenuItem, Escape);
+	Widget_Add((Widget*)gui, (Widget*)ingame);
+	Widget_Add((Widget*)ingame, (Widget*)whitebg);
+	Widget_Add((Widget*)ingame, (Widget*)quitmenu);
+	Widget_Add((Widget*)ingame, (Widget*)cancel);
+	RichText_Free(&quitmenulabel);
+	RichText_Free(&cancellabel);
 
-	//gui->add(new ViewLayer(gui, "bl preview"));
-	gui->add(new BuildPreview(gui, "bl preview", Resize_BuildPreview));
-	//ViewLayer* blpreview = (ViewLayer*)gui->get("bl preview");
-
-	//blpreview->add(new TouchListener(NULL, Resize_Fullscreen, NULL, NULL, NULL, -1));
-	//blpreview->add(new BuildPreview(blpreview, "bl preview", Resize_BuildPreview));
-	//blpreview->add(new WindowW(blpreview, "bl preview", Resize_BuildPreview));
-
-	gui->add(new BlView(gui, "bl view", Resize_BuildPreview));
-	gui->add(new TruckMgr(gui, "truck mgr", Resize_BuildPreview));
-
-
-	gui->add(new SaveView(gui, "save", Resize_BuildPreview));
-	gui->add(new LoadView(gui, "load", Resize_BuildPreview));
-
-#if 0
-	gui->add(new ViewLayer(gui, "construction estimate view"));
-	ViewLayer* cev = (ViewLayer*)gui->get("construction estimate view");
-#endif
-
-	gui->add(new ViewLayer(gui, "ingame"));
-	ViewLayer* ingame = (ViewLayer*)gui->get("ingame");
-	ingame->add(new Image(ingame, "gui/backg/white.jpg", true, Resize_Fullscreen, 0, 0, 0, 0.5f));
-	ingame->add(new Link(ingame, "0", RichText("Quit to Menu"), MAINFONT16, Resize_MenuItem, Click_QuitToMenu));
-	ingame->add(new Link(ingame, "1", RichText("Cancel"), MAINFONT16, Resize_MenuItem, Escape));
-
-	gui->add(new ViewLayer(gui, "message view"));
-	ViewLayer* msgview = (ViewLayer*)gui->get("message view");
-
-	msgview->add(new Image(NULL, "gui/backg/white.jpg", true, Resize_Message));
-	msgview->add(new TextBlock(NULL, "message", RichText(""), MAINFONT16, Resize_Message));
-	msgview->add(new TouchListener(NULL, Resize_Fullscreen, NULL, NULL, NULL, -1));
-	msgview->add(new Button(NULL, "continue button", "gui/transp.png", RichText("Continue"), RichText(""), MAINFONT16, BUST_LEFTIMAGE, Resize_MessageContinue, Click_MessageContinue, NULL, NULL, NULL, NULL, -1));
+	//Message view
+	msgviewl = (ViewLayer*)malloc(sizeof(ViewLayer));
+	whitebg = (Image*)malloc(sizeof(Image));
+	msgtextbl = (TextBlock*)malloc(sizeof(TextBlock));
+	msgtouchl = (TouchListen*)malloc(sizeof(TouchListen));
+	msgbutton = (Button*)malloc(sizeof(Button));
+	RichText_Init_Str(&continuelabel, "Continue");
+	Widget_ViewLayer_Init(msgviewl, (Widget*)gui, "message view");
+	Widget_Image_Init(whitebg, (Widget*)msgviewl, "gui/backg/white.jpg", true, Resize_Message, 1.0f, 1.0f, 1.0f, 1.0f);
+	Widget_TextBlock_Init(msgtextbl, (Widget*)msgviewl, "message", &blank, MAINFONT, Resize_Message);
+	Widget_TouchListen_Init(msgtouchl, (Widget*)msgviewl, Resize_Fullscreen, NULL, NULL, NULL, -1);
+	Widget_Button_Init(msgbutton, (Widget*)msgviewl, "continue button", "gui/transp.png", &continuelabel, &blank, MAINFONT, BUST_LEFTIMAGE, Resize_MessageContinue, Click_MessageContinue, NULL, NULL, NULL, NULL, -1);
+	Widget_Add((Widget*)gui, (Widget*)msgviewl);
+	Widget_Add((Widget*)msgviewl, (Widget*)whitebg);
+	Widget_Add((Widget*)msgviewl, (Widget*)msgtextbl);
+	Widget_Add((Widget*)msgviewl, (Widget*)msgtouchl);
+	Widget_Add((Widget*)msgviewl, (Widget*)msgbutton);
+	RichText_Free(&continuelabel);
 }

@@ -3,7 +3,7 @@
 
 Icon g_icon[ICONS];
 
-void DefI(int type, const char* relative, const UString tag)
+void DefI(int type, const char* relative, const UStr tag)
 {
 	Icon* i = &g_icon[type];
 

@@ -70,7 +70,7 @@ ConstructionView::ConstructionView(Widget* parent, const char* n, void (*reframe
 	middle_outer_bottom = Image(this, "gui/frames/outertop2x64.png", true, NULL, 1, 1, 1, 1,		0, 1, 1, 0);
 
 	white_bg = Image(this, "gui/backg/white.jpg", true, NULL, 1, 1, 1, 1,		0, 0, 1, 1);
-	bg_touch = TouchListener(this, NULL, NULL, NULL, NULL, -1);
+	bg_touch = TouchListen(this, NULL, NULL, NULL, NULL, -1);
 
 	//RichText inititle("Construction Manager");
 	//titletext = Text(this, "title", inititle, MAINFONT16, NULL);

@@ -156,15 +156,12 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="..\engine\ai\ai.h" />
     <ClInclude Include="..\engine\algo\binheap.h" />
     <ClInclude Include="..\engine\algo\checksum.h" />
     <ClInclude Include="..\engine\algo\list.h" />
     <ClInclude Include="..\engine\algo\mempool.h" />
     <ClInclude Include="..\engine\app.h" />
     <ClInclude Include="..\engine\debug.h" />
-    <ClInclude Include="..\engine\econ\balance.h" />
-    <ClInclude Include="..\engine\econ\demand.h" />
     <ClInclude Include="..\engine\econ\utility.h" />
     <ClInclude Include="..\engine\gui\cursor.h" />
     <ClInclude Include="..\engine\gui\draw2d.h" />
@@ -263,23 +260,19 @@
     <ClInclude Include="..\engine\phys\collision.h" />
     <ClInclude Include="..\engine\phys\trace.h" />
     <ClInclude Include="..\engine\platform.h" />
-    <ClInclude Include="..\engine\render\billboard.h" />
     <ClInclude Include="..\engine\render\cell.h" />
-    <ClInclude Include="..\engine\render\dmdmodel.h" />
     <ClInclude Include="..\engine\render\drawqueue.h" />
     <ClInclude Include="..\engine\render\foliage.h" />
     <ClInclude Include="..\engine\render\graph.h" />
     <ClInclude Include="..\engine\render\heightmap.h" />
     <ClInclude Include="..\engine\render\infoov.h" />
-    <ClInclude Include="..\engine\render\model.h" />
-    <ClInclude Include="..\engine\render\ms3d.h" />
     <ClInclude Include="..\engine\render\particle.h" />
     <ClInclude Include="..\engine\render\projectile.h" />
     <ClInclude Include="..\engine\render\screenshot.h" />
     <ClInclude Include="..\engine\render\shader.h" />
     <ClInclude Include="..\engine\render\shadow.h" />
-    <ClInclude Include="..\engine\render\skybox.h" />
     <ClInclude Include="..\engine\render\sprite.h" />
+    <ClInclude Include="..\engine\render\texture.h" />
     <ClInclude Include="..\engine\render\tile.h" />
     <ClInclude Include="..\engine\render\transaction.h" />
     <ClInclude Include="..\engine\render\vertexarray.h" />
@@ -313,7 +306,6 @@
     <ClInclude Include="..\engine\sound\sound.h" />
     <ClInclude Include="..\engine\sound\soundch.h" />
     <ClInclude Include="..\engine\sys\dirent.h" />
-    <ClInclude Include="..\engine\sys\texture.h" />
     <ClInclude Include="..\engine\sys\unicode.h" />
     <ClInclude Include="..\engine\sys\ustring.h" />
     <ClInclude Include="..\engine\sys\utf8.h" />
@@ -330,15 +322,12 @@
     <ResourceCompile Include="res.rc" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\engine\ai\ai.c" />
     <ClCompile Include="..\engine\algo\binheap.c" />
     <ClCompile Include="..\engine\algo\checksum.c" />
     <ClCompile Include="..\engine\algo\list.c" />
     <ClCompile Include="..\engine\algo\mempool.c" />
     <ClCompile Include="..\engine\app.c" />
     <ClCompile Include="..\engine\debug.c" />
-    <ClCompile Include="..\engine\econ\balance.c" />
-    <ClCompile Include="..\engine\econ\demand.c" />
     <ClCompile Include="..\engine\econ\utility.c" />
     <ClCompile Include="..\engine\gui\cursor.c" />
     <ClCompile Include="..\engine\gui\draw2d.c" />
@@ -430,23 +419,19 @@
     <ClCompile Include="..\engine\phys\collision.c" />
     <ClCompile Include="..\engine\phys\trace.c" />
     <ClCompile Include="..\engine\platform.c" />
-    <ClCompile Include="..\engine\render\billboard.c" />
     <ClCompile Include="..\engine\render\cell.c" />
-    <ClCompile Include="..\engine\render\dmdmodel.c" />
     <ClCompile Include="..\engine\render\drawqueue.c" />
     <ClCompile Include="..\engine\render\foliage.c" />
     <ClCompile Include="..\engine\render\graph.c" />
     <ClCompile Include="..\engine\render\heightmap.c" />
     <ClCompile Include="..\engine\render\infoov.c" />
-    <ClCompile Include="..\engine\render\model.c" />
-    <ClCompile Include="..\engine\render\ms3d.c" />
     <ClCompile Include="..\engine\render\particle.c" />
     <ClCompile Include="..\engine\render\projectile.c" />
     <ClCompile Include="..\engine\render\screenshot.c" />
     <ClCompile Include="..\engine\render\shader.c" />
     <ClCompile Include="..\engine\render\shadow.c" />
-    <ClCompile Include="..\engine\render\skybox.c" />
     <ClCompile Include="..\engine\render\sprite.c" />
+    <ClCompile Include="..\engine\render\texture.c" />
     <ClCompile Include="..\engine\render\tile.c" />
     <ClCompile Include="..\engine\render\transaction.c" />
     <ClCompile Include="..\engine\render\vertexarray.c" />
@@ -481,7 +466,6 @@
     <ClCompile Include="..\engine\sound\soundch.c" />
     <ClCompile Include="..\engine\sys\dirent.c" />
     <ClCompile Include="..\engine\sys\regress.c" />
-    <ClCompile Include="..\engine\sys\texture.c" />
     <ClCompile Include="..\engine\sys\unicode.c" />
     <ClCompile Include="..\engine\sys\ustring.c" />
     <ClCompile Include="..\engine\sys\utf8.c" />

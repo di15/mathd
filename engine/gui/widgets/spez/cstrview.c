@@ -155,7 +155,7 @@ void CstrView::regen(Selection* sel)
 
 		conmat = t->conmat;
 		g_bptype = b->type;
-		bname = RichText(UString(t->name));
+		bname = RichText(UStr(t->name));
 		conwage = b->conwage;
 		opy = &g_player[b->owner];
 
@@ -181,7 +181,7 @@ void CstrView::regen(Selection* sel)
 		CdTile* co = GetCd(CONDUIT_ROAD, xz.x, xz.y, false);
 		conwage = co->conwage;
 		opy = &g_player[co->owner];
-		bname = RichText(UString(cot->name));
+		bname = RichText(UStr(cot->name));
 
 		for(auto cit=sel->roads.begin(); cit!=sel->roads.end(); cit++)
 		{
@@ -209,7 +209,7 @@ void CstrView::regen(Selection* sel)
 		CdTile* co = GetCd(CONDUIT_POWL, xz.x, xz.y, false);
 		conwage = co->conwage;
 		opy = &g_player[co->owner];
-		bname = RichText(UString(cot->name));
+		bname = RichText(UStr(cot->name));
 
 		for(auto cit=sel->roads.begin(); cit!=sel->roads.end(); cit++)
 		{
@@ -237,7 +237,7 @@ void CstrView::regen(Selection* sel)
 		CdTile* co = GetCd(CONDUIT_CRPIPE, xz.x, xz.y, false);
 		conwage = co->conwage;
 		opy = &g_player[co->owner];
-		bname = RichText(UString(cot->name));
+		bname = RichText(UStr(cot->name));
 
 		for(auto cit=sel->roads.begin(); cit!=sel->roads.end(); cit++)
 		{
@@ -267,12 +267,12 @@ void CstrView::regen(Selection* sel)
 
 	char rowname[32];
 	sprintf(rowname, "%d %d", row, 0);
-	m_subwidg.push_back(new Text(this, rowname, RichText(UString("Construction Wage")) + RichText(RichPart(RICHTEXT_ICON, ICON_LABOUR)) + RichText(UString(":")), MAINFONT16, Resize_CV_Cl, true, 1.0f,1.0f,1.0f,1.0f /*, 0.7f, 0.9f, 0.3f, 1*/));
+	m_subwidg.push_back(new Text(this, rowname, RichText(UStr("Construction Wage")) + RichText(RichPart(RICHTEXT_ICON, ICON_LABOUR)) + RichText(UStr(":")), MAINFONT16, Resize_CV_Cl, true, 1.0f,1.0f,1.0f,1.0f /*, 0.7f, 0.9f, 0.3f, 1*/));
 
 	sprintf(rowname, "%d %d", row, 1);
 	char cwstr[32];
 	sprintf(cwstr, "%d", conwage);
-	m_subwidg.push_back(new EditBox(this, rowname, RichText(UString(cwstr)), MAINFONT16, Resize_CV_Cl, false, 6, Change_CV_CW, NULL, -1));
+	m_subwidg.push_back(new EditBox(this, rowname, RichText(UStr(cwstr)), MAINFONT16, Resize_CV_Cl, false, 6, Change_CV_CW, NULL, -1));
 
 	//requisite list
 	RichText rl;

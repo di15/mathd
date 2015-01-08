@@ -389,13 +389,13 @@ void DoBlJob(Unit* u)
 
 			char ft[32];	//labour text
 			sprintf(ft, "%+d ", 1);
-			tt.m_part.push_back(RichPart(UString(ft)));
+			tt.m_part.push_back(RichPart(UStr(ft)));
 
 			tt.m_part.push_back(RichPart(RICHTEXT_ICON, ICON_DOLLARS));
 			
 			char mt[32];	//money text
 			sprintf(mt, "%+d ", b->opwage);
-			tt.m_part.push_back(RichPart(UString(mt)));
+			tt.m_part.push_back(RichPart(UStr(mt)));
 
 			NewTransx(u->drawpos, &tt);
 		}
@@ -633,7 +633,7 @@ void GoRest(Unit* u)
 			char msg[128];
 			sprintf(msg, "%s Eviction", Time().c_str());
 			RichText em;
-			em.m_part.push_back(UString(msg));
+			em.m_part.push_back(UStr(msg));
 			//SubmitConsole(&em);
 			AddChat(&em);
 			Evict(u);
@@ -744,7 +744,7 @@ void CheckMul(Unit* u, int foodpr)
 	char msg[128];
 	sprintf(msg, "%s Growth! (Population %d.)", Time().c_str(), CountU(UNIT_LABOURER));
 	RichText gr;
-	gr.m_part.push_back(UString(msg));
+	gr.m_part.push_back(UStr(msg));
 	AddChat(&gr);
 	//SubmitConsole(&gr);
 }
@@ -889,13 +889,13 @@ void DoShop(Unit* u)
 
 		char mt[32];	//money text
 		sprintf(mt, "%+d ", b->price[RES_RETFOOD]);
-		tt.m_part.push_back(RichPart(UString(mt)));
+		tt.m_part.push_back(RichPart(UStr(mt)));
 
 		tt.m_part.push_back(RichPart(RICHTEXT_ICON, ICON_RETFOOD));
 
 		char ft[32];	//food text
 		sprintf(ft, "%+d ", -trysub);
-		tt.m_part.push_back(RichPart(UString(ft)));
+		tt.m_part.push_back(RichPart(UStr(ft)));
 
 		NewTransx(u->drawpos, &tt);
 		PlaySound(g_labsnd[LABSND_SHOP]);
@@ -915,7 +915,7 @@ void DoRest(Unit* u)
 		//Chat("!CheckApartmentAvailability()");
 		if(eviction)
 		{
-			RichText em(UString("Eviction"));
+			RichText em(UStr("Eviction"));
 			//SubmitConsole(&em);
 			AddChat(&em);
 			Evict(u);
@@ -930,7 +930,7 @@ void DoRest(Unit* u)
 	u->belongings[RES_LABOUR] += 1;
 
 #if 1
-	RichText rt(UString("Rest"));
+	RichText rt(UStr("Rest"));
 	//SubmitConsole(&em);
 	//AddChat(&rt);
 	NewTransx(u->drawpos, &rt);
@@ -1290,7 +1290,7 @@ void UpdLab(Unit* u)
 		char msg[128];
 		sprintf(msg, "%s Starvation!", Time().c_str());
 		RichText sr;
-		sr.m_part.push_back(UString(msg));
+		sr.m_part.push_back(UStr(msg));
 		//SubmitConsole(&sr);
 		AddChat(&sr);
 		Inherit(u);

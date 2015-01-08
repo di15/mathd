@@ -3,17 +3,17 @@
 #include "utils.h"
 #include "sys/unicode.h"
 
-UString::UString()
+UStr::UStr()
 {
 	m_data = new unsigned int[1];
 	m_data[0] = 0;
 	m_length = 0;
 }
 
-UString::~UString()
+UStr::~UStr()
 {
 #ifdef USTR_DEBUG
-	g_log<<"delete UString...";
+	g_log<<"delete UStr...";
 	g_log.flush();
 
 	for(int i=0; i<m_length; i++)
@@ -33,7 +33,7 @@ UString::~UString()
 }
 
 
-UString::UString(const UString& original)
+UStr::UStr(const UStr& original)
 {
 	m_data = new unsigned int[1];
 	m_data[0] = 0;
@@ -41,10 +41,10 @@ UString::UString(const UString& original)
 	*this = original;
 }
 
-UString::UString(const char* cstr)
+UStr::UStr(const char* cstr)
 {
 #ifdef USTR_DEBUG
-	g_log<<"UString::UString(const char* cstr)"<<std::endl;
+	g_log<<"UStr::UStr(const char* cstr)"<<std::endl;
 	g_log.flush();
 #endif
 
@@ -54,7 +54,7 @@ UString::UString(const char* cstr)
 		m_data[i] = (unsigned char)cstr[i];
 }
 
-UString::UString(unsigned int k)
+UStr::UStr(unsigned int k)
 {
 	m_length = 1;
 	m_data = new unsigned int [m_length+1];
@@ -62,7 +62,7 @@ UString::UString(unsigned int k)
 	m_data[1] = 0;
 }
 
-UString::UString(unsigned int* k)
+UStr::UStr(unsigned int* k)
 {
 	if(!k)
 	{
@@ -80,10 +80,10 @@ UString::UString(unsigned int* k)
 
 //#define USTR_DEBUG
 
-UString& UString::operator=(const UString& original)
+UStr& UStr::operator=(const UStr& original)
 {
 #ifdef USTR_DEBUG
-	g_log<<"UString= ["<<rawstr()<<"] => ["<<original.rawstr()<<"]"<<std::endl;
+	g_log<<"UStr= ["<<rawstr()<<"] => ["<<original.rawstr()<<"]"<<std::endl;
 	g_log.flush();
 #endif
 
@@ -96,9 +96,9 @@ UString& UString::operator=(const UString& original)
 	return *this;
 }
 
-UString UString::operator+(const UString &other)
+UStr UStr::operator+(const UStr &other)
 {
-	UString newstr;
+	UStr newstr;
 
 	delete [] newstr.m_data;
 
@@ -117,9 +117,9 @@ UString UString::operator+(const UString &other)
 	return newstr;
 }
 
-UString UString::substr(int start, int len) const
+UStr UStr::substr(int start, int len) const
 {
-	UString newstr;
+	UStr newstr;
 
 	if(len <= 0)
 		return newstr;
@@ -144,7 +144,7 @@ UString UString::substr(int start, int len) const
 	return newstr;
 }
 
-int UString::firstof(UString find) const
+int UStr::firstof(UStr find) const
 {
 	for(int i=0; i<m_length; i++)
 	{
@@ -166,13 +166,13 @@ int UString::firstof(UString find) const
 	return -1;
 }
 
-std::string UString::rawstr() const
+std::string UStr::rawstr() const
 {
 	std::string finstr;
 
 //#ifdef USTR_DEBUG
 #if 0
-	g_log<<"\t\tstring UString::rawstr() const..."<<std::endl;
+	g_log<<"\t\tstring UStr::rawstr() const..."<<std::endl;
 	g_log.flush();
 
 	g_log<<"\t\t\t"<<std::endl;

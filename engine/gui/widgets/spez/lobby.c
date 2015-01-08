@@ -235,7 +235,7 @@ void Lobby::regen()
 			unsigned int* utf32 = ToUTF32(utf8);
 			delete [] utf8;
 
-			m_svname.m_text = RichText(UString(utf32));
+			m_svname.m_text = RichText(UStr(utf32));
 			m_svname.m_text = ParseTags(m_svname.m_text, NULL);
 			delete [] utf32;
 
@@ -244,13 +244,13 @@ void Lobby::regen()
 		else
 		{
 			strcpy(g_svname, "");
-			m_svname.m_text = RichText(UString(g_svname));
+			m_svname.m_text = RichText(UStr(g_svname));
 		}
 	}
 	else if(g_netmode == NETM_CLIENT)
 	{
 		unsigned int* utf32 = ToUTF32((unsigned char*)g_svname);
-		m_svname.m_text = RichText(UString(utf32));
+		m_svname.m_text = RichText(UStr(utf32));
 		m_svname.m_text = ParseTags(m_svname.m_text, NULL);
 		delete [] utf32;
 	}
@@ -333,7 +333,7 @@ void Lobby::drawpyl()
 
 		char numcs[16];
 		sprintf(numcs, "%d.", jcin+1);
-		RichText numrt = RichText(UString(numcs));
+		RichText numrt = RichText(UStr(numcs));
 		DrawShadowedTextF(m_font, m_pylpos[0], (int)(m_pylpos[1] + (jcin-scroll)*f->gheight), m_pylpos[0], m_pylpos[1], m_pylpos[2], m_pylpos[3], &numrt, color);
 
 		DrawShadowedTextF(m_font, m_pylpos[0] + f->gheight*1.5f, (int)(m_pylpos[1] + (jcin-scroll)*f->gheight), m_pylpos[0], m_pylpos[1], m_pylpos[2], m_pylpos[3], &c->name, color);

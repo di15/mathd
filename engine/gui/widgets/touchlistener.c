@@ -14,7 +14,7 @@
 #include "touchlistener.h"
 #include "../../sim/player.h"
 
-TouchListener::TouchListener() : Widget()
+TouchListen::TouchListen() : Widget()
 {
 	m_parent = NULL;
 	m_type = WIDGET_TOUCHLISTENER;
@@ -29,7 +29,7 @@ TouchListener::TouchListener() : Widget()
 	m_param = -1;
 }
 
-TouchListener::TouchListener(Widget* parent, void (*reframef)(Widget* thisw), void (*click2)(int p), void (*overf2)(int p), void (*out)(), int parm) : Widget()
+TouchListen::TouchListen(Widget* parent, void (*reframef)(Widget* thisw), void (*click2)(int p), void (*overf2)(int p), void (*out)(), int parm) : Widget()
 {
 	m_parent = parent;
 	m_type = WIDGET_TOUCHLISTENER;
@@ -45,7 +45,7 @@ TouchListener::TouchListener(Widget* parent, void (*reframef)(Widget* thisw), vo
 	reframe();
 }
 
-void TouchListener::inev(InEv* ie)
+void TouchListen::inev(InEv* ie)
 {
 	Player* py = &g_player[g_localP];
 

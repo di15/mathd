@@ -854,8 +854,8 @@ void ReadSvInfoPacket(SvInfoPacket* sip, NetConn* nc, IPaddress* from, UDPsocket
 		//unsigned int* svnameuni = ToUTF32((const unsigned char*)sip->svinfo.svname, strlen(sip->svinfo.svname));
 		unsigned int* mapnameuni = ToUTF32((const unsigned char*)sip->svinfo.mapname);
 		unsigned int* svnameuni = ToUTF32((const unsigned char*)sip->svinfo.svname);
-		sit->mapnamert = RichText(UString(mapnameuni));
-		sit->name = RichText(UString(svnameuni));
+		sit->mapnamert = RichText(UStr(mapnameuni));
+		sit->name = RichText(UStr(svnameuni));
 		sit->name = ParseTags(sit->name, NULL);
 		delete [] mapnameuni;
 		delete [] svnameuni;
@@ -984,7 +984,7 @@ void ReadJoinPacket(JoinPacket* jp, NetConn* nc, IPaddress* from, UDPsocket* soc
 
 		RichText name;
 		unsigned int* uname = ToUTF32((unsigned char*)jp->name);
-		name.m_part.push_back(UString(uname));
+		name.m_part.push_back(UStr(uname));
 		delete [] uname;
 		int joinci;
 
@@ -1064,7 +1064,7 @@ void ReadAddClPacket(AddClientPacket* acp, NetConn* nc, IPaddress* from, UDPsock
 		//g_log<<"acp"<<std::endl;
 		unsigned int* uname = ToUTF32((unsigned char*)acp->name);
 		int addci;
-		AddClient(nc, RichText(UString(uname)), &addci);
+		AddClient(nc, RichText(UStr(uname)), &addci);
 		delete [] uname;
 		Client* c = &g_client[addci];
 		c->player = acp->player;
@@ -1101,14 +1101,14 @@ void ReadSetClNamePacket(SetClNamePacket* scnp, NetConn* nc, IPaddress* from, UD
 	{
 		Client* c = &g_client[scnp->client];
 		unsigned int* uname = ToUTF32((unsigned char*)scnp->name);
-		c->name = RichText(UString(uname));
+		c->name = RichText(UStr(uname));
 		delete [] uname;
 	}
 	else if(g_netmode == NETM_HOST && nc && nc->isclient)
 	{
 		Client* c = &g_client[scnp->client];
 		unsigned int* uname = ToUTF32((unsigned char*)scnp->name);
-		c->name = RichText(UString(uname));
+		c->name = RichText(UStr(uname));
 		delete [] uname;
 
 		SetClNamePacket scnp2;

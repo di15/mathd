@@ -243,7 +243,7 @@ void LogRich(const RichText* rt)
 		}
 		else if(rtiter->m_type == RICHTEXT_TEXT)
 		{
-			const UString* ustr = &rtiter->m_text;
+			const UStr* ustr = &rtiter->m_text;
 
 			for(int i=0; i<ustr->m_length; i++)
 			{

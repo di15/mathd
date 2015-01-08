@@ -19,7 +19,7 @@
 #include "../viewportw.h"
 #include "../../../../app/gui/gviewport.h"
 
-BuildPreview::BuildPreview(Widget* parent, const char* n, void (*reframef)(Widget* thisw))
+BlPreview::BlPreview(Widget* parent, const char* n, void (*reframef)(Widget* thisw))
 {
 	m_parent = parent;
 	m_type = WIDGET_BUILDPREVIEW;
@@ -64,7 +64,7 @@ BuildPreview::BuildPreview(Widget* parent, const char* n, void (*reframef)(Widge
 	reframe();
 }
 
-void BuildPreview::reframe()	//resized or moved
+void BlPreview::reframe()	//resized or moved
 {
 	if(reframefunc)
 		reframefunc(this);
@@ -86,7 +86,7 @@ void BuildPreview::reframe()	//resized or moved
 
 }
 
-void BuildPreview::draw()
+void BlPreview::draw()
 {
 
 	glUnIForm4f(g_shader[SHADER_ORTHO].m_slot[SSLOT_COLOR], 1, 1, 1, 1);
@@ -118,19 +118,19 @@ void BuildPreview::draw()
 #endif
 }
 
-void BuildPreview::drawover()
+void BlPreview::drawover()
 {
 	for(auto i=m_subwidg.begin(); i!=m_subwidg.end(); i++)
 		(*i)->drawover();
 }
 
-void BuildPreview::frameupd()
+void BlPreview::frameupd()
 {
 	for(auto i=m_subwidg.rbegin(); i!=m_subwidg.rend(); i++)
 		(*i)->frameupd();
 }
 
-void BuildPreview::inev(InEv* ev)
+void BlPreview::inev(InEv* ev)
 {
 	for(auto i=m_subwidg.rbegin(); i!=m_subwidg.rend(); i++)
 		(*i)->inev(ev);

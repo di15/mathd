@@ -3,11 +3,11 @@
 
 #include "../widget.h"
 
-class TouchListener : public Widget
+class TouchListen : public Widget
 {
 public:
-	TouchListener();
-	TouchListener(Widget* parent, void (*reframef)(Widget* thisw), void (*click2)(int p), void (*overf)(int p), void (*out)(), int parm);
+	TouchListen();
+	TouchListen(Widget* parent, void (*reframef)(Widget* thisw), void (*click2)(int p), void (*overf)(int p), void (*out)(), int parm);
 
 	void inev(InEv* ie);
 };

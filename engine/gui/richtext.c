@@ -27,7 +27,7 @@ RichPart::RichPart(const RichPart& original)
 RichPart::RichPart(const char* cstr)
 {
 	m_type = RICHTEXT_TEXT;
-	m_text = UString(cstr);
+	m_text = UStr(cstr);
 
 #ifdef USTR_DEBUG
 	g_log<<"RichPart::RichPart(const char* cstr) end '"<<m_text.rawstr()<<"'"<<std::endl;
@@ -35,7 +35,7 @@ RichPart::RichPart(const char* cstr)
 #endif
 }
 
-RichPart::RichPart(UString ustr)
+RichPart::RichPart(UStr ustr)
 {
 	m_type = RICHTEXT_TEXT;
 	m_text = ustr;
@@ -409,7 +409,7 @@ RichText ParseTags(RichText original, int* caret)
 			int lastof = -1;
 
 			RichPart* p = &*i;
-			UString* s = &p->m_text;
+			UStr* s = &p->m_text;
 			unsigned int* u = s->m_data;
 
 			for(int j=0; j<s->m_length; j++)

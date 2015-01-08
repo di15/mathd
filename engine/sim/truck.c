@@ -693,7 +693,7 @@ void UpdTruck(Unit* u)
 		g_log<<msg<<std::endl;
 		g_log<<"\tRemain: "<<CountU(UNIT_TRUCK)<<std::endl;
 		RichText sr;
-		sr.m_part.push_back(UString(msg));
+		sr.m_part.push_back(UStr(msg));
 		//SubmitConsole(&sr);
 		AddChat(&sr);
 		//SubmitConsole(&sr);

@@ -365,8 +365,8 @@ void TextArea::inev(InEv* ie)
 #endif
 		//unsigned int* ustr = ToUTF32((const unsigned char*)ie->text.c_str(), ie->text.length());
 		unsigned int* ustr = ToUTF32((const unsigned char*)ie->text.c_str());
-		//RichText addstr(RichPart(UString(ustr)));	//Why does MSVS2012 not accept this?
-		RichText addstr = RichText(RichPart(UString(ustr)));
+		//RichText addstr(RichPart(UStr(ustr)));	//Why does MSVS2012 not accept this?
+		RichText addstr = RichText(RichPart(UStr(ustr)));
 		unsigned int first = ustr[0];
 		delete [] ustr;
 
@@ -469,7 +469,7 @@ void TextArea::placestr(const char* str)
 		RichText before = m_value.substr(0, m_highl[0]);
 		//RichText after = m_value.substr(m_highl[1]-1, m_value.texlen()-m_highl[1]);
 		RichText after = m_value.substr(m_highl[1], m_value.texlen()-m_highl[1]);
-		m_value = before + RichText(UString(addstr)) + after;
+		m_value = before + RichText(UStr(addstr)) + after;
 
 		m_caret = m_highl[0] + addlen;
 		m_highl[0] = m_highl[1] = 0;
@@ -669,7 +669,7 @@ void TextArea::pasteval()
 	placestr( SDL_GetClipboardText() );
 #else
 	unsigned int* ustr = ToUTF32( (unsigned char*)SDL_GetClipboardText() ); 
-	RichText rstr = RichText(UString(ustr));
+	RichText rstr = RichText(UStr(ustr));
 	delete [] ustr;
 	placestr( &rstr );
 #endif
@@ -717,7 +717,7 @@ void TextArea::placechar(unsigned int k)
 					chpart.m_text = chpart.m_text + i->m_text.substr(0, subplace);
 				}
 
-				chpart.m_text = chpart.m_text + UString(k);
+				chpart.m_text = chpart.m_text + UStr(k);
 
 				if(i->m_text.m_length - subplace > 0)
 				{
@@ -736,13 +736,13 @@ void TextArea::placechar(unsigned int k)
 
 				if(subplace <= 0)
 				{
-					newval = newval + RichText(RichPart(UString(k)));
+					newval = newval + RichText(RichPart(UStr(k)));
 					newval = newval + RichText(*i);
 				}
 				else
 				{
 					newval = newval + RichText(*i);
-					newval = newval + RichText(RichPart(UString(k)));
+					newval = newval + RichText(RichPart(UStr(k)));
 				}
 			}
 

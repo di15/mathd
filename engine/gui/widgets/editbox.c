@@ -484,8 +484,8 @@ void EditBox::inev(InEv* ie)
 #endif
 		//unsigned int* ustr = ToUTF32((const unsigned char*)ie->text.c_str(), ie->text.length());
 		unsigned int* ustr = ToUTF32((const unsigned char*)ie->text.c_str());
-		//RichText addstr(RichPart(UString(ustr)));	//Why does MSVS2012 not accept this?
-		RichText addstr = RichText(RichPart(UString(ustr)));
+		//RichText addstr(RichPart(UStr(ustr)));	//Why does MSVS2012 not accept this?
+		RichText addstr = RichText(RichPart(UStr(ustr)));
 		unsigned int first = ustr[0];
 		delete [] ustr;
 
@@ -735,7 +735,7 @@ void EditBox::copyval()
 void EditBox::pasteval()
 {
 	unsigned int* ustr = ToUTF32( (unsigned char*)SDL_GetClipboardText() ); 
-	RichText rstr = RichText(UString(ustr));
+	RichText rstr = RichText(UStr(ustr));
 	delete [] ustr;
 	placestr( &rstr );
 

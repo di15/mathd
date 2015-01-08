@@ -95,7 +95,7 @@ void Resize_BP_Ds(Widget* thisw)
 	thisw->m_pos[3] = parw->m_pos[3] - 10;
 }
 
-BuildPreview::BuildPreview(Widget* parent, const char* n, void (*reframef)(Widget* thisw)) : WindowW(parent, n, reframef)
+BlPreview::BlPreview(Widget* parent, const char* n, void (*reframef)(Widget* thisw)) : WindowW(parent, n, reframef)
 {
 	m_parent = parent;
 	m_type = WIDGET_BUILDPREVIEW;

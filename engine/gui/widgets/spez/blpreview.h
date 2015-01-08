@@ -5,10 +5,10 @@
 #include "../viewportw.h"
 #include "../windoww.h"
 
-class BuildPreview : public WindowW
+class BlPreview : public WindowW
 {
 public:
-	BuildPreview(Widget* parent, const char* n, void (*reframef)(Widget* thisw));
+	BlPreview(Widget* parent, const char* n, void (*reframef)(Widget* thisw));
 };
 
 

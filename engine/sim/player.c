@@ -105,7 +105,7 @@ void Bankrupt(int player, const char* reason)
 
 	if(player == g_localP)
 	{
-		RichText lm(UString("You've gone bankrupt"));
+		RichText lm(UStr("You've gone bankrupt"));
 		//SubmitConsole(&lm);
 		AddChat(&lm);
 	}
@@ -126,7 +126,7 @@ void Bankrupt(int player, const char* reason)
 		strcat(msg, add);
 
 		RichText lm;
-		lm.m_part.push_back(RichPart(UString(msg)));
+		lm.m_part.push_back(RichPart(UStr(msg)));
 		//SubmitConsole(&lm);
 		AddChat(&lm);
 	}

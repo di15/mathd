@@ -5,10 +5,10 @@
 #include "../../widget.h"
 #include "../viewportw.h"
 
-class BuildPreview : public Widget
+class BlPreview : public Widget
 {
 public:
-	BuildPreview(Widget* parent, const char* n, void (*reframef)(Widget* thisw));
+	BlPreview(Widget* parent, const char* n, void (*reframef)(Widget* thisw));
 
 #if 0
 	Text restext;

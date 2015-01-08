@@ -7,7 +7,7 @@ class EditBox : public Widget
 {
 public:
 	int m_highl[2];	// highlighted (selected) text
-	UString m_compos;	//composition for unicode text
+	UStr m_compos;	//composition for unicode text
 	void (*submitfunc)();
 	void (*changefunc3)(unsigned int key, unsigned int scancode, bool down, int parm);
 
