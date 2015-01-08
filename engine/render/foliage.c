@@ -103,10 +103,10 @@ void DrawFol(Vec3f zoompos, Vec3f vertical, Vec3f horizontal)
 	Shader* s = &g_shader[g_curS];
 
 	glActiveTexture(GL_TEXTURE0);
-	glUniform1i(s->m_slot[SSLOT_TEXTURE0], 0);
+	glUnIForm1i(s->m_slot[SSLOT_TEXTURE0], 0);
 
-	//glUniform1f(s->m_slot[SSLOT_MIND], MIN_DISTANCE);
-	//glUniform1f(s->m_slot[SSLOT_MAXD], MAX_DISTANCE / g_zoom);
+	//glUnIForm1f(s->m_slot[SSLOT_MIND], MIN_DISTANCE);
+	//glUnIForm1f(s->m_slot[SSLOT_MAXD], MAX_DISTANCE / g_zoom);
 
 	FlType* t = &g_fltype[FL_TREE1];
 	Vec3i* size = &t->size;
@@ -236,14 +236,14 @@ void DrawFol(Vec3f zoompos, Vec3f vertical, Vec3f horizontal)
 			//glVertexPointer(3, GL_FLOAT, sizeof(float)*5, &vertices[0]);
 			//glTexCoordPointer(2, GL_FLOAT, sizeof(float)*5, &vertices[3]);
 			
-			glUniformMatrix4fv(s->m_slot[SSLOT_MODELMAT], 1, 0, im.m_matrix);
+			glUnIFormMatrix4fv(s->m_slot[SSLOT_MODELMAT], 1, 0, im.m_matrix);
 
 			Matrix modelview;
 	#ifdef SPECBUMPSHADOW
 			modelview.set(g_camview.m_matrix);
 	#endif
 			modelview.postmult(im);
-			glUniformMatrix4fv(s->m_slot[SSLOT_MODELVIEW], 1, 0, modelview.m_matrix);
+			glUnIFormMatrix4fv(s->m_slot[SSLOT_MODELVIEW], 1, 0, modelview.m_matrix);
 
 			Matrix mvp;
 	#if 0
@@ -257,13 +257,13 @@ void DrawFol(Vec3f zoompos, Vec3f vertical, Vec3f horizontal)
 			mvp.postmult(g_camview);
 			mvp.postmult(im);
 	#endif
-			glUniformMatrix4fv(s->m_slot[SSLOT_MVP], 1, 0, mvp.m_matrix);
+			glUnIFormMatrix4fv(s->m_slot[SSLOT_MVP], 1, 0, mvp.m_matrix);
 
 			Matrix modelviewinv;
 			Transpose(modelview, modelview);
 			Inverse2(modelview, modelviewinv);
 			//Transpose(modelviewinv, modelviewinv);
-			glUniformMatrix4fv(s->m_slot[SSLOT_NORMALMAT], 1, 0, modelviewinv.m_matrix);
+			glUnIFormMatrix4fv(s->m_slot[SSLOT_NORMALMAT], 1, 0, modelviewinv.m_matrix);
 			
 			//glVertexAttribPointer(s->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, va->vertices);
 			glVertexPointer(3, GL_FLOAT, sizeof(float) * 8, &vertices[0]);
@@ -277,14 +277,14 @@ void DrawFol(Vec3f zoompos, Vec3f vertical, Vec3f horizontal)
 		}
 		else
 		{
-			glUniformMatrix4fv(s->m_slot[SSLOT_MODELMAT], 1, 0, g_folmodmat[i].m_matrix);
+			glUnIFormMatrix4fv(s->m_slot[SSLOT_MODELMAT], 1, 0, g_folmodmat[i].m_matrix);
 
 			Matrix modelview;
 	#ifdef SPECBUMPSHADOW
 			modelview.set(g_camview.m_matrix);
 	#endif
 			modelview.postmult(g_folmodmat[i]);
-			glUniformMatrix4fv(s->m_slot[SSLOT_MODELVIEW], 1, 0, modelview.m_matrix);
+			glUnIFormMatrix4fv(s->m_slot[SSLOT_MODELVIEW], 1, 0, modelview.m_matrix);
 
 			Matrix mvp;
 	#if 0
@@ -298,13 +298,13 @@ void DrawFol(Vec3f zoompos, Vec3f vertical, Vec3f horizontal)
 			mvp.postmult(g_camview);
 			mvp.postmult(g_folmodmat[i]);
 	#endif
-			glUniformMatrix4fv(s->m_slot[SSLOT_MVP], 1, 0, mvp.m_matrix);
+			glUnIFormMatrix4fv(s->m_slot[SSLOT_MVP], 1, 0, mvp.m_matrix);
 
 			Matrix modelviewinv;
 			Transpose(modelview, modelview);
 			Inverse2(modelview, modelviewinv);
 			//Transpose(modelviewinv, modelviewinv);
-			glUniformMatrix4fv(s->m_slot[SSLOT_NORMALMAT], 1, 0, modelviewinv.m_matrix);
+			glUnIFormMatrix4fv(s->m_slot[SSLOT_NORMALMAT], 1, 0, modelviewinv.m_matrix);
 
 			//glVertexAttribPointer(s->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, va->vertices);
 			glVertexPointer(3, GL_FLOAT, 0, va->vertices);

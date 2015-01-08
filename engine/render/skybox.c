@@ -60,7 +60,7 @@ void DrawSkyBox(Vec3f pos)
 #if 1
 	Matrix modelmat;
 	modelmat.translation((const float*)&pos);
-	glUniformMatrix4fv(s->m_slot[SSLOT_MODELMAT], 1, 0, modelmat.m_matrix);
+	glUnIFormMatrix4fv(s->m_slot[SSLOT_MODELMAT], 1, 0, modelmat.m_matrix);
 #endif
 
 	Matrix mvp;
@@ -75,14 +75,14 @@ void DrawSkyBox(Vec3f pos)
 	mvp.postmult(g_camview);
 	mvp.postmult(modelmat);
 #endif
-	glUniformMatrix4fv(s->m_slot[SSLOT_MVP], 1, 0, mvp.m_matrix);
+	glUnIFormMatrix4fv(s->m_slot[SSLOT_MVP], 1, 0, mvp.m_matrix);
 
 	CheckGLError(__FILE__, __LINE__);
 
 	// right
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, g_texture[ g_right ].texname);
-	glUniform1i(s->m_slot[SSLOT_TEXTURE0], 0);
+	glUnIForm1i(s->m_slot[SSLOT_TEXTURE0], 0);
 
 	CheckGLError(__FILE__, __LINE__);
 
@@ -127,7 +127,7 @@ void DrawSkyBox(Vec3f pos)
 	// left
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, g_texture[ g_left ].texname);
-	glUniform1i(s->m_slot[SSLOT_TEXTURE0], 0);
+	glUnIForm1i(s->m_slot[SSLOT_TEXTURE0], 0);
 
 	float vleft[] =
 	{
@@ -151,7 +151,7 @@ void DrawSkyBox(Vec3f pos)
 	// front
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, g_texture[ g_front ].texname);
-	glUniform1i(s->m_slot[SSLOT_TEXTURE0], 0);
+	glUnIForm1i(s->m_slot[SSLOT_TEXTURE0], 0);
 
 	float vfront[] =
 	{
@@ -172,7 +172,7 @@ void DrawSkyBox(Vec3f pos)
 	// back
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, g_texture[ g_back ].texname);
-	glUniform1i(s->m_slot[SSLOT_TEXTURE0], 0);
+	glUnIForm1i(s->m_slot[SSLOT_TEXTURE0], 0);
 
 	float vback[] =
 	{
@@ -193,7 +193,7 @@ void DrawSkyBox(Vec3f pos)
 	// bottom
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, g_texture[ g_bottom ].texname);
-	glUniform1i(s->m_slot[SSLOT_TEXTURE0], 0);
+	glUnIForm1i(s->m_slot[SSLOT_TEXTURE0], 0);
 
 	float vbottom[] =
 	{
@@ -214,7 +214,7 @@ void DrawSkyBox(Vec3f pos)
 	// top
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, g_texture[ g_top ].texname);
-	glUniform1i(s->m_slot[SSLOT_TEXTURE0], 0);
+	glUnIForm1i(s->m_slot[SSLOT_TEXTURE0], 0);
 
 	float vtop[] =
 	{

@@ -16,7 +16,7 @@
 #include "cstrview.h"
 #include "../../../platform.h"
 #include "../viewportw.h"
-#include "../../../../game/gui/gviewport.h"
+#include "../../../../app/gui/gviewport.h"
 #include "../../../sim/building.h"
 #include "../../../sim/bltype.h"
 #include "../../../sim/road.h"
@@ -35,8 +35,8 @@
 #include "../../../net/client.h"
 
 //not engine
-#include "../../../../game/gui/ggui.h"
-#include "../../../../game/gui/chattext.h"
+#include "../../../../app/gui/appgui.h"
+#include "../../../../app/gui/chattext.h"
 
 //player lines top
 #define PYLINESTOP	200

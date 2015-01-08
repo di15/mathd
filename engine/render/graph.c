@@ -46,9 +46,9 @@ void DrawGraph(Graph* g, float left, float top, float right, float bottom)
 	}
 
 	Player* py = &g_player[g_localP];
-	glUniform4f(s->m_slot[SSLOT_COLOR], 0.1f, 0.9f, 0.1f, 1.0f);
-	glUniform1f(s->m_slot[SSLOT_WIDTH], (float)g_width);
-	glUniform1f(s->m_slot[SSLOT_HEIGHT], (float)g_height);
+	glUnIForm4f(s->m_slot[SSLOT_COLOR], 0.1f, 0.9f, 0.1f, 1.0f);
+	glUnIForm1f(s->m_slot[SSLOT_WIDTH], (float)g_width);
+	glUnIForm1f(s->m_slot[SSLOT_HEIGHT], (float)g_height);
 
 	if(ps.size() <= 0)
 		return;

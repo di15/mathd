@@ -7,9 +7,9 @@
 #include "../sim/selection.h"
 #include "../gui/gui.h"
 #include "../gui/widgets/spez/cstrview.h"
-#include "../../game/gui/gviewport.h"
-#include "../../game/gmain.h"
-#include "../../game/gui/ggui.h"
+#include "../../app/gui/gviewport.h"
+#include "../../app/appmain.h"
+#include "../../app/gui/appgui.h"
 #include "../math/hmapmath.h"
 #include "../render/foliage.h"
 #include "../render/transaction.h"
@@ -17,7 +17,7 @@
 #include "job.h"
 
 //not engine
-#include "../../game/gui/chattext.h"
+#include "../../app/gui/chattext.h"
 
 CdType g_cdtype[CONDUIT_TYPES];
 
@@ -1086,7 +1086,7 @@ void DrawCo(unsigned char ctype)
 				continue;
 
 			const float* owncol = g_player[ctile->owner].color;
-			glUniform4f(s->m_slot[SSLOT_OWNCOLOR], owncol[0], owncol[1], owncol[2], owncol[3]);
+			glUnIForm4f(s->m_slot[SSLOT_OWNCOLOR], owncol[0], owncol[1], owncol[2], owncol[3]);
 
 			const int mi = ct->model[ctile->conntype][(int)ctile->finished];
 			const Model* m = &g_model[mi];
@@ -1098,7 +1098,7 @@ void DrawCo(unsigned char ctype)
 	if(g_build != BL_TYPES + ctype)
 		return;
 
-	glUniform4f(s->m_slot[SSLOT_COLOR], 1, 1, 1, 0.5f);
+	glUnIForm4f(s->m_slot[SSLOT_COLOR], 1, 1, 1, 0.5f);
 
 	for(int x=0; x<g_hmap.m_widthx; x++)
 		for(int z=0; z<g_hmap.m_widthy; z++)
@@ -1109,7 +1109,7 @@ void DrawCo(unsigned char ctype)
 				continue;
 
 			const float* owncol = g_player[ctile->owner].color;
-			glUniform4f(s->m_slot[SSLOT_OWNCOLOR], owncol[0], owncol[1], owncol[2], owncol[3]);
+			glUnIForm4f(s->m_slot[SSLOT_OWNCOLOR], owncol[0], owncol[1], owncol[2], owncol[3]);
 
 			const int mi = ct->model[ctile->conntype][(int)ctile->finished];
 			const Model* m = &g_model[mi];
@@ -1118,7 +1118,7 @@ void DrawCo(unsigned char ctype)
 			DrawVA(&ctile->drawva, ctile->drawpos);
 		}
 
-	glUniform4f(s->m_slot[SSLOT_COLOR], 1, 1, 1, 1);
+	glUnIForm4f(s->m_slot[SSLOT_COLOR], 1, 1, 1, 1);
 
 	//StopTimer(TIMER_DRAWROADS);
 }

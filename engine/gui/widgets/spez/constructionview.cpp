@@ -17,7 +17,7 @@
 #include "constructionview.h"
 #include "../../../platform.h"
 #include "../viewportw.h"
-#include "../../../../game/gui/gviewport.h"
+#include "../../../../app/gui/gviewport.h"
 #include "../../../sim/building.h"
 #include "../../../sim/buildingtype.h"
 #include "../../../sim/road.h"
@@ -411,7 +411,7 @@ void ConstructionView::reframe()	//resized or moved
 
 void ConstructionView::draw()
 {
-	glUniform4f(g_shader[SHADER_ORTHO].m_slot[SSLOT_COLOR], 1, 1, 1, 1);
+	glUnIForm4f(g_shader[SHADER_ORTHO].m_slot[SSLOT_COLOR], 1, 1, 1, 1);
 
 	middle_outer_top.draw();
 	white_bg.draw();

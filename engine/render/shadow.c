@@ -17,7 +17,7 @@
 #include "model.h"
 #include "../math/camera.h"
 #include "../window.h"
-#include "../../game/gmain.h"
+#include "../../app/appmain.h"
 
 unsigned int g_depth = -1;
 unsigned int g_rbDepth;
@@ -348,10 +348,10 @@ void RenderToShadowMap(Matrix projection, Matrix viewmat, Matrix modelmat, Vec3f
 
 #if 0
 	UseS(SHADER_DEPTH);
-	glUniformMatrix4fv(g_shader[SHADER_DEPTH].m_slot[SSLOT_PROJECTION], 1, 0, g_lightproj.m_matrix);
-	glUniformMatrix4fv(g_shader[SHADER_DEPTH].m_slot[SSLOT_MODELMAT], 1, 0, modelmat.m_matrix);
-	glUniformMatrix4fv(g_shader[SHADER_DEPTH].m_slot[SSLOT_VIEWMAT], 1, 0, g_lightview.m_matrix);
-	glUniform4f(g_shader[SHADER_DEPTH].m_slot[SSLOT_COLOR], 1, 1, 1, 1);
+	glUnIFormMatrix4fv(g_shader[SHADER_DEPTH].m_slot[SSLOT_PROJECTION], 1, 0, g_lightproj.m_matrix);
+	glUnIFormMatrix4fv(g_shader[SHADER_DEPTH].m_slot[SSLOT_MODELMAT], 1, 0, modelmat.m_matrix);
+	glUnIFormMatrix4fv(g_shader[SHADER_DEPTH].m_slot[SSLOT_VIEWMAT], 1, 0, g_lightview.m_matrix);
+	glUnIForm4f(g_shader[SHADER_DEPTH].m_slot[SSLOT_COLOR], 1, 1, 1, 1);
 
 	g_camproj = g_lightproj;
 	g_camview = g_lightview;
@@ -391,23 +391,23 @@ void UseShadow(int shader, Matrix projection, Matrix viewmat, Matrix modelmat, M
 {
 	UseS(shader);
 	Shader* s = &g_shader[g_curS];
-	glUniformMatrix4fv(s->m_slot[SSLOT_PROJECTION], 1, 0, projection.m_matrix);
-	glUniformMatrix4fv(s->m_slot[SSLOT_MODELMAT], 1, 0, modelmat.m_matrix);
-	glUniformMatrix4fv(s->m_slot[SSLOT_VIEWMAT], 1, 0, viewmat.m_matrix);
-	//glUniformMatrix4fv(s->m_slot[SSLOT_NORMALMAT], 1, 0, modelviewinv.m_matrix);
-	//glUniformMatrix4fv(s->m_slot[SSLOT_INVMODLVIEWMAT], 1, 0, modelviewinv.m_matrix);
-	glUniform4f(s->m_slot[SSLOT_COLOR], 1, 1, 1, 1);
+	glUnIFormMatrix4fv(s->m_slot[SSLOT_PROJECTION], 1, 0, projection.m_matrix);
+	glUnIFormMatrix4fv(s->m_slot[SSLOT_MODELMAT], 1, 0, modelmat.m_matrix);
+	glUnIFormMatrix4fv(s->m_slot[SSLOT_VIEWMAT], 1, 0, viewmat.m_matrix);
+	//glUnIFormMatrix4fv(s->m_slot[SSLOT_NORMALMAT], 1, 0, modelviewinv.m_matrix);
+	//glUnIFormMatrix4fv(s->m_slot[SSLOT_INVMODLVIEWMAT], 1, 0, modelviewinv.m_matrix);
+	glUnIForm4f(s->m_slot[SSLOT_COLOR], 1, 1, 1, 1);
 	//glEnableVertexAttribArray(s->m_slot[SSLOT_POSITION]);
 	//glEnableVertexAttribArray(s->m_slot[SSLOT_TEXCOORD0]);
 	//glEnableVertexAttribArray(s->m_slot[SSLOT_TEXCOORD1]);
 	//if(s->m_slot[SSLOT_NORMAL] != -1)   glEnableVertexAttribArray(s->m_slot[SSLOT_NORMAL]);
 
-	//glUniformMatrix4fv(s->m_slot[SSLOT_LIGHTMATRIX], 1, false, g_lightmat);
-	glUniformMatrix4fv(s->m_slot[SSLOT_LIGHTMATRIX], 1, false, g_lightmat.m_matrix);
+	//glUnIFormMatrix4fv(s->m_slot[SSLOT_LIGHTMATRIX], 1, false, g_lightmat);
+	glUnIFormMatrix4fv(s->m_slot[SSLOT_LIGHTMATRIX], 1, false, g_lightmat.m_matrix);
 
-	glUniform3f(s->m_slot[SSLOT_LIGHTPOS], lightpos[0], lightpos[1], lightpos[2]);
-	glUniform3f(s->m_slot[SSLOT_SUNDIRECTION], lightdir[0], lightdir[1], lightdir[2]);
-	//glUniform1f(s->m_slot[SSLOT_MAXELEV], g_maxelev);
+	glUnIForm3f(s->m_slot[SSLOT_LIGHTPOS], lightpos[0], lightpos[1], lightpos[2]);
+	glUnIForm3f(s->m_slot[SSLOT_SUNDIRECTION], lightdir[0], lightdir[1], lightdir[2]);
+	//glUnIForm1f(s->m_slot[SSLOT_MAXELEV], g_maxelev);
 
 #if 0
 	g_log<<"sun "<<lightdir[0]<<","<<lightdir[1]<<","<<lightdir[2]<<std::endl;
@@ -491,10 +491,10 @@ void RenderShadowedScene(Matrix projection, Matrix viewmat, Matrix modelmat, Mat
 	if(g_mode == APPMODE_EDITOR)
 	{
 		UseS(COLOR3D);
-		glUniformMatrix4fv(g_shader[SHADER_COLOR3D].m_slot[SSLOT_PROJECTION], 1, 0, projection.m_matrix);
-		glUniformMatrix4fv(g_shader[SHADER_COLOR3D].m_slot[SSLOT_MODELMAT], 1, 0, modelmat.m_matrix);
-		glUniformMatrix4fv(g_shader[SHADER_COLOR3D].m_slot[SSLOT_VIEWMAT], 1, 0, viewmat.m_matrix);
-		glUniform4f(g_shader[SHADER_COLOR3D].m_slot[SSLOT_COLOR], 0, 1, 0, 1);
+		glUnIFormMatrix4fv(g_shader[SHADER_COLOR3D].m_slot[SSLOT_PROJECTION], 1, 0, projection.m_matrix);
+		glUnIFormMatrix4fv(g_shader[SHADER_COLOR3D].m_slot[SSLOT_MODELMAT], 1, 0, modelmat.m_matrix);
+		glUnIFormMatrix4fv(g_shader[SHADER_COLOR3D].m_slot[SSLOT_VIEWMAT], 1, 0, viewmat.m_matrix);
+		glUnIForm4f(g_shader[SHADER_COLOR3D].m_slot[SSLOT_COLOR], 0, 1, 0, 1);
 		glEnableVertexAttribArray(g_shader[SHADER_COLOR3D].m_slot[SSLOT_POSITION]);
 		glEnableVertexAttribArray(g_shader[SHADER_COLOR3D].m_slot[SSLOT_NORMAL]);
 		DrawTileSq();

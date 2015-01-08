@@ -134,7 +134,7 @@ void VScroll::reframe()
 
 void VScroll::draw()
 {
-	glUniform4f(g_shader[g_curS].m_slot[SSLOT_COLOR], 1, 1, 1, 0.8f);
+	glUnIForm4f(g_shader[g_curS].m_slot[SSLOT_COLOR], 1, 1, 1, 0.8f);
 	DrawImage(g_texture[ m_uptex ].texname, m_uppos[0], m_uppos[1], m_uppos[2], m_uppos[3], 0, 0, 1, 1);
 	DrawImage(g_texture[ m_uptex ].texname, m_downpos[0], m_downpos[1], m_downpos[2], m_downpos[3], 0, 1, 1, 0);
 
@@ -143,8 +143,8 @@ void VScroll::draw()
 	EndS();
 
 	UseS(SHADER_COLOR2D);
-	glUniform1f(g_shader[g_curS].m_slot[SSLOT_WIDTH], (float)g_currw);
-	glUniform1f(g_shader[g_curS].m_slot[SSLOT_HEIGHT], (float)g_currh);
+	glUnIForm1f(g_shader[g_curS].m_slot[SSLOT_WIDTH], (float)g_currw);
+	glUnIForm1f(g_shader[g_curS].m_slot[SSLOT_HEIGHT], (float)g_currh);
 
 	float midcolor[] = {0.7f,0.7f,0.7f,0.8f};
 	float lightcolor[] = {0.8f,0.8f,0.8f,0.8f};

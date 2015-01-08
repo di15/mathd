@@ -105,29 +105,29 @@ void DrawWater3()
 
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, g_texture[g_water].texname);
-	glUniform1i(s->m_slot[SSLOT_TEXTURE0], 0);
+	glUnIForm1i(s->m_slot[SSLOT_TEXTURE0], 0);
 
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, g_texture[ g_watertex[WATER_TEX_GRADIENT] ].texname);
-	glUniform1i(s->m_slot[SSLOT_GRADIENTTEX], 0);
+	glUnIForm1i(s->m_slot[SSLOT_GRADIENTTEX], 0);
 
 	glActiveTexture(GL_TEXTURE1);
 	glBindTexture(GL_TEXTURE_2D, g_texture[ g_watertex[WATER_TEX_DETAIL] ].texname);
-	glUniform1i(s->m_slot[SSLOT_DETAILTEX], 1);
+	glUnIForm1i(s->m_slot[SSLOT_DETAILTEX], 1);
 
 	glActiveTexture(GL_TEXTURE2);
 	glBindTexture(GL_TEXTURE_2D, g_texture[ g_watertex[WATER_TEX_SPECULAR] ].texname);
-	glUniform1i(s->m_slot[SSLOT_SPECULARMAP], 2);
+	glUnIForm1i(s->m_slot[SSLOT_SPECULARMAP], 2);
 
 	glActiveTexture(GL_TEXTURE3);
 	glBindTexture(GL_TEXTURE_2D, g_texture[ g_watertex[WATER_TEX_NORMAL] ].texname);
-	glUniform1i(s->m_slot[SSLOT_NORMALMAP], 3);
+	glUnIForm1i(s->m_slot[SSLOT_NORMALMAP], 3);
 
 	Player* py = &g_player[g_localP];
 
-	glUniform1f(s->m_slot[SSLOT_MIND], MIN_DISTANCE);
-	glUniform1f(s->m_slot[SSLOT_MAXD], MAX_DISTANCE / g_zoom);
-	glUniform1i(s->m_slot[SSLOT_WAVEPHASE], wavephase);
+	glUnIForm1f(s->m_slot[SSLOT_MIND], MIN_DISTANCE);
+	glUnIForm1f(s->m_slot[SSLOT_MAXD], MAX_DISTANCE / g_zoom);
+	glUnIForm1i(s->m_slot[SSLOT_WAVEPHASE], wavephase);
 
 	Matrix modelmat;
 	Matrix modelview;
@@ -135,7 +135,7 @@ void DrawWater3()
 	modelview.set(g_camview.m_matrix);
 #endif
 	modelview.postmult(modelmat);
-	glUniformMatrix4fv(s->m_slot[SSLOT_MODELVIEW], 1, 0, modelview.m_matrix);
+	glUnIFormMatrix4fv(s->m_slot[SSLOT_MODELVIEW], 1, 0, modelview.m_matrix);
 
 	Matrix mvp;
 #if 0
@@ -149,13 +149,13 @@ void DrawWater3()
 	mvp.postmult(g_camview);
 	mvp.postmult(modelmat);
 #endif
-	glUniformMatrix4fv(s->m_slot[SSLOT_MVP], 1, 0, mvp.m_matrix);
+	glUnIFormMatrix4fv(s->m_slot[SSLOT_MVP], 1, 0, mvp.m_matrix);
 
 	Matrix modelviewinv;
 	Transpose(modelview, modelview);
 	Inverse2(modelview, modelviewinv);
 	//Transpose(modelviewinv, modelviewinv);
-	glUniformMatrix4fv(s->m_slot[SSLOT_NORMALMAT], 1, 0, modelviewinv.m_matrix);
+	glUnIFormMatrix4fv(s->m_slot[SSLOT_NORMALMAT], 1, 0, modelviewinv.m_matrix);
 
 #if 0
 	glEnable(GL_POLYGON_OFFSET_FILL);
@@ -191,25 +191,25 @@ void DrawWater()
 
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, g_texture[g_water].texname);
-	glUniform1i(s->m_slot[SSLOT_TEXTURE0], 0);
+	glUnIForm1i(s->m_slot[SSLOT_TEXTURE0], 0);
 
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, g_texture[ g_watertex[WATER_TEX_GRADIENT] ].texname);
-	glUniform1i(s->m_slot[SSLOT_GRADIENTTEX], 0);
+	glUnIForm1i(s->m_slot[SSLOT_GRADIENTTEX], 0);
 
 	glActiveTexture(GL_TEXTURE1);
 	glBindTexture(GL_TEXTURE_2D, g_texture[ g_watertex[WATER_TEX_DETAIL] ].texname);
-	glUniform1i(s->m_slot[SSLOT_DETAILTEX], 1);
+	glUnIForm1i(s->m_slot[SSLOT_DETAILTEX], 1);
 
 	glActiveTexture(GL_TEXTURE2);
 	glBindTexture(GL_TEXTURE_2D, g_texture[ g_watertex[WATER_TEX_SPECULAR] ].texname);
-	glUniform1i(s->m_slot[SSLOT_SPECULARMAP], 2);
+	glUnIForm1i(s->m_slot[SSLOT_SPECULARMAP], 2);
 
 	glActiveTexture(GL_TEXTURE3);
 	glBindTexture(GL_TEXTURE_2D, g_texture[ g_watertex[WATER_TEX_NORMAL] ].texname);
-	glUniform1i(s->m_slot[SSLOT_NORMALMAP], 3);
+	glUnIForm1i(s->m_slot[SSLOT_NORMALMAP], 3);
 
-	glUniform1i(s->m_slot[SSLOT_WAVEPHASE], wavephase);
+	glUnIForm1i(s->m_slot[SSLOT_WAVEPHASE], wavephase);
 
 	Matrix modelmat;
 	Matrix modelview;
@@ -217,7 +217,7 @@ void DrawWater()
 	modelview.set(g_camview.m_matrix);
 #endif
 	modelview.postmult(modelmat);
-	glUniformMatrix4fv(s->m_slot[SSLOT_MODELVIEW], 1, 0, modelview.m_matrix);
+	glUnIFormMatrix4fv(s->m_slot[SSLOT_MODELVIEW], 1, 0, modelview.m_matrix);
 
 	Matrix mvp;
 #if 0
@@ -231,13 +231,13 @@ void DrawWater()
 	mvp.postmult(g_camview);
 	mvp.postmult(modelmat);
 #endif
-	glUniformMatrix4fv(s->m_slot[SSLOT_MVP], 1, 0, mvp.m_matrix);
+	glUnIFormMatrix4fv(s->m_slot[SSLOT_MVP], 1, 0, mvp.m_matrix);
 
 	Matrix modelviewinv;
 	Transpose(modelview, modelview);
 	Inverse2(modelview, modelviewinv);
 	//Transpose(modelviewinv, modelviewinv);
-	glUniformMatrix4fv(s->m_slot[SSLOT_NORMALMAT], 1, 0, modelviewinv.m_matrix);
+	glUnIFormMatrix4fv(s->m_slot[SSLOT_NORMALMAT], 1, 0, modelviewinv.m_matrix);
 
 	Vec3f a, b, c, d;
 
@@ -281,8 +281,8 @@ void DrawWater()
 
 	Player* py = &g_player[g_localP];
 
-	glUniform1f(s->m_slot[SSLOT_MIND], MIN_DISTANCE);
-	glUniform1f(s->m_slot[SSLOT_MAXD], MAX_DISTANCE / g_zoom);
+	glUnIForm1f(s->m_slot[SSLOT_MIND], MIN_DISTANCE);
+	glUnIForm1f(s->m_slot[SSLOT_MAXD], MAX_DISTANCE / g_zoom);
 
 #if 0
 	glEnable(GL_POLYGON_OFFSET_FILL);
@@ -311,31 +311,31 @@ void DrawWater2()
 
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, g_texture[g_water].texname);
-	glUniform1i(s->m_slot[SSLOT_TEXTURE0], 0);
+	glUnIForm1i(s->m_slot[SSLOT_TEXTURE0], 0);
 
 	CheckGLError(__FILE__, __LINE__);
 
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, g_texture[ g_watertex[WATER_TEX_GRADIENT] ].texname);
-	glUniform1i(s->m_slot[SSLOT_GRADIENTTEX], 0);
+	glUnIForm1i(s->m_slot[SSLOT_GRADIENTTEX], 0);
 
 	CheckGLError(__FILE__, __LINE__);
 
 	glActiveTexture(GL_TEXTURE1);
 	glBindTexture(GL_TEXTURE_2D, g_texture[ g_watertex[WATER_TEX_DETAIL] ].texname);
-	glUniform1i(s->m_slot[SSLOT_DETAILTEX], 1);
+	glUnIForm1i(s->m_slot[SSLOT_DETAILTEX], 1);
 
 	CheckGLError(__FILE__, __LINE__);
 
 	glActiveTexture(GL_TEXTURE2);
 	glBindTexture(GL_TEXTURE_2D, g_texture[ g_watertex[WATER_TEX_SPECULAR] ].texname);
-	glUniform1i(s->m_slot[SSLOT_SPECULARMAP], 2);
+	glUnIForm1i(s->m_slot[SSLOT_SPECULARMAP], 2);
 
 	CheckGLError(__FILE__, __LINE__);
 
 	glActiveTexture(GL_TEXTURE3);
 	glBindTexture(GL_TEXTURE_2D, g_texture[ g_watertex[WATER_TEX_NORMAL] ].texname);
-	glUniform1i(s->m_slot[SSLOT_NORMALMAP], 3);
+	glUnIForm1i(s->m_slot[SSLOT_NORMALMAP], 3);
 
 	CheckGLError(__FILE__, __LINE__);
 
@@ -344,12 +344,12 @@ void DrawWater2()
 	int wx = g_hmap.m_widthx;
 	int wy = g_hmap.m_widthy;
 
-	glUniform1f(s->m_slot[SSLOT_MAPMINZ], 0);
-	glUniform1f(s->m_slot[SSLOT_MAPMAXZ], (float)wx*TILE_SIZE);
-	glUniform1f(s->m_slot[SSLOT_MAPMINX], 0);
-	glUniform1f(s->m_slot[SSLOT_MAPMAXX], (float)wy*TILE_SIZE);
-	glUniform1f(s->m_slot[SSLOT_MAPMINY], ConvertHeight(0));
-	glUniform1f(s->m_slot[SSLOT_MAPMAXY], ConvertHeight(255));
+	glUnIForm1f(s->m_slot[SSLOT_MAPMINZ], 0);
+	glUnIForm1f(s->m_slot[SSLOT_MAPMAXZ], (float)wx*TILE_SIZE);
+	glUnIForm1f(s->m_slot[SSLOT_MAPMINX], 0);
+	glUnIForm1f(s->m_slot[SSLOT_MAPMAXX], (float)wy*TILE_SIZE);
+	glUnIForm1f(s->m_slot[SSLOT_MAPMINY], ConvertHeight(0));
+	glUnIForm1f(s->m_slot[SSLOT_MAPMAXY], ConvertHeight(255));
 
 	CheckGLError(__FILE__, __LINE__);
 
@@ -359,7 +359,7 @@ void DrawWater2()
 	modelview.set(g_camview.m_matrix);
 #endif
 	modelview.postmult(modelmat);
-	glUniformMatrix4fv(s->m_slot[SSLOT_MODELVIEW], 1, 0, modelview.m_matrix);
+	glUnIFormMatrix4fv(s->m_slot[SSLOT_MODELVIEW], 1, 0, modelview.m_matrix);
 
 	Matrix mvp;
 #if 0
@@ -373,13 +373,13 @@ void DrawWater2()
 	mvp.postmult(g_camview);
 	mvp.postmult(modelmat);
 #endif
-	glUniformMatrix4fv(s->m_slot[SSLOT_MVP], 1, 0, mvp.m_matrix);
+	glUnIFormMatrix4fv(s->m_slot[SSLOT_MVP], 1, 0, mvp.m_matrix);
 
 	Matrix modelviewinv;
 	Transpose(modelview, modelview);
 	Inverse2(modelview, modelviewinv);
 	//Transpose(modelviewinv, modelviewinv);
-	glUniformMatrix4fv(s->m_slot[SSLOT_NORMALMAT], 1, 0, modelviewinv.m_matrix);
+	glUnIFormMatrix4fv(s->m_slot[SSLOT_NORMALMAT], 1, 0, modelviewinv.m_matrix);
 
 	CheckGLError(__FILE__, __LINE__);
 

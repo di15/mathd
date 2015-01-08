@@ -5,9 +5,9 @@
 
 #define CHAT_LINES		(100/8)
 
-class Widget;
-class ViewLayer;
-class RichText;
+struct Widget;
+struct ViewLayer;
+struct RichText;
 
 void AddChat(ViewLayer* playview);
 void AddChat(RichText* newl);

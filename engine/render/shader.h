@@ -66,10 +66,10 @@ public:
 		release();
 	}
 
-	GLint getuniform(const char* strVariable);
+	GLint getunIForm(const char* strVariable);
 	GLint getattrib(const char* strVariable);
 
-	void mapuniform(int slot, const char* variable);
+	void mapunIForm(int slot, const char* variable);
 	void mapattrib(int slot, const char* variable);
 
 	void release();

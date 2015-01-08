@@ -124,7 +124,7 @@ void ResTicker::draw()
 	Image whitebg;
 #endif
 
-	glUniform4f(g_shader[SHADER_ORTHO].m_slot[SSLOT_COLOR], 1, 1, 1, 1);
+	glUnIForm4f(g_shader[SHADER_ORTHO].m_slot[SSLOT_COLOR], 1, 1, 1, 1);
 
 	whitebg.draw();
 

@@ -19,10 +19,10 @@
 #ifndef MATCHMAKER
 #include "../gui/widgets/spez/svlist.h"
 #include "../gui/widgets/spez/lobby.h"
-#include "../../game/gui/ggui.h"
+#include "../../app/gui/appgui.h"
 
 //not engine
-#include "../../game/gui/chattext.h"
+#include "../../app/gui/chattext.h"
 #endif
 
 /*

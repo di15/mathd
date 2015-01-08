@@ -17,7 +17,7 @@
 #include "../path/pathjob.h"
 
 //not engine
-#include "../../game/gui/chattext.h"
+#include "../../app/gui/chattext.h"
 
 short g_trsnd[TR_SOUNDS] = {-1,-1,-1};
 

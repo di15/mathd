@@ -292,7 +292,7 @@ void ListFiles(const char* fullpath, std::list<std::string>& files)
 }
 
 //add thousands separators
-std::string iform(int n)
+std::string IForm(int n)
 {
 	std::string s;
 

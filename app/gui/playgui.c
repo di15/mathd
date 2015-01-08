@@ -1,70 +1,38 @@
-#include "../gmain.h"
-#include "../../common/gui/gui.h"
-#include "../../common/gui/widgets/windoww.h"
-#include "../keymap.h"
-#include "../../common/render/heightmap.h"
-#include "../../common/render/transaction.h"
-#include "../../common/math/camera.h"
-#include "../../common/render/shadow.h"
-#include "../../common/render/screenshot.h"
-#include "../../common/save/savemap.h"
-#include "ggui.h"
+#include "../appmain.h"
+#include "../../engine/gui/gui.h"
+#include "../../engine/gui/widgets/windoww.h"
+#include "../../engine/input/keymap.h"
+#include "../../engine/render/heightmap.h"
+#include "../../engine/render/transaction.h"
+#include "../../engine/math/camera.h"
+#include "../../engine/render/shadow.h"
+#include "../../engine/render/screenshot.h"
+#include "../../engine/save/savemap.h"
+#include "appgui.h"
 #include "playgui.h"
-#include "../../common/gui/icon.h"
-#include "../../common/gui/widgets/spez/resticker.h"
-#include "../../common/gui/widgets/spez/botpan.h"
-#include "../../common/gui/widgets/spez/blpreview.h"
-#include "../../common/gui/widgets/spez/blview.h"
-#include "../../common/gui/widgets/spez/cstrview.h"
-#include "../../common/gui/widgets/spez/svlist.h"
-#include "../../common/gui/widgets/spez/saveview.h"
-#include "../../common/gui/widgets/spez/loadview.h"
-#include "../../common/gui/widgets/spez/truckmgr.h"
-#include "gviewport.h"
-#include "../../common/sim/bltype.h"
-#include "../../common/sim/building.h"
-#include "../../common/sim/road.h"
-#include "../../common/sim/powl.h"
-#include "../../common/sim/crpipe.h"
-#include "../../common/sim/player.h"
-#include "../../common/sim/conduit.h"
-#include "../../common/sim/simflow.h"
+#include "../../engine/gui/icon.h"
+#include "../../engine/gui/widgets/spez/resticker.h"
+#include "../../engine/gui/widgets/spez/botpan.h"
+#include "../../engine/gui/widgets/spez/blpreview.h"
+#include "../../engine/gui/widgets/spez/blview.h"
+#include "../../engine/gui/widgets/spez/cstrview.h"
+#include "../../engine/gui/widgets/spez/svlist.h"
+#include "../../engine/gui/widgets/spez/saveview.h"
+#include "../../engine/gui/widgets/spez/loadview.h"
+#include "../../engine/gui/widgets/spez/truckmgr.h"
+#include "../../engine/sim/bltype.h"
+#include "../../engine/sim/building.h"
+#include "../../engine/sim/road.h"
+#include "../../engine/sim/powl.h"
+#include "../../engine/sim/crpipe.h"
+#include "../../engine/sim/player.h"
+#include "../../engine/sim/conduit.h"
+#include "../../engine/sim/simflow.h"
+#include "../../engine/sys/window.h"
 #include "chattext.h"
-
-void Resize_ResNamesTextBlock(Widget* thisw)
-{
-	Player* py = &g_player[g_localP];
-	thisw->m_pos[0] = 0;
-	thisw->m_pos[1] = 10;
-	thisw->m_pos[2] = g_width;
-	thisw->m_pos[3] = g_height;
-}
-
-void Resize_ResAmtsTextBlock(Widget* thisw)
-{
-	Player* py = &g_player[g_localP];
-	thisw->m_pos[0] = 150;
-	thisw->m_pos[1] = 10;
-	thisw->m_pos[2] = g_width;
-	thisw->m_pos[3] = g_height;
-}
-
-void Resize_ResDeltasTextBlock(Widget* thisw)
-{
-	Player* py = &g_player[g_localP];
-	thisw->m_pos[0] = 250;
-	thisw->m_pos[1] = 10;
-	thisw->m_pos[2] = g_width;
-	thisw->m_pos[3] = g_height;
-}
-
-void Out_Build()
-{
-}
 
 void Resize_ResTicker(Widget* thisw)
 {
-	Player* py = &g_player[g_localP];
 	thisw->m_pos[0] = 0;
 	thisw->m_pos[1] = 0;
 	thisw->m_pos[2] = g_width;
@@ -75,140 +43,98 @@ void Resize_ResTicker(Widget* thisw)
 
 void UpdResTicker()
 {
-	//return;
-
-	static float tickerpos = 0;
-
-	Player* py = &g_player[g_localP];
-	GUI* gui = &g_gui;
-	ViewLayer* playview = (ViewLayer*)gui->get("play");
-	ResTicker* restickerw = (ResTicker*)playview->get("res ticker");
-	Widget* restickertw = &restickerw->restext;
+	Player* py;
+	GUI* gui;
+	ViewLayer* playview;
+	ResTicker* restickerw;
+	Widget* restickertw;
 	RichText restext;
+	Resource* r;
+	RichPart richpart;
+	static float tickerpos = 0;
+	char local[16];
+	char global[16];
+	char cstr1[128];
+	char cstr2[40];
+	char total[16];
+	RichText subrestext;
+	RichText subrestext2;
+	int len;
+	int endx;
 
-#if 0
-	restext.m_part.push_back(RichPart(RICHTEXT_ICON, ICON_DOLLARS));
-	restext.m_part.push_back(RichPart(" Funds: 100 +1/"));
-	restext.m_part.push_back(RichPart(RICHTEXT_ICON, ICON_TIME));
-	restext.m_part.push_back(RichPart("    "));
-	restext.m_part.push_back(RichPart(RICHTEXT_ICON, ICON_HOUSING));
-	restext.m_part.push_back(RichPart(" Housing: 100/120"));
-	restext.m_part.push_back(RichPart("    "));
-	restext.m_part.push_back(RichPart(RICHTEXT_ICON, ICON_FARMPRODUCT));
-	restext.m_part.push_back(RichPart(" Farm Products: 100 +1/"));
-	restext.m_part.push_back(RichPart(RICHTEXT_ICON, ICON_TIME));
-	restext.m_part.push_back(RichPart("    "));
-	restext.m_part.push_back(RichPart(RICHTEXT_ICON, ICON_RETFOOD));
-	restext.m_part.push_back(RichPart(" Retail Food: 100 +1/"));
-	restext.m_part.push_back(RichPart(RICHTEXT_ICON, ICON_TIME));
-	restext.m_part.push_back(RichPart("    "));
-	restext.m_part.push_back(RichPart(RICHTEXT_ICON, ICON_PRODUCTION));
-	restext.m_part.push_back(RichPart(" Production: 100 +1/"));
-	restext.m_part.push_back(RichPart(RICHTEXT_ICON, ICON_TIME));
-	restext.m_part.push_back(RichPart("    "));
-	restext.m_part.push_back(RichPart(RICHTEXT_ICON, ICON_IRONORE));
-	restext.m_part.push_back(RichPart(" Minerals: 100 +1/"));
-	restext.m_part.push_back(RichPart(RICHTEXT_ICON, ICON_TIME));
-	restext.m_part.push_back(RichPart("    "));
-	restext.m_part.push_back(RichPart(RICHTEXT_ICON, ICON_CRUDEOIL));
-	restext.m_part.push_back(RichPart(" Crude Oil: 100 +1/"));
-	restext.m_part.push_back(RichPart(RICHTEXT_ICON, ICON_TIME));
-	restext.m_part.push_back(RichPart("    "));
-	restext.m_part.push_back(RichPart(RICHTEXT_ICON, ICON_WSFUEL));
-	restext.m_part.push_back(RichPart(" Wholesale Fuel: 100 +1/"));
-	restext.m_part.push_back(RichPart(RICHTEXT_ICON, ICON_TIME));
-	restext.m_part.push_back(RichPart("    "));
-	restext.m_part.push_back(RichPart(RICHTEXT_ICON, ICON_RETFUEL));
-	restext.m_part.push_back(RichPart(" Retail Fuel: 100 +1/"));
-	restext.m_part.push_back(RichPart(RICHTEXT_ICON, ICON_TIME));
-	restext.m_part.push_back(RichPart("    "));
-	restext.m_part.push_back(RichPart(RICHTEXT_ICON, ICON_ENERGY));
-	restext.m_part.push_back(RichPart(" Energy: 100/120"));
-	restext.m_part.push_back(RichPart("    "));
-	restext.m_part.push_back(RichPart(RICHTEXT_ICON, ICON_ENRICHEDURAN));
-	restext.m_part.push_back(RichPart(" Uranium: 100 +1/"));
-	restext.m_part.push_back(RichPart(RICHTEXT_ICON, ICON_TIME));
-	restext.m_part.push_back(RichPart("    "));
-#else
+	py = &g_player[g_localP];
+	gui = &g_gui;
+	playview = (ViewLayer*)gui->get("play");
+	restickerw = (ResTicker*)playview->get("res ticker");
+	restickertw = &restickerw->restext;
+	
+	RichText_Free(&restickertw->m_text);
+	RichText_Init(&restext);
+
 	for(int i=0; i<RESOURCES; i++)
 	{
 		if(i == RES_LABOUR)
 			continue;
 
-		Resource* r = &g_resource[i];
-		
+		r = &g_resource[i];
+
 		if(r->capacity && py->local[i] <= 0)
 			continue;
 		else if(!r->capacity && py->local[i] + py->global[i] <= 0)
 			continue;
 
-		restext.m_part.push_back(RichPart(RICHTEXT_ICON, r->icon));
+		RichPart_Init_Icon(&richpart, r->icon);
+		List_PushBack(&restext.m_part, &richpart, sizeof(RichPart));
 
-		char cstr1[128];
-		sprintf(cstr1, " %s: ", r->name.c_str());
-		char cstr2[64];
+		sprintf(cstr1, " %s: ", r->name);
 
-#if 0	//with reschanges?
-		if(r->capacity)
-			sprintf(cstr2, "%d/%d", py->local[i], py->global[i]);
-		else
-			sprintf(cstr2, "%d %+d/", py->local[i] + py->global[i], py->resch[i]);
-
-		strcat(cstr1, cstr2);
-		restext.m_part.push_back(RichPart(cstr1));
-
-		if(!r->capacity)
-			restext.m_part.push_back(RichPart(RICHTEXT_ICON, ICON_TIME));
-#else	
-#if 0
-		if(r->capacity)
-			sprintf(cstr2, "%d/%d", py->local[i], py->global[i]);
-		else
-			sprintf(cstr2, "%d", py->local[i] + py->global[i]);
-#else
 		if(r->capacity)
 		{
-			std::string local = iform(py->local[i]);
-			std::string global = iform(py->global[i]);
-			sprintf(cstr2, "%s/%s", local.c_str(), global.c_str());
+			IForm(py->local[i], local);
+			IForm(py->global[i], global);
+			sprintf(cstr2, "%s/%s", local, global);
 		}
 		else
 		{
-			std::string total = iform(py->local[i] + py->global[i]);
-			sprintf(cstr2, "%s", total.c_str());
+			IForm(py->local[i] + py->global[i], total);
+			sprintf(cstr2, "%s", total);
 		}
-#endif
 
 		strcat(cstr1, cstr2);
 		restext.m_part.push_back(RichPart(cstr1));
-#endif
 
 		restext.m_part.push_back(RichPart("    "));
 	}
-#endif
 
-	int len = restext.texlen();
+	len = restext.texlen();
 
 	tickerpos += 0.5f * g_drawfrinterval * 20;
 
 	if((int)tickerpos > len)
 		tickerpos = 0;
 
-	int endx = EndX(&restext, restext.rawlen(), MAINFONT16, 0, 0);
+	endx = EndX(&restext, restext.rawlen(), MAINFONT16, 0, 0);
 
 	if(endx > g_width)
 	{
-		RichText restext2 = restext.substr((int)tickerpos, len-(int)tickerpos) + restext.substr(0, (int)tickerpos);
-		restickertw->m_text = restext2;
+		RichText_Init(&restickertw->m_text);
+		RichText_SubStr(&restext, (int)tickerpos, len-(int)tickerpos, &subrestext);
+		RichText_SubStr(&restext, 0, (int)tickerpos, &subrestext2);
+		RichText_Append_RichText(&restickertw->m_text, &subrestext);
+		RichText_Append_RichText(&restickertw->m_text, &subrestext2);
+		RichText_Free(&subrestext);
+		RichText_Free(&subrestext2);
 	}
 	else
-		restickertw->m_text = restext;
+	{
+		RichText_Copy(&restickertw->m_text, &restext);
+	}
+
+	RichText_Free(&restext);
 }
 
 void Resize_BottomPanel(Widget* thisw)
 {
-	Player* py = &g_player[g_localP];
-
 	thisw->m_pos[0] = 0;
 	thisw->m_pos[1] = (float)(g_height - MINIMAP_SIZE - 32);
 	thisw->m_pos[2] = (float)g_width;
@@ -217,9 +143,8 @@ void Resize_BottomPanel(Widget* thisw)
 
 void Out_BuildButton()
 {
-	Player* py = &g_player[g_localP];
 	GUI* gui = &g_gui;
-	gui->close("bl preview");
+	Widget_Close(gui, "bl preview");
 }
 
 void Click_BuildButton(int bwhat)
@@ -240,7 +165,7 @@ void Over_BuildButton(int bwhat)
 
 	if(gui->get("cstr view")->m_opened)
 		return;
-	
+
 	if(gui->get("bl view")->m_opened)
 		return;
 
@@ -416,7 +341,7 @@ void BuildMenu_OpenPage1()
 #endif
 
 #if 0	//with gas station
-	bp->bottomright_button[0] = Button(bp, "name", "gui/brbut/apartment2.png", RichText(""), RichText(""), MAINFONT8, BUST_CORRODE, NULL, NULL, Click_BuildButton, NULL, Over_BuildButton, Out_BuildButton, BL_APARTMENT);
+		bp->bottomright_button[0] = Button(bp, "name", "gui/brbut/apartment2.png", RichText(""), RichText(""), MAINFONT8, BUST_CORRODE, NULL, NULL, Click_BuildButton, NULL, Over_BuildButton, Out_BuildButton, BL_APARTMENT);
 	bp->bottomright_button_on[0] = true;
 
 	bp->bottomright_button[1] = Button(bp, "name", "gui/brbut/store1.png", RichText(""), RichText(""), MAINFONT8, BUST_CORRODE, NULL, NULL, Click_BuildButton, NULL, Over_BuildButton, Out_BuildButton, BL_STORE);
@@ -443,7 +368,7 @@ void BuildMenu_OpenPage1()
 	bp->bottomright_button[8] = Button(bp, "name", "gui/next.png", RichText(""), RichText(""), MAINFONT8, BUST_CORRODE, NULL, NULL, Click_NextBuildButton, NULL, NULL, NULL, 2);
 	bp->bottomright_button_on[8] = true;
 #else
-	bp->bottomright_button[0] = Button(bp, "name", "gui/brbut/apartment2.png", RichText(""), RichText(""), MAINFONT8, BUST_CORRODE, NULL, NULL, Click_BuildButton, NULL, Over_BuildButton, Out_BuildButton, BL_APARTMENT);
+		bp->bottomright_button[0] = Button(bp, "name", "gui/brbut/apartment2.png", RichText(""), RichText(""), MAINFONT8, BUST_CORRODE, NULL, NULL, Click_BuildButton, NULL, Over_BuildButton, Out_BuildButton, BL_APARTMENT);
 	bp->bottomright_button_on[0] = true;
 
 	bp->bottomright_button[1] = Button(bp, "name", "gui/brbut/store1.png", RichText(""), RichText(""), MAINFONT8, BUST_CORRODE, NULL, NULL, Click_BuildButton, NULL, Over_BuildButton, Out_BuildButton, BL_STORE);
@@ -463,7 +388,7 @@ void BuildMenu_OpenPage1()
 
 	bp->bottomright_button[6] = Button(bp, "name", "gui/brbut/factory3.png", RichText(""), RichText(""), MAINFONT8, BUST_CORRODE, NULL, NULL, Click_BuildButton, NULL, Over_BuildButton, Out_BuildButton, BL_FACTORY);
 	bp->bottomright_button_on[6] = true;
-	
+
 	bp->bottomright_button[7] = Button(bp, "name", "gui/brbut/nucpow2.png", RichText(""), RichText(""), MAINFONT8, BUST_CORRODE, NULL, NULL, Click_BuildButton, NULL, Over_BuildButton, Out_BuildButton, BL_NUCPOW);
 	bp->bottomright_button_on[7] = true;
 
@@ -504,19 +429,19 @@ void BuildMenu_OpenPage2()
 #else
 	bp->bottomright_button[0] = Button(bp, "name", "gui/brbut/coalpow.png", RichText(""), RichText(""), MAINFONT8, BUST_CORRODE, NULL, NULL, Click_BuildButton, NULL, Over_BuildButton, Out_BuildButton, BL_COALPOW);
 	bp->bottomright_button_on[0] = true;
-	
+
 	bp->bottomright_button[1] = Button(bp, "name", "gui/brbut/chemplant.png", RichText(""), RichText(""), MAINFONT8, BUST_CORRODE, NULL, NULL, Click_BuildButton, NULL, Over_BuildButton, Out_BuildButton, BL_CHEMPLANT);
 	bp->bottomright_button_on[1] = true;
-	
+
 	bp->bottomright_button[2] = Button(bp, "name", "gui/brbut/elecplant.png", RichText(""), RichText(""), MAINFONT8, BUST_CORRODE, NULL, NULL, Click_BuildButton, NULL, Over_BuildButton, Out_BuildButton, BL_ELECPLANT);
 	bp->bottomright_button_on[2] = true;
-	
+
 	bp->bottomright_button[3] = Button(bp, "name", "gui/brbut/cemplant.png", RichText(""), RichText(""), MAINFONT8, BUST_CORRODE, NULL, NULL, Click_BuildButton, NULL, Over_BuildButton, Out_BuildButton, BL_CEMPLANT);
 	bp->bottomright_button_on[3] = true;
 
 	bp->bottomright_button[4] = Button(bp, "name", "gui/brbut/quarry.png", RichText(""), RichText(""), MAINFONT8, BUST_CORRODE, NULL, NULL, Click_BuildButton, NULL, Over_BuildButton, Out_BuildButton, BL_QUARRY);
 	bp->bottomright_button_on[4] = true;
-	
+
 	bp->bottomright_button[5] = Button(bp, "name", "gui/brbut/smelter.png", RichText(""), RichText(""), MAINFONT8, BUST_CORRODE, NULL, NULL, Click_BuildButton, NULL, Over_BuildButton, Out_BuildButton, BL_SMELTER);
 	bp->bottomright_button_on[5] = true;
 
@@ -875,7 +800,7 @@ void Resize_Fast(Widget* thisw)
 	thisw->m_pos[2] = 32 + 32*i;
 	thisw->m_pos[3] = g_height - MINIMAP_SIZE - 32;
 }
-	
+
 void Click_Pause()
 {
 	g_speed = SPEED_PAUSE;
@@ -920,7 +845,7 @@ void Click_QSave()
 	}
 
 	SaveMap(g_lastsave);
-	
+
 	Player* py = &g_player[g_localP];
 	GUI* gui = &g_gui;
 	gui->close("save");
@@ -997,11 +922,11 @@ void FillPlay()
 	//blpreview->add(new TouchListener(NULL, Resize_Fullscreen, NULL, NULL, NULL, -1));
 	//blpreview->add(new BuildPreview(blpreview, "bl preview", Resize_BuildPreview));
 	//blpreview->add(new WindowW(blpreview, "bl preview", Resize_BuildPreview));
-	
+
 	gui->add(new BlView(gui, "bl view", Resize_BuildPreview));
 	gui->add(new TruckMgr(gui, "truck mgr", Resize_BuildPreview));
 
-	
+
 	gui->add(new SaveView(gui, "save", Resize_BuildPreview));
 	gui->add(new LoadView(gui, "load", Resize_BuildPreview));
 

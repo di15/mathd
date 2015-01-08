@@ -191,19 +191,19 @@ void DrawBillboards()
 
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, g_texture[t->tex].texname);
-		glUniform1i(s->m_slot[SSLOT_TEXTURE0], 0);
+		glUnIForm1i(s->m_slot[SSLOT_TEXTURE0], 0);
 
 		if(billb->particle >= 0)
 		{
 			part = &g_particle[billb->particle];
 			pT = &g_particleT[part->type];
 			size = pT->minsize + pT->sizevariation*(1.0f - part->life);
-			glUniform4f(s->m_slot[SSLOT_COLOR], 1, 1, 1, part->life);
+			glUnIForm4f(s->m_slot[SSLOT_COLOR], 1, 1, 1, part->life);
 		}
 		else
 		{
 			size = billb->size;
-			glUniform4f(s->m_slot[SSLOT_COLOR], 1, 1, 1, 1);
+			glUnIForm4f(s->m_slot[SSLOT_COLOR], 1, 1, 1, 1);
 		}
 
 		vert = vertical*size;

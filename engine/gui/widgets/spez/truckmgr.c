@@ -16,7 +16,7 @@
 #include "cstrview.h"
 #include "../../../platform.h"
 #include "../viewportw.h"
-#include "../../../../game/gui/gviewport.h"
+#include "../../../../app/gui/gviewport.h"
 #include "../../../sim/building.h"
 #include "../../../sim/bltype.h"
 #include "../../../sim/road.h"

@@ -75,7 +75,7 @@ inline int iceil(const int num, const int denom)
 	return div;
 }
 
-std::string iform(int n);
+std::string IForm(int n);
 
 void ListFiles(const char* fullpath, std::list<std::string>& files);
 

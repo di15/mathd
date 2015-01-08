@@ -28,7 +28,7 @@
 #include "tilepath.h"
 
 //not engine
-#include "../../game/gui/chattext.h"
+#include "../../app/gui/chattext.h"
 
 ColliderTile *g_collidertile = NULL;
 

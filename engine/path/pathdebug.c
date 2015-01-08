@@ -131,7 +131,7 @@ void DrawSteps()
 	if(lines.size() <= 0)
 		return;
 
-	glUniform4f(s->m_slot[SSLOT_COLOR], 0.5f, 0.5f, 0, 1);
+	glUnIForm4f(s->m_slot[SSLOT_COLOR], 0.5f, 0.5f, 0, 1);
 	//glBegin(GL_LINES);
 
 	//glVertexAttribPointer(s->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, &lines[0]);
@@ -146,7 +146,7 @@ void DrawGrid()
 #if 1
 	if(g_gridvecs.size() > 0)
 	{
-		glUniform4f(s->m_slot[SSLOT_COLOR], 1, 1, 1, 1);
+		glUnIForm4f(s->m_slot[SSLOT_COLOR], 1, 1, 1, 1);
 		//glBegin(GL_LINES);
 
 		//glVertexAttribPointer(s->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, &g_gridvecs[0]);
@@ -158,7 +158,7 @@ void DrawGrid()
 #endif
 
 #if 1
-	glUniform4f(s->m_slot[SSLOT_COLOR],  0.5f, 0, 0, 1);
+	glUnIForm4f(s->m_slot[SSLOT_COLOR],  0.5f, 0, 0, 1);
 
 	Player* py = &g_player[g_localP];
 
@@ -304,7 +304,7 @@ void DrawUnitSquares()
 	Vec3f p;
 	Shader* s = &g_shader[g_curS];
 
-	glUniform4f(s->m_slot[SSLOT_COLOR], 0.5f, 0, 0, 1);
+	glUnIForm4f(s->m_slot[SSLOT_COLOR], 0.5f, 0, 0, 1);
 
 	for(int i=0; i<UNITS; i++)
 	{
@@ -318,9 +318,9 @@ void DrawUnitSquares()
 
 #if 1
 		if(u->collided)
-			glUniform4f(s->m_slot[SSLOT_COLOR], 1.0f, 0, 0, 1);
+			glUnIForm4f(s->m_slot[SSLOT_COLOR], 1.0f, 0, 0, 1);
 		else
-			glUniform4f(s->m_slot[SSLOT_COLOR], 0.2f, 0, 0, 1);
+			glUnIForm4f(s->m_slot[SSLOT_COLOR], 0.2f, 0, 0, 1);
 #endif
 
 		/*
@@ -369,7 +369,7 @@ void DrawPaths()
 	for(int i=0; i<UNITS; i++)
 #endif
 	{
-		glUniform4f(s->m_slot[SSLOT_COLOR], 0, 1, 0, 1);
+		glUnIForm4f(s->m_slot[SSLOT_COLOR], 0, 1, 0, 1);
 
 		Unit* u = &g_unit[i];
 
@@ -380,14 +380,14 @@ void DrawPaths()
 
 		std::vector<Vec3f> vecs;
 		
-		glUniform4f(s->m_slot[SSLOT_COLOR], 1, 1, 0, 1);
+		glUnIForm4f(s->m_slot[SSLOT_COLOR], 1, 1, 0, 1);
 		vecs.push_back(Vec3f(u->cmpos.x, g_hmap.accheight(u->cmpos.x, u->cmpos.y) + TILE_SIZE/20, u->cmpos.y));
 		vecs.push_back(Vec3f(u->goal.x, g_hmap.accheight(u->goal.x, u->goal.y) + TILE_SIZE/20, u->goal.y));
 		glVertexPointer(3, GL_FLOAT, 0, &vecs[0]);
 		//glDrawArrays(GL_LINE_STRIP, 0, vecs.size());
 		vecs.clear();
 		
-		glUniform4f(s->m_slot[SSLOT_COLOR], 0, 1, 0, 1);
+		glUnIForm4f(s->m_slot[SSLOT_COLOR], 0, 1, 0, 1);
 
 		Vec3f p;
 		p.x = u->cmpos.x;
@@ -424,7 +424,7 @@ void DrawPaths()
 			//vecs.push_back(u->camera.Position() + Vec3f(0,5,0));
 			//vecs.push_back(u->goal + Vec3f(0,5,0));
 
-			glUniform4f(s->m_slot[SSLOT_COLOR], 0.8f, 1, 0.8f, 1);
+			glUnIForm4f(s->m_slot[SSLOT_COLOR], 0.8f, 1, 0.8f, 1);
 
 			glVertexAttribPointer(s->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, &vecs[0]);
 			glDrawArrays(GL_LINE_STRIP, 0, vecs.size());
@@ -433,7 +433,7 @@ void DrawPaths()
 
 		vecs.clear();
 
-		glUniform4f(s->m_slot[SSLOT_COLOR], 0.5f, 1, 0.5f, 1);
+		glUnIForm4f(s->m_slot[SSLOT_COLOR], 0.5f, 1, 0.5f, 1);
 
 		for(auto titer = u->tpath.begin(); titer != u->tpath.end(); titer++)
 		{
@@ -468,7 +468,7 @@ void DrawVelocities()
 	UType* t;
 	Shader* s = &g_shader[g_curS];
 
-	glUniform4f(s->m_slot[SSLOT_COLOR], 1, 0, 1, 1);
+	glUnIForm4f(s->m_slot[SSLOT_COLOR], 1, 0, 1, 1);
 
 	for(int i=0; i<UNITS; i++)
 	{

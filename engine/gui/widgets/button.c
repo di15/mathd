@@ -200,8 +200,8 @@ void Button::draw()
 		EndS();
 
 		UseS(SHADER_COLOR2D);
-		glUniform1f(g_shader[g_curS].m_slot[SSLOT_WIDTH], (float)g_currw);
-		glUniform1f(g_shader[g_curS].m_slot[SSLOT_HEIGHT], (float)g_currh);
+		glUnIForm1f(g_shader[g_curS].m_slot[SSLOT_WIDTH], (float)g_currw);
+		glUnIForm1f(g_shader[g_curS].m_slot[SSLOT_HEIGHT], (float)g_currh);
 
 		float midcolor[] = {0.7f,0.7f,0.7f,0.8f};
 		float lightcolor[] = {0.8f,0.8f,0.8f,0.8f};
@@ -249,8 +249,8 @@ void Button::draw()
 		EndS();
 
 		UseS(SHADER_COLOR2D);
-		glUniform1f(g_shader[g_curS].m_slot[SSLOT_WIDTH], (float)g_currw);
-		glUniform1f(g_shader[g_curS].m_slot[SSLOT_HEIGHT], (float)g_currh);
+		glUnIForm1f(g_shader[g_curS].m_slot[SSLOT_WIDTH], (float)g_currw);
+		glUnIForm1f(g_shader[g_curS].m_slot[SSLOT_HEIGHT], (float)g_currh);
 
 		float midcolor[] = {0.7f,0.7f,0.7f,0.8f};
 		float lightcolor[] = {0.8f,0.8f,0.8f,0.8f};

@@ -16,7 +16,7 @@
 #include "../path/collidertile.h"
 
 //not engine
-#include "../../game/gui/chattext.h"
+#include "../../app/gui/chattext.h"
 
 //#define PREPATHJOB		//check if path to job exists before considering job
 //#define PATHTOJOB	//must we pathfind to job to see if there is a path to it before we consider the job?

@@ -1,4 +1,5 @@
-#include "gmain.h"
+
+#include "appmain.h"
 #include "../engine/app.h"
 
 #ifdef PLATFORM_WIN
@@ -8,11 +9,11 @@ int main(int argc, char* argv[])
 #endif
 {
 	Init();
-	MakeWindow(TITLE);
+	MakeWin(TITLE);
 	FillGUI();
 	SDL_ShowCursor(false);
 	Queue();
-	EventLoop();
+	EvLoop();
 	Deinit();
 	SDL_ShowCursor(true);
 	return 0;

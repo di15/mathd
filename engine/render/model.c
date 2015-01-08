@@ -83,14 +83,14 @@ void DrawVA(VertexArray* va, Vec3f pos)
 
 	Matrix modelmat;
 	modelmat.translation((const float*)&pos);
-	glUniformMatrix4fv(s->m_slot[SSLOT_MODELMAT], 1, 0, modelmat.m_matrix);
+	glUnIFormMatrix4fv(s->m_slot[SSLOT_MODELMAT], 1, 0, modelmat.m_matrix);
 
 	Matrix modelview;
 #ifdef SPECBUMPSHADOW
 	modelview.set(g_camview.m_matrix);
 #endif
 	modelview.postmult(modelmat);
-	glUniformMatrix4fv(s->m_slot[SSLOT_MODELVIEW], 1, 0, modelview.m_matrix);
+	glUnIFormMatrix4fv(s->m_slot[SSLOT_MODELVIEW], 1, 0, modelview.m_matrix);
 
 	Matrix mvp;
 #if 0
@@ -104,7 +104,7 @@ void DrawVA(VertexArray* va, Vec3f pos)
 	mvp.postmult(g_camview);
 	mvp.postmult(modelmat);
 #endif
-	glUniformMatrix4fv(s->m_slot[SSLOT_MVP], 1, 0, mvp.m_matrix);
+	glUnIFormMatrix4fv(s->m_slot[SSLOT_MVP], 1, 0, mvp.m_matrix);
 
 	//modelview.set(g_camview.m_matrix);
 	//modelview.postmult(modelmat);
@@ -112,7 +112,7 @@ void DrawVA(VertexArray* va, Vec3f pos)
 	Transpose(modelview, modelview);
 	Inverse2(modelview, modelviewinv);
 	//Transpose(modelviewinv, modelviewinv);
-	glUniformMatrix4fv(s->m_slot[SSLOT_NORMALMAT], 1, 0, modelviewinv.m_matrix);
+	glUnIFormMatrix4fv(s->m_slot[SSLOT_NORMALMAT], 1, 0, modelviewinv.m_matrix);
 
 #if 0
 	glVertexAttribPointer(s->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, va->vertices);
@@ -145,24 +145,24 @@ void Model::usetex() const
 
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, g_texture[ m_diffusem ].texname);
-	glUniform1i(s->m_slot[SSLOT_TEXTURE0], 0);
+	glUnIForm1i(s->m_slot[SSLOT_TEXTURE0], 0);
 
 	glActiveTexture(GL_TEXTURE1);
 	glBindTexture(GL_TEXTURE_2D, g_texture[ m_specularm ].texname);
-	glUniform1i(s->m_slot[SSLOT_SPECULARMAP], 1);
+	glUnIForm1i(s->m_slot[SSLOT_SPECULARMAP], 1);
 
 	//if(s->m_slot[SSLOT_NORMAL] != -1)
 	{
 		glActiveTexture(GL_TEXTURE2);
 		glBindTexture(GL_TEXTURE_2D, g_texture[ m_normalm ].texname);
-		glUniform1i(s->m_slot[SSLOT_NORMALMAP], 2);
+		glUnIForm1i(s->m_slot[SSLOT_NORMALMAP], 2);
 	}
 
 	//if(s->m_slot[SSLOT_OWNERMAP] != -1)
 	{
 		glActiveTexture(GL_TEXTURE3);
 		glBindTexture(GL_TEXTURE_2D, g_texture[ m_ownerm ].texname);
-		glUniform1i(s->m_slot[SSLOT_OWNERMAP], 3);
+		glUnIForm1i(s->m_slot[SSLOT_OWNERMAP], 3);
 	}
 }
 
@@ -180,14 +180,14 @@ void Model::draw(int frame, Vec3f pos, float yaw)
 	Matrix rotation;
 	rotation.rotrad(radians);
 	modelmat.postmult(rotation);
-	glUniformMatrix4fv(s->m_slot[SSLOT_MODELMAT], 1, 0, modelmat.m_matrix);
+	glUnIFormMatrix4fv(s->m_slot[SSLOT_MODELMAT], 1, 0, modelmat.m_matrix);
 
 	Matrix modelview;
 #ifdef SPECBUMPSHADOW
 	modelview.set(g_camview.m_matrix);
 #endif
 	modelview.postmult(modelmat);
-	glUniformMatrix4fv(s->m_slot[SSLOT_MODELVIEW], 1, 0, modelview.m_matrix);
+	glUnIFormMatrix4fv(s->m_slot[SSLOT_MODELVIEW], 1, 0, modelview.m_matrix);
 
 	Matrix mvp;
 #if 0
@@ -201,13 +201,13 @@ void Model::draw(int frame, Vec3f pos, float yaw)
 	mvp.postmult(g_camview);
 	mvp.postmult(modelmat);
 #endif
-	glUniformMatrix4fv(s->m_slot[SSLOT_MVP], 1, 0, mvp.m_matrix);
+	glUnIFormMatrix4fv(s->m_slot[SSLOT_MVP], 1, 0, mvp.m_matrix);
 
 	Matrix modelviewinv;
 	Transpose(modelview, modelview);
 	Inverse2(modelview, modelviewinv);
 	//Transpose(modelviewinv, modelviewinv);
-	glUniformMatrix4fv(s->m_slot[SSLOT_NORMALMAT], 1, 0, modelviewinv.m_matrix);
+	glUnIFormMatrix4fv(s->m_slot[SSLOT_NORMALMAT], 1, 0, modelviewinv.m_matrix);
 
 	VertexArray* va = &m_va[frame];
 

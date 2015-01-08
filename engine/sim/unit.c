@@ -138,7 +138,7 @@ void DrawUnits()
 
 		Player* py = &g_player[u->owner];
 		float* color = py->color;
-		glUniform4f(s->m_slot[SSLOT_OWNCOLOR], color[0], color[1], color[2], color[3]);
+		glUnIForm4f(s->m_slot[SSLOT_OWNCOLOR], color[0], color[1], color[2], color[3]);
 
 		Model* m = &g_model[t->model];
 

@@ -10,8 +10,8 @@
 #include "../math/hmapmath.h"
 #include "bltype.h"
 #include "building.h"
-#include "../../game/gmain.h"
-#include "../../game/gui/ggui.h"
+#include "../../app/appmain.h"
+#include "../../app/gui/appgui.h"
 
 #if 0
 unsigned char CrPipeTile::cdtype()

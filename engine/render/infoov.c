@@ -122,9 +122,9 @@ void DrawOv(Matrix* mvp)
 	
 	UseS(SHADER_COLOR2D);
 	Shader* s = &g_shader[g_curS];
-	glUniform1f(s->m_slot[SSLOT_WIDTH], (float)g_width);
-	glUniform1f(s->m_slot[SSLOT_HEIGHT], (float)g_height);
-	glUniform4f(s->m_slot[SSLOT_COLOR], 1, 1, 1, 1);
+	glUnIForm1f(s->m_slot[SSLOT_WIDTH], (float)g_width);
+	glUnIForm1f(s->m_slot[SSLOT_HEIGHT], (float)g_height);
+	glUnIForm4f(s->m_slot[SSLOT_COLOR], 1, 1, 1, 1);
 
 	//show production met % and next cycle count down timer and HP
 	if(g_zoom > 0.09f)

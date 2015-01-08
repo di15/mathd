@@ -8,7 +8,7 @@
 #include "../render/model.h"
 #include "../render/heightmap.h"
 #include "../sim/build.h"
-#include "../../game/gui/chattext.h"
+#include "../../app/gui/chattext.h"
 #endif
 
 PlayerColor g_pycols[PLAYER_COLORS] =

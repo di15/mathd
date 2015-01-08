@@ -86,16 +86,16 @@ RichText EditBox::drawvalue()
 void EditBox::draw()
 {
 	//glColor4f(1, 1, 1, 1);
-	glUniform4f(g_shader[SHADER_ORTHO].m_slot[SSLOT_COLOR], 1, 1, 1, 1);
+	glUnIForm4f(g_shader[SHADER_ORTHO].m_slot[SSLOT_COLOR], 1, 1, 1, 1);
 
 	DrawImage(g_texture[m_frametex].texname, m_pos[0], m_pos[1], m_pos[2], m_pos[3]);
 
 	if(m_over)
 		//glColor4f(1, 1, 1, 1);
-		glUniform4f(g_shader[SHADER_ORTHO].m_slot[SSLOT_COLOR], 1, 1, 1, 1);
+		glUnIForm4f(g_shader[SHADER_ORTHO].m_slot[SSLOT_COLOR], 1, 1, 1, 1);
 	else
 		//glColor4f(0.8f, 0.8f, 0.8f, 1);
-		glUniform4f(g_shader[SHADER_ORTHO].m_slot[SSLOT_COLOR], 0.8f, 0.8f, 0.8f, 1);
+		glUnIForm4f(g_shader[SHADER_ORTHO].m_slot[SSLOT_COLOR], 0.8f, 0.8f, 0.8f, 1);
 
 	RichText val = drawvalue();
 
@@ -105,7 +105,7 @@ void EditBox::draw()
 	DrawShadowedTextF(m_font, m_pos[0]+m_scroll[0], m_pos[1], m_pos[0], m_pos[1], m_pos[2], m_pos[3], &val, NULL, m_opened ? m_caret : -1);
 
 	//glColor4f(1, 1, 1, 1);
-	//glUniform4f(g_shader[SHADER_ORTHO].m_slot[SSLOT_COLOR], 1, 1, 1, 1);
+	//glUnIForm4f(g_shader[SHADER_ORTHO].m_slot[SSLOT_COLOR], 1, 1, 1, 1);
 
 	HighlightF(m_font, m_pos[0]+m_scroll[0], m_pos[1], m_pos[0], m_pos[1], m_pos[2], m_pos[3], &val, m_highl[0], m_highl[1]);
 }

@@ -8,7 +8,7 @@
 #include "draw2d.h"
 #include "../render/shadow.h"
 #include "../render/heightmap.h"
-#include "../../game/gmain.h"
+#include "../../app/appmain.h"
 #include "cursor.h"
 #include "../sim/player.h"
 #include "../debug.h"
@@ -67,9 +67,9 @@ void GUI::draw()
 	CheckGLError(__FILE__, __LINE__);
 
 	UseS(SHADER_COLOR2D);
-	glUniform1f(g_shader[SHADER_COLOR2D].m_slot[SSLOT_WIDTH], (float)g_width);
-	glUniform1f(g_shader[SHADER_COLOR2D].m_slot[SSLOT_HEIGHT], (float)g_height);
-	glUniform4f(g_shader[SHADER_COLOR2D].m_slot[SSLOT_COLOR], 0, 1, 0, 0.75f);
+	glUnIForm1f(g_shader[SHADER_COLOR2D].m_slot[SSLOT_WIDTH], (float)g_width);
+	glUnIForm1f(g_shader[SHADER_COLOR2D].m_slot[SSLOT_HEIGHT], (float)g_height);
+	glUnIForm4f(g_shader[SHADER_COLOR2D].m_slot[SSLOT_COLOR], 0, 1, 0, 0.75f);
 	//glEnable(GL_DEPTH_TEST);
 	//DrawSelector();
 	DrawMarquee();
@@ -226,9 +226,9 @@ void Ortho(int width, int height, float r, float g, float b, float a)
 	Player* py = &g_player[g_localP];
 	UseS(SHADER_ORTHO);
 	Shader* s = &g_shader[g_curS];
-	glUniform1f(g_shader[SHADER_ORTHO].m_slot[SSLOT_WIDTH], (float)width);
-	glUniform1f(g_shader[SHADER_ORTHO].m_slot[SSLOT_HEIGHT], (float)height);
-	glUniform4f(g_shader[SHADER_ORTHO].m_slot[SSLOT_COLOR], r, g, b, a);
+	glUnIForm1f(g_shader[SHADER_ORTHO].m_slot[SSLOT_WIDTH], (float)width);
+	glUnIForm1f(g_shader[SHADER_ORTHO].m_slot[SSLOT_HEIGHT], (float)height);
+	glUnIForm4f(g_shader[SHADER_ORTHO].m_slot[SSLOT_COLOR], r, g, b, a);
 	//glEnableVertexAttribArray(s->m_slot[SSLOT_POSITION]);
 	//glEnableVertexAttribArray(g_shader[SHADER_ORTHO].m_slot[SSLOT_TEXCOORD0]);
 	//glEnableVertexAttribArray(g_shader[SHADER_ORTHO].m_slot[SSLOT_NORMAL]);

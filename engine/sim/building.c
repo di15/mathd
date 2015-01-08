@@ -18,7 +18,7 @@
 #include "powl.h"
 #include "road.h"
 #include "crpipe.h"
-#include "../../game/gmain.h"
+#include "../../app/appmain.h"
 #include "../render/shadow.h"
 #include "../math/frustum.h"
 #include "unit.h"
@@ -32,7 +32,7 @@
 #include "job.h"
 
 //not engine
-#include "../../game/gui/chattext.h"
+#include "../../app/gui/chattext.h"
 
 Building g_building[BUILDINGS];
 
@@ -1332,7 +1332,7 @@ void DrawBls()
 
 		Player* py = &g_player[b->owner];
 		float* color = py->color;
-		glUniform4f(s->m_slot[SSLOT_OWNCOLOR], color[0], color[1], color[2], color[3]);
+		glUnIForm4f(s->m_slot[SSLOT_OWNCOLOR], color[0], color[1], color[2], color[3]);
 
 		float pitch = 0;
 		float yaw = 0;
@@ -1342,14 +1342,14 @@ void DrawBls()
 		Matrix rotation;
 		rotation.rotrad(radians);
 		modelmat.postmult(rotation);
-		glUniformMatrix4fv(s->m_slot[SSLOT_MODELMAT], 1, 0, modelmat.m_matrix);
+		glUnIFormMatrix4fv(s->m_slot[SSLOT_MODELMAT], 1, 0, modelmat.m_matrix);
 
 		Matrix modelview;
 #ifdef SPECBUMPSHADOW
 		modelview.set(g_camview.m_matrix);
 #endif
 		modelview.postmult(modelmat);
-		glUniformMatrix4fv(s->m_slot[SSLOT_MODELVIEW], 1, 0, modelview.m_matrix);
+		glUnIFormMatrix4fv(s->m_slot[SSLOT_MODELVIEW], 1, 0, modelview.m_matrix);
 
 		Matrix mvp;
 #if 0
@@ -1363,13 +1363,13 @@ void DrawBls()
 		mvp.postmult(g_camview);
 		mvp.postmult(modelmat);
 #endif
-		glUniformMatrix4fv(s->m_slot[SSLOT_MVP], 1, 0, mvp.m_matrix);
+		glUnIFormMatrix4fv(s->m_slot[SSLOT_MVP], 1, 0, mvp.m_matrix);
 
 		Matrix modelviewinv;
 		Transpose(modelview, modelview);
 		Inverse2(modelview, modelviewinv);
 		//Transpose(modelviewinv, modelviewinv);
-		glUniformMatrix4fv(s->m_slot[SSLOT_NORMALMAT], 1, 0, modelviewinv.m_matrix);
+		glUnIFormMatrix4fv(s->m_slot[SSLOT_NORMALMAT], 1, 0, modelviewinv.m_matrix);
 
 		VertexArray* va = &b->drawva;
 

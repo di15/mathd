@@ -4,10 +4,10 @@
 #include "player.h"
 #include "road.h"
 #include "../render/shader.h"
-#include "../../game/gui/ggui.h"
+#include "../../app/gui/appgui.h"
 #include "bltype.h"
 #include "../phys/collision.h"
-#include "../../game/gmain.h"
+#include "../../app/appmain.h"
 #include "building.h"
 
 #if 0

@@ -28,7 +28,7 @@
 #include "../path/astarpath.h"
 
 //not engine
-#include "../../game/gui/chattext.h"
+#include "../../app/gui/chattext.h"
 
 #define HIERPATH	//hierarchical pathfinding?
 

@@ -150,7 +150,7 @@ void DrawGlyph()
 		float hscale = f->gheight / (float)icon->m_height;
 
 		UseIconTex(g_rpartit->m_icon);
-		//glUniform4f(g_shader[g_curS].m_slot[SSLOT_COLOR], 1, 1, 1, 1);
+		//glUnIForm4f(g_shader[g_curS].m_slot[SSLOT_COLOR], 1, 1, 1, 1);
 
 		short left = x;
 		short right = (short)( left + (float)icon->m_width * hscale );
@@ -159,7 +159,7 @@ void DrawGlyph()
 		DrawGlyph((float)left, (float)top, (float)right, (float)bottom, 0, 0, 1, 1);
 
 		UseFontTex();
-		//glUniform4f(g_shader[g_curS].m_slot[SSLOT_COLOR], currcolor[0], currcolor[1], currcolor[2], currcolor[3]);
+		//glUnIForm4f(g_shader[g_curS].m_slot[SSLOT_COLOR], currcolor[0], currcolor[1], currcolor[2], currcolor[3]);
 
 		//g_log<<"color[3] = "<<currcolor[3]<<std::endl;
 	}
@@ -186,7 +186,7 @@ void DrawGlyphF()
 		float hscale = f->gheight / (float)icon->m_height;
 
 		UseIconTex(g_rpartit->m_icon);
-		//glUniform4f(g_shader[g_curS].m_slot[SSLOT_COLOR], 1, 1, 1, 1);
+		//glUnIForm4f(g_shader[g_curS].m_slot[SSLOT_COLOR], 1, 1, 1, 1);
 
 		short left = x;
 		short right = (short)( left + (float)icon->m_width * hscale );
@@ -195,7 +195,7 @@ void DrawGlyphF()
 		DrawGlyphF((float)left, (float)top, (float)right, (float)bottom, 0, 0, 1, 1);
 
 		UseFontTex();
-		//glUniform4f(g_shader[g_curS].m_slot[SSLOT_COLOR], currcolor[0], currcolor[1], currcolor[2], currcolor[3]);
+		//glUnIForm4f(g_shader[g_curS].m_slot[SSLOT_COLOR], currcolor[0], currcolor[1], currcolor[2], currcolor[3]);
 
 		//g_log<<"color[3] = "<<currcolor[3]<<std::endl;
 	}
@@ -331,14 +331,14 @@ void UseFontTex()
 {
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, g_texture[ g_font[g_currfont].texindex ].texname);
-	glUniform1i(g_shader[SHADER_ORTHO].m_slot[SSLOT_TEXTURE0], 0);
+	glUnIForm1i(g_shader[SHADER_ORTHO].m_slot[SSLOT_TEXTURE0], 0);
 }
 
 void UseIconTex(int ico)
 {
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, g_texture[ g_icon[ico].m_tex ].texname);
-	glUniform1i(g_shader[SHADER_ORTHO].m_slot[SSLOT_TEXTURE0], 0);
+	glUnIForm1i(g_shader[SHADER_ORTHO].m_slot[SSLOT_TEXTURE0], 0);
 }
 
 void StartTextF(const RichText* text, int fnt, float width, float height, int ln, int realstartx, int framex1, int framey1, int framex2, int framey2)
@@ -763,13 +763,13 @@ void DrawLine(int fnt, float startx, float starty, const RichText* text, const f
 {
 	if(color == NULL)
 	{
-		glUniform4f(g_shader[SHADER_ORTHO].m_slot[SSLOT_COLOR], 1, 1, 1, 1);
+		glUnIForm4f(g_shader[SHADER_ORTHO].m_slot[SSLOT_COLOR], 1, 1, 1, 1);
 		//glColor4f(1, 1, 1, 1);
 		for(int c=0; c<4; c++) currcolor[c] = 1;
 	}
 	else
 	{
-		glUniform4f(g_shader[SHADER_ORTHO].m_slot[SSLOT_COLOR], color[0], color[1], color[2], color[3]);
+		glUnIForm4f(g_shader[SHADER_ORTHO].m_slot[SSLOT_COLOR], color[0], color[1], color[2], color[3]);
 		//glColor4f(color[0], color[1], color[2], color[3]);
 		for(int c=0; c<4; c++) currcolor[c] = color[c];
 	}
@@ -783,8 +783,8 @@ void DrawLine(int fnt, float startx, float starty, const RichText* text, const f
 
 void DrawShadowedText(int fnt, float startx, float starty, const RichText* text, const float* color, int caret)
 {
-	//glUniform4f(g_shader[SHADER_ORTHO].m_slot[SSLOT_COLOR], 0, 0, 0, 1);
-	glUniform4f(g_shader[SHADER_ORTHO].m_slot[SSLOT_COLOR], 0.0f, 0.0f, 0.0f, color != NULL ? color[3] : 1);
+	//glUnIForm4f(g_shader[SHADER_ORTHO].m_slot[SSLOT_COLOR], 0, 0, 0, 1);
+	glUnIForm4f(g_shader[SHADER_ORTHO].m_slot[SSLOT_COLOR], 0.0f, 0.0f, 0.0f, color != NULL ? color[3] : 1);
 	//glColor4f(0, 0, 0, 1);
 	currcolor[0] = 0;
 	currcolor[1] = 0;
@@ -803,13 +803,13 @@ void DrawShadowedText(int fnt, float startx, float starty, const RichText* text,
 
 	if(color == NULL)
 	{
-		glUniform4f(g_shader[SHADER_ORTHO].m_slot[SSLOT_COLOR], 1, 1, 1, 1);
+		glUnIForm4f(g_shader[SHADER_ORTHO].m_slot[SSLOT_COLOR], 1, 1, 1, 1);
 		//glColor4f(1, 1, 1, 1);
 		for(int c=0; c<4; c++) currcolor[c] = 1;
 	}
 	else
 	{
-		glUniform4f(g_shader[SHADER_ORTHO].m_slot[SSLOT_COLOR], color[0], color[1], color[2], color[3]);
+		glUnIForm4f(g_shader[SHADER_ORTHO].m_slot[SSLOT_COLOR], color[0], color[1], color[2], color[3]);
 		//glColor4f(color[0], color[1], color[2], color[3]);
 		for(int c=0; c<4; c++) currcolor[c] = color[c];
 	}
@@ -817,7 +817,7 @@ void DrawShadowedText(int fnt, float startx, float starty, const RichText* text,
 	TextLayer(startx, starty);
 	DrawLine(caret);
 
-	glUniform4f(g_shader[SHADER_ORTHO].m_slot[SSLOT_COLOR], 1, 1, 1, 1);
+	glUnIForm4f(g_shader[SHADER_ORTHO].m_slot[SSLOT_COLOR], 1, 1, 1, 1);
 	//glColor4f(1, 1, 1, 1);
 }
 
@@ -825,13 +825,13 @@ void DrawLineF(int fnt, float startx, float starty, float framex1, float framey1
 {
 	if(color == NULL)
 	{
-		glUniform4f(g_shader[SHADER_ORTHO].m_slot[SSLOT_COLOR], 1, 1, 1, 1);
+		glUnIForm4f(g_shader[SHADER_ORTHO].m_slot[SSLOT_COLOR], 1, 1, 1, 1);
 		//glColor4f(1, 1, 1, 1);
 		for(int c=0; c<4; c++) currcolor[c] = 1;
 	}
 	else
 	{
-		glUniform4f(g_shader[SHADER_ORTHO].m_slot[SSLOT_COLOR], color[0], color[1], color[2], color[3]);
+		glUnIForm4f(g_shader[SHADER_ORTHO].m_slot[SSLOT_COLOR], color[0], color[1], color[2], color[3]);
 		//glColor4f(color[0], color[1], color[2], color[3]);
 		for(int c=0; c<4; c++) currcolor[c] = color[c];
 	}
@@ -845,7 +845,7 @@ void DrawLineF(int fnt, float startx, float starty, float framex1, float framey1
 
 void DrawShadowedTextF(int fnt, float startx, float starty, float framex1, float framey1, float framex2, float framey2, const RichText* text, const float* color, int caret)
 {
-	glUniform4f(g_shader[SHADER_ORTHO].m_slot[SSLOT_COLOR], 0.0f, 0.0f, 0.0f, color != NULL ? color[3] : 1);
+	glUnIForm4f(g_shader[SHADER_ORTHO].m_slot[SSLOT_COLOR], 0.0f, 0.0f, 0.0f, color != NULL ? color[3] : 1);
 	currcolor[0] = 0;
 	currcolor[1] = 0;
 	currcolor[2] = 0;
@@ -875,13 +875,13 @@ void DrawShadowedTextF(int fnt, float startx, float starty, float framex1, float
 
 	if(color == NULL)
 	{
-		glUniform4f(g_shader[SHADER_ORTHO].m_slot[SSLOT_COLOR], 1, 1, 1, 1);
+		glUnIForm4f(g_shader[SHADER_ORTHO].m_slot[SSLOT_COLOR], 1, 1, 1, 1);
 		//glColor4f(1, 1, 1, 1);
 		for(int c=0; c<4; c++) currcolor[c] = 1;
 	}
 	else
 	{
-		glUniform4f(g_shader[SHADER_ORTHO].m_slot[SSLOT_COLOR], color[0], color[1], color[2], color[3]);
+		glUnIForm4f(g_shader[SHADER_ORTHO].m_slot[SSLOT_COLOR], color[0], color[1], color[2], color[3]);
 		//glColor4f(color[0], color[1], color[2], color[3]);
 		for(int c=0; c<4; c++) currcolor[c] = color[c];
 	}
@@ -889,7 +889,7 @@ void DrawShadowedTextF(int fnt, float startx, float starty, float framex1, float
 	TextLayer(startx, starty);
 	DrawLineF(caret);
 
-	glUniform4f(g_shader[SHADER_ORTHO].m_slot[SSLOT_COLOR], 1, 1, 1, 1);
+	glUnIForm4f(g_shader[SHADER_ORTHO].m_slot[SSLOT_COLOR], 1, 1, 1, 1);
 }
 
 void HighlightF(int fnt, float startx, float starty, float framex1, float framey1, float framex2, float framey2, const RichText* text, int highlstarti, int highlendi)
@@ -897,9 +897,9 @@ void HighlightF(int fnt, float startx, float starty, float framex1, float framey
 	Player* py = &g_player[g_localP];
 	EndS();
 	UseS(SHADER_COLOR2D);
-	glUniform1f(g_shader[SHADER_COLOR2D].m_slot[SSLOT_WIDTH], (float)g_currw);
-	glUniform1f(g_shader[SHADER_COLOR2D].m_slot[SSLOT_HEIGHT], (float)g_currh);
-	glUniform4f(g_shader[SHADER_COLOR2D].m_slot[SSLOT_COLOR], 1, 1, 1, 0.5f);
+	glUnIForm1f(g_shader[SHADER_COLOR2D].m_slot[SSLOT_WIDTH], (float)g_currw);
+	glUnIForm1f(g_shader[SHADER_COLOR2D].m_slot[SSLOT_HEIGHT], (float)g_currh);
+	glUnIForm4f(g_shader[SHADER_COLOR2D].m_slot[SSLOT_COLOR], 1, 1, 1, 0.5f);
 
 	currcolor[0] = 1;
 	currcolor[1] = 1;
@@ -961,8 +961,8 @@ void DrawCenterShadText(int fnt, float startx, float starty, const RichText* tex
 	if(color != NULL)
 		a = color[3];
 
-	//glUniform4f(g_shader[SHADER_ORTHO].m_slot[SSLOT_COLOR], 0, 0, 0, a);
-	glUniform4f(g_shader[SHADER_ORTHO].m_slot[SSLOT_COLOR], 0.0f, 0.0f, 0.0f, color != NULL ? color[3] : 1);
+	//glUnIForm4f(g_shader[SHADER_ORTHO].m_slot[SSLOT_COLOR], 0, 0, 0, a);
+	glUnIForm4f(g_shader[SHADER_ORTHO].m_slot[SSLOT_COLOR], 0.0f, 0.0f, 0.0f, color != NULL ? color[3] : 1);
 	currcolor[0] = 0.0f;
 	currcolor[1] = 0.0f;
 	currcolor[2] = 0.0f;
@@ -980,12 +980,12 @@ void DrawCenterShadText(int fnt, float startx, float starty, const RichText* tex
 
 	if(color == NULL)
 	{
-		glUniform4f(g_shader[SHADER_ORTHO].m_slot[SSLOT_COLOR], 1, 1, 1, 1);
+		glUnIForm4f(g_shader[SHADER_ORTHO].m_slot[SSLOT_COLOR], 1, 1, 1, 1);
 		for(int c=0; c<4; c++) currcolor[c] = 1;
 	}
 	else
 	{
-		glUniform4f(g_shader[SHADER_ORTHO].m_slot[SSLOT_COLOR], color[0], color[1], color[2], color[3]);
+		glUnIForm4f(g_shader[SHADER_ORTHO].m_slot[SSLOT_COLOR], color[0], color[1], color[2], color[3]);
 		for(int c=0; c<4; c++) currcolor[c] = color[c];
 	}
 
@@ -996,13 +996,13 @@ void DrawCenterShadText(int fnt, float startx, float starty, const RichText* tex
 		AdvGlyph();
 	}
 
-	glUniform4f(g_shader[SHADER_ORTHO].m_slot[SSLOT_COLOR], 1, 1, 1, 1);
+	glUnIForm4f(g_shader[SHADER_ORTHO].m_slot[SSLOT_COLOR], 1, 1, 1, 1);
 }
 
 void DrawBoxShadText(int fnt, float startx, float starty, float width, float height, const RichText* text, const float* color, int ln, int caret)
 {
-	//glUniform4f(g_shader[SHADER_ORTHO].m_slot[SSLOT_COLOR], 0, 0, 0, 1);
-	glUniform4f(g_shader[SHADER_ORTHO].m_slot[SSLOT_COLOR], 0.3f, 0.3f, 0.3f, color ? color[3] : 1);
+	//glUnIForm4f(g_shader[SHADER_ORTHO].m_slot[SSLOT_COLOR], 0, 0, 0, 1);
+	glUnIForm4f(g_shader[SHADER_ORTHO].m_slot[SSLOT_COLOR], 0.3f, 0.3f, 0.3f, color ? color[3] : 1);
 	currcolor[0] = 0.3f;
 	currcolor[1] = 0.3f;
 	currcolor[2] = 0.3f;
@@ -1075,12 +1075,12 @@ void DrawBoxShadText(int fnt, float startx, float starty, float width, float hei
 
 	if(color == NULL)
 	{
-		glUniform4f(g_shader[SHADER_ORTHO].m_slot[SSLOT_COLOR], 1, 1, 1, 1);
+		glUnIForm4f(g_shader[SHADER_ORTHO].m_slot[SSLOT_COLOR], 1, 1, 1, 1);
 		for(int c=0; c<4; c++) currcolor[c] = 1;
 	}
 	else
 	{
-		glUniform4f(g_shader[SHADER_ORTHO].m_slot[SSLOT_COLOR], color[0], color[1], color[2], color[3]);
+		glUnIForm4f(g_shader[SHADER_ORTHO].m_slot[SSLOT_COLOR], color[0], color[1], color[2], color[3]);
 		for(int c=0; c<4; c++) currcolor[c] = color[c];
 	}
 
@@ -1108,8 +1108,8 @@ void DrawBoxShadText(int fnt, float startx, float starty, float width, float hei
 
 void DrawBoxShadTextF(int fnt, float startx, float starty, float width, float height, const RichText* text, const float* color, int ln, int caret, float framex1, float framey1, float framex2, float framey2)
 {
-	//glUniform4f(g_shader[SHADER_ORTHO].m_slot[SSLOT_COLOR], 0, 0, 0, 1);
-	glUniform4f(g_shader[SHADER_ORTHO].m_slot[SSLOT_COLOR], 0.3f, 0.3f, 0.3f, color ? color[3] : 1);
+	//glUnIForm4f(g_shader[SHADER_ORTHO].m_slot[SSLOT_COLOR], 0, 0, 0, 1);
+	glUnIForm4f(g_shader[SHADER_ORTHO].m_slot[SSLOT_COLOR], 0.3f, 0.3f, 0.3f, color ? color[3] : 1);
 	currcolor[0] = 0.3f;
 	currcolor[1] = 0.3f;
 	currcolor[2] = 0.3f;
@@ -1182,12 +1182,12 @@ void DrawBoxShadTextF(int fnt, float startx, float starty, float width, float he
 
 	if(color == NULL)
 	{
-		glUniform4f(g_shader[SHADER_ORTHO].m_slot[SSLOT_COLOR], 1, 1, 1, 1);
+		glUnIForm4f(g_shader[SHADER_ORTHO].m_slot[SSLOT_COLOR], 1, 1, 1, 1);
 		for(int c=0; c<4; c++) currcolor[c] = 1;
 	}
 	else
 	{
-		glUniform4f(g_shader[SHADER_ORTHO].m_slot[SSLOT_COLOR], color[0], color[1], color[2], color[3]);
+		glUnIForm4f(g_shader[SHADER_ORTHO].m_slot[SSLOT_COLOR], color[0], color[1], color[2], color[3]);
 		for(int c=0; c<4; c++) currcolor[c] = color[c];
 	}
 

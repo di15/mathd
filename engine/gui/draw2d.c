@@ -6,7 +6,7 @@ void DrawImage(unsigned int tex, float left, float top, float right, float botto
 {
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, tex);
-	glUniform1i(g_shader[SHADER_ORTHO].m_slot[SSLOT_TEXTURE0], 0);
+	glUnIForm1i(g_shader[SHADER_ORTHO].m_slot[SSLOT_TEXTURE0], 0);
 
 	float vertices[] =
 	{
@@ -47,7 +47,7 @@ void DrawSquare(float r, float g, float b, float a, float left, float top, float
 	glColor4f(1, 1, 1, 1);
 	glEnable(GL_TEXTURE_2D);*/
 
-	glUniform4f(g_shader[SHADER_COLOR2D].m_slot[SSLOT_COLOR], r, g, b, a);
+	glUnIForm4f(g_shader[SHADER_COLOR2D].m_slot[SSLOT_COLOR], r, g, b, a);
 
 	float vertices[] =
 	{
@@ -87,7 +87,7 @@ void DrawLine(float r, float g, float b, float a, float x1, float y1, float x2, 
 	glColor4f(1, 1, 1, 1);
 	glEnable(GL_TEXTURE_2D);*/
 
-	glUniform4f(g_shader[SHADER_COLOR2D].m_slot[SSLOT_COLOR], r, g, b, a);
+	glUnIForm4f(g_shader[SHADER_COLOR2D].m_slot[SSLOT_COLOR], r, g, b, a);
 
 	float vertices[] =
 	{

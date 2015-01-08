@@ -22,7 +22,7 @@ void TextBlock::draw()
 
 	DrawBoxShadTextF(m_font, m_pos[0], m_pos[1], width, height, &m_text, m_rgba, 0, -1, m_frame[0], m_frame[1], m_frame[2], m_frame[3]);
 
-	glUniform4f(g_shader[SHADER_ORTHO].m_slot[SSLOT_COLOR], 1, 1, 1, 1);
+	glUnIForm4f(g_shader[SHADER_ORTHO].m_slot[SSLOT_COLOR], 1, 1, 1, 1);
 }
 
 void TextBlock::changevalue(const char* newv)

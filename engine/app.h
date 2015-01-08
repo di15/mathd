@@ -2,7 +2,7 @@
 #ifndef APP_H
 #define APP_H
 
-#include "../engine/window.h"
+#include "sys/window.h"
 
 #define VERSION				3
 #define CONFIGFILE			"config.ini"
@@ -19,6 +19,6 @@
 #define APPMODE_EDITOR		7
 #define APPMODE_JOINING		8
 extern int g_mode;
-extern int g_reStage;
+extern int g_restage;
 
 #endif

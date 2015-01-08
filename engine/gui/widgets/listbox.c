@@ -70,7 +70,7 @@ float ListBox::scrollspace()
 
 void ListBox::draw()
 {
-	glUniform4f(g_shader[SHADER_ORTHO].m_slot[SSLOT_COLOR], 1, 1, 1, 1);
+	glUnIForm4f(g_shader[SHADER_ORTHO].m_slot[SSLOT_COLOR], 1, 1, 1, 1);
 
 	Font* f = &g_font[m_font];
 	int rows = rowsshown();
@@ -84,9 +84,9 @@ void ListBox::draw()
 
 	if(m_selected >= 0 && m_selected >= (int)m_scroll[1] && m_selected < (int)m_scroll[1]+rowsshown())
 	{
-		glUniform4f(g_shader[SHADER_ORTHO].m_slot[SSLOT_COLOR], 1, 1, 1, 0.5f);
+		glUnIForm4f(g_shader[SHADER_ORTHO].m_slot[SSLOT_COLOR], 1, 1, 1, 0.5f);
 		DrawImage(g_texture[m_filledtex].texname, m_pos[0], m_pos[1]+(m_selected-(int)m_scroll[1])*f->gheight, m_pos[2]-square(), m_pos[1]+(m_selected-(int)m_scroll[1]+1)*f->gheight);
-		glUniform4f(g_shader[SHADER_ORTHO].m_slot[SSLOT_COLOR], 1, 1, 1, 1);
+		glUnIForm4f(g_shader[SHADER_ORTHO].m_slot[SSLOT_COLOR], 1, 1, 1, 1);
 	}
 
 	for(int i=(int)m_scroll[1]; i<(int)m_scroll[1]+rowsshown(); i++)

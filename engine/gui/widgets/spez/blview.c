@@ -16,7 +16,7 @@
 #include "cstrview.h"
 #include "../../../platform.h"
 #include "../viewportw.h"
-#include "../../../../game/gui/gviewport.h"
+#include "../../../../app/gui/gviewport.h"
 #include "../../../sim/building.h"
 #include "../../../sim/bltype.h"
 #include "../../../sim/road.h"
@@ -961,7 +961,7 @@ void BlView::regen(Selection* sel)
 			somestock = true;
 
 			char num[32];
-			std::string stocked = iform(b->stocked[ri]);
+			std::string stocked = IForm(b->stocked[ri]);
 			sprintf(num, "%s\n", stocked.c_str());
 
 			Resource* r = &g_resource[ri];
@@ -1033,13 +1033,13 @@ void BlView::regen(Selection* sel)
 			char str[32];
 			if(bt->output[ri] <= 0)
 			{
-				std::string nums = iform(num);
+				std::string nums = IForm(num);
 				sprintf(str, "%s\n", nums.c_str());
 			}
 			else
 			{
-				std::string nums = iform(num);
-				std::string denoms = iform(denom);
+				std::string nums = IForm(num);
+				std::string denoms = IForm(denom);
 				sprintf(str, "%s/%s\n", nums.c_str(), denoms.c_str());
 			}
 

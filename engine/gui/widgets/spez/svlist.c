@@ -16,7 +16,7 @@
 #include "cstrview.h"
 #include "../../../platform.h"
 #include "../viewportw.h"
-#include "../../../../game/gui/gviewport.h"
+#include "../../../../app/gui/gviewport.h"
 #include "../../../sim/building.h"
 #include "../../../sim/bltype.h"
 #include "../../../sim/road.h"
@@ -33,7 +33,7 @@
 #include "../../../net/client.h"
 
 //not engine
-#include "../../../../game/gui/ggui.h"
+#include "../../../../app/gui/appgui.h"
 
 bool g_reqsvlist = false;
 bool g_reqdnexthost = false;
@@ -498,9 +498,9 @@ void SvList::subdraw()
 			Player* py = &g_player[g_localP];
 			
 			Shader* s = &g_shader[g_curS];
-			glUniform1f(g_shader[SHADER_ORTHO].m_slot[SSLOT_WIDTH], (float)g_width);
-			glUniform1f(g_shader[SHADER_ORTHO].m_slot[SSLOT_HEIGHT], (float)g_height);
-			//glUniform4f(g_shader[SHADER_ORTHO].m_slot[SSLOT_COLOR], 0.2f, 1.0f, 0.2f, 0.6f);
+			glUnIForm1f(g_shader[SHADER_ORTHO].m_slot[SSLOT_WIDTH], (float)g_width);
+			glUnIForm1f(g_shader[SHADER_ORTHO].m_slot[SSLOT_HEIGHT], (float)g_height);
+			//glUnIForm4f(g_shader[SHADER_ORTHO].m_slot[SSLOT_COLOR], 0.2f, 1.0f, 0.2f, 0.6f);
 
 			DrawSquare(0.2f, 1.0f, 0.2f, 0.6f, m_pos[0], m_listtop + (sin-scroll)*f->gheight, m_pos[2], m_listtop + (sin-scroll+1.0f)*f->gheight);
 

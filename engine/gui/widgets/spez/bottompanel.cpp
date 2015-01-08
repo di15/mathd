@@ -17,7 +17,7 @@
 #include "bottompanel.h"
 #include "../../../platform.h"
 #include "../viewportw.h"
-#include "../../../../game/gui/gviewport.h"
+#include "../../../../app/gui/gviewport.h"
 #include "../../../sim/player.h"
 
 BottomPanel::BottomPanel(Widget* parent, const char* n, void (*reframef)(Widget* thisw))
@@ -181,7 +181,7 @@ void BottomPanel::draw()
 	Image whitebg;
 #endif
 
-	glUniform4f(g_shader[SHADER_ORTHO].m_slot[SSLOT_COLOR], 1, 1, 1, 1);
+	glUnIForm4f(g_shader[SHADER_ORTHO].m_slot[SSLOT_COLOR], 1, 1, 1, 1);
 
 #if 0
 	whitebg.draw();

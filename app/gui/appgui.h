@@ -1,7 +1,7 @@
 #ifndef GGUI_H
 #define GGUI_H
 
-#include "../../common/math/vec3f.h"
+#include "../../engine/math/vec3f.h"
 
 class ViewLayer;
 class Widget;

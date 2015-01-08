@@ -46,7 +46,7 @@ TextArea::TextArea(Widget* parent, const char* n, const RichText t, int f, void 
 
 void TextArea::draw()
 {
-	glUniform4f(g_shader[SHADER_ORTHO].m_slot[SSLOT_COLOR], 1, 1, 1, 1);
+	glUnIForm4f(g_shader[SHADER_ORTHO].m_slot[SSLOT_COLOR], 1, 1, 1, 1);
 
 	DrawImage(m_frametex, m_pos[0], m_pos[1], m_pos[2], m_pos[3]);
 

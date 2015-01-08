@@ -29,18 +29,18 @@ void DrawOrders(Matrix* projection, Matrix* modelmat, Matrix* viewmat)
 
 	Shader* s = &g_shader[g_curS];
 
-	glUniformMatrix4fv(s->m_slot[SSLOT_PROJECTION], 1, 0, projection->m_matrix);
-	glUniformMatrix4fv(s->m_slot[SSLOT_MODELMAT], 1, 0, modelmat->m_matrix);
-	glUniformMatrix4fv(s->m_slot[SSLOT_VIEWMAT], 1, 0, viewmat->m_matrix);
-	glUniformMatrix4fv(s->m_slot[SSLOT_MVP], 1, 0, g_cammvp.m_matrix);
-	glUniform4f(s->m_slot[SSLOT_COLOR], 0, 1, 0, 1);
+	glUnIFormMatrix4fv(s->m_slot[SSLOT_PROJECTION], 1, 0, projection->m_matrix);
+	glUnIFormMatrix4fv(s->m_slot[SSLOT_MODELMAT], 1, 0, modelmat->m_matrix);
+	glUnIFormMatrix4fv(s->m_slot[SSLOT_VIEWMAT], 1, 0, viewmat->m_matrix);
+	glUnIFormMatrix4fv(s->m_slot[SSLOT_MVP], 1, 0, g_cammvp.m_matrix);
+	glUnIForm4f(s->m_slot[SSLOT_COLOR], 0, 1, 0, 1);
 	//glEnableVertexAttribArray(s->m_slot[SSLOT_POSITION]);
 	//glEnableVertexAttribArray(s->m_slot[SSLOT_TEXCOORD0]);
 	//glEnableVertexAttribArray(s->m_slot[SSLOT_NORMAL]);
 
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, g_texture[ g_circle ].texname);
-	glUniform1i(s->m_slot[SSLOT_TEXTURE0], 0);
+	glUnIForm1i(s->m_slot[SSLOT_TEXTURE0], 0);
 
 	auto oitr = g_order.begin();
 
@@ -60,7 +60,7 @@ void DrawOrders(Matrix* projection, Matrix* modelmat, Matrix* viewmat)
 		1, 0);		glVertex3f(p.x + r, p.y + 1, p.z - r);
 		*/
 
-		glUniform4f(s->m_slot[SSLOT_COLOR], 0, 1, 0, a);
+		glUnIForm4f(s->m_slot[SSLOT_COLOR], 0, 1, 0, a);
 
 #if 0
 		float y1 = Bilerp(&g_hmap, p.x + r, p.z - r);
@@ -113,7 +113,7 @@ void DrawOrders(Matrix* projection, Matrix* modelmat, Matrix* viewmat)
 
 	//glEnd();
 	//glColor4f(1, 1, 1, 1);
-	//glUniform4f(s->m_slot[SSLOT_COLOR], 1, 1, 1, 1);
+	//glUnIForm4f(s->m_slot[SSLOT_COLOR], 1, 1, 1, 1);
 
 	EndS();
 }

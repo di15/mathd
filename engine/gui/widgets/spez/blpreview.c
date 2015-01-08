@@ -16,7 +16,7 @@
 #include "blpreview.h"
 #include "../../../platform.h"
 #include "../viewportw.h"
-#include "../../../../game/gui/gviewport.h"
+#include "../../../../app/gui/gviewport.h"
 
 //viewport
 void Resize_BP_VP(Widget* thisw)

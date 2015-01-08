@@ -17,7 +17,7 @@
 #include "buildpreview.h"
 #include "../../../platform.h"
 #include "../viewportw.h"
-#include "../../../../game/gui/gviewport.h"
+#include "../../../../app/gui/gviewport.h"
 
 BuildPreview::BuildPreview(Widget* parent, const char* n, void (*reframef)(Widget* thisw))
 {
@@ -89,7 +89,7 @@ void BuildPreview::reframe()	//resized or moved
 void BuildPreview::draw()
 {
 
-	glUniform4f(g_shader[SHADER_ORTHO].m_slot[SSLOT_COLOR], 1, 1, 1, 1);
+	glUnIForm4f(g_shader[SHADER_ORTHO].m_slot[SSLOT_COLOR], 1, 1, 1, 1);
 
 #if 0
 	whitebg.draw();

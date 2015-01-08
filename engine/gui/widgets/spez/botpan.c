@@ -20,7 +20,7 @@
 #include "../../../render/graph.h"
 
 //not engine
-#include "../../../../game/gui/gviewport.h"
+#include "../../../../app/gui/gviewport.h"
 
 BotPan::BotPan(Widget* parent, const char* n, void (*reframef)(Widget* thisw))
 {
@@ -199,7 +199,7 @@ void BotPan::draw()
 	Image whitebg;
 #endif
 
-	glUniform4f(g_shader[SHADER_ORTHO].m_slot[SSLOT_COLOR], 1, 1, 1, 1);
+	glUnIForm4f(g_shader[SHADER_ORTHO].m_slot[SSLOT_COLOR], 1, 1, 1, 1);
 
 #if 0
 	whitebg.draw();

@@ -1,17 +1,21 @@
 
 #include "chattext.h"
-#include "../../common/gui/gui.h"
-#include "../../common/sim/player.h"
+#include "../../engine/gui/gui.h"
+#include "../../engine/sim/player.h"
+#include "../../engine/sys/window.h"
 
 void Resize_ChatLine(Widget* thisw)
 {
-	Font* f = &g_font[thisw->m_font];
-	Player* py = &g_player[g_localP];
+	Font* f;
+	int i;
+	float topy;
 
-	int i = 0;
+	f = &g_font[thisw->m_font];
+	i = 0;
+
 	sscanf(thisw->m_name.c_str(), "%d", &i);
 
-	float topy = g_height - 200 - CHAT_LINES * f->gheight;
+	topy = g_height - 200 - CHAT_LINES * f->gheight;
 
 	thisw->m_pos[0] = 0;
 	thisw->m_pos[1] = topy + f->gheight * i;
@@ -21,9 +25,11 @@ void Resize_ChatLine(Widget* thisw)
 
 void Resize_ChatPrompt(Widget* thisw)
 {
-	Font* f = &g_font[thisw->m_font];
-	Player* py = &g_player[g_localP];
-	int i = CHAT_LINES;
+	Font* f;
+	int i;
+
+	f = &g_font[thisw->m_font];
+	i = CHAT_LINES;
 	thisw->m_pos[0] = 0;
 	thisw->m_pos[1] = 30 + f->gheight * i;
 	thisw->m_pos[2] = g_width;
@@ -32,39 +38,51 @@ void Resize_ChatPrompt(Widget* thisw)
 
 void AddChat(ViewLayer* playview)
 {
-	for(int i=0; i<CHAT_LINES; i++)
+	char name[32];
+	int i;
+	Text* textw;
+	RichText rt;
+
+	RichText_Init(&rt);
+
+	for(i=0; i<CHAT_LINES; i++)
 	{
-		char name[32];
 		sprintf(name, "%d", i);
-		playview->add(new Text(playview, name, RichText(), MAINFONT16, Resize_ChatLine, true, 1.0f, 1.0f, 1.0f, 1.0f));
-		//TODO get rid of warnings
+		textw = (Text*)malloc(sizeof(Text));
+		Widget_Text_Init(textw, playview, name, &rt, MAINFONT16, Resize_ChatLine, true, 1.0f, 1.0f, 1.0f, 1.0f);
+		Widget_Add((Widget*)playview, textw);
 	}
+
+	RichText_Free(&rt);
 }
 
 void AddChat(RichText* newl)
 {
-	Player* py = &g_player[g_localP];
-	GUI* gui = &g_gui;
-	ViewLayer* playview = (ViewLayer*)gui->get("play");
+	GUI* gui;
+	ViewLayer* playview;
+	int i;
+	char name[32];
+	char name2[32];
+	Text* textw;
+	Text* textw2;
 
-	for(int i=0; i<CHAT_LINES-1; i++)
+	gui = &g_gui;
+	playview = (ViewLayer*)gui->get("play");
+
+	for(i=0; i<CHAT_LINES-1; i++)
 	{
-		char name[32];
 		sprintf(name, "%d", i);
-		
-		char name2[32];
 		sprintf(name2, "%d", i+1);
 		
-		Text* text = (Text*)playview->get(name);
-		Text* text2 = (Text*)playview->get(name2);
+		textw = (Text*)Widget_Get(playview, name);
+		textw2 = (Text*)Widget_Get(playview, name2);
 
-		text->m_text = text2->m_text;
+		RichText_Free(&textw->m_text);
+		RichText_Copy(&textw->m_text, &textw2->m_text);
 	}
 
-	char name[32];
 	sprintf(name, "%d", CHAT_LINES-1);
-	Text* text = (Text*)playview->get(name);
-	std::string datetime = DateTime();
-	//text->m_text = RichText(UString("[")) + RichText(UString(datetime.c_str())) + RichText(UString("] ")) + *newl;
-	text->m_text = *newl;
+	textw = (Text*)Widget_Get(playview, name);
+	RichText_Free(&textw->m_text);
+	RichText_Copy(&textw->m_text, newl);
 }

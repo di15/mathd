@@ -30,7 +30,7 @@
 #include "tilepath.h"
 
 //not engine
-#include "../../game/gui/chattext.h"
+#include "../../app/gui/chattext.h"
 
 long long g_lastpath = 0;
 std::list<PathNode*> g_toclear;

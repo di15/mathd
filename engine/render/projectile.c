@@ -60,7 +60,7 @@ void DrawProjectiles()
 	Vec3f a, b, c, d;
 
 	Shader* s = &g_shader[SHADER_BILLBOARD];
-	glUniform4f(s->m_slot[SSLOT_COLOR], 1, 1, 1, 1);
+	glUnIForm4f(s->m_slot[SSLOT_COLOR], 1, 1, 1, 1);
 
 	for(int i=0; i<PROJECTILES; i++)
 	{

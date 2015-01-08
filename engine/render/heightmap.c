@@ -1334,37 +1334,37 @@ void Heightmap::draw()
 
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, g_texture[ g_tiletexs[TILE_SAND] ].texname);
-	glUniform1i(s->m_slot[SSLOT_SANDTEX], 0);
+	glUnIForm1i(s->m_slot[SSLOT_SANDTEX], 0);
 	glActiveTexture(GL_TEXTURE1);
 	glBindTexture(GL_TEXTURE_2D, g_texture[ g_tiletexs[TILE_GRASS] ].texname);
-	glUniform1i(s->m_slot[SSLOT_GRASSTEX], 1);
+	glUnIForm1i(s->m_slot[SSLOT_GRASSTEX], 1);
 	//glActiveTexture(GL_TEXTURE2);
 	//glBindTexture(GL_TEXTURE_2D, g_texture[ g_tiletexs[TILE_SNOW] ].texname);
-	//glUniform1i(s->m_slot[SSLOT_SNOWTEX], 2);
+	//glUnIForm1i(s->m_slot[SSLOT_SNOWTEX], 2);
 	glActiveTexture(GL_TEXTURE3);
 	glBindTexture(GL_TEXTURE_2D, g_texture[ g_tiletexs[TILE_ROCK] ].texname);
-	glUniform1i(s->m_slot[SSLOT_ROCKTEX], 3);
+	glUnIForm1i(s->m_slot[SSLOT_ROCKTEX], 3);
 	glActiveTexture(GL_TEXTURE4);
 	glBindTexture(GL_TEXTURE_2D, g_texture[ g_tiletexs[TILE_CRACKEDROCK] ].texname);
-	glUniform1i(s->m_slot[SSLOT_CRACKEDROCKTEX], 4);
+	glUnIForm1i(s->m_slot[SSLOT_CRACKEDROCKTEX], 4);
 	glActiveTexture(GL_TEXTURE5);
 	glBindTexture(GL_TEXTURE_2D, g_texture[ g_tiletexs[TILE_CRACKEDROCK_NORM] ].texname);
-	glUniform1i(s->m_slot[SSLOT_CRACKEDROCKNORMTEX], 5);
+	glUnIForm1i(s->m_slot[SSLOT_CRACKEDROCKNORMTEX], 5);
 	glActiveTexture(GL_TEXTURE6);
 	glBindTexture(GL_TEXTURE_2D, g_texture[ g_tiletexs[TILE_ROCK_NORM] ].texname);
-	glUniform1i(s->m_slot[SSLOT_ROCKNORMTEX], 6);
+	glUnIForm1i(s->m_slot[SSLOT_ROCKNORMTEX], 6);
 
 	//float yscale = TILE_Y_SCALE / 2000.0f;
-	glUniform1f(s->m_slot[SSLOT_SANDONLYMAXY], ELEV_SANDONLYMAXY);
-	glUniform1f(s->m_slot[SSLOT_SANDGRASSMAXY], ELEV_SANDGRASSMAXY);
-	glUniform1f(s->m_slot[SSLOT_GRASSONLYMAXY], ELEV_GRASSONLYMAXY);
-	glUniform1f(s->m_slot[SSLOT_GRASSROCKMAXY], ELEV_GRASSROCKMAXY);
-	glUniform1f(s->m_slot[SSLOT_MAPMINZ], 0);
-	glUniform1f(s->m_slot[SSLOT_MAPMAXZ], m_widthy*TILE_SIZE*m_tilescale);
-	glUniform1f(s->m_slot[SSLOT_MAPMINX], 0);
-	glUniform1f(s->m_slot[SSLOT_MAPMAXX], m_widthx*TILE_SIZE*m_tilescale);
-	glUniform1f(s->m_slot[SSLOT_MAPMINY], ConvertHeight(0));
-	glUniform1f(s->m_slot[SSLOT_MAPMAXY], ConvertHeight(255));
+	glUnIForm1f(s->m_slot[SSLOT_SANDONLYMAXY], ELEV_SANDONLYMAXY);
+	glUnIForm1f(s->m_slot[SSLOT_SANDGRASSMAXY], ELEV_SANDGRASSMAXY);
+	glUnIForm1f(s->m_slot[SSLOT_GRASSONLYMAXY], ELEV_GRASSONLYMAXY);
+	glUnIForm1f(s->m_slot[SSLOT_GRASSROCKMAXY], ELEV_GRASSROCKMAXY);
+	glUnIForm1f(s->m_slot[SSLOT_MAPMINZ], 0);
+	glUnIForm1f(s->m_slot[SSLOT_MAPMAXZ], m_widthy*TILE_SIZE*m_tilescale);
+	glUnIForm1f(s->m_slot[SSLOT_MAPMINX], 0);
+	glUnIForm1f(s->m_slot[SSLOT_MAPMAXX], m_widthx*TILE_SIZE*m_tilescale);
+	glUnIForm1f(s->m_slot[SSLOT_MAPMINY], ConvertHeight(0));
+	glUnIForm1f(s->m_slot[SSLOT_MAPMAXY], ConvertHeight(255));
 
 	Matrix modelmat;
 	modelmat.reset();
@@ -1373,7 +1373,7 @@ void Heightmap::draw()
 	modelview.set(g_camview.m_matrix);
 #endif
 	modelview.postmult(modelmat);
-	glUniformMatrix4fv(s->m_slot[SSLOT_MODELVIEW], 1, 0, modelview.m_matrix);
+	glUnIFormMatrix4fv(s->m_slot[SSLOT_MODELVIEW], 1, 0, modelview.m_matrix);
 
 	Matrix mvp;
 #if 0
@@ -1387,13 +1387,13 @@ void Heightmap::draw()
 	mvp.postmult(g_camview);
 	mvp.postmult(modelmat);
 #endif
-	glUniformMatrix4fv(s->m_slot[SSLOT_MVP], 1, 0, mvp.m_matrix);
+	glUnIFormMatrix4fv(s->m_slot[SSLOT_MVP], 1, 0, mvp.m_matrix);
 
 	Matrix modelviewinv;
 	Transpose(modelview, modelview);
 	Inverse2(modelview, modelviewinv);
 	//Transpose(modelviewinv, modelviewinv);
-	glUniformMatrix4fv(s->m_slot[SSLOT_NORMALMAT], 1, 0, modelviewinv.m_matrix);
+	glUnIFormMatrix4fv(s->m_slot[SSLOT_NORMALMAT], 1, 0, modelviewinv.m_matrix);
 
 	/*
 	for(int x=0; x<m_widthx; x++)
@@ -1455,57 +1455,57 @@ void Heightmap::draw2()
 
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, g_texture[ g_tiletexs[TILE_SAND] ].texname);
-	glUniform1i(s->m_slot[SSLOT_SANDTEX], 0);
+	glUnIForm1i(s->m_slot[SSLOT_SANDTEX], 0);
 
 	CheckGLError(__FILE__, __LINE__);
 
 	glActiveTexture(GL_TEXTURE1);
 	glBindTexture(GL_TEXTURE_2D, g_texture[ g_tiletexs[TILE_GRASS] ].texname);
-	glUniform1i(s->m_slot[SSLOT_GRASSTEX], 1);
+	glUnIForm1i(s->m_slot[SSLOT_GRASSTEX], 1);
 
 	CheckGLError(__FILE__, __LINE__);
 
 	//glActiveTexture(GL_TEXTURE2);
 	//glBindTexture(GL_TEXTURE_2D, g_texture[ g_tiletexs[TILE_SNOW] ].texname);
-	//glUniform1i(s->m_slot[SSLOT_SNOWTEX], 2);
+	//glUnIForm1i(s->m_slot[SSLOT_SNOWTEX], 2);
 
 	CheckGLError(__FILE__, __LINE__);
 
 	glActiveTexture(GL_TEXTURE3);
 	glBindTexture(GL_TEXTURE_2D, g_texture[ g_tiletexs[TILE_ROCK] ].texname);
-	glUniform1i(s->m_slot[SSLOT_ROCKTEX], 3);
+	glUnIForm1i(s->m_slot[SSLOT_ROCKTEX], 3);
 
 	CheckGLError(__FILE__, __LINE__);
 
 	glActiveTexture(GL_TEXTURE4);
 	glBindTexture(GL_TEXTURE_2D, g_texture[ g_tiletexs[TILE_CRACKEDROCK] ].texname);
-	glUniform1i(s->m_slot[SSLOT_CRACKEDROCKTEX], 4);
+	glUnIForm1i(s->m_slot[SSLOT_CRACKEDROCKTEX], 4);
 
 	CheckGLError(__FILE__, __LINE__);
 
 	glActiveTexture(GL_TEXTURE5);
 	glBindTexture(GL_TEXTURE_2D, g_texture[ g_tiletexs[TILE_CRACKEDROCK_NORM] ].texname);
-	glUniform1i(s->m_slot[SSLOT_CRACKEDROCKNORMTEX], 5);
+	glUnIForm1i(s->m_slot[SSLOT_CRACKEDROCKNORMTEX], 5);
 
 	CheckGLError(__FILE__, __LINE__);
 
 	glActiveTexture(GL_TEXTURE6);
 	glBindTexture(GL_TEXTURE_2D, g_texture[ g_tiletexs[TILE_ROCK_NORM] ].texname);
-	glUniform1i(s->m_slot[SSLOT_ROCKNORMTEX], 6);
+	glUnIForm1i(s->m_slot[SSLOT_ROCKNORMTEX], 6);
 
 	CheckGLError(__FILE__, __LINE__);
 
 	//float yscale = TILE_Y_SCALE / 2000.0f;
-	glUniform1f(s->m_slot[SSLOT_SANDONLYMAXY], ELEV_SANDONLYMAXY);
-	glUniform1f(s->m_slot[SSLOT_SANDGRASSMAXY], ELEV_SANDGRASSMAXY);
-	glUniform1f(s->m_slot[SSLOT_GRASSONLYMAXY], ELEV_GRASSONLYMAXY);
-	glUniform1f(s->m_slot[SSLOT_GRASSROCKMAXY], ELEV_GRASSROCKMAXY);
-	glUniform1f(s->m_slot[SSLOT_MAPMINZ], 0);
-	glUniform1f(s->m_slot[SSLOT_MAPMAXZ], m_widthy*TILE_SIZE*m_tilescale);
-	glUniform1f(s->m_slot[SSLOT_MAPMINX], 0);
-	glUniform1f(s->m_slot[SSLOT_MAPMAXX], m_widthx*TILE_SIZE*m_tilescale);
-	glUniform1f(s->m_slot[SSLOT_MAPMINY], ConvertHeight(0));
-	glUniform1f(s->m_slot[SSLOT_MAPMAXY], ConvertHeight(255));
+	glUnIForm1f(s->m_slot[SSLOT_SANDONLYMAXY], ELEV_SANDONLYMAXY);
+	glUnIForm1f(s->m_slot[SSLOT_SANDGRASSMAXY], ELEV_SANDGRASSMAXY);
+	glUnIForm1f(s->m_slot[SSLOT_GRASSONLYMAXY], ELEV_GRASSONLYMAXY);
+	glUnIForm1f(s->m_slot[SSLOT_GRASSROCKMAXY], ELEV_GRASSROCKMAXY);
+	glUnIForm1f(s->m_slot[SSLOT_MAPMINZ], 0);
+	glUnIForm1f(s->m_slot[SSLOT_MAPMAXZ], m_widthy*TILE_SIZE*m_tilescale);
+	glUnIForm1f(s->m_slot[SSLOT_MAPMINX], 0);
+	glUnIForm1f(s->m_slot[SSLOT_MAPMAXX], m_widthx*TILE_SIZE*m_tilescale);
+	glUnIForm1f(s->m_slot[SSLOT_MAPMINY], ConvertHeight(0));
+	glUnIForm1f(s->m_slot[SSLOT_MAPMAXY], ConvertHeight(255));
 
 	Matrix modelmat;
 	modelmat.reset();
@@ -1514,7 +1514,7 @@ void Heightmap::draw2()
 	modelview.set(g_camview.m_matrix);
 #endif
 	modelview.postmult(modelmat);
-	glUniformMatrix4fv(s->m_slot[SSLOT_MODELVIEW], 1, 0, modelview.m_matrix);
+	glUnIFormMatrix4fv(s->m_slot[SSLOT_MODELVIEW], 1, 0, modelview.m_matrix);
 
 	Matrix mvp;
 #if 0
@@ -1528,13 +1528,13 @@ void Heightmap::draw2()
 	mvp.postmult(g_camview);
 	mvp.postmult(modelmat);
 #endif
-	glUniformMatrix4fv(s->m_slot[SSLOT_MVP], 1, 0, mvp.m_matrix);
+	glUnIFormMatrix4fv(s->m_slot[SSLOT_MVP], 1, 0, mvp.m_matrix);
 
 	Matrix modelviewinv;
 	Transpose(modelview, modelview);
 	Inverse2(modelview, modelviewinv);
 	//Transpose(modelviewinv, modelviewinv);
-	glUniformMatrix4fv(s->m_slot[SSLOT_NORMALMAT], 1, 0, modelviewinv.m_matrix);
+	glUnIFormMatrix4fv(s->m_slot[SSLOT_NORMALMAT], 1, 0, modelviewinv.m_matrix);
 
 	CheckGLError(__FILE__, __LINE__);
 
@@ -1611,26 +1611,26 @@ void Heightmap::drawrim()
 
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, g_texture[ g_rimtexs[TEX_DIFF] ].texname);
-	glUniform1i(s->m_slot[SSLOT_TEXTURE0], 0);
+	glUnIForm1i(s->m_slot[SSLOT_TEXTURE0], 0);
 	glActiveTexture(GL_TEXTURE1);
 	glBindTexture(GL_TEXTURE_2D, g_texture[ g_rimtexs[TEX_SPEC] ].texname);
-	glUniform1i(s->m_slot[SSLOT_SPECULARMAP], 1);
+	glUnIForm1i(s->m_slot[SSLOT_SPECULARMAP], 1);
 	glActiveTexture(GL_TEXTURE2);
 	glBindTexture(GL_TEXTURE_2D, g_texture[ g_rimtexs[TEX_NORM] ].texname);
-	glUniform1i(s->m_slot[SSLOT_NORMALMAP], 2);
+	glUnIForm1i(s->m_slot[SSLOT_NORMALMAP], 2);
 	glActiveTexture(GL_TEXTURE3);
 
 	//float yscale = TILE_Y_SCALE / 2000.0f;
-	glUniform1f(s->m_slot[SSLOT_SANDONLYMAXY], ELEV_SANDONLYMAXY);
-	glUniform1f(s->m_slot[SSLOT_SANDGRASSMAXY], ELEV_SANDGRASSMAXY);
-	glUniform1f(s->m_slot[SSLOT_GRASSONLYMAXY], ELEV_GRASSONLYMAXY);
-	glUniform1f(s->m_slot[SSLOT_GRASSROCKMAXY], ELEV_GRASSROCKMAXY);
-	glUniform1f(s->m_slot[SSLOT_MAPMINZ], 0);
-	glUniform1f(s->m_slot[SSLOT_MAPMAXZ], m_widthy*TILE_SIZE*m_tilescale);
-	glUniform1f(s->m_slot[SSLOT_MAPMINX], 0);
-	glUniform1f(s->m_slot[SSLOT_MAPMAXX], m_widthx*TILE_SIZE*m_tilescale);
-	glUniform1f(s->m_slot[SSLOT_MAPMINY], ConvertHeight(0));
-	glUniform1f(s->m_slot[SSLOT_MAPMAXY], ConvertHeight(255));
+	glUnIForm1f(s->m_slot[SSLOT_SANDONLYMAXY], ELEV_SANDONLYMAXY);
+	glUnIForm1f(s->m_slot[SSLOT_SANDGRASSMAXY], ELEV_SANDGRASSMAXY);
+	glUnIForm1f(s->m_slot[SSLOT_GRASSONLYMAXY], ELEV_GRASSONLYMAXY);
+	glUnIForm1f(s->m_slot[SSLOT_GRASSROCKMAXY], ELEV_GRASSROCKMAXY);
+	glUnIForm1f(s->m_slot[SSLOT_MAPMINZ], 0);
+	glUnIForm1f(s->m_slot[SSLOT_MAPMAXZ], m_widthy*TILE_SIZE*m_tilescale);
+	glUnIForm1f(s->m_slot[SSLOT_MAPMINX], 0);
+	glUnIForm1f(s->m_slot[SSLOT_MAPMAXX], m_widthx*TILE_SIZE*m_tilescale);
+	glUnIForm1f(s->m_slot[SSLOT_MAPMINY], ConvertHeight(0));
+	glUnIForm1f(s->m_slot[SSLOT_MAPMAXY], ConvertHeight(255));
 
 	Matrix modelmat;
 	modelmat.reset();
@@ -1639,7 +1639,7 @@ void Heightmap::drawrim()
 	modelview.set(g_camview.m_matrix);
 #endif
 	modelview.postmult(modelmat);
-	glUniformMatrix4fv(s->m_slot[SSLOT_MODELVIEW], 1, 0, modelview.m_matrix);
+	glUnIFormMatrix4fv(s->m_slot[SSLOT_MODELVIEW], 1, 0, modelview.m_matrix);
 
 	Matrix mvp;
 #if 0
@@ -1653,13 +1653,13 @@ void Heightmap::drawrim()
 	mvp.postmult(g_camview);
 	mvp.postmult(modelmat);
 #endif
-	glUniformMatrix4fv(s->m_slot[SSLOT_MVP], 1, 0, mvp.m_matrix);
+	glUnIFormMatrix4fv(s->m_slot[SSLOT_MVP], 1, 0, mvp.m_matrix);
 
 	Matrix modelviewinv;
 	Transpose(modelview, modelview);
 	Inverse2(modelview, modelviewinv);
 	//Transpose(modelviewinv, modelviewinv);
-	glUniformMatrix4fv(s->m_slot[SSLOT_NORMALMAT], 1, 0, modelviewinv.m_matrix);
+	glUnIFormMatrix4fv(s->m_slot[SSLOT_NORMALMAT], 1, 0, modelviewinv.m_matrix);
 
 	/*
 	for(int x=0; x<m_widthx; x++)

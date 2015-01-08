@@ -23,13 +23,13 @@ void Link::draw()
 
 	if(m_over)
 	{
-		//glUniform4f(g_shader[SHADER_ORTHO].m_slot[SSLOT_COLOR], 1, 1, 1, 1);
+		//glUnIForm4f(g_shader[SHADER_ORTHO].m_slot[SSLOT_COLOR], 1, 1, 1, 1);
 		//glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
 	}
 	else
 	{
 		//glColor4f(0.8f, 0.8f, 0.8f, 1.0f);
-		//glUniform4f(g_shader[SHADER_ORTHO].m_slot[SSLOT_COLOR], 0.8f, 0.8f, 0.8f, 1.0f);
+		//glUnIForm4f(g_shader[SHADER_ORTHO].m_slot[SSLOT_COLOR], 0.8f, 0.8f, 0.8f, 1.0f);
 		color[0] = 0.8f;
 		color[1] = 0.8f;
 		color[2] = 0.8f;
@@ -38,7 +38,7 @@ void Link::draw()
 	DrawShadowedText(m_font, m_pos[0], m_pos[1], &m_text, color);
 
 	//glColor4f(1, 1, 1, 1);
-	glUniform4f(g_shader[SHADER_ORTHO].m_slot[SSLOT_COLOR], 1, 1, 1, 1);
+	glUnIForm4f(g_shader[SHADER_ORTHO].m_slot[SSLOT_COLOR], 1, 1, 1, 1);
 
 	//glEnable(GL_TEXTURE_2D);
 }

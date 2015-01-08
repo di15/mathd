@@ -11,7 +11,7 @@
 #include "../utils.h"
 
 #ifndef MATCHMAKER
-#include "../../game/gmain.h"
+#include "../../app/appmain.h"
 #endif
 
 bool g_sentsvinfo = false;	//did we send our hosted game's IP to the sv list?

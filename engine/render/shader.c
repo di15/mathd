@@ -8,12 +8,12 @@
 Shader g_shader[SHADERS];
 int g_curS = 0;
 
-GLint Shader::getuniform(const char* strVariable)
+GLint Shader::getunIForm(const char* strVariable)
 {
 	if(!m_program)
 		return -1;
 
-	return glGetUniformLocation(m_program, strVariable);
+	return glGetUnIFormLocation(m_program, strVariable);
 }
 
 GLint Shader::getattrib(const char* strVariable)
@@ -28,10 +28,10 @@ GLint Shader::getattrib(const char* strVariable)
 	return glGetAttribLocation(m_program, strVariable);
 }
 
-void Shader::mapuniform(int slot, const char* variable)
+void Shader::mapunIForm(int slot, const char* variable)
 {
-	m_slot[slot] = getuniform(variable);
-	//g_log<<"\tmap uniform "<<variable<<" = "<<(int)m_slot[slot]<<std::endl;
+	m_slot[slot] = getunIForm(variable);
+	//g_log<<"\tmap unIForm "<<variable<<" = "<<(int)m_slot[slot]<<std::endl;
 }
 
 void Shader::mapattrib(int slot, const char* variable)
@@ -292,53 +292,53 @@ void LoadShader(int shader, char* strVertex, char* strFragment, bool hastexcoord
 	//s->mapattrib(SSLOT_TEXCOORD1, "texCoordIn1");
 	s->mapattrib(SSLOT_VERTCOLORS, "vertcolors");
 	//s->mapattrib(SSLOT_TANGENT, "tangent");
-	s->mapuniform(SSLOT_SHADOWMAP, "shadowmap");
-	s->mapuniform(SSLOT_LIGHTMATRIX, "lightMatrix");
-	s->mapuniform(SSLOT_LIGHTPOS, "lightPos");
-	//s->mapuniform(SSLOT_LIGHTDIR, "lightdir");
-	s->mapuniform(SSLOT_TEXTURE0, "texture0");
-	s->mapuniform(SSLOT_NORMALMAP, "normalmap");
-	s->mapuniform(SSLOT_SPECULARMAP, "specularmap");
-	s->mapuniform(SSLOT_PROJECTION, "projection");
-	s->mapuniform(SSLOT_MODELMAT, "model");
-	s->mapuniform(SSLOT_VIEWMAT, "view");
-	s->mapuniform(SSLOT_MVP, "mvp");
-	s->mapuniform(SSLOT_MODELVIEW, "modelview");
-	s->mapuniform(SSLOT_NORMALMAT, "normalMat");
-	//s->mapuniform(SSLOT_INVMODLVIEWMAT, "invModelView");
-	s->mapuniform(SSLOT_COLOR, "color");
-	s->mapuniform(SSLOT_OWNCOLOR, "owncolor");
-	s->mapuniform(SSLOT_WIDTH, "width");
-	s->mapuniform(SSLOT_HEIGHT, "height");
-	s->mapuniform(SSLOT_MIND, "mind");
-	s->mapuniform(SSLOT_MAXD, "maxd");
-	s->mapuniform(SSLOT_CAMERAPOS, "cameraPos");
-	s->mapuniform(SSLOT_SCALE, "scale");
-	s->mapuniform(SSLOT_MAXELEV, "maxelev");
-	s->mapuniform(SSLOT_SANDONLYMAXY, "sandonlymaxy");
-	s->mapuniform(SSLOT_SANDGRASSMAXY, "sandgrassmaxy");
-	s->mapuniform(SSLOT_GRASSONLYMAXY, "grassonlymaxy");
-	s->mapuniform(SSLOT_GRASSROCKMAXY, "dirtrockmaxy");
-	s->mapuniform(SSLOT_SANDTEX, "sandtex");
-	s->mapuniform(SSLOT_GRASSTEX, "grasstex");
-	s->mapuniform(SSLOT_SNOWTEX, "snowtex");
-	s->mapuniform(SSLOT_ROCKTEX, "rocktex");
-	s->mapuniform(SSLOT_ROCKNORMTEX, "rocknormtex");
-	s->mapuniform(SSLOT_CRACKEDROCKTEX, "crackedrocktex");
-	s->mapuniform(SSLOT_CRACKEDROCKNORMTEX, "crackedrocknormtex");
-	s->mapuniform(SSLOT_SUNDIRECTION, "sundirection");
-	s->mapuniform(SSLOT_GRADIENTTEX, "gradienttex");
-	s->mapuniform(SSLOT_DETAILTEX, "detailtex");
-	s->mapuniform(SSLOT_OWNERMAP, "ownermap");
-	s->mapuniform(SSLOT_MAPMINZ, "mapminz");
-	s->mapuniform(SSLOT_MAPMAXZ, "mapmaxz");
-	s->mapuniform(SSLOT_MODELMATS, "modelmats");
-	s->mapuniform(SSLOT_ONSWITCHES, "onswitches");
-	s->mapuniform(SSLOT_MAPMINX, "mapminx");
-	s->mapuniform(SSLOT_MAPMAXX, "mapmaxx");
-	s->mapuniform(SSLOT_MAPMINY, "mapminy");
-	s->mapuniform(SSLOT_MAPMAXY, "mapmaxy");
-	s->mapuniform(SSLOT_WAVEPHASE, "wavephase");
+	s->mapunIForm(SSLOT_SHADOWMAP, "shadowmap");
+	s->mapunIForm(SSLOT_LIGHTMATRIX, "lightMatrix");
+	s->mapunIForm(SSLOT_LIGHTPOS, "lightPos");
+	//s->mapunIForm(SSLOT_LIGHTDIR, "lightdir");
+	s->mapunIForm(SSLOT_TEXTURE0, "texture0");
+	s->mapunIForm(SSLOT_NORMALMAP, "normalmap");
+	s->mapunIForm(SSLOT_SPECULARMAP, "specularmap");
+	s->mapunIForm(SSLOT_PROJECTION, "projection");
+	s->mapunIForm(SSLOT_MODELMAT, "model");
+	s->mapunIForm(SSLOT_VIEWMAT, "view");
+	s->mapunIForm(SSLOT_MVP, "mvp");
+	s->mapunIForm(SSLOT_MODELVIEW, "modelview");
+	s->mapunIForm(SSLOT_NORMALMAT, "normalMat");
+	//s->mapunIForm(SSLOT_INVMODLVIEWMAT, "invModelView");
+	s->mapunIForm(SSLOT_COLOR, "color");
+	s->mapunIForm(SSLOT_OWNCOLOR, "owncolor");
+	s->mapunIForm(SSLOT_WIDTH, "width");
+	s->mapunIForm(SSLOT_HEIGHT, "height");
+	s->mapunIForm(SSLOT_MIND, "mind");
+	s->mapunIForm(SSLOT_MAXD, "maxd");
+	s->mapunIForm(SSLOT_CAMERAPOS, "cameraPos");
+	s->mapunIForm(SSLOT_SCALE, "scale");
+	s->mapunIForm(SSLOT_MAXELEV, "maxelev");
+	s->mapunIForm(SSLOT_SANDONLYMAXY, "sandonlymaxy");
+	s->mapunIForm(SSLOT_SANDGRASSMAXY, "sandgrassmaxy");
+	s->mapunIForm(SSLOT_GRASSONLYMAXY, "grassonlymaxy");
+	s->mapunIForm(SSLOT_GRASSROCKMAXY, "dirtrockmaxy");
+	s->mapunIForm(SSLOT_SANDTEX, "sandtex");
+	s->mapunIForm(SSLOT_GRASSTEX, "grasstex");
+	s->mapunIForm(SSLOT_SNOWTEX, "snowtex");
+	s->mapunIForm(SSLOT_ROCKTEX, "rocktex");
+	s->mapunIForm(SSLOT_ROCKNORMTEX, "rocknormtex");
+	s->mapunIForm(SSLOT_CRACKEDROCKTEX, "crackedrocktex");
+	s->mapunIForm(SSLOT_CRACKEDROCKNORMTEX, "crackedrocknormtex");
+	s->mapunIForm(SSLOT_SUNDIRECTION, "sundirection");
+	s->mapunIForm(SSLOT_GRADIENTTEX, "gradienttex");
+	s->mapunIForm(SSLOT_DETAILTEX, "detailtex");
+	s->mapunIForm(SSLOT_OWNERMAP, "ownermap");
+	s->mapunIForm(SSLOT_MAPMINZ, "mapminz");
+	s->mapunIForm(SSLOT_MAPMAXZ, "mapmaxz");
+	s->mapunIForm(SSLOT_MODELMATS, "modelmats");
+	s->mapunIForm(SSLOT_ONSWITCHES, "onswitches");
+	s->mapunIForm(SSLOT_MAPMINX, "mapminx");
+	s->mapunIForm(SSLOT_MAPMAXX, "mapmaxx");
+	s->mapunIForm(SSLOT_MAPMINY, "mapminy");
+	s->mapunIForm(SSLOT_MAPMAXY, "mapmaxy");
+	s->mapunIForm(SSLOT_WAVEPHASE, "wavephase");
 }
 
 void UseS(int shader)
@@ -370,8 +370,8 @@ void UseS(int shader)
 	if(s->m_hasnormals)	glEnableClientState(GL_NORMAL_ARRAY);
 #endif
 
-	if(s->m_slot[SSLOT_MIND] != -1) glUniform1f(s->m_slot[SSLOT_MIND], MIN_DISTANCE);
-	if(s->m_slot[SSLOT_MAXD] != -1) glUniform1f(s->m_slot[SSLOT_MAXD], MAX_DISTANCE / g_zoom);
+	if(s->m_slot[SSLOT_MIND] != -1) glUnIForm1f(s->m_slot[SSLOT_MIND], MIN_DISTANCE);
+	if(s->m_slot[SSLOT_MAXD] != -1) glUnIForm1f(s->m_slot[SSLOT_MAXD], MAX_DISTANCE / g_zoom);
 
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);

@@ -12,7 +12,7 @@
 #include "../texture.h"
 #include "../math/hmapmath.h"
 #include "../utils.h"
-#include "../../game/gmain.h"
+#include "../../app/appmain.h"
 #include "build.h"
 #include "player.h"
 #include "../gui/widgets/spez/cstrview.h"
@@ -57,9 +57,9 @@ void DrawMarquee()
 #if 0
 	EndS();
 	UseS(SHADER_COLOR2D);
-	glUniform1f(g_shader[SHADER_COLOR2D].m_slot[SSLOT_WIDTH], (float)g_width);
-	glUniform1f(g_shader[SHADER_COLOR2D].m_slot[SSLOT_HEIGHT], (float)g_height);
-	glUniform4f(g_shader[SHADER_COLOR2D].m_slot[SSLOT_COLOR], 0, 1, 0, 0.75f);
+	glUnIForm1f(g_shader[SHADER_COLOR2D].m_slot[SSLOT_WIDTH], (float)g_width);
+	glUnIForm1f(g_shader[SHADER_COLOR2D].m_slot[SSLOT_HEIGHT], (float)g_height);
+	glUnIForm4f(g_shader[SHADER_COLOR2D].m_slot[SSLOT_COLOR], 0, 1, 0, 0.75f);
 	glEnableVertexAttribArray(g_shader[SHADER_COLOR2D].m_slot[SSLOT_POSITION]);
 	glEnableVertexAttribArray(g_shader[SHADER_COLOR2D].m_slot[SSLOT_TEXCOORD0]);
 #endif
@@ -87,9 +87,9 @@ void DrawSel(Matrix* projection, Matrix* modelmat, Matrix* viewmat)
 	//glBlendFunc(GL_SRC_ALPHA, GL_ONE);
 	UseS(SHADER_COLOR3D);
 	Shader* s = &g_shader[g_curS];
-	glUniformMatrix4fv(s->m_slot[SSLOT_PROJECTION], 1, 0, projection->m_matrix);
-	glUniformMatrix4fv(s->m_slot[SSLOT_MODELMAT], 1, 0, modelmat->m_matrix);
-	glUniformMatrix4fv(s->m_slot[SSLOT_VIEWMAT], 1, 0, viewmat->m_matrix);
+	glUnIFormMatrix4fv(s->m_slot[SSLOT_PROJECTION], 1, 0, projection->m_matrix);
+	glUnIFormMatrix4fv(s->m_slot[SSLOT_MODELMAT], 1, 0, modelmat->m_matrix);
+	glUnIFormMatrix4fv(s->m_slot[SSLOT_VIEWMAT], 1, 0, viewmat->m_matrix);
 
 	Matrix mvp;
 #if 0
@@ -103,10 +103,10 @@ void DrawSel(Matrix* projection, Matrix* modelmat, Matrix* viewmat)
 	mvp.postmult(*viewmat);
 	mvp.postmult(*modelmat);
 #endif
-	glUniformMatrix4fv(s->m_slot[SSLOT_MVP], 1, 0, mvp.m_matrix);
+	glUnIFormMatrix4fv(s->m_slot[SSLOT_MVP], 1, 0, mvp.m_matrix);
 
 	float* color = g_player[g_localP].color;
-	glUniform4f(s->m_slot[SSLOT_COLOR], color[0], color[1], color[2], 0.5f);
+	glUnIForm4f(s->m_slot[SSLOT_COLOR], color[0], color[1], color[2], 0.5f);
 
 	Player* py = &g_player[g_localP];
 
@@ -165,12 +165,12 @@ void DrawSel(Matrix* projection, Matrix* modelmat, Matrix* viewmat)
 
 	s = &g_shader[g_curS];
 
-	glUniformMatrix4fv(s->m_slot[SSLOT_PROJECTION], 1, 0, projection->m_matrix);
-	glUniformMatrix4fv(s->m_slot[SSLOT_MODELMAT], 1, 0, modelmat->m_matrix);
-	glUniformMatrix4fv(s->m_slot[SSLOT_VIEWMAT], 1, 0, viewmat->m_matrix);
+	glUnIFormMatrix4fv(s->m_slot[SSLOT_PROJECTION], 1, 0, projection->m_matrix);
+	glUnIFormMatrix4fv(s->m_slot[SSLOT_MODELMAT], 1, 0, modelmat->m_matrix);
+	glUnIFormMatrix4fv(s->m_slot[SSLOT_VIEWMAT], 1, 0, viewmat->m_matrix);
 
 	color = g_player[g_localP].color;
-	glUniform4f(s->m_slot[SSLOT_COLOR], color[0], color[1], color[2], 1.0f);
+	glUnIForm4f(s->m_slot[SSLOT_COLOR], color[0], color[1], color[2], 1.0f);
 
 	//glEnableVertexAttribArray(s->m_slot[SSLOT_POSITION]);
 	//glEnableVertexAttribArray(s->m_slot[SSLOT_TEXCOORD0]);
@@ -178,7 +178,7 @@ void DrawSel(Matrix* projection, Matrix* modelmat, Matrix* viewmat)
 
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, g_texture[ g_circle ].texname);
-	glUniform1i(s->m_slot[SSLOT_TEXTURE0], 0);
+	glUnIForm1i(s->m_slot[SSLOT_TEXTURE0], 0);
 
 	for(auto seliter = g_sel.units.begin(); seliter != g_sel.units.end(); seliter++)
 	{

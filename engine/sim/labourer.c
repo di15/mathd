@@ -9,7 +9,7 @@
 #include "simdef.h"
 #include "job.h"
 #include "unitmove.h"
-#include "../../game/gui/chattext.h"
+#include "../../app/gui/chattext.h"
 #include "../render/transaction.h"
 #include "../sound/sound.h"
 #include "truck.h"

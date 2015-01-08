@@ -16,7 +16,7 @@
 #include "cstrview.h"
 #include "../../../platform.h"
 #include "../viewportw.h"
-#include "../../../../game/gui/gviewport.h"
+#include "../../../../app/gui/gviewport.h"
 #include "../../../sim/building.h"
 #include "../../../sim/bltype.h"
 #include "../../../sim/road.h"
@@ -33,7 +33,7 @@
 #include "../../../net/client.h"
 
 //not engine
-#include "../../../../game/gui/ggui.h"
+#include "../../../../app/gui/appgui.h"
 
 //new host create button
 void Resize_NH_Create(Widget* thisw)

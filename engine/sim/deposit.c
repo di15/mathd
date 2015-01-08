@@ -36,7 +36,7 @@ void DrawDeposits(const Matrix projection, const Matrix viewmat)
 
 	//glActiveTexture(GL_TEXTURE0);
 	//glBindTexture(GL_TEXTURE_2D, g_texture[ g_tiletexs[TILE_SAND] ].texname);
-	//glUniform1i(s->m_slot[SSLOT_SANDTEX], 0);
+	//glUnIForm1i(s->m_slot[SSLOT_SANDTEX], 0);
 
 	Matrix mvp;
 	mvp.set(projection.m_matrix);

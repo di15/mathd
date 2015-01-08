@@ -89,9 +89,9 @@ void Image::reframe()	//resized or moved
 void Image::draw()
 {
 	//glColor4fv(rgba);
-	glUniform4fv(g_shader[SHADER_ORTHO].m_slot[SSLOT_COLOR], 1, m_rgba);
+	glUnIForm4fv(g_shader[SHADER_ORTHO].m_slot[SSLOT_COLOR], 1, m_rgba);
 	DrawImage(g_texture[m_tex].texname, m_pos[0], m_pos[1], m_pos[2], m_pos[3], m_texc[0], m_texc[1], m_texc[2], m_texc[3]);
 	//glColor4f(1,1,1,1);
-	glUniform4f(g_shader[SHADER_ORTHO].m_slot[SSLOT_COLOR], 1, 1, 1, 1);
+	glUnIForm4f(g_shader[SHADER_ORTHO].m_slot[SSLOT_COLOR], 1, 1, 1, 1);
 }
 

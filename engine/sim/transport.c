@@ -23,7 +23,7 @@
 #include "../path/anypath.h"
 
 //not engine
-#include "../../game/gui/chattext.h"
+#include "../../app/gui/chattext.h"
 
 static std::list<int> truckpathd;
 

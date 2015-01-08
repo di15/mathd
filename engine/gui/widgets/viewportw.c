@@ -74,8 +74,8 @@ void Viewport::draw()
 	int viewport[4];
 	glGetIntegerv(GL_VIEWPORT, viewport);
 	glViewport(m_pos[0], g_height-m_pos[3], w, h);
-	glUniform1f(g_shader[SHADER_ORTHO].m_slot[SSLOT_WIDTH], (float)w);
-	glUniform1f(g_shader[SHADER_ORTHO].m_slot[SSLOT_HEIGHT], (float)h);
+	glUnIForm1f(g_shader[SHADER_ORTHO].m_slot[SSLOT_WIDTH], (float)w);
+	glUnIForm1f(g_shader[SHADER_ORTHO].m_slot[SSLOT_HEIGHT], (float)h);
 
 	EndS();
 
@@ -88,8 +88,8 @@ void Viewport::draw()
 
 	//glViewport(0, 0, g_width, g_height);
 	glViewport(viewport[0], viewport[1], viewport[2], viewport[3]);
-	//glUniform1f(g_shader[SHADER_ORTHO].m_slot[SSLOT_WIDTH], (float)g_width);
-	//glUniform1f(g_shader[SHADER_ORTHO].m_slot[SSLOT_HEIGHT], (float)g_height);
+	//glUnIForm1f(g_shader[SHADER_ORTHO].m_slot[SSLOT_WIDTH], (float)g_width);
+	//glUnIForm1f(g_shader[SHADER_ORTHO].m_slot[SSLOT_HEIGHT], (float)g_height);
 
 	CheckGLError(__FILE__, __LINE__);
 	Ortho(g_width, g_height, 1, 1, 1, 1);

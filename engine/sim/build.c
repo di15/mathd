@@ -20,7 +20,7 @@
 #include "../math/vec4f.h"
 #include "../gui/icon.h"
 #include "player.h"
-#include "../../game/gmain.h"
+#include "../../app/appmain.h"
 #include "../gui/gui.h"
 #include "../gui/widget.h"
 #include "../gui/widgets/spez/cstrview.h"
@@ -116,9 +116,9 @@ void DrawSBl()
 		//g_log<<"dr"<<std::endl;
 
 		if(g_canplace)
-			glUniform4f(s->m_slot[SSLOT_COLOR], 1, 1, 1, 0.5f);
+			glUnIForm4f(s->m_slot[SSLOT_COLOR], 1, 1, 1, 0.5f);
 		else
-			glUniform4f(s->m_slot[SSLOT_COLOR], 1, 0, 0, 0.5f);
+			glUnIForm4f(s->m_slot[SSLOT_COLOR], 1, 0, 0, 0.5f);
 
 		const BlType* t = &g_bltype[g_build];
 		Model* m = &g_model[ t->model ];

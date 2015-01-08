@@ -12,7 +12,7 @@
 #include "gui/widgets/spez/cstrview.h"
 #include "sim/player.h"
 #include "window.h"
-#include "../game/gmain.h"
+#include "../app/appmain.h"
 
 Timer g_profile[TIMERS];
  bool g_debuglines = false;

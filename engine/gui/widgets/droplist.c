@@ -90,7 +90,7 @@ float DropList::scrollspace()
 void DropList::draw()
 {
 	//glColor4f(1, 1, 1, 1);
-	glUniform4f(g_shader[SHADER_ORTHO].m_slot[SSLOT_COLOR], 1, 1, 1, 1);
+	glUnIForm4f(g_shader[SHADER_ORTHO].m_slot[SSLOT_COLOR], 1, 1, 1, 1);
 
 	DrawImage(g_texture[m_frametex].texname, m_pos[0], m_pos[1], m_pos[2], m_pos[3]);
 
@@ -122,7 +122,7 @@ void DropList::drawover()
 		return;
 
 	//glColor4f(1, 1, 1, 1);
-	glUniform4f(g_shader[SHADER_ORTHO].m_slot[SSLOT_COLOR], 1, 1, 1, 1);
+	glUnIForm4f(g_shader[SHADER_ORTHO].m_slot[SSLOT_COLOR], 1, 1, 1, 1);
 
 	Font* f = &g_font[m_font];
 

@@ -16,7 +16,7 @@
 void Text::draw()
 {
 	//glColor4f(0.8f, 0.8f, 0.8f, 1.0f);
-	//glUniform4f(g_shader[SHADER_ORTHO].m_slot[SSLOT_COLOR], 0.8f, 0.8f, 0.8f, 1.0f);
+	//glUnIForm4f(g_shader[SHADER_ORTHO].m_slot[SSLOT_COLOR], 0.8f, 0.8f, 0.8f, 1.0f);
 	//float color[] = {0.8f, 0.8f, 0.8f, 1.0f};
 	//DrawShadowedText(font, pos[0], pos[1], text.c_str(), color);
 
@@ -46,6 +46,6 @@ void Text::draw()
 		DrawLineF(m_font, m_pos[0], m_pos[1], m_pos[0], m_pos[1], m_pos[2], m_pos[3], &m_text, m_rgba);
 	}
 	//glColor4f(1, 1, 1, 1);
-	glUniform4f(g_shader[SHADER_ORTHO].m_slot[SSLOT_COLOR], 1, 1, 1, 1);
+	glUnIForm4f(g_shader[SHADER_ORTHO].m_slot[SSLOT_COLOR], 1, 1, 1, 1);
 }
 
