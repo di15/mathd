@@ -313,31 +313,31 @@ void DrawWater2()
 	glBindTexture(GL_TEXTURE_2D, g_texture[g_water].texname);
 	glUnIForm1i(s->m_slot[SSLOT_TEXTURE0], 0);
 
-	CheckGLError(__FILE__, __LINE__);
+	CHECKGLERROR();
 
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, g_texture[ g_watertex[WATER_TEX_GRADIENT] ].texname);
 	glUnIForm1i(s->m_slot[SSLOT_GRADIENTTEX], 0);
 
-	CheckGLError(__FILE__, __LINE__);
+	CHECKGLERROR();
 
 	glActiveTexture(GL_TEXTURE1);
 	glBindTexture(GL_TEXTURE_2D, g_texture[ g_watertex[WATER_TEX_DETAIL] ].texname);
 	glUnIForm1i(s->m_slot[SSLOT_DETAILTEX], 1);
 
-	CheckGLError(__FILE__, __LINE__);
+	CHECKGLERROR();
 
 	glActiveTexture(GL_TEXTURE2);
 	glBindTexture(GL_TEXTURE_2D, g_texture[ g_watertex[WATER_TEX_SPECULAR] ].texname);
 	glUnIForm1i(s->m_slot[SSLOT_SPECULARMAP], 2);
 
-	CheckGLError(__FILE__, __LINE__);
+	CHECKGLERROR();
 
 	glActiveTexture(GL_TEXTURE3);
 	glBindTexture(GL_TEXTURE_2D, g_texture[ g_watertex[WATER_TEX_NORMAL] ].texname);
 	glUnIForm1i(s->m_slot[SSLOT_NORMALMAP], 3);
 
-	CheckGLError(__FILE__, __LINE__);
+	CHECKGLERROR();
 
 	Vec3f a, b, c, d;
 
@@ -351,7 +351,7 @@ void DrawWater2()
 	glUnIForm1f(s->m_slot[SSLOT_MAPMINY], ConvertHeight(0));
 	glUnIForm1f(s->m_slot[SSLOT_MAPMAXY], ConvertHeight(255));
 
-	CheckGLError(__FILE__, __LINE__);
+	CHECKGLERROR();
 
 	Matrix modelmat;
 	Matrix modelview;
@@ -381,7 +381,7 @@ void DrawWater2()
 	//Transpose(modelviewinv, modelviewinv);
 	glUnIFormMatrix4fv(s->m_slot[SSLOT_NORMALMAT], 1, 0, modelviewinv.m_matrix);
 
-	CheckGLError(__FILE__, __LINE__);
+	CHECKGLERROR();
 
 	a = Vec3f(wx * TILE_SIZE, WATER_LEVEL, wy * TILE_SIZE);
 	b = Vec3f(0, WATER_LEVEL, wy * TILE_SIZE);
@@ -425,21 +425,21 @@ void DrawWater2()
 	glPolygonOffset(1.0, 0.01/(g_zoom));
 	//glPolygonOffset(1.0, 250.0);
 
-	CheckGLError(__FILE__, __LINE__);
+	CHECKGLERROR();
 
 	//glVertexAttribPointer(s->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, vertices);
 	glVertexPointer(3, GL_FLOAT, 0, vertices);
-	CheckGLError(__FILE__, __LINE__);
+	CHECKGLERROR();
 	//glVertexAttribPointer(s->m_slot[SSLOT_TEXCOORD0], 2, GL_FLOAT, GL_FALSE, 0, texcoords0);
 	glTexCoordPointer(2, GL_FLOAT, 0, texcoords0);
-	CheckGLError(__FILE__, __LINE__);
+	CHECKGLERROR();
 	//glVertexAttribPointer(s->m_slot[SSLOT_NORMAL], 3, GL_FLOAT, GL_FALSE, 0, normals);
 	glNormalPointer(GL_FLOAT, 0, normals);
-	CheckGLError(__FILE__, __LINE__);
+	CHECKGLERROR();
 
 	glDrawArrays(GL_TRIANGLES, 0, 6);
-	CheckGLError(__FILE__, __LINE__);
+	CHECKGLERROR();
 
 	glDisable(GL_POLYGON_OFFSET_FILL);
-	CheckGLError(__FILE__, __LINE__);
+	CHECKGLERROR();
 }

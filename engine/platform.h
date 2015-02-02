@@ -182,6 +182,8 @@ extern SDL_GLContext g_glcontext;
 //#define GLDEBUG
 //#define DEBUG
 
+#define CHECKGLERROR() CheckGLError(__FILE__, __LINE__)
+
 #ifndef GLDEBUG
 #define CheckGLError(a,b); (void)0;
 #endif

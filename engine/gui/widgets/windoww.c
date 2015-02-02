@@ -34,26 +34,26 @@ WindowW::WindowW(Widget* parent, const char* n, void (*reframef)(Widget* thisw))
 
 	const float alpha = 0.9f;
 
-	CheckGLError(__FILE__, __LINE__);
+	CHECKGLERROR();
 
 	top_image = Image(this, "gui/frames/outertop2x64.png", true, NULL, 1, 1, 1, alpha,		0, 0, 1, 1);
 
-	CheckGLError(__FILE__, __LINE__);
+	CHECKGLERROR();
 	topleft_image = Image(this, "gui/frames/outertopleft64x64.png", true, NULL, 1, 1, 1, alpha,		0, 0, 1, 1);
 
-	CheckGLError(__FILE__, __LINE__);
+	CHECKGLERROR();
 	topright_image = Image(this, "gui/frames/outertopleft64x64.png", true, NULL, 1, 1, 1, alpha,		1, 0, 0, 1);
 
-	CheckGLError(__FILE__, __LINE__);
+	CHECKGLERROR();
 	left_image = Image(this, "gui/frames/outerleft64x2.png", false, NULL, 1, 1, 1, alpha,		0, 0, 1, 1);
 
-	CheckGLError(__FILE__, __LINE__);
+	CHECKGLERROR();
 	right_image = Image(this, "gui/frames/outerleft64x2.png", false, NULL, 1, 1, 1, alpha,		1, 0, 0, 1);
 
-	CheckGLError(__FILE__, __LINE__);
+	CHECKGLERROR();
 	bottom_image = Image(this, "gui/frames/outertop2x64.png", true, NULL, 1, 1, 1, alpha,		0, 1, 1, 0);
 
-	CheckGLError(__FILE__, __LINE__);
+	CHECKGLERROR();
 	bottomleft_image = Image(this, "gui/frames/outertopleft64x64.png", true, NULL, 1, 1, 1, alpha,		0, 1, 1, 0);
 	bottomright_image = Image(this, "gui/frames/outertopleft64x64.png", true, NULL, 1, 1, 1, alpha,		1, 1, 0, 0);
 	bg_image = Image(this, "gui/backg/white.jpg", true, NULL, 1, 1, 1, alpha,		0, 0, 1, 1);

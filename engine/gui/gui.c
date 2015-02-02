@@ -21,9 +21,9 @@ void GUI::draw()
 
 	glClear(GL_DEPTH_BUFFER_BIT);
 	glDisable(GL_DEPTH_TEST);
-	CheckGLError(__FILE__, __LINE__);
+	CHECKGLERROR();
 	Ortho(g_width, g_height, 1, 1, 1, 1);
-	CheckGLError(__FILE__, __LINE__);
+	CHECKGLERROR();
 
 #if 0
 	DrawImage(g_texture[0].texname, g_width - 300, 0, g_width, 300, 0, 1, 1, 0);
@@ -39,7 +39,7 @@ void GUI::draw()
 		(*i)->draw();
 	}
 
-	CheckGLError(__FILE__, __LINE__);
+	CHECKGLERROR();
 
 	for(auto i=m_subwidg.begin(); i!=m_subwidg.end(); i++)
 		(*i)->drawover();
@@ -61,10 +61,10 @@ void GUI::draw()
 	Sprite* sp = &g_cursor[g_curst];
 	DrawImage(g_texture[sp->texindex].texname, g_mouse.x-sp->offset[0], g_mouse.y-sp->offset[1], g_mouse.x-sp->offset[0]+32, g_mouse.y-sp->offset[1]+32);
 
-	CheckGLError(__FILE__, __LINE__);
+	CHECKGLERROR();
 
 	EndS();
-	CheckGLError(__FILE__, __LINE__);
+	CHECKGLERROR();
 
 	UseS(SHADER_COLOR2D);
 	glUnIForm1f(g_shader[SHADER_COLOR2D].m_slot[SSLOT_WIDTH], (float)g_width);
@@ -74,9 +74,9 @@ void GUI::draw()
 	//DrawSelector();
 	DrawMarquee();
 
-	CheckGLError(__FILE__, __LINE__);
+	CHECKGLERROR();
 	EndS();
-	CheckGLError(__FILE__, __LINE__);
+	CHECKGLERROR();
 
 	glEnable(GL_DEPTH_TEST);
 }
@@ -222,7 +222,7 @@ void CenterMouse()
 
 void Ortho(int width, int height, float r, float g, float b, float a)
 {
-	CheckGLError(__FILE__, __LINE__);
+	CHECKGLERROR();
 	Player* py = &g_player[g_localP];
 	UseS(SHADER_ORTHO);
 	Shader* s = &g_shader[g_curS];
@@ -234,5 +234,5 @@ void Ortho(int width, int height, float r, float g, float b, float a)
 	//glEnableVertexAttribArray(g_shader[SHADER_ORTHO].m_slot[SSLOT_NORMAL]);
 	g_currw = width;
 	g_currh = height;
-	CheckGLError(__FILE__, __LINE__);
+	CHECKGLERROR();
 }

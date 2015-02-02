@@ -24,7 +24,7 @@
 #include "../../engine/gui/widgets/windoww.h"
 #include "../../engine/debug.h"
 #include "../../engine/script/console.h"
-#include "../../engine/window.h"
+#include "../../engine/sys/window.h"
 #include "../../engine/net/lockstep.h"
 #include "../../engine/net/sendpackets.h"
 #include "../../engine/gui/widgets/spez/svlist.h"
@@ -33,7 +33,7 @@
 #include "../../engine/gui/widgets/spez/lobby.h"
 
 //not engine
-#include "editorgui.h"
+#include "edgui.h"
 #include "playgui.h"
 #include "appgui.h"
 
@@ -53,82 +53,10 @@ void Resize_Fullscreen(Widget* thisw)
 
 void Click_LoadMapButton()
 {
-#ifdef PLATFORM_WIN
-	OPENFILENAME ofn;
-
-	char filepath[MAX_PATH+1];
-
-	ZeroMemory( &ofn , sizeof( ofn));
-
-	char initdir[MAX_PATH+1];
-	FullPath("map projects\\", initdir);
-	CorrectSlashes(initdir);
-	//strcpy(filepath, initdir);
-	FullPath("map projects/map project", filepath);
-	CorrectSlashes(filepath);
-
-	ofn.lStructSize     = sizeof ( ofn );
-	ofn.hwndOwner       = NULL;
-	ofn.lpstrInitialDir = initdir;
-	ofn.lpstrFile       = filepath;
-	//ofn.lpstrFile[0]  = '\0';
-	ofn.nMaxFile        = sizeof( filepath );
-	//ofn.lpstrFilter   = "Save\0*.map\0All\0*.*\0";
-	ofn.lpstrFilter     = "All\0*.*\0";
-	ofn.nFilterIndex    = 1;
-	ofn.lpstrFileTitle  = NULL;
-	ofn.nMaxFileTitle   = MAX_PATH;	//0;
-	ofn.lpstrInitialDir = NULL;
-	ofn.Flags           = OFN_PATHMUSTEXIST|OFN_FILEMUSTEXIST;
-
-	if(!GetOpenFileName(&ofn))
-		return;
-
-	//CorrectSlashes(filepath);
-	FreeMap();
-
-	if(LoadMap(filepath))
-		strcpy(g_lastsave, filepath);
-#endif //PLATFORM_WIN
 }
 
 void Click_SaveMapButton()
 {
-#ifdef PLATFORM_WIN
-	OPENFILENAME ofn;
-
-	char filepath[MAX_PATH+1];
-
-	ZeroMemory( &ofn , sizeof( ofn));
-
-	char initdir[MAX_PATH+1];
-	FullPath("maps\\", initdir);
-	CorrectSlashes(initdir);
-	//strcpy(filepath, initdir);
-	FullPath("maps/map", filepath);
-	CorrectSlashes(filepath);
-
-	ofn.lStructSize = sizeof ( ofn );
-	ofn.hwndOwner = NULL  ;
-	ofn.lpstrInitialDir = initdir;
-	ofn.lpstrFile = filepath;
-	//ofn.lpstrFile[0] = '\0';
-	ofn.nMaxFile = sizeof( filepath );
-	//ofn.lpstrFilter = "Save\0*.map\0All\0*.*\0";
-	ofn.lpstrFilter = "All\0*.*\0";
-	ofn.nFilterIndex =1;
-	ofn.lpstrFileTitle = NULL;
-	ofn.nMaxFileTitle = MAX_PATH;	//0;
-	ofn.lpstrInitialDir = NULL;
-	ofn.Flags = OFN_OVERWRITEPROMPT;
-
-	if(!GetSaveFileName(&ofn))
-		return;
-
-	//CorrectSlashes(filepath);
-	SaveMap(filepath);
-	strcpy(g_lastsave, filepath);
-#endif //PLATFORM_WIN
 }
 
 void Click_QSaveMapButton()
@@ -183,7 +111,7 @@ void Click_HostGame()
 {
 	Player* py = &g_player[g_localP];
 	GUI* gui = &g_gui;
-	gui->open("new host");
+	Widget_open((Widget*)gui, "new host");
 }
 
 void Click_ListHosts()
@@ -201,9 +129,11 @@ void Click_ListHosts()
 
 	//g_canturn = true;	//temp, assuming no clients were handshook to server when netfr0 turn happened and server didn't have any cl's to send NetTurnPacket to
 
-	Player* py = &g_player[g_localP];
-	GUI* gui = &g_gui;
-	gui->open("sv list");
+	GUI* gui;
+
+	gui = &g_gui;
+	
+	Widget_open((Widget*)gui, "sv list");
 }
 
 void Click_EndGame()
@@ -213,221 +143,38 @@ void Click_EndGame()
 
 void Click_NewGame()
 {
-	CheckGLError(__FILE__, __LINE__);
-#if 0
-	//LoadJPGMap("heightmaps/heightmap0e2s.jpg");
-	//LoadJPGMap("heightmaps/heightmap0e2.jpg");
-	//LoadJPGMap("heightmaps/heightmap0e.jpg");
-	LoadJPGMap("heightmaps/heightmap0e4.jpg");
-	//LoadJPGMap("heightmaps/water.jpg");
-#elif 1
-	//LoadJPGMap("heightmaps/heightmap0c.jpg");
-	LoadJPGMap("heightmaps/heightmap0d.jpg");
-#else
-	char fullpath[MAX_PATH+1];
-	FullPath("maps/testmap", fullpath);
-	//FullPath("maps/bigmap256", fullpath);
-	LoadMap(fullpath);
-#endif
-
-	//return;
-
-	CheckGLError(__FILE__, __LINE__);
-
-
-
-	for(int i=0; i<10; i++)
-		//for(int j=0; j<10; j++)
-	//for(int i=0; i<15; i++)
-	//	for(int j=0; j<1; j++)
-	//for(int i=0; i<1; i++)
-		for(int j=0; j<1; j++)
-		{
-
-			//Vec3i cmpos((g_hmap.m_widthx+4)*TILE_SIZE/2 + (i+2)*PATHNODE_SIZE, 0, g_hmap.m_widthy*TILE_SIZE/2 + (j+2)*PATHNODE_SIZE);
-			//cmpos.y = g_hmap.accheight(cmpos.x, cmpos.z);
-			Vec2i cmpos((g_hmap.m_widthx+4)*TILE_SIZE/2 + (i+2)*PATHNODE_SIZE*4, g_hmap.m_widthy*TILE_SIZE/2 + (j+2)*PATHNODE_SIZE*4);
-
-			//if(rand()%2 == 1)
-			//	PlaceUnit(UNIT_BATTLECOMP, cmpos, 0);
-			//else
-			PlaceUnit(UNIT_LABOURER, cmpos, 0, NULL);
-			//PlaceUnit(UNIT_TRUCK, cmpos, rand()%PLAYERS, NULL);
-		}
-
-	//return;
-
-	CheckGLError(__FILE__, __LINE__);
-
-	for(int i=0; i<PLAYERS; i++)
-	{
-		Player* p = &g_player[i];
-
-		p->on = true;
-		p->ai = (i == g_localP) ? false : true;
-
-		p->global[RES_DOLLARS] = 40 * 1000 * 1000;
-		p->global[RES_FARMPRODUCTS] = 4000;
-		p->global[RES_RETFOOD] = 4000;
-		p->global[RES_CEMENT] = 4000;
-		p->global[RES_STONE] = 4000;
-		p->global[RES_FUEL] = 4000;
-		p->global[RES_URANIUM] = 4000;
-		p->global[RES_ELECTRONICS] = 4000;
-		p->global[RES_METAL] = 4000;
-		p->global[RES_PRODUCTION] = 40;
-
-#if 0
-#define RES_DOLLARS			0
-#define RES_LABOUR			1
-#define RES_HOUSING			2
-#define RES_FARMPRODUCTS	3
-#define RES_RETFOOD			4
-#define RES_PRODUCTION		5
-#define RES_CEMENT		6
-#define RES_CRUDEOIL		7
-#define RES_FUEL			8
-#define RES_FUEL			9
-#define RES_ENERGY			10
-#define RES_URANIUM			11
-#define RESOURCES			12
-#endif
-	}
-
-#if 0
-	PlaceBl(BL_HARBOUR, Vec2i(g_hmap.m_widthx/2-1, g_hmap.m_widthy/2-3), true, 0);
-	PlaceBl(BL_APARTMENT, Vec2i(g_hmap.m_widthx/2+2, g_hmap.m_widthy/2-2), true, 0);
-	PlaceBl(BL_APARTMENT, Vec2i(g_hmap.m_widthx/2+4, g_hmap.m_widthy/2-3), true, 0);
-	PlaceBl(BL_APARTMENT, Vec2i(g_hmap.m_widthx/2+6, g_hmap.m_widthy/2-3), true, 0);
-	PlaceRoad(g_hmap.m_widthx/2+1, g_hmap.m_widthy/2-1, 1, false);
-	PlaceRoad(g_hmap.m_widthx/2+2, g_hmap.m_widthy/2-1, 1, false);
-	PlaceRoad(g_hmap.m_widthx/2+3, g_hmap.m_widthy/2-1, 1, false);
-	PlaceRoad(g_hmap.m_widthx/2+3, g_hmap.m_widthy/2-2, 1, false);
-	PlaceRoad(g_hmap.m_widthx/2+4, g_hmap.m_widthy/2-2, 1, false);
-	PlaceRoad(g_hmap.m_widthx/2+5, g_hmap.m_widthy/2-2, 1, false);
-	PlaceRoad(g_hmap.m_widthx/2+6, g_hmap.m_widthy/2-2, 1, false);
-	PlaceRoad(g_hmap.m_widthx/2+7, g_hmap.m_widthy/2-2, 1, false);
-	PlaceRoad(g_hmap.m_widthx/2+7, g_hmap.m_widthy/2-3, 1, false);
-	PlaceRoad(g_hmap.m_widthx/2+7, g_hmap.m_widthy/2-4, 1, false);
-	PlaceRoad(g_hmap.m_widthx/2+7, g_hmap.m_widthy/2-5, 1, false);
-	PlaceRoad(g_hmap.m_widthx/2+7, g_hmap.m_widthy/2-6, 1, false);
-	PlaceRoad(g_hmap.m_widthx/2+7, g_hmap.m_widthy/2-7, 1, false);
-	PlaceRoad(g_hmap.m_widthx/2+8, g_hmap.m_widthy/2-2, 1, false);
-	PlaceRoad(g_hmap.m_widthx/2+9, g_hmap.m_widthy/2-2, 1, false);
-	PlaceRoad(g_hmap.m_widthx/2+10, g_hmap.m_widthy/2-2, 1, false);
-	PlaceBl(BL_FACTORY, Vec2i(g_hmap.m_widthx/2+9, g_hmap.m_widthy/2-3), true, 0);
-	PlaceBl(BL_REFINERY, Vec2i(g_hmap.m_widthx/2+11, g_hmap.m_widthy/2-3), true, 0);
-	PlaceBl(BL_NUCPOW, Vec2i(g_hmap.m_widthx/2+13, g_hmap.m_widthy/2-3), true, 0);
-	PlaceRoad(g_hmap.m_widthx/2+11, g_hmap.m_widthy/2-2, 1, false);
-	PlaceRoad(g_hmap.m_widthx/2+12, g_hmap.m_widthy/2-2, 1, false);
-	PlaceRoad(g_hmap.m_widthx/2+13, g_hmap.m_widthy/2-2, 1, false);
-	PlaceRoad(g_hmap.m_widthx/2+14, g_hmap.m_widthy/2-2, 1, false);
-	PlaceRoad(g_hmap.m_widthx/2+14, g_hmap.m_widthy/2-3, 1, false);
-	PlaceRoad(g_hmap.m_widthx/2+14, g_hmap.m_widthy/2-4, 1, false);
-	PlaceRoad(g_hmap.m_widthx/2+14, g_hmap.m_widthy/2-5, 1, false);
-	PlaceRoad(g_hmap.m_widthx/2+14, g_hmap.m_widthy/2-6, 1, false);
-	PlaceRoad(g_hmap.m_widthx/2+14, g_hmap.m_widthy/2-7, 1, false);
-	PlaceRoad(g_hmap.m_widthx/2+15, g_hmap.m_widthy/2-2, 1, false);
-	PlaceBl(BL_FARM, Vec2i(g_hmap.m_widthx/2+6, g_hmap.m_widthy/2-0), true, 0);
-	PlaceRoad(g_hmap.m_widthx/2+10, g_hmap.m_widthy/2-1, 1, false);
-	PlaceRoad(g_hmap.m_widthx/2+10, g_hmap.m_widthy/2-0, 1, false);
-	PlaceRoad(g_hmap.m_widthx/2+10, g_hmap.m_widthy/2+1, 1, false);
-	PlaceBl(BL_STORE, Vec2i(g_hmap.m_widthx/2+9, g_hmap.m_widthy/2-1), true, 0);
-	PlaceBl(BL_OILWELL, Vec2i(g_hmap.m_widthx/2+9, g_hmap.m_widthy/2-0), true, 0);
-	PlaceBl(BL_MINE, Vec2i(g_hmap.m_widthx/2+11, g_hmap.m_widthy/2-0), true, 0);
-	PlaceBl(BL_MINE, Vec2i(g_hmap.m_widthx/2+12, g_hmap.m_widthy/2-0), true, 0);
-	PlaceRoad(g_hmap.m_widthx/2+13, g_hmap.m_widthy/2-1, 1, false);
-	PlaceRoad(g_hmap.m_widthx/2+13, g_hmap.m_widthy/2-0, 1, false);
-	PlaceRoad(g_hmap.m_widthx/2+13, g_hmap.m_widthy/2+1, 1, false);
-	CheckGLError(__FILE__, __LINE__);
-	PlaceBl(BL_GASSTATION, Vec2i(g_hmap.m_widthx/2+14, g_hmap.m_widthy/2-1), true, 0);
-	g_hmap.genvbo();
-#endif
-
-	CheckGLError(__FILE__, __LINE__);
+	GUI* gui;
 
 	g_mode = APPMODE_PLAY;
-
-	Player* py = &g_player[g_localP];
-	GUI* gui = &g_gui;
-
-	//return;
-
-	gui->closeall();
-	gui->open("play");
-	gui->open("play right opener");
-
-	CheckGLError(__FILE__, __LINE__);
-
-#if 0
-	gui->add(new WindowW(gui, "window", Resize_Window));
-	//gui->open("window");
-
-	WindowW* win = (WindowW*)gui->get("window");
-
-	RichText bigtext;
-
-	for(int i=0; i<2000; i++)
-	{
-		bigtext.m_part.push_back(RichPart((unsigned int)(rand()%3000+16000)));
-
-		if(rand()%10 == 1)
-			bigtext.m_part.push_back(RichPart((unsigned int)'\n'));
-	}
-
-	win->add(new TextBlock(win, "text block", bigtext, MAINFONT16, Resize_WinText));
-#endif
+	gui = &g_gui;
+	
+	Widget_closeall((Widget*)gui);
+	Widget_open((Widget*)gui, "play");
+	Widget_open((Widget*)gui, "play right opener");
 
 	g_lastsave[0] = '\0';
 	BegSess();
 	g_netmode = NETM_SINGLE;
 }
 
-void Click_OpenEditor()
+void Click_OpenEd()
 {
-	CheckGLError(__FILE__, __LINE__);
-	LoadJPGMap("heightmaps/heightmap0e2.jpg");
-	CheckGLError(__FILE__, __LINE__);
+	GUI* gui;
 
 	g_mode = APPMODE_EDITOR;
-
-
-	Player* py = &g_player[g_localP];
-	GUI* gui = &g_gui;
-
-	gui->closeall();
-	gui->open("editor gui");
-
+	gui = &g_gui;
+	Widget_closeall((Widget*)gui);
+	Widget_open((Widget*)gui, "ed");
 	g_lastsave[0] = '\0';
-}
-
-void Resize_CenterWin(Widget* thisw)
-{
-	Player* py = &g_player[g_localP];
-	
-	thisw->m_pos[0] = g_width/2 - 150;
-	thisw->m_pos[1] = g_height/2 - 150;
-	thisw->m_pos[2] = g_width/2 + 200;
-	thisw->m_pos[3] = g_height/2 + 150;
-}
-
-void Resize_CenterWin2(Widget* thisw)
-{
-	Player* py = &g_player[g_localP];
-	
-	thisw->m_pos[0] = g_width/2 - 150 + 60;
-	thisw->m_pos[1] = g_height/2 - 150 + 30;
-	thisw->m_pos[2] = g_width/2 + 200 + 60;
-	thisw->m_pos[3] = g_height/2 + 150 + 30;
 }
 
 void Click_LoadGame()
 {
 	Player* py = &g_player[g_localP];
 	GUI* gui = &g_gui;
-	
-	gui->open("load");
-	((LoadView*)gui->get("load"))->regen();
+
+	Widget_open((Widget*)gui, "load");
+	Widget_LoadView_regen((LoadView*)gui->get("load"));
 }
 
 void Click_Options()
@@ -438,7 +185,6 @@ void Click_Quit()
 {
 	EndSess();
 	FreeMap();
-	FreeGrid();
 	g_quit = true;
 }
 

@@ -120,7 +120,7 @@ void InitGLSL()
 		g_log<<"Reging debug handler"<<std::endl;
 		g_log.flush();
 		glDebugMessageCallbackARB(&GLMessageHandler, 0);
-		CheckGLError(__FILE__, __LINE__);
+		CHECKGLERROR();
 	}
 
 	if(!strstr(szGLExtensions, "GL_ARB_shader_objects"))
@@ -343,26 +343,26 @@ void LoadShader(int shader, char* strVertex, char* strFragment, bool hastexcoord
 
 void UseS(int shader)
 {
-	CheckGLError(__FILE__, __LINE__);
+	CHECKGLERROR();
 	g_curS = shader;
 
 	Shader* s = &g_shader[g_curS];
 
 	//glUseProgramObject(g_shader[shader].m_program);
 	glUseProgram(s->m_program);
-	CheckGLError(__FILE__, __LINE__);
+	CHECKGLERROR();
 
 	Player* py = &g_player[g_localP];
 
 #if 0
 	//opengl 3 way
-	CheckGLError(__FILE__, __LINE__);
+	CHECKGLERROR();
 	if(s->m_slot[SSLOT_POSITION] != -1)	glEnableVertexAttribArray(s->m_slot[SSLOT_POSITION]);
-	CheckGLError(__FILE__, __LINE__);
+	CHECKGLERROR();
 	if(s->m_slot[SSLOT_TEXCOORD0] != -1) glEnableVertexAttribArray(s->m_slot[SSLOT_TEXCOORD0]);
-	CheckGLError(__FILE__, __LINE__);
+	CHECKGLERROR();
 	if(s->m_slot[SSLOT_NORMAL] != -1)	glEnableVertexAttribArray(s->m_slot[SSLOT_NORMAL]);
-	CheckGLError(__FILE__, __LINE__);
+	CHECKGLERROR();
 #else
 	//opengl 1.4 way
 	glEnableClientState(GL_VERTEX_ARRAY);
@@ -379,7 +379,7 @@ void UseS(int shader)
 
 void EndS()
 {
-	CheckGLError(__FILE__, __LINE__);
+	CHECKGLERROR();
 
 	if(g_curS < 0)
 		return;
@@ -388,13 +388,13 @@ void EndS()
 
 #if 0
 	//opengl 3 way
-	CheckGLError(__FILE__, __LINE__);
+	CHECKGLERROR();
 	if(s->m_slot[SSLOT_POSITION] != -1)	glDisableVertexAttribArray(s->m_slot[SSLOT_POSITION]);
-	CheckGLError(__FILE__, __LINE__);
+	CHECKGLERROR();
 	if(s->m_slot[SSLOT_TEXCOORD0] != -1) glDisableVertexAttribArray(s->m_slot[SSLOT_TEXCOORD0]);
-	CheckGLError(__FILE__, __LINE__);
+	CHECKGLERROR();
 	if(s->m_slot[SSLOT_NORMAL] != -1)	glDisableVertexAttribArray(s->m_slot[SSLOT_NORMAL]);
-	CheckGLError(__FILE__, __LINE__);
+	CHECKGLERROR();
 #else
 	//opengl 1.4 way
 	glDisableClientState(GL_VERTEX_ARRAY);

@@ -817,7 +817,7 @@ bool Load1Texture()
 	if(g_lastLTex+1 < g_texLoad.size())
 		Status(g_texLoad[g_lastLTex+1].relative);
 
-	CheckGLError(__FILE__, __LINE__);
+	CHECKGLERROR();
 
 	if(g_lastLTex >= 0)
 	{
@@ -888,7 +888,7 @@ LoadedTex* LoadTexture(const char* full)
 
 bool CreateTexture(unsigned int &texindex, const char* relative, bool clamp, bool mipmaps, bool reload)
 {
-	CheckGLError(__FILE__, __LINE__);
+	CHECKGLERROR();
 
 	if(!relative)
 		return false;
@@ -921,15 +921,15 @@ bool CreateTexture(unsigned int &texindex, const char* relative, bool clamp, boo
 	// Generate a texture with the associative texture ID stored in the array
 	glGenTextures(1, &texname);
 
-	CheckGLError(__FILE__, __LINE__);
+	CHECKGLERROR();
 	// This sets the alignment requirements for the start of each pixel row in memory.
 	glPixelStorei (GL_UNPACK_ALIGNMENT, 1);
-	CheckGLError(__FILE__, __LINE__);
+	CHECKGLERROR();
 
 	// Bind the texture to the texture arrays index and init the texture
 	glBindTexture(GL_TEXTURE_2D, texname);
 
-	CheckGLError(__FILE__, __LINE__);
+	CHECKGLERROR();
 	// Assume that the texture is a 24 bit RGB texture (We convert 16-bit ones to 24-bit)
 	int textureType = GL_RGB;
 	bool transp = false;
@@ -942,7 +942,7 @@ bool CreateTexture(unsigned int &texindex, const char* relative, bool clamp, boo
 	}
 
 
-	CheckGLError(__FILE__, __LINE__);
+	CHECKGLERROR();
 
 #if 1
 
@@ -973,7 +973,7 @@ bool CreateTexture(unsigned int &texindex, const char* relative, bool clamp, boo
 		glTexImage2D(GL_TEXTURE_2D, 0, textureType, pImage->sizeX, pImage->sizeY, 0, textureType, GL_UNSIGNED_BYTE, pImage->data);
 		glGenerateMipmap(GL_TEXTURE_2D);
 
-		CheckGLError(__FILE__, __LINE__);
+		CHECKGLERROR();
 	}
 	else
 	{
@@ -994,10 +994,10 @@ bool CreateTexture(unsigned int &texindex, const char* relative, bool clamp, boo
 
 		glTexImage2D(GL_TEXTURE_2D, 0, textureType, pImage->sizeX, pImage->sizeY, 0, textureType, GL_UNSIGNED_BYTE, pImage->data);
 
-		CheckGLError(__FILE__, __LINE__);
+		CHECKGLERROR();
 	}
 
-	CheckGLError(__FILE__, __LINE__);
+	CHECKGLERROR();
 #else
 	// Option 3: without mipmaps linear
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);

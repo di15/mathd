@@ -79,19 +79,19 @@ void Viewport::draw()
 
 	EndS();
 
-	CheckGLError(__FILE__, __LINE__);
+	CHECKGLERROR();
 
 	if(drawfunc != NULL)
 		drawfunc(m_param, m_pos[0], m_pos[1], w, h);
 
-	CheckGLError(__FILE__, __LINE__);
+	CHECKGLERROR();
 
 	//glViewport(0, 0, g_width, g_height);
 	glViewport(viewport[0], viewport[1], viewport[2], viewport[3]);
 	//glUnIForm1f(g_shader[SHADER_ORTHO].m_slot[SSLOT_WIDTH], (float)g_width);
 	//glUnIForm1f(g_shader[SHADER_ORTHO].m_slot[SSLOT_HEIGHT], (float)g_height);
 
-	CheckGLError(__FILE__, __LINE__);
+	CHECKGLERROR();
 	Ortho(g_width, g_height, 1, 1, 1, 1);
 }
 

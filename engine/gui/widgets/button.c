@@ -226,7 +226,7 @@ void Button::draw()
 		DrawLine(darkcolor[0], darkcolor[1], darkcolor[2], darkcolor[3], m_pos[2], m_pos[1]+1, m_pos[2], m_pos[3]);
 
 		EndS();
-		CheckGLError(__FILE__, __LINE__);
+		CHECKGLERROR();
 		Ortho(g_currw, g_currh, 1, 1, 1, 1);
 
 		float w = m_pos[2]-m_pos[0]-2;
@@ -275,7 +275,7 @@ void Button::draw()
 		DrawLine(darkcolor[0], darkcolor[1], darkcolor[2], darkcolor[3], m_pos[2], m_pos[1]+1, m_pos[2], m_pos[3]);
 
 		EndS();
-		CheckGLError(__FILE__, __LINE__);
+		CHECKGLERROR();
 		Ortho(g_currw, g_currh, 1, 1, 1, 1);
 
 		float w = m_pos[2]-m_pos[0]-2;

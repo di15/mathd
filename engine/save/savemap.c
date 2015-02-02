@@ -88,7 +88,7 @@ void LoadJPGMap(const char* relative)
 	g_hmap4.destroy();
 	g_hmap8.destroy();
 
-	CheckGLError(__FILE__, __LINE__);
+	CHECKGLERROR();
 
 	LoadedTex *pImage = NULL;
 
@@ -100,7 +100,7 @@ void LoadJPGMap(const char* relative)
 	if(!pImage)
 		return;
 
-	CheckGLError(__FILE__, __LINE__);
+	CHECKGLERROR();
 
 	g_hmap.allocate((pImage->sizeX-1), (pImage->sizeY-1));
 #if 0
@@ -109,7 +109,7 @@ void LoadJPGMap(const char* relative)
 	g_hmap8.allocate((pImage->sizeX-1)/8, (pImage->sizeY-1)/8);
 #endif
 
-	CheckGLError(__FILE__, __LINE__);
+	CHECKGLERROR();
 	for(int x=0; x<pImage->sizeX; x++)
 	{
 		for(int z=0; z<pImage->sizeY; z++)
@@ -136,9 +136,9 @@ void LoadJPGMap(const char* relative)
 		}
 	}
 
-	CheckGLError(__FILE__, __LINE__);
+	CHECKGLERROR();
 	AllocWater(g_hmap.m_widthx, g_hmap.m_widthy);
-	CheckGLError(__FILE__, __LINE__);
+	CHECKGLERROR();
 
 	g_hmap.remesh(1);
 #if 0
@@ -146,7 +146,7 @@ void LoadJPGMap(const char* relative)
 	g_hmap4.remesh(4);
 	g_hmap8.remesh(8);
 #endif
-	CheckGLError(__FILE__, __LINE__);
+	CHECKGLERROR();
 
 #if 1
 	AllocPathGrid(g_hmap.m_widthx*TILE_SIZE, g_hmap.m_widthy*TILE_SIZE);
@@ -154,7 +154,7 @@ void LoadJPGMap(const char* relative)
 	FillColliderGrid();
 #endif
 
-	CheckGLError(__FILE__, __LINE__);
+	CHECKGLERROR();
 	FillForest();
 	//PlaceUnits();
 
@@ -203,6 +203,7 @@ void FreeMap()
 	FreeParts();
 	FreeTransx();
 	FreeGraphs();
+	FreeGrid();
 }
 
 void SaveHmap(FILE *fp)

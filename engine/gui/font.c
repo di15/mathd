@@ -441,7 +441,7 @@ void LoadFont(int id, const char* fontfile)
 	strcpy(texfile, fontfile);
 	FindTextureExtension(texfile);
 
-	CheckGLError(__FILE__, __LINE__);
+	CHECKGLERROR();
 
 	CreateTexture(f->texindex, texfile, true, false);
 	f->width = g_texwidth;
@@ -920,7 +920,7 @@ void HighlightF(int fnt, float startx, float starty, float framex1, float framey
 	}
 
 	EndS();
-	CheckGLError(__FILE__, __LINE__);
+	CHECKGLERROR();
 	Ortho(g_currw, g_currh, 1, 1, 1, 1);
 }
 
