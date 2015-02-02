@@ -30,11 +30,13 @@ void AStarPath(int utype, int umode, int cmstartx, int cmstarty, int target, int
 {
 	UType* ut = &g_utype[utype];
 
+#if 1
 	if(thisu)
 	{
 		RichText rt("pathf");
 		NewTransx(thisu->drawpos, &rt);
 	}
+#endif
 	
 	if(!ignoreb)
 	{

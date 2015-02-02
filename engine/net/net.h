@@ -7,8 +7,8 @@
 #include "packets.h"
 
 #define PORT		50400
-//#define SV_ADDR		"corpstates.com"	//live server
-#define SV_ADDR			"23.226.224.175"		//vps
+#define SV_ADDR		"polyfrag.com"	//live server
+//#define SV_ADDR			"23.226.224.175"		//vps
 //#define SV_ADDR		"54.221.229.124"	//corp1 aws
 //#define SV_ADDR			"192.168.1.100"		//home local server ip
 //#define SV_ADDR			"192.168.1.103"		//home local server ip

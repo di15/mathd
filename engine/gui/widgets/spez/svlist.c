@@ -16,7 +16,7 @@
 #include "cstrview.h"
 #include "../../../platform.h"
 #include "../viewportw.h"
-#include "../../../../app/gui/gviewport.h"
+#include "../../../../game/gui/gviewport.h"
 #include "../../../sim/building.h"
 #include "../../../sim/bltype.h"
 #include "../../../sim/road.h"
@@ -33,7 +33,7 @@
 #include "../../../net/client.h"
 
 //not engine
-#include "../../../../app/gui/appgui.h"
+#include "../../../../game/gui/ggui.h"
 
 bool g_reqsvlist = false;
 bool g_reqdnexthost = false;
@@ -146,7 +146,7 @@ void Click_SL_Ref()	//refresh
 		g_reqdnexthost = true;
 		GetSvListPacket gslp;
 		gslp.header.type = PACKET_GETSVLIST;
-		SendData((char*)&gslp, sizeof(GetSvListPacket), &g_mmconn->addr, true, false, g_mmconn, &g_sock, 0);
+		SendData((char*)&gslp, sizeof(GetSvListPacket), &g_mmconn->addr, true, false, g_mmconn, &g_sock, 0, NULL);
 	}
 }
 
@@ -198,7 +198,7 @@ void Click_SL_Join()
 	{
 		JoinPacket jp;
 		jp.header.type = PACKET_JOIN;
-		SendData((char*)&jp, sizeof(JoinPacket), &sinfo->addr, true, false, svnc, &g_sock, 0);
+		SendData((char*)&jp, sizeof(JoinPacket), &sinfo->addr, true, false, svnc, &g_sock, 0, NULL);
 	}
 
 	//Connect("localhost", PORT, false, true, false, false);
@@ -231,21 +231,21 @@ SvList::SvList(Widget* parent, const char* n, void (*reframef)(Widget* thisw)) :
 
 #if 0
 	SvInfo sv;
-	sv.name = RichText(UStr("asdjasld9a0f09230jf3"));
-	sv.pingrt = RichText(UStr("124"));
-	sv.nplayersrt = RichText(UStr("3/32"));
-	sv.mapnamert = RichText(UStr("wr_fluffy"));
+	sv.name = RichText(UString("asdjasld9a0f09230jf3"));
+	sv.pingrt = RichText(UString("124"));
+	sv.nplayersrt = RichText(UString("3/32"));
+	sv.mapnamert = RichText(UString("wr_fluffy"));
 	m_svlist.push_back(sv);
-	sv.name = RichText(UStr("Joe's"));
-	sv.pingrt = RichText(UStr("340"));
-	sv.nplayersrt = RichText(UStr("4/48"));
-	sv.mapnamert = RichText(UStr("bz_dunes"));
+	sv.name = RichText(UString("Joe's"));
+	sv.pingrt = RichText(UString("340"));
+	sv.nplayersrt = RichText(UString("4/48"));
+	sv.mapnamert = RichText(UString("bz_dunes"));
 	m_svlist.push_back(sv);
 	//m_selsv = &*m_svlist.rbegin();
-	sv.name = RichText(UStr("Bob's"));
-	sv.pingrt = RichText(UStr("15"));
-	sv.nplayersrt = RichText(UStr("2/12"));
-	sv.mapnamert = RichText(UStr("bz_hills"));
+	sv.name = RichText(UString("Bob's"));
+	sv.pingrt = RichText(UString("15"));
+	sv.nplayersrt = RichText(UString("2/12"));
+	sv.mapnamert = RichText(UString("bz_hills"));
 	m_svlist.push_back(sv);
 #endif
 
@@ -345,16 +345,16 @@ void SvList::regen()
 #if 0
 		Button(Widget* parent, const char* name, const char* filepath, const RichText label, const RichText tooltip,int f, int style, void (*reframef)(Widget* thisw), void (*click)(), void (*click2)(int p), void (*overf)(), void (*overf2)(int p), void (*out)(), int parm);
 #endif
-		m_subwidg.push_back(new Button(this, rowname, "gui/transp.png", RichText(UStr("Order Truck for ")) + RichText(RichPart(RICHTEXT_ICON, r->icon)) + RichText(UStr(":")), RichText(), m_font, BUST_LINEBASED, Resize_BV_Cl, NULL, NULL, NULL, NULL, NULL, UNIT_TRUCK));
+		m_subwidg.push_back(new Button(this, rowname, "gui/transp.png", RichText(UString("Order Truck for ")) + RichText(RichPart(RICHTEXT_ICON, r->icon)) + RichText(UString(":")), RichText(), m_font, BUST_LINEBASED, Resize_BV_Cl, NULL, NULL, NULL, NULL, NULL, UNIT_TRUCK));
 	
 		sprintf(rowname, "%d %d", col, 1);
 		char clabel[64];
 		sprintf(clabel, "%d", b->manufprc[UNIT_TRUCK]);
 
 		if(owned)
-			m_subwidg.push_back(new EditBox(this, rowname, RichText(UStr(clabel)), m_font, Resize_BV_Cl, false, 6, Change_BV_MP, NULL, UNIT_TRUCK));
+			m_subwidg.push_back(new EditBox(this, rowname, RichText(UString(clabel)), m_font, Resize_BV_Cl, false, 6, Change_BV_MP, NULL, UNIT_TRUCK));
 		else
-			m_subwidg.push_back(new Text(this, rowname, RichText(UStr(clabel)), m_font, Resize_BV_Cl));
+			m_subwidg.push_back(new Text(this, rowname, RichText(UString(clabel)), m_font, Resize_BV_Cl));
 
 		col++;
 	}
@@ -498,9 +498,9 @@ void SvList::subdraw()
 			Player* py = &g_player[g_localP];
 			
 			Shader* s = &g_shader[g_curS];
-			glUnIForm1f(g_shader[SHADER_ORTHO].m_slot[SSLOT_WIDTH], (float)g_width);
-			glUnIForm1f(g_shader[SHADER_ORTHO].m_slot[SSLOT_HEIGHT], (float)g_height);
-			//glUnIForm4f(g_shader[SHADER_ORTHO].m_slot[SSLOT_COLOR], 0.2f, 1.0f, 0.2f, 0.6f);
+			glUniform1f(g_shader[SHADER_ORTHO].m_slot[SSLOT_WIDTH], (float)g_width);
+			glUniform1f(g_shader[SHADER_ORTHO].m_slot[SSLOT_HEIGHT], (float)g_height);
+			//glUniform4f(g_shader[SHADER_ORTHO].m_slot[SSLOT_COLOR], 0.2f, 1.0f, 0.2f, 0.6f);
 
 			DrawSquare(0.2f, 1.0f, 0.2f, 0.6f, m_pos[0], m_listtop + (sin-scroll)*f->gheight, m_pos[2], m_listtop + (sin-scroll+1.0f)*f->gheight);
 

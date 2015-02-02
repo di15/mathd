@@ -19,10 +19,10 @@
 #ifndef MATCHMAKER
 #include "../gui/widgets/spez/svlist.h"
 #include "../gui/widgets/spez/lobby.h"
-#include "../../app/gui/appgui.h"
+#include "../../game/gui/ggui.h"
 
 //not engine
-#include "../../app/gui/chattext.h"
+#include "../../game/gui/chattext.h"
 #endif
 
 /*
@@ -80,6 +80,7 @@ void ParseRecieved(unsigned int first, unsigned int last, NetConn* nc)
 	} while(current != afterlast);
 }
 
+//do what needs to be done when we've recieved a packet range [first,last]
 bool Recieved(unsigned short first, unsigned short last, NetConn* nc)
 {
 	OldPacket* p;
@@ -232,6 +233,19 @@ void TranslatePacket(char* buffer, int bytes, bool checkprev, UDPsocket* sock, I
 	}
 #endif
 
+	//We're getting an anonymous packet.
+	//Maybe we've timed out and they still have a connection.
+	//Tell them we don't have a connection.
+	//We check if sock is set to make sure this isn't a local 
+	//command packet being executed.
+	if(!nc && header->type != PACKET_CONNECT && sock)
+	{
+		NoConnectionPacket ncp;
+		ncp.header.type = PACKET_NOCONN;
+		SendData((char*)&ncp, sizeof(NoConnectionPacket), from, false, true, NULL, &g_sock, 0, NULL);
+		return;
+	}
+
 	PacketSwitch(header->type, buffer, bytes, nc, from, sock);
 	
 	//have to do this again because PacketSwitch might 
@@ -292,6 +306,9 @@ void PacketSwitch(int type, char* buffer, int bytes, NetConn* nc, IPaddress* fro
 		break;
 	case PACKET_DISCONNECT:
 		ReadDisconnectPacket((DisconnectPacket*)buffer, nc, from, sock);
+		break;
+	case PACKET_NOCONN:
+		ReadNoConnPacket((NoConnectionPacket*)buffer, nc, from, sock);
 		break;
 	case PACKET_PLACEBL:
 		ReadPlaceBlPacket((PlaceBlPacket*)buffer, nc, from, sock);
@@ -415,6 +432,9 @@ void ReadAckPacket(AckPacket* ap, NetConn* nc, IPaddress* from, UDPsocket* sock)
 				g_log.flush();
 #endif
 			}
+
+			if(p->onackfunc)
+				p->onackfunc(p, nc);
 
 			//p->freemem();
 			i = g_outgo.erase(i);
@@ -559,6 +579,50 @@ void ReadPlaceBlPacket(PlaceBlPacket* pbp, NetConn* nc, IPaddress* from, UDPsock
 #endif
 }
 
+//If we got a "no connection" packet while attempting to send
+//data to a connection we have, reconnect to them, setting their
+//recvack to the one before our current sendack (?)
+//Will that work? If we have outgoing packets. It should be the earliest
+//outgoing packet sendack. But what if one ahead has been ack'd? 
+//Recvack will still be at the first one. If they have a connection (or buffered packet).
+void ReadNoConnPacket(NoConnectionPacket* ncp, NetConn* nc, IPaddress* from, UDPsocket* sock)
+{
+	if(!nc)
+		nc = Match(from);
+
+	if(!nc)
+		return;	//Not our problem
+
+	//Reconnect(from);	//Might want to encapsulate it in a function later
+
+	unsigned short early;	//earliest outgoing ack
+	bool earlyset = false;
+
+	for(auto oit=g_outgo.begin(); oit!=g_outgo.end(); oit++)
+	{
+		if(!Same(&oit->addr, from))
+			continue;
+
+		PacketHeader* ph = (PacketHeader*)oit->buffer;
+
+		if(!earlyset && PastAck(ph->ack, early))
+		{
+			earlyset = true;
+			early = ph->ack;
+		}
+	}
+
+	if(!earlyset)
+		early = 0;	//Strange, should have outgoing
+
+	ConnectPacket scp;
+	scp.header.type = PACKET_CONNECT;
+	scp.reply = false;
+	scp.header.ack = early - 1;	//Must be -1; next packet to be read is recvack+1.
+	//Do we need OnAck_Connect?
+	SendData((char*)&scp, sizeof(ConnectPacket), from, false, true, nc, &g_sock, 0, NULL);
+}
+
 void ReadClDisconnectedPacket(ClDisconnectedPacket* cdp, NetConn* nc, IPaddress* from, UDPsocket* sock)
 {
 #ifndef MATCHMAKER
@@ -621,6 +685,8 @@ void ReadChValPacket(ChValPacket* cvp, NetConn* nc, IPaddress* from, UDPsocket* 
 		CdTile* cdtile = NULL;
 		Resource* r = NULL;
 		BlType* bt = NULL;
+		CdType* ct = NULL;
+		UType* ut = NULL;
 
 		RichText chat;
 
@@ -633,7 +699,7 @@ void ReadChValPacket(ChValPacket* cvp, NetConn* nc, IPaddress* from, UDPsocket* 
 		case CHVAL_BLPRICE:
 			b = &g_building[cvp->bi];
 			b->price[cvp->res] = cvp->value;
-#if 0
+#if 1
 			r = &g_resource[cvp->res];
 			bt = &g_bltype[b->type];
 			sprintf(add, " set price ");
@@ -652,35 +718,133 @@ void ReadChValPacket(ChValPacket* cvp, NetConn* nc, IPaddress* from, UDPsocket* 
 		case CHVAL_BLWAGE:
 			b = &g_building[cvp->bi];
 			b->opwage = cvp->value;
+#if 1
+			//r = &g_resource[cvp->res];
+			bt = &g_bltype[b->type];
+			sprintf(add, " set wage");
+			chat = chat + RichText(add);
+			//chat = chat + RichText(RichPart(RICHTEXT_ICON, r->icon));
+			//chat = chat + RichText(r->name.c_str());
+			sprintf(add, " at %s to ", bt->name);
+			chat = chat + RichText(add);
+			r = &g_resource[RES_DOLLARS];
+			chat = chat + RichText(RichPart(RICHTEXT_ICON, r->icon));
+			sprintf(add, "%d", cvp->value);
+			chat = chat + RichText(add);
+#endif
 			break;
 		case CHVAL_CSTWAGE:
 			b = &g_building[cvp->bi];
 			b->conwage = cvp->value;
+#if 1
+			r = &g_resource[cvp->res];
+			bt = &g_bltype[b->type];
+			sprintf(add, " set con. wage");
+			chat = chat + RichText(add);
+			//chat = chat + RichText(RichPart(RICHTEXT_ICON, r->icon));
+			//chat = chat + RichText(r->name.c_str());
+			sprintf(add, " at %s to ", bt->name);
+			chat = chat + RichText(add);
+			r = &g_resource[RES_DOLLARS];
+			chat = chat + RichText(RichPart(RICHTEXT_ICON, r->icon));
+			sprintf(add, "%d", cvp->value);
+			chat = chat + RichText(add);
+#endif
 			break;
 		case CHVAL_TRPRICE:
 			py->transpcost = cvp->value;
+#if 1
+			r = &g_resource[cvp->res];
+			bt = &g_bltype[b->type];
+			sprintf(add, " set transp. price");
+			chat = chat + RichText(add);
+			//chat = chat + RichText(RichPart(RICHTEXT_ICON, r->icon));
+			//chat = chat + RichText(r->name.c_str());
+			sprintf(add, " to ");
+			chat = chat + RichText(add);
+			r = &g_resource[RES_DOLLARS];
+			chat = chat + RichText(RichPart(RICHTEXT_ICON, r->icon));
+			sprintf(add, "%d", cvp->value);
+			chat = chat + RichText(add);
+#endif
 			break;
 		case CHVAL_TRWAGE:
 			py->truckwage = cvp->value;
+#if 1
+			r = &g_resource[cvp->res];
+			bt = &g_bltype[b->type];
+			sprintf(add, " set driver wage");
+			chat = chat + RichText(add);
+			//chat = chat + RichText(RichPart(RICHTEXT_ICON, r->icon));
+			//chat = chat + RichText(r->name.c_str());
+			sprintf(add, " to ");
+			chat = chat + RichText(add);
+			r = &g_resource[RES_DOLLARS];
+			chat = chat + RichText(RichPart(RICHTEXT_ICON, r->icon));
+			sprintf(add, "%d", cvp->value);
+			chat = chat + RichText(add);
+#endif
 			break;
 		case CHVAL_PRODLEV:
 			b = &g_building[cvp->bi];
 			b->prodlevel = cvp->value;
+#if 1
+			r = &g_resource[cvp->res];
+			bt = &g_bltype[b->type];
+			sprintf(add, " set prod. level");
+			chat = chat + RichText(add);
+			//chat = chat + RichText(RichPart(RICHTEXT_ICON, r->icon));
+			//chat = chat + RichText(r->name.c_str());
+			sprintf(add, " at %s to ", bt->name);
+			chat = chat + RichText(add);
+			//r = &g_resource[RES_DOLLARS];
+			//chat = chat + RichText(RichPart(RICHTEXT_ICON, r->icon));
+			sprintf(add, "%d", cvp->value);
+			chat = chat + RichText(add);
+#endif
 			break;
 		case CHVAL_CDWAGE:
 			//TODO verify that player owns this
 			cdtile = GetCd(cvp->cdtype, cvp->x, cvp->y, false);
 			cdtile->conwage = cvp->value;
+#if 1
+			r = &g_resource[cvp->res];
+			ct = &g_cdtype[cvp->cdtype];
+			sprintf(add, " set con. wage");
+			chat = chat + RichText(add);
+			//chat = chat + RichText(RichPart(RICHTEXT_ICON, r->icon));
+			//chat = chat + RichText(r->name.c_str());
+			sprintf(add, " at %s to ", ct->name);
+			chat = chat + RichText(add);
+			r = &g_resource[RES_DOLLARS];
+			chat = chat + RichText(RichPart(RICHTEXT_ICON, r->icon));
+			sprintf(add, "%d", cvp->value);
+			chat = chat + RichText(add);
+#endif
 			break;
 		case CHVAL_MANPRICE:
 			b = &g_building[cvp->bi];
 			b->manufprc[cvp->utype] = cvp->value;
+#if 1
+			r = &g_resource[cvp->res];
+			bt = &g_bltype[b->type];
+			sprintf(add, " set manuf. price");
+			//chat = chat + RichText(add);
+			//chat = chat + RichText(RichPart(RICHTEXT_ICON, r->icon));
+			//chat = chat + RichText(r->name.c_str());
+			sprintf(add, " of %s to ", ut->name);
+			chat = chat + RichText(add);
+			r = &g_resource[RES_DOLLARS];
+			chat = chat + RichText(RichPart(RICHTEXT_ICON, r->icon));
+			sprintf(add, "%d", cvp->value);
+			chat = chat + RichText(add);
+#endif
 			break;
 		default:
 			break;
 		};
 
-		//AddChat(&chat);
+		AddChat(&chat);
 
 		return;
 	}
@@ -787,7 +951,7 @@ void ReadSvAddrPacket(SvAddrPacket* sap, NetConn* nc, IPaddress* from, UDPsocket
 		{
 			GetSvInfoPacket gsip;
 			gsip.header.type = PACKET_GETSVINFO;
-			SendData((char*)&gsip, sizeof(GetSvInfoPacket), &havenc->addr, true, false, nc, &g_sock, 0);
+			SendData((char*)&gsip, sizeof(GetSvInfoPacket), &havenc->addr, true, false, nc, &g_sock, 0, NULL);
 		}
 	}
 #endif
@@ -808,7 +972,7 @@ void ReadGetSvInfoPacket(GetSvInfoPacket* gsip, NetConn* nc, IPaddress* from, UD
 	sip.svinfo.mapname[MAPNAME_LEN] = 0;
 	sip.svinfo.svname[SVNAME_LEN] = 0;
 	//sip.svinfo.nplayers = g_nplayers;	//TO DO
-	SendData((char*)&sip, sizeof(SvInfoPacket), from, true, false, nc, &g_sock, 0);
+	SendData((char*)&sip, sizeof(SvInfoPacket), from, true, false, nc, &g_sock, 0, NULL);
 #endif
 }
 
@@ -854,8 +1018,8 @@ void ReadSvInfoPacket(SvInfoPacket* sip, NetConn* nc, IPaddress* from, UDPsocket
 		//unsigned int* svnameuni = ToUTF32((const unsigned char*)sip->svinfo.svname, strlen(sip->svinfo.svname));
 		unsigned int* mapnameuni = ToUTF32((const unsigned char*)sip->svinfo.mapname);
 		unsigned int* svnameuni = ToUTF32((const unsigned char*)sip->svinfo.svname);
-		sit->mapnamert = RichText(UStr(mapnameuni));
-		sit->name = RichText(UStr(svnameuni));
+		sit->mapnamert = RichText(UString(mapnameuni));
+		sit->name = RichText(UString(svnameuni));
 		sit->name = ParseTags(sit->name, NULL);
 		delete [] mapnameuni;
 		delete [] svnameuni;
@@ -984,17 +1148,25 @@ void ReadJoinPacket(JoinPacket* jp, NetConn* nc, IPaddress* from, UDPsocket* soc
 
 		RichText name;
 		unsigned int* uname = ToUTF32((unsigned char*)jp->name);
-		name.m_part.push_back(UStr(uname));
+		name.m_part.push_back(UString(uname));
 		delete [] uname;
 		int joinci;
 
 		//InfoMess(" ? mcp", " ? mcp");
+		
+		//unsigned int ipaddr = SDL_SwapBE32(ip.host);
+		//unsigned short port = SDL_SwapBE16(ip.port);
+#if 1
+		char ipname[128];
+		sprintf(ipname, "%u:%u", SDL_SwapBE32(nc->addr.host), (unsigned int)SDL_SwapBE16(nc->addr.port));
+		name = RichText(ipname);
+#endif
 
 		if(!AddClient(nc, name, &joinci))
 		{
 			TooManyClPacket tmcp;
 			tmcp.header.type = PACKET_TOOMANYCL;
-			SendData((char*)&tmcp, sizeof(TooManyClPacket), &nc->addr, true, false, nc, &g_sock, 0);
+			SendData((char*)&tmcp, sizeof(TooManyClPacket), &nc->addr, true, false, nc, &g_sock, 0, NULL);
 			return;
 		}
 
@@ -1003,7 +1175,7 @@ void ReadJoinPacket(JoinPacket* jp, NetConn* nc, IPaddress* from, UDPsocket* soc
 		MapChangePacket mcp;
 		mcp.header.type = PACKET_MAPCHANGE;
 		strcpy(mcp.map, g_mapname);
-		SendData((char*)&mcp, sizeof(MapChangePacket), &nc->addr, true, false, nc, &g_sock, msdelay);
+		SendData((char*)&mcp, sizeof(MapChangePacket), &nc->addr, true, false, nc, &g_sock, msdelay, NULL);
 		msdelay += RESEND_DELAY;
 
 		AddClientPacket acp;
@@ -1033,7 +1205,7 @@ void ReadJoinPacket(JoinPacket* jp, NetConn* nc, IPaddress* from, UDPsocket* soc
 
 			acp.player = c->player;
 
-			SendData((char*)&acp, sizeof(AddClientPacket), &nc->addr, true, false, nc, &g_sock, msdelay);
+			SendData((char*)&acp, sizeof(AddClientPacket), &nc->addr, true, false, nc, &g_sock, msdelay, NULL);
 			msdelay += RESEND_DELAY;
 
 			if(i == joinci)
@@ -1045,12 +1217,12 @@ void ReadJoinPacket(JoinPacket* jp, NetConn* nc, IPaddress* from, UDPsocket* soc
 		SelfClientPacket scp;
 		scp.header.type = PACKET_SELFCLIENT;
 		scp.client = joinci;
-		SendData((char*)&scp, sizeof(SelfClientPacket), &nc->addr, true, false, nc, &g_sock, msdelay);
+		SendData((char*)&scp, sizeof(SelfClientPacket), &nc->addr, true, false, nc, &g_sock, msdelay, NULL);
 		msdelay += RESEND_DELAY;
 
 		DoneJoinPacket djp;
 		djp.header.type = PACKET_DONEJOIN;
-		SendData((char*)&djp, sizeof(DoneJoinPacket), &nc->addr, true, false, nc, &g_sock, msdelay);
+		SendData((char*)&djp, sizeof(DoneJoinPacket), &nc->addr, true, false, nc, &g_sock, msdelay, NULL);
 		msdelay += RESEND_DELAY;
 	}
 #endif
@@ -1064,7 +1236,7 @@ void ReadAddClPacket(AddClientPacket* acp, NetConn* nc, IPaddress* from, UDPsock
 		//g_log<<"acp"<<std::endl;
 		unsigned int* uname = ToUTF32((unsigned char*)acp->name);
 		int addci;
-		AddClient(nc, RichText(UStr(uname)), &addci);
+		AddClient(nc, RichText(UString(uname)), &addci);
 		delete [] uname;
 		Client* c = &g_client[addci];
 		c->player = acp->player;
@@ -1101,14 +1273,14 @@ void ReadSetClNamePacket(SetClNamePacket* scnp, NetConn* nc, IPaddress* from, UD
 	{
 		Client* c = &g_client[scnp->client];
 		unsigned int* uname = ToUTF32((unsigned char*)scnp->name);
-		c->name = RichText(UStr(uname));
+		c->name = RichText(UString(uname));
 		delete [] uname;
 	}
 	else if(g_netmode == NETM_HOST && nc && nc->isclient)
 	{
 		Client* c = &g_client[scnp->client];
 		unsigned int* uname = ToUTF32((unsigned char*)scnp->name);
-		c->name = RichText(UStr(uname));
+		c->name = RichText(UString(uname));
 		delete [] uname;
 
 		SetClNamePacket scnp2;
@@ -1310,7 +1482,7 @@ void ReadConnectPacket(ConnectPacket* cp, NetConn* nc, IPaddress* from, UDPsocke
 		}
 #endif
 
-#if 1
+#if 0	//now done by ack
 			ConnectPacket replycp;
 			replycp.header.type = PACKET_CONNECT;
 			//replycp.header.ack = 0;
@@ -1330,7 +1502,12 @@ void ReadConnectPacket(ConnectPacket* cp, NetConn* nc, IPaddress* from, UDPsocke
 	nc->closed = false;
 	//nc->sendack = 0;
 
-#if 1
+#if 1	//for ack to work
+	nc->recvack = cp->header.ack;
+	nc->sendack = 0;
+#endif
+
+#if 0	//now done by ack
 	//we already have a connection to them, 
 	//so they must have lost theirs if this isn't a reply to ours.
 	if(!cp->reply)
@@ -1384,6 +1561,7 @@ void ReadConnectPacket(ConnectPacket* cp, NetConn* nc, IPaddress* from, UDPsocke
 	//we got this in reply to a ConnectPacket sent?
 
 #ifndef MATCHMAKER
+#if 0	//now done in OnAck_Connect
 	else
 	{
 		//is this a reply copy?
@@ -1450,6 +1628,79 @@ void ReadConnectPacket(ConnectPacket* cp, NetConn* nc, IPaddress* from, UDPsocke
 			}
 		}
 	}
+#endif
 #else
 #endif
+}
+
+//on connect packed ack'd
+void OnAck_Connect(OldPacket* p, NetConn* nc)
+{
+	if(!nc)
+		nc = Match(&p->addr);
+
+	if(!nc)
+		return;
+	
+	ConnectPacket* scp = (ConnectPacket*)p->buffer;
+
+	if(!scp->reply)
+	{
+		//if(nc->ctype == CONN_HOST)
+		if(nc->isourhost)
+		{
+			g_svconn = nc;
+
+			//InfoMess("conn", "conn to our host");
+
+			//TO DO request data, get ping, whatever, server info
+
+			//g_canturn = true;
+			//
+			//char msg[128];
+			//sprintf(msg, "send join to %u:%u aka %u:%u", from->host, (unsigned int)from->port, nc->addr.host, (unsigned int)nc->addr.port);
+			//InfoMess("j", msg);
+
+			JoinPacket jp;
+			jp.header.type = PACKET_JOIN;
+			std::string name = g_name.rawstr();
+			if(name.length() >= PYNAME_LEN)
+				name[PYNAME_LEN] = 0;
+			strcpy(jp.name, name.c_str());
+			SendData((char*)&jp, sizeof(JoinPacket), &nc->addr, true, false, nc, &g_sock, 0, NULL);
+		}
+		//else if(nc->ctype == CONN_MATCHER)
+	
+		if(nc->ishostinfo)
+		{
+			//TO DO request data, get ping, whatever, server info
+			GetSvInfoPacket gsip;
+			gsip.header.type = PACKET_GETSVINFO;
+			SendData((char*)&gsip, sizeof(GetSvInfoPacket), &nc->addr, true, false, nc, &g_sock, 0, NULL);
+		}
+
+		if(nc->ismatcher)
+		{
+			//InfoMess("got mm", "got mm");
+			//g_log<<"got mm"<<std::endl;
+			//g_log.flush();
+			g_mmconn = nc;
+			g_sentsvinfo = false;
+
+			if(g_reqsvlist && !g_reqdnexthost)
+			{
+				//g_log<<"got mm send f svl"<<std::endl;
+				//g_log.flush();
+
+				//g_reqdsvlist = true;
+				//g_needsvlist = false;
+				g_reqdnexthost = true;
+
+				GetSvListPacket gslp;
+				gslp.header.type = PACKET_GETSVLIST;
+				SendData((char*)&gslp, sizeof(GetSvListPacket), &nc->addr, true, false, nc, &g_sock, 0, NULL);
+				//InfoMess("sglp", "sglp");
+			}
+		}
+	}
 }
