@@ -10,7 +10,7 @@ public:
 	ViewLayer()
 	{
 		m_name = "";
-		m_opened = false;
+		m_Opened = false;
 		m_type = WIDGET_VIEWLAYER;
 		m_parent = NULL;
 	}
@@ -18,7 +18,7 @@ public:
 	ViewLayer(Widget* parent, const char* n) : Widget()
 	{
 		m_name = n;
-		m_opened = false;
+		m_Opened = false;
 		m_type = WIDGET_VIEWLAYER;
 		m_parent = parent;
 		

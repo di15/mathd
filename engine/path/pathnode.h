@@ -127,7 +127,7 @@ class PathJob;
 
 extern Vec2i g_pathdim;
 extern PathNode* g_pathnode;
-extern BinHeap g_openlist;
+extern BinHeap g_Openlist;
 
 bool CompareNodes(void* a, void* b);
 Vec2i PathNodePos(PathNode* node);

@@ -8,7 +8,7 @@ VScroll::VScroll() : Widget()
 	m_parent = NULL;
 	m_type = WIDGET_VSCROLLBAR;
 	m_name = "";
-	m_opened = false;
+	m_Opened = false;
 	m_selected = 0;
 	m_scroll[1] = 0;
 	m_mousescroll = false;
@@ -27,7 +27,7 @@ VScroll::VScroll(Widget* parent, const char* n) : Widget()
 	m_parent = parent;
 	m_type = WIDGET_VSCROLLBAR;
 	m_name = n;
-	m_opened = false;
+	m_Opened = false;
 	m_selected = 0;
 	m_scroll[1] = 0;
 	m_mousescroll = false;
@@ -178,7 +178,7 @@ void VScroll::draw()
 
 void VScroll::drawover()
 {
-	if(!m_opened)
+	if(!m_Opened)
 		return;
 
 	for(auto w=m_subwidg.begin(); w!=m_subwidg.end(); w++)

@@ -548,7 +548,7 @@ LoadedTex *LoadPNG(const char *fullpath)
 
 	/* Set up the output control if
 	 * you are using standard C streams */
-	png_init_io(png_ptr, fp);
+	png_Init_io(png_ptr, fp);
 
 	/* If we have already
 	 * read some of the signature */
@@ -1225,7 +1225,7 @@ int SavePNG(const char* fullpath, LoadedTex* image)
 	/* One of the following I/O initialization functions is REQUIRED */
 
 	/* Set up the output control if you are using standard C streams */
-	png_init_io(png_ptr, fp);
+	png_Init_io(png_ptr, fp);
 
 
 	png_bytep* row_pointers = (png_bytep*) malloc(sizeof(png_bytep) * image->sizeY);

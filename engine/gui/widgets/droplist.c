@@ -20,7 +20,7 @@ DropList::DropList() : Widget()
 	m_type = WIDGET_DROPLIST;
 	m_name = "";
 	m_font = MAINFONT8;
-	m_opened = false;
+	m_Opened = false;
 	m_selected = 0;
 	m_scroll[1] = 0;
 	m_mousescroll = false;
@@ -40,7 +40,7 @@ DropList::DropList(Widget* parent, const char* n, int f, void (*reframef)(Widget
 	m_type = WIDGET_DROPLIST;
 	m_name = n;
 	m_font = f;
-	m_opened = false;
+	m_Opened = false;
 	m_selected = 0;
 	m_scroll[1] = 0;
 	m_mousescroll = false;
@@ -94,7 +94,7 @@ void DropList::draw()
 
 	DrawImage(g_texture[m_frametex].texname, m_pos[0], m_pos[1], m_pos[2], m_pos[3]);
 
-	if(!m_opened)
+	if(!m_Opened)
 		DrawImage(g_texture[m_uptex].texname, m_pos[2]-square(), m_pos[1], m_pos[2], m_pos[1]+square(), 0, 1, 1, 0);
 
 	if(m_options.size() <= 0)
@@ -118,7 +118,7 @@ void DropList::draw()
 
 void DropList::drawover()
 {
-	if(!m_opened)
+	if(!m_Opened)
 		return;
 
 	//glColor4f(1, 1, 1, 1);
@@ -141,7 +141,7 @@ void DropList::inev(InEv* ie)
 {
 	if(ie->type == INEV_MOUSEWHEEL && !ie->intercepted)
 	{
-		if(m_opened)
+		if(m_Opened)
 		{
 			ie->intercepted = true;
 			return;	// intercept mouse event
@@ -153,7 +153,7 @@ void DropList::inev(InEv* ie)
 			g_mouseoveraction =  true;
 
 #if 0
-		if(m_opened)
+		if(m_Opened)
 		{
 			Font* f = &g_font[m_font];
 
@@ -215,7 +215,7 @@ void DropList::inev(InEv* ie)
 		}
 #endif
 
-		if(m_opened)
+		if(m_Opened)
 		{
 			for(int i=(int)m_scroll[1]; i<(int)m_scroll[1]+rowsshown(); i++)
 			{
@@ -280,11 +280,11 @@ void DropList::inev(InEv* ie)
 		}
 #endif
 
-		if(m_opened)
+		if(m_Opened)
 		{
 			if(!m_ldown)
 			{
-				m_opened = false;
+				m_Opened = false;
 				return;
 			}
 
@@ -308,7 +308,7 @@ void DropList::inev(InEv* ie)
 				                && g_mouse.y <= m_pos[3]+g_font[m_font].gheight*(i-(int)m_scroll[1]+1))
 				{
 					m_selected = i;
-					m_opened = false;
+					m_Opened = false;
 					if(changefunc != NULL)
 						changefunc();
 
@@ -339,7 +339,7 @@ void DropList::inev(InEv* ie)
 				return;
 			}
 
-			m_opened = false;
+			m_Opened = false;
 
 			ie->intercepted = true;	// intercept mouse event
 		}
@@ -353,7 +353,7 @@ void DropList::inev(InEv* ie)
 
 			if(g_mouse.x >= m_pos[2]-square() && g_mouse.y >= m_pos[1] && g_mouse.x <= m_pos[2] && g_mouse.y <= m_pos[1]+square())
 			{
-				m_opened = true;
+				m_Opened = true;
 				ie->intercepted = true;
 
 				//Need to bring tree to front so that drop-down list gets 

@@ -196,7 +196,7 @@ bool AnyPath(int utype, int umode, int cmstartx, int cmstarty, int target, int t
 	int depth = 0;
 	const int maxdepth = (TILE_SIZE * 20) * (TILE_SIZE * 20) / PATHNODE_SIZE / PATHNODE_SIZE;
 
-	while( g_openlist.hasmore() )
+	while( g_Openlist.hasmore() )
 	{
 #if 1
 		depth++;
@@ -206,7 +206,7 @@ bool AnyPath(int utype, int umode, int cmstartx, int cmstarty, int target, int t
 #endif
 
 		// Pops the lowest score-cost node, moves it in the closed std::list
-		PathNode* node = (PathNode*)g_openlist.deletemin();
+		PathNode* node = (PathNode*)g_Openlist.deletemin();
 
 		node->closed = true;
 
@@ -250,7 +250,7 @@ bool AnyPath(int utype, int umode, int cmstartx, int cmstarty, int target, int t
 			//nextn->score = nextn->totalD + H;
 			nextn->score = PATHHEUR( nextnpos - Vec2i(pj.goalx, pj.goalz) ) << 1;
 			//nextn->previous = node;
-			g_openlist.insert(nextn);
+			g_Openlist.insert(nextn);
 			nextn->opened = true;
 		}
 	}
@@ -315,12 +315,12 @@ void Expand_AP(PathJob* pj, PathNode* node)
 
 			if( !nextn->opened )
 			{
-				g_openlist.insert(nextn);
+				g_Openlist.insert(nextn);
 				nextn->opened = true;
 			}
 			else
 			{
-				g_openlist.heapify(nextn);
+				g_Openlist.heapify(nextn);
 			}
 		}
 	}

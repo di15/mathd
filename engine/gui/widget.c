@@ -108,7 +108,7 @@ void Widget::add(Widget* neww)
 
 void Widget::close()
 {
-	m_opened = false;
+	m_Opened = false;
 
 	for(auto i=m_subwidg.begin(); i!=m_subwidg.end(); i++)
 		(*i)->close();
@@ -116,7 +116,7 @@ void Widget::close()
 
 void Widget::open()
 {
-	m_opened = true;
+	m_Opened = true;
 	tofront();	//can't break list iterator, might shift
 }
 

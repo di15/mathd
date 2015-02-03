@@ -52,11 +52,11 @@ public:
 	float m_listtop;
 	Button m_joinbut;
 
-	Text m_addrlab;
+	Text m_Addrlab;
 	Text m_portlab;
-	EditBox m_addrbox;
+	EditBox m_Addrbox;
 	EditBox m_portbox;
-	Button m_addbut;
+	Button m_Addbut;
 	Button m_clearbut;
 	Button m_qrefbut;
 	Button m_refbut;

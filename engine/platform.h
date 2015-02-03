@@ -90,7 +90,7 @@
 #ifdef PLATFORM_LINUX
 #include <SDL2/SDL.h>
 #ifndef MATCHMAKER
-#include <SDL2/SDL_opengl.h>
+#include <SDL2/SDL_Opengl.h>
 #include <SDL2/SDL_mixer.h>
 //#include <GL/glut.h>
 #endif
@@ -100,7 +100,7 @@
 #ifdef PLATFORM_MAC
 #include <GL/xglew.h>
 #include <SDL2/SDL.h>
-#include <SDL2/SDL_opengl.h>
+#include <SDL2/SDL_Opengl.h>
 #include <SDL2/SDL_net.h>
 #include <SDL2/SDL_mixer.h>
 #endif
@@ -109,7 +109,7 @@
 #include <GL/wglew.h>
 #include <SDL.h>
 #ifndef MATCHMAKER
-#include <SDL_opengl.h>
+#include <SDL_Opengl.h>
 #include <SDL_mixer.h>
 #endif
 #include <SDL_net.h>

@@ -66,7 +66,7 @@ public:
 	RichText m_text;
 	int m_font;
 	unsigned int m_frametex, m_filledtex, m_uptex, m_downtex;
-	bool m_opened;
+	bool m_Opened;
 	std::vector<RichText> m_options;
 	int m_selected;
 	float m_scroll[2];
@@ -105,7 +105,7 @@ public:
 		changefunc2 = NULL;
 		m_caret = 0;
 		m_parent = NULL;
-		m_opened = false;
+		m_Opened = false;
 		m_ldown = false;
 		reframefunc = NULL;
 	}

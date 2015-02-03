@@ -83,7 +83,7 @@ void Escape()
 		GUI* gui = &g_gui;
 		Widget* ingame = gui->get("ingame");
 
-		if(ingame->m_opened)
+		if(ingame->m_Opened)
 			gui->close("ingame");
 		else
 			gui->open("ingame");

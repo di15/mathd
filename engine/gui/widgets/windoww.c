@@ -8,7 +8,7 @@ WindowW::WindowW() : Widget()
 {
 	m_type = WIDGET_WINDOW;
 	m_parent = NULL;
-	m_opened = false;
+	m_Opened = false;
 }
 
 void WindowW::chcall(Widget* ch, int type, void* data)
@@ -28,7 +28,7 @@ WindowW::WindowW(Widget* parent, const char* n, void (*reframef)(Widget* thisw))
 	reframefunc = reframef;
 	m_parent = parent;
 	m_name = n;
-	m_opened = false;
+	m_Opened = false;
 	m_scroll[0] = 0;
 	m_scroll[1] = 0;
 
@@ -283,7 +283,7 @@ void WindowW::reframe()
 
 void WindowW::draw()
 {
-	if(!m_opened)
+	if(!m_Opened)
 		return;
 
 	top_image.draw();
@@ -328,7 +328,7 @@ void WindowW::draw()
 
 void WindowW::drawover()
 {
-	if(!m_opened)
+	if(!m_Opened)
 		return;
 
 	//m_vscroll.drawover();
@@ -341,7 +341,7 @@ void WindowW::drawover()
 
 void WindowW::inev(InEv* ie)
 {
-	if(!m_opened)
+	if(!m_Opened)
 		return;
 
 	subinev(ie);

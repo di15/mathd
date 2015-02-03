@@ -11,7 +11,7 @@
 
 Vec2i g_pathdim(0,0);
 PathNode* g_pathnode = NULL;
-BinHeap g_openlist(CompareNodes);
+BinHeap g_Openlist(CompareNodes);
 
 bool CompareNodes(void* a, void* b)
 {
@@ -363,7 +363,7 @@ foundnode:
 	startnode->score = startnode->totalD + PATHHEUR( Vec2i(pj->goalx, pj->goalz) - cmpos/PATHNODE_SIZE ) << 1;
 	startnode->previous = NULL;
 
-	g_openlist.insert(startnode);
+	g_Openlist.insert(startnode);
 
 	startnode->opened = true;
 	g_toclear.push_back(startnode);
@@ -378,14 +378,14 @@ foundnode:
 	startnode->score = startnode->totalD + Manhattan( Vec2i(pj->goalx, pj->goalz) - cmpos );
 	startnode->previous = NULL;
 
-	g_openlist.insert(startnode);
+	g_Openlist.insert(startnode);
 	//pj->wt->opennode[ startnode - pj->wt->pathnode ] = pj->wt->pathcnt;
 	
 	startnode->opened = true;
 	g_toclear.push_back(startnode);
 #endif
 
-	//startNode._opened = true
+	//startNode._Opened = true
 	//toClear[startNode] = true
 }
 
@@ -404,7 +404,7 @@ void ResetPathNodes()
 		n->opened = false;
 		n->previous = NULL;
 	}
-	g_openlist.resetelems();
+	g_Openlist.resetelems();
 	
 	StopTimer(TIMER_RESETPATHNODES);
 }

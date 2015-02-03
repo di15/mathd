@@ -66,7 +66,7 @@ void Click_SL_Add()
 	GUI* gui = &g_gui;
 	SvList* v = (SvList*)gui->get("sv list");
 
-	EditBox* addrbox = &v->m_addrbox;
+	EditBox* addrbox = &v->m_Addrbox;
 	EditBox* portbox = &v->m_portbox;
 	std::string addrstr = addrbox->m_value.rawstr();
 	std::string portstr = portbox->m_value.rawstr();
@@ -251,11 +251,11 @@ SvList::SvList(Widget* parent, const char* n, void (*reframef)(Widget* thisw)) :
 
 	char portstr[16];
 	sprintf(portstr, "%d", (int)PORT);
-	m_addrlab = Text(this, "addr lab", RichText("Address:"), MAINFONT16, NULL);
+	m_Addrlab = Text(this, "addr lab", RichText("Address:"), MAINFONT16, NULL);
 	m_portlab = Text(this, "port lab", RichText("Port:"), MAINFONT16, NULL);
-	m_addrbox = EditBox(this, "addr box", RichText(""), MAINFONT16, NULL, false, 64, NULL, NULL, -1);
+	m_Addrbox = EditBox(this, "addr box", RichText(""), MAINFONT16, NULL, false, 64, NULL, NULL, -1);
 	m_portbox = EditBox(this, "port box", RichText(portstr), MAINFONT16, NULL, false, 8, NULL, NULL, -1);
-	m_addbut = Button(this, "add but", "gui/transp.png", RichText("Add"), RichText("Add the server address"), m_font, BUST_LINEBASED, NULL, Click_SL_Add, NULL, NULL, NULL, NULL, -1);
+	m_Addbut = Button(this, "add but", "gui/transp.png", RichText("Add"), RichText("Add the server address"), m_font, BUST_LINEBASED, NULL, Click_SL_Add, NULL, NULL, NULL, NULL, -1);
 	m_clearbut = Button(this, "clear but", "gui/transp.png", RichText("Clear"), RichText("Clear the server list"), m_font, BUST_LINEBASED, NULL, Click_SL_Clear, NULL, NULL, NULL, NULL, -1);
 	m_qrefbut = Button(this, "qref but", "gui/transp.png", RichText("Quick Refresh"), RichText("Refresh the servers"), m_font, BUST_LINEBASED, NULL, Click_SL_QRef, NULL, NULL, NULL, NULL, -1);
 	m_refbut = Button(this, "ref but", "gui/transp.png", RichText("Refresh"), RichText("Get a new list"), m_font, BUST_LINEBASED, NULL, Click_SL_Ref, NULL, NULL, NULL, NULL, -1);
@@ -270,10 +270,10 @@ void SvList::subinev(InEv* ie)
 {
 	m_vscroll.inev(ie);
 	m_joinbut.inev(ie);
-	m_addbut.inev(ie);
-	m_addrlab.inev(ie);
+	m_Addbut.inev(ie);
+	m_Addrlab.inev(ie);
 	m_portlab.inev(ie);
-	m_addrbox.inev(ie);
+	m_Addrbox.inev(ie);
 	m_portbox.inev(ie);
 	m_clearbut.inev(ie);
 	m_qrefbut.inev(ie);
@@ -406,32 +406,32 @@ void SvList::subreframe()
 	CenterLabel(&m_joinbut);
 	m_joinbut.reframe();
 	
-	m_addbut.m_pos[0] = m_pos[2] - 70;
-	m_addbut.m_pos[1] = m_pos[3] - 30 - 30 - 10;
-	m_addbut.m_pos[2] = m_pos[2];
-	m_addbut.m_pos[3] = m_pos[3] - 30 - 10;
-	CenterLabel(&m_addbut);
-	m_addbut.reframe();
+	m_Addbut.m_pos[0] = m_pos[2] - 70;
+	m_Addbut.m_pos[1] = m_pos[3] - 30 - 30 - 10;
+	m_Addbut.m_pos[2] = m_pos[2];
+	m_Addbut.m_pos[3] = m_pos[3] - 30 - 10;
+	CenterLabel(&m_Addbut);
+	m_Addbut.reframe();
 	
 #if 0
-	Text m_addrlab;
+	Text m_Addrlab;
 	Text m_portlab;
-	EditBox m_addrbox;
+	EditBox m_Addrbox;
 	EditBox m_portbox;
-	Button m_addbut;
+	Button m_Addbut;
 #endif
 	
-	m_addrlab.m_pos[0] = m_pos[0] + 0;
-	m_addrlab.m_pos[1] = m_pos[3] - 30 - 30 - 10;
-	m_addrlab.m_pos[2] = m_pos[0] + 60;
-	m_addrlab.m_pos[3] = m_pos[3] - 30 - 10;
-	m_addrlab.reframe();
+	m_Addrlab.m_pos[0] = m_pos[0] + 0;
+	m_Addrlab.m_pos[1] = m_pos[3] - 30 - 30 - 10;
+	m_Addrlab.m_pos[2] = m_pos[0] + 60;
+	m_Addrlab.m_pos[3] = m_pos[3] - 30 - 10;
+	m_Addrlab.reframe();
 
-	m_addrbox.m_pos[0] = m_pos[0] + 60;
-	m_addrbox.m_pos[1] = m_pos[3] - 30 - 30 - 10;
-	m_addrbox.m_pos[2] = m_pos[0] + 60 + 150;
-	m_addrbox.m_pos[3] = m_pos[3] - 30 - 30 - 10 + 16;
-	m_addrbox.reframe();
+	m_Addrbox.m_pos[0] = m_pos[0] + 60;
+	m_Addrbox.m_pos[1] = m_pos[3] - 30 - 30 - 10;
+	m_Addrbox.m_pos[2] = m_pos[0] + 60 + 150;
+	m_Addrbox.m_pos[3] = m_pos[3] - 30 - 30 - 10 + 16;
+	m_Addrbox.reframe();
 	
 	m_portlab.m_pos[0] = m_pos[0] + 0;
 	m_portlab.m_pos[1] = m_pos[3] - 30 - 30 - 10 + 20;
@@ -527,10 +527,10 @@ void SvList::subdraw()
 
 	m_vscroll.draw();
 	m_joinbut.draw();
-	m_addbut.draw();
-	m_addrlab.draw();
+	m_Addbut.draw();
+	m_Addrlab.draw();
 	m_portlab.draw();
-	m_addrbox.draw();
+	m_Addrbox.draw();
 	m_portbox.draw();
 	m_clearbut.draw();
 	m_refbut.draw();
@@ -541,10 +541,10 @@ void SvList::subdrawover()
 {
 	m_vscroll.drawover();
 	m_joinbut.drawover();
-	m_addbut.drawover();
-	m_addrlab.drawover();
+	m_Addbut.drawover();
+	m_Addrlab.drawover();
 	m_portlab.drawover();
-	m_addrbox.drawover();
+	m_Addrbox.drawover();
 	m_portbox.drawover();
 	m_clearbut.drawover();
 	m_refbut.drawover();

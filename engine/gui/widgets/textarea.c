@@ -58,9 +58,9 @@ void TextArea::draw()
 	float width = m_pos[2] - m_pos[0] - square();
 	float height = m_pos[3] - m_pos[1];
 
-	//DrawBoxShadText(m_font, m_pos[0], m_pos[1], width, height, m_value.c_str(), m_rgba, m_scroll[1], m_opened ? m_caret : -1);
+	//DrawBoxShadText(m_font, m_pos[0], m_pos[1], width, height, m_value.c_str(), m_rgba, m_scroll[1], m_Opened ? m_caret : -1);
 
-	DrawShadowedTextF(m_font, m_pos[0]+m_scroll[0], m_pos[1], m_pos[0], m_pos[1], m_pos[2], m_pos[3], &m_value, NULL, m_opened ? m_caret : -1);
+	DrawShadowedTextF(m_font, m_pos[0]+m_scroll[0], m_pos[1], m_pos[0], m_pos[1], m_pos[2], m_pos[3], &m_value, NULL, m_Opened ? m_caret : -1);
 
 	HighlightF(m_font, m_pos[0]+m_scroll[0], m_pos[1], m_pos[0], m_pos[1], m_pos[2], m_pos[3], &m_value, m_highl[0], m_highl[1]);
 }
@@ -146,15 +146,15 @@ void TextArea::inev(InEv* ie)
 
 		m_ldown = false;
 
-		if(m_opened)
+		if(m_Opened)
 		{
-			m_opened = false;
+			m_Opened = false;
 			return;
 		}
 	}
 	else if(ie->type == INEV_KEYDOWN && !ie->intercepted)
 	{
-		if(!m_opened)
+		if(!m_Opened)
 			return;
 
 		//int len = m_value.length();
@@ -217,14 +217,14 @@ void TextArea::inev(InEv* ie)
 	}
 	else if(ie->type == INEV_KEYUP && !ie->intercepted)
 	{
-		if(!m_opened)
+		if(!m_Opened)
 			return;
 
 		ie->intercepted = true;
 	}
 	else if(ie->type == INEV_CHARIN && !ie->intercepted)
 	{
-		if(!m_opened)
+		if(!m_Opened)
 			return;
 
 		int len = m_value.texlen();
@@ -318,7 +318,7 @@ void TextArea::inev(InEv* ie)
 	}
 	else if(ie->type == INEV_TEXTIN && !ie->intercepted)
 	{
-		if(!m_opened)
+		if(!m_Opened)
 			return;
 
 		ie->intercepted = true;
@@ -385,7 +385,7 @@ void TextArea::inev(InEv* ie)
 	}
 	else if(ie->type == INEV_PASTE && !ie->intercepted)
 	{
-		if(!m_opened)
+		if(!m_Opened)
 			return;
 
 		ie->intercepted = true;
@@ -399,7 +399,7 @@ void TextArea::inev(InEv* ie)
 	}
 	else if(ie->type == INEV_COPY && !ie->intercepted)
 	{
-		if(!m_opened)
+		if(!m_Opened)
 			return;
 
 		ie->intercepted = true;
@@ -413,7 +413,7 @@ void TextArea::inev(InEv* ie)
 	}
 	else if(ie->type == INEV_SELALL && !ie->intercepted)
 	{
-		if(!m_opened)
+		if(!m_Opened)
 			return;
 
 		ie->intercepted = true;
@@ -788,7 +788,7 @@ void TextArea::close()
 
 void TextArea::gainfocus()
 {
-	if(!m_opened)
+	if(!m_Opened)
 	{
 		Player* py = &g_player[g_localP];
 
@@ -798,7 +798,7 @@ void TextArea::gainfocus()
 			g_kbfocus--;
 		}
 
-		m_opened = true;
+		m_Opened = true;
 		SDL_StartTextInput();
 		SDL_Rect r;
 		r.x = (int)m_pos[0];
@@ -812,7 +812,7 @@ void TextArea::gainfocus()
 
 void TextArea::losefocus()
 {
-	if(m_opened)
+	if(m_Opened)
 	{
 		Player* py = &g_player[g_localP];
 
@@ -822,6 +822,6 @@ void TextArea::losefocus()
 			g_kbfocus--;
 		}
 
-		m_opened = false;
+		m_Opened = false;
 	}
 }

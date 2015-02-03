@@ -590,12 +590,12 @@ void Expand_JPS(PathJob* pj, PathNode* node)
 
 					if( !jumpnode->opened )
 					{
-						g_openlist.insert(jumpnode);
+						g_Openlist.insert(jumpnode);
 						jumpnode->opened = true;
 					}
 					else
 					{
-						g_openlist.heapify(jumpnode);
+						g_Openlist.heapify(jumpnode);
 					}
 				}
 			}

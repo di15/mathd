@@ -691,7 +691,7 @@ BlView::BlView(Widget* parent, const char* n, void (*reframef)(Widget* thisw)) :
 	reframefunc = reframef;
 	m_ldown = false;
 	
-	m_close = Button(this, "close", "gui/transp.png", RichText("Close"), RichText(), MAINFONT16, BUST_LINEBASED, Resize_BV_Close, Click_BV_Close, NULL, NULL, NULL, NULL, -1);
+	m_Close = Button(this, "close", "gui/transp.png", RichText("Close"), RichText(), MAINFONT16, BUST_LINEBASED, Resize_BV_Close, Click_BV_Close, NULL, NULL, NULL, NULL, -1);
 	m_set = Button(this, "set", "gui/transp.png", RichText("Set"), RichText(), MAINFONT16, BUST_LINEBASED, Resize_BV_Set, Click_BV_Set, NULL, NULL, NULL, NULL, -1);
 
 	if(reframefunc)
@@ -707,25 +707,25 @@ void BlView::regvals(Selection* sel)
 
 void BlView::subdraw()
 {
-	m_close.draw();
+	m_Close.draw();
 	m_set.draw();
 }
 
 void BlView::subdrawover()
 {
-	m_close.drawover();
+	m_Close.drawover();
 	m_set.drawover();
 }
 
 void BlView::subreframe()
 {
-	m_close.reframe();
+	m_Close.reframe();
 	m_set.reframe();
 }
 
 void BlView::subinev(InEv* ie)
 {
-	m_close.inev(ie);
+	m_Close.inev(ie);
 	m_set.inev(ie);
 }
 

@@ -4,7 +4,7 @@
 
 void ViewLayer::draw()
 {
-	if(!m_opened)
+	if(!m_Opened)
 		return;
 
 	for(auto w=m_subwidg.begin(); w!=m_subwidg.end(); w++)
@@ -15,7 +15,7 @@ void ViewLayer::draw()
 
 void ViewLayer::drawover()
 {
-	if(!m_opened)
+	if(!m_Opened)
 		return;
 
 	for(auto w=m_subwidg.begin(); w!=m_subwidg.end(); w++)
@@ -26,7 +26,7 @@ void ViewLayer::drawover()
 
 void ViewLayer::inev(InEv* ie)
 {
-	if(!m_opened)
+	if(!m_Opened)
 		return;
 
 	for(auto w=m_subwidg.rbegin(); w!=m_subwidg.rend(); w++)

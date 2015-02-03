@@ -87,7 +87,7 @@ bool Trapped(Unit* u, Unit* ignoreu)
 	//ResetPathNodes();
 	SnapToNode(&pj);
 
-	if(!g_openlist.hasmore())
+	if(!g_Openlist.hasmore())
 	{
 		ClearNodes(g_toclear);
 
@@ -110,7 +110,7 @@ bool Trapped(Unit* u, Unit* ignoreu)
 		return true;
 	}
 
-	PathNode* node = (PathNode*)g_openlist.deletemin();
+	PathNode* node = (PathNode*)g_Openlist.deletemin();
 	Vec2i npos = PathNodePos(node);
 	//unsigned short noff = imax(1, ut->size.x / PATHNODE_SIZE);
 	unsigned short noff = 1;
@@ -158,7 +158,7 @@ void ClearNodes(std::list<PathNode*> &toclear)
 	}
 
 	toclear.clear();
-	g_openlist.resetelems();
+	g_Openlist.resetelems();
 
 	//ResetPathNodes();
 }
@@ -199,7 +199,7 @@ bool PathJob::process()
 		char t[1280];
 		int standable1 = Standable(this, u->cmpos.x/PATHNODE_SIZE, u->cmpos.y / PATHNODE_SIZE);
 		int standable2 = Standable2(this, u->cmpos.x, u->cmpos.y);
-		sprintf(t, "snap node ?%d u%d stdbl1:%d stdbl2:%d", (int)g_openlist.hasmore(), (int)thisu, standable1, standable2);
+		sprintf(t, "snap node ?%d u%d stdbl1:%d stdbl2:%d", (int)g_Openlist.hasmore(), (int)thisu, standable1, standable2);
 		rt.m_part.push_back(t);
 		AddChat(&rt);
 		g_log<<"truck---------------"<<thisu<<std::endl;
@@ -212,7 +212,7 @@ bool PathJob::process()
 	closest = 0;
 	closestnode = NULL;
 
-	while( g_openlist.hasmore() )
+	while( g_Openlist.hasmore() )
 	{
 		searchdepth ++;
 
@@ -220,7 +220,7 @@ bool PathJob::process()
 			break;
 
 		// Pops the lowest score-cost node, moves it in the closed std::list
-		node = (PathNode*)g_openlist.deletemin();
+		node = (PathNode*)g_Openlist.deletemin();
 		//int i = node - g_pathnode;
 
 		Vec2i npos = PathNodePos(node);

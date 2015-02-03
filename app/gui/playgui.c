@@ -183,10 +183,10 @@ void Over_BuildButton(int bwhat)
 
 	gui = &g_gui;
 
-	if(Widget_Get((Widget*)gui, "cstr view")->m_opened)
+	if(Widget_Get((Widget*)gui, "cstr view")->m_Opened)
 		return;
 
-	if(Widget_Get((Widget*)gui, "bl view")->m_opened)
+	if(Widget_Get((Widget*)gui, "bl view")->m_Opened)
 		return;
 
 	g_bptype = bwhat;

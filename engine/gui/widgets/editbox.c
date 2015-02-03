@@ -25,7 +25,7 @@ EditBox::EditBox() : Widget()
 	m_font = MAINFONT8;
 	m_value = "";
 	m_caret = m_value.texlen();
-	m_opened = false;
+	m_Opened = false;
 	m_passw = false;
 	m_maxlen = 0;
 	reframefunc = NULL;
@@ -48,7 +48,7 @@ EditBox::EditBox(Widget* parent, const char* n, const RichText t, int f, void (*
 	m_font = f;
 	m_value = t;
 	m_caret = m_value.texlen();
-	m_opened = false;
+	m_Opened = false;
 	m_passw = pw;
 	m_maxlen = maxl;
 	reframefunc = reframef;
@@ -99,10 +99,10 @@ void EditBox::draw()
 
 	RichText val = drawvalue();
 
-	//if(m_opened)
+	//if(m_Opened)
 	//	g_log<<"op m_caret="<<m_caret<<std::endl;
 
-	DrawShadowedTextF(m_font, m_pos[0]+m_scroll[0], m_pos[1], m_pos[0], m_pos[1], m_pos[2], m_pos[3], &val, NULL, m_opened ? m_caret : -1);
+	DrawShadowedTextF(m_font, m_pos[0]+m_scroll[0], m_pos[1], m_pos[0], m_pos[1], m_pos[2], m_pos[3], &val, NULL, m_Opened ? m_caret : -1);
 
 	//glColor4f(1, 1, 1, 1);
 	//glUnIForm4f(g_shader[SHADER_ORTHO].m_slot[SSLOT_COLOR], 1, 1, 1, 1);
@@ -232,9 +232,9 @@ void EditBox::inev(InEv* ie)
 	}
 	else if(ie->type == INEV_MOUSEDOWN && ie->key == MOUSE_LEFT)
 	{
-		if(m_opened)
+		if(m_Opened)
 		{
-			m_opened = false;
+			m_Opened = false;
 			m_highl[0] = m_highl[1] = 0;
 		}
 
@@ -279,7 +279,7 @@ void EditBox::inev(InEv* ie)
 
 		m_ldown = false;
 
-		if(m_opened)
+		if(m_Opened)
 		{
 			ie->intercepted = true;
 			return;
@@ -287,7 +287,7 @@ void EditBox::inev(InEv* ie)
 	}
 	else if(ie->type == INEV_KEYDOWN && !ie->intercepted)
 	{
-		if(!m_opened)
+		if(!m_Opened)
 			return;
 
 		int len = m_value.texlen();
@@ -427,7 +427,7 @@ void EditBox::inev(InEv* ie)
 	}
 	else if(ie->type == INEV_KEYUP && !ie->intercepted)
 	{
-		if(!m_opened)
+		if(!m_Opened)
 			return;
 
 		if(changefunc3 != NULL)
@@ -437,7 +437,7 @@ void EditBox::inev(InEv* ie)
 	}
 	else if(ie->type == INEV_TEXTIN && !ie->intercepted)
 	{
-		if(!m_opened)
+		if(!m_Opened)
 			return;
 
 		ie->intercepted = true;
@@ -504,7 +504,7 @@ void EditBox::inev(InEv* ie)
 	}
 	else if(ie->type == INEV_PASTE && !ie->intercepted)
 	{
-		if(!m_opened)
+		if(!m_Opened)
 			return;
 
 		ie->intercepted = true;
@@ -518,7 +518,7 @@ void EditBox::inev(InEv* ie)
 	}
 	else if(ie->type == INEV_COPY && !ie->intercepted)
 	{
-		if(!m_opened)
+		if(!m_Opened)
 			return;
 
 		ie->intercepted = true;
@@ -532,7 +532,7 @@ void EditBox::inev(InEv* ie)
 	}
 	else if(ie->type == INEV_SELALL && !ie->intercepted)
 	{
-		if(!m_opened)
+		if(!m_Opened)
 			return;
 
 		ie->intercepted = true;
@@ -772,7 +772,7 @@ void EditBox::close()
 
 void EditBox::gainfocus()
 {
-	if(!m_opened)
+	if(!m_Opened)
 	{
 		Player* py = &g_player[g_localP];
 
@@ -782,7 +782,7 @@ void EditBox::gainfocus()
 			g_kbfocus--;
 		}
 
-		m_opened = true;
+		m_Opened = true;
 		SDL_StartTextInput();
 		SDL_Rect r;
 		r.x = (int)m_pos[0];
@@ -796,7 +796,7 @@ void EditBox::gainfocus()
 
 void EditBox::losefocus()
 {
-	if(m_opened)
+	if(m_Opened)
 	{
 		Player* py = &g_player[g_localP];
 
@@ -806,6 +806,6 @@ void EditBox::losefocus()
 			g_kbfocus--;
 		}
 
-		m_opened = false;
+		m_Opened = false;
 	}
 }

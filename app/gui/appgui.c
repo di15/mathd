@@ -109,9 +109,8 @@ void Resize_WinText(Widget* thisw)
 
 void Click_HostGame()
 {
-	Player* py = &g_player[g_localP];
 	GUI* gui = &g_gui;
-	Widget_open((Widget*)gui, "new host");
+	Widget_Open((Widget*)gui, "new host");
 }
 
 void Click_ListHosts()
@@ -133,7 +132,7 @@ void Click_ListHosts()
 
 	gui = &g_gui;
 	
-	Widget_open((Widget*)gui, "sv list");
+	Widget_Open((Widget*)gui, "sv list");
 }
 
 void Click_EndGame()
@@ -148,9 +147,9 @@ void Click_NewGame()
 	g_mode = APPMODE_PLAY;
 	gui = &g_gui;
 	
-	Widget_closeall((Widget*)gui);
-	Widget_open((Widget*)gui, "play");
-	Widget_open((Widget*)gui, "play right opener");
+	Widget_CloseAll((Widget*)gui);
+	Widget_Open((Widget*)gui, "play");
+	Widget_Open((Widget*)gui, "play right opener");
 
 	g_lastsave[0] = '\0';
 	BegSess();
@@ -163,17 +162,16 @@ void Click_OpenEd()
 
 	g_mode = APPMODE_EDITOR;
 	gui = &g_gui;
-	Widget_closeall((Widget*)gui);
-	Widget_open((Widget*)gui, "ed");
+	Widget_CloseAll((Widget*)gui);
+	Widget_Open((Widget*)gui, "ed");
 	g_lastsave[0] = '\0';
 }
 
 void Click_LoadGame()
 {
-	Player* py = &g_player[g_localP];
 	GUI* gui = &g_gui;
 
-	Widget_open((Widget*)gui, "load");
+	Widget_Open((Widget*)gui, "load");
 	Widget_LoadView_regen((LoadView*)gui->get("load"));
 }
 
@@ -204,12 +202,52 @@ void Click_JoinCancel()
 
 void FillMenu()
 {
-	Player* py = &g_player[g_localP];
-	GUI* gui = &g_gui;
+	GUI* gui;
+	ViewLayer* mainview;
+	Image* mmbg;
+	Link* newgamel;
+	Link* loadgamel;
+	Link* hostgamel;
+	Link* joingamel;
+	Link* optionsl;
+	Link* quitl;
+	RichText newgamert;
+	RichText loadgamert;
+	RichText hostgamert;
+	RichText joingamert;
+	RichText optionsrt;
+	RichText quitrt;
+	UStr newgameus;
+	UStr loadgameus;
+	UStr hostgameus;
+	UStr joingameus;
+	UStr optionsus;
+	UStr quitus;
+
+	gui = &g_gui;
 
 	// Main ViewLayer
-	gui->add(new ViewLayer(gui, "main"));
-	ViewLayer* mainview = (ViewLayer*)gui->get("main");
+
+	mainview = (ViewLayer*)malloc(sizeof(ViewLayer));
+	mmbg = (Image*)malloc(sizeof(Image));
+	newgamel = (Link*)malloc(sizeof(Link));
+	loadgamel = (Link*)malloc(sizeof(Link));
+	hostgamel = (Link*)malloc(sizeof(Link));
+	joingamel = (Link*)malloc(sizeof(Link));
+	optionsl = (Link*)malloc(sizeof(Link));
+	quitl = (Link*)malloc(sizeof(Link));
+	
+	RichText_Init_UStr(&newgamert, &newgameus);
+	RichText_Init_UStr(&loadgamert, &loadgameus);
+	RichText_Init_UStr(&hostgamert, &hostgameus);
+	RichText_Init_UStr(&joingamert, &joingameus);
+	RichText_Init_UStr(&optionsrt, &optionsus);
+	RichText_Init_UStr(&quitrt, &quitus);
+
+	Widget_ViewLayer_Init(mainview, (Widget*)gui, "main");
+	Widget_Image_Init(mmbg, (Widget*)mainview, "gui/mmbg.jpg", true, Resize_Fullscreen);
+
+	Widget_Add((Widget*)gui, (Widget*)mainview);
 
 	mainview->add(new Image(mainview, "gui/mmbg.jpg", true, Resize_Fullscreen));
 	

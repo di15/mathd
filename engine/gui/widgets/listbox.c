@@ -22,7 +22,7 @@ ListBox::ListBox(Widget* parent, const char* n, int f, void (*reframef)(Widget* 
 	m_name = n;
 	m_font = f;
 	reframefunc = reframef;
-	m_opened = false;
+	m_Opened = false;
 	m_selected = -1;
 	m_scroll[1] = 0;
 	m_mousescroll = false;

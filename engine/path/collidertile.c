@@ -78,7 +78,7 @@ void FreePathGrid()
 		g_pathnode = NULL;
 	}
 
-	g_openlist.freemem();
+	g_Openlist.freemem();
 
 	if(g_tilepass)
 	{
@@ -114,7 +114,7 @@ void AllocPathGrid(int cmwx, int cmwz)
 	g_pathnode = new PathNode [ cwx * cwz ];
 	if(!g_pathnode) OutOfMem(__FILE__, __LINE__);
 
-	g_openlist.alloc( cwx * cwz );
+	g_Openlist.alloc( cwx * cwz );
 
 	for(int x=0; x<cwx; x++)
 		for(int z=0; z<cwz; z++)

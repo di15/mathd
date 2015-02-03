@@ -254,11 +254,11 @@ void Expand_A(PathJob* pj, PathNode* node)
 
 			if( !nextn->opened )
 			{
-				g_openlist.insert(nextn);
+				g_Openlist.insert(nextn);
 				nextn->opened = true;
 			}
 			else
-				g_openlist.heapify(nextn);
+				g_Openlist.heapify(nextn);
 		}
 	}
 }
